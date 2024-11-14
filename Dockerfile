@@ -24,7 +24,7 @@ apksigner sign --ks app/keys/app-release-key.jks \
 --out app/build/outputs/apk/release/app-release.apk
 
 FROM base as bundle-builder
-CMD ./gradlew assemble bundleRelease && \
+CMD rm ~/.gradle && ./gradlew assemble bundleRelease && \
 apksigner sign --ks app/keys/app-release-key.jks \
 --ks-pass pass:$PASS \
 --in app/build/outputs/bundle/release/app-release.aab \
