@@ -49,7 +49,7 @@ RelaySMS employs robust encryption methods to protect your data and ensure secur
 
 *   **HMAC (Hash-based Message Authentication Code):** Generates and verifies HMACs for unique values in the vault.
 
-*   **Double Ratchet Algorithm:** The [Double Ratchet algorithm](https://github.com/smswithoutborders/lib_signal_double_ratchet_java) is used to provide end-to-end encryption with perfect forward secrecy for secure messaging.
+*   **Double Ratchet Algorithm:** The [Double Ratchet algorithm](https://github.com/smswithoutborders/lib_signal_double_ratchet_java) is used to provide End-to-Vault encryption with perfect forward secrecy for secure messaging.
 
 These cryptographic methods work together to provide a layered security approach, safeguarding your data and communications within the RelaySMS ecosystem.
 
