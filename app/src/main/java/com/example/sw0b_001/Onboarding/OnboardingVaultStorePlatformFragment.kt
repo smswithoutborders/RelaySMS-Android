@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.View
 import androidx.transition.TransitionInflater
 import com.example.sw0b_001.Modals.AvailablePlatformsModalFragment
+import com.example.sw0b_001.Modals.LoginModalFragment
+import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.R
 import com.google.android.material.button.MaterialButton
 
@@ -20,10 +22,24 @@ class OnboardingVaultStorePlatformFragment:
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val loginSuccessRunnable = Runnable {
+            activity?.runOnUiThread {
+                showPlatformsModal()
+            }
+        }
+
         view.findViewById<MaterialButton>(R.id.onboarding_welcome_vaults_store_description_try_example_btn)
-                .setOnClickListener {
+            .setOnClickListener {
+                if (Vaults.fetchLongLivedToken(requireContext()).isNotBlank()) {
                     showPlatformsModal()
+                } else {
+                    val fragmentTransaction = activity?.supportFragmentManager?.beginTransaction()
+                    val loginModalFragment = LoginModalFragment(loginSuccessRunnable)
+                    fragmentTransaction?.add(loginModalFragment, "login_signup_login_vault_tag")
+                    fragmentTransaction?.show(loginModalFragment)
+                    fragmentTransaction?.commit()
                 }
+            }
     }
 
     private fun showPlatformsModal() {

@@ -37,7 +37,7 @@
     <string name="messages_are_shared_with_your_default_sms_messaging_app_which_you_use_to_send_out_sms_messages_from_your_device">Les messages sont partagés avec votre application de messagerie SMS par défaut que vous utilisez pour envoyer des messages SMS depuis votre appareil</string>
     <string name="learn_how_it_works">Découvrez comment cela fonctionne</string>
     <string name="send_your_first_messages">Envoyez vos premiers messages</string>
-    <string name="create_a_new_relaysms_vault_account_or_signup_to_your_existing">Créez un nouveau compte RelaySMS Vault ou inscrivez-vous à votre compte existant.</string>
+    <string name="create_a_new_relaysms_vault_account_or_signup_to_your_existing">Créez un nouveau compte RelaySMS Vault ou connectez-vous à un compte existant.</string>
     <string name="messages_are_encrypted_meaning_the_messages_will_be_scrambled_don_t_worry_that_s_intended">Les messages sont cryptés, ce qui signifie qu\'ils seront brouillés - ne vous inquiétez pas, c\'est intentionnel</string>
     <string name="you_can_add_platforms_from_the_homepage_once_you_are_logged_in">Vous pouvez ajouter des plateformes depuis la page d\'accueil une fois connecté</string>
     <string name="you_are_ready_to_begin_sending_messages_from_you_added_platforms">Vous êtes prêt à commencer à envoyer des messages à partir de vos plateformes ajoutées.</string>

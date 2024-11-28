@@ -172,7 +172,7 @@
     <string name="messages_are_shared_with_your_default_sms_messaging_app_which_you_use_to_send_out_sms_messages_from_your_device">Mesajlar, cihazınızdan SMS mesajları göndermek için kullandığınız varsayılan SMS mesajlaşma uygulamanızla paylaşılır</string>
     <string name="learn_how_it_works">Nasıl çalıştığını öğrenin</string>
     <string name="send_your_first_messages">İlk mesajlarınızı gönderin</string>
-    <string name="create_a_new_relaysms_vault_account_or_signup_to_your_existing">Yeni bir RelaySMS Kasa hesabı oluşturun veya mevcut hesabınıza kaydolun.</string>
+    <string name="create_a_new_relaysms_vault_account_or_signup_to_your_existing">Yeni bir RelaySMS Vault hesabı oluşturun veya mevcut bir hesaba giriş yapın.</string>
     <string name="messages_are_encrypted_meaning_the_messages_will_be_scrambled_don_t_worry_that_s_intended">Mesajlar şifrelenir, yani mesajlar karıştırılacaktır - endişelenmeyin, bu kasıtlıdır</string>
     <string name="you_can_add_platforms_from_the_homepage_once_you_are_logged_in">Giriş yaptıktan sonra ana sayfadan platform ekleyebilirsiniz</string>
     <string name="you_are_ready_to_begin_sending_messages_from_you_added_platforms">Eklediğiniz platformlardan mesaj göndermeye başlamaya hazırsınız.</string>

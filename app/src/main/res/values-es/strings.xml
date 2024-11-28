@@ -119,7 +119,7 @@
     <string name="messages_are_shared_with_your_default_sms_messaging_app_which_you_use_to_send_out_sms_messages_from_your_device">Los mensajes se comparten con su aplicación de mensajería SMS predeterminada que utiliza para enviar mensajes SMS desde su dispositivo</string>
     <string name="learn_how_it_works">Aprende cómo funciona</string>
     <string name="send_your_first_messages">Envía tus primeros mensajes</string>
-    <string name="create_a_new_relaysms_vault_account_or_signup_to_your_existing">Cree una nueva cuenta de RelaySMS Vault o regístrese en la existente.</string>
+    <string name="create_a_new_relaysms_vault_account_or_signup_to_your_existing">>Cree una nueva cuenta de RelaySMS Vault o inicie sesión en una existente.</string>
     <string name="messages_are_encrypted_meaning_the_messages_will_be_scrambled_don_t_worry_that_s_intended">Los mensajes están cifrados, lo que significa que se codificarán; no se preocupe, eso es lo que se pretende.</string>
     <string name="you_can_add_platforms_from_the_homepage_once_you_are_logged_in">Puede agregar plataformas desde la página de inicio una vez que haya iniciado sesión</string>
     <string name="you_are_ready_to_begin_sending_messages_from_you_added_platforms">Está listo para comenzar a enviar mensajes desde las plataformas agregadas.</string>
