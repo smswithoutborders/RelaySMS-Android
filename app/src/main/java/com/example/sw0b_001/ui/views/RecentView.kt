@@ -173,12 +173,6 @@ fun RecentView(
         .padding(16.dp)
         .fillMaxSize()
     ) {
-        Text(
-            text = stringResource(R.string.recents),
-            style = MaterialTheme.typography.displayMedium,
-            modifier = Modifier.padding(bottom = 16.dp),
-        )
-
         if (messages.isNotEmpty()) {
             LazyColumn(
                 modifier = Modifier

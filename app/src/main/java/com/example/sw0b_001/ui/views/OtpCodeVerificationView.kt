@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,6 +28,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -60,13 +62,24 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.Models.NavigationFlowHandler
+import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.Screen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.google.android.gms.auth.api.phone.SmsRetriever
 import com.google.android.gms.common.api.CommonStatusCodes
 import com.google.android.gms.common.api.Status
+import io.grpc.StatusRuntimeException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+enum class OTPCodeVerificationType {
+    CREATE,
+    AUTHENTICATE,
+    RECOVER,
+}
 
 @Composable
 fun SmsRetrieverHandler(onSmsRetrieved: (String) -> Unit) {
@@ -150,6 +163,8 @@ fun OtpCodeVerificationView(
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
+    var isLoading by remember { mutableStateOf(false) }
+
     SmsRetrieverHandler {
         otpCode = it
         println("Code came in: $otpCode")
@@ -193,6 +208,7 @@ fun OtpCodeVerificationView(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .imePadding()
                 .padding(paddingValues)
                 .padding(16.dp)
                 .background(MaterialTheme.colorScheme.surface),
@@ -238,14 +254,34 @@ fun OtpCodeVerificationView(
 
             Button(
                 onClick = {
-                    if (otpCode.length == 6) {
-                        navController.navigate(HomepageScreen)
+                    isLoading = true
+                    submitOTPCode(
+                        context = context,
+                        phoneNumber = navigationFlowHandler.loginSignupPhoneNumber,
+                        password = navigationFlowHandler.loginSignupPassword,
+                        countryCode = navigationFlowHandler.countryCode,
+                        code = otpCode,
+                        type = navigationFlowHandler.otpRequestType!!,
+                        onFailedCallback = {isLoading = false},
+                        onCompleteCallback = {isLoading = false}
+                    )  {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            navController.navigate(HomepageScreen)
+                        }
                     }
                 },
-                enabled = otpCode.length == 6,
+                enabled = otpCode.length == 6 && !isLoading,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Submit")
+                if(isLoading) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.secondary,
+                        trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                    )
+                }
+                else {
+                    Text("Submit")
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -311,9 +347,57 @@ private fun configureVerificationListener(context: Context) {
     // Start listening for SMS User Consent broadcasts from senderPhoneNumber
     // The Task<Void> will be successful if SmsRetriever was able to start
     // SMS User Consent, and will error if there was an error starting.
-    val smsSenderNumber = "VERIFY"
-//    val smsSenderNumber = "+15024439537"
+//    val smsSenderNumber = "VERIFY"
+    val smsSenderNumber = "+15024439537"
     val task = SmsRetriever.getClient(context).startSmsUserConsent(smsSenderNumber)
     task.addOnSuccessListener { }
     task.addOnFailureListener { }
+}
+
+private fun submitOTPCode(
+    context: Context,
+    phoneNumber: String,
+    password: String,
+    countryCode: String = "",
+    code: String,
+    type: OTPCodeVerificationType,
+    onFailedCallback: (String?) -> Unit,
+    onCompleteCallback: () -> Unit,
+    onSuccessCallback: () -> Unit,
+) {
+    CoroutineScope(Dispatchers.Default).launch {
+        try {
+            val vault = Vaults(context)
+            when(type) {
+                OTPCodeVerificationType.CREATE -> {
+                    val response = vault.createEntity(
+                        context,
+                        phoneNumber,
+                        countryCode,
+                        password,
+                        code
+                    )
+                }
+                OTPCodeVerificationType.AUTHENTICATE, OTPCodeVerificationType.RECOVER -> {
+                    val response = vault.recoverEntityPassword(
+                        context,
+                        phoneNumber,
+                        password,
+                        code
+                    )
+                }
+            }
+
+            vault.refreshStoredTokens(context)
+            onSuccessCallback()
+        } catch(e: StatusRuntimeException) {
+            e.printStackTrace()
+            onFailedCallback(e.message)
+        } catch(e: Exception) {
+            e.printStackTrace()
+            onFailedCallback(e.message)
+        } finally {
+            onCompleteCallback()
+        }
+    }
 }

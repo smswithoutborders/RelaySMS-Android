@@ -90,9 +90,7 @@ class MainActivity : ComponentActivity() {
                 OtpCodeVerificationView(
                     navController = navController,
                     navigationFlowHandler = navigationFlowHandler
-                ) {
-                    navigationFlowHandler.navigationCompleteCallback()
-                }
+                )
             }
             composable(Screen.Settings.route) {
                 SettingsView(navController = navController)

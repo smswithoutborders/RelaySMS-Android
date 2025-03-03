@@ -23,9 +23,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.appbars.GatewayClientsAppBar
 import com.example.sw0b_001.ui.appbars.RecentsAppBar
@@ -43,7 +46,16 @@ fun HomepageView(
     isLoggedIn: Boolean = false,
     navController: NavController
 ) {
-    var isLoggedIn by remember { mutableStateOf(isLoggedIn) }
+    val context = LocalContext.current
+    val inspectionMode = LocalInspectionMode.current
+
+    var isLoggedIn by remember {
+        mutableStateOf(
+            if(inspectionMode) isLoggedIn else
+            Vaults.fetchLongLivedToken(context).isNotBlank()
+        )
+    }
+
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     var bottomBarItem by remember { mutableStateOf(BottomTabsItems.BottomBarRecentTab) }

@@ -250,9 +250,8 @@ fun LoginView(
                             otpRequiredCallback = {
                                 navigationFlowHandler.loginSignupPassword = password
                                 navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
-                                navigationFlowHandler.navigationCompleteCallback = {
-                                    navController.navigate(HomepageScreen)
-                                }
+                                navigationFlowHandler.otpRequestType =
+                                    OTPCodeVerificationType.AUTHENTICATE
 
                                 CoroutineScope(Dispatchers.Main).launch {
                                     navController.navigate(OTPCodeScreen)
@@ -288,9 +287,8 @@ fun LoginView(
                     onClick = {
                         navigationFlowHandler.loginSignupPassword = password
                         navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
-                        navigationFlowHandler.navigationCompleteCallback = {
-                            navController.navigate(HomepageScreen)
-                        }
+                        navigationFlowHandler.otpRequestType =
+                            OTPCodeVerificationType.AUTHENTICATE
                         navController.navigate(OTPCodeScreen)
                     },
                     enabled = (phoneNumber.isNotEmpty() && password.isNotEmpty()) && !isLoading,

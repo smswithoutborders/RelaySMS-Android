@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -29,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -55,14 +57,15 @@ fun RecentsAppBar(
     }
     CenterAlignedTopAppBar(
         title = {
-
-            Image(
-                painter = painterResource(id = logo),
-                contentDescription = "Relay Logo",
-                modifier = Modifier.size(120.dp)
-            )
+            Text(stringResource(R.string.app_name))
         },
         actions = {
+            IconButton(onClick = { TODO() }) {
+                Icon(
+                    imageVector = Icons.Filled.Search,
+                    contentDescription = "Search"
+                )
+            }
             IconButton(onClick = { showMenu = !showMenu }) {
                 Icon(
                     imageVector = Icons.Filled.MoreVert,
