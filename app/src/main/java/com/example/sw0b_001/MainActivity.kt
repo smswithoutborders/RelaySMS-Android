@@ -7,7 +7,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
 import com.example.sw0b_001.ui.theme.AppTheme
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -52,6 +54,15 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
+            val composeView = LocalView.current
+
+            DisposableEffect(Unit) {
+                composeView.filterTouchesWhenObscured = true
+                onDispose {
+                    composeView.filterTouchesWhenObscured = false
+                }
+            }
+
             AppTheme {
                 navController = rememberNavController()
                 Surface(
