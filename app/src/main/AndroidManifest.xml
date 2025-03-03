@@ -29,7 +29,14 @@
         android:usesCleartextTraffic="false"
         android:versionCode="48"
         android:versionName="2.5.8"
+        android:enableOnBackInvokedCallback="true"
         tools:replace="android:label">
+
+        <activity
+            android:name=".MainActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:launchMode="singleInstance"
+            android:exported="true" />
 
         <activity
             android:name=".Bridges.BridgesSubmitCodeActivity"

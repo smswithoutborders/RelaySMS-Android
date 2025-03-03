@@ -3,6 +3,7 @@ activity = "1.10.0"
 adaptiveLayout = "1.1.0-alpha09"
 adaptiveNavigation = "1.1.0-alpha09"
 adaptiveVersion = "1.1.0-alpha09"
+androidxMaterial = "1.7.8"
 annotation = "1.9.1"
 appauth = "0.11.1"
 appcompat = "1.7.0"
@@ -13,6 +14,7 @@ ccp = "2.7.0"
 circleimageview = "3.1.0"
 composeBom = "2025.01.00"
 constraintlayout = "2.2.0"
+countryPicker = "2.1.0"
 dots = "1.0.1"
 espressoCore = "3.6.1"
 fernetJava8 = "1.4.2"
@@ -47,6 +49,7 @@ swiperefreshlayout = "1.2.0-alpha01"
 uiTestJunit4 = "1.7.6"
 volley = "1.2.1"
 workRuntime = "2.10.0"
+uiTextGoogleFonts = "1.7.6"
 
 [libraries]
 androidx-activity = { module = "androidx.activity:activity", version.ref = "activity" }
@@ -74,6 +77,7 @@ androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-view
 androidx-material = { module = "androidx.compose.material:material", version.ref = "materialVersion" }
 androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
+androidx-material-v178 = { module = "androidx.compose.material:material", version.ref = "androidxMaterial" }
 androidx-material3 = { module = "androidx.compose.material3:material3" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-preference = { module = "androidx.preference:preference", version.ref = "preferenceKtx" }
@@ -94,6 +98,7 @@ appauth = { module = "net.openid:appauth", version.ref = "appauth" }
 armadillo = { module = "at.favre.lib:armadillo", version.ref = "armadillo" }
 ccp = { module = "com.hbb20:ccp", version.ref = "ccp" }
 circleimageview = { module = "de.hdodenhof:circleimageview", version.ref = "circleimageview" }
+country-picker = { module = "com.github.arpitkatiyar1999:Country-Picker", version.ref = "countryPicker" }
 dots = { module = "com.github.tizisdeepan:dots", version.ref = "dots" }
 fernet-java8 = { module = "com.macasaet.fernet:fernet-java8", version.ref = "fernetJava8" }
 fuel = { module = "com.github.kittinunf.fuel:fuel", version.ref = "fuelVersion" }
@@ -118,6 +123,7 @@ protobuf-java = { module = "com.google.protobuf:protobuf-java", version.ref = "p
 smswithoutborders_libsignal = { module = "com.afkanerd.oss1:smswithoutborders_libsignal", version.ref = "smswithoutborders_libsignal" }
 ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "uiTestJunit4" }
 volley = { module = "com.android.volley:volley", version.ref = "volley" }
+androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 
 [plugins]
 org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

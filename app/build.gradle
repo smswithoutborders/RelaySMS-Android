@@ -155,9 +155,11 @@ dependencies {
     implementation libs.androidx.activity
     implementation libs.play.services.auth
     implementation libs.play.services.auth.api.phone
+    implementation libs.androidx.ui.text.google.fonts
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core
+    implementation(libs.androidx.material.v178)
 
     // Java language implementation
     implementation libs.androidx.fragment
@@ -262,5 +264,8 @@ dependencies {
     implementation libs.androidx.adaptive.navigation
 
     androidTestImplementation libs.ui.test.junit4
+
+    implementation(libs.country.picker)
+
 }
 
