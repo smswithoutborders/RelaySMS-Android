@@ -1,19 +1,14 @@
-package com.example.sw0b_001.ui.modals
+package com.example.sw0b_001.ui.views
 
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -23,7 +18,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -58,16 +52,16 @@ import androidx.navigation.compose.rememberNavController
 import com.arpitkatiyarprojects.countrypicker.CountryPickerOutlinedTextField
 import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
-import com.example.sw0b_001.ui.navigation.Screen
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.platform.LocalContext
 import com.example.sw0b_001.BuildConfig
+import com.example.sw0b_001.Models.NavigationFlowHandler
 import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
+import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
@@ -78,7 +72,8 @@ import kotlinx.coroutines.launch
 @Composable
 @Preview
 fun LoginView(
-    navController: NavController = rememberNavController()
+    navController: NavController = rememberNavController(),
+    navigationFlowHandler: NavigationFlowHandler = NavigationFlowHandler()
 ) {
     val context = LocalContext.current
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
@@ -247,11 +242,18 @@ fun LoginView(
                     onClick = {
                         isLoading = true
                         phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+
                         login(
                             context = context,
                             phoneNumber = phoneNumber,
                             password = password,
                             otpRequiredCallback = {
+                                navigationFlowHandler.loginSignupPassword = password
+                                navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
+                                navigationFlowHandler.navigationCompleteCallback = {
+                                    navController.navigate(HomepageScreen)
+                                }
+
                                 CoroutineScope(Dispatchers.Main).launch {
                                     navController.navigate(OTPCodeScreen)
                                 }
@@ -284,8 +286,14 @@ fun LoginView(
                 
                 TextButton(
                     onClick = {
-                        TODO()
+                        navigationFlowHandler.loginSignupPassword = password
+                        navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
+                        navigationFlowHandler.navigationCompleteCallback = {
+                            navController.navigate(HomepageScreen)
+                        }
+                        navController.navigate(OTPCodeScreen)
                     },
+                    enabled = (phoneNumber.isNotEmpty() && password.isNotEmpty()) && !isLoading,
                     modifier = Modifier.padding(bottom=16.dp)) {
                     Text("Already got code")
                 }

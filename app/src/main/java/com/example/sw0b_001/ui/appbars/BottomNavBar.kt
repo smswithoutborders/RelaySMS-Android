@@ -22,7 +22,8 @@ import com.example.sw0b_001.ui.views.BottomTabsItems
 @Composable
 @Preview
 fun BottomNavBar(
-    selectedTab: BottomTabsItems = BottomTabsItems.BottomBarRecentsTab,
+    selectedTab: BottomTabsItems = BottomTabsItems.BottomBarRecentTab,
+    isLoggedIn: Boolean = true,
     onChangeTab: (BottomTabsItems) -> Unit = {}
 ) {
     var selectedTab = remember { mutableStateOf(selectedTab) }
@@ -36,13 +37,13 @@ fun BottomNavBar(
             ) },
             label = {
                 Text(
-                    text = "Recents",
+                    text = if(isLoggedIn)  "Recents" else "Get started",
                     style = MaterialTheme.typography.labelSmall
                 )
             },
-            selected = selectedTab.value == BottomTabsItems.BottomBarRecentsTab,
+            selected = selectedTab.value == BottomTabsItems.BottomBarRecentTab,
             onClick = {
-                selectedTab.value = BottomTabsItems.BottomBarRecentsTab
+                selectedTab.value = BottomTabsItems.BottomBarRecentTab
                 onChangeTab(selectedTab.value)
             },
             colors = NavigationBarItemDefaults.colors(
@@ -53,29 +54,32 @@ fun BottomNavBar(
                 indicatorColor = MaterialTheme.colorScheme.primaryContainer
             )
         )
-        NavigationBarItem(
-            icon = { Icon(
-                Icons.Filled.PhoneAndroid,
-                contentDescription = "Platforms",
-                modifier = Modifier.size(20.dp)
-            ) },
-            label = { Text(
-                text = "Platforms",
-                style = MaterialTheme.typography.labelSmall
-            ) },
-            selected = selectedTab.value == BottomTabsItems.BottomBarPlatformsTab,
-            onClick = {
-                selectedTab.value = BottomTabsItems.BottomBarPlatformsTab
-                onChangeTab(selectedTab.value)
-            },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = MaterialTheme.colorScheme.onSurface,
-                selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                indicatorColor = MaterialTheme.colorScheme.primaryContainer
+        if (isLoggedIn) {
+            NavigationBarItem(
+                icon = { Icon(
+                    Icons.Filled.PhoneAndroid,
+                    contentDescription = "Platforms",
+                    modifier = Modifier.size(20.dp)
+                ) },
+                label = { Text(
+                    text = "Platforms",
+                    style = MaterialTheme.typography.labelSmall
+                ) },
+                selected = selectedTab.value == BottomTabsItems.BottomBarPlatformsTab,
+                onClick = {
+                    selectedTab.value = BottomTabsItems.BottomBarPlatformsTab
+                    onChangeTab(selectedTab.value)
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.onSurface,
+                    selectedTextColor = MaterialTheme.colorScheme.onSurface,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                )
             )
-        )
+        }
+
         NavigationBarItem(
             icon = { Icon(
                 Icons.Filled.Public,

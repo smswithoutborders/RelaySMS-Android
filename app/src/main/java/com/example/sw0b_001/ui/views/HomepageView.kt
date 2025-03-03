@@ -31,9 +31,8 @@ import com.example.sw0b_001.ui.appbars.GatewayClientsAppBar
 import com.example.sw0b_001.ui.appbars.RecentsAppBar
 import com.example.sw0b_001.ui.theme.AppTheme
 
-
 enum class BottomTabsItems {
-    BottomBarRecentsTab,
+    BottomBarRecentTab,
     BottomBarPlatformsTab,
     BottomBarCountriesTab
 }
@@ -47,7 +46,7 @@ fun HomepageView(
     var isLoggedIn by remember { mutableStateOf(isLoggedIn) }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-    var bottomBarItem by remember { mutableStateOf(BottomTabsItems.BottomBarRecentsTab) }
+    var bottomBarItem by remember { mutableStateOf(BottomTabsItems.BottomBarRecentTab) }
 
     var showAddGatewayClientsModal by remember { mutableStateOf(false) }
 
@@ -55,7 +54,7 @@ fun HomepageView(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             when(bottomBarItem) {
-                BottomTabsItems.BottomBarRecentsTab -> {
+                BottomTabsItems.BottomBarRecentTab -> {
                     if (isLoggedIn) {
                         RecentsAppBar(navController = navController)
                     }
@@ -67,13 +66,13 @@ fun HomepageView(
             }
         },
         bottomBar = {
-            BottomNavBar { selectedTab ->
+            BottomNavBar(isLoggedIn = isLoggedIn) { selectedTab ->
                 bottomBarItem = selectedTab
             }
         },
         floatingActionButton = {
             when(bottomBarItem) {
-                BottomTabsItems.BottomBarRecentsTab -> {
+                BottomTabsItems.BottomBarRecentTab -> {
                     Column(horizontalAlignment = Alignment.End) {
                         ExtendedFloatingActionButton(
                             onClick = {
@@ -118,7 +117,7 @@ fun HomepageView(
                 .padding(innerPadding)
         ) {
             when(bottomBarItem) {
-                BottomTabsItems.BottomBarRecentsTab -> {
+                BottomTabsItems.BottomBarRecentTab -> {
                     if (isLoggedIn) {
                         RecentView(navController = navController)
                     } else {

@@ -18,16 +18,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
-import com.example.sw0b_001.ui.modals.CreateAccountView
-import com.example.sw0b_001.ui.modals.LoginView
+import com.example.sw0b_001.Models.NavigationFlowHandler
+import com.example.sw0b_001.ui.views.CreateAccountView
+import com.example.sw0b_001.ui.views.LoginView
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
 import com.example.sw0b_001.ui.navigation.Screen
 import com.example.sw0b_001.ui.views.AboutView
-import com.example.sw0b_001.ui.views.AvailablePlatformsView
-import com.example.sw0b_001.ui.views.GatewayClientView
 import com.example.sw0b_001.ui.views.GetStartedView
 import com.example.sw0b_001.ui.views.HomepageView
 import com.example.sw0b_001.ui.views.OtpCodeVerificationView
@@ -36,17 +35,12 @@ import com.example.sw0b_001.ui.views.SettingsView
 import com.example.sw0b_001.ui.views.compose.EmailComposeView
 import com.example.sw0b_001.ui.views.compose.MessageComposeView
 import com.example.sw0b_001.ui.views.compose.TextComposeView
-import com.example.sw0b_001.ui.views.details.EmailDetailsView
-import com.example.sw0b_001.ui.views.details.MessageDetailsView
-import com.example.sw0b_001.ui.views.details.TextDetailsView
-import kotlinx.serialization.json.Json
-import java.net.URLDecoder
-import java.nio.charset.StandardCharsets
 
 
 class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
-    val messagesViewModel: MessagesViewModel = MessagesViewModel()
+
+    val navigationFlowHandler = NavigationFlowHandler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,13 +78,21 @@ class MainActivity : ComponentActivity() {
                 HomepageView(navController = navController)
             }
             composable<LoginScreen> {
-                LoginView(navController = navController)
+                LoginView(
+                    navController = navController,
+                    navigationFlowHandler = navigationFlowHandler
+                )
             }
             composable<CreateAccountScreen> {
                 CreateAccountView(navController = navController)
             }
             composable<OTPCodeScreen> {
-                OtpCodeVerificationView(navController = navController)
+                OtpCodeVerificationView(
+                    navController = navController,
+                    navigationFlowHandler = navigationFlowHandler
+                ) {
+                    navigationFlowHandler.navigationCompleteCallback()
+                }
             }
             composable(Screen.Settings.route) {
                 SettingsView(navController = navController)

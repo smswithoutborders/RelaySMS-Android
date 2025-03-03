@@ -1,6 +1,17 @@
 package com.example.sw0b_001.ui.views
 
+import com.example.sw0b_001.R
+import android.app.Activity.RESULT_OK
+import android.content.ActivityNotFoundException
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.os.Build
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -42,25 +54,111 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat.startActivityForResult
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.sw0b_001.BuildConfig
+import com.example.sw0b_001.Models.NavigationFlowHandler
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.Screen
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.google.android.gms.auth.api.phone.SmsRetriever
+import com.google.android.gms.common.api.CommonStatusCodes
+import com.google.android.gms.common.api.Status
 import kotlinx.coroutines.delay
+
+@Composable
+fun SmsRetrieverHandler(onSmsRetrieved: (String) -> Unit) {
+    val context = LocalContext.current
+    
+    val smsNotificationLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()) { activityResult ->
+        when(activityResult.resultCode) {
+            RESULT_OK -> {
+                val message = activityResult.data?.getStringExtra(SmsRetriever.EXTRA_SMS_MESSAGE)
+                val smsTemplate = context.getString(R.string.otp_verification_code_template);
+
+                val code = message?.split(smsTemplate.toRegex())
+                if(code != null && code.size > 1)
+                    onSmsRetrieved(code[1].replace(" ".toRegex(), ""))
+            }
+        }
+    }
+
+    val receiver = remember {
+        object: BroadcastReceiver() {
+            override fun onReceive(
+                context: Context?,
+                intent: Intent?
+            ) {
+                if (SmsRetriever.SMS_RETRIEVED_ACTION == intent?.action) {
+                    val extras = intent.extras
+                    val status = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        extras?.getParcelable(SmsRetriever.EXTRA_STATUS, Status::class.java)
+                    } else {
+                        @Suppress("DEPRECATION")
+                        extras?.get(SmsRetriever.EXTRA_STATUS) as Status
+                    }
+                    when (status?.statusCode) {
+                        CommonStatusCodes.SUCCESS -> {
+                            // Get consent intent
+                            val consentIntent = extras?.getParcelable<Intent>(SmsRetriever.EXTRA_CONSENT_INTENT)
+                            try {
+                                // Start activity to show consent dialog to user, activity must be started in
+                                // 5 minutes, otherwise you'll receive another TIMEOUT intent
+                                if (consentIntent != null) {
+                                    smsNotificationLauncher.launch(consentIntent)
+                                }
+                            } catch (e: ActivityNotFoundException) {
+                                e.printStackTrace()
+                            }
+                        }
+                        CommonStatusCodes.TIMEOUT -> {
+                            // Timeout occurred, handle accordingly
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    DisposableEffect(Unit) {
+        val intentFilter = IntentFilter(SmsRetriever.SMS_RETRIEVED_ACTION)
+        ContextCompat.registerReceiver(context, receiver, intentFilter, ContextCompat.RECEIVER_EXPORTED)
+
+        onDispose {
+            context.unregisterReceiver(receiver)
+        }
+    }
+}
+
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
 fun OtpCodeVerificationView(
-    onCodeSubmitted: (String) -> Unit = {},
+    navController: NavController = rememberNavController(),
+    navigationFlowHandler: NavigationFlowHandler = NavigationFlowHandler(),
     onResendClicked: () -> Unit = {},
-    navController: NavController = rememberNavController()
+    onCodeSubmitted: (String) -> Unit = {},
 ) {
+    val context = LocalContext.current
     var otpCode by remember { mutableStateOf("") }
     var timeLeft by remember { mutableLongStateOf(60L) }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
+    SmsRetrieverHandler {
+        otpCode = it
+        println("Code came in: $otpCode")
+    }
+    configureVerificationListener(context)
+
+    if(BuildConfig.DEBUG && otpCode.isEmpty()) {
+        otpCode = "123456"
+    }
 
     LaunchedEffect(key1 = timeLeft) {
         if (timeLeft > 0) {
@@ -207,4 +305,15 @@ fun OtpCodeDigitBox(char: String) {
         textAlign = TextAlign.Center,
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
+}
+
+private fun configureVerificationListener(context: Context) {
+    // Start listening for SMS User Consent broadcasts from senderPhoneNumber
+    // The Task<Void> will be successful if SmsRetriever was able to start
+    // SMS User Consent, and will error if there was an error starting.
+    val smsSenderNumber = "VERIFY"
+//    val smsSenderNumber = "+15024439537"
+    val task = SmsRetriever.getClient(context).startSmsUserConsent(smsSenderNumber)
+    task.addOnSuccessListener { }
+    task.addOnFailureListener { }
 }
