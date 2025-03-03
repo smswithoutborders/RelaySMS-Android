@@ -3,7 +3,12 @@ package com.example.sw0b_001.ui.views
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -17,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.ui.appbars.BottomNavBar
+import com.example.sw0b_001.ui.appbars.GatewayClientsAppBar
 import com.example.sw0b_001.ui.appbars.RecentsAppBar
 import kotlinx.serialization.Serializable
 
@@ -36,11 +42,21 @@ fun HomepageView(navController: NavController = rememberNavController()) {
 
     var bottomBarItem by remember { mutableStateOf(BottomTabsItems.BottomBarRecentsTab) }
 
+    var showAddGatewayClientsModal by remember { mutableStateOf(false) }
+
     Scaffold (
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            if (isLoggedIn) {
-                RecentsAppBar(navController = navController)
+            when(bottomBarItem) {
+                BottomTabsItems.BottomBarRecentsTab -> {
+                    if (isLoggedIn) {
+                        RecentsAppBar(navController = navController)
+                    }
+                }
+                BottomTabsItems.BottomBarPlatformsTab -> {}
+                BottomTabsItems.BottomBarCountriesTab -> {
+                    GatewayClientsAppBar(navController = navController)
+                }
             }
         },
         bottomBar = {
@@ -48,7 +64,24 @@ fun HomepageView(navController: NavController = rememberNavController()) {
                 bottomBarItem = selectedTab
             }
         },
-        floatingActionButton = {}
+        floatingActionButton = {
+            when(bottomBarItem) {
+                BottomTabsItems.BottomBarRecentsTab -> {}
+                BottomTabsItems.BottomBarPlatformsTab -> {}
+                BottomTabsItems.BottomBarCountriesTab -> {
+                    FloatingActionButton(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        onClick = { showAddGatewayClientsModal = true }
+                    ) {
+                        Icon(
+                            Icons.Filled.Add,
+                            contentDescription = "Add Gateway Client",
+                            tint = MaterialTheme.colorScheme.onSecondary
+                        )
+                    }
+                }
+            }
+        }
     ) { innerPadding ->
         Box(
             Modifier
@@ -67,7 +100,9 @@ fun HomepageView(navController: NavController = rememberNavController()) {
                     AvailablePlatformsView(navController = navController)
                 }
                 BottomTabsItems.BottomBarCountriesTab -> {
-                    GatewayClientView(navController = navController)
+                    GatewayClientView(addShowBottomSheet = showAddGatewayClientsModal) {
+                        showAddGatewayClientsModal = false
+                    }
                 }
             }
         }

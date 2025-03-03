@@ -42,6 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.appbars.GatewayClientsAppBar
 import com.example.sw0b_001.ui.modals.AddGatewayClientModal
@@ -59,9 +60,10 @@ data class GatewayClient(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GatewayClientView(
-    gatewayClients: List<GatewayClient> = sampleGatewayClients,
+    gatewayClients: List<GatewayClient> = emptyList(),
     onGatewayClientSelected: (GatewayClient) -> Unit = {},
-    navController: NavController,
+    addShowBottomSheet: Boolean = false,
+    onDismissCallback: () -> Unit? = {}
 ) {
     var selectedGatewayClient by remember {
         mutableStateOf<GatewayClient?>(
@@ -75,128 +77,100 @@ fun GatewayClientView(
     }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    var addShowBottomSheet by remember { mutableStateOf(false) }
+//    var addShowBottomSheet by remember { mutableStateOf(false) }
     var optionsShowBottomSheet by remember { mutableStateOf(false) }
     var editShowBottomSheet by remember { mutableStateOf(false) }
 
-    Scaffold(
-        topBar = {
-            GatewayClientsAppBar(navController = navController)
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                containerColor = MaterialTheme.colorScheme.secondary,
-                onClick = { addShowBottomSheet = true }
-            ) {
-                Icon(
-                    Icons.Filled.Add,
-                    contentDescription = "Add Gateway Client",
-                    tint = MaterialTheme.colorScheme.onSecondary
-                )
-            }
-        },
-        bottomBar = {
-            BottomNavBar( )
-        }
-    ) { innerPadding ->
-        Box(
-            Modifier
-                .fillMaxSize()
-                .padding(innerPadding),
-            contentAlignment = Alignment.Center
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
+    ) {
+        // Selected Gateway Client Section
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surface)
-            ) {
-                // Selected Gateway Client Section
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    Text(
-                        text = "Selected Gateway Client",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+            Text(
+                text = "Selected Gateway Client",
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-                    if (selectedGatewayClient != null) {
-                        SelectedGatewayClientCard(gatewayClient = selectedGatewayClient!!)
-                    } else {
-                        Text(
-                            text = "No Gateway Client Selected",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // List of Gateway Clients Section
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                ) {
-                    Text(
-                        text = "Available Gateway Clients",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    LazyColumn(
-                        contentPadding = PaddingValues(bottom = 16.dp)
-                    ) {
-                        items(gatewayClients) { gatewayClient ->
-                            GatewayClientCard(
-                                gatewayClient = gatewayClient,
-                                onCardClicked = {
-                                    selectedGatewayClient = it
-                                    onGatewayClientSelected(it)
-                                    optionsShowBottomSheet = true
-                                }
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-                    }
-                }
-            }
-
-            if (addShowBottomSheet) {
-                AddGatewayClientModal(
-                    showBottomSheet = addShowBottomSheet,
-                    onDismiss = { addShowBottomSheet = false }
-                )
-            }
-
-            if (optionsShowBottomSheet) {
-                GatewayClientOptionsModal(
-                    showBottomSheet = optionsShowBottomSheet,
-                    onDismiss = { optionsShowBottomSheet = false },
-                    gatewayClient = selectedGatewayClient!!,
-                    onEditClicked = {
-                        optionsShowBottomSheet = false
-                        editShowBottomSheet = true
-                    }
-                )
-            }
-
-            if (editShowBottomSheet) {
-                AddGatewayClientModal(
-                    showBottomSheet = editShowBottomSheet,
-                    onDismiss = { editShowBottomSheet = false },
-                    gatewayClient = selectedGatewayClient!!
+            if (selectedGatewayClient != null) {
+                SelectedGatewayClientCard(gatewayClient = selectedGatewayClient!!)
+            } else {
+                Text(
+                    text = "No Gateway Client Selected",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                 )
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // List of Gateway Clients Section
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
+            Text(
+                text = "Available Gateway Clients",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            LazyColumn(
+                contentPadding = PaddingValues(bottom = 16.dp)
+            ) {
+                items(gatewayClients) { gatewayClient ->
+                    GatewayClientCard(
+                        gatewayClient = gatewayClient,
+                        onCardClicked = {
+                            selectedGatewayClient = it
+                            onGatewayClientSelected(it)
+                            optionsShowBottomSheet = true
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+        }
+    }
+
+    if (addShowBottomSheet) {
+        AddGatewayClientModal(
+            showBottomSheet = addShowBottomSheet,
+            onDismiss = { onDismissCallback() }
+        )
+    }
+
+    if (optionsShowBottomSheet) {
+        GatewayClientOptionsModal(
+            showBottomSheet = optionsShowBottomSheet,
+            onDismiss = { optionsShowBottomSheet = false },
+            gatewayClient = selectedGatewayClient!!,
+            onEditClicked = {
+                optionsShowBottomSheet = false
+                editShowBottomSheet = true
+            }
+        )
+    }
+
+    if (editShowBottomSheet) {
+        AddGatewayClientModal(
+            showBottomSheet = editShowBottomSheet,
+            onDismiss = { editShowBottomSheet = false },
+            gatewayClient = selectedGatewayClient!!
+        )
     }
 }
 
@@ -288,7 +262,7 @@ val sampleGatewayClients = listOf(
 @Composable
 fun GatewayClientScreenPreview() {
     AppTheme(darkTheme = false) {
-        GatewayClientView(gatewayClients = sampleGatewayClients, navController = NavController(LocalContext.current))
+        GatewayClientView(gatewayClients = sampleGatewayClients,)
     }
 }
 
