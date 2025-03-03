@@ -62,19 +62,6 @@ fun RecentsAppBar(
                 modifier = Modifier.size(120.dp)
             )
         },
-        navigationIcon = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-//                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Text(
-                    text = "Recents",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
-
-            }
-        },
         actions = {
             IconButton(onClick = { showMenu = !showMenu }) {
                 Icon(
