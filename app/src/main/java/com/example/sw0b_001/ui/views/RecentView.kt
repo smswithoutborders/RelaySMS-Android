@@ -48,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -169,7 +170,16 @@ fun RecentView(
     val messages: List<EncryptedContent> by viewModel
         .getMessages(context = context).observeAsState(emptyList())
 
-    Box( Modifier.fillMaxSize()) {
+    Box(Modifier
+        .padding(16.dp)
+        .fillMaxSize()
+    ) {
+        Text(
+            text = stringResource(R.string.recents),
+            style = MaterialTheme.typography.displayMedium,
+            modifier = Modifier.padding(bottom = 16.dp),
+        )
+
         if (messages.isNotEmpty()) {
             LazyColumn(
                 modifier = Modifier

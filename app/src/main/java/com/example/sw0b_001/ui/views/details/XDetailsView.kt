@@ -32,11 +32,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.sw0b_001.Models.Messages.EncryptedContent
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.views.MessageType
-import com.example.sw0b_001.ui.views.RecentMessage
 import kotlinx.android.parcel.Parcelize
 
 // Data class for X details
@@ -50,15 +50,15 @@ data class TextDetails(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextDetailsView(
-    message: RecentMessage,
+    message: EncryptedContent,
     navController: NavController,
 ) {
-    val textDetails = TextDetails(
-        userAvatar = message.platformLogo,
-        username = message.subHeadingText ?: "",
-        date = message.date,
-        fullText = message.messagePreview
-    )
+//    val textDetails = TextDetails(
+//        userAvatar = message.platformLogo,
+//        username = message.subHeadingText ?: "",
+//        date = message.date,
+//        fullText = message.messagePreview
+//    )
     Scaffold(
         topBar = {
             RelayAppBar(screenName = "Text Details", navController = navController)
@@ -72,28 +72,28 @@ fun TextDetailsView(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 // User Avatar
-                Image(
-                    painter = painterResource(id = textDetails.userAvatar),
-                    contentDescription = "User Avatar",
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                )
+//                Image(
+//                    painter = painterResource(id = textDetails.userAvatar),
+//                    contentDescription = "User Avatar",
+//                    modifier = Modifier
+//                        .size(48.dp)
+//                        .clip(CircleShape)
+//                )
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
-                    // Username
-                    Text(
-                        text = textDetails.username,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                    // Date
-                    Text(
-                        text = textDetails.date,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+//                    // Username
+//                    Text(
+//                        text = textDetails.username,
+//                        style = MaterialTheme.typography.titleMedium,
+//                        fontWeight = FontWeight.Bold,
+//                        color = MaterialTheme.colorScheme.onBackground
+//                    )
+//                    // Date
+//                    Text(
+//                        text = textDetails.date,
+//                        style = MaterialTheme.typography.bodySmall,
+//                        color = MaterialTheme.colorScheme.onBackground
+//                    )
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(onClick = {TODO("Handle Edit")}) {
@@ -116,30 +116,30 @@ fun TextDetailsView(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Full Text
-            Text(
-                text = textDetails.fullText,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onBackground
-            )
+//            Text(
+//                text = textDetails.fullText,
+//                style = MaterialTheme.typography.bodySmall,
+//                color = MaterialTheme.colorScheme.onBackground
+//            )
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun TextDetailsPreview() {
-    AppTheme(darkTheme = false) {
-        TextDetailsView(
-            message = RecentMessage(
-                platformLogo = R.drawable.x_icon,
-                platformName = "X",
-                headingText = "John Doe",
-                subHeadingText = "123-456-7890",
-                date = "10:30 AM",
-                messagePreview = "Hello, this is a test message.",
-                messageType = MessageType.X
-            ),
-            navController = NavController(LocalContext.current)
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun TextDetailsPreview() {
+//    AppTheme(darkTheme = false) {
+//        TextDetailsView(
+//            message = RecentMessage(
+//                platformLogo = R.drawable.x_icon,
+//                platformName = "X",
+//                headingText = "John Doe",
+//                subHeadingText = "123-456-7890",
+//                date = "10:30 AM",
+//                messagePreview = "Hello, this is a test message.",
+//                messageType = MessageType.X
+//            ),
+//            navController = NavController(LocalContext.current)
+//        )
+//    }
+//}

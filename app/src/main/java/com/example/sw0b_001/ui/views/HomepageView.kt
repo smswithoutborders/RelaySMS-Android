@@ -40,8 +40,11 @@ enum class BottomTabsItems {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomepageView(navController: NavController) {
-    var isLoggedIn by remember { mutableStateOf(false) }
+fun HomepageView(
+    isLoggedIn: Boolean = false,
+    navController: NavController
+) {
+    var isLoggedIn by remember { mutableStateOf(isLoggedIn) }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     var bottomBarItem by remember { mutableStateOf(BottomTabsItems.BottomBarRecentsTab) }
@@ -142,4 +145,14 @@ fun HomepageView_Preview() {
         HomepageView(navController = rememberNavController())
     }
 }
+
+
+@Preview(showBackground = false)
+@Composable
+fun HomepageViewLoggedIn_Preview() {
+    AppTheme(darkTheme = false) {
+        HomepageView(isLoggedIn = true, navController = rememberNavController())
+    }
+}
+
 

@@ -31,7 +31,6 @@ import com.example.sw0b_001.ui.views.GatewayClientView
 import com.example.sw0b_001.ui.views.GetStartedView
 import com.example.sw0b_001.ui.views.HomepageView
 import com.example.sw0b_001.ui.views.OtpCodeVerificationView
-import com.example.sw0b_001.ui.views.RecentMessage
 import com.example.sw0b_001.ui.views.SecurityView
 import com.example.sw0b_001.ui.views.SettingsView
 import com.example.sw0b_001.ui.views.compose.EmailComposeView
@@ -133,9 +132,9 @@ class MainActivity : ComponentActivity() {
             ) { backStackEntry ->
                 val encodedJson = backStackEntry.arguments?.getString("recentMessage")
                 encodedJson?.let {
-                    val decodedJson = URLDecoder.decode(it, StandardCharsets.UTF_8.toString())
-                    val recentMessage = Json.decodeFromString<RecentMessage>(decodedJson)
-                    EmailDetailsView(message = recentMessage, navController = navController)
+//                    val decodedJson = URLDecoder.decode(it, StandardCharsets.UTF_8.toString())
+//                    val recentMessage = Json.decodeFromString<RecentMessage>(decodedJson)
+//                    EmailDetailsView(message = recentMessage, navController = navController)
                 }
             }
             composable(
@@ -144,9 +143,9 @@ class MainActivity : ComponentActivity() {
             ) { backStackEntry ->
                 val encodedJson = backStackEntry.arguments?.getString("recentMessage")
                 encodedJson?.let {
-                    val decodedJson = URLDecoder.decode(it, StandardCharsets.UTF_8.toString())
-                    val recentMessage = Json.decodeFromString<RecentMessage>(decodedJson)
-                    MessageDetailsView(message = recentMessage, navController = navController)
+//                    val decodedJson = URLDecoder.decode(it, StandardCharsets.UTF_8.toString())
+//                    val recentMessage = Json.decodeFromString<RecentMessage>(decodedJson)
+//                    MessageDetailsView(message = recentMessage, navController = navController)
                 }
             }
             composable(
@@ -155,9 +154,9 @@ class MainActivity : ComponentActivity() {
             ) { backStackEntry ->
                 val encodedJson = backStackEntry.arguments?.getString("recentMessage")
                 encodedJson?.let {
-                    val decodedJson = URLDecoder.decode(it, StandardCharsets.UTF_8.toString())
-                    val recentMessage = Json.decodeFromString<RecentMessage>(decodedJson)
-                    TextDetailsView(message = recentMessage, navController = navController)
+//                    val decodedJson = URLDecoder.decode(it, StandardCharsets.UTF_8.toString())
+//                    val recentMessage = Json.decodeFromString<RecentMessage>(decodedJson)
+//                    TextDetailsView(message = recentMessage, navController = navController)
                 }
             }
         }

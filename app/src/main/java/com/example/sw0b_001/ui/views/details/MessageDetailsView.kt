@@ -30,11 +30,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.sw0b_001.Models.Messages.EncryptedContent
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.views.MessageType
-import com.example.sw0b_001.ui.views.RecentMessage
 
 // Data class for Telegram details
 data class MessageDetails(
@@ -48,15 +48,16 @@ data class MessageDetails(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageDetailsView(
-    message: RecentMessage,
+    message: EncryptedContent,
     navController: NavController
 ) {
-    val telegramDetails = MessageDetails(
-        senderAvatar = message.platformLogo,
-        senderUsername = message.subHeadingText ?: "",
-        recipientNumber = message.messagePreview,
-        date = message.date,
-        fullText = message.messagePreview)
+//    val telegramDetails = MessageDetails(
+//        senderAvatar = message.platformLogo,
+//        senderUsername = message.subHeadingText ?: "",
+//        recipientNumber = message.messagePreview,
+//        date = message.date,
+//        fullText = message.messagePreview)
+
     Scaffold(
         topBar = {
             RelayAppBar(screenName = "Message Details", navController = navController)
@@ -70,34 +71,34 @@ fun MessageDetailsView(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 // Sender Avatar
-                Image(
-                    painter = painterResource(id = telegramDetails.senderAvatar),
-                    contentDescription = "Sender Avatar",
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                )
+//                Image(
+//                    painter = painterResource(id = telegramDetails.senderAvatar),
+//                    contentDescription = "Sender Avatar",
+//                    modifier = Modifier
+//                        .size(48.dp)
+//                        .clip(CircleShape)
+//                )
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     // Sender Username/number
-                    Text(
-                        text = telegramDetails.senderUsername,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                    // Recipient Number
-                    Text(
-                        text = "To: ${telegramDetails.recipientNumber}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                    // Date
-                    Text(
-                        text = telegramDetails.date,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+//                    Text(
+//                        text = telegramDetails.senderUsername,
+//                        style = MaterialTheme.typography.titleMedium,
+//                        fontWeight = FontWeight.Bold,
+//                        color = MaterialTheme.colorScheme.onBackground
+//                    )
+//                    // Recipient Number
+//                    Text(
+//                        text = "To: ${telegramDetails.recipientNumber}",
+//                        style = MaterialTheme.typography.bodyMedium,
+//                        color = MaterialTheme.colorScheme.onBackground
+//                    )
+//                    // Date
+//                    Text(
+//                        text = telegramDetails.date,
+//                        style = MaterialTheme.typography.bodySmall,
+//                        color = MaterialTheme.colorScheme.onBackground
+//                    )
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 IconButton(onClick = { TODO("Handle Edit") }) {
@@ -120,30 +121,30 @@ fun MessageDetailsView(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Full Text
-            Text(
-                text = telegramDetails.fullText,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onBackground
-            )
+//            Text(
+//                text = telegramDetails.fullText,
+//                style = MaterialTheme.typography.bodySmall,
+//                color = MaterialTheme.colorScheme.onBackground
+//            )
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun MessageDetailsPreview() {
-    AppTheme(darkTheme = false) {
-        MessageDetailsView(
-            message = RecentMessage(
-                platformLogo = R.drawable.telegram,
-                platformName = "Telegram",
-                headingText = "John Doe",
-                subHeadingText = "123-456-7890",
-                date = "10:30 AM",
-                messagePreview = "Hello, this is a test message.",
-                messageType = MessageType.TELEGRAM
-            ),
-            navController = NavController(LocalContext.current)
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun MessageDetailsPreview() {
+//    AppTheme(darkTheme = false) {
+//        MessageDetailsView(
+//            message = RecentMessage(
+//                platformLogo = R.drawable.telegram,
+//                platformName = "Telegram",
+//                headingText = "John Doe",
+//                subHeadingText = "123-456-7890",
+//                date = "10:30 AM",
+//                messagePreview = "Hello, this is a test message.",
+//                messageType = MessageType.TELEGRAM
+//            ),
+//            navController = NavController(LocalContext.current)
+//        )
+//    }
+//}
