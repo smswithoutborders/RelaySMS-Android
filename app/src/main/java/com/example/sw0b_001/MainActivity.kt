@@ -99,12 +99,6 @@ class MainActivity : ComponentActivity() {
             composable(Screen.About.route) {
                 AboutView(navController = navController)
             }
-            composable(Screen.GatewayClients.route) {
-                GatewayClientView(navController = navController)
-            }
-            composable(Screen.AvailablePlatforms.route) {
-                AvailablePlatformsView(navController = navController)
-            }
             composable(Screen.Security.route) {
                 SecurityView(navController = navController)
             }

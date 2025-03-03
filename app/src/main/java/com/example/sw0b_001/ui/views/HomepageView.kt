@@ -18,6 +18,14 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.appbars.RecentsAppBar
+import kotlinx.serialization.Serializable
+
+
+enum class BottomTabsItems {
+    BottomBarRecentsTab,
+    BottomBarPlatformsTab,
+    BottomBarCountriesTab
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -25,6 +33,8 @@ import com.example.sw0b_001.ui.appbars.RecentsAppBar
 fun HomepageView(navController: NavController = rememberNavController()) {
     var isLoggedIn by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
+    var bottomBarItem by remember { mutableStateOf(BottomTabsItems.BottomBarRecentsTab) }
 
     Scaffold (
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -34,9 +44,9 @@ fun HomepageView(navController: NavController = rememberNavController()) {
             }
         },
         bottomBar = {
-            BottomNavBar(
-                navController = navController
-            )
+            BottomNavBar { selectedTab ->
+                bottomBarItem = selectedTab
+            }
         },
         floatingActionButton = {}
     ) { innerPadding ->
@@ -45,10 +55,20 @@ fun HomepageView(navController: NavController = rememberNavController()) {
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            if (isLoggedIn) {
-                RecentsView(navController = navController)
-            } else {
-                GetStartedView(navController = navController)
+            when(bottomBarItem) {
+                BottomTabsItems.BottomBarRecentsTab -> {
+                    if (isLoggedIn) {
+                        RecentsView(navController = navController)
+                    } else {
+                        GetStartedView(navController = navController)
+                    }
+                }
+                BottomTabsItems.BottomBarPlatformsTab -> {
+                    AvailablePlatformsView(navController = navController)
+                }
+                BottomTabsItems.BottomBarCountriesTab -> {
+                    GatewayClientView(navController = navController)
+                }
             }
         }
     }

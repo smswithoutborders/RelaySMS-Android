@@ -61,6 +61,7 @@ import com.arpitkatiyarprojects.countrypicker.CountryPickerOutlinedTextField
 import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
 import com.example.sw0b_001.ui.navigation.HomepageScreen
+import com.example.sw0b_001.ui.navigation.OTPCodeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 
 
@@ -228,7 +229,7 @@ fun CreateAccountView(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Button(onClick = {
-                    navController.navigate(HomepageScreen)
+                    navController.navigate(OTPCodeScreen)
                 },
                     modifier = Modifier.fillMaxWidth()
                         .align(Alignment.CenterHorizontally)) {

@@ -96,9 +96,7 @@ fun GatewayClientView(
             }
         },
         bottomBar = {
-            BottomNavBar(
-                navController = navController
-            )
+            BottomNavBar( )
         }
     ) { innerPadding ->
         Box(

@@ -73,53 +73,40 @@ fun AvailablePlatformsView(
         showPlatformOptions = true
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(title = { Text("Available Platforms") })
-        },
-        bottomBar = {
-            BottomNavBar (
-                navController = navController
-            )
-        }
-    ) { innerPadding ->
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
                 .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
+            val platforms = listOf(
+                PlatformData(R.drawable.gmail, "Gmail", true),
+                PlatformData(R.drawable.telegram, "Telegram", false),
+                PlatformData(R.drawable.x_icon, "X", false)
+            )
 
-                val platforms = listOf(
-                    PlatformData(R.drawable.gmail, "Gmail", true),
-                    PlatformData(R.drawable.telegram, "Telegram", false),
-                    PlatformData(R.drawable.x_icon, "X", false)
-                )
-
-                PlatformListContent(
-                    platforms = platforms,
-                    filterPlatforms = false,
-                    onPlatformClick = showPlatformOptionsModal
-                )
-            }
-        }
-
-        if (showPlatformOptions) {
-            PlatformOptionsModal(
-                platform = selectedPlatform!!,
-                onDismissRequest = { showPlatformOptions = false },
-                isActive = selectedPlatform!!.isActive,
-                isDefault = selectedPlatform!!.platformName == "RelaySMS",
-                navController = navController
+            PlatformListContent(
+                platforms = platforms,
+                filterPlatforms = false,
+                onPlatformClick = showPlatformOptionsModal
             )
         }
+    }
+
+    if (showPlatformOptions) {
+        PlatformOptionsModal(
+            platform = selectedPlatform!!,
+            onDismissRequest = { showPlatformOptions = false },
+            isActive = selectedPlatform!!.isActive,
+            isDefault = selectedPlatform!!.platformName == "RelaySMS",
+            navController = navController
+        )
     }
 }
 
