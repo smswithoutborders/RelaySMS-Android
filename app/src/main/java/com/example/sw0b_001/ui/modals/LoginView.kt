@@ -1,5 +1,7 @@
 package com.example.sw0b_001.ui.modals
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -58,7 +60,19 @@ import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
 import com.example.sw0b_001.ui.navigation.Screen
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.platform.LocalContext
+import com.example.sw0b_001.BuildConfig
+import com.example.sw0b_001.Models.Vaults
+import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
+import io.grpc.StatusRuntimeException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,13 +80,22 @@ import com.example.sw0b_001.ui.navigation.OTPCodeScreen
 fun LoginView(
     navController: NavController = rememberNavController()
 ) {
+    val context = LocalContext.current
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
+
     var phoneNumber by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    if(BuildConfig.DEBUG) {
+        phoneNumber = "1123457528"
+        password = "dMd2Kmo9#"
+    }
+
     var passwordVisible by remember { mutableStateOf(false) }
 
-    var showCreateAccountModal by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
+    var isLoading by remember { mutableStateOf(false) }
 
     BackHandler {
         navController.popBackStack()
@@ -100,6 +123,8 @@ fun LoginView(
         Column(
             modifier = Modifier
                 .padding(innerPadding)
+                .fillMaxSize()
+                .imePadding()
                 .verticalScroll(rememberScrollState())
                 .background(MaterialTheme.colorScheme.surface),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -115,9 +140,8 @@ fun LoginView(
                     style = MaterialTheme.typography.headlineMedium,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(16.dp)
                 )
-
-                Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
                     text = buildAnnotatedString {
@@ -145,7 +169,6 @@ fun LoginView(
                 )
             }
 
-
             Column(
                 modifier = Modifier.fillMaxWidth()
                     .padding(16.dp)
@@ -153,14 +176,34 @@ fun LoginView(
                 CountryPickerOutlinedTextField(
                     mobileNumber = phoneNumber,
                     onMobileNumberChange = { phoneNumber = it },
-                    onCountrySelected = { selectedCountry = it },
-                    defaultCountryCode = "us",
+                    onCountrySelected = {
+                        selectedCountry = it
+                    },
+                    defaultCountryCode = "cm",
                     countryListDisplayType = CountryListDisplayType.Dialog,
-                    modifier = Modifier.fillMaxWidth(),
-                    label = { Text(text = "Phone Number", style = MaterialTheme.typography.bodySmall) }
+                    modifier = Modifier
+                        .padding(bottom = 8.dp)
+                        .fillMaxWidth(),
+                    label = {
+                        Text(
+                            text = "Phone Number",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    },
+                    enabled = !isLoading
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    TextButton(
+                        onClick = { TODO() }
+                    ) {
+                        Text("Forgot password?")
+                    }
+                }
 
                 OutlinedTextField(
                     value = password,
@@ -187,91 +230,124 @@ fun LoginView(
                         disabledContainerColor = Color.Transparent,
                         focusedBorderColor = MaterialTheme.colorScheme.outline,
                         unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                    )
+                    ),
+                    enabled = !isLoading
                 )
-                Spacer(modifier = Modifier.height(8.dp))
 
 
-                Spacer(modifier = Modifier.height(24.dp))
+            }
 
+            Spacer(modifier = Modifier.weight(1f))
+
+            Column(
+                modifier = Modifier.padding(bottom = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Button(
                     onClick = {
-                        navController.navigate(OTPCodeScreen)
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                        .align(Alignment.CenterHorizontally)
-                ) {
-                    Text("Log In")
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Checkbox(
-                            checked = false,
-                            onCheckedChange = {}
-                        )
-                        Text(
-                            text = buildAnnotatedString {
-                                append("I have read the  ")
-                                pushStringAnnotation(tag = "privacy_policy", annotation = "privacy_policy")
-                                withStyle(
-                                    style = SpanStyle(
-                                        color = MaterialTheme.colorScheme.tertiary,
-                                        textDecoration = TextDecoration.Underline
-                                    )
-                                ) {
-                                    append("privacy policy")
+                        isLoading = true
+                        phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+                        login(
+                            context = context,
+                            phoneNumber = phoneNumber,
+                            password = password,
+                            otpRequiredCallback = {
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    navController.navigate(OTPCodeScreen)
                                 }
                             },
-                            style = MaterialTheme.typography.bodySmall,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .padding(top = 0.dp)
-                                .clickable {
-                                    // Handle click on "privacy policy"
-                                },
-                            color = MaterialTheme.colorScheme.onBackground
+                            failedCallback = {
+                                isLoading = false
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        ) {
+                            isLoading = false
+                        }
+                    },
+                    enabled = (phoneNumber.isNotEmpty() && password.isNotEmpty()) && !isLoading,
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(start=16.dp, end=16.dp)
+                        .align(Alignment.CenterHorizontally),
+                ) {
+                    if(isLoading) {
+                        CircularProgressIndicator(
+                            color = MaterialTheme.colorScheme.secondary,
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
                         )
                     }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = buildAnnotatedString {
-                            append("Do not have an account?  ")
-                            pushStringAnnotation(tag = "signup", annotation = "signup")
-                            withStyle(
-                                style = SpanStyle(
-                                    color = MaterialTheme.colorScheme.tertiary,
-                                    textDecoration = TextDecoration.Underline
-                                )
-                            ) {
-                                append("Sign up")
-                            }
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .padding(top = 0.dp)
-                            .align(Alignment.CenterHorizontally)
-                            .clickable {
-                                showCreateAccountModal = true
-                            },
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                    else {
+                        Text("Log In")
+                    }
+                }
+                
+                TextButton(
+                    onClick = {
+                        TODO()
+                    },
+                    modifier = Modifier.padding(bottom=16.dp)) {
+                    Text("Already got code")
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
-
+                Text(
+                    text = buildAnnotatedString {
+                        append("Do not have an account?  ")
+                        pushStringAnnotation(tag = "signup", annotation = "signup")
+                        withStyle(
+                            style = SpanStyle(
+                                color = MaterialTheme.colorScheme.tertiary,
+                                textDecoration = TextDecoration.Underline
+                            )
+                        ) {
+                            append("Create account")
+                        }
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .clickable {
+                            navController.navigate(CreateAccountScreen)
+                        },
+                    color = MaterialTheme.colorScheme.onBackground
+                )
             }
         }
     }
+}
+
+
+private fun login(
+    context: Context,
+    phoneNumber: String,
+    password: String,
+    otpRequiredCallback: () -> Unit,
+    failedCallback: (String?) -> Unit = {},
+    completedCallback: () -> Unit = {},
+) {
+    CoroutineScope(Dispatchers.Default).launch{
+        try {
+            val vaults = Vaults(context)
+            val response = vaults.authenticateEntity(
+                context,
+                phoneNumber,
+                password
+            )
+
+            if(response.requiresOwnershipProof) {
+                otpRequiredCallback()
+            }
+        } catch(e: StatusRuntimeException) {
+            e.printStackTrace()
+            failedCallback(e.message)
+        } catch(e: Exception) {
+            e.printStackTrace()
+            failedCallback(e.message)
+        }
+        finally {
+            completedCallback()
+        }
+    }
+
 }
