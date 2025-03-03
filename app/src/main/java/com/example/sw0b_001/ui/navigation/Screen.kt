@@ -1,15 +1,27 @@
 package com.example.sw0b_001.ui.navigation
 
+import kotlinx.serialization.Serializable
+
+@Serializable
+object HomepageScreen
+
+//object GatewayClients : Screen("gateway")
+//object About : Screen("about")
+//object Settings : Screen("settings")
+//object AvailablePlatforms : Screen("available_platforms")
+//object Security : Screen("security")
+//object GetStarted : Screen("get_started")
+//object Homepage : Screen("homepage")
+//object OTPCode : Screen("otp_code")
+
 sealed class Screen(val route: String) {
     //Screen Routes
-    data object Recents : Screen("recents")
     data object GatewayClients : Screen("gateway")
     data object About : Screen("about")
     data object Settings : Screen("settings")
     data object AvailablePlatforms : Screen("available_platforms")
     data object Security : Screen("security")
     data object GetStarted : Screen("get_started")
-    data object Homepage : Screen("homepage")
     data object OTPCode : Screen("otp_code")
 
     // Message Compose Routes

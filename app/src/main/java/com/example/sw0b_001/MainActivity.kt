@@ -23,6 +23,7 @@ import com.example.sw0b_001.Homepage.HomepageNotLoggedIn
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
 import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.modals.NewMessageModal
+import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.Screen
 import com.example.sw0b_001.ui.views.AboutView
 import com.example.sw0b_001.ui.views.AvailablePlatformsView
@@ -46,24 +47,6 @@ import kotlinx.serialization.json.Json
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 
-//@Serializable
-//object RecentScreen
-//@Serializable
-//object GatewayClientScreen
-//@Serializable
-//object AboutScreen
-//@Serializable
-//object SettingsScreen
-//@Serializable
-//object HomepageScreen
-//@Serializable
-//object HomepageNotLoggedScreen
-//@Serializable
-//object AddPlatformsScreen
-//@Serializable
-//object OtpCodeVerificationScreen
-//@Serializable
-//object SecurityScreen
 
 class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
@@ -81,42 +64,19 @@ class MainActivity : ComponentActivity() {
                         .fillMaxSize()
                 ) {
                     MainNavigation(navController = navController)
-//                    NavHost(
-//                        modifier = Modifier,
-//                        navController = navController,
-//                        startDestination = RecentScreen,
-//                    ) {
-//                        composable<RecentScreen> {
-//                            RecentScreenComposable()
-//                        }
-//                        composable<SettingsScreen> {
-//                            SettingsScreenComposable()
-//                        }
-//                        composable<AboutScreen> {
-//                            AboutScreenComposable()
-//                        }
-//                        composable<GatewayClientScreen> {
-//                            GatewayClientsScreenComposable()
-//                        }
-//
-//                    }
                 }
             }
         }
-
     }
 
     @Composable
     fun MainNavigation(navController: NavHostController) {
         NavHost(
             navController = navController,
-            startDestination = Screen.Homepage.route,
+            startDestination = HomepageScreen,
         ) {
-            composable(Screen.Homepage.route) {
+            composable<HomepageScreen> {
                 HomepageView(navController = navController)
-            }
-            composable(Screen.Recents.route) {
-                RecentsView(navController = navController)
             }
             composable(Screen.Settings.route) {
                 SettingsView(navController = navController)
@@ -160,8 +120,6 @@ class MainActivity : ComponentActivity() {
                 TextComposeView(navController = navController)
             }
 
-
-
             // Message Details Screens
             composable(
                 route = Screen.EmailDetails().route,
@@ -198,26 +156,5 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-
-//    @Composable
-//    fun RecentScreenComposable() {
-//        RecentsView(navController = navController)
-//    }
-//
-//    @Composable
-//    fun SettingsScreenComposable() {
-//        SettingsView(navController = navController)
-//    }
-//
-//    @Composable
-//    fun AboutScreenComposable() {
-//        AboutView(navController = navController)
-//    }
-//
-//    @Composable
-//    fun GatewayClientsScreenComposable() {
-//        GatewayClientView(navController = navController)
-//    }
 }
 

@@ -34,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.Screen
 import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.coroutines.delay
@@ -104,7 +105,7 @@ fun OtpCodeVerificationView(
             Button(
                 onClick = {
                     if (otpCode.length == 6) {
-                        navController.navigate(Screen.Recents.route)
+                        navController.navigate(HomepageScreen)
                     }
                 },
                 enabled = otpCode.length == 6,

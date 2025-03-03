@@ -19,6 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.Screen
 import com.example.sw0b_001.ui.theme.AppTheme
 
@@ -44,9 +45,9 @@ fun BottomNavBar(
                     style = MaterialTheme.typography.labelSmall
                 )
             },
-            selected = currentRoute == Screen.Recents.route,
+            selected = true,
             onClick = {
-                navController.navigate(Screen.Recents.route) {
+                navController.navigate(HomepageScreen) {
                     launchSingleTop = true
                     restoreState = true
                 }

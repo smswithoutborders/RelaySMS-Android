@@ -53,6 +53,7 @@ import androidx.navigation.NavController
 import com.arpitkatiyarprojects.countrypicker.CountryPickerOutlinedTextField
 import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
+import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.Screen
 import com.example.sw0b_001.ui.theme.AppTheme
 
@@ -218,7 +219,7 @@ fun CreateAccountModal(
                     Spacer(modifier = Modifier.height(24.dp))
 
                     Button(onClick = {
-                        navController.navigate(Screen.Recents.route)
+                        navController.navigate(HomepageScreen)
                     },
                         modifier = Modifier.fillMaxWidth()
                             .align(Alignment.CenterHorizontally)) {

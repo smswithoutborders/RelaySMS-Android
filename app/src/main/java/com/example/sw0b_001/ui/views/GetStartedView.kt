@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.material.icons.Icons
@@ -55,8 +56,6 @@ import com.example.sw0b_001.ui.theme.AppTheme
 fun GetStartedView (
     navController: NavController
 ) {
-
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     var showLoginBottomSheet by remember { mutableStateOf(false) }
     var showCreateAccountBottomSheet by remember { mutableStateOf(false) }
 
@@ -64,177 +63,137 @@ fun GetStartedView (
         modifier = Modifier
             .fillMaxSize()
     ) {
-
-        Scaffold (
-            containerColor = MaterialTheme.colorScheme.background,
-        ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 35.dp, start = 8.dp, end = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .padding(top = 35.dp, start = 8.dp, end = 8.dp),
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, bottom=50.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp)
-                        .padding(top = 16.dp, bottom = 16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(0.5.dp)
-                ) {
-                    Text(
-                        text = "Get started with",
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(8.dp)
-                    )
+                Text(
+                    text = "Get started with",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
 
+                Icon(
+                    painter = painterResource(id = R.drawable.relaysms_blue),
+                    contentDescription = "RelaySMS Logo",
+                    modifier = Modifier.size(width=200.dp, height=50.dp),
+                    tint = MaterialTheme.colorScheme.surfaceTint
+                )
+            }
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 16.dp)
+            ) {
+                Button(
+                    onClick = { navController.navigate(Screen.EmailCompose.withIsDefault(true)) },
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primaryContainer),
+                    modifier = Modifier
+                        .height(80.dp)
+                        .fillMaxWidth(),
+                ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.relaysms_blue),
-                        contentDescription = "RelaySMS Logo",
-                        modifier = Modifier
-                            .size(200.dp)
-                            .wrapContentSize(Alignment.Center),
-                        tint = MaterialTheme.colorScheme.surfaceTint
+                        imageVector = Icons.Filled.Create,
+                        contentDescription = "Compose",
+                        modifier = Modifier.size(ButtonDefaults.IconSize),
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
                     )
+                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                    Text("Compose Message",
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        style = MaterialTheme.typography.bodySmall)
                 }
 
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceEvenly,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(250.dp)
-                        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 50.dp)
-                ) {
-                    Text(
-                        text = "Send message with Alias",
-//                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.titleMedium)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(
-                        onClick = { navController.navigate(Screen.EmailCompose.withIsDefault(true)) },
-                        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primaryContainer),
-                        modifier = Modifier.fillMaxWidth(),
-//                    shape = MaterialTheme.shapes.medium
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Create,
-                            contentDescription = "Compose",
-                            modifier = Modifier.size(ButtonDefaults.IconSize),
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                        Text("Compose Message",
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            style = MaterialTheme.typography.bodySmall)
+                Text(text = buildAnnotatedString {
+                    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
+                        append("Use your phone number to send an email with the alias: ")
                     }
-                    Text(text = buildAnnotatedString {
-                        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
-                            append("Use your phonenumber to send an email with the alias: ")
-                        }
-                        withStyle(style = SpanStyle(
-                            color = MaterialTheme.colorScheme.tertiary,
-                            fontWeight = FontWeight.Bold
-                        )
-                        ) {
-                            append("your_phonenumber@relaysms.me")
-                        }
-                    },
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(
-                                top = 8.dp,
-                                bottom = 8.dp,
-                                start = 20.dp,
-                                end = 20.dp
-                            ),
-                        color = MaterialTheme.colorScheme.onBackground,
-                        textAlign = TextAlign.Center)
-                }
-
-                HorizontalDivider()
-
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceEvenly,
+                    withStyle(style = SpanStyle(
+                        color = MaterialTheme.colorScheme.tertiary,
+                        fontWeight = FontWeight.Bold)
+                    ) { append("your_phonenumber@relaysms.me") } },
+                    style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(250.dp)
-                        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 50.dp)
+                        .padding(
+                            top = 32.dp,
+                            start = 20.dp,
+                            end = 20.dp
+                        ),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    textAlign = TextAlign.Center)
+            }
+
+            HorizontalDivider()
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 50.dp)
+            ) {
+                Text(
+                    text = "Login with Internet",
+                    style = MaterialTheme.typography.titleMedium,
+                )
+
+                Text("These features requires you to have an internet connection",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 32.dp, start = 8.dp, end = 8.dp),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    textAlign = TextAlign.Center
+                )
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text(
-                        text = "Login with Internet",
-                        style = MaterialTheme.typography.titleMedium,
-//                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    Button(
+                        onClick = { showCreateAccountBottomSheet = true },
+                        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
+                        modifier = Modifier
+                            .weight(1f)
+                            .size(height=65.dp, width=100.dp)
                     ) {
-                        Button(
-                            onClick = { showLoginBottomSheet = true },
-                            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.Login,
-                                contentDescription = "Log In",
-                                modifier = Modifier.size(ButtonDefaults.IconSize),
-                                tint = MaterialTheme.colorScheme.onPrimary
-                            )
-                            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                            Text("Log In", color = MaterialTheme.colorScheme.onPrimary)
-                        }
-                        Button(
-                            onClick = { showCreateAccountBottomSheet = true },
-                            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
-                            modifier = Modifier.weight(1f)
-                        ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(
                                 imageVector = Icons.Filled.PersonAdd,
                                 contentDescription = "Create Account",
-                                modifier = Modifier.size(ButtonDefaults.IconSize)
+                                Modifier.padding(bottom = 8.dp)
                             )
-                            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                            Text("Sign Up", color = MaterialTheme.colorScheme.onPrimary)
+                            Text("Create Account", color = MaterialTheme.colorScheme.onPrimary)
                         }
                     }
-                    Text("Use your RelaySMS account to send messages on your behalf on Gmail, X, Telegram",
-                        style = MaterialTheme.typography.bodySmall,
+
+                    Button(
+                        onClick = { showLoginBottomSheet = true },
+                        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 8.dp, bottom = 8.dp, start = 20.dp, end = 20.dp),
-                        color = MaterialTheme.colorScheme.onBackground,
-                        textAlign = TextAlign.Center)
-                }
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                TextButton(
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(top = 24.dp),
-                    onClick = { /* TODO: Navigate to Tutorial */ }
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
+                            .weight(1f)
+                            .size(height=65.dp, width=100.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Help,
-                            contentDescription = "Tutorial",
-                            modifier = Modifier.size(ButtonDefaults.IconSize)
-                        )
-                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                        Text("Need Help? View Tutorial",
-                            color = MaterialTheme.colorScheme.primary,
-                            style = MaterialTheme.typography.bodyMedium,
-                            textAlign = TextAlign.Center,
-                            textDecoration = TextDecoration.Underline
-                        )
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Login,
+                                contentDescription = "Log In",
+                                Modifier.padding(bottom = 8.dp)
+                            )
+                            Text("Log In", color = MaterialTheme.colorScheme.onPrimary)
+                        }
                     }
                 }
             }
