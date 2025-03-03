@@ -56,159 +56,159 @@ fun GetStartedView (
     var showLoginBottomSheet by remember { mutableStateOf(false) }
     var showCreateAccountBottomSheet by remember { mutableStateOf(false) }
 
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
+            .padding(top = 35.dp, start = 8.dp, end = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 35.dp, start = 8.dp, end = 8.dp),
+                .fillMaxWidth()
+                .padding(top = 50.dp, bottom=50.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 50.dp, bottom=50.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    text = "Get started with",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.primary,
-                )
+            Text(
+                text = "Get started with",
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
 
+            Icon(
+                painter = painterResource(id = R.drawable.relaysms_blue),
+                contentDescription = "RelaySMS Logo",
+                modifier = Modifier.size(width=200.dp, height=50.dp),
+                tint = MaterialTheme.colorScheme.surfaceTint
+            )
+        }
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 16.dp)
+        ) {
+            Button(
+                onClick = { navController.navigate(Screen.EmailCompose.withIsDefault(true)) },
+                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primaryContainer),
+                modifier = Modifier
+                    .height(80.dp)
+                    .fillMaxWidth(),
+            ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.relaysms_blue),
-                    contentDescription = "RelaySMS Logo",
-                    modifier = Modifier.size(width=200.dp, height=50.dp),
-                    tint = MaterialTheme.colorScheme.surfaceTint
+                    imageVector = Icons.Filled.Create,
+                    contentDescription = "Compose",
+                    modifier = Modifier.size(ButtonDefaults.IconSize),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
                 )
+                Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                Text("Compose Message",
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    style = MaterialTheme.typography.bodySmall)
             }
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceEvenly,
+            Text(text = buildAnnotatedString {
+                withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
+                    append("Use your phone number to send an email with the alias: ")
+                }
+                withStyle(style = SpanStyle(
+                    color = MaterialTheme.colorScheme.tertiary,
+                    fontWeight = FontWeight.Bold)
+                ) { append("your_phonenumber@relaysms.me") } },
+                style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 16.dp)
+                    .padding(
+                        top = 32.dp,
+                        start = 20.dp,
+                        end = 20.dp
+                    ),
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center)
+        }
+
+        HorizontalDivider()
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 50.dp)
+        ) {
+            Text(
+                text = "Login with Internet",
+                style = MaterialTheme.typography.titleMedium,
+            )
+
+            Text("These features requires you to have an internet connection",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 32.dp, start = 8.dp, end = 8.dp),
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Center
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Button(
-                    onClick = { navController.navigate(Screen.EmailCompose.withIsDefault(true)) },
-                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primaryContainer),
+                    onClick = { showLoginBottomSheet = true },
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
                     modifier = Modifier
-                        .height(80.dp)
-                        .fillMaxWidth(),
+                        .weight(1f)
+                        .size(height=65.dp, width=100.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.Create,
-                        contentDescription = "Compose",
-                        modifier = Modifier.size(ButtonDefaults.IconSize),
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                    Text("Compose Message",
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        style = MaterialTheme.typography.bodySmall)
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            imageVector = Icons.Filled.PersonAdd,
+                            contentDescription = "Create Account",
+                            Modifier.padding(bottom = 8.dp)
+                        )
+                        Text("Create Account", color = MaterialTheme.colorScheme.onPrimary)
+                    }
                 }
 
-                Text(text = buildAnnotatedString {
-                    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
-                        append("Use your phone number to send an email with the alias: ")
-                    }
-                    withStyle(style = SpanStyle(
-                        color = MaterialTheme.colorScheme.tertiary,
-                        fontWeight = FontWeight.Bold)
-                    ) { append("your_phonenumber@relaysms.me") } },
-                    style = MaterialTheme.typography.bodySmall,
+                Button(
+                    onClick = { showLoginBottomSheet = true },
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            top = 32.dp,
-                            start = 20.dp,
-                            end = 20.dp
-                        ),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center)
-            }
-
-            HorizontalDivider()
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 50.dp)
-            ) {
-                Text(
-                    text = "Login with Internet",
-                    style = MaterialTheme.typography.titleMedium,
-                )
-
-                Text("These features requires you to have an internet connection",
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 32.dp, start = 8.dp, end = 8.dp),
-                    color = MaterialTheme.colorScheme.onBackground,
-                    textAlign = TextAlign.Center
-                )
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        .weight(1f)
+                        .size(height=65.dp, width=100.dp)
                 ) {
-                    Button(
-                        onClick = { showCreateAccountBottomSheet = true },
-                        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
-                        modifier = Modifier
-                            .weight(1f)
-                            .size(height=65.dp, width=100.dp)
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(
-                                imageVector = Icons.Filled.PersonAdd,
-                                contentDescription = "Create Account",
-                                Modifier.padding(bottom = 8.dp)
-                            )
-                            Text("Create Account", color = MaterialTheme.colorScheme.onPrimary)
-                        }
-                    }
-
-                    Button(
-                        onClick = { showLoginBottomSheet = true },
-                        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
-                        modifier = Modifier
-                            .weight(1f)
-                            .size(height=65.dp, width=100.dp)
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.Login,
-                                contentDescription = "Log In",
-                                Modifier.padding(bottom = 8.dp)
-                            )
-                            Text("Log In", color = MaterialTheme.colorScheme.onPrimary)
-                        }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Login,
+                            contentDescription = "Log In",
+                            Modifier.padding(bottom = 8.dp)
+                        )
+                        Text("Log In", color = MaterialTheme.colorScheme.onPrimary)
                     }
                 }
             }
         }
 
         if (showLoginBottomSheet) {
-            LoginCreateInfoModal(onDismissCallback = {
-                showLoginBottomSheet = false
-            }) {
+            LoginCreateInfoModal(
+                showModal = showLoginBottomSheet,
+                onDismissCallback = {
+                    showLoginBottomSheet = false
+                }
+            ) {
                 navController.navigate(LoginScreen)
                 showLoginBottomSheet = false
             }
         }
 
         if (showCreateAccountBottomSheet) {
-            LoginCreateInfoModal(onDismissCallback = {
-                showLoginBottomSheet = false
-            }) {
+            LoginCreateInfoModal(
+                showModal = showLoginBottomSheet,
+                onDismissCallback = {
+                    showLoginBottomSheet = false
+                }) {
                 navController.navigate(CreateAccountScreen)
                 showLoginBottomSheet = false
             }
@@ -220,25 +220,30 @@ fun GetStartedView (
 @Preview
 @Composable
 fun LoginCreateInfoModal(
+    showModal: Boolean = false,
     onDismissCallback: () -> Unit = {},
     onContinueCallback: () -> Unit = {}
 ) {
+    var showModal by remember { mutableStateOf(showModal) }
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Expanded,
         skipHiddenState = false
     )
-    ModalBottomSheet(
-        onDismissRequest = {
-            onDismissCallback()
-        },
-        sheetState = sheetState,
-    ) {
-        Column {
-            Text("Something about this platform")
-            Button(onClick = {
-                onContinueCallback()
-            }) {
-                Text("Continue")
+    if(showModal) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                showModal = false
+                onDismissCallback()
+            },
+            sheetState = sheetState,
+        ) {
+            Column {
+                Text("Something about this platform")
+                Button(onClick = {
+                    onContinueCallback()
+                }) {
+                    Text("Continue")
+                }
             }
         }
     }
