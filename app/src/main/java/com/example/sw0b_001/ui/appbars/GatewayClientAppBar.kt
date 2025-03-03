@@ -36,19 +36,11 @@ fun GatewayClientsAppBar(
     TopAppBar(
         title = {
             Text(
-                text = "Gateway Clients",
+                text = "Countries",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
         },
-//        navigationIcon = {
-//            IconButton(onClick = {navController.popBackStack()}) {
-//                Icon(
-//                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-//                    contentDescription = "Back"
-//                )
-//            }
-//        },
         actions = {
             IconButton(onClick = { TODO("Implement refresh") }) {
                 Icon(
@@ -56,24 +48,6 @@ fun GatewayClientsAppBar(
                     contentDescription = "Menu"
                 )
             }
-//            DropdownMenu(
-//                expanded = showMenu,
-//                onDismissRequest = { showMenu = false }
-//            ) {
-//                DropdownMenuItem(
-//                    text = { Text("Refresh") },
-//                    onClick = {
-//                        TODO("Add functionality to refresh gateway clients")
-////                        showMenu = false
-//                    },
-//                    leadingIcon = {
-//                        Icon(
-//                            imageVector = Icons.Filled.Refresh,
-//                            contentDescription = "Refresh"
-//                        )
-//                    }
-//                )
-//            }
         },
         colors = TopAppBarDefaults.topAppBarColors()
     )

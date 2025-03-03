@@ -82,13 +82,18 @@ fun AvailablePlatformsView(
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
                 .padding(16.dp)
         ) {
             val platforms = listOf(
                 PlatformData(R.drawable.gmail, "Gmail", true),
                 PlatformData(R.drawable.telegram, "Telegram", false),
                 PlatformData(R.drawable.x_icon, "X", false)
+            )
+
+            Text(
+                text = "Available platforms",
+                style = MaterialTheme.typography.displayMedium,
+                modifier = Modifier.padding(bottom = 16.dp),
             )
 
             PlatformListContent(

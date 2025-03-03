@@ -24,6 +24,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.appbars.GatewayClientsAppBar
 import com.example.sw0b_001.ui.appbars.RecentsAppBar
+import com.example.sw0b_001.ui.navigation.HomepageScreen
+import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.serialization.Serializable
 
 
@@ -35,8 +37,7 @@ enum class BottomTabsItems {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Preview(showBackground = true)
-fun HomepageView(navController: NavController = rememberNavController()) {
+fun HomepageView(navController: NavController) {
     var isLoggedIn by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -108,3 +109,12 @@ fun HomepageView(navController: NavController = rememberNavController()) {
         }
     }
 }
+
+@Preview(showBackground = false)
+@Composable
+fun HomepageView_Preview() {
+    AppTheme(darkTheme = false) {
+        HomepageView(navController = rememberNavController())
+    }
+}
+
