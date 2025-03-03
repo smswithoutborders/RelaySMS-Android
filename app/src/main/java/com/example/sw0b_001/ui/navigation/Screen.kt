@@ -10,6 +10,8 @@ object LoginScreen
 object CreateAccountScreen
 @Serializable
 object OTPCodeScreen
+@Serializable
+object SettingsScreen
 
 //object GatewayClients : Screen("gateway")
 //object About : Screen("about")
@@ -24,7 +26,6 @@ sealed class Screen(val route: String) {
     //Screen Routes
     data object GatewayClients : Screen("gateway")
     data object About : Screen("about")
-    data object Settings : Screen("settings")
     data object AvailablePlatforms : Screen("available_platforms")
     data object Security : Screen("security")
     data object GetStarted : Screen("get_started")

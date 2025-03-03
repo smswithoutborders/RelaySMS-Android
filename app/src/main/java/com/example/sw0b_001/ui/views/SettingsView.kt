@@ -56,9 +56,6 @@ fun SettingsView(
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
-
-
-            
             // Accessibility Section
             SettingsSection(title = "Accessibility") {
                 SettingsRow(

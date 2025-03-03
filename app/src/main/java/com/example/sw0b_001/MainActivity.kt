@@ -1,5 +1,6 @@
 package com.example.sw0b_001
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,7 +10,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.core.content.ContentProviderCompat.requireContext
 import com.example.sw0b_001.ui.theme.AppTheme
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -26,6 +29,7 @@ import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
 import com.example.sw0b_001.ui.navigation.Screen
+import com.example.sw0b_001.ui.navigation.SettingsScreen
 import com.example.sw0b_001.ui.views.AboutView
 import com.example.sw0b_001.ui.views.GetStartedView
 import com.example.sw0b_001.ui.views.HomepageView
@@ -92,8 +96,9 @@ class MainActivity : ComponentActivity() {
                     navigationFlowHandler = navigationFlowHandler
                 )
             }
-            composable(Screen.Settings.route) {
-                SettingsView(navController = navController)
+            composable<SettingsScreen> {
+                val intent = Intent(LocalContext.current, SettingsActivity::class.java)
+                startActivity(intent)
             }
             composable(Screen.About.route) {
                 AboutView(navController = navController)

@@ -43,6 +43,10 @@
             android:exported="false" />
 
         <activity
+            android:name=".SettingsActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".Security.LockScreenActivity"
             android:exported="true">
             <intent-filter>
