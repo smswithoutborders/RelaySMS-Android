@@ -104,9 +104,12 @@ fun GetStartedView (
                     tint = MaterialTheme.colorScheme.onPrimaryContainer
                 )
                 Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                Text("Compose Message",
+                Text(
+                    "Compose Message",
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    style = MaterialTheme.typography.bodySmall)
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.SemiBold
+                )
             }
 
             Text(text = buildAnnotatedString {
