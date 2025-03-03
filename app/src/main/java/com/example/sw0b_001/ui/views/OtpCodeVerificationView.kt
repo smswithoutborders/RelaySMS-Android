@@ -1,5 +1,6 @@
 package com.example.sw0b_001.ui.views
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,10 +13,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -34,19 +43,24 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.Screen
 import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
+@Preview
 fun OtpCodeVerificationView(
     onCodeSubmitted: (String) -> Unit = {},
     onResendClicked: () -> Unit = {},
-    navController: NavController
+    navController: NavController = rememberNavController()
 ) {
     var otpCode by remember { mutableStateOf("") }
     var timeLeft by remember { mutableLongStateOf(60L) }
+
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     LaunchedEffect(key1 = timeLeft) {
         if (timeLeft > 0) {
@@ -55,7 +69,29 @@ fun OtpCodeVerificationView(
         }
     }
 
-    Scaffold { paddingValues ->
+    BackHandler {
+        navController.popBackStack()
+    }
+
+    Scaffold(
+        modifier = Modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            TopAppBar(
+                title = {},
+                navigationIcon = {
+                    IconButton(onClick = {
+                        navController.popBackStack()
+                    }) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            "Navigate back to home screen"
+                        )
+                    }
+                }
+            )
+        },
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -171,15 +207,4 @@ fun OtpCodeDigitBox(char: String) {
         textAlign = TextAlign.Center,
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun OtpCodeVerificationPreview() {
-    AppTheme {
-        OtpCodeVerificationView(
-            navController = NavController(context = LocalContext.current)
-        )
-    }
 }

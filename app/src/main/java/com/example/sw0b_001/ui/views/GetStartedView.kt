@@ -201,6 +201,7 @@ fun GetStartedView (
                 showLoginBottomSheet = false
             }) {
                 navController.navigate(LoginScreen)
+                showLoginBottomSheet = false
             }
         }
 
@@ -209,6 +210,7 @@ fun GetStartedView (
                 showLoginBottomSheet = false
             }) {
                 navController.navigate(CreateAccountScreen)
+                showLoginBottomSheet = false
             }
         }
     }
