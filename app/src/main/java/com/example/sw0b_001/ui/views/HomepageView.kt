@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.ui.appbars.BottomNavBar
+import com.example.sw0b_001.ui.appbars.RecentsAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,7 +28,11 @@ fun HomepageView(navController: NavController = rememberNavController()) {
 
     Scaffold (
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {},
+        topBar = {
+            if (isLoggedIn) {
+                RecentsAppBar(navController = navController)
+            }
+        },
         bottomBar = {
             BottomNavBar(
                 navController = navController

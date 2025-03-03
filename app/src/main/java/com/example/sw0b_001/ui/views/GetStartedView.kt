@@ -1,5 +1,6 @@
 package com.example.sw0b_001.ui.views
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,11 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.Scaffold
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.PersonAdd
@@ -24,9 +21,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,14 +38,13 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.modals.CreateAccountModal
-import com.example.sw0b_001.ui.modals.LoginModal
+import com.example.sw0b_001.ui.navigation.CreateAccountScreen
+import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.navigation.Screen
 import com.example.sw0b_001.ui.theme.AppTheme
 
@@ -72,7 +69,7 @@ fun GetStartedView (
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 16.dp, bottom=50.dp),
+                    .padding(top = 50.dp, bottom=50.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
@@ -200,24 +197,49 @@ fun GetStartedView (
         }
 
         if (showLoginBottomSheet) {
-            LoginModal(
-                showBottomSheet = showLoginBottomSheet,
-                onDismiss = { showLoginBottomSheet = false },
-                navController = navController
-            )
+            LoginCreateInfoModal(onDismissCallback = {
+                showLoginBottomSheet = false
+            }) {
+                navController.navigate(LoginScreen)
+            }
         }
 
         if (showCreateAccountBottomSheet) {
-            CreateAccountModal(
-                showBottomSheet = showCreateAccountBottomSheet,
-                onDismiss = { showCreateAccountBottomSheet = false },
-                navController = navController
-            )
+            LoginCreateInfoModal(onDismissCallback = {
+                showLoginBottomSheet = false
+            }) {
+                navController.navigate(CreateAccountScreen)
+            }
         }
-
     }
+}
 
-
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Composable
+fun LoginCreateInfoModal(
+    onDismissCallback: () -> Unit = {},
+    onContinueCallback: () -> Unit = {}
+) {
+    val sheetState = rememberStandardBottomSheetState(
+        initialValue = SheetValue.Expanded,
+        skipHiddenState = false
+    )
+    ModalBottomSheet(
+        onDismissRequest = {
+            onDismissCallback()
+        },
+        sheetState = sheetState,
+    ) {
+        Column {
+            Text("Something about this platform")
+            Button(onClick = {
+                onContinueCallback()
+            }) {
+                Text("Continue")
+            }
+        }
+    }
 }
 
 @Preview(showBackground = true)

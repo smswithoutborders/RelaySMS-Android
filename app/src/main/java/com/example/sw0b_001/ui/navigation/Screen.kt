@@ -4,6 +4,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 object HomepageScreen
+@Serializable
+object LoginScreen
+@Serializable
+object CreateAccountScreen
+@Serializable
+object OTPCodeScreen
 
 //object GatewayClients : Screen("gateway")
 //object About : Screen("about")
@@ -22,7 +28,6 @@ sealed class Screen(val route: String) {
     data object AvailablePlatforms : Screen("available_platforms")
     data object Security : Screen("security")
     data object GetStarted : Screen("get_started")
-    data object OTPCode : Screen("otp_code")
 
     // Message Compose Routes
     data object EmailCompose : Screen("email_compose?isDefault={isDefault}") {
