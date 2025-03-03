@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
@@ -168,7 +169,11 @@ fun GetStartedView (
                             contentDescription = "Create Account",
                             Modifier.padding(bottom = 8.dp)
                         )
-                        Text("Create Account", color = MaterialTheme.colorScheme.onPrimary)
+                        Text(
+                            "Create Account",
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontWeight = FontWeight.SemiBold
+                        )
                     }
                 }
 
@@ -185,7 +190,11 @@ fun GetStartedView (
                             contentDescription = "Log In",
                             Modifier.padding(bottom = 8.dp)
                         )
-                        Text("Log In", color = MaterialTheme.colorScheme.onPrimary)
+                        Text(
+                            "Log In",
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontWeight = FontWeight.SemiBold
+                        )
                     }
                 }
             }
