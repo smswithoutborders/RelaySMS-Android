@@ -22,4 +22,7 @@ interface AvailablePlatformsDao {
 
     @Query("DELETE FROM AvailablePlatforms WHERE name = :name")
     fun delete(name: String)
+
+    @Query("DELETE FROM AvailablePlatforms")
+    fun clear()
 }

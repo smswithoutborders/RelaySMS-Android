@@ -1,5 +1,7 @@
 package com.example.sw0b_001.ui.views
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,9 +45,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.sw0b_001.Models.Platforms.Platforms
+import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.PlatformOptionsModal
 import com.example.sw0b_001.ui.theme.AppTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.asImageBitmap
+import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
 
 data class PlatformData(
     val logo: Int,
@@ -57,7 +66,10 @@ data class PlatformData(
 @Composable
 fun AvailablePlatformsView(
     navController: NavController,
+    platformsViewModel: PlatformsViewModel,
+    isCompose: Boolean = false
 ) {
+    val context = LocalContext.current
     var showModal by remember { mutableStateOf(false) }
     var showPlatformOptions by remember { mutableStateOf(false) }
     var selectedPlatform by remember { mutableStateOf<PlatformData?>(null) }
@@ -83,21 +95,23 @@ fun AvailablePlatformsView(
             modifier = Modifier
                 .padding(16.dp)
         ) {
-            val platforms = listOf(
-                PlatformData(R.drawable.gmail, "Gmail", true),
-                PlatformData(R.drawable.telegram, "Telegram", false),
-                PlatformData(R.drawable.x_icon, "X", false)
-            )
+//            val platforms = listOf(
+//                PlatformData(R.drawable.gmail, "Gmail", true),
+//                PlatformData(R.drawable.telegram, "Telegram", false),
+//                PlatformData(R.drawable.x_icon, "X", false)
+//            )
+            val platforms: List<AvailablePlatforms> by platformsViewModel
+                .getAvailablePlatforms(context).observeAsState(emptyList())
 
             Text(
-                text = "Available platforms",
+                text = if(isCompose) "Send new message" else "Available platforms",
                 style = MaterialTheme.typography.displayMedium,
                 modifier = Modifier.padding(bottom = 16.dp),
             )
 
             PlatformListContent(
                 platforms = platforms,
-                filterPlatforms = false,
+                isCompose = isCompose,
                 onPlatformClick = showPlatformOptionsModal
             )
         }
@@ -152,10 +166,11 @@ fun RelaySMSCard(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PlatformListContent(
-    platforms: List<PlatformData>,
-    filterPlatforms: Boolean = false,
+    platforms: List<AvailablePlatforms>,
+    isCompose: Boolean = false,
     onPlatformClick: (PlatformData) -> Unit = {}
 ) {
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -183,8 +198,8 @@ fun PlatformListContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        val displayedPlatforms = if (filterPlatforms) {
-            platforms.filter { it.isActive }
+        val displayedPlatforms = if (isCompose) {
+            platforms.filter { TODO() }
         } else {
             platforms
         }
@@ -197,11 +212,15 @@ fun PlatformListContent(
         ) {
             displayedPlatforms.forEach { platform ->
                 PlatformCard(
-                    logo = platform.logo,
-                    platformName = platform.platformName,
+                    logo = BitmapFactory.decodeByteArray(
+                        platform.logo,
+                        0,
+                        platform.logo!!.count()
+                    ),
+                    platformName = platform.name,
                     modifier = Modifier.width(130.dp),
-                    isActive = platform.isActive,
-                    onClick = { onPlatformClick(platform) }
+                    isActive = false,
+                    onClick = {}
                 )
             }
         }
@@ -210,12 +229,13 @@ fun PlatformListContent(
 
 @Composable
 fun PlatformCard(
-    logo: Int,
+    logo: Bitmap? = null,
     platformName: String,
     modifier: Modifier = Modifier,
     isActive: Boolean,
     onClick: () -> Unit = {}
 ) {
+    val context = LocalContext.current
     Card(
         modifier = modifier
             .height(130.dp)
@@ -228,7 +248,11 @@ fun PlatformCard(
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
-                painter = painterResource(id = logo),
+                bitmap = if(logo != null) logo.asImageBitmap()
+                else BitmapFactory.decodeResource(
+                    context.resources,
+                    R.drawable.logo
+                ).asImageBitmap(),
                 contentDescription = "$platformName Logo",
                 modifier = Modifier
                     .size(50.dp)
@@ -262,7 +286,8 @@ fun PlatformCard(
 fun AddPlatformsScreenPreview() {
     AppTheme(darkTheme = false) {
         AvailablePlatformsView(
-            navController = NavController(context = LocalContext.current)
+            navController = NavController(context = LocalContext.current),
+            platformsViewModel = PlatformsViewModel()
         )
     }
 }

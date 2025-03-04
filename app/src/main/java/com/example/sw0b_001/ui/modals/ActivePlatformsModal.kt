@@ -37,9 +37,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.Screen
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.views.AvailablePlatformsView
 import com.example.sw0b_001.ui.views.PlatformData
 import com.example.sw0b_001.ui.views.PlatformListContent
 import kotlinx.coroutines.launch
@@ -47,7 +49,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivePlatformsModal(
-    platforms: List<PlatformData> = testPlatforms,
+    platformsViewModel: PlatformsViewModel,
     onDismiss: () -> Unit,
     navController: NavController,
     isCompose: Boolean = false
@@ -69,49 +71,11 @@ fun ActivePlatformsModal(
         sheetState = sheetState,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = if(isCompose) {"Send messages"} else "Active Platforms",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                modifier = if(isCompose)
-                    Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(bottom=16.dp)
-                else Modifier
-            )
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
-            ) {
-                PlatformListContent(
-                    platforms = platforms,
-                    filterPlatforms = true,
-                    onPlatformClick = { platform ->
-                        when (platform.platformName) {
-                            "Gmail" -> navController.navigate(Screen.EmailCompose.withIsDefault(false))
-                            "Telegram" -> navController.navigate(Screen.MessageCompose.route)
-                            "X" -> navController.navigate(Screen.TextCompose.route)
-                            "RelaySMS" -> navController.navigate(Screen.EmailCompose.withIsDefault(true))
-                            else -> {
-                                scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                    onDismiss()
-                                }
-                            }
-                        }
-                        scope.launch { sheetState.hide() }.invokeOnCompletion {
-                            onDismiss()
-                        }
-                    }
-                )
-            }
-        }
+        AvailablePlatformsView(
+            navController = navController,
+            platformsViewModel = platformsViewModel,
+            isCompose = isCompose
+        )
     }
 
     if (showSelectAccountModal && selectedPlatform != null) {
@@ -136,9 +100,8 @@ val testPlatforms = listOf(
 @Composable
 fun ActivePlatformsModalPreview() {
     AppTheme {
-
         ActivePlatformsModal(
-            platforms = testPlatforms,
+            platformsViewModel = PlatformsViewModel(),
             onDismiss = {},
             navController = NavController(LocalContext.current)
         )

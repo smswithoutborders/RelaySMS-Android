@@ -67,28 +67,20 @@ class GatewayClient {
     companion object {
         var TYPE_CUSTOM: String = "custom"
 
-        fun refreshGatewayClients(context: Context, failedCallback: Runnable) {
-            val scope = CoroutineScope(Dispatchers.Default)
-            scope.launch {
+        fun refreshGatewayClients(context: Context) {
+            CoroutineScope(Dispatchers.Default).launch {
                 try {
                     Publishers.getAvailablePlatforms(context).let{ json ->
                         json.forEach { it->
                             val url = URL(it.icon_png)
                             it.logo = url.readBytes()
                         }
-                        Datastore.getDatastore(context).availablePlatformsDao()
-                            .fetchAllList().forEach {
-                                if(!json.contains(it)) {
-                                    Datastore.getDatastore(context).availablePlatformsDao()
-                                        .delete(it.name)
-                                }
-                            }
-                        Datastore.getDatastore(context).availablePlatformsDao()
-                            .insertAll(json)
+                        Datastore.getDatastore(context).availablePlatformsDao().clear()
+                        println("Storing: $json")
+                        Datastore.getDatastore(context).availablePlatformsDao().insertAll(json)
                     }
                 } catch(e: Exception) {
-                    e.printStackTrace()
-                    failedCallback.run()
+                    throw e
                 }
             }
         }

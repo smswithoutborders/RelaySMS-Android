@@ -28,6 +28,8 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.sw0b_001.Models.Messages.MessagesViewModel
+import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.appbars.GatewayClientsAppBar
@@ -44,7 +46,9 @@ enum class BottomTabsItems {
 @Composable
 fun HomepageView(
     isLoggedIn: Boolean = false,
-    navController: NavController
+    navController: NavController,
+    platformsViewModel : PlatformsViewModel,
+    messagesViewModel: MessagesViewModel
 ) {
     val context = LocalContext.current
     val inspectionMode = LocalInspectionMode.current
@@ -134,7 +138,11 @@ fun HomepageView(
             when(bottomBarItem) {
                 BottomTabsItems.BottomBarRecentTab -> {
                     if (isLoggedIn) {
-                        RecentView(navController = navController) {
+                        RecentView(
+                            navController = navController,
+                            messagesViewModel = messagesViewModel,
+                            platformsViewModel = platformsViewModel
+                        ) {
                             bottomBarItem = BottomTabsItems.BottomBarPlatformsTab
                         }
                     } else {
@@ -142,7 +150,10 @@ fun HomepageView(
                     }
                 }
                 BottomTabsItems.BottomBarPlatformsTab -> {
-                    AvailablePlatformsView(navController = navController)
+                    AvailablePlatformsView(
+                        navController = navController,
+                        platformsViewModel = platformsViewModel
+                    )
                 }
                 BottomTabsItems.BottomBarCountriesTab -> {
                     GatewayClientView(addShowBottomSheet = showAddGatewayClientsModal) {
@@ -158,7 +169,11 @@ fun HomepageView(
 @Composable
 fun HomepageView_Preview() {
     AppTheme(darkTheme = false) {
-        HomepageView(navController = rememberNavController())
+        HomepageView(
+            navController = rememberNavController(),
+            platformsViewModel = PlatformsViewModel(),
+            messagesViewModel = MessagesViewModel()
+        )
     }
 }
 
@@ -167,7 +182,12 @@ fun HomepageView_Preview() {
 @Composable
 fun HomepageViewLoggedIn_Preview() {
     AppTheme(darkTheme = false) {
-        HomepageView(isLoggedIn = true, navController = rememberNavController())
+        HomepageView(
+            isLoggedIn = true,
+            navController = rememberNavController(),
+            platformsViewModel = PlatformsViewModel(),
+            messagesViewModel = MessagesViewModel()
+        )
     }
 }
 

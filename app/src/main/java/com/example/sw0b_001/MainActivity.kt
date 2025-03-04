@@ -20,8 +20,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.sw0b_001.Models.GatewayClients.GatewayClient
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
 import com.example.sw0b_001.Models.NavigationFlowHandler
+import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.ui.views.CreateAccountView
 import com.example.sw0b_001.ui.views.LoginView
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
@@ -39,12 +41,16 @@ import com.example.sw0b_001.ui.views.SettingsView
 import com.example.sw0b_001.ui.views.compose.EmailComposeView
 import com.example.sw0b_001.ui.views.compose.MessageComposeView
 import com.example.sw0b_001.ui.views.compose.TextComposeView
+import androidx.activity.viewModels
 
 
 class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
 
     val navigationFlowHandler = NavigationFlowHandler()
+
+    val platformsViewModel: PlatformsViewModel by viewModels()
+    val messagesViewModel: MessagesViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,7 +85,11 @@ class MainActivity : ComponentActivity() {
             startDestination = HomepageScreen,
         ) {
             composable<HomepageScreen> {
-                HomepageView(navController = navController)
+                HomepageView(
+                    navController = navController,
+                    platformsViewModel = platformsViewModel,
+                    messagesViewModel = messagesViewModel
+                )
             }
             composable<LoginScreen> {
                 LoginView(
@@ -160,6 +170,17 @@ class MainActivity : ComponentActivity() {
 //                    TextDetailsView(message = recentMessage, navController = navController)
                 }
             }
+        }
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+
+        try {
+            GatewayClient.refreshGatewayClients(applicationContext)
+        } catch(e: Exception) {
+            e.printStackTrace()
         }
     }
 }

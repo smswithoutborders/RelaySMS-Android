@@ -18,8 +18,7 @@ import publisher.v1.PublisherOuterClass
 
 class Publishers(val context: Context) {
 
-     private var REDIRECT_URL_SCHEME = "relaysms://oauth.afkanerd.com/android/"
-
+    private var REDIRECT_URL_SCHEME = "relaysms://oauth.afkanerd.com/android/"
     private var channel: ManagedChannel = ManagedChannelBuilder
         .forAddress(context.getString(R.string.publisher_grpc_url),
             context.getString(R.string.publisher_grpc_port).toInt())

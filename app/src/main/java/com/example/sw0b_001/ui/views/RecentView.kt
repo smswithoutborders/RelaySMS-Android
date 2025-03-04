@@ -1,6 +1,9 @@
 package com.example.sw0b_001.ui.views
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,12 +15,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -30,16 +37,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.Models.Messages.EncryptedContent
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
+import com.example.sw0b_001.Models.Platforms.Platforms
+import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
 import com.example.sw0b_001.ui.theme.AppTheme
@@ -125,15 +137,18 @@ fun RecentViewNoMessages(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecentView(
-    navController: NavController = rememberNavController(),
-    viewModel: MessagesViewModel = MessagesViewModel(),
+    _messages: List<EncryptedContent> = emptyList<EncryptedContent>(),
+    navController: NavController,
+    messagesViewModel: MessagesViewModel,
+    platformsViewModel: PlatformsViewModel,
     tabRequestedCallback: () -> Unit
 ) {
     val context = LocalContext.current
     var sendNewMessageRequested by remember { mutableStateOf(false) }
 
-    val messages: List<EncryptedContent> by viewModel
-        .getMessages(context = context).observeAsState(emptyList())
+    val messages: List<EncryptedContent> =
+        if(LocalInspectionMode.current) _messages
+        else messagesViewModel.getMessages(context = context).observeAsState(emptyList()).value
 
     Box(Modifier
         .padding(16.dp)
@@ -148,7 +163,7 @@ fun RecentView(
                 contentPadding = PaddingValues(vertical = 16.dp)
             ) {
                 items(messages) { message ->
-//                    RecentMessageCard(message, navController)
+                    RecentMessageCard(message)
                 }
             }
         } else {
@@ -161,6 +176,7 @@ fun RecentView(
 
         if (sendNewMessageRequested) {
             ActivePlatformsModal(
+                platformsViewModel = platformsViewModel,
                 onDismiss = { sendNewMessageRequested = false },
                 navController = navController,
                 isCompose = true
@@ -170,74 +186,99 @@ fun RecentView(
     }
 }
 
-//@Composable
-//fun RecentMessageCard(
-//    message: EncryptedContent,
-//    navController: NavController
-//) {
-//    Card(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .clickable { navigateToDetailsScreen(navController, message) },
-//        shape = RoundedCornerShape(16.dp),
-//        colors = CardDefaults.cardColors(
-//            containerColor = MaterialTheme.colorScheme.surfaceVariant
-//        )
-//    ) {
-//        Row(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(16.dp),
-//            verticalAlignment = Alignment.CenterVertically
-//        ) {
-//            Image(
-//                painter = painterResource(id = message.platformLogo),
-//                contentDescription = "${message.platformName} Logo",
-//                modifier = Modifier.size(48.dp)
-//            )
-//            Spacer(modifier = Modifier.width(16.dp))
-//            Column(modifier = Modifier.weight(1f)) {
-//                // Heading Text
-//                Text(
-//                    text = message.headingText,
-//                    style = if (message.platformName == "Gmail") {
-//                        MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-//                    } else {
-//                        MaterialTheme.typography.bodyLarge
-//                    },
-//                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-//                    maxLines = 1,
-//                    overflow = TextOverflow.Ellipsis
-//                )
-//                // Subheading Text
-//                if (message.subHeadingText != null) {
-//                    Text(
-//                        text = message.subHeadingText,
-//                        style = MaterialTheme.typography.bodyMedium,
-//                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-//                        maxLines = 1,
-//                        overflow = TextOverflow.Ellipsis
-//                    )
-//                }
-//                // Message Preview
-//                Text(
-//                    text = message.messagePreview,
-//                    style = MaterialTheme.typography.bodySmall,
-//                    maxLines = 2,
-//                    overflow = TextOverflow.Ellipsis,
-//                    color = MaterialTheme.colorScheme.onSurfaceVariant
-//                )
-//            }
-//            // Date
-//            Text(
-//                text = message.date,
-//                style = MaterialTheme.typography.labelSmall,
-//                color = MaterialTheme.colorScheme.onSurfaceVariant
-//            )
-//        }
-//    }
-//}
-//
+@Composable
+fun GetMessageAvatar(logo: Bitmap? = null) {
+    val context = LocalContext.current
+    if(LocalInspectionMode.current) {
+        Image(
+            painterResource(R.drawable.relaysms_icon_default_shape),
+            contentDescription = "Avatar image",
+            modifier = Modifier.size(48.dp)
+        )
+    }
+    else {
+        Image(
+            bitmap = if(logo != null) logo.asImageBitmap()
+            else BitmapFactory.decodeResource(
+                context.resources,
+                R.drawable.logo
+            ).asImageBitmap(),
+            contentDescription = "Avatar image",
+            modifier = Modifier.size(48.dp)
+        )
+    }
+}
+
+
+@Composable
+fun RecentMessageCard(
+    message: EncryptedContent,
+    logo: Bitmap? = null,
+) {
+    Column {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable {},
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                GetMessageAvatar(logo)
+
+                Spacer(modifier = Modifier.width(16.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    // Heading Text
+                    Text(
+                        text = message.encryptedContent,
+                        style = if (message.type == Platforms.Type.TEXT.type) {
+                            MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                        } else {
+                            MaterialTheme.typography.bodyLarge
+                        },
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    // Subheading Text
+                    if (message.encryptedContent != null) {
+                        Text(
+                            text = message.encryptedContent,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    // Message Preview
+                    Text(
+                        text = message.encryptedContent,
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                // Date
+                Text(
+                    text = message.date.toString(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
+    }
+}
+
 
 //fun navigateToDetailsScreen(navController: NavController, message: RecentMessage) {
 //    val recentMessageJson = Json.encodeToString(message)
@@ -263,15 +304,59 @@ fun RecentView(
 @Composable
 fun RecentScreenPreview() {
     AppTheme(darkTheme = false) {
-        RecentView(navController = NavController(context = LocalContext.current)) {}
+        val encryptedContent = EncryptedContent()
+        encryptedContent.id = 0
+        encryptedContent.type = "email"
+        encryptedContent.date = System.currentTimeMillis()
+        encryptedContent.platformName = "gmail"
+        encryptedContent.platformId = ""
+        encryptedContent.fromAccount = "developers@relaysms.me"
+        encryptedContent.gatewayClientMSISDN = "+237123456789"
+        encryptedContent.encryptedContent = "This is an encrypted content"
+        RecentView(
+            navController = rememberNavController(),
+            messagesViewModel = MessagesViewModel(),
+            platformsViewModel = PlatformsViewModel()
+        ) {}
     }
 }
 
 
 @Preview(showBackground = true)
 @Composable
-fun RecentCardPreview() {
+fun RecentScreenMessages_Preview() {
     AppTheme(darkTheme = false) {
-//        RecentMessageCard()
+        val encryptedContent = EncryptedContent()
+        encryptedContent.id = 0
+        encryptedContent.type = "email"
+        encryptedContent.date = System.currentTimeMillis()
+        encryptedContent.platformName = "gmail"
+        encryptedContent.platformId = ""
+        encryptedContent.fromAccount = "developers@relaysms.me"
+        encryptedContent.gatewayClientMSISDN = "+237123456789"
+        encryptedContent.encryptedContent = "This is an encrypted content"
+        RecentView(
+            _messages = listOf(encryptedContent),
+            navController = rememberNavController(),
+            messagesViewModel = MessagesViewModel(),
+            platformsViewModel = PlatformsViewModel()
+        ) {}
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RecentsCardPreview() {
+    AppTheme(darkTheme = false) {
+        val encryptedContent = EncryptedContent()
+        encryptedContent.id = 0
+        encryptedContent.type = "email"
+        encryptedContent.date = System.currentTimeMillis()
+        encryptedContent.platformName = "gmail"
+        encryptedContent.platformId = ""
+        encryptedContent.fromAccount = "developers@relaysms.me"
+        encryptedContent.gatewayClientMSISDN = "+237123456789"
+        encryptedContent.encryptedContent = "This is an encrypted content"
+        RecentMessageCard(encryptedContent)
     }
 }
