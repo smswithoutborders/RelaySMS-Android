@@ -79,7 +79,10 @@ fun HomepageView(
             when(bottomBarItem) {
                 BottomTabsItems.BottomBarRecentTab -> {
                     if (isLoggedIn) {
-                        RecentAppBar(navController = navController)
+                        RecentAppBar(
+                            navController = navController,
+                            isSearchable = messages.isNotEmpty()
+                        )
                     }
                 }
                 BottomTabsItems.BottomBarPlatformsTab -> {}

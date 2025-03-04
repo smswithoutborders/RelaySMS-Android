@@ -33,7 +33,8 @@ import com.example.sw0b_001.ui.theme.AppTheme
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun RecentAppBar(
-    navController: NavController
+    navController: NavController,
+    isSearchable: Boolean
 ) {
     val context = LocalContext.current
     var showMenu by remember { mutableStateOf(false) }
@@ -53,12 +54,15 @@ fun RecentAppBar(
             Text(stringResource(R.string.app_name))
         },
         actions = {
-            IconButton(onClick = { TODO() }) {
-                Icon(
-                    imageVector = Icons.Filled.Search,
-                    contentDescription = "Search"
-                )
+            if(isSearchable) {
+                IconButton(onClick = { TODO() }) {
+                    Icon(
+                        imageVector = Icons.Filled.Search,
+                        contentDescription = "Search"
+                    )
+                }
             }
+
             IconButton(onClick = { showMenu = !showMenu }) {
                 Icon(
                     imageVector = Icons.Filled.MoreVert,
@@ -104,6 +108,9 @@ fun RecentAppBar(
 @Composable
 fun RecentsAppBarPreview() {
     AppTheme(darkTheme = false) {
-        RecentAppBar(navController = NavController(context = LocalContext.current))
+        RecentAppBar(
+            navController = NavController(context = LocalContext.current),
+            isSearchable = true
+        )
     }
 }
