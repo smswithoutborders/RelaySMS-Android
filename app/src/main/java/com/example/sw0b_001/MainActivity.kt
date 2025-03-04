@@ -96,10 +96,6 @@ class MainActivity : ComponentActivity() {
                     navigationFlowHandler = navigationFlowHandler
                 )
             }
-            composable<SettingsScreen> {
-                val intent = Intent(LocalContext.current, SettingsActivity::class.java)
-                startActivity(intent)
-            }
             composable(Screen.About.route) {
                 AboutView(navController = navController)
             }

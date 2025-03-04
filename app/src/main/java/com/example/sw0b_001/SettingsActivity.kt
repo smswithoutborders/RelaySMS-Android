@@ -1,6 +1,8 @@
 package com.example.sw0b_001
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -30,5 +32,16 @@ class SettingsActivity : AppCompatActivity() {
                 .beginTransaction()
                 .replace(R.id.settings_fragment, SettingsFragment())
                 .commit()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if(item.itemId == android.R.id.home) {
+            startActivity(
+                Intent(applicationContext, MainActivity::class.java).apply {
+                    setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_TASK_ON_HOME)
+                }
+            )
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

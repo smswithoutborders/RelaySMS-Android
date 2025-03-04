@@ -1,5 +1,6 @@
 package com.example.sw0b_001.ui.appbars
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Row
@@ -35,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
+import com.example.sw0b_001.SettingsActivity
 import com.example.sw0b_001.ui.navigation.Screen
 import com.example.sw0b_001.ui.navigation.SettingsScreen
 import com.example.sw0b_001.ui.theme.AppTheme
@@ -44,6 +46,7 @@ import com.example.sw0b_001.ui.theme.AppTheme
 fun RecentsAppBar(
     navController: NavController
 ) {
+    val context = LocalContext.current
     var showMenu by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val isDarkTheme = isSystemInDarkTheme()
@@ -80,7 +83,11 @@ fun RecentsAppBar(
                 DropdownMenuItem(
                     text = { Text("Settings") },
                     onClick = {
-                        navController.navigate(SettingsScreen)
+                        context.startActivity(
+                            Intent(context, SettingsActivity::class.java).apply {
+                                setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_TASK_ON_HOME)
+                            }
+                        )
                         showMenu = false
                     }
                 )
