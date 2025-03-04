@@ -20,14 +20,11 @@ import androidx.compose.ui.unit.dp
 import com.example.sw0b_001.ui.views.BottomTabsItems
 
 @Composable
-@Preview
 fun BottomNavBar(
-    selectedTab: BottomTabsItems = BottomTabsItems.BottomBarRecentTab,
+    selectedTab: BottomTabsItems,
     isLoggedIn: Boolean = true,
     onChangeTab: (BottomTabsItems) -> Unit = {}
 ) {
-    var selectedTab = remember { mutableStateOf(selectedTab) }
-
     NavigationBar {
         NavigationBarItem(
             icon = { Icon(
@@ -41,10 +38,9 @@ fun BottomNavBar(
                     style = MaterialTheme.typography.labelSmall
                 )
             },
-            selected = selectedTab.value == BottomTabsItems.BottomBarRecentTab,
+            selected = selectedTab == BottomTabsItems.BottomBarRecentTab,
             onClick = {
-                selectedTab.value = BottomTabsItems.BottomBarRecentTab
-                onChangeTab(selectedTab.value)
+                onChangeTab(BottomTabsItems.BottomBarRecentTab)
             },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = MaterialTheme.colorScheme.onSurface,
@@ -65,10 +61,9 @@ fun BottomNavBar(
                     text = "Platforms",
                     style = MaterialTheme.typography.labelSmall
                 ) },
-                selected = selectedTab.value == BottomTabsItems.BottomBarPlatformsTab,
+                selected = selectedTab == BottomTabsItems.BottomBarPlatformsTab,
                 onClick = {
-                    selectedTab.value = BottomTabsItems.BottomBarPlatformsTab
-                    onChangeTab(selectedTab.value)
+                    onChangeTab(BottomTabsItems.BottomBarPlatformsTab,)
                 },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = MaterialTheme.colorScheme.onSurface,
@@ -90,10 +85,9 @@ fun BottomNavBar(
                 text = "Countries",
                 style = MaterialTheme.typography.labelSmall
             ) },
-            selected = selectedTab.value == BottomTabsItems.BottomBarCountriesTab,
+            selected = selectedTab == BottomTabsItems.BottomBarCountriesTab,
             onClick = {
-                selectedTab.value = BottomTabsItems.BottomBarCountriesTab
-                onChangeTab(selectedTab.value)
+                onChangeTab(BottomTabsItems.BottomBarCountriesTab,)
             },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = MaterialTheme.colorScheme.onSurface,

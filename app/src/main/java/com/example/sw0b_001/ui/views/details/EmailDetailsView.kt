@@ -35,7 +35,6 @@ import com.example.sw0b_001.Models.Messages.EncryptedContent
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.views.MessageType
 import kotlinx.android.parcel.Parcelize
 
 // Data class for Gmail details

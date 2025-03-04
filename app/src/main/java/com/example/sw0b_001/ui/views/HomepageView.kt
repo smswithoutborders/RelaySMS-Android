@@ -31,7 +31,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.appbars.GatewayClientsAppBar
-import com.example.sw0b_001.ui.appbars.RecentsAppBar
+import com.example.sw0b_001.ui.appbars.RecentAppBar
 import com.example.sw0b_001.ui.theme.AppTheme
 
 enum class BottomTabsItems {
@@ -68,7 +68,7 @@ fun HomepageView(
             when(bottomBarItem) {
                 BottomTabsItems.BottomBarRecentTab -> {
                     if (isLoggedIn) {
-                        RecentsAppBar(navController = navController)
+                        RecentAppBar(navController = navController)
                     }
                 }
                 BottomTabsItems.BottomBarPlatformsTab -> {}
@@ -78,7 +78,10 @@ fun HomepageView(
             }
         },
         bottomBar = {
-            BottomNavBar(isLoggedIn = isLoggedIn) { selectedTab ->
+            BottomNavBar(
+                selectedTab = bottomBarItem,
+                isLoggedIn = isLoggedIn
+            ) { selectedTab ->
                 bottomBarItem = selectedTab
             }
         },
@@ -131,7 +134,9 @@ fun HomepageView(
             when(bottomBarItem) {
                 BottomTabsItems.BottomBarRecentTab -> {
                     if (isLoggedIn) {
-                        RecentView(navController = navController)
+                        RecentView(navController = navController) {
+                            bottomBarItem = BottomTabsItems.BottomBarPlatformsTab
+                        }
                     } else {
                         GetStartedView(navController = navController)
                     }

@@ -1,7 +1,6 @@
 package com.example.sw0b_001.ui.views
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,28 +12,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Help
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -45,15 +30,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -61,25 +41,14 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.Models.Messages.EncryptedContent
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.appbars.RecentsAppBar
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
-import com.example.sw0b_001.ui.navigation.Screen
 import com.example.sw0b_001.ui.theme.AppTheme
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
-
-enum class MessageType {
-    DEFAULT,
-    GMAIL,
-    TELEGRAM,
-    X
-}
 
 @Composable
-fun RecentViewNoMessages() {
+fun RecentViewNoMessages(
+    saveNewPlatformCallback: () -> Unit,
+    sendNewMessageCallback: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -114,7 +83,7 @@ fun RecentViewNoMessages() {
         ) {
 
             Button(
-                onClick = {},
+                onClick = { sendNewMessageCallback() },
                 modifier = Modifier
                     .padding(bottom = 16.dp)
                     .height(50.dp)
@@ -127,7 +96,7 @@ fun RecentViewNoMessages() {
             }
 
             Button(
-                onClick = {},
+                onClick = { saveNewPlatformCallback() },
                 modifier = Modifier
                     .height(50.dp)
                     .fillMaxWidth(),
@@ -149,9 +118,6 @@ fun RecentViewNoMessages() {
                 }
             }
             Spacer(modifier = Modifier.height(64.dp))
-
-
-
         }
     }
 }
@@ -160,11 +126,11 @@ fun RecentViewNoMessages() {
 @Composable
 fun RecentView(
     navController: NavController = rememberNavController(),
-    viewModel: MessagesViewModel = MessagesViewModel()
+    viewModel: MessagesViewModel = MessagesViewModel(),
+    tabRequestedCallback: () -> Unit
 ) {
     val context = LocalContext.current
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    var showBottomSheet by remember { mutableStateOf(false) }
+    var sendNewMessageRequested by remember { mutableStateOf(false) }
 
     val messages: List<EncryptedContent> by viewModel
         .getMessages(context = context).observeAsState(emptyList())
@@ -186,13 +152,17 @@ fun RecentView(
                 }
             }
         } else {
-            RecentViewNoMessages()
+            RecentViewNoMessages(
+                saveNewPlatformCallback = { tabRequestedCallback() }
+            ) {
+                sendNewMessageRequested = true
+            }
         }
 
-        if (showBottomSheet) {
+        if (sendNewMessageRequested) {
             ActivePlatformsModal(
-                showBottomSheet = showBottomSheet,
-                onDismiss = { showBottomSheet = false },
+                showBottomSheet = sendNewMessageRequested,
+                onDismiss = { sendNewMessageRequested = false },
                 navController = navController
             )
         }
@@ -293,7 +263,7 @@ fun RecentView(
 @Composable
 fun RecentScreenPreview() {
     AppTheme(darkTheme = false) {
-        RecentView(navController = NavController(context = LocalContext.current))
+        RecentView(navController = NavController(context = LocalContext.current)) {}
     }
 }
 
