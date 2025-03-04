@@ -59,8 +59,8 @@ class Vaults(context: Context) {
                     it.platform)
             )
         }
-        Datastore.getDatastore(context).storedPlatformsDao()
-            .insertAll(storedPlatforms)
+        Datastore.getDatastore(context).storedPlatformsDao().deleteAll()
+        Datastore.getDatastore(context).storedPlatformsDao().insertAll(storedPlatforms)
     }
 
     private fun processVaultArtifacts(context: Context,

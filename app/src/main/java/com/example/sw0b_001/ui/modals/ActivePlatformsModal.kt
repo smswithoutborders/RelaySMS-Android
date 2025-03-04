@@ -49,6 +49,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivePlatformsModal(
+    sendNewMessageRequested: Boolean,
     platformsViewModel: PlatformsViewModel,
     onDismiss: () -> Unit,
     navController: NavController,
@@ -62,20 +63,25 @@ fun ActivePlatformsModal(
     var showSelectAccountModal by remember { mutableStateOf(false) }
     var selectedPlatform by remember { mutableStateOf<PlatformData?>(null) }
 
-    ModalBottomSheet(
-        onDismissRequest = {
-            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                onDismiss()
-            }
-        },
-        sheetState = sheetState,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        AvailablePlatformsView(
-            navController = navController,
-            platformsViewModel = platformsViewModel,
-            isCompose = isCompose
-        )
+    if(sendNewMessageRequested) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                scope.launch {
+                    sheetState.hide()
+                }.invokeOnCompletion {
+                    onDismiss()
+                }
+            },
+            sheetState = sheetState,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            AvailablePlatformsView(
+                navController = navController,
+                platformsViewModel = platformsViewModel,
+                isCompose = isCompose
+            )
+        }
+
     }
 
     if (showSelectAccountModal && selectedPlatform != null) {
@@ -101,6 +107,7 @@ val testPlatforms = listOf(
 fun ActivePlatformsModalPreview() {
     AppTheme {
         ActivePlatformsModal(
+            sendNewMessageRequested = true,
             platformsViewModel = PlatformsViewModel(),
             onDismiss = {},
             navController = NavController(LocalContext.current)

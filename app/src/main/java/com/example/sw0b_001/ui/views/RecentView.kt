@@ -176,6 +176,7 @@ fun RecentView(
 
         if (sendNewMessageRequested) {
             ActivePlatformsModal(
+                sendNewMessageRequested = sendNewMessageRequested,
                 platformsViewModel = platformsViewModel,
                 onDismiss = { sendNewMessageRequested = false },
                 navController = navController,

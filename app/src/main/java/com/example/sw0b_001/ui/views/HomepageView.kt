@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,8 +29,10 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.sw0b_001.Models.Messages.EncryptedContent
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
+import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.appbars.GatewayClientsAppBar
@@ -45,6 +48,7 @@ enum class BottomTabsItems {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomepageView(
+    _messages: List<EncryptedContent> = emptyList<EncryptedContent>(),
     isLoggedIn: Boolean = false,
     navController: NavController,
     platformsViewModel : PlatformsViewModel,
@@ -59,6 +63,9 @@ fun HomepageView(
             Vaults.fetchLongLivedToken(context).isNotBlank()
         )
     }
+
+    val messages: List<EncryptedContent> = if(_messages.isNotEmpty()) _messages
+    else messagesViewModel.getMessages(context).observeAsState(emptyList()).value
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -92,26 +99,28 @@ fun HomepageView(
         floatingActionButton = {
             when(bottomBarItem) {
                 BottomTabsItems.BottomBarRecentTab -> {
-                    Column(horizontalAlignment = Alignment.End) {
-                        ExtendedFloatingActionButton(
-                            onClick = {
+                    if(messages.isNotEmpty()) {
+                        Column(horizontalAlignment = Alignment.End) {
+                            ExtendedFloatingActionButton(
+                                onClick = {
 
-                            },
-                            containerColor = MaterialTheme.colorScheme.secondary,
-                            icon = {
-                                Icon(
-                                    imageVector = Icons.Filled.Create,
-                                    contentDescription = "Compose Message",
-                                    tint = MaterialTheme.colorScheme.onSecondary
-                                )
-                            },
-                            text = {
-                                Text(
-                                    text = "Compose",
-                                    color = MaterialTheme.colorScheme.onSecondary
-                                )
-                            }
-                        )
+                                },
+                                containerColor = MaterialTheme.colorScheme.secondary,
+                                icon = {
+                                    Icon(
+                                        imageVector = Icons.Filled.Create,
+                                        contentDescription = "Compose Message",
+                                        tint = MaterialTheme.colorScheme.onSecondary
+                                    )
+                                },
+                                text = {
+                                    Text(
+                                        text = "Compose",
+                                        color = MaterialTheme.colorScheme.onSecondary
+                                    )
+                                }
+                            )
+                        }
                     }
                 }
                 BottomTabsItems.BottomBarPlatformsTab -> {}
@@ -139,6 +148,7 @@ fun HomepageView(
                 BottomTabsItems.BottomBarRecentTab -> {
                     if (isLoggedIn) {
                         RecentView(
+                            _messages = _messages,
                             navController = navController,
                             messagesViewModel = messagesViewModel,
                             platformsViewModel = platformsViewModel
@@ -183,6 +193,31 @@ fun HomepageView_Preview() {
 fun HomepageViewLoggedIn_Preview() {
     AppTheme(darkTheme = false) {
         HomepageView(
+            isLoggedIn = true,
+            navController = rememberNavController(),
+            platformsViewModel = PlatformsViewModel(),
+            messagesViewModel = MessagesViewModel()
+        )
+    }
+}
+
+
+@Preview(showBackground = false)
+@Composable
+fun HomepageViewLoggedInMessages_Preview() {
+    AppTheme(darkTheme = false) {
+        val encryptedContent = EncryptedContent()
+        encryptedContent.id = 0
+        encryptedContent.type = "email"
+        encryptedContent.date = System.currentTimeMillis()
+        encryptedContent.platformName = "gmail"
+        encryptedContent.platformId = ""
+        encryptedContent.fromAccount = "developers@relaysms.me"
+        encryptedContent.gatewayClientMSISDN = "+237123456789"
+        encryptedContent.encryptedContent = "This is an encrypted content"
+
+        HomepageView(
+            _messages = listOf(encryptedContent),
             isLoggedIn = true,
             navController = rememberNavController(),
             platformsViewModel = PlatformsViewModel(),

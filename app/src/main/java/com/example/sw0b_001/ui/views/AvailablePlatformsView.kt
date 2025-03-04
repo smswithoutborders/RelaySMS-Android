@@ -54,6 +54,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.asImageBitmap
 import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
+import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 
 data class PlatformData(
     val logo: Int,
@@ -73,11 +74,6 @@ fun AvailablePlatformsView(
     var showModal by remember { mutableStateOf(false) }
     var showPlatformOptions by remember { mutableStateOf(false) }
     var selectedPlatform by remember { mutableStateOf<PlatformData?>(null) }
-    val platforms = listOf(
-        PlatformData(R.drawable.gmail, "Gmail", true),
-        PlatformData(R.drawable.telegram, "Telegram", false),
-        PlatformData(R.drawable.x_icon, "X", false)
-    )
 
     val showPlatformOptionsModal = { platform: PlatformData ->
         selectedPlatform = platform
@@ -95,13 +91,11 @@ fun AvailablePlatformsView(
             modifier = Modifier
                 .padding(16.dp)
         ) {
-//            val platforms = listOf(
-//                PlatformData(R.drawable.gmail, "Gmail", true),
-//                PlatformData(R.drawable.telegram, "Telegram", false),
-//                PlatformData(R.drawable.x_icon, "X", false)
-//            )
             val platforms: List<AvailablePlatforms> by platformsViewModel
                 .getAvailablePlatforms(context).observeAsState(emptyList())
+
+            val storedPlatforms: List<StoredPlatformsEntity> by platformsViewModel
+                .getSaved(context).observeAsState(emptyList())
 
             Text(
                 text = if(isCompose) "Send new message" else "Available platforms",
@@ -111,6 +105,7 @@ fun AvailablePlatformsView(
 
             PlatformListContent(
                 platforms = platforms,
+                storedPlatforms = storedPlatforms,
                 isCompose = isCompose,
                 onPlatformClick = showPlatformOptionsModal
             )
@@ -167,10 +162,10 @@ fun RelaySMSCard(
 @Composable
 fun PlatformListContent(
     platforms: List<AvailablePlatforms>,
+    storedPlatforms: List<StoredPlatformsEntity>,
     isCompose: Boolean = false,
     onPlatformClick: (PlatformData) -> Unit = {}
 ) {
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -199,7 +194,9 @@ fun PlatformListContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         val displayedPlatforms = if (isCompose) {
-            platforms.filter { TODO() }
+            platforms.filter { platform ->
+                storedPlatforms.filter { it.name == platform.name }.isNotEmpty()
+            }
         } else {
             platforms
         }
@@ -212,14 +209,18 @@ fun PlatformListContent(
         ) {
             displayedPlatforms.forEach { platform ->
                 PlatformCard(
-                    logo = BitmapFactory.decodeByteArray(
-                        platform.logo,
-                        0,
-                        platform.logo!!.count()
-                    ),
+                    logo =
+                    if(platform.logo != null)
+                        BitmapFactory.decodeByteArray(
+                            platform.logo,
+                            0,
+                            platform.logo!!.count()
+                        )
+                    else null,
                     platformName = platform.name,
                     modifier = Modifier.width(130.dp),
-                    isActive = false,
+                    isActive = isCompose || storedPlatforms
+                        .filter { platform.name == it.name}.isNotEmpty(),
                     onClick = {}
                 )
             }
@@ -288,6 +289,34 @@ fun AddPlatformsScreenPreview() {
         AvailablePlatformsView(
             navController = NavController(context = LocalContext.current),
             platformsViewModel = PlatformsViewModel()
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AvailablePlatformsCardPreview() {
+    AppTheme(darkTheme = false) {
+        val platform = AvailablePlatforms(
+            name = "gmail",
+            shortcode = "g",
+            service_type = "email",
+            protocol_type = "oauth2",
+            icon_png = "",
+            icon_svg = "",
+            support_url_scheme = true,
+            logo = null
+        )
+
+        val storedPlatform = StoredPlatformsEntity(
+            id= "0",
+            account = "developers@relaysms.me",
+            name = "gmail",
+        )
+
+        PlatformListContent(
+            platforms = listOf(platform),
+            storedPlatforms = listOf(storedPlatform),
         )
     }
 }
