@@ -161,9 +161,9 @@ fun RecentView(
 
         if (sendNewMessageRequested) {
             ActivePlatformsModal(
-                showBottomSheet = sendNewMessageRequested,
                 onDismiss = { sendNewMessageRequested = false },
-                navController = navController
+                navController = navController,
+                isCompose = true
             )
         }
 

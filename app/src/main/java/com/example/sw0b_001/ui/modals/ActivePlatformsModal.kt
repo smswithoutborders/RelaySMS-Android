@@ -49,15 +49,14 @@ import kotlinx.coroutines.launch
 fun ActivePlatformsModal(
     platforms: List<PlatformData> = testPlatforms,
     onDismiss: () -> Unit,
-    showBottomSheet: Boolean,
-    navController: NavController
+    navController: NavController,
+    isCompose: Boolean = false
 ) {
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Expanded,
         skipHiddenState = false
     )
     val scope = rememberCoroutineScope()
-    var isExpanded by remember { mutableStateOf(false) }
     var showSelectAccountModal by remember { mutableStateOf(false) }
     var selectedPlatform by remember { mutableStateOf<PlatformData?>(null) }
 
@@ -76,9 +75,14 @@ fun ActivePlatformsModal(
                 .padding(16.dp)
         ) {
             Text(
-                text = "Active Platforms",
+                text = if(isCompose) {"Send messages"} else "Active Platforms",
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
+                modifier = if(isCompose)
+                    Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(bottom=16.dp)
+                else Modifier
             )
 
             Column(
@@ -136,7 +140,6 @@ fun ActivePlatformsModalPreview() {
         ActivePlatformsModal(
             platforms = testPlatforms,
             onDismiss = {},
-            showBottomSheet = true,
             navController = NavController(LocalContext.current)
         )
     }
