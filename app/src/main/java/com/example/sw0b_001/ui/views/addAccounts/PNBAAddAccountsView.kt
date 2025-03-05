@@ -3,6 +3,7 @@ package com.example.sw0b_001.ui.views.addAccounts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,10 +46,14 @@ import com.example.sw0b_001.ui.theme.AppTheme
 
 @Composable
 fun PNBAPhoneNumberCodeRequestView(
+    isLoading: Boolean = false,
     platform: AvailablePlatforms? = null,
     isPhoneNumberRequested: Boolean = true,
     isAuthenticationCodeRequested: Boolean,
     isPasswordRequested: Boolean,
+    phoneNumberRequestedCallback: (String) -> Unit,
+    codeRequestedCallback: (String, String) -> Unit,
+    passwordRequestedCallback: (String, String, String) -> Unit,
 ) {
     var isCodeVisible by remember { mutableStateOf(false) }
     var isPasswordVisible by remember { mutableStateOf(false) }
@@ -65,18 +71,19 @@ fun PNBAPhoneNumberCodeRequestView(
                 Box(
                     modifier = Modifier
                         .background(
-                            color = MaterialTheme.colorScheme.tertiaryContainer,
+                            color = MaterialTheme.colorScheme.errorContainer,
                             shape = RoundedCornerShape(4.dp)
                         )
                 ) {
                     Text(
                         "Please enter your Telegram code without copying it from the message - copying might get flagged and Telegram might block your account.",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(16.dp)
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        modifier = Modifier
+                            .padding(16.dp)
                     )
                 }
+                Spacer(modifier = Modifier.padding(16.dp))
             }
         }
 
@@ -167,12 +174,37 @@ fun PNBAPhoneNumberCodeRequestView(
         }
 
         Button(
-            onClick = {},
+            onClick = {
+                if(!isAuthenticationCodeRequested && !isPasswordRequested) {
+                    phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+                    phoneNumberRequestedCallback(phoneNumber)
+                }
+                else if(isAuthenticationCodeRequested && !isPasswordRequested) {
+                    codeRequestedCallback(phoneNumber, authCode)
+                }
+                else {
+                    passwordRequestedCallback(phoneNumber, authCode, password)
+                }
+            },
+            enabled = !isLoading && (
+                    phoneNumber.isNotEmpty()
+                            || (isAuthenticationCodeRequested && authCode.isNotEmpty())
+                            && (isPasswordRequested && authCode.isNotEmpty() &&
+                            password.isNotEmpty())
+            ),
             modifier = Modifier.fillMaxWidth()
                 .padding(top=32.dp)
                 .align(Alignment.CenterHorizontally),
         ) {
-            Text("Submit")
+            if(isLoading) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.secondary,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                )
+            }
+            else {
+                Text("Submit")
+            }
         }
     }
 }
@@ -197,7 +229,10 @@ fun PNBAPreview() {
             platform = platform,
             isPhoneNumberRequested = true,
             isPasswordRequested = true,
-            isAuthenticationCodeRequested = true
+            isAuthenticationCodeRequested = true,
+            phoneNumberRequestedCallback = {},
+            codeRequestedCallback = {phoneNumber, authCode -> },
+            passwordRequestedCallback = {phoneNumber, authCode, password -> }
         )
     }
 }
