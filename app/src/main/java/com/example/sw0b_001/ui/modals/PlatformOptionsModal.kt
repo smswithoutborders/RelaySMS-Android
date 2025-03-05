@@ -1,6 +1,11 @@
 package com.example.sw0b_001.ui.modals
 
+import android.R.attr.bottom
+import android.content.Context
+import android.content.Intent
 import android.graphics.BitmapFactory
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,14 +15,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,6 +48,14 @@ import com.example.sw0b_001.ui.navigation.EmailScreen
 import com.example.sw0b_001.ui.navigation.MessageScreen
 import com.example.sw0b_001.ui.navigation.TextScreen
 import com.example.sw0b_001.ui.theme.AppTheme
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.window.SecureFlagPolicy
+import com.example.sw0b_001.Models.Publishers
+import io.grpc.StatusRuntimeException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,12 +68,14 @@ fun PlatformOptionsModal(
     onDismissRequest: () -> Unit,
 ) {
     val context = LocalContext.current
-    println("Modal received: ${platform?.name}")
+    var isLoading by remember { mutableStateOf(false) }
 
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Expanded,
-        skipHiddenState = false
+        skipHiddenState = false,
+        confirmValueChange = { !isLoading }
     )
+
 
     if (showPlatformsModal) {
         ModalBottomSheet(
@@ -69,85 +89,187 @@ fun PlatformOptionsModal(
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Image(
-                    bitmap = if(platform != null) {
-                        BitmapFactory.decodeByteArray(
-                            platform.logo,
-                            0,
-                            platform.logo!!.count()
-                        ).asImageBitmap()
-                    }
-                    else BitmapFactory.decodeResource(
-                        context.resources,
-                        R.drawable.logo
-                    ).asImageBitmap(),
-                    contentDescription = "Selected platform",
-                    modifier = Modifier.size(64.dp),
-                    contentScale = ContentScale.Fit
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = if (isCompose) {
-                        getServiceBasedComposeDescriptions(
-                            if(platform != null) platform.service_type!!
-                            else ""
-                        )
-                    } else {
-                        getServiceBasedAvailableDescription(
-                            if(platform != null) platform.service_type!!
-                            else ""
-                        )
-                    },
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-
-                if (isCompose || platform == null) {
-                    Button(
-                        onClick = {
-                            onDismissRequest()
-                            if(platform == null) {
-                                navController.navigate(BridgeEmailScreen)
-                            }
-                            else {
-                                when(platform.service_type) {
-                                    ServiceTypes.EMAIL.type -> {
-                                        navController.navigate(EmailScreen)
-                                    }
-                                    ServiceTypes.MESSAGE.type -> {
-                                        navController.navigate(MessageScreen)
-                                    }
-                                    ServiceTypes.TEXT.type -> {
-                                        navController.navigate(TextScreen)
-                                    }
-                                }
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Send Message")
-                    }
+                if(isLoading) {
+                    AddAccountLoading(platform!!)
                 } else {
-                    Button(
-                        onClick = { TODO("Add add accounts functionality") },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Add Account")
+                    Image(
+                        bitmap = if(platform != null) {
+                            BitmapFactory.decodeByteArray(
+                                platform.logo,
+                                0,
+                                platform.logo!!.count()
+                            ).asImageBitmap()
+                        }
+                        else BitmapFactory.decodeResource(
+                            context.resources,
+                            R.drawable.logo
+                        ).asImageBitmap(),
+                        contentDescription = "Selected platform",
+                        modifier = Modifier.size(64.dp),
+                        contentScale = ContentScale.Fit
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = if (isCompose) {
+                            getServiceBasedComposeDescriptions(
+                                if(platform != null) platform.service_type!!
+                                else ""
+                            )
+                        } else {
+                            getServiceBasedAvailableDescription(
+                                if(platform != null) platform.service_type!!
+                                else ""
+                            )
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    if (isCompose || platform == null) {
+                        ComposeMessages(
+                            platform = platform,
+                            navController = navController
+                        ) { onDismissRequest() }
+                    } else {
+                        ManageAccounts(
+                            isActive,
+                            addAccountsCallback = {
+                                isLoading = true
+                                triggerAddPlatformRequest(
+                                    context = context,
+                                    platform = platform
+                                ) {
+                                    isLoading = false
+                                }
+                            },
+                            removeAccountsCallback = {}
+                        )
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    if (isActive) {
-                        TextButton(
-                            onClick = { TODO("Add remove accounts functionality") },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)
-                        ) {
-                            Text("Remove Accounts")
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+            }
+        }
+    }
+}
+
+private fun triggerAddPlatformRequest(
+    context: Context,
+    platform: AvailablePlatforms,
+    onCompletedCallback: () -> Unit
+) {
+    CoroutineScope(Dispatchers.Default).launch {
+        val publishers = Publishers(context)
+
+        when(platform.protocol_type) {
+            Platforms.ProtocolTypes.OAUTH2.type -> {
+                try {
+                    val response = publishers.getOAuthURL(
+                        availablePlatforms = platform,
+                        autogenerateCodeVerifier = true,
+                        supportsUrlScheme = platform.support_url_scheme!!
+                    )
+
+                    Publishers.storeOauthRequestCodeVerifier(context, response.codeVerifier)
+
+                    CoroutineScope(Dispatchers.Main).launch {
+                        val intentUri = Uri.parse(response.authorizationUrl)
+                        val intent = Intent(Intent.ACTION_VIEW, intentUri)
+                        context.startActivity(intent)
+                    }
+                } catch(e: StatusRuntimeException) {
+                    e.printStackTrace()
+                    CoroutineScope(Dispatchers.Main).launch {
+                        e.status.description?.let {
+                            Toast.makeText(context, e.status.description,
+                                Toast.LENGTH_SHORT).show()
                         }
                     }
+                } catch(e: Exception) {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        Toast.makeText(context, e.message, Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                } finally {
+                    onCompletedCallback()
                 }
-                Spacer(modifier = Modifier.height(16.dp))
             }
+            Platforms.ProtocolTypes.PNBA.type -> {
+            }
+        }
+    }
+}
+
+@Composable
+private fun AddAccountLoading(platform: AvailablePlatforms) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(16.dp)
+    ){
+        Text(
+            text="Adding account for ${platform.name}",
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(bottom=16.dp)
+        )
+        CircularProgressIndicator(
+            color = MaterialTheme.colorScheme.secondary,
+            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+        )
+    }
+}
+
+@Composable
+private fun ComposeMessages(
+    platform: AvailablePlatforms?,
+    navController: NavController,
+    onDismissRequest: () -> Unit
+) {
+    Button(
+        onClick = {
+            onDismissRequest()
+            if(platform == null) {
+                navController.navigate(BridgeEmailScreen)
+            }
+            else {
+                when(platform.service_type) {
+                    ServiceTypes.EMAIL.type -> {
+                        navController.navigate(EmailScreen)
+                    }
+                    ServiceTypes.MESSAGE.type -> {
+                        navController.navigate(MessageScreen)
+                    }
+                    ServiceTypes.TEXT.type -> {
+                        navController.navigate(TextScreen)
+                    }
+                }
+            }
+        },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text("Send Message")
+    }
+}
+
+@Composable
+private fun ManageAccounts(
+    isActive: Boolean,
+    addAccountsCallback: () -> Unit,
+    removeAccountsCallback: () -> Unit
+) {
+    Button(
+        onClick = { addAccountsCallback() },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text("Add Account")
+    }
+    Spacer(modifier = Modifier.height(8.dp))
+    if (isActive) {
+        TextButton(
+            onClick = {removeAccountsCallback()},
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)
+        ) {
+            Text("Remove Accounts")
         }
     }
 }

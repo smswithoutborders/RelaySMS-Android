@@ -17,6 +17,11 @@ class Platforms {
         BRIDGE("bridge")
     }
 
+    enum class ProtocolTypes(val type: String) {
+        OAUTH2("oauth2"),
+        PNBA("pnba"),
+    }
+
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
 

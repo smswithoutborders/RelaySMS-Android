@@ -154,7 +154,6 @@ fun OtpCodeVerificationView(
     navController: NavController = rememberNavController(),
     navigationFlowHandler: NavigationFlowHandler = NavigationFlowHandler(),
     onResendClicked: () -> Unit = {},
-    onCodeSubmitted: (String) -> Unit = {},
 ) {
     val context = LocalContext.current
     var otpCode by remember { mutableStateOf("") }

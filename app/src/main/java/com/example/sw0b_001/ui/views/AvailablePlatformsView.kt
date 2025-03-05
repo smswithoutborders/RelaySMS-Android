@@ -115,8 +115,8 @@ fun AvailablePlatformsView(
             isCompose = isCompose,
             navController = navController,
         ) {
-            onDismiss()
             showPlatformOptions = false
+            onDismiss()
         }
     }
 }

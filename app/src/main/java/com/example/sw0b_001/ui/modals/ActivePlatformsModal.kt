@@ -89,6 +89,7 @@ fun ActivePlatformsModal(
             }
         )
     }
+
 }
 
 @Preview(showBackground = true)
