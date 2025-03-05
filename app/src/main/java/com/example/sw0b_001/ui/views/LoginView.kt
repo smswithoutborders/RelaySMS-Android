@@ -334,8 +334,8 @@ private fun login(
     completedCallback: () -> Unit = {},
 ) {
     CoroutineScope(Dispatchers.Default).launch{
+        val vaults = Vaults(context)
         try {
-            val vaults = Vaults(context)
             val response = vaults.authenticateEntity(
                 context,
                 phoneNumber,
@@ -353,6 +353,7 @@ private fun login(
             failedCallback(e.message)
         }
         finally {
+            vaults.shutdown()
             completedCallback()
         }
     }

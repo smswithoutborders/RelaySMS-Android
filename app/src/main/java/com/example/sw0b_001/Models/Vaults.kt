@@ -215,6 +215,9 @@ class Vaults(context: Context) {
         private const val DEVICE_ID_SECRET_KEY_KEYSTORE_ALIAS =
             "com.afkanerd.relaysms.DEVICE_ID_SECRET_KEY_KEYSTORE_ALIAS"
 
+        private const val IS_GET_ME_OUT =
+            "com.afkanerd.relaysms.IS_GET_ME_OUT"
+
 
         fun completeDelete(context: Context, llt: String) {
             val publishers = Publishers(context)
@@ -229,6 +232,23 @@ class Vaults(context: Context) {
                 Datastore.getDatastore(context).clearAllTables()
             }
             vaults.shutdown()
+        }
+
+        fun setGetMeOut(context: Context, value: Boolean) {
+            var sharedPreferences = Armadillo.create(context, VAULT_ATTRIBUTE_FILES)
+                .encryptionFingerprint(context)
+                .build()
+            sharedPreferences.edit()
+                .putBoolean(IS_GET_ME_OUT, value)
+                .apply()
+        }
+
+        fun isGetMeOut(context: Context) : Boolean {
+            var sharedPreferences = Armadillo.create(context, VAULT_ATTRIBUTE_FILES)
+                .encryptionFingerprint(context)
+                .build()
+
+            return sharedPreferences.getBoolean(IS_GET_ME_OUT, false)
         }
 
         fun logout(context: Context, successRunnable: Runnable) {

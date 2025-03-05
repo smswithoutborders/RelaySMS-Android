@@ -279,27 +279,6 @@ fun RecentMessageCard(
     }
 }
 
-
-//fun navigateToDetailsScreen(navController: NavController, message: RecentMessage) {
-//    val recentMessageJson = Json.encodeToString(message)
-//    // URL-encode the JSON string
-//    val encodedJson = URLEncoder.encode(recentMessageJson, StandardCharsets.UTF_8.toString())
-//    when (message.messageType) {
-//        MessageType.GMAIL, MessageType.DEFAULT -> {
-//            navController.navigate(Screen.EmailDetails(encodedJson).route)
-//        }
-//
-//        MessageType.TELEGRAM -> {
-//            navController.navigate(Screen.TelegramDetails(encodedJson).route)
-//        }
-//
-//        MessageType.X -> {
-//            navController.navigate(Screen.XDetails(encodedJson).route)
-//        }
-//    }
-//}
-//
-
 @Preview(showBackground = true)
 @Composable
 fun RecentScreenPreview() {
