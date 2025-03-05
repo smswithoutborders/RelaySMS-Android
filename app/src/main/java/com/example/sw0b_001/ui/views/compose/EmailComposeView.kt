@@ -48,24 +48,20 @@ fun EmailComposeView(
     platformsViewModel: PlatformsViewModel,
     isBridge: Boolean = false
 ) {
+    val context = LocalContext.current
+
+    var from by remember { mutableStateOf("") }
     var to by remember { mutableStateOf("") }
     var cc by remember { mutableStateOf("") }
     var bcc by remember { mutableStateOf("") }
     var subject by remember { mutableStateOf("") }
     var body by remember { mutableStateOf("") }
 
-    var showSelectAccountModal by remember { mutableStateOf(true) }
+    var showSelectAccountModal by remember { mutableStateOf(false) }
     var selectedAccount: StoredPlatformsEntity? by remember { mutableStateOf(null) }
-    val context = LocalContext.current
-    var from by remember { mutableStateOf("") }
 
-    LaunchedEffect(key1 = isBridge) {
-        if (isBridge) {
-            from = "your_phone_number@relaysms.me"
-            showSelectAccountModal = false
-        } else {
-            showSelectAccountModal = true
-        }
+    LaunchedEffect(isBridge) {
+        showSelectAccountModal = !isBridge
     }
 
     // Conditionally show the SelectAccountModal
@@ -80,8 +76,8 @@ fun EmailComposeView(
             },
             onAccountSelected = { account ->
                 selectedAccount = account
-                showSelectAccountModal = false
                 from = account.account!!
+                showSelectAccountModal = false
             }
         )
     }
@@ -113,22 +109,25 @@ fun EmailComposeView(
                 .padding(16.dp)
         ) {
             // Sender
-            OutlinedTextField(
-                value = from,
-                onValueChange = { },
-                label = { Text("From") },
-                enabled = false,
-                modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                    disabledBorderColor = MaterialTheme.colorScheme.outline,
-                    disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
+            if(!isBridge) {
+                OutlinedTextField(
+                    value = from,
+                    onValueChange = { },
+                    label = { Text("From") },
+                    enabled = false,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                        disabledBorderColor = MaterialTheme.colorScheme.outline,
+                        disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 )
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(16.dp))
+
+            }
 
             // To
             OutlinedTextField(
@@ -207,5 +206,22 @@ fun EmailComposePreview() {
             platformsViewModel = PlatformsViewModel(),
             isBridge = true
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AccountModalPreview() {
+    AppTheme(darkTheme = false) {
+        val storedPlatform = StoredPlatformsEntity(
+            id= "0",
+            account = "developers@relaysms.me",
+            name = "gmail",
+        )
+        SelectAccountModal(
+            _accounts = listOf(storedPlatform),
+            platformsViewModel = PlatformsViewModel(),
+            onAccountSelected = {}
+        ) {}
     }
 }

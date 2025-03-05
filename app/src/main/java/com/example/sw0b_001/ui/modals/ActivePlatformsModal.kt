@@ -49,9 +49,9 @@ import kotlinx.coroutines.launch
 fun ActivePlatformsModal(
     sendNewMessageRequested: Boolean,
     platformsViewModel: PlatformsViewModel,
-    onDismiss: () -> Unit,
     navController: NavController,
-    isCompose: Boolean = false
+    isCompose: Boolean = false,
+    onDismiss: () -> Unit,
 ) {
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Expanded,
@@ -63,11 +63,9 @@ fun ActivePlatformsModal(
     if(sendNewMessageRequested) {
         ModalBottomSheet(
             onDismissRequest = {
-                scope.launch {
-                    sheetState.hide()
-                }.invokeOnCompletion {
-                    onDismiss()
-                }
+                scope
+                    .launch { sheetState.hide() }
+                    .invokeOnCompletion { onDismiss() }
             },
             sheetState = sheetState,
             modifier = Modifier.fillMaxWidth()
@@ -76,7 +74,9 @@ fun ActivePlatformsModal(
                 navController = navController,
                 platformsViewModel = platformsViewModel,
                 isCompose = isCompose
-            )
+            ) {
+                onDismiss()
+            }
         }
 
     }

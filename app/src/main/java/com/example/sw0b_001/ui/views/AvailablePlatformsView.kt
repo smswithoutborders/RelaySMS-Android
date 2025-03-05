@@ -62,7 +62,8 @@ import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 fun AvailablePlatformsView(
     navController: NavController,
     platformsViewModel: PlatformsViewModel,
-    isCompose: Boolean = false
+    isCompose: Boolean = false,
+    onDismiss: () -> Unit = {}
 ) {
     val context = LocalContext.current
     var showPlatformOptions by remember { mutableStateOf(false) }
@@ -109,12 +110,14 @@ fun AvailablePlatformsView(
         PlatformOptionsModal(
             showPlatformsModal = showPlatformOptions,
             platform = availablePlatforms,
-            onDismissRequest = { showPlatformOptions = false },
             isActive = isCompose || availablePlatforms == null ||
                     storedPlatforms.filter{ it.name == availablePlatforms!!.name }.isNotEmpty(),
             isCompose = isCompose,
-            navController = navController
-        )
+            navController = navController,
+        ) {
+            onDismiss()
+            showPlatformOptions = false
+        }
     }
 }
 
@@ -239,7 +242,7 @@ fun PlatformCard(
                 )
             }
             Text(
-                text = if(platform != null) platform.name else "",
+                text = if(platform != null) platform.name else "RelaySMS",
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)

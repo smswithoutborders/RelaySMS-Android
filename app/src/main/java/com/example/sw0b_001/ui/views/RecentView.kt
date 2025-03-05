@@ -167,20 +167,20 @@ fun RecentView(
             }
         } else {
             RecentViewNoMessages(
-                saveNewPlatformCallback = { tabRequestedCallback() }
-            ) {
-                sendNewMessageRequested = true
-            }
+                saveNewPlatformCallback = { tabRequestedCallback() },
+                sendNewMessageCallback = { sendNewMessageRequested = true }
+            )
         }
 
         if (sendNewMessageRequested) {
             ActivePlatformsModal(
                 sendNewMessageRequested = sendNewMessageRequested,
                 platformsViewModel = platformsViewModel,
-                onDismiss = { sendNewMessageRequested = false },
                 navController = navController,
                 isCompose = true
-            )
+            ) {
+                sendNewMessageRequested = false
+            }
         }
 
     }

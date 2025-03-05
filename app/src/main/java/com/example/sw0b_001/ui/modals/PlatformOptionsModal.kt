@@ -106,18 +106,19 @@ fun PlatformOptionsModal(
                 if (isCompose || platform == null) {
                     Button(
                         onClick = {
+                            onDismissRequest()
                             if(platform == null) {
                                 navController.navigate(BridgeEmailScreen)
                             }
                             else {
                                 when(platform.service_type) {
-                                    ServiceTypes.EMAIL.name -> {
+                                    ServiceTypes.EMAIL.type -> {
                                         navController.navigate(EmailScreen)
                                     }
-                                    ServiceTypes.MESSAGE.name -> {
+                                    ServiceTypes.MESSAGE.type -> {
                                         navController.navigate(MessageScreen)
                                     }
-                                    ServiceTypes.TEXT.name -> {
+                                    ServiceTypes.TEXT.type -> {
                                         navController.navigate(TextScreen)
                                     }
                                 }
