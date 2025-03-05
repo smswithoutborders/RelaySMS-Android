@@ -33,6 +33,7 @@ import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
 import com.example.sw0b_001.Models.Platforms.Platforms
 import com.example.sw0b_001.Models.Platforms.Platforms.ServiceTypes
 import com.example.sw0b_001.R
+import com.example.sw0b_001.ui.navigation.BridgeEmailScreen
 import com.example.sw0b_001.ui.navigation.EmailScreen
 import com.example.sw0b_001.ui.navigation.MessageScreen
 import com.example.sw0b_001.ui.navigation.TextScreen
@@ -42,13 +43,14 @@ import com.example.sw0b_001.ui.theme.AppTheme
 @Composable
 fun PlatformOptionsModal(
     showPlatformsModal: Boolean,
-    platform: AvailablePlatforms,
+    platform: AvailablePlatforms?,
     isActive: Boolean,
     isCompose: Boolean,
     navController: NavController,
     onDismissRequest: () -> Unit,
 ) {
     val context = LocalContext.current
+    println("Modal received: ${platform?.name}")
 
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Expanded,
@@ -68,46 +70,56 @@ fun PlatformOptionsModal(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
-                    bitmap =
-                    if(platform.logo != null) {
+                    bitmap = if(platform != null) {
                         BitmapFactory.decodeByteArray(
                             platform.logo,
                             0,
                             platform.logo!!.count()
                         ).asImageBitmap()
-                                      }
+                    }
                     else BitmapFactory.decodeResource(
                         context.resources,
                         R.drawable.logo
                     ).asImageBitmap(),
-                    contentDescription = platform.name,
+                    contentDescription = "Selected platform",
                     modifier = Modifier.size(64.dp),
                     contentScale = ContentScale.Fit
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = if (isCompose) {
-                        getServiceBasedComposeDescriptions(platform.service_type!!)
+                        getServiceBasedComposeDescriptions(
+                            if(platform != null) platform.service_type!!
+                            else ""
+                        )
                     } else {
-                        getServiceBasedAvailableDescription(platform.service_type!!)
+                        getServiceBasedAvailableDescription(
+                            if(platform != null) platform.service_type!!
+                            else ""
+                        )
                     },
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(24.dp))
 
-                if (isCompose) {
+                if (isCompose || platform == null) {
                     Button(
                         onClick = {
-                            when(platform.service_type) {
-                                ServiceTypes.EMAIL.name -> {
-                                    navController.navigate(EmailScreen)
-                                }
-                                ServiceTypes.MESSAGE.name -> {
-                                    navController.navigate(MessageScreen)
-                                }
-                                ServiceTypes.TEXT.name -> {
-                                    navController.navigate(TextScreen)
+                            if(platform == null) {
+                                navController.navigate(BridgeEmailScreen)
+                            }
+                            else {
+                                when(platform.service_type) {
+                                    ServiceTypes.EMAIL.name -> {
+                                        navController.navigate(EmailScreen)
+                                    }
+                                    ServiceTypes.MESSAGE.name -> {
+                                        navController.navigate(MessageScreen)
+                                    }
+                                    ServiceTypes.TEXT.name -> {
+                                        navController.navigate(TextScreen)
+                                    }
                                 }
                             }
                         },

@@ -67,7 +67,13 @@ fun AvailablePlatformsView(
     val context = LocalContext.current
     var showPlatformOptions by remember { mutableStateOf(false) }
 
-    var availablePlatforms: AvailablePlatforms? = null
+    var availablePlatforms: AvailablePlatforms? by remember { mutableStateOf(null)}
+
+    val platforms: List<AvailablePlatforms> by platformsViewModel
+        .getAvailablePlatforms(context).observeAsState(emptyList())
+
+    val storedPlatforms: List<StoredPlatformsEntity> by platformsViewModel
+        .getSaved(context).observeAsState(emptyList())
 
     Column(
         modifier = Modifier
@@ -80,12 +86,6 @@ fun AvailablePlatformsView(
             modifier = Modifier
                 .padding(16.dp)
         ) {
-            val platforms: List<AvailablePlatforms> by platformsViewModel
-                .getAvailablePlatforms(context).observeAsState(emptyList())
-
-            val storedPlatforms: List<StoredPlatformsEntity> by platformsViewModel
-                .getSaved(context).observeAsState(emptyList())
-
             Text(
                 text = if(isCompose) "Send new message" else "Available platforms",
                 style = MaterialTheme.typography.displayMedium,
@@ -99,6 +99,7 @@ fun AvailablePlatformsView(
                 onPlatformClick = {
                     showPlatformOptions = true
                     availablePlatforms = it
+                    println("Available platform: ${availablePlatforms?.name}")
                 }
             )
         }
@@ -107,50 +108,13 @@ fun AvailablePlatformsView(
     if (showPlatformOptions) {
         PlatformOptionsModal(
             showPlatformsModal = showPlatformOptions,
-            platform = availablePlatforms!!,
+            platform = availablePlatforms,
             onDismissRequest = { showPlatformOptions = false },
-            isActive = true,
+            isActive = isCompose || availablePlatforms == null ||
+                    storedPlatforms.filter{ it.name == availablePlatforms!!.name }.isNotEmpty(),
             isCompose = isCompose,
             navController = navController
         )
-    }
-}
-
-@Composable
-fun RelaySMSCard(
-    availablePlatforms: AvailablePlatforms? = null,
-    onClick: (AvailablePlatforms?) -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .width(130.dp)
-            .height(130.dp)
-            .clickable {
-                onClick(availablePlatforms)
-            },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Image(
-                painter = painterResource(id = R.drawable.relaysms_icon_blue),
-                contentDescription = "RelaySMS Logo",
-                modifier = Modifier
-                    .size(60.dp)
-                    .align(Alignment.Center)
-            )
-            Box(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .size(12.dp)
-                    .clip(CircleShape)
-                    .background(Color.Green)
-                    .align(Alignment.TopEnd)
-            )
-        }
-
     }
 }
 
@@ -176,7 +140,13 @@ fun PlatformListContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        RelaySMSCard( onClick = onPlatformClick )
+        PlatformCard(
+            logo = null,
+            platform = null,
+            modifier = Modifier.width(130.dp),
+            isActive = true,
+            onClick = onPlatformClick
+        )
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -213,11 +183,11 @@ fun PlatformListContent(
                             platform.logo!!.count()
                         )
                     else null,
-                    platformName = platform.name,
+                    platform = platform,
                     modifier = Modifier.width(130.dp),
                     isActive = isCompose || storedPlatforms
                         .filter { platform.name == it.name}.isNotEmpty(),
-                    onClick = {}
+                    onClick = onPlatformClick
                 )
             }
         }
@@ -227,17 +197,17 @@ fun PlatformListContent(
 @Composable
 fun PlatformCard(
     logo: Bitmap? = null,
-    platformName: String,
+    platform: AvailablePlatforms?,
     modifier: Modifier = Modifier,
     isActive: Boolean,
-    onClick: () -> Unit = {}
+    onClick: (AvailablePlatforms?) -> Unit = {}
 ) {
     val context = LocalContext.current
     Card(
         modifier = modifier
             .height(130.dp)
             .width(130.dp)
-            .clickable { onClick() },
+            .clickable { onClick(platform) },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -250,13 +220,15 @@ fun PlatformCard(
                     context.resources,
                     R.drawable.logo
                 ).asImageBitmap(),
-                contentDescription = "$platformName Logo",
+                contentDescription = "Platform Logo",
                 modifier = Modifier
                     .size(50.dp)
                     .align(Alignment.Center),
-                colorFilter = if (!isActive) ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)) else null
+                colorFilter = if (!isActive && platform != null)
+                    ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
+                else null
             )
-            if (isActive) {
+            if (isActive || platform == null) {
                 Box(
                     modifier = Modifier
                         .padding(8.dp)
@@ -267,7 +239,7 @@ fun PlatformCard(
                 )
             }
             Text(
-                text = platformName,
+                text = if(platform != null) platform.name else "",
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
