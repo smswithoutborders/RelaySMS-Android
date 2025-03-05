@@ -30,6 +30,7 @@ import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -39,15 +40,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
+import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.views.PlatformData
 import kotlinx.coroutines.launch
 
 // Data class to represent an account
@@ -61,12 +64,12 @@ data class Account(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectAccountModal(
-    platform: PlatformData = PlatformData(R.drawable.gmail, "Gmail", true),
-    accounts: List<Account> = sampleAccounts,
-    onAccountSelected: (Account) -> Unit = {},
-    navController: NavController,
+    _accounts: List<StoredPlatformsEntity> = emptyList<StoredPlatformsEntity>(),
+    platformsViewModel: PlatformsViewModel,
+    onAccountSelected: (StoredPlatformsEntity) -> Unit = {},
     onDismissRequest: () -> Unit
 ) {
+    val context = LocalContext.current
     val sheetState = rememberStandardBottomSheetState(
         confirmValueChange = { it != SheetValue.Hidden },
         skipHiddenState = false
@@ -74,6 +77,8 @@ fun SelectAccountModal(
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(true) }
 
+    val accounts: List<StoredPlatformsEntity> = if(LocalInspectionMode.current) _accounts
+    else platformsViewModel.getSaved(context).observeAsState(emptyList()).value
 
     if (showBottomSheet) {
         ModalBottomSheet(
@@ -120,8 +125,8 @@ fun SelectAccountModal(
                     contentPadding = PaddingValues(bottom = 16.dp)
                 ) {
                     items(accounts) { account ->
-                        AccountCard(account = account) { selectedAccount ->
-                            onAccountSelected(selectedAccount)
+                        AccountCard(account = account) {
+                            onAccountSelected(account)
                             scope.launch { sheetState.hide() }.invokeOnCompletion {
                                 if (!sheetState.isVisible) {
                                     showBottomSheet = false
@@ -137,18 +142,21 @@ fun SelectAccountModal(
 }
 
 @Composable
-fun AccountCard(account: Account, onAccountSelected: (Account) -> Unit) {
+fun AccountCard(
+    account: StoredPlatformsEntity,
+    onAccountSelected: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onAccountSelected(account) },
+            .clickable { onAccountSelected() },
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val profileImage = account.profilePhoto ?: R.drawable.round_person_24
+            val profileImage = R.drawable.round_person_24
             Image(
                 painter = painterResource(id = profileImage),
                 contentDescription = "Profile Photo",
@@ -160,12 +168,12 @@ fun AccountCard(account: Account, onAccountSelected: (Account) -> Unit) {
             Spacer(modifier = Modifier.width(16.dp))
             Column {
                 Text(
-                    text = account.accountIdentifier,
+                    text = account.account!!,
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = account.subtext,
+                    text = account.name!!,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -174,36 +182,20 @@ fun AccountCard(account: Account, onAccountSelected: (Account) -> Unit) {
     }
 }
 
-val sampleAccounts = listOf(
-    Account(
-        profilePhoto = null,
-        platformName = "Gmail",
-        accountIdentifier = "user@gmail.com",
-        subtext = "Gmail"
-    ),
-    Account(
-        profilePhoto = null,
-        platformName = "X",
-        accountIdentifier = "@userx",
-        subtext = "X (formerly Twitter)"
-    ),
-    Account(
-        profilePhoto = R.drawable.relaysms_icon_default_shape,
-        platformName = "Telegram",
-        accountIdentifier = "+15551234567",
-        subtext = "Telegram"
-    )
-)
 
 @Preview(showBackground = true)
 @Composable
 fun SelectAccountModalPreview() {
     AppTheme {
+        val storedPlatform = StoredPlatformsEntity(
+            id= "0",
+            account = "developers@relaysms.me",
+            name = "gmail",
+        )
         SelectAccountModal(
-            platform = PlatformData(R.drawable.gmail, "Gmail", true),
-            accounts = sampleAccounts,
+            _accounts = listOf(storedPlatform),
+            platformsViewModel = PlatformsViewModel(),
             onAccountSelected = {},
-            navController = NavController(LocalContext.current),
             onDismissRequest = {}
         )
     }

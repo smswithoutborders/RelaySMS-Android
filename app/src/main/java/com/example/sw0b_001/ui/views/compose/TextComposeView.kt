@@ -31,6 +31,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
+import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.theme.AppTheme
@@ -39,10 +41,11 @@ import com.example.sw0b_001.ui.theme.AppTheme
 @Composable
 fun TextComposeView(
     navController: NavController,
+    platformsViewModel: PlatformsViewModel
 ) {
     var message by remember { mutableStateOf("") }
     var showSelectAccountModal by remember { mutableStateOf(true) }
-    var selectedAccount by remember { mutableStateOf<Account?>(null) }
+    var selectedAccount by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
     val context = LocalContext.current
 
     LaunchedEffect(key1 = Unit) {
@@ -52,7 +55,7 @@ fun TextComposeView(
     // Conditionally show the SelectAccountModal
     if (showSelectAccountModal) {
         SelectAccountModal(
-            navController = navController,
+            platformsViewModel = platformsViewModel,
             onDismissRequest = {
                 if (selectedAccount == null) {
                     navController.popBackStack()
@@ -115,6 +118,7 @@ fun TextComposePreview() {
     AppTheme(darkTheme = false) {
         TextComposeView(
             navController = NavController(LocalContext.current),
+            platformsViewModel = PlatformsViewModel()
         )
     }
 }

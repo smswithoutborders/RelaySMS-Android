@@ -35,6 +35,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
+import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.theme.AppTheme
@@ -43,7 +45,8 @@ import com.example.sw0b_001.ui.theme.AppTheme
 @Composable
 fun EmailComposeView(
     navController: NavController,
-    isDefault: Boolean
+    platformsViewModel: PlatformsViewModel,
+    isBridge: Boolean = false
 ) {
     var to by remember { mutableStateOf("") }
     var cc by remember { mutableStateOf("") }
@@ -52,12 +55,12 @@ fun EmailComposeView(
     var body by remember { mutableStateOf("") }
 
     var showSelectAccountModal by remember { mutableStateOf(true) }
-    var selectedAccount by remember { mutableStateOf<Account?>(null) }
+    var selectedAccount: StoredPlatformsEntity? by remember { mutableStateOf(null) }
     val context = LocalContext.current
     var from by remember { mutableStateOf("") }
 
-    LaunchedEffect(key1 = isDefault) {
-        if (isDefault) {
+    LaunchedEffect(key1 = isBridge) {
+        if (isBridge) {
             from = "your_phone_number@relaysms.me"
             showSelectAccountModal = false
         } else {
@@ -68,7 +71,7 @@ fun EmailComposeView(
     // Conditionally show the SelectAccountModal
     if (showSelectAccountModal) {
         SelectAccountModal(
-            navController = navController,
+            platformsViewModel = platformsViewModel,
             onDismissRequest = {
                 if (selectedAccount == null) {
                     navController.popBackStack()
@@ -78,7 +81,7 @@ fun EmailComposeView(
             onAccountSelected = { account ->
                 selectedAccount = account
                 showSelectAccountModal = false
-                from = account.accountIdentifier
+                from = account.account!!
             }
         )
     }
@@ -201,7 +204,8 @@ fun EmailComposePreview() {
     AppTheme(darkTheme = false) {
         EmailComposeView(
             navController = NavController(LocalContext.current),
-            isDefault = true
+            platformsViewModel = PlatformsViewModel(),
+            isBridge = true
         )
     }
 }

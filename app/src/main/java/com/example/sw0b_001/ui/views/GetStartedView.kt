@@ -45,8 +45,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
+import com.example.sw0b_001.ui.navigation.EmailScreen
 import com.example.sw0b_001.ui.navigation.LoginScreen
-import com.example.sw0b_001.ui.navigation.Screen
 import com.example.sw0b_001.ui.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -91,7 +91,7 @@ fun GetStartedView (
                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 16.dp)
         ) {
             Button(
-                onClick = { navController.navigate(Screen.EmailCompose.withIsDefault(true)) },
+                onClick = { navController.navigate(EmailScreen) },
                 colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primaryContainer),
                 modifier = Modifier
                     .height(80.dp)

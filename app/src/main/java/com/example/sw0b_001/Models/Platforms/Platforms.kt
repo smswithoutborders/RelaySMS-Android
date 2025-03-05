@@ -10,10 +10,11 @@ import androidx.room.PrimaryKey
 @Entity(indices = [Index(value = ["name"], unique = true)])
 class Platforms {
 
-    public enum class Type(val type: String) {
+    enum class ServiceTypes(val type: String) {
         EMAIL("email"),
         TEXT("text"),
-        MESSAGE("message")
+        MESSAGE("message"),
+        BRIDGE("bridge")
     }
 
     @PrimaryKey(autoGenerate = true)

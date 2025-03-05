@@ -30,8 +30,6 @@ import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
-import com.example.sw0b_001.ui.navigation.Screen
-import com.example.sw0b_001.ui.navigation.SettingsScreen
 import com.example.sw0b_001.ui.views.AboutView
 import com.example.sw0b_001.ui.views.GetStartedView
 import com.example.sw0b_001.ui.views.HomepageView
@@ -42,6 +40,11 @@ import com.example.sw0b_001.ui.views.compose.EmailComposeView
 import com.example.sw0b_001.ui.views.compose.MessageComposeView
 import com.example.sw0b_001.ui.views.compose.TextComposeView
 import androidx.activity.viewModels
+import com.example.sw0b_001.ui.navigation.AboutScreen
+import com.example.sw0b_001.ui.navigation.BridgeEmailScreen
+import com.example.sw0b_001.ui.navigation.EmailScreen
+import com.example.sw0b_001.ui.navigation.MessageScreen
+import com.example.sw0b_001.ui.navigation.TextScreen
 
 
 class MainActivity : ComponentActivity() {
@@ -106,69 +109,34 @@ class MainActivity : ComponentActivity() {
                     navigationFlowHandler = navigationFlowHandler
                 )
             }
-            composable(Screen.About.route) {
+            composable<AboutScreen> {
                 AboutView(navController = navController)
             }
-            composable(Screen.Security.route) {
-                SecurityView(navController = navController)
-            }
-            composable(Screen.GetStarted.route) {
-                GetStartedView(navController = navController)
-            }
 
-            // Compose Screens
-            composable(
-                route = Screen.EmailCompose.route,
-                arguments = listOf(
-                    navArgument("isDefault") {
-                        type = NavType.BoolType
-                        defaultValue = false
-                    }
+            composable<BridgeEmailScreen> {
+                EmailComposeView(
+                    navController = navController,
+                    platformsViewModel = platformsViewModel,
+                    isBridge = true
                 )
-            ) { backStackEntry ->
-                val isDefault = backStackEntry.arguments?.getBoolean("isDefault") ?: false
-                EmailComposeView(navController = navController, isDefault = isDefault)
             }
-            composable(Screen.MessageCompose.route) {
-                MessageComposeView(navController = navController)
+            composable<EmailScreen> {
+                EmailComposeView(
+                    navController = navController,
+                    platformsViewModel = platformsViewModel,
+                )
             }
-            composable(Screen.TextCompose.route) {
-                TextComposeView(navController = navController)
+            composable<TextScreen> {
+                TextComposeView(
+                    navController = navController,
+                    platformsViewModel = platformsViewModel,
+                )
             }
-
-            // Message Details Screens
-            composable(
-                route = Screen.EmailDetails().route,
-                arguments = listOf(navArgument("recentMessage") { type = NavType.StringType })
-            ) { backStackEntry ->
-                val encodedJson = backStackEntry.arguments?.getString("recentMessage")
-                encodedJson?.let {
-//                    val decodedJson = URLDecoder.decode(it, StandardCharsets.UTF_8.toString())
-//                    val recentMessage = Json.decodeFromString<RecentMessage>(decodedJson)
-//                    EmailDetailsView(message = recentMessage, navController = navController)
-                }
-            }
-            composable(
-                route = Screen.TelegramDetails().route,
-                arguments = listOf(navArgument("recentMessage") { type = NavType.StringType })
-            ) { backStackEntry ->
-                val encodedJson = backStackEntry.arguments?.getString("recentMessage")
-                encodedJson?.let {
-//                    val decodedJson = URLDecoder.decode(it, StandardCharsets.UTF_8.toString())
-//                    val recentMessage = Json.decodeFromString<RecentMessage>(decodedJson)
-//                    MessageDetailsView(message = recentMessage, navController = navController)
-                }
-            }
-            composable(
-                route = Screen.XDetails().route,
-                arguments = listOf(navArgument("recentMessage") { type = NavType.StringType })
-            ) { backStackEntry ->
-                val encodedJson = backStackEntry.arguments?.getString("recentMessage")
-                encodedJson?.let {
-//                    val decodedJson = URLDecoder.decode(it, StandardCharsets.UTF_8.toString())
-//                    val recentMessage = Json.decodeFromString<RecentMessage>(decodedJson)
-//                    TextDetailsView(message = recentMessage, navController = navController)
-                }
+            composable<MessageScreen> {
+                MessageComposeView(
+                    navController = navController,
+                    platformsViewModel = platformsViewModel,
+                )
             }
         }
     }

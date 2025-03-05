@@ -28,7 +28,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -239,7 +238,7 @@ fun RecentMessageCard(
                     // Heading Text
                     Text(
                         text = message.encryptedContent,
-                        style = if (message.type == Platforms.Type.TEXT.type) {
+                        style = if (message.type == Platforms.ServiceTypes.TEXT.type) {
                             MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
                         } else {
                             MaterialTheme.typography.bodyLarge

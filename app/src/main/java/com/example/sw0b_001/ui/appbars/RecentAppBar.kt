@@ -27,7 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
 import com.example.sw0b_001.SettingsActivity
-import com.example.sw0b_001.ui.navigation.Screen
+import com.example.sw0b_001.ui.navigation.AboutScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 
 @Composable
@@ -87,7 +87,7 @@ fun RecentAppBar(
                 DropdownMenuItem(
                     text = { Text("About") },
                     onClick = {
-                        navController.navigate(Screen.About.route)
+                        navController.navigate(AboutScreen)
                         showMenu = false
                     }
                 )
