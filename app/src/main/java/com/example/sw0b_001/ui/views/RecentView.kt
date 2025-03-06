@@ -25,11 +25,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -48,6 +50,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import androidx.room.util.TableInfo
 import com.example.sw0b_001.Models.Messages.EncryptedContent
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
 import com.example.sw0b_001.Models.Platforms.Platforms
@@ -153,30 +156,46 @@ fun RecentView(
         if(LocalInspectionMode.current) _messages
         else messagesViewModel.getMessages(context = context).observeAsState(emptyList()).value
 
+    val isLoading by messagesViewModel.isLoading.collectAsState()
+
     Box(Modifier
         .padding(16.dp)
         .fillMaxSize()
     ) {
-        if(messages.isNotEmpty()) {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(vertical = 16.dp)
-            ) {
-                items(messages) { message ->
-                    RecentMessageCard(message)
+        if(LocalInspectionMode.current || !isLoading) {
+            if(messages.isNotEmpty()) {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    contentPadding = PaddingValues(vertical = 16.dp)
+                ) {
+                    items(messages) { message ->
+                        RecentMessageCard(message)
+                    }
                 }
             }
+            else {
+                RecentViewNoMessages(
+                    saveNewPlatformCallback = { tabRequestedCallback() },
+                    sendNewMessageCallback = { sendNewMessageRequested = true }
+                )
+            }
+
         }
         else {
-            RecentViewNoMessages(
-                saveNewPlatformCallback = { tabRequestedCallback() },
-                sendNewMessageCallback = { sendNewMessageRequested = true }
-            )
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.secondary,
+                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                )
+            }
         }
-
         if (sendNewMessageRequested) {
             ActivePlatformsModal(
                 sendNewMessageRequested = sendNewMessageRequested,
