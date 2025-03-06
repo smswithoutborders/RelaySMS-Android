@@ -37,6 +37,7 @@ import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.appbars.GatewayClientsAppBar
 import com.example.sw0b_001.ui.appbars.RecentAppBar
+import com.example.sw0b_001.ui.modals.ActivePlatformsModal
 import com.example.sw0b_001.ui.theme.AppTheme
 
 enum class BottomTabsItems {
@@ -73,6 +74,8 @@ fun HomepageView(
 
     var showAddGatewayClientsModal by remember { mutableStateOf(false) }
 
+    var sendNewMessageRequested by remember { mutableStateOf(false)}
+
     Scaffold (
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -106,7 +109,7 @@ fun HomepageView(
                         Column(horizontalAlignment = Alignment.End) {
                             ExtendedFloatingActionButton(
                                 onClick = {
-
+                                    sendNewMessageRequested = true
                                 },
                                 containerColor = MaterialTheme.colorScheme.secondary,
                                 icon = {
@@ -172,6 +175,17 @@ fun HomepageView(
                     GatewayClientView(addShowBottomSheet = showAddGatewayClientsModal) {
                         showAddGatewayClientsModal = false
                     }
+                }
+            }
+
+            if (sendNewMessageRequested) {
+                ActivePlatformsModal(
+                    sendNewMessageRequested = sendNewMessageRequested,
+                    platformsViewModel = platformsViewModel,
+                    navController = navController,
+                    isCompose = true
+                ) {
+                    sendNewMessageRequested = false
                 }
             }
         }

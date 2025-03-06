@@ -51,9 +51,12 @@ import com.example.sw0b_001.Models.Messages.EncryptedContent
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
 import com.example.sw0b_001.Models.Platforms.Platforms
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
+import com.example.sw0b_001.Modules.Helpers
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.views.compose.EmailComposeHandler
+import kotlinx.serialization.json.internal.encodeByWriter
 
 @Composable
 fun RecentViewNoMessages(
@@ -215,6 +218,19 @@ fun RecentMessageCard(
     message: EncryptedContent,
     logo: Bitmap? = null,
 ) {
+    var text by remember { mutableStateOf("" ) }
+    var heading by remember { mutableStateOf( "") }
+    var toAccount by remember { mutableStateOf( "") }
+
+    when(message.type) {
+        Platforms.ServiceTypes.EMAIL.type -> {
+            val decomposed = EmailComposeHandler.decomposeMessage(message.encryptedContent!!)
+            text = decomposed.body
+            heading = decomposed.subject
+            toAccount = decomposed.to
+        }
+    }
+
     Column {
         Card(
             modifier = Modifier
@@ -237,7 +253,7 @@ fun RecentMessageCard(
                 Column(modifier = Modifier.weight(1f)) {
                     // Heading Text
                     Text(
-                        text = message.encryptedContent!!,
+                        heading,
                         style = if (message.type == Platforms.ServiceTypes.TEXT.type) {
                             MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
                         } else {
@@ -250,7 +266,7 @@ fun RecentMessageCard(
                     // Subheading Text
                     if (message.encryptedContent != null) {
                         Text(
-                            text = message.encryptedContent!!,
+                            toAccount,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
@@ -259,7 +275,7 @@ fun RecentMessageCard(
                     }
                     // Message Preview
                     Text(
-                        text = message.encryptedContent!!,
+                        text = text,
                         style = MaterialTheme.typography.bodySmall,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
@@ -269,7 +285,7 @@ fun RecentMessageCard(
 
                 // Date
                 Text(
-                    text = message.date.toString(),
+                    text = Helpers.formatDate(LocalContext.current, message.date),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -311,7 +327,7 @@ fun RecentScreenMessages_Preview() {
         encryptedContent.platformName = "gmail"
         encryptedContent.fromAccount = "developers@relaysms.me"
         encryptedContent.gatewayClientMSISDN = "+237123456789"
-        encryptedContent.encryptedContent = "This is an encrypted content"
+        encryptedContent.encryptedContent = "dev@relaysms.me:::subject here:This is an encrypted content"
         RecentView(
             _messages = listOf(encryptedContent),
             navController = rememberNavController(),
@@ -332,7 +348,7 @@ fun RecentsCardPreview() {
         encryptedContent.platformName = "gmail"
         encryptedContent.fromAccount = "developers@relaysms.me"
         encryptedContent.gatewayClientMSISDN = "+237123456789"
-        encryptedContent.encryptedContent = "This is an encrypted content"
+        encryptedContent.encryptedContent = "origin@gmail.com:dev@relaysms.me:::subject here:This is an encrypted content"
         RecentMessageCard(encryptedContent)
     }
 }

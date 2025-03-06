@@ -57,6 +57,36 @@ data class EmailContent(
     var body: String
 )
 
+object EmailComposeHandler {
+    fun decomposeMessage(
+        message: String,
+        isBridge: Boolean = false
+    ): EmailContent {
+        println(message)
+        return message.split(":").let {
+            if (isBridge)
+                EmailContent(
+                    from = "",
+                    to = it[0],
+                    cc = it[1],
+                    bcc = it[2],
+                    subject = it[3],
+                    body = it[4]
+                )
+            else
+                EmailContent(
+                    from = it[0],
+                    to = it[1],
+                    cc = it[2],
+                    bcc = it[3],
+                    subject = it[4],
+                    body = it.subList(5, it.size).joinToString()
+                )
+        }
+    }
+}
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmailComposeView(
