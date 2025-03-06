@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.sw0b_001.Models.GatewayClients.GatewayClientViewModel
 import com.example.sw0b_001.Models.Messages.EncryptedContent
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
@@ -52,7 +53,8 @@ fun HomepageView(
     isLoggedIn: Boolean = false,
     navController: NavController,
     platformsViewModel : PlatformsViewModel,
-    messagesViewModel: MessagesViewModel
+    messagesViewModel: MessagesViewModel,
+    gatewayClientViewModel: GatewayClientViewModel
 ) {
     val context = LocalContext.current
     val inspectionMode = LocalInspectionMode.current
@@ -169,8 +171,8 @@ fun HomepageView(
                     )
                 }
                 BottomTabsItems.BottomBarCountriesTab -> {
-                    GatewayClientView(addShowBottomSheet = showAddGatewayClientsModal) {
-                        showAddGatewayClientsModal = false
+                    GatewayClientView(addShowBottomSheet = showAddGatewayClientsModal, viewModel = gatewayClientViewModel) {
+//                        showAddGatewayClientsModal = false
                     }
                 }
             }
@@ -185,7 +187,8 @@ fun HomepageView_Preview() {
         HomepageView(
             navController = rememberNavController(),
             platformsViewModel = PlatformsViewModel(),
-            messagesViewModel = MessagesViewModel()
+            messagesViewModel = MessagesViewModel(),
+            gatewayClientViewModel = GatewayClientViewModel()
         )
     }
 }
@@ -199,7 +202,8 @@ fun HomepageViewLoggedIn_Preview() {
             isLoggedIn = true,
             navController = rememberNavController(),
             platformsViewModel = PlatformsViewModel(),
-            messagesViewModel = MessagesViewModel()
+            messagesViewModel = MessagesViewModel(),
+            gatewayClientViewModel = GatewayClientViewModel()
         )
     }
 }
@@ -224,7 +228,8 @@ fun HomepageViewLoggedInMessages_Preview() {
             isLoggedIn = true,
             navController = rememberNavController(),
             platformsViewModel = PlatformsViewModel(),
-            messagesViewModel = MessagesViewModel()
+            messagesViewModel = MessagesViewModel(),
+            gatewayClientViewModel = GatewayClientViewModel()
         )
     }
 }

@@ -42,6 +42,7 @@ import com.example.sw0b_001.ui.views.compose.EmailComposeView
 import com.example.sw0b_001.ui.views.compose.MessageComposeView
 import com.example.sw0b_001.ui.views.compose.TextComposeView
 import androidx.activity.viewModels
+import com.example.sw0b_001.Models.GatewayClients.GatewayClientViewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -51,6 +52,7 @@ class MainActivity : ComponentActivity() {
 
     val platformsViewModel: PlatformsViewModel by viewModels()
     val messagesViewModel: MessagesViewModel by viewModels()
+    val gatewayClientViewModel: GatewayClientViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,7 +90,8 @@ class MainActivity : ComponentActivity() {
                 HomepageView(
                     navController = navController,
                     platformsViewModel = platformsViewModel,
-                    messagesViewModel = messagesViewModel
+                    messagesViewModel = messagesViewModel,
+                    gatewayClientViewModel = gatewayClientViewModel
                 )
             }
             composable<LoginScreen> {

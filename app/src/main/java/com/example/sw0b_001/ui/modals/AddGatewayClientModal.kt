@@ -1,5 +1,6 @@
 package com.example.sw0b_001.ui.modals
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,13 +30,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.sw0b_001.Models.GatewayClients.GatewayClient
+import com.example.sw0b_001.Models.GatewayClients.GatewayClientViewModel
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.views.GatewayClient
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,22 +47,22 @@ import kotlinx.coroutines.launch
 fun AddGatewayClientModal(
     onDismiss: () -> Unit,
     showBottomSheet: Boolean,
+    viewModel: GatewayClientViewModel,
     gatewayClient: GatewayClient? = null
 ) {
+    val context = LocalContext.current
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Expanded,
         skipHiddenState = false
     )
     val scope = rememberCoroutineScope()
-    var phoneNumber by remember { mutableStateOf(gatewayClient?.phoneNumber ?: "") }
+    var phoneNumber by remember { mutableStateOf(gatewayClient?.mSISDN ?: "") }
     var alias by remember { mutableStateOf(gatewayClient?.alias ?: "") }
 
     if (showBottomSheet) {
         ModalBottomSheet(
             onDismissRequest = onDismiss,
             sheetState = sheetState,
-//            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
-//            scrimColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
         ) {
             Column(
                 modifier = Modifier
@@ -67,7 +71,7 @@ fun AddGatewayClientModal(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Add Gateway Client",
+                    text = if (gatewayClient == null) "Add Gateway Client" else "Edit Gateway Client",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -83,14 +87,16 @@ fun AddGatewayClientModal(
                     OutlinedTextField(
                         value = phoneNumber,
                         onValueChange = { phoneNumber = it },
-                        label = { Text(
-                            text = "Enter phone number with country code",
-                            style = MaterialTheme.typography.bodyMedium
-                        ) },
+                        label = {
+                            Text(
+                                text = "Enter phone number with country code",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        },
                         modifier = Modifier.weight(1f),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
                     )
-                    IconButton(onClick = {TODO("add functionality")}) {
+                    IconButton(onClick = { TODO("add functionality") }) {
                         Icon(
                             imageVector = Icons.Filled.Contacts,
                             contentDescription = "Select Contact",
@@ -111,10 +117,12 @@ fun AddGatewayClientModal(
                 OutlinedTextField(
                     value = alias,
                     onValueChange = { alias = it },
-                    label = { Text(
-                        text = "Alias (optional)",
-                        style = MaterialTheme.typography.bodyMedium
-                    ) },
+                    label = {
+                        Text(
+                            text = "Alias (optional)",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Text(
@@ -129,7 +137,38 @@ fun AddGatewayClientModal(
                 // Save Button
                 Button(
                     onClick = {
-                        TODO("add functionality")
+                        scope.launch {
+                            val successRunnable = Runnable {
+                                Log.i(
+                                    "AddGatewayClientModal",
+                                    if (gatewayClient == null) "Gateway client added successfully" else "Gateway client edited successfully"
+                                )
+                                onDismiss()
+                            }
+
+                            val failureRunnable = Runnable {
+                                Log.e(
+                                    "AddGatewayClientModal",
+                                    if (gatewayClient == null) "Failed to add gateway client" else "Failed to edit gateway client"
+                                )
+                            }
+
+                            if (gatewayClient == null) {
+                                // Add new client
+                                val newGatewayClient = GatewayClient()
+                                newGatewayClient.mSISDN = phoneNumber
+                                newGatewayClient.alias = alias
+                                newGatewayClient.type = GatewayClient.TYPE.CUSTOM.value
+                                //TODO: add the other fields
+                                viewModel.loadRemote(context, successRunnable, failureRunnable)
+                            } else {
+                                // Edit existing client
+                                gatewayClient.mSISDN = phoneNumber
+                                gatewayClient.alias = alias
+                                //TODO: add the other fields
+                                viewModel.loadRemote(context, successRunnable, failureRunnable)
+                            }
+                        }
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
@@ -141,13 +180,16 @@ fun AddGatewayClientModal(
     }
 }
 
+
 @Preview(showBackground = true)
 @Composable
 fun AddGatewayClientModalPreview() {
     AppTheme {
+        //TODO: add a dummy view model
         AddGatewayClientModal(
             showBottomSheet = true,
             onDismiss = {},
+            viewModel = GatewayClientViewModel()
         )
     }
 }
