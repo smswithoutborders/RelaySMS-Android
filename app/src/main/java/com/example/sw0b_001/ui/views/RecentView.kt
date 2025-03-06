@@ -60,6 +60,7 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.views.compose.EmailComposeHandler
+import com.example.sw0b_001.ui.views.compose.TextComposeHandler
 import kotlinx.serialization.json.internal.encodeByWriter
 
 @Composable
@@ -250,6 +251,11 @@ fun RecentMessageCard(
             heading = decomposed.subject
             toAccount = decomposed.to
         }
+        Platforms.ServiceTypes.TEXT.type -> {
+            val decomposed = TextComposeHandler.decomposeMessage(message.encryptedContent!!)
+            text = decomposed.text
+            heading = decomposed.from
+        }
     }
 
     Column {
@@ -349,8 +355,17 @@ fun RecentScreenMessages_Preview() {
         encryptedContent.fromAccount = "developers@relaysms.me"
         encryptedContent.gatewayClientMSISDN = "+237123456789"
         encryptedContent.encryptedContent = "dev@relaysms.me:::subject here:This is an encrypted content"
+
+        val text = EncryptedContent()
+        text.id = 1
+        text.type = "text"
+        text.date = System.currentTimeMillis()
+        text.platformName = "twitter"
+        text.fromAccount = "@relaysms.me"
+        text.gatewayClientMSISDN = "+237123456789"
+        text.encryptedContent = "@relaysms.me:Hello world"
         RecentView(
-            _messages = listOf(encryptedContent),
+            _messages = listOf(encryptedContent, text),
             navController = rememberNavController(),
             messagesViewModel = MessagesViewModel(),
             platformsViewModel = PlatformsViewModel()

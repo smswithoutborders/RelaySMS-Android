@@ -1,5 +1,6 @@
 package com.example.sw0b_001.ui.views.compose
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,11 +33,29 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.sw0b_001.Database.Datastore
+import com.example.sw0b_001.Models.ComposeHandlers
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.theme.AppTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
+data class TextContent(val from: String, val text: String)
+
+object TextComposeHandler {
+    fun decomposeMessage(
+        text: String
+    ): TextContent {
+        println(text)
+        return text.split(":").let {
+            TextContent(from=it[0], text=it[1])
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,7 +108,21 @@ fun TextComposeView(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { TODO("Post message") }) {
+                    IconButton(onClick = {
+                        processPost(
+                            context = context,
+                            textContent = TextContent(
+                                from = from,
+                                text = message,
+                            ),
+                            account = selectedAccount!!,
+                            onFailureCallback = {}
+                        ) {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                navController.popBackStack()
+                            }
+                        }
+                    }) {
                         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Post")
                     }
                 },
@@ -120,6 +153,42 @@ fun TextComposeView(
             )
         }
     }
+}
+
+
+private fun processPost(
+    context: Context,
+    textContent: TextContent,
+    account: StoredPlatformsEntity,
+    onFailureCallback: (String?) -> Unit,
+    onCompleteCallback: () -> Unit
+) {
+    CoroutineScope(Dispatchers.Default).launch {
+        val availablePlatforms = Datastore.getDatastore(context)
+            .availablePlatformsDao().fetch(account.name!!)
+        val formattedString =
+            processTextForEncryption(textContent.text, account)
+
+        try {
+            ComposeHandlers.compose(context,
+                formattedString,
+                availablePlatforms,
+                account,
+            ) {
+                onCompleteCallback()
+            }
+        } catch(e: Exception) {
+            e.printStackTrace()
+            onFailureCallback(e.message)
+            CoroutineScope(Dispatchers.Main).launch {
+                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+}
+
+private fun processTextForEncryption(body: String, account: StoredPlatformsEntity): String {
+    return "${account.account}:$body"
 }
 
 

@@ -26,7 +26,7 @@ class MessagesViewModel : ViewModel() {
                 datastore = Datastore.getDatastore(context)
                 messagesList = loadEncryptedContents()
             }
-            delay(200)
+            delay(50)
             _isLoading.value = false
         }
         return messagesList

@@ -154,7 +154,9 @@ fun EmailComposeView(
                             isBridge = isBridge,
                             onFailureCallback = {}
                         ) {
-
+                            CoroutineScope(Dispatchers.Main).launch {
+                                navController.popBackStack()
+                            }
                         }
                     }) {
                         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
