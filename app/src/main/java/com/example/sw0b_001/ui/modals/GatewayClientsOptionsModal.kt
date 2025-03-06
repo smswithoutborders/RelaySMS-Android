@@ -40,7 +40,8 @@ fun GatewayClientOptionsModal(
     showBottomSheet: Boolean,
     onEditClicked: (GatewayClient) -> Unit,
     viewModel: GatewayClientViewModel,
-    onMakeDefaultClicked: (GatewayClient) -> Unit
+    onMakeDefaultClicked: (GatewayClient) -> Unit,
+    isDefault: Boolean = false
 ) {
     val context = LocalContext.current
     val sheetState = rememberStandardBottomSheetState(
@@ -89,6 +90,7 @@ fun GatewayClientOptionsModal(
                             }
                             GatewayClientsCommunications(context).updateDefaultGatewayClient(gatewayClient.mSISDN!!)
                             viewModel.loadRemote(context, successRunnable, failureRunnable)
+                            onMakeDefaultClicked(gatewayClient)
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
@@ -105,54 +107,56 @@ fun GatewayClientOptionsModal(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Button(
-                    onClick = { onEditClicked(gatewayClient) },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = MaterialTheme.colorScheme.primary
-                    )
-                ) {
-                    Text(
-                        text = "Edit",
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
+                if (!isDefault) {
+                    Button(
+                        onClick = { onEditClicked(gatewayClient) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        Text(
+                            text = "Edit",
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                Button(
-                    onClick = {
-                        scope.launch {
-                            val successRunnable = Runnable {
-                                Log.i(
-                                    "GatewayClientOptionsModal",
-                                    "Gateway client deleted successfully"
-                                )
-                                onDismiss()
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                val successRunnable = Runnable {
+                                    Log.i(
+                                        "GatewayClientOptionsModal",
+                                        "Gateway client deleted successfully"
+                                    )
+                                    onDismiss()
+                                }
+
+                                val failureRunnable = Runnable {
+                                    Log.e(
+                                        "GatewayClientOptionsModal",
+                                        "Failed to delete gateway client"
+                                    )
+                                }
+                                viewModel.delete(context, gatewayClient)
+                                viewModel.loadRemote(context, successRunnable, failureRunnable)
                             }
-
-                            val failureRunnable = Runnable {
-                                Log.e(
-                                    "GatewayClientOptionsModal",
-                                    "Failed to delete gateway client"
-                                )
-                            }
-                            viewModel.delete(context, gatewayClient)
-                            viewModel.loadRemote(context, successRunnable, failureRunnable)
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer,
-                        contentColor = MaterialTheme.colorScheme.onErrorContainer
-                    )
-                ) {
-                    Text(
-                        text = "Delete",
-                        color = MaterialTheme.colorScheme.onErrorContainer
-                    )
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                            contentColor = MaterialTheme.colorScheme.onErrorContainer
+                        )
+                    ) {
+                        Text(
+                            text = "Delete",
+                            color = MaterialTheme.colorScheme.onErrorContainer
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
-                Spacer(modifier = Modifier.height(16.dp))
             }
         }
     }

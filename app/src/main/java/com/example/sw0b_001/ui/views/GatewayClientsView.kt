@@ -145,10 +145,11 @@ fun GatewayClientView(
                     },
                     viewModel = viewModel,
                     onMakeDefaultClicked = {
-                        viewModel.selectGatewayClient(it)
+                        viewModel.selectGatewayClient(currentGatewayClient!!)
                         optionsShowBottomSheet = false
                         onDismissCallback()
-                    }
+                    },
+                    isDefault = currentGatewayClient!!.isDefault
                 )
             }
         }
