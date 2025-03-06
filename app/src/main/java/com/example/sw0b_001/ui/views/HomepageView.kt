@@ -214,7 +214,6 @@ fun HomepageViewLoggedInMessages_Preview() {
         encryptedContent.type = "email"
         encryptedContent.date = System.currentTimeMillis()
         encryptedContent.platformName = "gmail"
-        encryptedContent.platformId = ""
         encryptedContent.fromAccount = "developers@relaysms.me"
         encryptedContent.gatewayClientMSISDN = "+237123456789"
         encryptedContent.encryptedContent = "This is an encrypted content"

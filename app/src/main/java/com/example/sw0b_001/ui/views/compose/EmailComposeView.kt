@@ -1,5 +1,6 @@
 package com.example.sw0b_001.ui.views.compose
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -35,11 +36,26 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.sw0b_001.Database.Datastore
+import com.example.sw0b_001.Models.Bridges
+import com.example.sw0b_001.Models.ComposeHandlers
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.theme.AppTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
+data class EmailContent(
+    var from: String,
+    var to: String,
+    var cc: String,
+    var bcc: String,
+    var subject: String,
+    var body: String
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,13 +108,28 @@ fun EmailComposeView(
                     }
                 },
                 actions = {
-                    IconButton(onClick = {TODO("Handle send") }) {
+                    IconButton(
+                        enabled = to.isNotEmpty() && body.isNotEmpty(),
+                        onClick = { processSend(
+                            context = context,
+                            emailContent = EmailContent(
+                                from = from,
+                                to = to,
+                                cc = cc,
+                                bcc = bcc,
+                                subject = subject,
+                                body = body
+                            ),
+                            account = selectedAccount,
+                            isBridge = isBridge,
+                            onFailureCallback = {}
+                        ) {
+
+                        }
+                    }) {
                         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
             )
         }
     ) { innerPadding ->
@@ -187,12 +218,65 @@ fun EmailComposeView(
                 label = { Text("Compose Email", style = MaterialTheme.typography.bodyMedium) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email,
-                    imeAction = ImeAction.Done
-                )
+                    .weight(1f)
             )
+        }
+    }
+}
+
+private fun processEmailForEncryption(
+    to: String,
+    cc: String,
+    bcc: String,
+    subject: String,
+    body: String,
+    isBridge: Boolean,
+    account: StoredPlatformsEntity?
+): String {
+    return if(isBridge) "$to:$cc:$bcc:$subject:$body"
+    else "${account!!.account}:$to:$cc:$bcc:$subject:$body"
+}
+
+private fun processSend(
+    context: Context,
+    emailContent: EmailContent,
+    account: StoredPlatformsEntity?,
+    isBridge: Boolean,
+    onFailureCallback: (String?) -> Unit,
+    onCompleteCallback: () -> Unit
+) {
+    CoroutineScope(Dispatchers.Default).launch {
+        val availablePlatforms = if(isBridge) Bridges.platforms
+        else Datastore.getDatastore(context)
+            .availablePlatformsDao().fetch(account!!.name!!)
+
+        val formattedContent = processEmailForEncryption(
+            emailContent.to,
+            emailContent.cc,
+            emailContent.bcc,
+            emailContent.subject,
+            emailContent.body,
+            isBridge,
+            account
+        )
+
+        try {
+            ComposeHandlers.compose(context,
+                formattedContent,
+                availablePlatforms,
+                account,
+                isBridge = isBridge,
+                authCode = if(isBridge) Bridges.getAuthCode(context)
+                    .encodeToByteArray() else null
+            ) {
+                onCompleteCallback()
+            }
+        } catch(e: Exception) {
+            e.printStackTrace()
+            onFailureCallback(e.message)
+            CoroutineScope(Dispatchers.Main).launch {
+                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }

@@ -21,10 +21,11 @@ class MessageComposer(val context: Context, val state: States) {
         }
     }
 
-    fun compose(availablePlatforms: AvailablePlatforms,
-                content: String,
-                authCode: ByteArray? = null,
-                isBridge: Boolean = false
+    fun compose(
+        availablePlatforms: AvailablePlatforms,
+        content: String,
+        authCode: ByteArray? = null,
+        isBridge: Boolean = false
     ): String {
         val (header, cipherMk) = Ratchets.ratchetEncrypt(state, content.encodeToByteArray(), AD)
 
@@ -42,11 +43,12 @@ class MessageComposer(val context: Context, val state: States) {
     }
 
     companion object {
-        fun formatTransmission(headers: Headers,
-                               cipherText: ByteArray,
-                               platformLetter: Byte,
-                               authCode: ByteArray? = null,
-                               deviceID: ByteArray? = null,
+        fun formatTransmission(
+            headers: Headers,
+            cipherText: ByteArray,
+            platformLetter: Byte,
+            authCode: ByteArray? = null,
+            deviceID: ByteArray? = null,
         ): String {
             val sHeader = headers.serialized
 

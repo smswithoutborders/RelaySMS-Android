@@ -237,7 +237,7 @@ fun RecentMessageCard(
                 Column(modifier = Modifier.weight(1f)) {
                     // Heading Text
                     Text(
-                        text = message.encryptedContent,
+                        text = message.encryptedContent!!,
                         style = if (message.type == Platforms.ServiceTypes.TEXT.type) {
                             MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
                         } else {
@@ -250,7 +250,7 @@ fun RecentMessageCard(
                     // Subheading Text
                     if (message.encryptedContent != null) {
                         Text(
-                            text = message.encryptedContent,
+                            text = message.encryptedContent!!,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
@@ -259,7 +259,7 @@ fun RecentMessageCard(
                     }
                     // Message Preview
                     Text(
-                        text = message.encryptedContent,
+                        text = message.encryptedContent!!,
                         style = MaterialTheme.typography.bodySmall,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
@@ -288,7 +288,6 @@ fun RecentScreenPreview() {
         encryptedContent.type = "email"
         encryptedContent.date = System.currentTimeMillis()
         encryptedContent.platformName = "gmail"
-        encryptedContent.platformId = ""
         encryptedContent.fromAccount = "developers@relaysms.me"
         encryptedContent.gatewayClientMSISDN = "+237123456789"
         encryptedContent.encryptedContent = "This is an encrypted content"
@@ -310,7 +309,6 @@ fun RecentScreenMessages_Preview() {
         encryptedContent.type = "email"
         encryptedContent.date = System.currentTimeMillis()
         encryptedContent.platformName = "gmail"
-        encryptedContent.platformId = ""
         encryptedContent.fromAccount = "developers@relaysms.me"
         encryptedContent.gatewayClientMSISDN = "+237123456789"
         encryptedContent.encryptedContent = "This is an encrypted content"
@@ -332,7 +330,6 @@ fun RecentsCardPreview() {
         encryptedContent.type = "email"
         encryptedContent.date = System.currentTimeMillis()
         encryptedContent.platformName = "gmail"
-        encryptedContent.platformId = ""
         encryptedContent.fromAccount = "developers@relaysms.me"
         encryptedContent.gatewayClientMSISDN = "+237123456789"
         encryptedContent.encryptedContent = "This is an encrypted content"
