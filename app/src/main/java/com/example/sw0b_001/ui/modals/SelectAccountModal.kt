@@ -78,7 +78,8 @@ fun SelectAccountModal(
     var showBottomSheet by remember { mutableStateOf(true) }
 
     val accounts: List<StoredPlatformsEntity> = if(LocalInspectionMode.current) _accounts
-    else platformsViewModel.getSaved(context).observeAsState(emptyList()).value
+    else platformsViewModel.getSaved(context, platformsViewModel.platform?.name)
+        .observeAsState(emptyList()).value
 
     if (showBottomSheet) {
         ModalBottomSheet(
@@ -113,7 +114,7 @@ fun SelectAccountModal(
                     }
                 }
                 Text(
-                    text = "Select an account to send a message",
+                    text = "Select an account",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,

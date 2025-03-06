@@ -1,6 +1,5 @@
 package com.example.sw0b_001.ui.modals
 
-import android.R.attr.bottom
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
@@ -19,13 +18,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.ModalBottomSheetProperties
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -50,7 +47,9 @@ import com.example.sw0b_001.ui.navigation.TextScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.window.SecureFlagPolicy
+import com.example.sw0b_001.Database.Datastore
+import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
+import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.Models.Publishers
 import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.ui.views.addAccounts.PNBAPhoneNumberCodeRequestView
@@ -58,28 +57,31 @@ import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import publisher.v1.PublisherOuterClass
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlatformOptionsModal(
     showPlatformsModal: Boolean,
-    platform: AvailablePlatforms?,
+    platformsViewModel: PlatformsViewModel,
     isActive: Boolean,
     isCompose: Boolean,
     navController: NavController,
     onDismissRequest: () -> Unit,
 ) {
     val context = LocalContext.current
-    var isLoading by remember { mutableStateOf(false) }
+    var isAddLoading by remember { mutableStateOf(false) }
+    var isRevokeLoading by remember { mutableStateOf(false) }
+    var removeAccountRequested by remember { mutableStateOf(false) }
+    var revokeAccountConfirmationRequested by remember { mutableStateOf(false) }
+
+    var account by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
 
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Expanded,
         skipHiddenState = false,
-        confirmValueChange = { !isLoading ||
-                platform?.service_type == Platforms.ProtocolTypes.PNBA.type }
+        confirmValueChange = { !isAddLoading ||
+                platformsViewModel.platform?.service_type == Platforms.ProtocolTypes.PNBA.type }
     )
-
 
     if (showPlatformsModal) {
         ModalBottomSheet(
@@ -93,20 +95,55 @@ fun PlatformOptionsModal(
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if(isLoading) {
+                if(isRevokeLoading) {
+                    RevokeAccountLoading(platformsViewModel.platform!!)
+                }
+                else if(revokeAccountConfirmationRequested) {
+                    ConfirmationModal(
+                        showBottomSheet = revokeAccountConfirmationRequested,
+                        onContinue = {
+                            revokeAccountConfirmationRequested = false
+                            isRevokeLoading = true
+                            triggerAccountRevoke(
+                                context = context,
+                                platform = platformsViewModel.platform!!,
+                                account = account!!,
+                                onCompletedCallback = {
+                                    isRevokeLoading = false
+                                    account = null
+                                }
+                            )
+                        }
+                    ) {
+                        revokeAccountConfirmationRequested = false
+                    }
+                }
+                else if(removeAccountRequested) {
+                    SelectAccountModal(
+                        platformsViewModel = platformsViewModel,
+                        onAccountSelected = { storedAccount ->
+                            removeAccountRequested = false
+                            revokeAccountConfirmationRequested = true
+                            account = storedAccount
+                        }
+                    ) {
+                        removeAccountRequested = false
+                    }
+                }
+                else if(isAddLoading) {
                     AddAccountLoading(
                         context,
-                        platform!!
+                        platformsViewModel.platform!!
                     ) {
                         onDismissRequest()
                     }
                 } else {
                     Image(
-                        bitmap = if(platform != null) {
+                        bitmap = if(platformsViewModel.platform != null) {
                             BitmapFactory.decodeByteArray(
-                                platform.logo,
+                                platformsViewModel.platform!!.logo,
                                 0,
-                                platform.logo!!.count()
+                                platformsViewModel.platform!!.logo!!.count()
                             ).asImageBitmap()
                         }
                         else BitmapFactory.decodeResource(
@@ -121,12 +158,14 @@ fun PlatformOptionsModal(
                     Text(
                         text = if (isCompose) {
                             getServiceBasedComposeDescriptions(
-                                if(platform != null) platform.service_type!!
+                                if(platformsViewModel.platform != null)
+                                    platformsViewModel.platform!!.service_type!!
                                 else ""
                             )
                         } else {
                             getServiceBasedAvailableDescription(
-                                if(platform != null) platform.service_type!!
+                                if(platformsViewModel.platform != null)
+                                    platformsViewModel.platform!!.service_type!!
                                 else ""
                             )
                         },
@@ -135,24 +174,26 @@ fun PlatformOptionsModal(
                     )
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    if (isCompose || platform == null) {
+                    if (isCompose || platformsViewModel.platform == null) {
                         ComposeMessages(
-                            platform = platform,
+                            platform = platformsViewModel.platform,
                             navController = navController
                         ) { onDismissRequest() }
                     } else {
                         ManageAccounts(
                             isActive,
                             addAccountsCallback = {
-                                isLoading = true
+                                isAddLoading = true
                                 triggerAddPlatformRequest(
                                     context = context,
-                                    platform = platform
+                                    platform = platformsViewModel.platform!!
                                 ) {
-                                    isLoading = false
+                                    isAddLoading = false
                                 }
                             },
-                            removeAccountsCallback = {}
+                            removeAccountsCallback = {
+                                removeAccountRequested = true
+                            }
                         )
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -204,6 +245,75 @@ private fun triggerAddPlatformRequest(
                     onCompletedCallback()
                 }
             }
+        }
+    }
+}
+
+
+@Composable
+private fun RevokeAccountLoading(
+    platform: AvailablePlatforms,
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.padding(16.dp)
+    ) {
+        Text(
+            text = "Revoking account for ${platform.name}",
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        CircularProgressIndicator(
+            color = MaterialTheme.colorScheme.secondary,
+            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+        )
+    }
+}
+
+private fun triggerAccountRevoke(
+    context: Context,
+    platform: AvailablePlatforms,
+    account: StoredPlatformsEntity,
+    onCompletedCallback: () -> Unit
+) {
+    CoroutineScope(Dispatchers.Default).launch {
+        val llt = Vaults.fetchLongLivedToken(context)
+        val publishers = Publishers(context)
+        try {
+            when(platform.protocol_type) {
+                Platforms.ProtocolTypes.OAUTH2.type -> {
+                    publishers.revokeOAuthPlatforms(
+                        llt,
+                        account.name!!,
+                        account.account!!
+                    )
+                }
+                Platforms.ProtocolTypes.PNBA.type -> {
+                    publishers.revokePNBAPlatforms(
+                        llt,
+                        account.name!!,
+                        account.account!!
+                    )
+                }
+            }
+
+            Datastore.getDatastore(context).storedPlatformsDao()
+                .delete(account.id)
+            onCompletedCallback()
+        } catch(e: StatusRuntimeException) {
+            e.printStackTrace()
+
+            CoroutineScope(Dispatchers.Main).launch {
+                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+            }
+        } catch(e: Exception) {
+            e.printStackTrace()
+            CoroutineScope(Dispatchers.Main).launch {
+                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+            }
+        } finally {
+            publishers.shutdown()
         }
     }
 }
@@ -489,9 +599,11 @@ fun PlatformOptionsModalPreview() {
             support_url_scheme = true,
             logo = null
         )
+        val platformsViewModel = PlatformsViewModel()
+        platformsViewModel.platform = platform
         PlatformOptionsModal(
             showPlatformsModal = false,
-            platform = platform,
+            platformsViewModel = PlatformsViewModel(),
             isActive = true,
             isCompose = false,
             onDismissRequest = {},

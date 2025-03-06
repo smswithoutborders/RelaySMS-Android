@@ -68,8 +68,6 @@ fun AvailablePlatformsView(
     val context = LocalContext.current
     var showPlatformOptions by remember { mutableStateOf(false) }
 
-    var availablePlatforms: AvailablePlatforms? by remember { mutableStateOf(null)}
-
     val platforms: List<AvailablePlatforms> by platformsViewModel
         .getAvailablePlatforms(context).observeAsState(emptyList())
 
@@ -98,9 +96,9 @@ fun AvailablePlatformsView(
                 storedPlatforms = storedPlatforms,
                 isCompose = isCompose,
                 onPlatformClick = {
+                    platformsViewModel.platform = it
                     showPlatformOptions = true
-                    availablePlatforms = it
-                    println("Available platform: ${availablePlatforms?.name}")
+                    println("Available platform: ${platformsViewModel.platform?.name}")
                 }
             )
         }
@@ -109,9 +107,9 @@ fun AvailablePlatformsView(
     if (showPlatformOptions) {
         PlatformOptionsModal(
             showPlatformsModal = showPlatformOptions,
-            platform = availablePlatforms,
-            isActive = isCompose || availablePlatforms == null ||
-                    storedPlatforms.filter{ it.name == availablePlatforms!!.name }.isNotEmpty(),
+            platformsViewModel = platformsViewModel,
+            isActive = isCompose || platformsViewModel.platform == null ||
+                    storedPlatforms.filter{ it.name == platformsViewModel.platform!!.name }.isNotEmpty(),
             isCompose = isCompose,
             navController = navController,
         ) {

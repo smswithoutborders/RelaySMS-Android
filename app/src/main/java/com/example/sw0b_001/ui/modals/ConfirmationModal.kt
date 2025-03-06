@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -36,10 +37,10 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConfirmationModal(
+    showBottomSheet: Boolean = true,
+    message: String = "Click continue to confirm this action. Do not worry, it has no dangerous effects.",
     onContinue: () -> Unit,
     onCancel: () -> Unit,
-    showBottomSheet: Boolean = true,
-    message: String = "Click continue to confirm this action. Do not worry, it has no dangerous effects."
 ) {
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Expanded,
@@ -72,19 +73,17 @@ fun ConfirmationModal(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    Text(
-                        text = "Cancel",
-                        modifier = Modifier
-                            .clickable {
-                                scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                    if (!sheetState.isVisible) {
-                                        onCancel()
-                                    }
+                    TextButton(
+                        onClick = {
+                            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                if (!sheetState.isVisible) {
+                                    onCancel()
                                 }
                             }
-                            .padding(8.dp),
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                        },
+                    ) {
+                        Text("Cancel")
+                    }
                     Spacer(modifier = Modifier.width(16.dp))
                     Button(
                         onClick = onContinue,

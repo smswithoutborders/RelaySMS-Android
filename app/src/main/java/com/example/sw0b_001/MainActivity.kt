@@ -282,7 +282,7 @@ fun GetMeOutOfHere(
                     }
                 }
         }) {
-            Text("Get me out here!")
+            Text("Get me out here!", fontWeight = FontWeight.SemiBold)
         }
     }
 }
