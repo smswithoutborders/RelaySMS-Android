@@ -126,9 +126,6 @@ fun TextComposeView(
                         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Post")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
             )
         }
     ) { innerPadding ->

@@ -1,5 +1,6 @@
 package com.example.sw0b_001.ui.views.compose
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -34,16 +35,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.sw0b_001.Database.Datastore
+import com.example.sw0b_001.Models.ComposeHandlers
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.theme.AppTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
+data class MessageContent(val from: String, val to: String, val message: String)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,18 +60,14 @@ fun MessageComposeView(
     navController: NavController,
     platformsViewModel: PlatformsViewModel
 ) {
+    val inspectMode = LocalInspectionMode.current
     var recipientNumber by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
-    var senderPhoneNumber by remember { mutableStateOf("") }
-    var showSelectAccountModal by remember { mutableStateOf(true) }
+    var from by remember { mutableStateOf("") }
+    var showSelectAccountModal by remember { mutableStateOf(!inspectMode) }
     var selectedAccount by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
     val context = LocalContext.current
 
-    LaunchedEffect(key1 = Unit) {
-        showSelectAccountModal = true
-    }
-
-    // Conditionally show the SelectAccountModal
     if (showSelectAccountModal) {
         SelectAccountModal(
             platformsViewModel = platformsViewModel,
@@ -74,8 +79,8 @@ fun MessageComposeView(
             },
             onAccountSelected = { account ->
                 selectedAccount = account
+                from = account.account!!
                 showSelectAccountModal = false
-                senderPhoneNumber = account.account!!
             }
         )
     }
@@ -96,9 +101,6 @@ fun MessageComposeView(
                         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
             )
         }
     ) { innerPadding ->
@@ -109,7 +111,7 @@ fun MessageComposeView(
                 .padding(16.dp)
         ) {
             OutlinedTextField(
-                value = senderPhoneNumber,
+                value = from,
                 onValueChange = { },
                 label = { Text("Sender") },
                 enabled = false,
@@ -141,7 +143,22 @@ fun MessageComposeView(
                     )
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                IconButton(onClick = { TODO("Handle select contact") }) {
+                IconButton(onClick = {
+                    sendMessage(
+                        context = context,
+                        messageContent = MessageContent(
+                            from = from,
+                            to = recipientNumber,
+                            message = message,
+                        ),
+                        account = selectedAccount!!,
+                        onFailureCallback = {}
+                    ) {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            navController.popBackStack()
+                        }
+                    }
+                }) {
                     Icon(
                         imageVector = Icons.Filled.Contacts,
                         contentDescription = "Select Contact",
@@ -177,6 +194,53 @@ fun MessageComposeView(
             )
         }
     }
+}
+
+private fun processMessageForEncryption(
+    to: String,
+    message: String,
+    account: StoredPlatformsEntity
+): String {
+    return "${account.account}:$to:$message"
+}
+
+private fun verifyPhoneNumberFormat(phoneNumber: String): Boolean {
+    val newPhoneNumber = phoneNumber
+        .replace("[\\s-]".toRegex(), "")
+    return newPhoneNumber.matches("^\\+[1-9]\\d{1,14}$".toRegex())
+}
+
+
+private fun sendMessage(
+    context: Context,
+    messageContent: MessageContent,
+    account: StoredPlatformsEntity,
+    onFailureCallback: (String?) -> Unit,
+    onCompleteCallback: () -> Unit
+) {
+    CoroutineScope(Dispatchers.Default).launch {
+        val availablePlatforms = Datastore.getDatastore(context)
+            .availablePlatformsDao().fetch(account.name!!)
+        val formattedString =
+            processMessageForEncryption(messageContent.to, messageContent.message, account)
+
+        try {
+            ComposeHandlers.compose(context,
+                formattedString,
+                availablePlatforms,
+                account,
+            ) {
+                onCompleteCallback()
+            }
+        } catch(e: Exception) {
+            e.printStackTrace()
+            onFailureCallback(e.message)
+            CoroutineScope(Dispatchers.Main).launch {
+                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
 }
 
 @Preview(showBackground = false)
