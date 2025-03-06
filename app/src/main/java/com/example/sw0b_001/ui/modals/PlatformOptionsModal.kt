@@ -116,6 +116,7 @@ fun PlatformOptionsModal(
                         }
                     ) {
                         revokeAccountConfirmationRequested = false
+                        onDismissRequest()
                     }
                 }
                 else if(removeAccountRequested) {
@@ -189,6 +190,7 @@ fun PlatformOptionsModal(
                                     platform = platformsViewModel.platform!!
                                 ) {
                                     isAddLoading = false
+                                    onDismissRequest()
                                 }
                             },
                             removeAccountsCallback = {
