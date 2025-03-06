@@ -157,7 +157,7 @@ fun HomepageView(
                             _messages = _messages,
                             navController = navController,
                             messagesViewModel = messagesViewModel,
-                            platformsViewModel = platformsViewModel
+                            platformsViewModel = platformsViewModel,
                         ) {
                             bottomBarItem = BottomTabsItems.BottomBarPlatformsTab
                         }
@@ -230,7 +230,7 @@ fun HomepageViewLoggedInMessages_Preview() {
         encryptedContent.platformName = "gmail"
         encryptedContent.fromAccount = "developers@relaysms.me"
         encryptedContent.gatewayClientMSISDN = "+237123456789"
-        encryptedContent.encryptedContent = "This is an encrypted content"
+        encryptedContent.encryptedContent = "origin@gmail.com:dev@relaysms.me:::subject here:This is an encrypted content"
 
         HomepageView(
             _messages = listOf(encryptedContent),

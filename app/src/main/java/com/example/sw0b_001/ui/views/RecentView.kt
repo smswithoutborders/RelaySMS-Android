@@ -29,6 +29,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -156,7 +157,7 @@ fun RecentView(
         .padding(16.dp)
         .fillMaxSize()
     ) {
-        if (messages.isNotEmpty()) {
+        if(messages.isNotEmpty()) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -168,7 +169,8 @@ fun RecentView(
                     RecentMessageCard(message)
                 }
             }
-        } else {
+        }
+        else {
             RecentViewNoMessages(
                 saveNewPlatformCallback = { tabRequestedCallback() },
                 sendNewMessageCallback = { sendNewMessageRequested = true }

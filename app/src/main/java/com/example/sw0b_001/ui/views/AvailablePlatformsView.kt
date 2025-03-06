@@ -109,7 +109,7 @@ fun AvailablePlatformsView(
             showPlatformsModal = showPlatformOptions,
             platformsViewModel = platformsViewModel,
             isActive = isCompose || platformsViewModel.platform == null ||
-                    storedPlatforms.filter{ it.name == platformsViewModel.platform!!.name }.isNotEmpty(),
+                    storedPlatforms.any { it.name == platformsViewModel.platform!!.name },
             isCompose = isCompose,
             navController = navController,
         ) {

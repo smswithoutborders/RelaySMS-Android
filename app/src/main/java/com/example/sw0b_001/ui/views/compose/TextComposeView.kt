@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,16 +44,14 @@ fun TextComposeView(
     navController: NavController,
     platformsViewModel: PlatformsViewModel
 ) {
+    val inspectMode = LocalInspectionMode.current
+    var from by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
-    var showSelectAccountModal by remember { mutableStateOf(true) }
+    var showSelectAccountModal by remember { mutableStateOf(!inspectMode) }
     var selectedAccount by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
+
     val context = LocalContext.current
 
-    LaunchedEffect(key1 = Unit) {
-        showSelectAccountModal = true
-    }
-
-    // Conditionally show the SelectAccountModal
     if (showSelectAccountModal) {
         SelectAccountModal(
             platformsViewModel = platformsViewModel,
@@ -64,6 +63,7 @@ fun TextComposeView(
             },
             onAccountSelected = { account ->
                 selectedAccount = account
+                from = account.account!!
                 showSelectAccountModal = false
             }
         )
@@ -72,7 +72,17 @@ fun TextComposeView(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("New Post") },
+                title = {
+                    Column {
+                        Text("New Post")
+
+                        if(from.isNotEmpty())
+                            Text(
+                                text = from,
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = {navController.popBackStack()}) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -111,6 +121,7 @@ fun TextComposeView(
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

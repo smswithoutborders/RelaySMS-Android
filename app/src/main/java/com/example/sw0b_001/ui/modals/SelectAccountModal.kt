@@ -78,7 +78,7 @@ fun SelectAccountModal(
     var showBottomSheet by remember { mutableStateOf(true) }
 
     val accounts: List<StoredPlatformsEntity> = if(LocalInspectionMode.current) _accounts
-    else platformsViewModel.getSaved(context, platformsViewModel.platform?.name)
+    else platformsViewModel.getAccounts(context, platformsViewModel.platform?.name!!)
         .observeAsState(emptyList()).value
 
     if (showBottomSheet) {

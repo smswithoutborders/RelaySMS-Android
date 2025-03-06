@@ -179,7 +179,9 @@ fun PlatformOptionsModal(
                         ComposeMessages(
                             platform = platformsViewModel.platform,
                             navController = navController
-                        ) { onDismissRequest() }
+                        ) {
+                            onDismissRequest()
+                        }
                     } else {
                         ManageAccounts(
                             isActive,

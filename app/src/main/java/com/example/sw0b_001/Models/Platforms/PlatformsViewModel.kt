@@ -15,11 +15,13 @@ class PlatformsViewModel : ViewModel() {
 
     var platform by mutableStateOf<AvailablePlatforms?>(null)
 
-    fun getSaved(context: Context, name: String? = null): LiveData<List<StoredPlatformsEntity>> {
+    fun getAccounts(context: Context, name: String): LiveData<List<StoredPlatformsEntity>> {
+        return Datastore.getDatastore(context).storedPlatformsDao().fetchPlatform(name)
+    }
+
+    fun getSaved(context: Context): LiveData<List<StoredPlatformsEntity>> {
         if(storedLiveData.value.isNullOrEmpty()) {
-            storedLiveData = if(name.isNullOrEmpty())
-                Datastore.getDatastore(context).storedPlatformsDao().fetchAll() else
-                Datastore.getDatastore(context).storedPlatformsDao().fetchPlatform(name)
+            storedLiveData = Datastore.getDatastore(context).storedPlatformsDao().fetchAll()
         }
         return storedLiveData
     }
