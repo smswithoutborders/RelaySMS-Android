@@ -50,11 +50,13 @@ class OauthRedirectActivity : AppCompatActivity() {
             try {
                 val llt = Vaults.fetchLongLivedToken(applicationContext)
                 val codeVerifier = Publishers.fetchOauthRequestVerifier(applicationContext)
-                publishers.sendOAuthAuthorizationCode(llt,
+                publishers.sendOAuthAuthorizationCode(
+                    llt,
                     platform,
                     code,
                     codeVerifier,
-                    supportsUrlScheme)
+                    supportsUrlScheme
+                )
 
                 val vaults = Vaults(applicationContext)
                 vaults.refreshStoredTokens(applicationContext)

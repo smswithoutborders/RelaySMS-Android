@@ -1,6 +1,7 @@
 package com.example.sw0b_001
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -60,7 +61,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.Messages.EncryptedContent
+import com.example.sw0b_001.Models.Platforms.Platforms
+import com.example.sw0b_001.Models.Publishers
 import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.ui.navigation.AboutScreen
 import com.example.sw0b_001.ui.navigation.BridgeEmailScreen
@@ -74,6 +78,7 @@ import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.net.URL
 
 
 class MainActivity : ComponentActivity() {
@@ -213,12 +218,13 @@ class MainActivity : ComponentActivity() {
         }
 
         try {
-            GatewayClient.refreshGatewayClients(applicationContext)
+            Platforms.refreshAvailablePlatforms(applicationContext)
         } catch(e: Exception) {
             e.printStackTrace()
         }
     }
 }
+
 
 @Composable
 fun GetMeOutOfHere(
