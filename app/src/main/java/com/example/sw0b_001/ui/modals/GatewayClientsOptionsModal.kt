@@ -109,7 +109,10 @@ fun GatewayClientOptionsModal(
 
                 if (!isDefault) {
                     Button(
-                        onClick = { onEditClicked(gatewayClient) },
+                        onClick = {
+                            Log.d("GatewayClientOptionsModal", "Edit button clicked for: ${gatewayClient.mSISDN}")
+                            onEditClicked(gatewayClient)
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.outlinedButtonColors(
                             contentColor = MaterialTheme.colorScheme.primary
@@ -127,6 +130,7 @@ fun GatewayClientOptionsModal(
                         onClick = {
                             scope.launch {
                                 val successRunnable = Runnable {
+
                                     Log.i(
                                         "GatewayClientOptionsModal",
                                         "Gateway client deleted successfully"

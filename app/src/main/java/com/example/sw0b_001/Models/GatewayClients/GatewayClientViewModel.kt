@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class GatewayClientViewModel() : ViewModel() {
     private var liveData: LiveData<List<GatewayClient>> = MutableLiveData()
@@ -58,6 +59,57 @@ class GatewayClientViewModel() : ViewModel() {
                 Datastore.getDatastore(context).gatewayClientsDao().delete(gatewayClient)
             } catch (e: Exception) {
                 Log.e(javaClass.name, "Error deleting Gateway client", e)
+            }
+        }
+    }
+
+    fun deleteGatewayClient(context: Context, gatewayClient: GatewayClient, successRunnable: Runnable, failureRunnable: Runnable) {
+        Log.d("GatewayClientViewModel", "deleteGatewayClient called: $gatewayClient")
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                Datastore.getDatastore(context).gatewayClientsDao().delete(gatewayClient)
+                withContext(Dispatchers.Main) {
+                    successRunnable.run()
+                }
+            } catch (e: Exception) {
+                Log.e("GatewayClientViewModel", "Error deleting gateway client", e)
+                withContext(Dispatchers.Main) {
+                    failureRunnable.run()
+                }
+            }
+        }
+    }
+
+    fun insertGatewayClient(context: Context, gatewayClient: GatewayClient, successRunnable: Runnable, failureRunnable: Runnable) {
+        Log.d("GatewayClientViewModel", "insertGatewayClient called: $gatewayClient")
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                Datastore.getDatastore(context).gatewayClientsDao().insert(gatewayClient)
+                withContext(Dispatchers.Main) {
+                    successRunnable.run()
+                }
+            } catch (e: Exception) {
+                Log.e("GatewayClientViewModel", "Error inserting gateway client", e)
+                withContext(Dispatchers.Main) {
+                    failureRunnable.run()
+                }
+            }
+        }
+    }
+
+    fun updateGatewayClient(context: Context, gatewayClient: GatewayClient, successRunnable: Runnable, failureRunnable: Runnable) {
+        Log.d("GatewayClientViewModel", "updateGatewayClient called: $gatewayClient")
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                Datastore.getDatastore(context).gatewayClientsDao().update(gatewayClient)
+                withContext(Dispatchers.Main) {
+                    successRunnable.run()
+                }
+            } catch (e: Exception) {
+                Log.e("GatewayClientViewModel", "Error updating gateway client", e)
+                withContext(Dispatchers.Main) {
+                    failureRunnable.run()
+                }
             }
         }
     }

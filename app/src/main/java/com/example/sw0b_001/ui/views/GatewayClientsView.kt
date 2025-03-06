@@ -1,5 +1,6 @@
 package com.example.sw0b_001.ui.views
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -47,6 +48,7 @@ fun GatewayClientView(
 
         println("Gateway clients loaded successfully!")
 
+
     }
 
     val gatewayClients by viewModel.get(context, successRunnable).observeAsState(initial = emptyList())
@@ -56,6 +58,7 @@ fun GatewayClientView(
     var editShowBottomSheet by remember { mutableStateOf(false) }
 
     var currentGatewayClient by remember { mutableStateOf<GatewayClient?>(null) }
+
 
     Column(
         modifier = Modifier
@@ -129,16 +132,19 @@ fun GatewayClientView(
             AddGatewayClientModal(
                 showBottomSheet = addShowBottomSheet,
                 onDismiss = { onDismissCallback() },
-                viewModel = viewModel
+                viewModel = viewModel,
+                onGatewayClientSaved = {
+                    onDismissCallback()
+                }
             )
         }
 
         if (optionsShowBottomSheet) {
-            currentGatewayClient?.let { clickedGatewayClient ->
+            currentGatewayClient?.let {
                 GatewayClientOptionsModal(
                     showBottomSheet = optionsShowBottomSheet,
                     onDismiss = { optionsShowBottomSheet = false },
-                    gatewayClient = clickedGatewayClient,
+                    gatewayClient = it,
                     onEditClicked = {
                         optionsShowBottomSheet = false
                         editShowBottomSheet = true
@@ -159,7 +165,11 @@ fun GatewayClientView(
                 showBottomSheet = editShowBottomSheet,
                 onDismiss = { editShowBottomSheet = false },
                 gatewayClient = selectedGatewayClient!!,
-                viewModel = viewModel
+                viewModel = viewModel,
+                onGatewayClientSaved = {
+                    editShowBottomSheet = false
+                    optionsShowBottomSheet = true
+                }
             )
         }
     }

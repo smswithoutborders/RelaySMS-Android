@@ -1,6 +1,7 @@
 package com.example.sw0b_001.ui.modals
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +23,7 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,7 +50,8 @@ fun AddGatewayClientModal(
     onDismiss: () -> Unit,
     showBottomSheet: Boolean,
     viewModel: GatewayClientViewModel,
-    gatewayClient: GatewayClient? = null
+    gatewayClient: GatewayClient? = null,
+    onGatewayClientSaved: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val sheetState = rememberStandardBottomSheetState(
@@ -58,6 +61,16 @@ fun AddGatewayClientModal(
     val scope = rememberCoroutineScope()
     var phoneNumber by remember { mutableStateOf(gatewayClient?.mSISDN ?: "") }
     var alias by remember { mutableStateOf(gatewayClient?.alias ?: "") }
+
+    var isSaving by remember { mutableStateOf(false) }
+    var isError by remember { mutableStateOf(false) }
+
+    // Reset error state when the modal is shown again
+    LaunchedEffect(showBottomSheet) {
+        if (showBottomSheet) {
+            isError = false
+        }
+    }
 
     if (showBottomSheet) {
         ModalBottomSheet(
@@ -94,9 +107,14 @@ fun AddGatewayClientModal(
                             )
                         },
                         modifier = Modifier.weight(1f),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                        enabled = !isSaving,
+                        isError = isError
                     )
-                    IconButton(onClick = { TODO("add functionality") }) {
+                    IconButton(
+                        onClick = { /*TODO("add functionality")*/ },
+                        enabled = !isSaving
+                    ) {
                         Icon(
                             imageVector = Icons.Filled.Contacts,
                             contentDescription = "Select Contact",
@@ -123,7 +141,9 @@ fun AddGatewayClientModal(
                             style = MaterialTheme.typography.bodyMedium
                         )
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !isSaving,
+                    isError = isError
                 )
                 Text(
                     text = "Name to help remember the Gateway Client",
@@ -137,43 +157,74 @@ fun AddGatewayClientModal(
                 // Save Button
                 Button(
                     onClick = {
+                        if (phoneNumber.isBlank()) {
+                            isError = true
+                            return@Button
+                        }
+                        isSaving = true
                         scope.launch {
-                            val successRunnable = Runnable {
-                                Log.i(
-                                    "AddGatewayClientModal",
-                                    if (gatewayClient == null) "Gateway client added successfully" else "Gateway client edited successfully"
-                                )
-                                onDismiss()
-                            }
+                            try {
+                                val successRunnable = Runnable {
+                                    Log.i(
+                                        "AddGatewayClientModal",
+                                        if (gatewayClient == null) "Gateway client added successfully" else "Gateway client edited successfully"
+                                    )
+                                    isSaving = false
+                                    onGatewayClientSaved()
+                                    onDismiss()
+                                }
 
-                            val failureRunnable = Runnable {
-                                Log.e(
-                                    "AddGatewayClientModal",
-                                    if (gatewayClient == null) "Failed to add gateway client" else "Failed to edit gateway client"
-                                )
-                            }
+                                val failureRunnable = Runnable {
+                                    Log.e(
+                                        "AddGatewayClientModal",
+                                        if (gatewayClient == null) "Failed to add gateway client" else "Failed to edit gateway client"
+                                    )
+                                    isSaving = false
+                                    isError = true
+                                }
 
-                            if (gatewayClient == null) {
-                                // Add new client
-                                val newGatewayClient = GatewayClient()
-                                newGatewayClient.mSISDN = phoneNumber
-                                newGatewayClient.alias = alias
-                                newGatewayClient.type = GatewayClient.TYPE.CUSTOM.value
-                                //TODO: add the other fields
-                                viewModel.loadRemote(context, successRunnable, failureRunnable)
-                            } else {
-                                // Edit existing client
-                                gatewayClient.mSISDN = phoneNumber
-                                gatewayClient.alias = alias
-                                //TODO: add the other fields
-                                viewModel.loadRemote(context, successRunnable, failureRunnable)
+                                if (gatewayClient == null) {
+                                    // Add new client
+                                    val newGatewayClient = GatewayClient()
+                                    newGatewayClient.mSISDN = phoneNumber
+                                    newGatewayClient.alias = alias
+                                    newGatewayClient.type = GatewayClient.TYPE.CUSTOM.value
+                                    //TODO: add the other fields
+                                    viewModel.insertGatewayClient(
+                                        context,
+                                        newGatewayClient,
+                                        successRunnable,
+                                        failureRunnable
+                                    )
+                                } else {
+                                    // Edit existing client
+                                    gatewayClient.mSISDN = phoneNumber
+                                    gatewayClient.alias = alias
+                                    //TODO: add the other fields
+                                    viewModel.updateGatewayClient(
+                                        context,
+                                        gatewayClient,
+                                        successRunnable,
+                                        failureRunnable
+                                    )
+                                }
+                            } catch (e: Exception) {
+                                Log.e("AddGatewayClientModal", "Error saving gateway client", e)
+                                isSaving = false
+                                isError = true
                             }
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                    enabled = !isSaving
                 ) {
-                    Text(text = "Save", color = Color.White)
+                    Text(text = if (isSaving) "Saving..." else "Save", color = Color.White)
+                }
+
+                if (isError) {
+                    Toast.makeText(context, "Error saving gateway client", Toast.LENGTH_SHORT).show()
+                    onDismiss()
                 }
             }
         }
