@@ -36,7 +36,6 @@ import androidx.navigation.NavController
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.components.LanguageOption
 import com.example.sw0b_001.ui.components.LanguageSelectionPopup
-import com.example.sw0b_001.ui.navigation.Screen
 import com.example.sw0b_001.ui.theme.AppTheme
 
 @Composable
@@ -88,7 +87,7 @@ fun SettingsView(
                     icon = Icons.Filled.Security,
                     title = "Security",
                     subtext = "Enable app locks and pin codes",
-                    onClick = {navController.navigate(Screen.Security.route) }
+                    onClick = {}
                 )
             }
         }

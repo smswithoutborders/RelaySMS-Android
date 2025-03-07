@@ -39,10 +39,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.navigation.Screen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.views.AvailablePlatformsView
-import com.example.sw0b_001.ui.views.PlatformData
 import com.example.sw0b_001.ui.views.PlatformListContent
 import kotlinx.coroutines.launch
 
@@ -51,9 +49,9 @@ import kotlinx.coroutines.launch
 fun ActivePlatformsModal(
     sendNewMessageRequested: Boolean,
     platformsViewModel: PlatformsViewModel,
-    onDismiss: () -> Unit,
     navController: NavController,
-    isCompose: Boolean = false
+    isCompose: Boolean = false,
+    onDismiss: () -> Unit,
 ) {
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Expanded,
@@ -61,16 +59,13 @@ fun ActivePlatformsModal(
     )
     val scope = rememberCoroutineScope()
     var showSelectAccountModal by remember { mutableStateOf(false) }
-    var selectedPlatform by remember { mutableStateOf<PlatformData?>(null) }
 
     if(sendNewMessageRequested) {
         ModalBottomSheet(
             onDismissRequest = {
-                scope.launch {
-                    sheetState.hide()
-                }.invokeOnCompletion {
-                    onDismiss()
-                }
+                scope
+                    .launch { sheetState.hide() }
+                    .invokeOnCompletion { onDismiss() }
             },
             sheetState = sheetState,
             modifier = Modifier.fillMaxWidth()
@@ -79,28 +74,23 @@ fun ActivePlatformsModal(
                 navController = navController,
                 platformsViewModel = platformsViewModel,
                 isCompose = isCompose
-            )
+            ) {
+                onDismiss()
+            }
         }
 
     }
 
-    if (showSelectAccountModal && selectedPlatform != null) {
+    if (showSelectAccountModal) {
         SelectAccountModal(
-            platform = selectedPlatform!!,
-            navController = navController,
+            platformsViewModel = platformsViewModel,
             onDismissRequest = {
                 showSelectAccountModal = false
-                selectedPlatform = null
             }
         )
     }
-}
 
-val testPlatforms = listOf(
-    PlatformData(R.drawable.gmail, "Gmail", true),
-    PlatformData(R.drawable.telegram, "Telegram", true),
-    PlatformData(R.drawable.x_icon, "X", true),
-)
+}
 
 @Preview(showBackground = true)
 @Composable

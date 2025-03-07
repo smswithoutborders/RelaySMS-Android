@@ -1,5 +1,6 @@
 package com.example.sw0b_001.ui.views.compose
 
+import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,33 +27,53 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.sw0b_001.Database.Datastore
+import com.example.sw0b_001.Models.ComposeHandlers
+import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
+import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.theme.AppTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
+data class TextContent(val from: String, val text: String)
+
+object TextComposeHandler {
+    fun decomposeMessage(
+        text: String
+    ): TextContent {
+        println(text)
+        return text.split(":").let {
+            TextContent(from=it[0], text=it[1])
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextComposeView(
     navController: NavController,
+    platformsViewModel: PlatformsViewModel
 ) {
+    val inspectMode = LocalInspectionMode.current
+    var from by remember { mutableStateOf("") }
     var message by remember { mutableStateOf("") }
-    var showSelectAccountModal by remember { mutableStateOf(true) }
-    var selectedAccount by remember { mutableStateOf<Account?>(null) }
+    var showSelectAccountModal by remember { mutableStateOf(!inspectMode) }
+    var selectedAccount by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
+
     val context = LocalContext.current
 
-    LaunchedEffect(key1 = Unit) {
-        showSelectAccountModal = true
-    }
-
-    // Conditionally show the SelectAccountModal
     if (showSelectAccountModal) {
         SelectAccountModal(
-            navController = navController,
+            platformsViewModel = platformsViewModel,
             onDismissRequest = {
                 if (selectedAccount == null) {
                     navController.popBackStack()
@@ -61,6 +82,7 @@ fun TextComposeView(
             },
             onAccountSelected = { account ->
                 selectedAccount = account
+                from = account.account!!
                 showSelectAccountModal = false
             }
         )
@@ -69,20 +91,41 @@ fun TextComposeView(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("New Post") },
+                title = {
+                    Column {
+                        Text("New Post")
+
+                        if(from.isNotEmpty())
+                            Text(
+                                text = from,
+                                style = MaterialTheme.typography.labelMedium
+                            )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = {navController.popBackStack()}) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
-                    IconButton(onClick = { TODO("Post message") }) {
+                    IconButton(onClick = {
+                        processPost(
+                            context = context,
+                            textContent = TextContent(
+                                from = from,
+                                text = message,
+                            ),
+                            account = selectedAccount!!,
+                            onFailureCallback = {}
+                        ) {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                navController.popBackStack()
+                            }
+                        }
+                    }) {
                         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Post")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
             )
         }
     ) { innerPadding ->
@@ -109,12 +152,50 @@ fun TextComposeView(
     }
 }
 
+
+private fun processPost(
+    context: Context,
+    textContent: TextContent,
+    account: StoredPlatformsEntity,
+    onFailureCallback: (String?) -> Unit,
+    onCompleteCallback: () -> Unit
+) {
+    CoroutineScope(Dispatchers.Default).launch {
+        val availablePlatforms = Datastore.getDatastore(context)
+            .availablePlatformsDao().fetch(account.name!!)
+        val formattedString =
+            processTextForEncryption(textContent.text, account)
+
+        try {
+            ComposeHandlers.compose(context,
+                formattedString,
+                availablePlatforms,
+                account,
+            ) {
+                onCompleteCallback()
+            }
+        } catch(e: Exception) {
+            e.printStackTrace()
+            onFailureCallback(e.message)
+            CoroutineScope(Dispatchers.Main).launch {
+                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+}
+
+private fun processTextForEncryption(body: String, account: StoredPlatformsEntity): String {
+    return "${account.account}:$body"
+}
+
+
 @Preview(showBackground = true)
 @Composable
 fun TextComposePreview() {
     AppTheme(darkTheme = false) {
         TextComposeView(
             navController = NavController(LocalContext.current),
+            platformsViewModel = PlatformsViewModel()
         )
     }
 }

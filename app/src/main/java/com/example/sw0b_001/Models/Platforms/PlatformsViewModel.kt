@@ -1,14 +1,23 @@
 package com.example.sw0b_001.Models.Platforms
 
 import android.content.Context
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.sw0b_001.Database.Datastore
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 class PlatformsViewModel : ViewModel() {
     private var availableLiveData: LiveData<List<AvailablePlatforms>> = MutableLiveData()
     private var storedLiveData: LiveData<List<StoredPlatformsEntity>> = MutableLiveData()
+
+    var platform by mutableStateOf<AvailablePlatforms?>(null)
+
+    fun getAccounts(context: Context, name: String): LiveData<List<StoredPlatformsEntity>> {
+        return Datastore.getDatastore(context).storedPlatformsDao().fetchPlatform(name)
+    }
 
     fun getSaved(context: Context): LiveData<List<StoredPlatformsEntity>> {
         if(storedLiveData.value.isNullOrEmpty()) {

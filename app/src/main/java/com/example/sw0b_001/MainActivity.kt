@@ -1,8 +1,12 @@
 package com.example.sw0b_001
 
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,8 +34,6 @@ import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
-import com.example.sw0b_001.ui.navigation.Screen
-import com.example.sw0b_001.ui.navigation.SettingsScreen
 import com.example.sw0b_001.ui.views.AboutView
 import com.example.sw0b_001.ui.views.GetStartedView
 import com.example.sw0b_001.ui.views.HomepageView
@@ -43,6 +45,42 @@ import com.example.sw0b_001.ui.views.compose.MessageComposeView
 import com.example.sw0b_001.ui.views.compose.TextComposeView
 import androidx.activity.viewModels
 import com.example.sw0b_001.Models.GatewayClients.GatewayClientViewModel
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.sw0b_001.Database.Datastore
+import com.example.sw0b_001.Models.Messages.EncryptedContent
+import com.example.sw0b_001.Models.Platforms.Platforms
+import com.example.sw0b_001.Models.Publishers
+import com.example.sw0b_001.Models.Vaults
+import com.example.sw0b_001.ui.navigation.AboutScreen
+import com.example.sw0b_001.ui.navigation.BridgeEmailScreen
+import com.example.sw0b_001.ui.navigation.EmailScreen
+import com.example.sw0b_001.ui.navigation.GetMeOutScreen
+import com.example.sw0b_001.ui.navigation.MessageScreen
+import com.example.sw0b_001.ui.navigation.TextScreen
+import com.example.sw0b_001.ui.views.RecentMessageCard
+import io.grpc.Status
+import io.grpc.StatusRuntimeException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.net.URL
+
 
 
 class MainActivity : ComponentActivity() {
@@ -86,6 +124,9 @@ class MainActivity : ComponentActivity() {
             navController = navController,
             startDestination = HomepageScreen,
         ) {
+            composable<GetMeOutScreen> {
+                GetMeOutOfHere(navController)
+            }
             composable<HomepageScreen> {
                 HomepageView(
                     navController = navController,
@@ -109,69 +150,34 @@ class MainActivity : ComponentActivity() {
                     navigationFlowHandler = navigationFlowHandler
                 )
             }
-            composable(Screen.About.route) {
+            composable<AboutScreen> {
                 AboutView(navController = navController)
             }
-            composable(Screen.Security.route) {
-                SecurityView(navController = navController)
-            }
-            composable(Screen.GetStarted.route) {
-                GetStartedView(navController = navController)
-            }
 
-            // Compose Screens
-            composable(
-                route = Screen.EmailCompose.route,
-                arguments = listOf(
-                    navArgument("isDefault") {
-                        type = NavType.BoolType
-                        defaultValue = false
-                    }
+            composable<BridgeEmailScreen> {
+                EmailComposeView(
+                    navController = navController,
+                    platformsViewModel = platformsViewModel,
+                    isBridge = true
                 )
-            ) { backStackEntry ->
-                val isDefault = backStackEntry.arguments?.getBoolean("isDefault") ?: false
-                EmailComposeView(navController = navController, isDefault = isDefault)
             }
-            composable(Screen.MessageCompose.route) {
-                MessageComposeView(navController = navController)
+            composable<EmailScreen> {
+                EmailComposeView(
+                    navController = navController,
+                    platformsViewModel = platformsViewModel,
+                )
             }
-            composable(Screen.TextCompose.route) {
-                TextComposeView(navController = navController)
+            composable<TextScreen> {
+                TextComposeView(
+                    navController = navController,
+                    platformsViewModel = platformsViewModel,
+                )
             }
-
-            // Message Details Screens
-            composable(
-                route = Screen.EmailDetails().route,
-                arguments = listOf(navArgument("recentMessage") { type = NavType.StringType })
-            ) { backStackEntry ->
-                val encodedJson = backStackEntry.arguments?.getString("recentMessage")
-                encodedJson?.let {
-//                    val decodedJson = URLDecoder.decode(it, StandardCharsets.UTF_8.toString())
-//                    val recentMessage = Json.decodeFromString<RecentMessage>(decodedJson)
-//                    EmailDetailsView(message = recentMessage, navController = navController)
-                }
-            }
-            composable(
-                route = Screen.TelegramDetails().route,
-                arguments = listOf(navArgument("recentMessage") { type = NavType.StringType })
-            ) { backStackEntry ->
-                val encodedJson = backStackEntry.arguments?.getString("recentMessage")
-                encodedJson?.let {
-//                    val decodedJson = URLDecoder.decode(it, StandardCharsets.UTF_8.toString())
-//                    val recentMessage = Json.decodeFromString<RecentMessage>(decodedJson)
-//                    MessageDetailsView(message = recentMessage, navController = navController)
-                }
-            }
-            composable(
-                route = Screen.XDetails().route,
-                arguments = listOf(navArgument("recentMessage") { type = NavType.StringType })
-            ) { backStackEntry ->
-                val encodedJson = backStackEntry.arguments?.getString("recentMessage")
-                encodedJson?.let {
-//                    val decodedJson = URLDecoder.decode(it, StandardCharsets.UTF_8.toString())
-//                    val recentMessage = Json.decodeFromString<RecentMessage>(decodedJson)
-//                    TextDetailsView(message = recentMessage, navController = navController)
-                }
+            composable<MessageScreen> {
+                MessageComposeView(
+                    navController = navController,
+                    platformsViewModel = platformsViewModel,
+                )
             }
         }
     }
@@ -180,11 +186,121 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
 
+        CoroutineScope(Dispatchers.Default).launch {
+            if(Vaults.isGetMeOut(applicationContext)) {
+                CoroutineScope(Dispatchers.Main).launch {
+                    navController.navigate(GetMeOutScreen) {
+                        popUpTo(HomepageScreen) {
+                            inclusive = true
+                        }
+                    }
+                }
+            } else {
+                Vaults.fetchLongLivedToken(applicationContext).let {
+                    if(it.isNotEmpty()) {
+                        val vault = Vaults(applicationContext)
+                        try {
+                            vault.refreshStoredTokens(applicationContext)
+                        } catch(e: StatusRuntimeException) {
+                            if(e.status.code == Status.UNAUTHENTICATED.code) {
+                                println("Yep, get me out")
+                                Vaults.setGetMeOut(applicationContext, true)
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    navController.navigate(GetMeOutScreen) {
+                                        popUpTo(HomepageScreen) {
+                                            inclusive = true
+                                        }
+                                    }
+                                }
+                            }
+                        } finally {
+                            vault.shutdown()
+                        }
+                    }
+                }
+            }
+        }
+
         try {
-            GatewayClient.refreshGatewayClients(applicationContext)
+            Platforms.refreshAvailablePlatforms(applicationContext)
         } catch(e: Exception) {
             e.printStackTrace()
         }
     }
 }
 
+
+@Composable
+fun GetMeOutOfHere(
+    navController: NavController
+) {
+    val activity = LocalActivity.current
+    val context = LocalContext.current
+    BackHandler {
+        activity?.finish()
+    }
+    Column(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Image(
+            painter = painterResource(R.drawable.relaysms_icon_default_shape),
+            contentDescription = "Drink me out of here",
+            modifier = Modifier
+                .size(100.dp)
+                .padding(top = 42.dp)
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        Text("You need to log in again into this device!",
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Thin,
+            modifier = Modifier.padding(start=16.dp, end=16.dp)
+        )
+        Text("You have logged in on another device",
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.Thin,
+            color = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier
+                .padding(bottom=32.dp, top=8.dp),
+        )
+        Image(
+            painter = painterResource(R.drawable.get_me_out),
+            contentDescription = "Drink me out of here",
+            modifier = Modifier
+                .size(200.dp)
+                .padding(bottom = 16.dp)
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom=32.dp),
+            onClick={
+                Vaults.logout(context) {
+                    Vaults.setGetMeOut(context, false)
+                    CoroutineScope(Dispatchers.Main).launch {
+                        navController.navigate(HomepageScreen) {
+                            popUpTo(HomepageScreen) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                }
+        }) {
+            Text("Get me out here!", fontWeight = FontWeight.SemiBold)
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GetMeOutOfHerePreview() {
+    AppTheme(darkTheme = false) {
+        GetMeOutOfHere(navController = rememberNavController())
+    }
+}

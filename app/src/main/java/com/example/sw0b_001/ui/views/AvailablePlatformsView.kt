@@ -56,29 +56,23 @@ import androidx.compose.ui.graphics.asImageBitmap
 import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 
-data class PlatformData(
-    val logo: Int,
-    val platformName: String,
-    val isActive: Boolean,
-    val icon: Int = R.drawable.relaysms_icon_default_shape
-)
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun AvailablePlatformsView(
     navController: NavController,
     platformsViewModel: PlatformsViewModel,
-    isCompose: Boolean = false
+    isCompose: Boolean = false,
+    onDismiss: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    var showModal by remember { mutableStateOf(false) }
     var showPlatformOptions by remember { mutableStateOf(false) }
-    var selectedPlatform by remember { mutableStateOf<PlatformData?>(null) }
 
-    val showPlatformOptionsModal = { platform: PlatformData ->
-        selectedPlatform = platform
-        showPlatformOptions = true
-    }
+    val platforms: List<AvailablePlatforms> by platformsViewModel
+        .getAvailablePlatforms(context).observeAsState(emptyList())
+
+    val storedPlatforms: List<StoredPlatformsEntity> by platformsViewModel
+        .getSaved(context).observeAsState(emptyList())
 
     Column(
         modifier = Modifier
@@ -91,12 +85,6 @@ fun AvailablePlatformsView(
             modifier = Modifier
                 .padding(16.dp)
         ) {
-            val platforms: List<AvailablePlatforms> by platformsViewModel
-                .getAvailablePlatforms(context).observeAsState(emptyList())
-
-            val storedPlatforms: List<StoredPlatformsEntity> by platformsViewModel
-                .getSaved(context).observeAsState(emptyList())
-
             Text(
                 text = if(isCompose) "Send new message" else "Available platforms",
                 style = MaterialTheme.typography.displayMedium,
@@ -107,54 +95,27 @@ fun AvailablePlatformsView(
                 platforms = platforms,
                 storedPlatforms = storedPlatforms,
                 isCompose = isCompose,
-                onPlatformClick = showPlatformOptionsModal
+                onPlatformClick = {
+                    platformsViewModel.platform = it
+                    showPlatformOptions = true
+                    println("Available platform: ${platformsViewModel.platform?.name}")
+                }
             )
         }
     }
 
     if (showPlatformOptions) {
         PlatformOptionsModal(
-            platform = selectedPlatform!!,
-            onDismissRequest = { showPlatformOptions = false },
-            isActive = selectedPlatform!!.isActive,
-            isDefault = selectedPlatform!!.platformName == "RelaySMS",
-            navController = navController
-        )
-    }
-}
-
-@Composable
-fun RelaySMSCard(
-    onClick: (PlatformData) -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .width(130.dp)
-            .height(130.dp)
-            .clickable { onClick(PlatformData(R.drawable.relaysms_icon_blue, "RelaySMS", true)) },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Image(
-                painter = painterResource(id = R.drawable.relaysms_icon_blue),
-                contentDescription = "RelaySMS Logo",
-                modifier = Modifier
-                    .size(60.dp)
-                    .align(Alignment.Center)
-            )
-            Box(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .size(12.dp)
-                    .clip(CircleShape)
-                    .background(Color.Green)
-                    .align(Alignment.TopEnd)
-            )
+            showPlatformsModal = showPlatformOptions,
+            platformsViewModel = platformsViewModel,
+            isActive = isCompose || platformsViewModel.platform == null ||
+                    storedPlatforms.any { it.name == platformsViewModel.platform!!.name },
+            isCompose = isCompose,
+            navController = navController,
+        ) {
+            showPlatformOptions = false
+            onDismiss()
         }
-
     }
 }
 
@@ -164,7 +125,7 @@ fun PlatformListContent(
     platforms: List<AvailablePlatforms>,
     storedPlatforms: List<StoredPlatformsEntity>,
     isCompose: Boolean = false,
-    onPlatformClick: (PlatformData) -> Unit = {}
+    onPlatformClick: (AvailablePlatforms?) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -180,7 +141,13 @@ fun PlatformListContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        RelaySMSCard(onPlatformClick)
+        PlatformCard(
+            logo = null,
+            platform = null,
+            modifier = Modifier.width(130.dp),
+            isActive = true,
+            onClick = onPlatformClick
+        )
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -217,11 +184,11 @@ fun PlatformListContent(
                             platform.logo!!.count()
                         )
                     else null,
-                    platformName = platform.name,
+                    platform = platform,
                     modifier = Modifier.width(130.dp),
                     isActive = isCompose || storedPlatforms
                         .filter { platform.name == it.name}.isNotEmpty(),
-                    onClick = {}
+                    onClick = onPlatformClick
                 )
             }
         }
@@ -231,17 +198,17 @@ fun PlatformListContent(
 @Composable
 fun PlatformCard(
     logo: Bitmap? = null,
-    platformName: String,
+    platform: AvailablePlatforms?,
     modifier: Modifier = Modifier,
     isActive: Boolean,
-    onClick: () -> Unit = {}
+    onClick: (AvailablePlatforms?) -> Unit = {}
 ) {
     val context = LocalContext.current
     Card(
         modifier = modifier
             .height(130.dp)
             .width(130.dp)
-            .clickable { onClick() },
+            .clickable { onClick(platform) },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -254,13 +221,15 @@ fun PlatformCard(
                     context.resources,
                     R.drawable.logo
                 ).asImageBitmap(),
-                contentDescription = "$platformName Logo",
+                contentDescription = "Platform Logo",
                 modifier = Modifier
                     .size(50.dp)
                     .align(Alignment.Center),
-                colorFilter = if (!isActive) ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)) else null
+                colorFilter = if (!isActive && platform != null)
+                    ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
+                else null
             )
-            if (isActive) {
+            if (isActive || platform == null) {
                 Box(
                     modifier = Modifier
                         .padding(8.dp)
@@ -271,7 +240,7 @@ fun PlatformCard(
                 )
             }
             Text(
-                text = platformName,
+                text = if(platform != null) platform.name else "RelaySMS",
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
