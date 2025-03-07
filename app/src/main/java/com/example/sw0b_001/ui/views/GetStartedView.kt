@@ -160,7 +160,7 @@ fun GetStartedView (
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Button(
-                    onClick = { showLoginBottomSheet = true },
+                    onClick = { showCreateAccountBottomSheet = true },
                     colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
                     modifier = Modifier
                         .weight(1f)
@@ -217,12 +217,12 @@ fun GetStartedView (
 
         if (showCreateAccountBottomSheet) {
             LoginCreateInfoModal(
-                showModal = showLoginBottomSheet,
+                showModal = showCreateAccountBottomSheet,
                 onDismissCallback = {
-                    showLoginBottomSheet = false
+                    showCreateAccountBottomSheet = false
                 }) {
                 navController.navigate(CreateAccountScreen)
-                showLoginBottomSheet = false
+                showCreateAccountBottomSheet = false
             }
         }
     }

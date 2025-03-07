@@ -137,6 +137,7 @@ fun MessageComposeView(
                     onValueChange = { recipientNumber = it },
                     label = { Text("Recipient Number", style = MaterialTheme.typography.bodyMedium) },
                     modifier = Modifier.weight(1f),
+                    isError = verifyPhoneNumberFormat(recipientNumber),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Phone,
                         imeAction = ImeAction.Next
