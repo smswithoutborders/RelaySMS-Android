@@ -227,12 +227,26 @@ fun GatewayClientCard(gatewayClient: GatewayClient, onCardClicked: (GatewayClien
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            Text(
-                text = gatewayClient.mSISDN ?: "N/A",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Spacer(modifier = Modifier.height(4.dp))
+            if (gatewayClient.alias != null) {
+                Text(
+                    text = gatewayClient.alias ?: "N/A",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = gatewayClient.mSISDN ?: "N/A",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            } else {
+                Text(
+                    text = gatewayClient.mSISDN ?: "N/A",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+            }
             Text(
                 text = gatewayClient.operatorName ?: "N/A",
                 style = MaterialTheme.typography.bodyMedium,

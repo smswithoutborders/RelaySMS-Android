@@ -307,7 +307,7 @@ fun AddGatewayClientModalPreview() {
         AddGatewayClientModal(
             showBottomSheet = true,
             onDismiss = {},
-            viewModel = GatewayClientViewModel()
+            viewModel = GatewayClientViewModel(),
         )
     }
 }
