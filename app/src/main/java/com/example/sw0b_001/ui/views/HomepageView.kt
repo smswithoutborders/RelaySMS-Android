@@ -16,6 +16,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -46,6 +48,7 @@ import com.example.sw0b_001.ui.theme.AppTheme
 enum class BottomTabsItems {
     BottomBarRecentTab,
     BottomBarPlatformsTab,
+    BottomBarInboxTab,
     BottomBarCountriesTab
 }
 
@@ -71,6 +74,8 @@ fun HomepageView(
 
     val messages: List<EncryptedContent> = if(_messages.isNotEmpty()) _messages
     else messagesViewModel.getMessages(context).observeAsState(emptyList()).value
+
+    val inbox = emptyList<EncryptedContent>()
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -105,6 +110,19 @@ fun HomepageView(
                         onRefreshClicked = {
                             gatewayClientViewModel.get(context, refreshSuccess)
                         }
+                    )
+                }
+
+                BottomTabsItems.BottomBarInboxTab -> {
+                    TopAppBar(
+                        title = {
+                            Text(
+                                text = "Inbox",
+                                style = MaterialTheme.typography.headlineLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors()
                     )
                 }
             }
@@ -157,6 +175,21 @@ fun HomepageView(
                         )
                     }
                 }
+
+                BottomTabsItems.BottomBarInboxTab -> {
+                    if (inbox.isNotEmpty()) {
+                        FloatingActionButton(
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            onClick = { }
+                        ) {
+                            Icon(
+                                Icons.Filled.Create,
+                                contentDescription = "Compose Message",
+                                tint = MaterialTheme.colorScheme.onSecondary
+                            )
+                        }
+                    }
+                }
             }
         }
     ) { innerPadding ->
@@ -190,6 +223,12 @@ fun HomepageView(
                     GatewayClientView(addShowBottomSheet = showAddGatewayClientsModal, viewModel = gatewayClientViewModel) {
 //                        showAddGatewayClientsModal = false
                     }
+                }
+
+                BottomTabsItems.BottomBarInboxTab -> {
+                    InboxView(
+                        messages = inbox
+                    )
                 }
             }
 
