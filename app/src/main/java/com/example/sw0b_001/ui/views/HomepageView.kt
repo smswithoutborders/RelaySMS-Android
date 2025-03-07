@@ -1,5 +1,7 @@
 package com.example.sw0b_001.ui.views
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -75,6 +77,11 @@ fun HomepageView(
 
     var showAddGatewayClientsModal by remember { mutableStateOf(false) }
 
+    val refreshSuccess = Runnable {
+        Toast.makeText(context, "Gateway clients refreshed successfully!", Toast.LENGTH_SHORT).show()
+        Log.d("GatewayClients", "Gateway clients refreshed successfully!")
+    }
+
     Scaffold (
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -89,7 +96,12 @@ fun HomepageView(
                 }
                 BottomTabsItems.BottomBarPlatformsTab -> {}
                 BottomTabsItems.BottomBarCountriesTab -> {
-                    GatewayClientsAppBar(navController = navController)
+                    GatewayClientsAppBar(
+                        navController = navController,
+                        onRefreshClicked = {
+                            gatewayClientViewModel.get(context, refreshSuccess)
+                        }
+                    )
                 }
             }
         },

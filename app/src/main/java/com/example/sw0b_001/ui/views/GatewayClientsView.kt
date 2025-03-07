@@ -1,6 +1,7 @@
 package com.example.sw0b_001.ui.views
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -45,10 +46,7 @@ fun GatewayClientView(
     val context = LocalContext.current
 
     val successRunnable = Runnable {
-
         println("Gateway clients loaded successfully!")
-
-
     }
 
     val gatewayClients by viewModel.get(context, successRunnable).observeAsState(initial = emptyList())
