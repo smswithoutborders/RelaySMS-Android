@@ -267,5 +267,6 @@ dependencies {
 
     implementation(libs.country.picker)
 
+    implementation libs.accompanist.permissions
 }
 

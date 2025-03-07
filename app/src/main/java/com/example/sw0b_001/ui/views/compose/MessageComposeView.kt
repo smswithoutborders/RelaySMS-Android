@@ -1,7 +1,16 @@
 package com.example.sw0b_001.ui.views.compose
 
+import android.Manifest
+import android.app.Activity
+import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
+import android.database.Cursor
+import android.net.Uri
+import android.provider.ContactsContract
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -48,13 +57,16 @@ import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
+import kotlinx.coroutines.withContext
 data class MessageContent(val from: String, val to: String, val message: String)
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun MessageComposeView(
     navController: NavController,
@@ -67,6 +79,19 @@ fun MessageComposeView(
     var showSelectAccountModal by remember { mutableStateOf(!inspectMode) }
     var selectedAccount by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
     val context = LocalContext.current
+
+    val readContactPermissions = rememberPermissionState(Manifest.permission.READ_CONTACTS)
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()) { result ->
+        if(result.resultCode == Activity.RESULT_OK) {
+            result.data?.data?.let { uri ->
+                println(uri)
+                recipientNumber = getContactDetails(context, uri)
+            }
+        } else {
+            println(result.resultCode)
+        }
+    }
 
     if (showSelectAccountModal) {
         SelectAccountModal(
@@ -97,7 +122,22 @@ fun MessageComposeView(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { TODO("Handle send") }) {
+                    IconButton(onClick = {
+                        sendMessage(
+                            context = context,
+                            messageContent = MessageContent(
+                                from = from,
+                                to = recipientNumber,
+                                message = message,
+                            ),
+                            account = selectedAccount!!,
+                            onFailureCallback = {}
+                        ) {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                navController.popBackStack()
+                            }
+                        }
+                    }) {
                         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
                     }
                 },
@@ -145,26 +185,19 @@ fun MessageComposeView(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 IconButton(onClick = {
-                    sendMessage(
-                        context = context,
-                        messageContent = MessageContent(
-                            from = from,
-                            to = recipientNumber,
-                            message = message,
-                        ),
-                        account = selectedAccount!!,
-                        onFailureCallback = {}
-                    ) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            navController.popBackStack()
-                        }
+                    if(readContactPermissions.status.isGranted) {
+                        val intent = Intent(Intent.ACTION_PICK,
+                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
+                        launcher.launch(intent)
+                    } else {
+                        readContactPermissions.launchPermissionRequest()
                     }
+
                 }) {
                     Icon(
                         imageVector = Icons.Filled.Contacts,
                         contentDescription = "Select Contact",
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.clickable(onClick = { TODO("Handle select contact") })
                     )
                 }
             }
@@ -243,6 +276,25 @@ private fun sendMessage(
     }
 
 }
+
+fun getContactDetails(context: Context, contactUri: Uri): String {
+    val contactCursor = context.contentResolver.query(
+        contactUri, null, null, null, null
+    )
+    if (contactCursor != null) {
+        if (contactCursor.moveToFirst()) {
+            val contactIndexInformation =
+                contactCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+            val number = contactCursor.getString(contactIndexInformation).filter {
+                !it.isWhitespace()
+            }
+            return number
+        }
+        contactCursor.close()
+    }
+    return ""
+}
+
 
 @Preview(showBackground = false)
 @Composable

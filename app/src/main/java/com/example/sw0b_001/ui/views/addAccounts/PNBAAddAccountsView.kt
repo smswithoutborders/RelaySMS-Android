@@ -193,7 +193,7 @@ fun PNBAPhoneNumberCodeRequestView(
                             password.isNotEmpty())
             ),
             modifier = Modifier.fillMaxWidth()
-                .padding(top=32.dp)
+                .padding(top=32.dp, bottom=24.dp)
                 .align(Alignment.CenterHorizontally),
         ) {
             if(isLoading) {
