@@ -380,7 +380,15 @@ private fun submitOTPCode(
                         code
                     )
                 }
-                OTPCodeVerificationType.AUTHENTICATE, OTPCodeVerificationType.RECOVER -> {
+                OTPCodeVerificationType.AUTHENTICATE -> {
+                    val response = vault.authenticateEntity(
+                        context,
+                        phoneNumber,
+                        password,
+                        code
+                    )
+                }
+                OTPCodeVerificationType.RECOVER -> {
                     val response = vault.recoverEntityPassword(
                         context,
                         phoneNumber,
