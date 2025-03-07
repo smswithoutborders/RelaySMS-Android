@@ -20,8 +20,8 @@ import kotlinx.coroutines.withContext
 
 class GatewayClientViewModel() : ViewModel() {
     private var liveData: LiveData<List<GatewayClient>> = MutableLiveData()
-    private val _selectedGatewayClient = MutableLiveData<GatewayClient>()
-    val selectedGatewayClient: LiveData<GatewayClient> = _selectedGatewayClient
+    private val _selectedGatewayClient = MutableLiveData<GatewayClient?>()
+    val selectedGatewayClient: LiveData<GatewayClient?> = _selectedGatewayClient
 
 
     fun get(context: Context, successRunnable: Runnable?): LiveData<List<GatewayClient>> {
@@ -51,6 +51,18 @@ class GatewayClientViewModel() : ViewModel() {
     fun selectGatewayClient(gatewayClient: GatewayClient) {
         _selectedGatewayClient.value = gatewayClient
         Log.d("GatewayClientViewModel", "selectGatewayClient called: $gatewayClient")
+    }
+
+    private fun loadDefaultGatewayClient(context: Context) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val defaultMsisdn = GatewayClientsCommunications(context).getDefaultGatewayClient()
+            if (!defaultMsisdn.isNullOrEmpty()) {
+                val defaultGatewayClient = getGatewayClientByMsisdn(context, defaultMsisdn)
+                withContext(Dispatchers.Main) {
+                    _selectedGatewayClient.value = defaultGatewayClient!!
+                }
+            }
+        }
     }
 
     fun delete(context: Context, gatewayClient: GatewayClient) {

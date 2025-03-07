@@ -1,7 +1,16 @@
 package com.example.sw0b_001.ui.modals
 
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.provider.ContactsContract
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -39,6 +48,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.navigation.activity
 import com.example.sw0b_001.Models.GatewayClients.GatewayClient
 import com.example.sw0b_001.Models.GatewayClients.GatewayClientViewModel
 import com.example.sw0b_001.ui.theme.AppTheme
@@ -54,6 +65,7 @@ fun AddGatewayClientModal(
     onGatewayClientSaved: () -> Unit = {}
 ) {
     val context = LocalContext.current
+    val activity = context as Activity
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Expanded,
         skipHiddenState = false
@@ -69,6 +81,51 @@ fun AddGatewayClientModal(
     LaunchedEffect(showBottomSheet) {
         if (showBottomSheet) {
             isError = false
+        }
+    }
+
+    // Intent to pick a contact
+    val contactIntent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
+
+    // Launcher for contact selection
+    val launchContactForResult = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val contactUri: Uri? = result.data?.data
+
+            val projection: Array<String> = arrayOf(
+                ContactsContract.CommonDataKinds.Phone.NUMBER,
+                ContactsContract.Contacts.DISPLAY_NAME
+            )
+
+            contactUri?.let {
+                activity.contentResolver.query(it, projection, null, null, null).use { cursor ->
+                    if (cursor != null && cursor.moveToFirst()) {
+                        val numberIndex =
+                            cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                        val number = cursor.getString(numberIndex)
+
+                        val nameIndex =
+                            cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)
+                        val name = cursor.getString(nameIndex)
+
+                        phoneNumber = number
+                        alias = name
+                    }
+                }
+            }
+        }
+    }
+
+    // Launcher for permission request
+    val launchContactPermission = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            launchContactForResult.launch(contactIntent)
+        } else {
+            Toast.makeText(context, "Permission Denied!", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -112,7 +169,20 @@ fun AddGatewayClientModal(
                         isError = isError
                     )
                     IconButton(
-                        onClick = { /*TODO("add functionality")*/ },
+                        onClick = {
+                            when (PackageManager.PERMISSION_GRANTED) {
+                                ContextCompat.checkSelfPermission(
+                                    context,
+                                    Manifest.permission.READ_CONTACTS
+                                ) -> {
+                                    launchContactForResult.launch(contactIntent)
+                                }
+
+                                else -> {
+                                    launchContactPermission.launch(Manifest.permission.READ_CONTACTS)
+                                }
+                            }
+                        },
                         enabled = !isSaving
                     ) {
                         Icon(
@@ -189,7 +259,6 @@ fun AddGatewayClientModal(
                                     newGatewayClient.mSISDN = phoneNumber
                                     newGatewayClient.alias = alias
                                     newGatewayClient.type = GatewayClient.TYPE.CUSTOM.value
-                                    //TODO: add the other fields
                                     viewModel.insertGatewayClient(
                                         context,
                                         newGatewayClient,
@@ -200,7 +269,6 @@ fun AddGatewayClientModal(
                                     // Edit existing client
                                     gatewayClient.mSISDN = phoneNumber
                                     gatewayClient.alias = alias
-                                    //TODO: add the other fields
                                     viewModel.updateGatewayClient(
                                         context,
                                         gatewayClient,
@@ -236,7 +304,6 @@ fun AddGatewayClientModal(
 @Composable
 fun AddGatewayClientModalPreview() {
     AppTheme {
-        //TODO: add a dummy view model
         AddGatewayClientModal(
             showBottomSheet = true,
             onDismiss = {},
