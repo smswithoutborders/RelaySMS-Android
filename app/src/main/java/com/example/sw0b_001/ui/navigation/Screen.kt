@@ -25,3 +25,6 @@ object BridgeEmailScreen
 object TextScreen
 @Serializable
 object MessageScreen
+
+@Serializable
+object PasteEncryptedTextScreen

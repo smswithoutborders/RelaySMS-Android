@@ -1,8 +1,5 @@
 package com.example.sw0b_001
 
-import android.app.Activity
-import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -16,15 +13,11 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
-import androidx.core.content.ContentProviderCompat.requireContext
 import com.example.sw0b_001.ui.theme.AppTheme
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.example.sw0b_001.Models.GatewayClients.GatewayClient
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
 import com.example.sw0b_001.Models.NavigationFlowHandler
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
@@ -35,11 +28,8 @@ import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
 import com.example.sw0b_001.ui.views.AboutView
-import com.example.sw0b_001.ui.views.GetStartedView
 import com.example.sw0b_001.ui.views.HomepageView
 import com.example.sw0b_001.ui.views.OtpCodeVerificationView
-import com.example.sw0b_001.ui.views.SecurityView
-import com.example.sw0b_001.ui.views.SettingsView
 import com.example.sw0b_001.ui.views.compose.EmailComposeView
 import com.example.sw0b_001.ui.views.compose.MessageComposeView
 import com.example.sw0b_001.ui.views.compose.TextComposeView
@@ -62,25 +52,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.sw0b_001.Database.Datastore
-import com.example.sw0b_001.Models.Messages.EncryptedContent
 import com.example.sw0b_001.Models.Platforms.Platforms
-import com.example.sw0b_001.Models.Publishers
 import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.ui.navigation.AboutScreen
 import com.example.sw0b_001.ui.navigation.BridgeEmailScreen
 import com.example.sw0b_001.ui.navigation.EmailScreen
 import com.example.sw0b_001.ui.navigation.GetMeOutScreen
 import com.example.sw0b_001.ui.navigation.MessageScreen
+import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.navigation.TextScreen
-import com.example.sw0b_001.ui.views.RecentMessageCard
+import com.example.sw0b_001.ui.views.PasteEncryptedTextView
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.net.URL
-
 
 
 class MainActivity : ComponentActivity() {
@@ -177,6 +163,11 @@ class MainActivity : ComponentActivity() {
                 MessageComposeView(
                     navController = navController,
                     platformsViewModel = platformsViewModel,
+                )
+            }
+            composable<PasteEncryptedTextScreen> {
+                PasteEncryptedTextView(
+                    navController = navController,
                 )
             }
         }

@@ -29,28 +29,35 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.Models.Messages.EncryptedContent
+import com.example.sw0b_001.Models.Messages.MessagesViewModel
+import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.R
+import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun InboxView(
+    navController: NavController,
     messages: List<EncryptedContent> = emptyList(),
-    onPasteNewMessageClicked: () -> Unit = {},
-    onComposeNewMessageClicked: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
         if (messages.isEmpty()) {
-            EmptyInboxContent(onPasteNewMessageClicked = onPasteNewMessageClicked)
+            EmptyInboxContent(onPasteNewMessageClicked = {
+                navController.navigate(PasteEncryptedTextScreen)
+            })
         } else {
             MessageListContent(messages = messages)
         }
@@ -90,7 +97,9 @@ fun MessageListContent(messages: List<EncryptedContent>) {
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(messages) { message ->
-            MessageCard(message = message)
+            RecentMessageCard(
+                message
+            )
         }
     }
 }
@@ -125,7 +134,38 @@ fun MessageCard(message: EncryptedContent) {
 @Composable
 fun InboxViewEmptyPreview() {
     AppTheme {
-        InboxView()
+        InboxView(
+            navController = NavController(LocalContext.current),
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun InboxScreenMessages_Preview() {
+    AppTheme(darkTheme = false) {
+        val encryptedContent = EncryptedContent()
+        encryptedContent.id = 0
+        encryptedContent.type = "email"
+        encryptedContent.date = System.currentTimeMillis()
+        encryptedContent.platformName = "gmail"
+        encryptedContent.fromAccount = "developers@relaysms.me"
+        encryptedContent.gatewayClientMSISDN = "+237123456789"
+        encryptedContent.encryptedContent = "dev@relaysms.me:::subject here:This is an encrypted content"
+
+        val text = EncryptedContent()
+        text.id = 1
+        text.type = "text"
+        text.date = System.currentTimeMillis()
+        text.platformName = "twitter"
+        text.fromAccount = "@relaysms.me"
+        text.gatewayClientMSISDN = "+237123456789"
+        text.encryptedContent = "@relaysms.me:Hello world"
+        InboxView(
+            messages = listOf(encryptedContent, text),
+            navController = rememberNavController(),
+
+        )
     }
 }
 

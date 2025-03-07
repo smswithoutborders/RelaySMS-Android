@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -183,7 +184,7 @@ fun HomepageView(
                             onClick = { }
                         ) {
                             Icon(
-                                Icons.Filled.Create,
+                                Icons.Filled.ContentPaste,
                                 contentDescription = "Compose Message",
                                 tint = MaterialTheme.colorScheme.onSecondary
                             )
@@ -227,7 +228,8 @@ fun HomepageView(
 
                 BottomTabsItems.BottomBarInboxTab -> {
                     InboxView(
-                        messages = inbox
+                        messages = inbox,
+                        navController = navController
                     )
                 }
             }
