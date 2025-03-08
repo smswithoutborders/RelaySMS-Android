@@ -64,7 +64,20 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
+
 data class MessageContent(val from: String, val to: String, val message: String)
+
+object MessageComposeHandler {
+    fun decomposeMessage(
+        text: String
+    ): MessageContent {
+        println(text)
+        return text.split(":").let {
+            MessageContent(from=it[0], to=it[1], message=it[2])
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
@@ -134,7 +147,9 @@ fun MessageComposeView(
                                 navController.popBackStack()
                             }
                         }
-                    }) {
+                    },
+                        enabled = recipientNumber.isNotEmpty() && message.isNotEmpty() &&
+                                verifyPhoneNumberFormat(recipientNumber)) {
                         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
                     }
                 },

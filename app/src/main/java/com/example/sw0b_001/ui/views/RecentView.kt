@@ -60,6 +60,7 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.views.compose.EmailComposeHandler
+import com.example.sw0b_001.ui.views.compose.MessageComposeHandler
 import com.example.sw0b_001.ui.views.compose.TextComposeHandler
 import kotlinx.serialization.json.internal.encodeByWriter
 
@@ -256,6 +257,11 @@ fun RecentMessageCard(
             text = decomposed.text
             heading = decomposed.from
         }
+        Platforms.ServiceTypes.MESSAGE.type -> {
+            val decomposed = MessageComposeHandler.decomposeMessage(message.encryptedContent!!)
+            text = decomposed.message
+            heading = decomposed.to
+        }
     }
 
     Column {
@@ -364,8 +370,18 @@ fun RecentScreenMessages_Preview() {
         text.fromAccount = "@relaysms.me"
         text.gatewayClientMSISDN = "+237123456789"
         text.encryptedContent = "@relaysms.me:Hello world"
+
+        val message = EncryptedContent()
+        message.id = 2
+        message.type = "message"
+        message.date = System.currentTimeMillis()
+        message.platformName = "telegram"
+        message.fromAccount = "+237123456789"
+        message.gatewayClientMSISDN = "+237123456789"
+        message.encryptedContent = "+123456789:+237123456789:hello Telegram"
+
         RecentView(
-            _messages = listOf(encryptedContent, text),
+            _messages = listOf(encryptedContent, text, message),
             navController = rememberNavController(),
             messagesViewModel = MessagesViewModel(),
             platformsViewModel = PlatformsViewModel()
