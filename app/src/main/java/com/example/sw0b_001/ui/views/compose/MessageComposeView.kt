@@ -80,18 +80,15 @@ fun MessageComposeView(
     var selectedAccount by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
     val context = LocalContext.current
 
-    val readContactPermissions = rememberPermissionState(Manifest.permission.READ_CONTACTS)
     val launcher = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()) { result ->
-        if(result.resultCode == Activity.RESULT_OK) {
-            result.data?.data?.let { uri ->
-                println(uri)
-                recipientNumber = getContactDetails(context, uri)
-            }
-        } else {
-            println(result.resultCode)
+        ActivityResultContracts.PickContact()
+    ) { uri ->
+        uri?.let {
+            recipientNumber = getContactDetails(context, uri)
         }
     }
+
+    val readContactPermissions = rememberPermissionState(Manifest.permission.READ_CONTACTS)
 
     if (showSelectAccountModal) {
         SelectAccountModal(
@@ -177,7 +174,7 @@ fun MessageComposeView(
                     onValueChange = { recipientNumber = it },
                     label = { Text("Recipient Number", style = MaterialTheme.typography.bodyMedium) },
                     modifier = Modifier.weight(1f),
-                    isError = verifyPhoneNumberFormat(recipientNumber),
+                    isError = recipientNumber.isNotEmpty() && !verifyPhoneNumberFormat(recipientNumber),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Phone,
                         imeAction = ImeAction.Next
@@ -186,9 +183,7 @@ fun MessageComposeView(
                 Spacer(modifier = Modifier.width(8.dp))
                 IconButton(onClick = {
                     if(readContactPermissions.status.isGranted) {
-                        val intent = Intent(Intent.ACTION_PICK,
-                            ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
-                        launcher.launch(intent)
+                        launcher.launch(null)
                     } else {
                         readContactPermissions.launchPermissionRequest()
                     }
@@ -278,22 +273,46 @@ private fun sendMessage(
 }
 
 fun getContactDetails(context: Context, contactUri: Uri): String {
-    val contactCursor = context.contentResolver.query(
-        contactUri, null, null, null, null
-    )
-    if (contactCursor != null) {
-        if (contactCursor.moveToFirst()) {
-            val contactIndexInformation =
-                contactCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
-            val number = contactCursor.getString(contactIndexInformation).filter {
-                !it.isWhitespace()
+    val contentResolver: ContentResolver = context.contentResolver
+    val contactDetails = mutableMapOf<String, String?>()
+
+    try {
+        val cursor: Cursor? = contentResolver.query(contactUri, null, null, null, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val id = it.getString(it.getColumnIndexOrThrow(ContactsContract.Contacts._ID))
+                val name = it.getString(it.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME))
+
+                contactDetails["id"] = id
+                contactDetails["name"] = name
+
+                // Retrieve phone numbers
+                val hasPhone = it.getInt(it.getColumnIndexOrThrow(ContactsContract.Contacts.HAS_PHONE_NUMBER))
+                if (hasPhone > 0) {
+                    val phoneCursor = contentResolver.query(
+                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                        null,
+                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                        arrayOf(id),
+                        null
+                    )
+                    phoneCursor?.use { phone ->
+                        if (phone.moveToFirst()) {
+                            return phone.getString(phone.getColumnIndexOrThrow(
+                                ContactsContract.CommonDataKinds.Phone.NUMBER))
+                        }
+                    }
+                }
+
             }
-            return number
         }
-        contactCursor.close()
+    } catch (e: Exception) {
+        e.printStackTrace()
     }
+
     return ""
 }
+
 
 
 @Preview(showBackground = false)
