@@ -59,6 +59,7 @@ import com.example.sw0b_001.Modules.Helpers
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
 import com.example.sw0b_001.ui.navigation.EmailViewScreen
+import com.example.sw0b_001.ui.navigation.TextViewScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.views.compose.EmailComposeHandler
 import com.example.sw0b_001.ui.views.compose.MessageComposeHandler
@@ -181,6 +182,9 @@ fun RecentView(
                             when(it.type) {
                                 Platforms.ServiceTypes.EMAIL.type -> {
                                     navController.navigate(EmailViewScreen)
+                                }
+                                Platforms.ServiceTypes.TEXT.type -> {
+                                    navController.navigate(TextViewScreen)
                                 }
                                 else -> {
                                     TODO()

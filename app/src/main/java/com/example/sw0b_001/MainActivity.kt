@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
@@ -73,8 +74,10 @@ import com.example.sw0b_001.ui.navigation.EmailViewScreen
 import com.example.sw0b_001.ui.navigation.GetMeOutScreen
 import com.example.sw0b_001.ui.navigation.MessageScreen
 import com.example.sw0b_001.ui.navigation.TextScreen
+import com.example.sw0b_001.ui.navigation.TextViewScreen
 import com.example.sw0b_001.ui.views.RecentMessageCard
 import com.example.sw0b_001.ui.views.details.EmailDetailsView
+import com.example.sw0b_001.ui.views.details.TextDetailsView
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
@@ -182,6 +185,15 @@ class MainActivity : ComponentActivity() {
                     navController = navController,
                     platformsViewModel = platformsViewModel,
                 )
+            }
+            composable<TextViewScreen> {
+                TextDetailsView(
+                    navController = navController,
+                    platformsViewModel = platformsViewModel,
+                )
+            }
+            composable<MessageScreen> {
+                TODO()
             }
         }
     }

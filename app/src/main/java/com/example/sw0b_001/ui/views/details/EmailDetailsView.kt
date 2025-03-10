@@ -47,20 +47,6 @@ import androidx.compose.runtime.setValue
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
-// Data class for Gmail details
-
-//data class EmailDetails(
-//    val subject: String,
-//    val senderAvatar: Int,
-//    val senderEmail: String,
-//    val to: List<String>,
-//    val cc: List<String>,
-//    val bcc: List<String>,
-//    val date: String,
-//    val fullText: String
-//)
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmailDetailsView(
