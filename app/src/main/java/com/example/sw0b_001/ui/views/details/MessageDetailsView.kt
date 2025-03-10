@@ -21,6 +21,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,31 +36,30 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.Models.Messages.EncryptedContent
+import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
+import com.example.sw0b_001.Modules.Helpers
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.theme.AppTheme
-
-// Data class for Telegram details
-data class MessageDetails(
-    val senderAvatar: Int, // Resource ID for the avatar
-    val senderUsername: String,
-    val recipientNumber: String,
-    val date: String,
-    val fullText: String
-)
+import com.example.sw0b_001.ui.views.compose.MessageComposeHandler
+import com.example.sw0b_001.ui.views.compose.TextComposeHandler
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageDetailsView(
-    message: EncryptedContent,
+    platformsViewModel: PlatformsViewModel,
     navController: NavController
 ) {
-//    val telegramDetails = MessageDetails(
-//        senderAvatar = message.platformLogo,
-//        senderUsername = message.subHeadingText ?: "",
-//        recipientNumber = message.messagePreview,
-//        date = message.date,
-//        fullText = message.messagePreview)
+    val context = LocalContext.current
+    var from by remember{ mutableStateOf(
+        platformsViewModel.message?.fromAccount ?: "RelaySMS account") }
+
+    val decomposedMessage = MessageComposeHandler.decomposeMessage(
+        platformsViewModel.message!!.encryptedContent!!)
+
+    var text by remember{ mutableStateOf(decomposedMessage.message) }
+    var to by remember{ mutableStateOf(decomposedMessage.to) }
+    var date by remember{ mutableLongStateOf(platformsViewModel.message!!.date) }
 
     Scaffold(
         topBar = {
@@ -69,49 +73,32 @@ fun MessageDetailsView(
                 .padding(16.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                // Sender Avatar
-//                Image(
-//                    painter = painterResource(id = telegramDetails.senderAvatar),
-//                    contentDescription = "Sender Avatar",
-//                    modifier = Modifier
-//                        .size(48.dp)
-//                        .clip(CircleShape)
-//                )
+                Image(
+                    painter = painterResource(R.drawable.round_person_24),
+                    contentDescription = "Sender Avatar",
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                )
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
-                    // Sender Username/number
-//                    Text(
-//                        text = telegramDetails.senderUsername,
-//                        style = MaterialTheme.typography.titleMedium,
-//                        fontWeight = FontWeight.Bold,
-//                        color = MaterialTheme.colorScheme.onBackground
-//                    )
-//                    // Recipient Number
-//                    Text(
-//                        text = "To: ${telegramDetails.recipientNumber}",
-//                        style = MaterialTheme.typography.bodyMedium,
-//                        color = MaterialTheme.colorScheme.onBackground
-//                    )
-//                    // Date
-//                    Text(
-//                        text = telegramDetails.date,
-//                        style = MaterialTheme.typography.bodySmall,
-//                        color = MaterialTheme.colorScheme.onBackground
-//                    )
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                IconButton(onClick = { TODO("Handle Edit") }) {
-                    Icon(
-                        imageVector = Icons.Filled.Edit,
-                        contentDescription = "Edit",
-                        tint = MaterialTheme.colorScheme.onBackground
+                    Text(
+                        text = from,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
                     )
-                }
-                IconButton(onClick = {TODO("Handle Edit")}) {
-                    Icon(
-                        imageVector = Icons.Filled.Delete,
-                        contentDescription = "Delete",
-                        tint = MaterialTheme.colorScheme.error
+                    // Recipient Number
+                    Text(
+                        text = "To: $to",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    // Date
+                    Text(
+                        text = Helpers.formatDate(context, date),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 }
             }
@@ -119,31 +106,34 @@ fun MessageDetailsView(
             HorizontalDivider(color = MaterialTheme.colorScheme.outline)
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Full Text
-//            Text(
-//                text = telegramDetails.fullText,
-//                style = MaterialTheme.typography.bodySmall,
-//                color = MaterialTheme.colorScheme.onBackground
-//            )
+            Text(
+                text = text,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onBackground
+            )
         }
     }
 }
 
-//@Preview(showBackground = true)
-//@Composable
-//fun MessageDetailsPreview() {
-//    AppTheme(darkTheme = false) {
-//        MessageDetailsView(
-//            message = RecentMessage(
-//                platformLogo = R.drawable.telegram,
-//                platformName = "Telegram",
-//                headingText = "John Doe",
-//                subHeadingText = "123-456-7890",
-//                date = "10:30 AM",
-//                messagePreview = "Hello, this is a test message.",
-//                messageType = MessageType.TELEGRAM
-//            ),
-//            navController = NavController(LocalContext.current)
-//        )
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun MessageDetailsPreview() {
+    AppTheme(darkTheme = false) {
+        val message = EncryptedContent()
+        message.id = 2
+        message.type = "message"
+        message.date = System.currentTimeMillis()
+        message.platformName = "telegram"
+        message.fromAccount = "+237123456789"
+        message.gatewayClientMSISDN = "+237123456789"
+        message.encryptedContent = "+123456789:+237123456789:hello Telegram"
+
+        val platformsViewModel = PlatformsViewModel()
+        platformsViewModel.message = message
+
+        MessageDetailsView(
+            platformsViewModel = platformsViewModel,
+            navController = NavController(LocalContext.current)
+        )
+    }
+}

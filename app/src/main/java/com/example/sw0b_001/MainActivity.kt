@@ -73,10 +73,12 @@ import com.example.sw0b_001.ui.navigation.EmailScreen
 import com.example.sw0b_001.ui.navigation.EmailViewScreen
 import com.example.sw0b_001.ui.navigation.GetMeOutScreen
 import com.example.sw0b_001.ui.navigation.MessageScreen
+import com.example.sw0b_001.ui.navigation.MessageViewScreen
 import com.example.sw0b_001.ui.navigation.TextScreen
 import com.example.sw0b_001.ui.navigation.TextViewScreen
 import com.example.sw0b_001.ui.views.RecentMessageCard
 import com.example.sw0b_001.ui.views.details.EmailDetailsView
+import com.example.sw0b_001.ui.views.details.MessageDetailsView
 import com.example.sw0b_001.ui.views.details.TextDetailsView
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
@@ -192,8 +194,11 @@ class MainActivity : ComponentActivity() {
                     platformsViewModel = platformsViewModel,
                 )
             }
-            composable<MessageScreen> {
-                TODO()
+            composable<MessageViewScreen> {
+                MessageDetailsView(
+                    navController = navController,
+                    platformsViewModel = platformsViewModel,
+                )
             }
         }
     }
