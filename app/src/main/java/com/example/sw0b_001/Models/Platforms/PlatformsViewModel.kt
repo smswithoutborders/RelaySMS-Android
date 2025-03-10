@@ -35,6 +35,10 @@ class PlatformsViewModel : ViewModel() {
         return availableLiveData
     }
 
+    fun getAvailablePlatforms(context: Context, name: String): AvailablePlatforms? {
+        return Datastore.getDatastore(context).availablePlatformsDao().fetch(name)
+    }
+
     fun getSavedCount(context: Context) : Int {
         return Datastore.getDatastore(context).platformDao().countSaved()
     }

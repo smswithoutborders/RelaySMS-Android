@@ -12,13 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -43,10 +38,12 @@ import com.example.sw0b_001.Models.Messages.MessagesViewModel
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Modules.Helpers
 import com.example.sw0b_001.ui.appbars.RelayAppBar
+import com.example.sw0b_001.ui.navigation.TextComposeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.views.compose.EmailComposeHandler
-import com.example.sw0b_001.ui.views.compose.MessageComposeHandler
 import com.example.sw0b_001.ui.views.compose.TextComposeHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,7 +65,15 @@ fun TextDetailsView(
             RelayAppBar(
                 navController = navController,
                 editCallback = {
-                    TODO()
+                    CoroutineScope(Dispatchers.Default).launch {
+                        val platform = platformsViewModel.getAvailablePlatforms(context,
+                            platformsViewModel.message!!.platformName!!)
+                        platformsViewModel.platform = platform
+
+                        CoroutineScope(Dispatchers.Main).launch {
+                            navController.navigate(TextComposeScreen)
+                        }
+                    }
                 }
             ) {
                 val messagesViewModel = MessagesViewModel()

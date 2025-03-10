@@ -2,6 +2,7 @@ package com.example.sw0b_001.ui.views.compose
 
 import android.content.Context
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,6 +40,7 @@ import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
+import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,7 +54,10 @@ object TextComposeHandler {
     ): TextContent {
         println(text)
         return text.split(":").let {
-            TextContent(from=it[0], text=it[1])
+            TextContent(
+                from=it[0],
+                text = it.subList(1, it.size).joinToString()
+            )
         }
     }
 }
@@ -64,12 +69,17 @@ fun TextComposeView(
     platformsViewModel: PlatformsViewModel
 ) {
     val inspectMode = LocalInspectionMode.current
-    var from by remember { mutableStateOf("") }
-    var message by remember { mutableStateOf("") }
+    val context = LocalContext.current
+
+    val decomposedMessage = if(platformsViewModel.message != null)
+        MessageComposeHandler.decomposeMessage(platformsViewModel.message!!.encryptedContent!!)
+    else null
+
+    var from by remember { mutableStateOf( decomposedMessage?.from ?: "") }
+    var message by remember { mutableStateOf( decomposedMessage?.message ?: "" ) }
+
     var showSelectAccountModal by remember { mutableStateOf(!inspectMode) }
     var selectedAccount by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
-
-    val context = LocalContext.current
 
     if (showSelectAccountModal) {
         SelectAccountModal(
@@ -86,6 +96,10 @@ fun TextComposeView(
                 showSelectAccountModal = false
             }
         )
+    }
+
+    BackHandler {
+        navController.navigate(HomepageScreen)
     }
 
     Scaffold(
@@ -119,7 +133,7 @@ fun TextComposeView(
                             onFailureCallback = {}
                         ) {
                             CoroutineScope(Dispatchers.Main).launch {
-                                navController.popBackStack()
+                                navController.navigate(HomepageScreen)
                             }
                         }
                     }) {
@@ -169,7 +183,7 @@ private fun processPost(
         try {
             ComposeHandlers.compose(context,
                 formattedString,
-                availablePlatforms,
+                availablePlatforms!!,
                 account,
             ) {
                 onCompleteCallback()

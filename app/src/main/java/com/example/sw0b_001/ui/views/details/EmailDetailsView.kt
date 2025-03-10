@@ -1,6 +1,5 @@
 package com.example.sw0b_001.ui.views.details
 
-import android.os.Parcelable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,13 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -39,20 +33,25 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.views.compose.EmailComposeHandler
-import kotlinx.android.parcel.Parcelize
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.example.sw0b_001.Models.Bridges
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.example.sw0b_001.ui.navigation.BridgeEmailComposeScreen
+import com.example.sw0b_001.ui.navigation.EmailComposeScreen
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmailDetailsView(
     platformsViewModel: PlatformsViewModel,
-    navController: NavController
+    navController: NavController,
+    isBridge: Boolean = false
 ) {
     val context = LocalContext.current
     val decomposedMessage = EmailComposeHandler.decomposeMessage(
@@ -70,7 +69,15 @@ fun EmailDetailsView(
     Scaffold(
         topBar = {
             RelayAppBar(navController = navController, {
+                CoroutineScope(Dispatchers.Default).launch {
+                    val platform = platformsViewModel.getAvailablePlatforms(context,
+                        platformsViewModel.message!!.platformName!!)
+                    platformsViewModel.platform = platform ?: Bridges.platforms
 
+                    CoroutineScope(Dispatchers.Main).launch {
+                        navController.navigate(if(isBridge) EmailComposeScreen else BridgeEmailComposeScreen)
+                    }
+                }
             }) {
                 val messagesViewModel = MessagesViewModel()
                 messagesViewModel.delete(context, platformsViewModel.message!!) {

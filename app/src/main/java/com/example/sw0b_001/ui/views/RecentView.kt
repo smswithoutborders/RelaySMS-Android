@@ -58,6 +58,7 @@ import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Modules.Helpers
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
+import com.example.sw0b_001.ui.navigation.BridgeViewScreen
 import com.example.sw0b_001.ui.navigation.EmailViewScreen
 import com.example.sw0b_001.ui.navigation.MessageViewScreen
 import com.example.sw0b_001.ui.navigation.TextViewScreen
@@ -180,10 +181,13 @@ fun RecentView(
                     items(messages) { message ->
                         RecentMessageCard(message) {
                             platformsViewModel.message = it
+                            print(it.type)
                             when(it.type) {
-                                Platforms.ServiceTypes.EMAIL.type,
-                                Platforms.ServiceTypes.BRIDGE.type -> {
+                                Platforms.ServiceTypes.EMAIL.type -> {
                                     navController.navigate(EmailViewScreen)
+                                }
+                                Platforms.ServiceTypes.BRIDGE.type -> {
+                                    navController.navigate(BridgeViewScreen)
                                 }
                                 Platforms.ServiceTypes.TEXT.type -> {
                                     navController.navigate(TextViewScreen)

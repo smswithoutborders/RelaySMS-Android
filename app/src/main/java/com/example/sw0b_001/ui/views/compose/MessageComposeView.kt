@@ -9,6 +9,7 @@ import android.database.Cursor
 import android.net.Uri
 import android.provider.ContactsContract
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -56,6 +57,7 @@ import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
+import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -74,7 +76,11 @@ object MessageComposeHandler {
     ): MessageContent {
         println(text)
         return text.split(":").let {
-            MessageContent(from=it[0], to=it[1], message=it[2])
+            MessageContent(
+                from=it[0],
+                to=it[1],
+                message = it.subList(2, it.size).joinToString()
+            )
         }
     }
 }
@@ -86,12 +92,18 @@ fun MessageComposeView(
     platformsViewModel: PlatformsViewModel
 ) {
     val inspectMode = LocalInspectionMode.current
-    var recipientNumber by remember { mutableStateOf("") }
-    var message by remember { mutableStateOf("") }
-    var from by remember { mutableStateOf("") }
+    val context = LocalContext.current
+
+    val decomposedMessage = if(platformsViewModel.message != null)
+        MessageComposeHandler.decomposeMessage(platformsViewModel.message!!.encryptedContent!!)
+    else null
+
+    var recipientNumber by remember { mutableStateOf(decomposedMessage?.to ?: "") }
+    var message by remember { mutableStateOf( decomposedMessage?.message ?: "") }
+    var from by remember { mutableStateOf( decomposedMessage?.from ?: "") }
+
     var showSelectAccountModal by remember { mutableStateOf(!inspectMode) }
     var selectedAccount by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
-    val context = LocalContext.current
 
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.PickContact()
@@ -120,6 +132,10 @@ fun MessageComposeView(
         )
     }
 
+    BackHandler {
+        navController.navigate(HomepageScreen)
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -144,7 +160,7 @@ fun MessageComposeView(
                             onFailureCallback = {}
                         ) {
                             CoroutineScope(Dispatchers.Main).launch {
-                                navController.popBackStack()
+                                navController.navigate(HomepageScreen)
                             }
                         }
                     },
@@ -271,7 +287,7 @@ private fun sendMessage(
         try {
             ComposeHandlers.compose(context,
                 formattedString,
-                availablePlatforms,
+                availablePlatforms!!,
                 account,
             ) {
                 onCompleteCallback()

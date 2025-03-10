@@ -41,9 +41,15 @@ import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Modules.Helpers
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.appbars.RelayAppBar
+import com.example.sw0b_001.ui.navigation.MessageComposeScreen
+import com.example.sw0b_001.ui.navigation.TextComposeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.views.compose.MessageComposeHandler
+import com.example.sw0b_001.ui.views.compose.MessageComposeView
 import com.example.sw0b_001.ui.views.compose.TextComposeHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,7 +71,15 @@ fun MessageDetailsView(
     Scaffold(
         topBar = {
             RelayAppBar(navController = navController, {
-                TODO()
+                CoroutineScope(Dispatchers.Default).launch {
+                    val platform = platformsViewModel.getAvailablePlatforms(context,
+                        platformsViewModel.message!!.platformName!!)
+                    platformsViewModel.platform = platform
+
+                    CoroutineScope(Dispatchers.Main).launch {
+                        navController.navigate(MessageComposeScreen)
+                    }
+                }
             }) {
                 val messagesViewModel = MessagesViewModel()
                 messagesViewModel.delete(context, platformsViewModel.message!!) {

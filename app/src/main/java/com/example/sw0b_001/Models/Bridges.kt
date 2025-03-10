@@ -14,15 +14,10 @@ import java.nio.ByteOrder
 object Bridges {
 
     private const val BRIDGE_VALUE: Byte = 0
-
-    val storedPlatformsEntity = StoredPlatformsEntity(
-        id = "0",
-        account = "@relaysms.me",
-        name = "email"
-    )
+    private const val NAME: String = "BRIDGES"
 
     val platforms = AvailablePlatforms(
-        name = "email",
+        name = NAME,
         shortcode = "e",
         service_type = "email",
         protocol_type = "bridge",
