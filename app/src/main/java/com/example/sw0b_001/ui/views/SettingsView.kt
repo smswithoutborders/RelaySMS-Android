@@ -46,7 +46,7 @@ fun SettingsView(
     var currentLanguage by remember { mutableStateOf(LanguageOption("English", "en")) }
     Scaffold(
         topBar = {
-            RelayAppBar(screenName = "Settings", navController = navController)
+//            RelayAppBar(screenName = "Settings", navController = navController)
         }
     ) { innerPadding ->
         Column(

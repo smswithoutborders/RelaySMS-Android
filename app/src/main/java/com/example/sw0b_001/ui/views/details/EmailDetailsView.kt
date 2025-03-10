@@ -44,6 +44,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.example.sw0b_001.Models.Messages.MessagesViewModel
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -68,7 +69,14 @@ fun EmailDetailsView(
 
     Scaffold(
         topBar = {
-            RelayAppBar(screenName = "Email Details", navController = navController)
+            RelayAppBar(navController = navController, {
+
+            }) {
+                val messagesViewModel = MessagesViewModel()
+                messagesViewModel.delete(context, platformsViewModel.message!!) {
+                    navController.popBackStack()
+                }
+            }
         }
     ) { innerPadding ->
         Column(

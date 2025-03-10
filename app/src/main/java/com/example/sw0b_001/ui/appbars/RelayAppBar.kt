@@ -28,8 +28,9 @@ import com.example.sw0b_001.ui.theme.AppTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RelayAppBar(
-    screenName: String,
     navController: NavController,
+    editCallback: () -> Unit,
+    deleteCallback: () -> Unit,
 ) {
     TopAppBar(
         title = { },
@@ -42,14 +43,18 @@ fun RelayAppBar(
             }
         },
         actions = {
-            IconButton(onClick = { TODO("Implement edit functionality") }) {
+            IconButton(onClick = {
+                editCallback()
+            }) {
                 Icon(
                     imageVector = Icons.Filled.Edit,
                     contentDescription = "Edit",
                     tint = MaterialTheme.colorScheme.onBackground
                 )
             }
-            IconButton(onClick = { TODO("Implement delete functionality") }) {
+            IconButton(onClick = {
+                deleteCallback()
+            }) {
                 Icon(
                     imageVector = Icons.Filled.Delete,
                     contentDescription = "Delete",
@@ -65,6 +70,9 @@ fun RelayAppBar(
 @Composable
 fun RelayAppBarPreview() {
     AppTheme {
-        RelayAppBar(screenName = "My Screen", navController = NavController(LocalContext.current))
+        RelayAppBar(
+            navController = NavController(LocalContext.current),
+            {}
+        ) {}
     }
 }

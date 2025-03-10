@@ -5,20 +5,23 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sw0b_001.Database.Datastore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MessagesViewModel : ViewModel() {
 
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    private lateinit var messagesList: LiveData<List<EncryptedContent>>
+    private lateinit var messagesList: LiveData<MutableList<EncryptedContent>>
 
     private lateinit var datastore: Datastore
-    fun getMessages(context: Context): LiveData<List<EncryptedContent>> {
+    fun getMessages(context: Context): LiveData<MutableList<EncryptedContent>> {
         viewModelScope.launch {
             if (!::messagesList.isInitialized) {
                 _isLoading.value = true
@@ -32,12 +35,20 @@ class MessagesViewModel : ViewModel() {
         return messagesList
     }
 
-    private fun loadEncryptedContents() :
-            LiveData<List<EncryptedContent>>{
+    private fun loadEncryptedContents() : LiveData<MutableList<EncryptedContent>>{
         return datastore.encryptedContentDAO().all
     }
 
     fun insert(encryptedContent: EncryptedContent) : Long {
         return datastore.encryptedContentDAO().insert(encryptedContent)
+    }
+
+    fun delete(context: Context, message: EncryptedContent, onCompleteCallback: () -> Unit) {
+        viewModelScope.launch(Dispatchers.Default) {
+            Datastore.getDatastore(context).encryptedContentDAO().delete(message)
+            launch(Dispatchers.Main) {
+                onCompleteCallback()
+            }
+        }
     }
 }

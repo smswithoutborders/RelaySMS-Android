@@ -1,31 +1,31 @@
-package com.example.sw0b_001.Models.Messages;
+package com.example.sw0b_001.Models.Messages
 
-import androidx.lifecycle.LiveData;
-import androidx.room.Dao;
-import androidx.room.Insert;
-import androidx.room.Query;
-
-import java.util.List;
+import androidx.lifecycle.LiveData
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.Query
 
 @Dao
-public interface EncryptedContentDAO {
-
+interface EncryptedContentDAO {
     @Insert
-    long insert(EncryptedContent encryptedContent);
+    fun insert(encryptedContent: EncryptedContent): Long
 
-    @Query("SELECT * FROM EncryptedContent ORDER BY date DESC")
-    LiveData<List<EncryptedContent>> getAll();
+    @get:Query("SELECT * FROM EncryptedContent ORDER BY date DESC")
+    val all: LiveData<MutableList<EncryptedContent>>
 
     @Query("DELETE FROM EncryptedContent")
-    void deleteAll();
+    fun deleteAll()
 
     @Query("DELETE FROM EncryptedContent WHERE id = :id")
-    void delete(long id);
+    fun delete(id: Long)
+
+    @Delete
+    fun delete(message: EncryptedContent)
 
     @Query("SELECT * FROM EncryptedContent WHERE id=:encryptedContentId")
-    EncryptedContent get(long encryptedContentId);
+    fun get(encryptedContentId: Long): EncryptedContent
 
     @Query("SELECT * FROM EncryptedContent WHERE encryptedContent LIKE '%' || :filterText || '%'")
-    List<EncryptedContent> getForFilterText(String filterText);
-
+    fun getForFilterText(filterText: String?): MutableList<EncryptedContent>?
 }

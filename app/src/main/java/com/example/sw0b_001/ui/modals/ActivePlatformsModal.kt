@@ -58,7 +58,6 @@ fun ActivePlatformsModal(
         skipHiddenState = false
     )
     val scope = rememberCoroutineScope()
-    var showSelectAccountModal by remember { mutableStateOf(false) }
 
     if(sendNewMessageRequested) {
         ModalBottomSheet(
@@ -79,15 +78,6 @@ fun ActivePlatformsModal(
             }
         }
 
-    }
-
-    if (showSelectAccountModal) {
-        SelectAccountModal(
-            platformsViewModel = platformsViewModel,
-            onDismissRequest = {
-                showSelectAccountModal = false
-            }
-        )
     }
 
 }

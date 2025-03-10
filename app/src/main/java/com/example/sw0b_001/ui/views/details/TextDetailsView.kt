@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.Models.Messages.EncryptedContent
+import com.example.sw0b_001.Models.Messages.MessagesViewModel
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Modules.Helpers
 import com.example.sw0b_001.ui.appbars.RelayAppBar
@@ -64,7 +65,17 @@ fun TextDetailsView(
 
     Scaffold(
         topBar = {
-            RelayAppBar(screenName = "Text Details", navController = navController)
+            RelayAppBar(
+                navController = navController,
+                editCallback = {
+                    TODO()
+                }
+            ) {
+                val messagesViewModel = MessagesViewModel()
+                messagesViewModel.delete(context, platformsViewModel.message!!) {
+                    navController.popBackStack()
+                }
+            }
         }
     ) { innerPadding ->
         Column(
