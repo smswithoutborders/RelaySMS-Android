@@ -25,3 +25,12 @@ object BridgeEmailScreen
 object TextScreen
 @Serializable
 object MessageScreen
+
+@Serializable
+object BridgeViewScreen
+@Serializable
+object EmailViewScreen
+@Serializable
+object TextViewScreen
+@Serializable
+object MessageViewScreen

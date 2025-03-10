@@ -49,7 +49,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 data class EmailContent(
-    var from: String,
     var to: String,
     var cc: String,
     var bcc: String,
@@ -60,28 +59,16 @@ data class EmailContent(
 object EmailComposeHandler {
     fun decomposeMessage(
         message: String,
-        isBridge: Boolean = false
     ): EmailContent {
         println(message)
         return message.split(":").let {
-            if (isBridge)
-                EmailContent(
-                    from = "",
-                    to = it[0],
-                    cc = it[1],
-                    bcc = it[2],
-                    subject = it[3],
-                    body = it[4]
-                )
-            else
-                EmailContent(
-                    from = it[0],
-                    to = it[1],
-                    cc = it[2],
-                    bcc = it[3],
-                    subject = it[4],
-                    body = it.subList(5, it.size).joinToString()
-                )
+            EmailContent(
+                to = it[0],
+                cc = it[1],
+                bcc = it[2],
+                subject = it[3],
+                body = it.subList(4, it.size).joinToString()
+            )
         }
     }
 }
@@ -143,7 +130,6 @@ fun EmailComposeView(
                         onClick = { processSend(
                             context = context,
                             emailContent = EmailContent(
-                                from = from,
                                 to = to,
                                 cc = cc,
                                 bcc = bcc,

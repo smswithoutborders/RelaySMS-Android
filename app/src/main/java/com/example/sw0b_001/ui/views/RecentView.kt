@@ -33,10 +33,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
@@ -58,10 +58,12 @@ import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Modules.Helpers
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
+import com.example.sw0b_001.ui.navigation.EmailViewScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.views.compose.EmailComposeHandler
 import com.example.sw0b_001.ui.views.compose.MessageComposeHandler
 import com.example.sw0b_001.ui.views.compose.TextComposeHandler
+import com.example.sw0b_001.ui.views.details.EmailDetailsView
 import kotlinx.serialization.json.internal.encodeByWriter
 
 @Composable
@@ -174,7 +176,17 @@ fun RecentView(
                     contentPadding = PaddingValues(vertical = 16.dp)
                 ) {
                     items(messages) { message ->
-                        RecentMessageCard(message)
+                        RecentMessageCard(message) {
+                            platformsViewModel.message = it
+                            when(it.type) {
+                                Platforms.ServiceTypes.EMAIL.type -> {
+                                    navController.navigate(EmailViewScreen)
+                                }
+                                else -> {
+                                    TODO()
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -224,11 +236,11 @@ fun GetMessageAvatar(logo: Bitmap? = null) {
     }
     else {
         Image(
-            bitmap = if(logo != null) logo.asImageBitmap()
-            else BitmapFactory.decodeResource(
-                context.resources,
-                R.drawable.logo
-            ).asImageBitmap(),
+            bitmap = logo?.asImageBitmap()
+                ?: BitmapFactory.decodeResource(
+                    context.resources,
+                    R.drawable.logo
+                ).asImageBitmap(),
             contentDescription = "Avatar image",
             modifier = Modifier.size(48.dp)
         )
@@ -240,24 +252,28 @@ fun GetMessageAvatar(logo: Bitmap? = null) {
 fun RecentMessageCard(
     message: EncryptedContent,
     logo: Bitmap? = null,
+    onClickCallback: (EncryptedContent) -> Unit
 ) {
     var text by remember { mutableStateOf("" ) }
     var heading by remember { mutableStateOf( "") }
-    var toAccount by remember { mutableStateOf( "") }
+    var subHeading by remember { mutableStateOf( "") }
 
     when(message.type) {
-        Platforms.ServiceTypes.EMAIL.type -> {
-            val decomposed = EmailComposeHandler.decomposeMessage(message.encryptedContent!!)
+        Platforms.ServiceTypes.EMAIL.type, Platforms.ServiceTypes.BRIDGE.type -> {
+            println(message.encryptedContent)
+            val decomposed = EmailComposeHandler.decomposeMessage(
+                message.encryptedContent!!,
+            )
+            heading = message.fromAccount ?: "RelaySMS"
+            subHeading = decomposed.subject
             text = decomposed.body
-            heading = decomposed.subject
-            toAccount = decomposed.to
         }
         Platforms.ServiceTypes.TEXT.type -> {
             val decomposed = TextComposeHandler.decomposeMessage(message.encryptedContent!!)
             text = decomposed.text
             heading = decomposed.from
         }
-        Platforms.ServiceTypes.MESSAGE.type -> {
+        Platforms.ServiceTypes.MESSAGE.type,  -> {
             val decomposed = MessageComposeHandler.decomposeMessage(message.encryptedContent!!)
             text = decomposed.message
             heading = decomposed.to
@@ -268,7 +284,7 @@ fun RecentMessageCard(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable {},
+                .clickable { onClickCallback(message) },
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -299,7 +315,7 @@ fun RecentMessageCard(
                     // Subheading Text
                     if (message.encryptedContent != null) {
                         Text(
-                            toAccount,
+                            subHeading,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
@@ -360,7 +376,7 @@ fun RecentScreenMessages_Preview() {
         encryptedContent.platformName = "gmail"
         encryptedContent.fromAccount = "developers@relaysms.me"
         encryptedContent.gatewayClientMSISDN = "+237123456789"
-        encryptedContent.encryptedContent = "dev@relaysms.me:::subject here:This is an encrypted content"
+        encryptedContent.encryptedContent = "reply@relaysms.me:cc@relaysms.me:bcc@relaysms.me:subject here:This is an encrypted content"
 
         val text = EncryptedContent()
         text.id = 1
@@ -400,7 +416,7 @@ fun RecentsCardPreview() {
         encryptedContent.platformName = "gmail"
         encryptedContent.fromAccount = "developers@relaysms.me"
         encryptedContent.gatewayClientMSISDN = "+237123456789"
-        encryptedContent.encryptedContent = "origin@gmail.com:dev@relaysms.me:::subject here:This is an encrypted content"
-        RecentMessageCard(encryptedContent)
+        encryptedContent.encryptedContent = "reply@relaysms.me:cc@relaysms.me:bcc@relaysms.me:subject here:This is an encrypted content"
+        RecentMessageCard(encryptedContent) {}
     }
 }

@@ -69,10 +69,12 @@ import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.ui.navigation.AboutScreen
 import com.example.sw0b_001.ui.navigation.BridgeEmailScreen
 import com.example.sw0b_001.ui.navigation.EmailScreen
+import com.example.sw0b_001.ui.navigation.EmailViewScreen
 import com.example.sw0b_001.ui.navigation.GetMeOutScreen
 import com.example.sw0b_001.ui.navigation.MessageScreen
 import com.example.sw0b_001.ui.navigation.TextScreen
 import com.example.sw0b_001.ui.views.RecentMessageCard
+import com.example.sw0b_001.ui.views.details.EmailDetailsView
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
@@ -171,6 +173,12 @@ class MainActivity : ComponentActivity() {
             }
             composable<MessageScreen> {
                 MessageComposeView(
+                    navController = navController,
+                    platformsViewModel = platformsViewModel,
+                )
+            }
+            composable<EmailViewScreen> {
+                EmailDetailsView(
                     navController = navController,
                     platformsViewModel = platformsViewModel,
                 )
