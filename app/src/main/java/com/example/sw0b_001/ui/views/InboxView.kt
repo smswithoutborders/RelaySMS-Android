@@ -104,31 +104,6 @@ fun MessageListContent(messages: List<EncryptedContent>) {
     }
 }
 
-@Composable
-fun MessageCard(message: EncryptedContent) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = message.fromAccount ?: "Unknown Sender",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = message.encryptedContent ?: "No content",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = message.date.toString(),
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
