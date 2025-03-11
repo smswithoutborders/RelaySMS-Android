@@ -1,6 +1,7 @@
 package com.example.sw0b_001.ui.modals
 
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.result.launch
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,7 +20,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -41,7 +47,8 @@ fun GatewayClientOptionsModal(
     onEditClicked: (GatewayClient) -> Unit,
     viewModel: GatewayClientViewModel,
     onMakeDefaultClicked: (GatewayClient) -> Unit,
-    isDefault: Boolean = false
+    isDefault: Boolean = false,
+    isSelected: Boolean
 ) {
     val context = LocalContext.current
     val sheetState = rememberStandardBottomSheetState(
@@ -49,6 +56,9 @@ fun GatewayClientOptionsModal(
         skipHiddenState = false
     )
     val scope = rememberCoroutineScope()
+
+    var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
+    var showModal by remember { mutableStateOf(showBottomSheet) }
 
     if (showBottomSheet) {
         ModalBottomSheet(
@@ -128,24 +138,29 @@ fun GatewayClientOptionsModal(
 
                     Button(
                         onClick = {
-                            scope.launch {
-                                val successRunnable = Runnable {
+                            if (isSelected) {
+                                showDeleteConfirmationDialog = true
+                                Toast.makeText(context, "Gateway client is already selected. Change default gateway client before deleting this one", Toast.LENGTH_LONG).show()
+                            } else {
+                                scope.launch {
+                                    val successRunnable = Runnable {
 
-                                    Log.i(
-                                        "GatewayClientOptionsModal",
-                                        "Gateway client deleted successfully"
-                                    )
-                                    onDismiss()
-                                }
+                                        Log.i(
+                                            "GatewayClientOptionsModal",
+                                            "Gateway client deleted successfully"
+                                        )
+                                        onDismiss()
+                                    }
 
-                                val failureRunnable = Runnable {
-                                    Log.e(
-                                        "GatewayClientOptionsModal",
-                                        "Failed to delete gateway client"
-                                    )
+                                    val failureRunnable = Runnable {
+                                        Log.e(
+                                            "GatewayClientOptionsModal",
+                                            "Failed to delete gateway client"
+                                        )
+                                    }
+                                    viewModel.delete(context, gatewayClient)
+                                    viewModel.loadRemote(context, successRunnable, failureRunnable)
                                 }
-                                viewModel.delete(context, gatewayClient)
-                                viewModel.loadRemote(context, successRunnable, failureRunnable)
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
@@ -164,6 +179,19 @@ fun GatewayClientOptionsModal(
             }
         }
     }
+
+    if (showDeleteConfirmationDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirmationDialog = false },
+            title = { Text("Cannot Delete") },
+            text = { Text("Gateway client is already selected. Change default gateway client before deleting this one") },
+            confirmButton = {
+                Button(onClick = { showDeleteConfirmationDialog = false }) {
+                    Text("OK")
+                }
+            }
+        )
+    }
 }
 
 @Preview(showBackground = false)
@@ -177,7 +205,8 @@ fun GatewayClientOptionsModalPreview() {
             showBottomSheet = true,
             onEditClicked = {},
             viewModel = GatewayClientViewModel(),
-            onMakeDefaultClicked = {}
+            onMakeDefaultClicked = {},
+            isSelected = false
         )
     }
 }

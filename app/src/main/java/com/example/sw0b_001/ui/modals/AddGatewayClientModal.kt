@@ -53,6 +53,7 @@ import androidx.navigation.activity
 import com.example.sw0b_001.Models.GatewayClients.GatewayClient
 import com.example.sw0b_001.Models.GatewayClients.GatewayClientViewModel
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.views.compose.verifyPhoneNumberFormat
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -227,7 +228,7 @@ fun AddGatewayClientModal(
                 // Save Button
                 Button(
                     onClick = {
-                        if (phoneNumber.isBlank()) {
+                        if (phoneNumber.isBlank() || !verifyPhoneNumberFormat(phoneNumber)) {
                             isError = true
                             return@Button
                         }
@@ -254,7 +255,6 @@ fun AddGatewayClientModal(
                                 }
 
                                 if (gatewayClient == null) {
-                                    // Add new client
                                     val newGatewayClient = GatewayClient()
                                     newGatewayClient.mSISDN = phoneNumber
                                     newGatewayClient.alias = alias
@@ -266,7 +266,6 @@ fun AddGatewayClientModal(
                                         failureRunnable
                                     )
                                 } else {
-                                    // Edit existing client
                                     gatewayClient.mSISDN = phoneNumber
                                     gatewayClient.alias = alias
                                     viewModel.updateGatewayClient(

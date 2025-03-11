@@ -1,6 +1,7 @@
 package com.example.sw0b_001.ui.views
 
 import android.util.Log
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,10 +47,11 @@ fun GatewayClientView(
 ) {
     val context = LocalContext.current
 
+    var isLoading by remember { mutableStateOf(true) }
     val successRunnable = Runnable {
         println("Gateway clients loaded successfully!")
+        isLoading = false
     }
-
     val gatewayClients by viewModel.get(context, successRunnable).observeAsState(initial = emptyList())
     var defaultGatewayClient by remember {
         mutableStateOf<GatewayClient?>(null)
@@ -134,6 +137,10 @@ fun GatewayClientView(
             }
         }
 
+        if (isLoading) {
+            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+        }
+
         if (addShowBottomSheet) {
             AddGatewayClientModal(
                 showBottomSheet = addShowBottomSheet,
@@ -162,7 +169,8 @@ fun GatewayClientView(
                         optionsShowBottomSheet = false
                         onDismissCallback()
                     },
-                    isDefault = currentGatewayClient!!.isDefault
+                    isDefault = currentGatewayClient!!.isDefault,
+                    isSelected = currentGatewayClient == defaultGatewayClient
                 )
             }
         }
@@ -171,11 +179,11 @@ fun GatewayClientView(
             AddGatewayClientModal(
                 showBottomSheet = editShowBottomSheet,
                 onDismiss = { editShowBottomSheet = false },
-                gatewayClient = defaultGatewayClient,
+                gatewayClient = currentGatewayClient,
                 viewModel = viewModel,
                 onGatewayClientSaved = {
                     editShowBottomSheet = false
-                    optionsShowBottomSheet = true
+                    optionsShowBottomSheet = false
                 }
             )
         }
@@ -205,13 +213,13 @@ fun SelectedGatewayClientCard(gatewayClient: GatewayClient) {
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "${gatewayClient.operatorName ?: "N/A"} - ${gatewayClient.operatorId ?: "N/A"}",
+                text = "${gatewayClient.operatorName ?: ""} - ${gatewayClient.operatorId ?: ""}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = gatewayClient.country ?: "N/A",
+                text = gatewayClient.country ?: "",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.tertiary
             )
@@ -236,9 +244,9 @@ fun GatewayClientCard(gatewayClient: GatewayClient, onCardClicked: (GatewayClien
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            if (gatewayClient.alias != null) {
+            if (gatewayClient.alias != null && gatewayClient.alias!!.isNotEmpty()) {
                 Text(
-                    text = gatewayClient.alias ?: "N/A",
+                    text = gatewayClient.alias ?: "",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -257,13 +265,13 @@ fun GatewayClientCard(gatewayClient: GatewayClient, onCardClicked: (GatewayClien
                 Spacer(modifier = Modifier.height(4.dp))
             }
             Text(
-                text = gatewayClient.operatorName ?: "N/A",
+                text = gatewayClient.operatorName ?: "",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = gatewayClient.country ?: "N/A",
+                text = gatewayClient.country ?: "",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.tertiary
             )
