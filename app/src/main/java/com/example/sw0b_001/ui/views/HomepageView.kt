@@ -44,6 +44,7 @@ import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.appbars.GatewayClientsAppBar
 import com.example.sw0b_001.ui.appbars.RecentAppBar
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
+import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 
 enum class BottomTabsItems {
@@ -76,7 +77,7 @@ fun HomepageView(
     val messages: List<EncryptedContent> = if(_messages.isNotEmpty()) _messages
     else messagesViewModel.getMessages(context).observeAsState(emptyList()).value
 
-    val inbox = emptyList<EncryptedContent>()
+    val inbox = emptyList<EncryptedContent>() // TODO: get inbox messages from view model (i think?)
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -178,10 +179,12 @@ fun HomepageView(
                 }
 
                 BottomTabsItems.BottomBarInboxTab -> {
-                    if (inbox.isNotEmpty()) {
+                    if (inbox.isNotEmpty()) { // TODO: make sure inbox isn't always empty
                         FloatingActionButton(
                             containerColor = MaterialTheme.colorScheme.secondary,
-                            onClick = { }
+                            onClick = {
+                                navController.navigate(PasteEncryptedTextScreen)
+                            }
                         ) {
                             Icon(
                                 Icons.Filled.ContentPaste,
