@@ -17,6 +17,11 @@ class PlatformsViewModel : ViewModel() {
     var platform by mutableStateOf<AvailablePlatforms?>(null)
     var message by mutableStateOf<EncryptedContent?>(null)
 
+    fun reset() {
+        platform = null
+        message = null
+    }
+
     fun getAccounts(context: Context, name: String): LiveData<List<StoredPlatformsEntity>> {
         return Datastore.getDatastore(context).storedPlatformsDao().fetchPlatform(name)
     }

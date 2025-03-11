@@ -96,6 +96,7 @@ fun AvailablePlatformsView(
                 storedPlatforms = storedPlatforms,
                 isCompose = isCompose,
                 onPlatformClick = {
+                    platformsViewModel.reset()
                     platformsViewModel.platform = it
                     showPlatformOptions = true
                     println("Available platform: ${platformsViewModel.platform?.name}")
