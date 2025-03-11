@@ -50,7 +50,15 @@ fun GatewayClientView(
     }
 
     val gatewayClients by viewModel.get(context, successRunnable).observeAsState(initial = emptyList())
-    val selectedGatewayClient by viewModel.selectedGatewayClient.observeAsState()
+    var defaultGatewayClient by remember {
+        mutableStateOf<GatewayClient?>(null)
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.getDefaultGatewayClient(context) {
+            defaultGatewayClient = it
+        }
+    }
 
     var optionsShowBottomSheet by remember { mutableStateOf(false) }
     var editShowBottomSheet by remember { mutableStateOf(false) }
@@ -83,8 +91,8 @@ fun GatewayClientView(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                if (selectedGatewayClient != null) {
-                    SelectedGatewayClientCard(gatewayClient = selectedGatewayClient!!)
+                if (defaultGatewayClient != null) {
+                    SelectedGatewayClientCard(gatewayClient = defaultGatewayClient!!)
                 } else {
                     Text(
                         text = "No Gateway Client Selected",
@@ -148,8 +156,9 @@ fun GatewayClientView(
                         editShowBottomSheet = true
                     },
                     viewModel = viewModel,
-                    onMakeDefaultClicked = {
-                        viewModel.selectGatewayClient(currentGatewayClient!!)
+                    onMakeDefaultClicked = { gatewayClient ->
+//                        viewModel.selectGatewayClient(currentGatewayClient!!)
+                        defaultGatewayClient = gatewayClient
                         optionsShowBottomSheet = false
                         onDismissCallback()
                     },
@@ -162,7 +171,7 @@ fun GatewayClientView(
             AddGatewayClientModal(
                 showBottomSheet = editShowBottomSheet,
                 onDismiss = { editShowBottomSheet = false },
-                gatewayClient = selectedGatewayClient!!,
+                gatewayClient = defaultGatewayClient,
                 viewModel = viewModel,
                 onGatewayClientSaved = {
                     editShowBottomSheet = false

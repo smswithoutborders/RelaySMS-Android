@@ -4,6 +4,9 @@ import android.app.Application
 import android.content.Context
 import android.util.Log
 import androidx.activity.result.launch
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -23,6 +26,16 @@ class GatewayClientViewModel() : ViewModel() {
     private val _selectedGatewayClient = MutableLiveData<GatewayClient?>()
     val selectedGatewayClient: LiveData<GatewayClient?> = _selectedGatewayClient
 
+//    private val _defaultGatewayClient = MutableStateFlow<GatewayClient?>(null)
+//    val defaultGatewayClient = _defaultGatewayClient.asStateFlow()
+
+    fun getDefaultGatewayClient(context: Context, successRunnable: (GatewayClient) -> Unit) {
+        val msisdn = GatewayClientsCommunications(context).getDefaultGatewayClient()
+        viewModelScope.launch(Dispatchers.Default) {
+            val defaultGatewayClient = getGatewayClientByMsisdn(context, msisdn!!)!!
+            successRunnable(defaultGatewayClient)
+        }
+    }
 
     fun get(context: Context, successRunnable: Runnable?): LiveData<List<GatewayClient>> {
         if(liveData.value.isNullOrEmpty()) {
