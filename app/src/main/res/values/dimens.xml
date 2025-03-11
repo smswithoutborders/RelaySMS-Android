@@ -1,5 +1,1 @@
-<resources>
-    <dimen name="padding_small">8dp</dimen>
-    <dimen name="padding_medium">16dp</dimen>
-    <dimen name="image_size">64dp</dimen>
-</resources>
+<resources></resources>
