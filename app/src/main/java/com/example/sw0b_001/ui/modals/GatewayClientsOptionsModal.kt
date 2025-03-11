@@ -58,7 +58,6 @@ fun GatewayClientOptionsModal(
     val scope = rememberCoroutineScope()
 
     var showDeleteConfirmationDialog by remember { mutableStateOf(false) }
-    var showModal by remember { mutableStateOf(showBottomSheet) }
 
     if (showBottomSheet) {
         ModalBottomSheet(
@@ -183,11 +182,33 @@ fun GatewayClientOptionsModal(
     if (showDeleteConfirmationDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirmationDialog = false },
-            title = { Text("Cannot Delete") },
-            text = { Text("Gateway client is already selected. Change default gateway client before deleting this one") },
+            title = {
+                Text(
+                    text = "Cannot Delete",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                    },
+            backgroundColor = MaterialTheme.colorScheme.background,
+            text = {
+                Text(
+                    text = "Gateway client is already selected. Change default gateway client before deleting this one",
+                    color = MaterialTheme.colorScheme.onBackground,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                   },
             confirmButton = {
-                Button(onClick = { showDeleteConfirmationDialog = false }) {
-                    Text("OK")
+                Button(
+                    onClick = { showDeleteConfirmationDialog = false },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError
+                    )
+                ) {
+                    Text(
+                        text = "OK",
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
                 }
             }
         )

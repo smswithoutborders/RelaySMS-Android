@@ -154,9 +154,13 @@ fun GatewayClientView(
 
         if (optionsShowBottomSheet) {
             currentGatewayClient?.let {
+                val isSelected = defaultGatewayClient?.mSISDN == it.mSISDN
                 GatewayClientOptionsModal(
                     showBottomSheet = optionsShowBottomSheet,
-                    onDismiss = { optionsShowBottomSheet = false },
+                    onDismiss = {
+                        optionsShowBottomSheet = false
+                        currentGatewayClient = null
+                                },
                     gatewayClient = it,
                     onEditClicked = {
                         optionsShowBottomSheet = false
@@ -170,7 +174,7 @@ fun GatewayClientView(
                         onDismissCallback()
                     },
                     isDefault = currentGatewayClient!!.isDefault,
-                    isSelected = currentGatewayClient == defaultGatewayClient
+                    isSelected = isSelected
                 )
             }
         }
