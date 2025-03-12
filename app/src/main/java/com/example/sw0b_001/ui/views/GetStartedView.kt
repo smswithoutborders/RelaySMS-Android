@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -30,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -63,7 +65,7 @@ fun GetStartedView (
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 50.dp, bottom=50.dp),
+                .padding(top = 50.dp, bottom = 50.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
@@ -161,7 +163,7 @@ fun GetStartedView (
                     colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
                     modifier = Modifier
                         .weight(1f)
-                        .size(height=65.dp, width=100.dp)
+                        .size(height = 65.dp, width = 100.dp)
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
@@ -182,7 +184,7 @@ fun GetStartedView (
                     colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
                     modifier = Modifier
                         .weight(1f)
-                        .size(height=65.dp, width=100.dp)
+                        .size(height = 65.dp, width = 100.dp)
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
@@ -205,7 +207,8 @@ fun GetStartedView (
                 showModal = showLoginBottomSheet,
                 onDismissCallback = {
                     showLoginBottomSheet = false
-                }
+                },
+                title = "Login"
             ) {
                 navController.navigate(LoginScreen)
                 showLoginBottomSheet = false
@@ -217,7 +220,9 @@ fun GetStartedView (
                 showModal = showCreateAccountBottomSheet,
                 onDismissCallback = {
                     showCreateAccountBottomSheet = false
-                }) {
+                },
+                title = "Create Account"
+            ) {
                 navController.navigate(CreateAccountScreen)
                 showCreateAccountBottomSheet = false
             }
@@ -226,10 +231,10 @@ fun GetStartedView (
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
 fun LoginCreateInfoModal(
     showModal: Boolean = false,
+    title: String,
     onDismissCallback: () -> Unit = {},
     onContinueCallback: () -> Unit = {}
 ) {
@@ -238,7 +243,7 @@ fun LoginCreateInfoModal(
         initialValue = SheetValue.Expanded,
         skipHiddenState = false
     )
-    if(showModal) {
+    if (showModal) {
         ModalBottomSheet(
             onDismissRequest = {
                 showModal = false
@@ -246,13 +251,49 @@ fun LoginCreateInfoModal(
             },
             sheetState = sheetState,
         ) {
-            Column {
-                Text("Something about this platform")
-                Button(onClick = {
-                    onContinueCallback()
-                }) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Person,
+                    contentDescription = "Person Icon",
+                    modifier = Modifier.size(48.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.size(16.dp))
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.size(8.dp))
+                Text(
+                    text = "Access your account to save or use your online platforms without an internet connection",
+                    style = MaterialTheme.typography.bodyMedium,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.size(24.dp))
+                Button(
+                    onClick = {
+                        onContinueCallback()
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text("Continue")
                 }
+                Spacer(modifier = Modifier.size(16.dp))
+                Text(
+                    text = "An SMS would be sent to your phone number to verify you own the number",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.size(16.dp))
             }
         }
     }
@@ -264,6 +305,19 @@ fun GetStartedPreview() {
     AppTheme (darkTheme = false) {
         GetStartedView(
             navController = NavController(LocalContext.current)
+        )
+    }
+}
+
+@Preview
+@Composable
+fun LoginCreateInfoModalPreview() {
+    AppTheme {
+        LoginCreateInfoModal(
+            showModal = true,
+            title = "Login",
+            onDismissCallback = {},
+            onContinueCallback = {}
         )
     }
 }
