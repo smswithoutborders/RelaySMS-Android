@@ -30,6 +30,7 @@ import com.example.sw0b_001.ui.theme.AppTheme
 @Composable
 fun GatewayClientsAppBar(
     navController: NavController,
+    onRefreshClicked: () -> Unit = {}
 ) {
     var showMenu by remember { mutableStateOf(false) }
 
@@ -42,7 +43,9 @@ fun GatewayClientsAppBar(
             )
         },
         actions = {
-            IconButton(onClick = { TODO("Implement refresh") }) {
+            IconButton(onClick = {
+                onRefreshClicked()
+            }) {
                 Icon(
                     imageVector = Icons.Filled.Refresh,
                     contentDescription = "Menu"

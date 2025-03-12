@@ -32,3 +32,6 @@ object EmailViewScreen
 object TextViewScreen
 @Serializable
 object MessageViewScreen
+
+@Serializable
+object PasteEncryptedTextScreen

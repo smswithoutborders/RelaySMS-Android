@@ -1,11 +1,14 @@
 package com.example.sw0b_001.ui.views
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -14,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,9 +30,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.sw0b_001.Models.GatewayClients.GatewayClientViewModel
 import com.example.sw0b_001.Models.Messages.EncryptedContent
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
@@ -38,11 +44,13 @@ import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.appbars.GatewayClientsAppBar
 import com.example.sw0b_001.ui.appbars.RecentAppBar
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
+import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 
 enum class BottomTabsItems {
     BottomBarRecentTab,
     BottomBarPlatformsTab,
+    BottomBarInboxTab,
     BottomBarCountriesTab
 }
 
@@ -53,7 +61,8 @@ fun HomepageView(
     isLoggedIn: Boolean = false,
     navController: NavController,
     platformsViewModel : PlatformsViewModel,
-    messagesViewModel: MessagesViewModel
+    messagesViewModel: MessagesViewModel,
+    gatewayClientViewModel: GatewayClientViewModel
 ) {
     val context = LocalContext.current
     val inspectionMode = LocalInspectionMode.current
@@ -68,13 +77,21 @@ fun HomepageView(
     val messages: List<EncryptedContent> = if(_messages.isNotEmpty()) _messages
     else messagesViewModel.getMessages(context).observeAsState(emptyList()).value
 
+    val inbox = emptyList<EncryptedContent>() // TODO: get inbox messages from view model (i think?)
+
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     var bottomBarItem by remember { mutableStateOf(BottomTabsItems.BottomBarRecentTab) }
 
     var showAddGatewayClientsModal by remember { mutableStateOf(false) }
 
+    val refreshSuccess = Runnable {
+        Toast.makeText(context, "Gateway clients refreshed successfully!", Toast.LENGTH_SHORT).show()
+        Log.d("GatewayClients", "Gateway clients refreshed successfully!")
+    }
+
     var sendNewMessageRequested by remember { mutableStateOf(false)}
+
 
     Scaffold (
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -90,7 +107,25 @@ fun HomepageView(
                 }
                 BottomTabsItems.BottomBarPlatformsTab -> {}
                 BottomTabsItems.BottomBarCountriesTab -> {
-                    GatewayClientsAppBar(navController = navController)
+                    GatewayClientsAppBar(
+                        navController = navController,
+                        onRefreshClicked = {
+                            gatewayClientViewModel.get(context, refreshSuccess)
+                        }
+                    )
+                }
+
+                BottomTabsItems.BottomBarInboxTab -> {
+                    TopAppBar(
+                        title = {
+                            Text(
+                                text = "Inbox",
+                                style = MaterialTheme.typography.headlineLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors()
+                    )
                 }
             }
         },
@@ -142,6 +177,23 @@ fun HomepageView(
                         )
                     }
                 }
+
+                BottomTabsItems.BottomBarInboxTab -> {
+                    if (inbox.isNotEmpty()) { // TODO: make sure inbox isn't always empty
+                        FloatingActionButton(
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            onClick = {
+                                navController.navigate(PasteEncryptedTextScreen)
+                            }
+                        ) {
+                            Icon(
+                                Icons.Filled.ContentPaste,
+                                contentDescription = "Compose Message",
+                                tint = MaterialTheme.colorScheme.onSecondary
+                            )
+                        }
+                    }
+                }
             }
         }
     ) { innerPadding ->
@@ -172,9 +224,16 @@ fun HomepageView(
                     )
                 }
                 BottomTabsItems.BottomBarCountriesTab -> {
-                    GatewayClientView(addShowBottomSheet = showAddGatewayClientsModal) {
-                        showAddGatewayClientsModal = false
+                    GatewayClientView(addShowBottomSheet = showAddGatewayClientsModal, viewModel = gatewayClientViewModel) {
+//                        showAddGatewayClientsModal = false
                     }
+                }
+
+                BottomTabsItems.BottomBarInboxTab -> {
+                    InboxView(
+                        messages = inbox,
+                        navController = navController
+                    )
                 }
             }
 
@@ -199,7 +258,8 @@ fun HomepageView_Preview() {
         HomepageView(
             navController = rememberNavController(),
             platformsViewModel = PlatformsViewModel(),
-            messagesViewModel = MessagesViewModel()
+            messagesViewModel = MessagesViewModel(),
+            gatewayClientViewModel = GatewayClientViewModel()
         )
     }
 }
@@ -213,7 +273,8 @@ fun HomepageViewLoggedIn_Preview() {
             isLoggedIn = true,
             navController = rememberNavController(),
             platformsViewModel = PlatformsViewModel(),
-            messagesViewModel = MessagesViewModel()
+            messagesViewModel = MessagesViewModel(),
+            gatewayClientViewModel = GatewayClientViewModel()
         )
     }
 }
@@ -237,7 +298,8 @@ fun HomepageViewLoggedInMessages_Preview() {
             isLoggedIn = true,
             navController = rememberNavController(),
             platformsViewModel = PlatformsViewModel(),
-            messagesViewModel = MessagesViewModel()
+            messagesViewModel = MessagesViewModel(),
+            gatewayClientViewModel = GatewayClientViewModel()
         )
     }
 }

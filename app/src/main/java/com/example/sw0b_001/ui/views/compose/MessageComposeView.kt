@@ -264,7 +264,7 @@ private fun processMessageForEncryption(
     return "${account.account}:$to:$message"
 }
 
-private fun verifyPhoneNumberFormat(phoneNumber: String): Boolean {
+fun verifyPhoneNumberFormat(phoneNumber: String): Boolean {
     val newPhoneNumber = phoneNumber
         .replace("[\\s-]".toRegex(), "")
     return newPhoneNumber.matches("^\\+[1-9]\\d{1,14}$".toRegex())

@@ -1,5 +1,16 @@
 package com.example.sw0b_001.ui.modals
 
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.provider.ContactsContract
+import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +32,7 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,13 +41,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.navigation.activity
+import com.example.sw0b_001.Models.GatewayClients.GatewayClient
+import com.example.sw0b_001.Models.GatewayClients.GatewayClientViewModel
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.views.GatewayClient
+import com.example.sw0b_001.ui.views.compose.verifyPhoneNumberFormat
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,22 +61,79 @@ import kotlinx.coroutines.launch
 fun AddGatewayClientModal(
     onDismiss: () -> Unit,
     showBottomSheet: Boolean,
-    gatewayClient: GatewayClient? = null
+    viewModel: GatewayClientViewModel,
+    gatewayClient: GatewayClient? = null,
+    onGatewayClientSaved: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+    val activity = context as Activity
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Expanded,
         skipHiddenState = false
     )
     val scope = rememberCoroutineScope()
-    var phoneNumber by remember { mutableStateOf(gatewayClient?.phoneNumber ?: "") }
+    var phoneNumber by remember { mutableStateOf(gatewayClient?.mSISDN ?: "") }
     var alias by remember { mutableStateOf(gatewayClient?.alias ?: "") }
+
+    var isSaving by remember { mutableStateOf(false) }
+    var isError by remember { mutableStateOf(false) }
+
+    // Reset error state when the modal is shown again
+    LaunchedEffect(showBottomSheet) {
+        if (showBottomSheet) {
+            isError = false
+        }
+    }
+
+    // Intent to pick a contact
+    val contactIntent = Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
+
+    // Launcher for contact selection
+    val launchContactForResult = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val contactUri: Uri? = result.data?.data
+
+            val projection: Array<String> = arrayOf(
+                ContactsContract.CommonDataKinds.Phone.NUMBER,
+                ContactsContract.Contacts.DISPLAY_NAME
+            )
+
+            contactUri?.let {
+                activity.contentResolver.query(it, projection, null, null, null).use { cursor ->
+                    if (cursor != null && cursor.moveToFirst()) {
+                        val numberIndex =
+                            cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                        val number = cursor.getString(numberIndex)
+
+                        val nameIndex =
+                            cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME)
+                        val name = cursor.getString(nameIndex)
+
+                        phoneNumber = number
+                        alias = name
+                    }
+                }
+            }
+        }
+    }
+
+    // Launcher for permission request
+    val launchContactPermission = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            launchContactForResult.launch(contactIntent)
+        } else {
+            Toast.makeText(context, "Permission Denied!", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     if (showBottomSheet) {
         ModalBottomSheet(
             onDismissRequest = onDismiss,
             sheetState = sheetState,
-//            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
-//            scrimColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
         ) {
             Column(
                 modifier = Modifier
@@ -67,7 +142,7 @@ fun AddGatewayClientModal(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Add Gateway Client",
+                    text = if (gatewayClient == null) "Add Gateway Client" else "Edit Gateway Client",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -83,14 +158,34 @@ fun AddGatewayClientModal(
                     OutlinedTextField(
                         value = phoneNumber,
                         onValueChange = { phoneNumber = it },
-                        label = { Text(
-                            text = "Enter phone number with country code",
-                            style = MaterialTheme.typography.bodyMedium
-                        ) },
+                        label = {
+                            Text(
+                                text = "Enter phone number with country code",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        },
                         modifier = Modifier.weight(1f),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                        enabled = !isSaving,
+                        isError = isError
                     )
-                    IconButton(onClick = {TODO("add functionality")}) {
+                    IconButton(
+                        onClick = {
+                            when (PackageManager.PERMISSION_GRANTED) {
+                                ContextCompat.checkSelfPermission(
+                                    context,
+                                    Manifest.permission.READ_CONTACTS
+                                ) -> {
+                                    launchContactForResult.launch(contactIntent)
+                                }
+
+                                else -> {
+                                    launchContactPermission.launch(Manifest.permission.READ_CONTACTS)
+                                }
+                            }
+                        },
+                        enabled = !isSaving
+                    ) {
                         Icon(
                             imageVector = Icons.Filled.Contacts,
                             contentDescription = "Select Contact",
@@ -111,11 +206,15 @@ fun AddGatewayClientModal(
                 OutlinedTextField(
                     value = alias,
                     onValueChange = { alias = it },
-                    label = { Text(
-                        text = "Alias (optional)",
-                        style = MaterialTheme.typography.bodyMedium
-                    ) },
-                    modifier = Modifier.fillMaxWidth()
+                    label = {
+                        Text(
+                            text = "Alias (optional)",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !isSaving,
+                    isError = isError
                 )
                 Text(
                     text = "Name to help remember the Gateway Client",
@@ -129,17 +228,76 @@ fun AddGatewayClientModal(
                 // Save Button
                 Button(
                     onClick = {
-                        TODO("add functionality")
+                        if (phoneNumber.isBlank() || !verifyPhoneNumberFormat(phoneNumber)) {
+                            isError = true
+                            return@Button
+                        }
+                        isSaving = true
+                        scope.launch {
+                            try {
+                                val successRunnable = Runnable {
+                                    Log.i(
+                                        "AddGatewayClientModal",
+                                        if (gatewayClient == null) "Gateway client added successfully" else "Gateway client edited successfully"
+                                    )
+                                    isSaving = false
+                                    onGatewayClientSaved()
+                                    onDismiss()
+                                }
+
+                                val failureRunnable = Runnable {
+                                    Log.e(
+                                        "AddGatewayClientModal",
+                                        if (gatewayClient == null) "Failed to add gateway client" else "Failed to edit gateway client"
+                                    )
+                                    isSaving = false
+                                    isError = true
+                                }
+
+                                if (gatewayClient == null) {
+                                    val newGatewayClient = GatewayClient()
+                                    newGatewayClient.mSISDN = phoneNumber
+                                    newGatewayClient.alias = alias
+                                    newGatewayClient.type = GatewayClient.TYPE.CUSTOM.value
+                                    viewModel.insertGatewayClient(
+                                        context,
+                                        newGatewayClient,
+                                        successRunnable,
+                                        failureRunnable
+                                    )
+                                } else {
+                                    gatewayClient.mSISDN = phoneNumber
+                                    gatewayClient.alias = alias
+                                    viewModel.updateGatewayClient(
+                                        context,
+                                        gatewayClient,
+                                        successRunnable,
+                                        failureRunnable
+                                    )
+                                }
+                            } catch (e: Exception) {
+                                Log.e("AddGatewayClientModal", "Error saving gateway client", e)
+                                isSaving = false
+                                isError = true
+                            }
+                        }
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                    enabled = !isSaving
                 ) {
-                    Text(text = "Save", color = Color.White)
+                    Text(text = if (isSaving) "Saving..." else "Save", color = Color.White)
+                }
+
+                if (isError) {
+                    Toast.makeText(context, "Error saving gateway client", Toast.LENGTH_SHORT).show()
+                    onDismiss()
                 }
             }
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
@@ -148,6 +306,7 @@ fun AddGatewayClientModalPreview() {
         AddGatewayClientModal(
             showBottomSheet = true,
             onDismiss = {},
+            viewModel = GatewayClientViewModel(),
         )
     }
 }
