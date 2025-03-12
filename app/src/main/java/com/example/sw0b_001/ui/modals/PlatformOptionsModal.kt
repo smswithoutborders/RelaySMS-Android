@@ -40,10 +40,10 @@ import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
 import com.example.sw0b_001.Models.Platforms.Platforms
 import com.example.sw0b_001.Models.Platforms.Platforms.ServiceTypes
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.navigation.BridgeEmailScreen
-import com.example.sw0b_001.ui.navigation.EmailScreen
-import com.example.sw0b_001.ui.navigation.MessageScreen
-import com.example.sw0b_001.ui.navigation.TextScreen
+import com.example.sw0b_001.ui.navigation.BridgeEmailComposeScreen
+import com.example.sw0b_001.ui.navigation.EmailComposeScreen
+import com.example.sw0b_001.ui.navigation.MessageComposeScreen
+import com.example.sw0b_001.ui.navigation.TextComposeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -514,18 +514,18 @@ private fun ComposeMessages(
         onClick = {
             onDismissRequest()
             if(platform == null) {
-                navController.navigate(BridgeEmailScreen)
+                navController.navigate(BridgeEmailComposeScreen)
             }
             else {
                 when(platform.service_type) {
                     ServiceTypes.EMAIL.type -> {
-                        navController.navigate(EmailScreen)
+                        navController.navigate(EmailComposeScreen)
                     }
                     ServiceTypes.MESSAGE.type -> {
-                        navController.navigate(MessageScreen)
+                        navController.navigate(MessageComposeScreen)
                     }
                     ServiceTypes.TEXT.type -> {
-                        navController.navigate(TextScreen)
+                        navController.navigate(TextComposeScreen)
                     }
                 }
             }

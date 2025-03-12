@@ -2,6 +2,7 @@ package com.example.sw0b_001.ui.views.compose
 
 import android.content.Context
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,13 +44,14 @@ import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
+import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.views.compose.EmailComposeHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 data class EmailContent(
-    var from: String,
     var to: String,
     var cc: String,
     var bcc: String,
@@ -60,28 +62,16 @@ data class EmailContent(
 object EmailComposeHandler {
     fun decomposeMessage(
         message: String,
-        isBridge: Boolean = false
     ): EmailContent {
         println(message)
         return message.split(":").let {
-            if (isBridge)
-                EmailContent(
-                    from = "",
-                    to = it[0],
-                    cc = it[1],
-                    bcc = it[2],
-                    subject = it[3],
-                    body = it[4]
-                )
-            else
-                EmailContent(
-                    from = it[0],
-                    to = it[1],
-                    cc = it[2],
-                    bcc = it[3],
-                    subject = it[4],
-                    body = it.subList(5, it.size).joinToString()
-                )
+            EmailContent(
+                to = it[0],
+                cc = it[1],
+                bcc = it[2],
+                subject = it[3],
+                body = it.subList(4, it.size).joinToString()
+            )
         }
     }
 }
@@ -96,18 +86,26 @@ fun EmailComposeView(
 ) {
     val context = LocalContext.current
 
-    var from by remember { mutableStateOf("") }
-    var to by remember { mutableStateOf("") }
-    var cc by remember { mutableStateOf("") }
-    var bcc by remember { mutableStateOf("") }
-    var subject by remember { mutableStateOf("") }
-    var body by remember { mutableStateOf("") }
+    val decomposedMessage = if(platformsViewModel.message != null)
+        EmailComposeHandler.decomposeMessage(platformsViewModel.message!!.encryptedContent!!)
+    else null
+
+    var from by remember { mutableStateOf(platformsViewModel.message?.fromAccount ?: "") }
+    var to by remember { mutableStateOf( decomposedMessage?.to ?: "") }
+    var cc by remember { mutableStateOf( decomposedMessage?.cc ?: "") }
+    var bcc by remember { mutableStateOf( decomposedMessage?.bcc ?: "") }
+    var subject by remember { mutableStateOf( decomposedMessage?.subject ?: "") }
+    var body by remember { mutableStateOf( decomposedMessage?.body ?: "") }
 
     var showSelectAccountModal by remember { mutableStateOf(false) }
     var selectedAccount: StoredPlatformsEntity? by remember { mutableStateOf(null) }
 
     LaunchedEffect(isBridge) {
         showSelectAccountModal = !isBridge
+    }
+
+    BackHandler {
+        navController.navigate(HomepageScreen)
     }
 
     // Conditionally show the SelectAccountModal
@@ -143,7 +141,6 @@ fun EmailComposeView(
                         onClick = { processSend(
                             context = context,
                             emailContent = EmailContent(
-                                from = from,
                                 to = to,
                                 cc = cc,
                                 bcc = bcc,
@@ -155,7 +152,7 @@ fun EmailComposeView(
                             onFailureCallback = {}
                         ) {
                             CoroutineScope(Dispatchers.Main).launch {
-                                navController.popBackStack()
+                                navController.navigate(HomepageScreen)
                             }
                         }
                     }) {
@@ -295,7 +292,7 @@ private fun processSend(
         try {
             ComposeHandlers.compose(context,
                 formattedContent,
-                availablePlatforms,
+                availablePlatforms!!,
                 account,
                 isBridge = isBridge,
                 authCode = if(isBridge) Bridges.getAuthCode(context)

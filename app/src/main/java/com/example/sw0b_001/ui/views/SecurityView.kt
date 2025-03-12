@@ -52,7 +52,7 @@ fun SecurityView(
 
     Scaffold(
         topBar = {
-            RelayAppBar(screenName = "Security", navController = navController)
+//            RelayAppBar(navController = navController)
         }
     ) { innerPadding ->
         Box(

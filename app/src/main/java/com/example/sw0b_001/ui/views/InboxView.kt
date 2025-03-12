@@ -98,7 +98,8 @@ fun MessageListContent(messages: List<EncryptedContent>) {
     ) {
         items(messages) { message ->
             RecentMessageCard(
-                message
+                message,
+                onClickCallback = {}
             )
         }
     }

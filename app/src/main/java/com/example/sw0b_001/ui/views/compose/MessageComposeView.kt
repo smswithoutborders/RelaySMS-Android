@@ -1,7 +1,17 @@
 package com.example.sw0b_001.ui.views.compose
 
+import android.Manifest
+import android.app.Activity
+import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
+import android.database.Cursor
+import android.net.Uri
+import android.provider.ContactsContract
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -47,26 +57,63 @@ import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
+import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
 
 data class MessageContent(val from: String, val to: String, val message: String)
 
-@OptIn(ExperimentalMaterial3Api::class)
+object MessageComposeHandler {
+    fun decomposeMessage(
+        text: String
+    ): MessageContent {
+        println(text)
+        return text.split(":").let {
+            MessageContent(
+                from=it[0],
+                to=it[1],
+                message = it.subList(2, it.size).joinToString()
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun MessageComposeView(
     navController: NavController,
     platformsViewModel: PlatformsViewModel
 ) {
     val inspectMode = LocalInspectionMode.current
-    var recipientNumber by remember { mutableStateOf("") }
-    var message by remember { mutableStateOf("") }
-    var from by remember { mutableStateOf("") }
+    val context = LocalContext.current
+
+    val decomposedMessage = if(platformsViewModel.message != null)
+        MessageComposeHandler.decomposeMessage(platformsViewModel.message!!.encryptedContent!!)
+    else null
+
+    var recipientNumber by remember { mutableStateOf(decomposedMessage?.to ?: "") }
+    var message by remember { mutableStateOf( decomposedMessage?.message ?: "") }
+    var from by remember { mutableStateOf( decomposedMessage?.from ?: "") }
+
     var showSelectAccountModal by remember { mutableStateOf(!inspectMode) }
     var selectedAccount by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
-    val context = LocalContext.current
+
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.PickContact()
+    ) { uri ->
+        uri?.let {
+            recipientNumber = getContactDetails(context, uri)
+        }
+    }
+
+    val readContactPermissions = rememberPermissionState(Manifest.permission.READ_CONTACTS)
 
     if (showSelectAccountModal) {
         SelectAccountModal(
@@ -85,6 +132,10 @@ fun MessageComposeView(
         )
     }
 
+    BackHandler {
+        navController.navigate(HomepageScreen)
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -97,7 +148,24 @@ fun MessageComposeView(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { TODO("Handle send") }) {
+                    IconButton(onClick = {
+                        sendMessage(
+                            context = context,
+                            messageContent = MessageContent(
+                                from = from,
+                                to = recipientNumber,
+                                message = message,
+                            ),
+                            account = selectedAccount!!,
+                            onFailureCallback = {}
+                        ) {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                navController.navigate(HomepageScreen)
+                            }
+                        }
+                    },
+                        enabled = recipientNumber.isNotEmpty() && message.isNotEmpty() &&
+                                verifyPhoneNumberFormat(recipientNumber)) {
                         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
                     }
                 },
@@ -137,7 +205,7 @@ fun MessageComposeView(
                     onValueChange = { recipientNumber = it },
                     label = { Text("Recipient Number", style = MaterialTheme.typography.bodyMedium) },
                     modifier = Modifier.weight(1f),
-                    isError = verifyPhoneNumberFormat(recipientNumber),
+                    isError = recipientNumber.isNotEmpty() && !verifyPhoneNumberFormat(recipientNumber),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Phone,
                         imeAction = ImeAction.Next
@@ -145,26 +213,17 @@ fun MessageComposeView(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 IconButton(onClick = {
-                    sendMessage(
-                        context = context,
-                        messageContent = MessageContent(
-                            from = from,
-                            to = recipientNumber,
-                            message = message,
-                        ),
-                        account = selectedAccount!!,
-                        onFailureCallback = {}
-                    ) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            navController.popBackStack()
-                        }
+                    if(readContactPermissions.status.isGranted) {
+                        launcher.launch(null)
+                    } else {
+                        readContactPermissions.launchPermissionRequest()
                     }
+
                 }) {
                     Icon(
                         imageVector = Icons.Filled.Contacts,
                         contentDescription = "Select Contact",
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.clickable(onClick = { TODO("Handle select contact") })
                     )
                 }
             }
@@ -228,7 +287,7 @@ private fun sendMessage(
         try {
             ComposeHandlers.compose(context,
                 formattedString,
-                availablePlatforms,
+                availablePlatforms!!,
                 account,
             ) {
                 onCompleteCallback()
@@ -243,6 +302,49 @@ private fun sendMessage(
     }
 
 }
+
+fun getContactDetails(context: Context, contactUri: Uri): String {
+    val contentResolver: ContentResolver = context.contentResolver
+    val contactDetails = mutableMapOf<String, String?>()
+
+    try {
+        val cursor: Cursor? = contentResolver.query(contactUri, null, null, null, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val id = it.getString(it.getColumnIndexOrThrow(ContactsContract.Contacts._ID))
+                val name = it.getString(it.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME))
+
+                contactDetails["id"] = id
+                contactDetails["name"] = name
+
+                // Retrieve phone numbers
+                val hasPhone = it.getInt(it.getColumnIndexOrThrow(ContactsContract.Contacts.HAS_PHONE_NUMBER))
+                if (hasPhone > 0) {
+                    val phoneCursor = contentResolver.query(
+                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                        null,
+                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                        arrayOf(id),
+                        null
+                    )
+                    phoneCursor?.use { phone ->
+                        if (phone.moveToFirst()) {
+                            return phone.getString(phone.getColumnIndexOrThrow(
+                                ContactsContract.CommonDataKinds.Phone.NUMBER))
+                        }
+                    }
+                }
+
+            }
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+
+    return ""
+}
+
+
 
 @Preview(showBackground = false)
 @Composable

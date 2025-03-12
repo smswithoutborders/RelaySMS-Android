@@ -1,8 +1,6 @@
 package com.example.sw0b_001.ui.views
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -36,7 +34,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
@@ -45,7 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
-import com.example.sw0b_001.ui.navigation.EmailScreen
+import com.example.sw0b_001.ui.navigation.EmailComposeScreen
 import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 
@@ -91,7 +88,7 @@ fun GetStartedView (
                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 16.dp)
         ) {
             Button(
-                onClick = { navController.navigate(EmailScreen) },
+                onClick = { navController.navigate(EmailComposeScreen) },
                 colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primaryContainer),
                 modifier = Modifier
                     .height(80.dp)

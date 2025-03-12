@@ -1,35 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
 
-        <item name="android:statusBarColor"> @android:color/transparent </item>
-        <item name="android:navigationBarColor"> @android:color/transparent </item>
-
-        <item name="android:windowActionBarOverlay">true</item>
-
-        <item name="android:textCursorDrawable">@null</item>
-        <item name="android:cursorVisible">true</item>
-        <item name="autoCompleteTextViewStyle">@style/SearchAutoCompleteTextView</item>
-        <item name="colorControlNormal">@color/md_theme_onBackground</item>
-    </style>
-
-    <style name="SearchAutoCompleteTextView" parent="Widget.AppCompat.Light.AutoCompleteTextView">
-        <item name="android:textColor">@color/md_theme_onSecondary</item>
-        <item name="android:textColorHint">@color/material_on_primary_disabled</item>
-    </style>
-
-
-    <style name="Theme.main.day" parent="Theme.AppTheme">
-        <item name="android:windowLightStatusBar">true</item>
-    </style>
-
-    <style name="Theme.main.night" parent="Theme.AppTheme">
-        <item name="android:windowLightStatusBar">false</item>
-    </style>
-
-    <style name="roundedImageViewRounded">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">50%</item>
-    </style>
 
 </resources>

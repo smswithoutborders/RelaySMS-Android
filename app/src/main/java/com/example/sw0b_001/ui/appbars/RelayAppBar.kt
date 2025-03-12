@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,34 +28,39 @@ import com.example.sw0b_001.ui.theme.AppTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RelayAppBar(
-    screenName: String,
     navController: NavController,
+    editCallback: () -> Unit,
+    deleteCallback: () -> Unit,
 ) {
     TopAppBar(
-        title = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = {navController.popBackStack()}) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back"
-                    )
-                }
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = screenName,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(end = 8.dp)
+        title = { },
+        navigationIcon = {
+            IconButton(onClick = {navController.popBackStack()}) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back"
                 )
             }
         },
-        navigationIcon = {
-
-        },
         actions = {
-
+            IconButton(onClick = {
+                editCallback()
+            }) {
+                Icon(
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = "Edit",
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            }
+            IconButton(onClick = {
+                deleteCallback()
+            }) {
+                Icon(
+                    imageVector = Icons.Filled.Delete,
+                    contentDescription = "Delete",
+                    tint = MaterialTheme.colorScheme.error
+                )
+            }
         },
         colors = TopAppBarDefaults.topAppBarColors()
     )
@@ -63,6 +70,9 @@ fun RelayAppBar(
 @Composable
 fun RelayAppBarPreview() {
     AppTheme {
-        RelayAppBar(screenName = "My Screen", navController = NavController(LocalContext.current))
+        RelayAppBar(
+            navController = NavController(LocalContext.current),
+            {}
+        ) {}
     }
 }

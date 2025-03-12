@@ -8,12 +8,19 @@ import androidx.lifecycle.ViewModel
 import com.example.sw0b_001.Database.Datastore
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import com.example.sw0b_001.Models.Messages.EncryptedContent
 
 class PlatformsViewModel : ViewModel() {
     private var availableLiveData: LiveData<List<AvailablePlatforms>> = MutableLiveData()
     private var storedLiveData: LiveData<List<StoredPlatformsEntity>> = MutableLiveData()
 
     var platform by mutableStateOf<AvailablePlatforms?>(null)
+    var message by mutableStateOf<EncryptedContent?>(null)
+
+    fun reset() {
+        platform = null
+        message = null
+    }
 
     fun getAccounts(context: Context, name: String): LiveData<List<StoredPlatformsEntity>> {
         return Datastore.getDatastore(context).storedPlatformsDao().fetchPlatform(name)
@@ -31,6 +38,10 @@ class PlatformsViewModel : ViewModel() {
             availableLiveData = Datastore.getDatastore(context).availablePlatformsDao().fetchAll()
         }
         return availableLiveData
+    }
+
+    fun getAvailablePlatforms(context: Context, name: String): AvailablePlatforms? {
+        return Datastore.getDatastore(context).availablePlatformsDao().fetch(name)
     }
 
     fun getSavedCount(context: Context) : Int {

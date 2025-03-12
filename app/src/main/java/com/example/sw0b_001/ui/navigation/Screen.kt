@@ -16,15 +16,22 @@ object OTPCodeScreen
 object AboutScreen
 
 @Serializable
-object EmailScreen
+object EmailComposeScreen
+@Serializable
+object BridgeEmailComposeScreen
+@Serializable
+object TextComposeScreen
+@Serializable
+object MessageComposeScreen
 
 @Serializable
-object BridgeEmailScreen
-
+object BridgeViewScreen
 @Serializable
-object TextScreen
+object EmailViewScreen
 @Serializable
-object MessageScreen
+object TextViewScreen
+@Serializable
+object MessageViewScreen
 
 @Serializable
 object PasteEncryptedTextScreen

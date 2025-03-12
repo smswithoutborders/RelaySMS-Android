@@ -82,8 +82,11 @@ fun LoginView(
     var password by remember { mutableStateOf("") }
 
     if(BuildConfig.DEBUG) {
-        phoneNumber = "1123457528"
-        password = "dMd2Kmo9#"
+//        phoneNumber = "1123457528"
+//        password = "dMd2Kmo9#"
+
+        phoneNumber = "123456789"
+        password = "dummy_password"
     }
 
     var passwordVisible by remember { mutableStateOf(false) }

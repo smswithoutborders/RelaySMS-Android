@@ -368,8 +368,8 @@ private fun submitOTPCode(
     onSuccessCallback: () -> Unit,
 ) {
     CoroutineScope(Dispatchers.Default).launch {
+        val vault = Vaults(context)
         try {
-            val vault = Vaults(context)
             when(type) {
                 OTPCodeVerificationType.CREATE -> {
                     val response = vault.createEntity(
@@ -407,6 +407,7 @@ private fun submitOTPCode(
             e.printStackTrace()
             onFailedCallback(e.message)
         } finally {
+            vault.shutdown()
             onCompleteCallback()
         }
     }
