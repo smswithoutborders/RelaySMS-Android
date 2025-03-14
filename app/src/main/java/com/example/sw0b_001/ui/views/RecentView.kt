@@ -43,6 +43,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -93,7 +94,7 @@ fun RecentViewNoMessages(
         )
 
         Text(
-            text = "Send your first message...",
+            text = stringResource(R.string.send_your_first_message),
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Thin,
             textAlign = TextAlign.Center,
@@ -115,7 +116,7 @@ fun RecentViewNoMessages(
                     .fillMaxWidth(),
             ) {
                 Text(
-                    text = "Send new message",
+                    text = stringResource(R.string.send_new_message),
                     fontWeight = FontWeight.SemiBold
                 )
             }
@@ -137,7 +138,7 @@ fun RecentViewNoMessages(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Save platforms",
+                        text = stringResource(R.string.save_platforms_),
                         fontWeight = FontWeight.SemiBold
                     )
                 }

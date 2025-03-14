@@ -30,11 +30,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sw0b_001.Models.GatewayClients.GatewayClient
 import com.example.sw0b_001.Models.GatewayClients.GatewayClientViewModel
+import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.AddGatewayClientModal
 import com.example.sw0b_001.ui.modals.GatewayClientOptionsModal
 import com.example.sw0b_001.ui.theme.AppTheme
@@ -86,7 +88,7 @@ fun GatewayClientView(
                     .padding(16.dp)
             ) {
                 Text(
-                    text = "Selected Gateway Client",
+                    text = stringResource(R.string.selected_gateway_client),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -98,7 +100,7 @@ fun GatewayClientView(
                     SelectedGatewayClientCard(gatewayClient = defaultGatewayClient!!)
                 } else {
                     Text(
-                        text = "No Gateway Client Selected",
+                        text = stringResource(R.string.no_gateway_client_selected),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
@@ -114,7 +116,7 @@ fun GatewayClientView(
                     .padding(horizontal = 16.dp)
             ) {
                 Text(
-                    text = "Available Gateway Clients",
+                    text = stringResource(R.string.available_countries),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.primary
                 )

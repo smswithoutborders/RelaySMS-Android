@@ -57,9 +57,11 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.Models.NavigationFlowHandler
 import com.example.sw0b_001.Models.Vaults
+import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
@@ -134,7 +136,7 @@ fun LoginView(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Log Into RelaySMS",
+                    text = stringResource(R.string.log_into_relaysms),
                     style = MaterialTheme.typography.headlineMedium,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.primary,
@@ -143,7 +145,7 @@ fun LoginView(
 
                 Text(
                     text = buildAnnotatedString {
-                        append("Log into your account and ")
+                        append(stringResource(R.string.log_into_your_account_and))
                         pushStringAnnotation(tag = "save_platforms", annotation = "save_platforms")
                         withStyle(
                             style = SpanStyle(
@@ -154,7 +156,7 @@ fun LoginView(
                             append("save platforms")
                         }
                         pop()
-                        append(" for RelaySMS to send messages to Gmail, X, and Telegram on your behalf when offline")
+                        append(stringResource(R.string.for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline_))
                     },
                     style = MaterialTheme.typography.bodySmall,
                     textAlign = TextAlign.Center,
@@ -168,7 +170,8 @@ fun LoginView(
             }
 
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(16.dp)
             ) {
                 CountryPickerOutlinedTextField(
@@ -184,7 +187,7 @@ fun LoginView(
                         .fillMaxWidth(),
                     label = {
                         Text(
-                            text = "Phone Number",
+                            text = stringResource(R.string.phone_number),
                             style = MaterialTheme.typography.bodySmall
                         )
                     },
@@ -199,14 +202,14 @@ fun LoginView(
                     TextButton(
                         onClick = { TODO() }
                     ) {
-                        Text("Forgot password?")
+                        Text(stringResource(R.string.forgot_password))
                     }
                 }
 
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text(text = "Password", style = MaterialTheme.typography.bodySmall) },
+                    label = { Text(text = stringResource(R.string.password), style = MaterialTheme.typography.bodySmall) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -216,7 +219,7 @@ fun LoginView(
                             Icons.Filled.Visibility
                         else Icons.Filled.VisibilityOff
 
-                        val description = if (passwordVisible) "Hide password" else "Show password"
+                        val description = if (passwordVisible) stringResource(R.string.hide_password) else stringResource(R.string.show_password)
 
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(imageVector = image, description)
@@ -272,8 +275,9 @@ fun LoginView(
                         }
                     },
                     enabled = (phoneNumber.isNotEmpty() && password.isNotEmpty()) && !isLoading,
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(start=16.dp, end=16.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp)
                         .align(Alignment.CenterHorizontally),
                 ) {
                     if(isLoading) {
@@ -297,12 +301,12 @@ fun LoginView(
                     },
                     enabled = (phoneNumber.isNotEmpty() && password.isNotEmpty()) && !isLoading,
                     modifier = Modifier.padding(bottom=16.dp)) {
-                    Text("Already got code")
+                    Text(stringResource(R.string.already_got_code))
                 }
 
                 Text(
                     text = buildAnnotatedString {
-                        append("Do not have an account?  ")
+                        append(stringResource(R.string.do_not_have_an_account))
                         pushStringAnnotation(tag = "signup", annotation = "signup")
                         withStyle(
                             style = SpanStyle(
@@ -310,7 +314,7 @@ fun LoginView(
                                 textDecoration = TextDecoration.Underline
                             )
                         ) {
-                            append("Create account")
+                            append(stringResource(R.string.create_account))
                         }
                     },
                     style = MaterialTheme.typography.bodySmall,

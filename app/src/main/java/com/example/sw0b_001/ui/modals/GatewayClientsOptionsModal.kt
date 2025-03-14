@@ -27,6 +27,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.example.sw0b_001.Models.GatewayClients.GatewayClient
 import com.example.sw0b_001.Models.GatewayClients.GatewayClientViewModel
 import com.example.sw0b_001.Models.GatewayClients.GatewayClientsCommunications
+import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 
@@ -71,7 +73,7 @@ fun GatewayClientOptionsModal(
                 horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Gateway Client Options",
+                    text = stringResource(R.string.country_options),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -109,7 +111,7 @@ fun GatewayClientOptionsModal(
                     )
                 ) {
                     Text(
-                        text = "Make Default",
+                        text = stringResource(R.string.make_default),
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
@@ -128,7 +130,7 @@ fun GatewayClientOptionsModal(
                         )
                     ) {
                         Text(
-                            text = "Edit",
+                            text = stringResource(R.string.edit),
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
@@ -169,7 +171,7 @@ fun GatewayClientOptionsModal(
                         )
                     ) {
                         Text(
-                            text = "Delete",
+                            text = stringResource(R.string.delete),
                             color = MaterialTheme.colorScheme.onErrorContainer
                         )
                     }

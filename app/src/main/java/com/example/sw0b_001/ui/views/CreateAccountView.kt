@@ -40,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
@@ -55,6 +56,7 @@ import androidx.navigation.compose.rememberNavController
 import com.arpitkatiyarprojects.countrypicker.CountryPickerOutlinedTextField
 import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
+import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
 
 
@@ -89,7 +91,7 @@ fun CreateAccountView(
                     }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            "Navigate back to home screen"
+                            stringResource(R.string.navigate_back_to_home_screen)
                         )
                     }
                 }
@@ -112,7 +114,7 @@ fun CreateAccountView(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Create RelaySMS Account",
+                    text = stringResource(R.string.create_relaysms_account),
                     style = MaterialTheme.typography.headlineMedium,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.primary,
@@ -122,7 +124,7 @@ fun CreateAccountView(
 
                 Text(
                     text = buildAnnotatedString {
-                        append("Create your account and ")
+                        append(stringResource(R.string.create_your_account_and))
                         pushStringAnnotation(tag = "save_platforms", annotation = "save_platforms")
                         withStyle(
                             style = SpanStyle(
@@ -130,10 +132,10 @@ fun CreateAccountView(
                                 textDecoration = TextDecoration.Underline
                             )
                         ) {
-                            append("save platforms")
+                            append(stringResource(R.string.save_platforms))
                         }
                         pop()
-                        append(" for RelaySMS to send messages to Gmail, X, and Telegram on your behalf when offline")
+                        append(stringResource(R.string.for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline))
                     },
                     style = MaterialTheme.typography.bodySmall,
                     textAlign = TextAlign.Center,
@@ -148,7 +150,8 @@ fun CreateAccountView(
 
 
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(16.dp)
             ) {
                 CountryPickerOutlinedTextField(
@@ -158,7 +161,7 @@ fun CreateAccountView(
                     defaultCountryCode = "us",
                     countryListDisplayType = CountryListDisplayType.Dialog,
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text(text = "Phone Number", style = MaterialTheme.typography.bodySmall) }
+                    label = { Text(text = stringResource(R.string.phone_number), style = MaterialTheme.typography.bodySmall) }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -166,7 +169,7 @@ fun CreateAccountView(
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text(text = "Password", style = MaterialTheme.typography.bodySmall) },
+                    label = { Text(text = stringResource(R.string.password), style = MaterialTheme.typography.bodySmall) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -176,7 +179,7 @@ fun CreateAccountView(
                             Icons.Filled.Visibility
                         else Icons.Filled.VisibilityOff
 
-                        val description = if (passwordVisible) "Hide password" else "Show password"
+                        val description = if (passwordVisible) stringResource(R.string.hide_password) else stringResource(R.string.show_password)
 
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(imageVector = image, description)
@@ -194,7 +197,7 @@ fun CreateAccountView(
                 OutlinedTextField(
                     value = reenterPassword,
                     onValueChange = { reenterPassword = it },
-                    label = { Text(text = "Re-enter Password", style = MaterialTheme.typography.bodySmall) },
+                    label = { Text(text = stringResource(R.string.re_enter_password), style = MaterialTheme.typography.bodySmall) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp),
                     visualTransformation = if (reenterPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -204,7 +207,7 @@ fun CreateAccountView(
                             Icons.Filled.Visibility
                         else Icons.Filled.VisibilityOff
 
-                        val description = if (reenterPasswordVisible) "Hide password" else "Show password"
+                        val description = if (reenterPasswordVisible) stringResource(R.string.hide_password) else stringResource(R.string.show_password)
 
                         IconButton(onClick = { reenterPasswordVisible = !reenterPasswordVisible }) {
                             Icon(imageVector = image, description)
@@ -224,9 +227,10 @@ fun CreateAccountView(
                 Button(onClick = {
                     navController.navigate(OTPCodeScreen)
                 },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .align(Alignment.CenterHorizontally)) {
-                    Text("Sign Up")
+                    Text(stringResource(R.string.sign_up))
                 }
             }
 
@@ -243,7 +247,7 @@ fun CreateAccountView(
                 )
                 Text(
                     text = buildAnnotatedString {
-                        append("I have read the  ")
+                        append(stringResource(R.string.i_have_read_the))
                         pushStringAnnotation(tag = "privacy_policy", annotation = "privacy_policy")
                         withStyle(
                             style = SpanStyle(
@@ -251,7 +255,7 @@ fun CreateAccountView(
                                 textDecoration = TextDecoration.Underline
                             )
                         ) {
-                            append("privacy policy")
+                            append(stringResource(R.string.privacy_policy))
                         }
                     },
                     style = MaterialTheme.typography.bodySmall,
@@ -269,7 +273,7 @@ fun CreateAccountView(
 
             Text(
                 text = buildAnnotatedString {
-                    append("Already have an account?  ")
+                    append(stringResource(R.string.already_have_an_account))
                     pushStringAnnotation(tag = "login", annotation = "login")
                     withStyle(
                         style = SpanStyle(
@@ -277,7 +281,7 @@ fun CreateAccountView(
                             textDecoration = TextDecoration.Underline
                         )
                     ) {
-                        append("Log in")
+                        append(stringResource(R.string.log_in))
                     }
                 },
                 style = MaterialTheme.typography.bodySmall,

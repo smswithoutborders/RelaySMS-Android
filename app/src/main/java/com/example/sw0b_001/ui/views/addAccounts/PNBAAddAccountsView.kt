@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -40,6 +41,7 @@ import com.arpitkatiyarprojects.countrypicker.CountryPickerOutlinedTextField
 import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
 import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
+import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.PlatformOptionsModal
 import com.example.sw0b_001.ui.theme.AppTheme
 
@@ -76,7 +78,7 @@ fun PNBAPhoneNumberCodeRequestView(
                         )
                 ) {
                     Text(
-                        "Please enter your Telegram code without copying it from the message - copying might get flagged and Telegram might block your account.",
+                        stringResource(R.string.please_enter_your_telegram_code_without_copying_it_from_the_message_copying_might_get_flagged_and_telegram_might_block_your_account),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onErrorContainer,
                         modifier = Modifier
@@ -101,7 +103,7 @@ fun PNBAPhoneNumberCodeRequestView(
                     .fillMaxWidth(),
                 label = {
                     Text(
-                        text = "Phone Number",
+                        text = stringResource(R.string.phone_number),
                         style = MaterialTheme.typography.bodySmall
                     )
                 },
@@ -112,7 +114,7 @@ fun PNBAPhoneNumberCodeRequestView(
             OutlinedTextField(
                 value = authCode,
                 onValueChange = { authCode = it },
-                label = { Text(text = "Code", style = MaterialTheme.typography.bodySmall) },
+                label = { Text(text = stringResource(R.string.code), style = MaterialTheme.typography.bodySmall) },
                 modifier = Modifier
                     .padding(bottom = 8.dp)
                     .fillMaxWidth(),
@@ -124,7 +126,9 @@ fun PNBAPhoneNumberCodeRequestView(
                         Icons.Filled.Visibility
                     else Icons.Filled.VisibilityOff
 
-                    val description = if (isCodeVisible) "Hide password" else "Show password"
+                    val description = if (isCodeVisible) stringResource(R.string.hide_password) else stringResource(
+                        R.string.show_password
+                    )
 
                     IconButton(onClick = { isCodeVisible = !isCodeVisible }) {
                         Icon(imageVector = image, description)
@@ -144,7 +148,7 @@ fun PNBAPhoneNumberCodeRequestView(
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text(text = "Password", style = MaterialTheme.typography.bodySmall) },
+                label = { Text(text = stringResource(R.string.password), style = MaterialTheme.typography.bodySmall) },
                 modifier = Modifier
                     .padding(bottom = 8.dp)
                     .fillMaxWidth(),
@@ -156,7 +160,7 @@ fun PNBAPhoneNumberCodeRequestView(
                         Icons.Filled.Visibility
                     else Icons.Filled.VisibilityOff
 
-                    val description = if (isPasswordVisible) "Hide password" else "Show password"
+                    val description = if (isPasswordVisible) stringResource(R.string.hide_password) else stringResource(R.string.show_password)
 
                     IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
                         Icon(imageVector = image, description)
@@ -192,8 +196,9 @@ fun PNBAPhoneNumberCodeRequestView(
                             && (isPasswordRequested && authCode.isNotEmpty() &&
                             password.isNotEmpty())
             ),
-            modifier = Modifier.fillMaxWidth()
-                .padding(top=32.dp, bottom=24.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 32.dp, bottom = 24.dp)
                 .align(Alignment.CenterHorizontally),
         ) {
             if(isLoading) {
@@ -203,7 +208,7 @@ fun PNBAPhoneNumberCodeRequestView(
                 )
             }
             else {
-                Text("Submit")
+                Text(stringResource(R.string.submit))
             }
         }
     }

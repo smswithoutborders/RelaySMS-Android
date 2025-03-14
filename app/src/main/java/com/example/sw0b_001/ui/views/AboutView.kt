@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -83,7 +84,7 @@ fun AboutView(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Connecting the world, one SMS at a time",
+                text = stringResource(R.string.connecting_the_world_one_sms_at_a_time),
                 fontStyle = FontStyle.Italic,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -93,21 +94,20 @@ fun AboutView(
 
             // Description
             Text(
-                text = "RelaySMS is an open-source initiative focused on enabling communication through SMS without relying on internet connectivity. We believe in a connected world, and we're making it happen one SMS at a time. RelaySMS remains free and open source.",
+                text = stringResource(R.string.relaysms_is_an_open_source_initiative_focused_on_enabling_communication_through_sms_without_relying_on_internet_connectivity_we_believe_in_a_connected_world_and_we_re_making_it_happen_one_sms_at_a_time_relaysms_remains_free_and_open_source),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(24.dp))
 
-            // App Tutorial Button
             Button(
                 onClick = {TODO("Implement app tutorial")},
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "App Tutorial", color = Color.White)
+                    Text(text = stringResource(R.string.app_tutorial), color = Color.White)
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,
@@ -134,7 +134,7 @@ fun AboutView(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Support us by starring our GitHub repository and sharing it with your friends!",
+                        text = stringResource(R.string.support_us_by_starring_our_github_repository_and_sharing_it_with_your_friends),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface,
                         textAlign = TextAlign.Left
@@ -142,7 +142,7 @@ fun AboutView(
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "View on GitHub >>>",
+                    text = stringResource(R.string.view_on_github),
                     modifier = Modifier.clickable {
                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/smswithoutborders/RelaySMS-Android")) // Replace with your GitHub link
                         context.startActivity(intent)

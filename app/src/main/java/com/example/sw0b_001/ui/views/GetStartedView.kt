@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -63,11 +64,11 @@ fun GetStartedView (
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 50.dp, bottom=50.dp),
+                .padding(top = 50.dp, bottom = 50.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "Get started with",
+                text = stringResource(R.string.get_started_with),
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.primary,
             )
@@ -102,7 +103,7 @@ fun GetStartedView (
                 )
                 Spacer(Modifier.size(ButtonDefaults.IconSpacing))
                 Text(
-                    "Compose Message",
+                    stringResource(R.string.compose_message),
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.SemiBold
@@ -111,7 +112,7 @@ fun GetStartedView (
 
             Text(text = buildAnnotatedString {
                 withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onBackground)) {
-                    append("Use your phone number to send an email with the alias: ")
+                    append(stringResource(R.string.use_your_phone_number_to_send_an_email_with_the_alias))
                 }
                 withStyle(style = SpanStyle(
                     color = MaterialTheme.colorScheme.tertiary,
@@ -139,11 +140,12 @@ fun GetStartedView (
                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 50.dp)
         ) {
             Text(
-                text = "Login with Internet",
+                text = stringResource(R.string.login_with_internet),
                 style = MaterialTheme.typography.titleMedium,
             )
 
-            Text("These features requires you to have an internet connection",
+            Text(
+                stringResource(R.string.these_features_requires_you_to_have_an_internet_connection),
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -161,7 +163,7 @@ fun GetStartedView (
                     colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
                     modifier = Modifier
                         .weight(1f)
-                        .size(height=65.dp, width=100.dp)
+                        .size(height = 65.dp, width = 100.dp)
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
@@ -170,7 +172,7 @@ fun GetStartedView (
                             Modifier.padding(bottom = 8.dp)
                         )
                         Text(
-                            "Create Account",
+                            stringResource(R.string.create_account),
                             color = MaterialTheme.colorScheme.onPrimary,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -182,7 +184,7 @@ fun GetStartedView (
                     colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
                     modifier = Modifier
                         .weight(1f)
-                        .size(height=65.dp, width=100.dp)
+                        .size(height = 65.dp, width = 100.dp)
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
@@ -191,7 +193,7 @@ fun GetStartedView (
                             Modifier.padding(bottom = 8.dp)
                         )
                         Text(
-                            "Log In",
+                            stringResource(R.string.login),
                             color = MaterialTheme.colorScheme.onPrimary,
                             fontWeight = FontWeight.SemiBold
                         )

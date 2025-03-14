@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -52,6 +53,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.activity
 import com.example.sw0b_001.Models.GatewayClients.GatewayClient
 import com.example.sw0b_001.Models.GatewayClients.GatewayClientViewModel
+import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.views.compose.verifyPhoneNumberFormat
 import kotlinx.coroutines.launch
@@ -126,7 +128,8 @@ fun AddGatewayClientModal(
         if (isGranted) {
             launchContactForResult.launch(contactIntent)
         } else {
-            Toast.makeText(context, "Permission Denied!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context,
+                context.getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -142,7 +145,9 @@ fun AddGatewayClientModal(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = if (gatewayClient == null) "Add Gateway Client" else "Edit Gateway Client",
+                    text = if (gatewayClient == null) stringResource(R.string.add_gateway_client) else stringResource(
+                        R.string.edit_gateway_client
+                    ),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -160,7 +165,7 @@ fun AddGatewayClientModal(
                         onValueChange = { phoneNumber = it },
                         label = {
                             Text(
-                                text = "Enter phone number with country code",
+                                text = stringResource(R.string.enter_phone_number_with_country_code),
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         },
@@ -194,7 +199,7 @@ fun AddGatewayClientModal(
                     }
                 }
                 Text(
-                    text = "e.g +237123456 or select contact",
+                    text = stringResource(R.string.e_g_237123456_or_select_contact),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.fillMaxWidth(),
@@ -208,7 +213,7 @@ fun AddGatewayClientModal(
                     onValueChange = { alias = it },
                     label = {
                         Text(
-                            text = "Alias (optional)",
+                            text = stringResource(R.string.alias_optional),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     },
@@ -217,7 +222,7 @@ fun AddGatewayClientModal(
                     isError = isError
                 )
                 Text(
-                    text = "Name to help remember the Gateway Client",
+                    text = stringResource(R.string.name_to_help_remember_the_gateway_client),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.fillMaxWidth(),
@@ -286,11 +291,12 @@ fun AddGatewayClientModal(
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                     enabled = !isSaving
                 ) {
-                    Text(text = if (isSaving) "Saving..." else "Save", color = Color.White)
+                    Text(text = if (isSaving) stringResource(R.string.saving) else stringResource(R.string.save), color = Color.White)
                 }
 
                 if (isError) {
-                    Toast.makeText(context, "Error saving gateway client", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context,
+                        stringResource(R.string.error_saving_gateway_client), Toast.LENGTH_SHORT).show()
                     onDismiss()
                 }
             }

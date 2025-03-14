@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -63,7 +64,7 @@ fun OnboardingVaultStoreView(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Skip",
+                        text = stringResource(R.string.skip),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -89,7 +90,7 @@ fun OnboardingVaultStoreView(
 
             // Vault Store Text
             Text(
-                text = "RelaySMS Vaults securely stores your online accounts, so that you can access them without an internet connection",
+                text = stringResource(R.string.relaysms_vaults_securely_stores_your_online_accounts_so_that_you_can_access_them_without_an_internet_connection),
                 style = MaterialTheme.typography.headlineMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface
