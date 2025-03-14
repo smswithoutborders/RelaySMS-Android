@@ -1,4 +1,184 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">RelaySMS</string>
+
+    <!-- Homepage menu -->
+
+    <string name="settings_settings">الإعدادات</string>
+
+    <!-- settings saved platforms -->
+
+    <string name="settings_accessibility_category">إمكانية الوصول</string>
+    <string name="settings_language">اللغة</string>
+
+    <string name="settings_security_category">الأمان والخصوصية</string>
+    <string name="settings_security">الأمان</string>
+    <string name="settings_security_category_summary">تمكين أقفال التطبيق ورموز PIN</string>
+
+    <!-- settings security -->
+    <string name="settings_lock_screen_preference_category">خيارات قفل شاشة الهاتف</string>
+    <string name="settings_security_and_privacy_enable_lockscreen_open">تمكين قفل الشاشة</string>
+    <string name="settings_security_and_privacy_enable_lockscreen_open_summary">طلب رمز PIN/بصمة الإصبع لقفل الشاشة عند بدء تشغيل التطبيق</string>
+
+    <string name="settings_security_and_privacy_account">الحساب</string>
+    <string name="settings_security_and_privacy_account_logout">تسجيل الخروج</string>
+    <string name="settings_security_and_privacy_account_logout_summary">تسجيل الخروج من حسابك. يمكنك دائمًا تسجيل الدخول مرة أخرى، ولكن سيتم حذف رسائلك الحالية.</string>
+
+    <string name="settings_security_and_privacy_account_delete">حذف</string>
+
+    <string name="settings_security_and_privacy_account_delete_summary">يعني حذف حسابك حذف جميع حساباتك المحفوظة عبر الإنترنت. يمكنك دائمًا إعادة إنشاء حسابك عند الحاجة.</string>
+
+    <!-- settings language -->
+    <string name="language_english">الإنجليزية</string>
+    <string name="language_french">الفرنسية</string>
+    <string name="language_farsi">الفارسية</string>
+    <string name="language_spanish">الإسبانية</string>
+    <string name="language_turkish">التركية</string>
+    <string name="language_arabic">العربية</string>
+    <string name="language_german">الألمانية</string>
+    <string name="language_swahili">السواحيلية</string>
+
+    <string name="gateway_client_settings_add_custom_empty_error">الرجاء إدخال رقم هاتف</string>
+
+    <string name="new_gateway_client_alias">الاسم المستعار (اختياري)</string>
+    <string name="gateway_client_alias_description">اسم للمساعدة في تذكر عميل البوابة</string>
+    <string name="gateway_client_save_btn_text">حفظ</string>
+
+    <string name="choose_sms_app">حدد تطبيق مراسلة SMS</string>
+
+    <string name="security_settings_failed_to_switch_security">فشل تشغيل الأمان…</string>
+    <string name="settings_security_biometric_user_cannot_add_this_functionality_at_this_time">لا يمكن للمستخدم إضافة هذه الوظيفة في هذا الوقت.</string>
+    <string name="lock_screen_relay_sms_is_locked">تطبيق RelaySMS مقفل</string>
+    <string name="lock_screen_unlock_with_your_phone_s_locking_system">افتح باستخدام نظام قفل هاتفك</string>
+    <string name="gateway_client_add_custom_example_text">مثال: +237123456789 أو حدد جهة اتصال</string>
+    <string name="gateway_client_add_gateway_client_text">إضافة عميل بوابة</string>
+    <string name="otp_verification_code_template" translatable="false">Your SMSWithoutBorders-Auth verification code is: </string>
+
+    <string name="logout_you_have_no_accounts_logged_into_vaults_at_this_time">ليس لديك أي حسابات مسجلة الدخول في الخزائن في هذا الوقت</string>
+    <string name="security_settings_you_have_no_accounts_to_delete_in_vault_at_this_time">ليس لديك أي حسابات لحذفها في الخزنة في هذا الوقت</string>
+    <string name="helper_yesterday">أمس</string>
+    <string name="smswithoutboarders_official_gateway_client_seeding_url" translatable="false">https://smswithoutborders.com:15000/v3/clients</string>
+    <string name="recovery_continue">متابعة</string>
+
+    <string name="vault_grpc_url" translatable="false">vault.smswithoutborders.com</string>
+    <string name="vault_grpc_port" translatable="false">443</string>
+
+    <string name="publisher_grpc_url" translatable="false">publisher.smswithoutborders.com</string>
+    <string name="publisher_grpc_port" translatable="false">443</string>
+
+    <string name="publisher_get_platforms_url" translatable="false">https://raw.githubusercontent.com/smswithoutborders/SMSWithoutBorders-Publisher/master/resources/platforms.json</string>
+    <string name="cancel">إلغاء</string>
+    <string name="click_continue_to_confirm_this_action_do_not_worry_this_has_no_dangerous_effects">انقر فوق متابعة لتأكيد هذا الإجراء. لا تقلق، ليس لهذا أي آثار خطيرة.</string>
+    <string name="messaging">المراسلة</string>
+    <string name="you_have_a_device_id_for_the_device_you_log_into_it_is_used_to_identify_you_on_the_vault_you_can_switch_to_phone_number_to_reduce_size_of_sms_message">لديك مُعرّف جهاز للجهاز الذي تسجل الدخول إليه. يتم استخدامه لتحديد هويتك في الخزنة. يمكنك التبديل إلى رقم الهاتف لتقليل حجم رسالة SMS.</string>
+    <string name="validate_with_phone_number">التحقق من رقم الهاتف</string>
+    <string name="enter_phone_number_with_country_code">أدخل رقم الهاتف مع رمز البلد</string>
+    <string name="remove_accounts">إزالة الحسابات</string>
+    <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported">تتيح لك إضافة رسائل البريد الإلكتروني إلى حساب RelaySMS الخاص بك استخدامها لإرسال رسائل البريد الإلكتروني باستخدام رسائل SMS.\n\nGmail مدعوم حاليًا.</string>
+    <string name="adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported">تتيح لك إضافة الأرقام إلى حساب RelaySMS الخاص بك استخدامها لإرسال الرسائل باستخدام رسائل SMS.\n\nTelegram مدعوم حاليًا.</string>
+    <string name="adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported">تتيح لك إضافة الحسابات إلى حساب RelaySMS الخاص بك استخدامها لإنشاء منشورات باستخدام رسائل SMS.\n\nالنشر مدعوم حاليًا.</string>
+    <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias">حساب RelaySMS الخاص بك هو اسم مستعار لرقم هاتفك مع النطاق @relaysms.me.\n\nيمكنك تلقي الردود عبر الرسائل القصيرة (SMS) عندما يتم إرسال رسالة إلى اسمك المستعار.</string>
+    <string name="continue_to_send_an_email_from_your_saved_email_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">تابع لإرسال بريد إلكتروني من حساب بريدك الإلكتروني المحفوظ. يمكنك اختيار بلد إعادة توجيه الرسائل من علامة التبويب "الدول" أدناه.\n\nتابع لإرسال رسالة</string>
+    <string name="continue_to_send_messages_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">تابع لإرسال رسائل من حساب المراسلة المحفوظ. يمكنك اختيار بلد إعادة توجيه الرسائل من علامة التبويب "الدول" أدناه.\n\nتابع لإرسال رسالة</string>
+    <string name="continue_to_make_posts_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">تابع لإنشاء منشورات من حساب المراسلة المحفوظ. يمكنك اختيار بلد إعادة توجيه الرسائل من علامة التبويب "الدول" أدناه.\n\nتابع لإرسال رسالة</string>
+    <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">حساب RelaySMS الخاص بك هو اسم مستعار لرقم هاتفك مع النطاق @relaysms.me.\n\nيمكنك تلقي الردود عبر الرسائل القصيرة (SMS) عندما يتم إرسال رسالة إلى اسمك المستعار.\n\nيمكنك اختيار بلد إعادة توجيه الرسائل من علامة التبويب "الدول" أدناه.\n\nتابع لإرسال رسالة</string>
+    <string name="select_an_account">حدد حسابًا</string>
+    <string name="please_enter_your_telegram_code_without_copying_it_from_the_message_copying_might_get_flagged_and_telegram_might_block_your_account">الرجاء إدخال رمز Telegram الخاص بك دون نسخه من الرسالة - قد يتم الإبلاغ عن النسخ وقد يحظر Telegram حسابك.</string>
+    <string name="phone_number">رقم الهاتف</string>
+    <string name="code">الرمز</string>
+    <string name="hide_password">إخفاء كلمة المرور</string>
+    <string name="show_password">إظهار كلمة المرور</string>
+    <string name="no_account_selected">لم يتم تحديد حساب</string>
+    <string name="compose_email">كتابة بريد إلكتروني</string>
+    <string name="to">إلى</string>
+    <string name="subject">الموضوع</string>
+    <string name="no_account_selected_">لم يتم تحديد حساب</string>
+    <string name="new_message">رسالة جديدة</string>
+    <string name="sender">المرسل</string>
+    <string name="recipient_number">رقم المستلم</string>
+    <string name="message">الرسالة</string>
+    <string name="new_post">منشور جديد</string>
+    <string name="what_s_happening">ما الذي يحدث؟</string>
+    <string name="connecting_the_world_one_sms_at_a_time">ربط العالم، رسالة SMS واحدة في كل مرة</string>
+    <string name="relaysms_is_an_open_source_initiative_focused_on_enabling_communication_through_sms_without_relying_on_internet_connectivity_we_believe_in_a_connected_world_and_we_re_making_it_happen_one_sms_at_a_time_relaysms_remains_free_and_open_source">RelaySMS هي مبادرة مفتوحة المصدر تركز على تمكين الاتصال عبر الرسائل القصيرة (SMS) دون الاعتماد على الاتصال بالإنترنت. نحن نؤمن بعالم متصل، ونحن نعمل على تحقيق ذلك رسالة SMS واحدة في كل مرة. تظل RelaySMS مجانية ومفتوحة المصدر.</string>
+    <string name="app_tutorial">شرح التطبيق</string>
+    <string name="support_us_by_starring_our_github_repository_and_sharing_it_with_your_friends">ادعمنا بوضع نجمة على مستودع GitHub الخاص بنا ومشاركته مع أصدقائك!</string>
+    <string name="send_new_message_">إرسال رسالة جديدة</string>
+    <string name="available_platforms">المنصات المتاحة</string>
+    <string name="use_your_relaysms_account">استخدم حساب RelaySMS الخاص بك</string>
+    <string name="use_your_online_accounts">استخدم حساباتك عبر الإنترنت</string>
+    <string name="navigate_back_to_home_screen">الرجوع إلى الشاشة الرئيسية</string>
+    <string name="create_relaysms_account">إنشاء حساب RelaySMS</string>
+    <string name="create_your_account_and">"أنشئ حسابك و "</string>
+    <string name="save_platforms">حفظ المنصات</string>
+    <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline">" لكي تتمكن RelaySMS من إرسال رسائل إلى Gmail و X و Telegram نيابة عنك في حالة عدم الاتصال بالإنترنت"</string>
+    <string name="i_have_read_the">"لقد قرأت "</string>
+    <string name="privacy_policy">سياسة الخصوصية</string>
+    <string name="log_in">تسجيل الدخول</string>
+    <string name="sign_up">اشتراك</string>
+    <string name="selected_gateway_client">عميل البوابة المحدد</string>
+    <string name="no_gateway_client_selected">لم يتم تحديد عميل بوابة</string>
+    <string name="available_countries">الدول المتاحة</string>
+    <string name="gateway_clients_refreshed_successfully">تم تحديث عملاء البوابة بنجاح!</string>
+    <string name="compose">كتابة</string>
+    <string name="no_messages_in_inbox">لا توجد رسائل في صندوق الوارد</string>
+    <string name="paste_new_incoming_message">لصق رسالة واردة جديدة</string>
+    <string name="log_into_relaysms">تسجيل الدخول إلى RelaySMS</string>
+    <string name="log_into_your_account_and">"سجل الدخول إلى حسابك و "</string>
+    <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline_">" لكي تتمكن RelaySMS من إرسال رسائل إلى Gmail و X و Telegram نيابة عنك في حالة عدم الاتصال بالإنترنت"</string>
+    <string name="already_got_code">حصلت على الرمز بالفعل</string>
+    <string name="do_not_have_an_account">"ليس لديك حساب؟  "</string>
+    <string name="get_started_with">ابدأ مع</string>
+    <string name="compose_message">كتابة رسالة</string>
+    <string name="use_your_phone_number_to_send_an_email_with_the_alias">"استخدم رقم هاتفك لإرسال بريد إلكتروني بالاسم المستعار: "</string>
+    <string name="login_with_internet">تسجيل الدخول باستخدام الإنترنت</string>
+    <string name="these_features_requires_you_to_have_an_internet_connection">تتطلب هذه الميزات أن يكون لديك اتصال بالإنترنت</string>
+    <string name="input_your_code">أدخل الرمز الخاص بك</string>
+    <string name="please_enter_the_6_digit_code_we_sent_to_you_via_sms">الرجاء إدخال الرمز المكون من 6 أرقام الذي أرسلناه إليك عبر الرسائل القصيرة (SMS)</string>
+    <string name="the_code_would_automatically_be_detected_in_some_cases">سيتم اكتشاف الرمز تلقائيًا في بعض الحالات</string>
+    <string name="paste_encrypted_text_into_this_box">الصق النص المشفر في هذا المربع…</string>
+    <string name="this_is_an_example_of_an_encrypted_message_that_you_would_paste_here">هذا مثال على رسالة مشفرة ستقوم بلصقها هنا…</string>
+    <string name="relaysms_reply_please_paste_this_entire_message_in_your_relaysms_app">رد RelaySMS. يرجى لصق هذه الرسالة بالكامل في تطبيق RelaySMS الخاص بك</string>
+    <string name="click_to_paste">انقر للصق</string>
+    <string name="decrypt_message">فك تشفير الرسالة</string>
+    <string name="send_your_first_message">أرسل رسالتك الأولى…</string>
+    <string name="save_platforms_">حفظ المنصات</string>
+    <string name="phone_lockscreen_options">خيارات قفل شاشة الهاتف</string>
+    <string name="enable_lockscreen">تمكين قفل الشاشة</string>
+    <string name="require_lockscreen_pin_fingerprint_when_starting_the_app">طلب رمز PIN/بصمة الإصبع لقفل الشاشة عند بدء تشغيل التطبيق</string>
+    <string name="vault">الخزنة</string>
+    <string name="choose_which_platforms_you_want_to_remove_from_the_vault">اختر المنصات التي تريد إزالتها من الخزنة</string>
+    <string name="account">الحساب</string>
+    <string name="clear_aliasing">مسح الأسماء المستعارة</string>
+    <string name="this_would_delete_your_auth_codes_stored_for_aliasing_you_can_request_for_another_code_at_anytime">سيؤدي هذا إلى حذف رموز المصادقة المحفوظة لإنشاء الأسماء المستعارة. يمكنك طلب رمز آخر في أي وقت.</string>
+    <string name="logout">تسجيل الخروج</string>
+    <string name="logout_of_your_account_you_can_always_log_back_in_however_your_current_messages_would_be_deleted">تسجيل الخروج من حسابك. يمكنك دائمًا تسجيل الدخول مرة أخرى، ولكن سيتم حذف رسائلك الحالية.</string>
+    <string name="delete_">حذف</string>
+    <string name="deleting_your_account_means_deleting_all_your_saved_accounts_online_you_can_always_recreate_your_account_once_needed">يعني حذف حسابك حذف جميع حساباتك المحفوظة عبر الإنترنت. يمكنك دائمًا إعادة إنشاء حسابك عند الحاجة.</string>
+    <string name="accessibility">إمكانية الوصول</string>
+    <string name="language">اللغة</string>
+    <string name="messaging_">المراسلة</string>
+    <string name="validate_with_phone_number_">التحقق من رقم الهاتف</string>
+    <string name="you_have_a_device_id_for_the_device_you_log_into_it_is_used_to_identify_you_on_the_vault_you_can_switch_to_phone_number_to_reduce_size_of_sms_message_">لديك مُعرّف جهاز للجهاز الذي تسجل الدخول إليه. يتم استخدامه لتحديد هويتك في الخزنة. يمكنك التبديل إلى رقم الهاتف لتقليل حجم رسالة SMS.</string>
+    <string name="security_and_privacy">الأمان والخصوصية</string>
+    <string name="security">الأمان</string>
+    <string name="enable_app_locks_and_pin_codes">تمكين أقفال التطبيقات ورموز PIN</string>
+    <string name="english">الإنجليزية</string>
+    <string name="arabic">العربية</string>
+    <string name="french">الفرنسية</string>
+    <string name="farsi">الفارسية</string>
+    <string name="spanish">الإسبانية</string>
+    <string name="german">الألمانية</string>
+    <string name="swahili">السواحيلية</string>
+    <string name="turkish">التركية</string>
+    <string name="welcome_to_relaysms_">مرحبًا بك في RelaySMS!</string>
+    <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">استخدم الرسائل القصيرة (SMS) لإنشاء منشور وإرسال رسائل البريد الإلكتروني والرسائل دون اتصال بالإنترنت</string>
+    <string name="learn_how_it_works_">تعرف على كيفية عمله</string>
+    <string name="read_our_privacy_policy">اقرأ سياسة الخصوصية الخاصة بنا</string>
+    <string name="skip">تخطي</string>
+    <string name="you_are_ready_to_begin_sending_messages_from_relaysms">أنت الآن جاهز لبدء إرسال الرسائل من RelaySMS</string>
+    <string name="great">رائع!</string>
+    <string name="relaysms_vaults_securely_stores_your_online_accounts_so_that_you_can_access_them_without_an_internet_connection">تقوم خزائن RelaySMS بتخزين حساباتك عبر الإنترنت بشكل آمن، بحيث يمكنك الوصول إليها دون اتصال بالإنترنت</string>
+    <string name="you_can_add_online_accounts_to_your_vault">يمكنك إضافة حسابات عبر الإنترنت إلى خزنتك</string>
+
 </resources>

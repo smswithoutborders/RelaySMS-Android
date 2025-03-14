@@ -32,9 +32,12 @@
     <string name="language_french">"French</string>
     <string name="language_farsi">Farsi</string>
     <string name="language_spanish">Spanish</string>
-    <string name="language_turkish" >
-        Turkish
-    </string>
+    <string name="language_turkish" >Turkish</string>
+    <string name="language_arabic" >Arabic</string>
+    <string name="language_german" >German</string>
+    <string name="language_swahili" >Swahili</string>
+
+
     <string name="language_english_value" translatable="false">
         en
     </string>
@@ -49,6 +52,15 @@
     </string>
     <string name="language_turkish_value" translatable="false">
         tr
+    </string>
+    <string name="language_arabic_value" translatable="false">
+        ar
+    </string>
+    <string name="language_german_value" translatable="false">
+        de
+    </string>
+    <string name="language_swahili_value" translatable="false">
+        sw
     </string>
 
 
@@ -108,7 +120,7 @@
     <string name="e_g_237123456_or_select_contact">e.g +237123456 or select contact</string>
     <string name="alias_optional">Alias (optional)</string>
     <string name="name_to_help_remember_the_gateway_client">Name to help remember the Gateway Client</string>
-    <string name="saving">Saving...</string>
+    <string name="saving">Saving…</string>
     <string name="save">Save</string>
     <string name="error_saving_gateway_client">Error saving gateway client</string>
     <string name="click_continue_to_confirm_this_action_do_not_worry_it_has_no_dangerous_effects">Click continue to confirm this action. Do not worry, it has no dangerous effects.</string>
@@ -181,12 +193,12 @@
     <string name="input_your_code">Input Your Code</string>
     <string name="please_enter_the_6_digit_code_we_sent_to_you_via_sms">Please enter the 6-digit code we sent to you via SMS</string>
     <string name="the_code_would_automatically_be_detected_in_some_cases">The code would automatically be detected in some cases</string>
-    <string name="paste_encrypted_text_into_this_box">Paste encrypted text into this box...</string>
-    <string name="this_is_an_example_of_an_encrypted_message_that_you_would_paste_here">This is an example of an encrypted message that you would paste here...</string>
+    <string name="paste_encrypted_text_into_this_box">Paste encrypted text into this box…</string>
+    <string name="this_is_an_example_of_an_encrypted_message_that_you_would_paste_here">This is an example of an encrypted message that you would paste here…</string>
     <string name="relaysms_reply_please_paste_this_entire_message_in_your_relaysms_app">RelaySMS Reply Please paste this entire message in your RelaySMS app</string>
     <string name="click_to_paste">Click to paste</string>
     <string name="decrypt_message">Decrypt message</string>
-    <string name="send_your_first_message">Send your first message...</string>
+    <string name="send_your_first_message">Send your first message…</string>
     <string name="save_platforms_">Save platforms</string>
     <string name="phone_lockscreen_options">Phone Lockscreen options</string>
     <string name="enable_lockscreen">Enable lockscreen</string>
