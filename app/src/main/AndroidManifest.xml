@@ -40,10 +40,6 @@
             android:exported="true" />
 
         <activity
-            android:name=".Bridges.BridgesSubmitCodeActivity"
-            android:exported="false" />
-
-        <activity
             android:name=".SettingsActivity"
             android:exported="false" />
 

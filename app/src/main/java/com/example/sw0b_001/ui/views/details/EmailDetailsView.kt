@@ -37,6 +37,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.ui.navigation.BridgeEmailComposeScreen
@@ -133,11 +134,11 @@ fun EmailDetailsView(
             EmailDetailsRow(label = stringResource(R.string.to), email = to)
 
             if (cc.isNotEmpty()) {
-                EmailDetailsRow(label = "Cc", email = cc)
+                EmailDetailsRow(label = stringResource(R.string.cc), email = cc)
             }
 
             if (bcc.isNotEmpty()) {
-                EmailDetailsRow(label = "Bcc", email = bcc)
+                EmailDetailsRow(label = stringResource(R.string.bcc), email = bcc)
             }
 
             Spacer(modifier = Modifier.height(16.dp))

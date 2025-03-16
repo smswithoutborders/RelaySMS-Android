@@ -50,7 +50,7 @@ import com.example.sw0b_001.ui.theme.AppTheme
 @Composable
 fun InboxView(
     navController: NavController,
-    messages: List<EncryptedContent> = emptyList(),
+    messages: List<EncryptedContent>,
 ) {
     Box(
         modifier = Modifier
@@ -116,6 +116,7 @@ fun InboxViewEmptyPreview() {
     AppTheme {
         InboxView(
             navController = NavController(LocalContext.current),
+            messages = emptyList()
         )
     }
 }

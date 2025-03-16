@@ -87,7 +87,8 @@ fun AvailablePlatformsView(
                 .padding(16.dp)
         ) {
             Text(
-                text = if(isCompose) stringResource(R.string.send_new_message) else stringResource(R.string.available_platforms),
+                text = if(isCompose) stringResource(R.string.send_new_message)
+                else stringResource(R.string.available_platforms),
                 style = MaterialTheme.typography.displayMedium,
                 modifier = Modifier.padding(bottom = 16.dp),
             )

@@ -1,8 +1,10 @@
 package com.example.sw0b_001.Security
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -40,6 +42,7 @@ class LockScreenActivity : AppCompatActivity() {
             setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         startActivity(intent)
+        overridePendingTransition(0, 0)
         finish()
     }
 }

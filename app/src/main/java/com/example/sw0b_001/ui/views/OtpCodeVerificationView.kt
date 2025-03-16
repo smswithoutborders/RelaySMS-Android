@@ -297,7 +297,7 @@ fun OtpCodeVerificationView(
             )
             if (timeLeft == 0L){
                 Button(onClick = onResendClicked) {
-                    Text(text = stringResource(R.string.resend_code))
+                    Text(text = stringResource(R.string.re_send_code))
                 }
             }
         }

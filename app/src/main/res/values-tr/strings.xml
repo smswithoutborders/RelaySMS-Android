@@ -114,7 +114,7 @@
     <string name="continue_to_send_an_email_from_your_saved_email_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">Kayıtlı e-posta hesabınızdan e-posta göndermeye devam edin. Aşağıdaki \'Ülkeler\' sekmesinden bir mesaj yönlendirme ülkesi seçebilirsiniz.\n\nMesaj göndermeye devam et</string>
     <string name="continue_to_send_messages_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">Kayıtlı mesajlaşma hesabınızdan mesaj göndermeye devam edin. Aşağıdaki \'Ülkeler\' sekmesinden bir mesaj yönlendirme ülkesi seçebilirsiniz.\n\nMesaj göndermeye devam et</string>
     <string name="continue_to_make_posts_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">Kayıtlı mesajlaşma hesabınızdan gönderi oluşturmaya devam edin. Aşağıdaki \'Ülkeler\' sekmesinden bir mesaj yönlendirme ülkesi seçebilirsiniz.\n\nMesaj göndermeye devam et</string>
-    <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">RelaySMS hesabınız, @relaysms.me alan adıyla telefon numaranızın bir takma adıdır.\n\nTakma adınıza bir mesaj gönderildiğinde, SMS ile yanıt alabilirsiniz.\nAşağıdaki 'Ülkeler' sekmesinden bir mesaj yönlendirme ülkesi seçebilirsiniz.\n\nMesaj göndermeye devam et</string>
+    <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">RelaySMS hesabınız, @relaysms.me alan adıyla telefon numaranızın bir takma adıdır.\n\nTakma adınıza bir mesaj gönderildiğinde, SMS ile yanıt alabilirsiniz.\nAşağıdaki \'Ülkeler\' sekmesinden bir mesaj yönlendirme ülkesi seçebilirsiniz.\n\nMesaj göndermeye devam et</string>
     <string name="select_an_account">Bir hesap seçin</string>
     <string name="please_enter_your_telegram_code_without_copying_it_from_the_message_copying_might_get_flagged_and_telegram_might_block_your_account">Lütfen Telegram kodunuzu mesajdan kopyalamadan girin - kopyalama işaretlenebilir ve Telegram hesabınızı engelleyebilir.</string>
     <string name="phone_number">Telefon Numarası</string>
@@ -144,7 +144,7 @@
     <string name="create_relaysms_account">RelaySMS Hesabı Oluştur</string>
     <string name="create_your_account_and">"Hesabınızı oluşturun ve "</string>
     <string name="save_platforms">platformları kaydedin</string>
-    <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline">"RelaySMS'in çevrimdışıyken sizin adınıza Gmail, X ve Telegram'a mesaj göndermesi için"</string>
+    <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline">"RelaySMS\'in çevrimdışıyken sizin adınıza Gmail, X ve Telegram'a mesaj göndermesi için"</string>
     <string name="i_have_read_the">"Okudum "</string>
     <string name="privacy_policy">gizlilik politikası</string>
     <string name="log_in">Giriş Yap</string>
@@ -158,7 +158,7 @@
     <string name="paste_new_incoming_message">Yeni gelen mesajı yapıştır</string>
     <string name="log_into_relaysms">RelaySMS\'e Giriş Yap</string>
     <string name="log_into_your_account_and">"Hesabınıza giriş yapın ve "</string>
-    <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline_">"RelaySMS'in çevrimdışıyken sizin adınıza Gmail, X ve Telegram'a mesaj göndermesi için"</string>
+    <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline_">"RelaySMS\'in çevrimdışıyken sizin adınıza Gmail, X ve Telegram\'a mesaj göndermesi için"</string>
     <string name="already_got_code">Kodu zaten aldım</string>
     <string name="do_not_have_an_account">"Hesabınız yok mu?  "</string>
     <string name="get_started_with">Şununla başlayın</string>

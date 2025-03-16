@@ -231,7 +231,7 @@ fun HomepageView(
 
                 BottomTabsItems.BottomBarInboxTab -> {
                     InboxView(
-                        messages = inboxes,
+                        messages = messages,
                         navController = navController
                     )
                 }

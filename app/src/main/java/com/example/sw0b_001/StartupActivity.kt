@@ -11,7 +11,11 @@ import kotlinx.coroutines.launch
 class StartupActivity : Initializer<GatewayClientsCommunications>{
     override fun create(context: Context): GatewayClientsCommunications {
         CoroutineScope(Dispatchers.Default).launch {
-            GatewayClientsCommunications.populateDefaultGatewayClientsSetDefaults(context)
+            try {
+                GatewayClientsCommunications.populateDefaultGatewayClientsSetDefaults(context)
+            } catch(e: Exception) {
+                e.printStackTrace()
+            }
         }
         return GatewayClientsCommunications(context)
     }

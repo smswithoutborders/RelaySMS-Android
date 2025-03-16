@@ -144,7 +144,8 @@ fun AboutView(
                 Text(
                     text = stringResource(R.string.view_on_github),
                     modifier = Modifier.clickable {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/smswithoutborders/RelaySMS-Android")) // Replace with your GitHub link
+                        val intent = Intent(Intent.ACTION_VIEW,
+                            Uri.parse("https://github.com/smswithoutborders/RelaySMS-Android")) // Replace with your GitHub link
                         context.startActivity(intent)
                     },
                     color = MaterialTheme.colorScheme.primary,

@@ -237,5 +237,24 @@
     <string name="great">Great!</string>
     <string name="relaysms_vaults_securely_stores_your_online_accounts_so_that_you_can_access_them_without_an_internet_connection">RelaySMS Vaults securely stores your online accounts, so that you can access them without an internet connection</string>
     <string name="you_can_add_online_accounts_to_your_vault">You can add online accounts to your vault</string>
+    <string name="ok">OK</string>
+    <string name="make_default">Make default</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="view_on_github">View on GitHub</string>
+    <string name="send_new_message">Send new message</string>
+    <string name="password">Password</string>
+    <string name="re_enter_password">Re-enter password</string>
+    <string name="already_have_an_account">Already have an account</string>
+    <string name="create_account">Create account</string>
+    <string name="login">Login</string>
+    <string name="forgot_password">Forgot password</string>
+    <string name="submit">Submit</string>
+    <string name="re_send_code">Re-send code</string>
+    <string name="revoke_platforms">Revoke platforms</string>
+    <string name="from">From</string>
+    <string name="always_add_the_dialing_code_if_absent_e_g_237">always add the dialing code if absent, e.g +237</string>
+    <string name="cc">Cc</string>
+    <string name="bcc">Bcc</string>
 
 </resources>

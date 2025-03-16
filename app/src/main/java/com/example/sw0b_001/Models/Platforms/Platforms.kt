@@ -75,7 +75,7 @@ class Platforms {
                         Datastore.getDatastore(context).availablePlatformsDao().insertAll(json)
                     }
                 } catch(e: Exception) {
-                    throw e
+                    e.printStackTrace()
                 }
             }
         }

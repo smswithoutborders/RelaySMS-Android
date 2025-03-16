@@ -169,7 +169,11 @@ fun CreateAccountView(
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text(text = stringResource(R.string.password), style = MaterialTheme.typography.bodySmall) },
+                    label = {
+                        Text(
+                            text = stringResource(R.string.password),
+                            style = MaterialTheme.typography.bodySmall)
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -197,7 +201,10 @@ fun CreateAccountView(
                 OutlinedTextField(
                     value = reenterPassword,
                     onValueChange = { reenterPassword = it },
-                    label = { Text(text = stringResource(R.string.re_enter_password), style = MaterialTheme.typography.bodySmall) },
+                    label = {
+                        Text(text = stringResource(R.string.re_enter_password),
+                            style = MaterialTheme.typography.bodySmall)
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp),
                     visualTransformation = if (reenterPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),

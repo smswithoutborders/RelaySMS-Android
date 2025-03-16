@@ -224,45 +224,45 @@ class MainActivity : ComponentActivity() {
         super.onResume()
 
         CoroutineScope(Dispatchers.Default).launch {
-            if(Vaults.isGetMeOut(applicationContext)) {
-                CoroutineScope(Dispatchers.Main).launch {
-                    navController.navigate(GetMeOutScreen) {
-                        popUpTo(HomepageScreen) {
-                            inclusive = true
+            try {
+                if(Vaults.isGetMeOut(applicationContext)) {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        navController.navigate(GetMeOutScreen) {
+                            popUpTo(HomepageScreen) {
+                                inclusive = true
+                            }
                         }
                     }
-                }
-            } else {
-                Vaults.fetchLongLivedToken(applicationContext).let {
-                    if(it.isNotEmpty()) {
-                        val vault = Vaults(applicationContext)
-                        try {
-                            vault.refreshStoredTokens(applicationContext)
-                        } catch(e: StatusRuntimeException) {
-                            if(e.status.code == Status.UNAUTHENTICATED.code) {
-                                println("Yep, get me out")
-                                Vaults.setGetMeOut(applicationContext, true)
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    navController.navigate(GetMeOutScreen) {
-                                        popUpTo(HomepageScreen) {
-                                            inclusive = true
+                } else {
+                    Vaults.fetchLongLivedToken(applicationContext).let {
+                        if(it.isNotEmpty()) {
+                            val vault = Vaults(applicationContext)
+                            try {
+                                vault.refreshStoredTokens(applicationContext)
+                            } catch(e: StatusRuntimeException) {
+                                if(e.status.code == Status.UNAUTHENTICATED.code) {
+                                    println("Yep, get me out")
+                                    Vaults.setGetMeOut(applicationContext, true)
+                                    CoroutineScope(Dispatchers.Main).launch {
+                                        navController.navigate(GetMeOutScreen) {
+                                            popUpTo(HomepageScreen) {
+                                                inclusive = true
+                                            }
                                         }
                                     }
                                 }
+                            } finally {
+                                vault.shutdown()
                             }
-                        } finally {
-                            vault.shutdown()
                         }
                     }
                 }
+            } catch(e: Exception) {
+                e.printStackTrace()
             }
         }
 
-        try {
-            Platforms.refreshAvailablePlatforms(applicationContext)
-        } catch(e: Exception) {
-            e.printStackTrace()
-        }
+        Platforms.refreshAvailablePlatforms(applicationContext)
     }
 }
 
