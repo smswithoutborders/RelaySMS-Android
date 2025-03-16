@@ -17,7 +17,6 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreferenceCompat
 import com.example.sw0b_001.MainActivity
-import com.example.sw0b_001.Models.Bridges
 import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.Modules.Security
 import com.example.sw0b_001.Security.LockScreenFragment

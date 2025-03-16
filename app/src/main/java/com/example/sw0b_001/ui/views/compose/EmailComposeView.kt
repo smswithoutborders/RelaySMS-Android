@@ -38,8 +38,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.sw0b_001.Bridges.Bridges
 import com.example.sw0b_001.Database.Datastore
-import com.example.sw0b_001.Models.Bridges
 import com.example.sw0b_001.Models.ComposeHandlers
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
@@ -262,11 +262,9 @@ private fun processEmailForEncryption(
     bcc: String,
     subject: String,
     body: String,
-    isBridge: Boolean,
     account: StoredPlatformsEntity?
 ): String {
-    return if(isBridge) "$to:$cc:$bcc:$subject:$body"
-    else "${account!!.account}:$to:$cc:$bcc:$subject:$body"
+    return "${account!!.account}:$to:$cc:$bcc:$subject:$body"
 }
 
 private fun processSend(
@@ -278,30 +276,34 @@ private fun processSend(
     onCompleteCallback: () -> Unit
 ) {
     CoroutineScope(Dispatchers.Default).launch {
-        val availablePlatforms = if(isBridge) Bridges.platforms
-        else Datastore.getDatastore(context)
-            .availablePlatformsDao().fetch(account!!.name!!)
-
-        val formattedContent = processEmailForEncryption(
-            emailContent.to,
-            emailContent.cc,
-            emailContent.bcc,
-            emailContent.subject,
-            emailContent.body,
-            isBridge,
-            account
-        )
-
         try {
-            ComposeHandlers.compose(context,
-                formattedContent,
-                availablePlatforms!!,
-                account,
-                isBridge = isBridge,
-                authCode = if(isBridge) Bridges.getAuthCode(context)
-                    .encodeToByteArray() else null
-            ) {
-                onCompleteCallback()
+            if(isBridge) {
+                Bridges.compose(
+                    context = context,
+                    to = emailContent.to,
+                    cc = emailContent.cc,
+                    bcc = emailContent.bcc,
+                    subject = emailContent.subject,
+                    body = emailContent.body
+                ).first
+            } else {
+                val formattedContent = processEmailForEncryption(
+                    emailContent.to,
+                    emailContent.cc,
+                    emailContent.bcc,
+                    emailContent.subject,
+                    emailContent.body,
+                    account
+                )
+                val availablePlatforms = Datastore.getDatastore(context)
+                    .availablePlatformsDao().fetch(account!!.name!!)
+                ComposeHandlers.compose(context,
+                    formattedContent,
+                    availablePlatforms!!,
+                    account,
+                ) {
+                    onCompleteCallback()
+                }
             }
         } catch(e: Exception) {
             e.printStackTrace()
