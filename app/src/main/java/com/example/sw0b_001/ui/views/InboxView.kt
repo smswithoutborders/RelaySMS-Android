@@ -41,6 +41,7 @@ import com.example.sw0b_001.Models.Messages.EncryptedContent
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.R
+import com.example.sw0b_001.ui.navigation.EmailViewScreen
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 
@@ -59,7 +60,7 @@ fun InboxView(
                 navController.navigate(PasteEncryptedTextScreen)
             })
         } else {
-            MessageListContent(messages = messages)
+            MessageListContent(messages = messages, navController = navController)
         }
     }
 }
@@ -90,7 +91,7 @@ fun EmptyInboxContent(onPasteNewMessageClicked: () -> Unit) {
 }
 
 @Composable
-fun MessageListContent(messages: List<EncryptedContent>) {
+fun MessageListContent(messages: List<EncryptedContent>, navController: NavController) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
@@ -99,7 +100,9 @@ fun MessageListContent(messages: List<EncryptedContent>) {
         items(messages) { message ->
             RecentMessageCard(
                 message,
-                onClickCallback = {}
+                onClickCallback = {
+                    navController.navigate(EmailViewScreen)
+                }
             )
         }
     }

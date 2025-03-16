@@ -76,8 +76,6 @@ fun HomepageView(
     val messages: List<EncryptedContent> = if(_messages.isNotEmpty()) _messages
     else messagesViewModel.getMessages(context).observeAsState(emptyList()).value
 
-    val inboxes = emptyList<EncryptedContent>() // TODO: get inbox messages from view model (i think?)
-
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     var bottomBarItem by remember { mutableStateOf(BottomTabsItems.BottomBarRecentTab) }
@@ -178,7 +176,7 @@ fun HomepageView(
                 }
 
                 BottomTabsItems.BottomBarInboxTab -> {
-                    if (inboxes.isNotEmpty()) { // TODO: make sure inbox isn't always empty
+                    if (messages.isNotEmpty()) {
                         FloatingActionButton(
                             containerColor = MaterialTheme.colorScheme.secondary,
                             onClick = {
