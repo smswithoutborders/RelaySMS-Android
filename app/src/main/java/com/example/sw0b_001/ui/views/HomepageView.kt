@@ -38,7 +38,6 @@ import com.example.sw0b_001.Models.GatewayClients.GatewayClientViewModel
 import com.example.sw0b_001.Models.Messages.EncryptedContent
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
-import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.appbars.GatewayClientsAppBar
@@ -77,7 +76,7 @@ fun HomepageView(
     val messages: List<EncryptedContent> = if(_messages.isNotEmpty()) _messages
     else messagesViewModel.getMessages(context).observeAsState(emptyList()).value
 
-    val inbox = emptyList<EncryptedContent>() // TODO: get inbox messages from view model (i think?)
+    val inboxes = emptyList<EncryptedContent>() // TODO: get inbox messages from view model (i think?)
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -179,7 +178,7 @@ fun HomepageView(
                 }
 
                 BottomTabsItems.BottomBarInboxTab -> {
-                    if (inbox.isNotEmpty()) { // TODO: make sure inbox isn't always empty
+                    if (inboxes.isNotEmpty()) { // TODO: make sure inbox isn't always empty
                         FloatingActionButton(
                             containerColor = MaterialTheme.colorScheme.secondary,
                             onClick = {
@@ -231,7 +230,7 @@ fun HomepageView(
 
                 BottomTabsItems.BottomBarInboxTab -> {
                     InboxView(
-                        messages = inbox,
+                        messages = inboxes,
                         navController = navController
                     )
                 }

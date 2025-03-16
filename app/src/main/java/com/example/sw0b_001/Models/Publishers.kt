@@ -124,6 +124,8 @@ class Publishers(val context: Context) {
 
         private const val PUBLISHER_PUBLIC_KEY =
             "com.afkanerd.relaysms.PUBLISHER_PUBLIC_KEY"
+        private const val PUBLISHER_CLIENT_PUBLIC_KEY =
+            "com.afkanerd.relaysms.PUBLISHER_CLIENT_PUBLIC_KEY"
 
         private const val PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS =
             "com.afkanerd.relaysms.PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS"
@@ -200,12 +202,22 @@ class Publishers(val context: Context) {
                 Base64.DEFAULT)
         }
 
-        fun fetchPublisherSharedKey(context: Context) : ByteArray {
-            val pubKey = fetchPublisherPublicKey(context)
+        fun fetchPublisherSharedKey(context: Context, publicKey: ByteArray? = null) : ByteArray {
+            val pubKey = publicKey ?: fetchPublisherPublicKey(context)
             println("Public key: $pubKey")
             println("Public key: ${Base64.encodeToString(pubKey, Base64.DEFAULT)}")
             return Cryptography.calculateSharedSecret(context, PUBLISHER_ID_KEYSTORE_ALIAS,
                 pubKey!!)
+        }
+
+        fun storeClientArtifacts(context: Context, publisherPubKey: String) {
+            val sharedPreferences = Armadillo.create(context, PUBLISHER_ATTRIBUTE_FILES)
+                .encryptionFingerprint(context)
+                .build()
+
+            sharedPreferences.edit()
+                .putString(PUBLISHER_CLIENT_PUBLIC_KEY, publisherPubKey)
+                .apply()
         }
 
         fun storeArtifacts(context: Context, publisherPubKey: String) {
