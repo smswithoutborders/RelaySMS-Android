@@ -54,8 +54,9 @@ object Bridges {
         subject: String,
         body: String,
     ) : Pair<String?, ByteArray?> {
+
         val isLoggedIn = Vaults.fetchLongLivedToken(context).isNotEmpty()
-        var clientPublicKey: ByteArray? = null
+        var clientPublicKey: ByteArray? = Publishers.fetchClientPublisherPublicKey(context)
 
         if(!isLoggedIn) {
             if(!KeystoreHelpers.isAvailableInKeystore(Publishers.PUBLISHER_ID_KEYSTORE_ALIAS)) {
@@ -78,12 +79,12 @@ object Bridges {
                 context = context,
                 formattedContent = this,
             )
-            if(isLoggedIn) {
-                payloadOnly(messageComposer)
-            } else {
+            if(!isLoggedIn) {
                 clientPublicKey?.let {
                     authRequestAndPayload(it, messageComposer)
                 }
+            } else {
+                payloadOnly(messageComposer)
             }
         }
 

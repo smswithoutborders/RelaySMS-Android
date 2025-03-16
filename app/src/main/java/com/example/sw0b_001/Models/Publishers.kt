@@ -202,6 +202,14 @@ class Publishers(val context: Context) {
                 Base64.DEFAULT)
         }
 
+        fun fetchClientPublisherPublicKey(context: Context) : ByteArray? {
+            val sharedPreferences = Armadillo.create(context, PUBLISHER_ATTRIBUTE_FILES)
+                .encryptionFingerprint(context)
+                .build()
+            return Base64.decode(sharedPreferences.getString(PUBLISHER_CLIENT_PUBLIC_KEY, ""),
+                Base64.DEFAULT)
+        }
+
         fun fetchPublisherSharedKey(context: Context, publicKey: ByteArray? = null) : ByteArray {
             val pubKey = publicKey ?: fetchPublisherPublicKey(context)
             println("Public key: $pubKey")
