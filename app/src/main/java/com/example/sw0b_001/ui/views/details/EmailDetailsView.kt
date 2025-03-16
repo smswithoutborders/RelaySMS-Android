@@ -37,7 +37,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.example.sw0b_001.Models.Bridges
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.ui.navigation.BridgeEmailComposeScreen
@@ -70,9 +69,9 @@ fun EmailDetailsView(
         topBar = {
             RelayAppBar(navController = navController, {
                 CoroutineScope(Dispatchers.Default).launch {
-                    val platform = platformsViewModel.getAvailablePlatforms(context,
-                        platformsViewModel.message!!.platformName!!)
-                    platformsViewModel.platform = platform ?: Bridges.platforms
+                    val platform = if(!isBridge) platformsViewModel.getAvailablePlatforms(context,
+                        platformsViewModel.message!!.platformName!!) else null
+                    platformsViewModel.platform = platform
 
                     CoroutineScope(Dispatchers.Main).launch {
                         navController.navigate(if(isBridge) EmailComposeScreen else BridgeEmailComposeScreen)
