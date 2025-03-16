@@ -35,7 +35,15 @@ class BridgesTest {
     var body = "Hello world"
 
     @Test
-    fun bridgeFlowTest() {
+    fun bridgeDecomposeTest() {
+        val incomingText = ""
+        val text = Bridges.decryptIncomingMessages(context, incomingText)
+
+        println(text)
+    }
+
+    @Test
+    fun bridgeComposeTest() {
         Vaults.logout(context) {}
         Datastore.getDatastore(context).ratchetStatesDAO().deleteAll()
 

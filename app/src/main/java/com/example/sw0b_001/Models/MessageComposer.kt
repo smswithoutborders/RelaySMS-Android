@@ -10,6 +10,7 @@ import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.Ratchets
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.States
 import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
 import com.example.sw0b_001.Modules.Helpers.toBytes
+import java.nio.charset.Charset
 
 class MessageComposer(val context: Context, val state: States) {
     private val AD = Publishers.fetchPublisherPublicKey(context)
@@ -19,6 +20,14 @@ class MessageComposer(val context: Context, val state: States) {
             val SK = Publishers.fetchPublisherSharedKey(context)
             Ratchets.ratchetInitAlice(state, SK, AD)
         }
+    }
+
+    fun decryptBridge(
+        header: Headers,
+        content: ByteArray,
+    ): String {
+        val text = Ratchets.ratchetDecrypt(state, header, content, AD)
+        return String(text, Charsets.UTF_8)
     }
 
     fun composeBridge(
