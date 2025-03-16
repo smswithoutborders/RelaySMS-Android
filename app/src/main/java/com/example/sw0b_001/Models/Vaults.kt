@@ -257,12 +257,11 @@ class Vaults(context: Context) {
                 .build()
             sharedPreferences.edit().clear().apply()
 
-//            sharedPreferences = Armadillo.create(context, Publishers.PUBLISHER_ATTRIBUTE_FILES)
-//                .encryptionFingerprint(context)
-//                .build()
-//            sharedPreferences.edit().clear().apply()
+            sharedPreferences = Armadillo.create(context, Publishers.PUBLISHER_ATTRIBUTE_FILES)
+                .encryptionFingerprint(context)
+                .build()
+            sharedPreferences.edit().clear().apply()
 
-//            KeystoreHelpers.removeAllFromKeystore(context)
             KeystoreHelpers.removeFromKeystore(context, DEVICE_ID_KEYSTORE_ALIAS)
             KeystoreHelpers.removeFromKeystore(context, DEVICE_ID_SECRET_KEY_KEYSTORE_ALIAS)
             KeystoreHelpers.removeFromKeystore(context, DEVICE_ID_PUB_KEY)
