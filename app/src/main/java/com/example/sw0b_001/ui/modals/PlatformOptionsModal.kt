@@ -47,6 +47,7 @@ import com.example.sw0b_001.ui.navigation.TextComposeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
@@ -161,13 +162,15 @@ fun PlatformOptionsModal(
                             getServiceBasedComposeDescriptions(
                                 if(platformsViewModel.platform != null)
                                     platformsViewModel.platform!!.service_type!!
-                                else ""
+                                else "",
+                                context
                             )
                         } else {
                             getServiceBasedAvailableDescription(
                                 if(platformsViewModel.platform != null)
                                     platformsViewModel.platform!!.service_type!!
-                                else ""
+                                else "",
+                                context
                             )
                         },
                         style = MaterialTheme.typography.bodyMedium,
@@ -263,7 +266,7 @@ private fun RevokeAccountLoading(
         modifier = Modifier.padding(16.dp)
     ) {
         Text(
-            text = "Revoking account for ${platform.name}",
+            text = stringResource(R.string.revoking_account_for, platform.name),
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = 16.dp)
         )
@@ -338,7 +341,7 @@ private fun AddAccountLoading(
         var isLoading by remember { mutableStateOf(false) }
 
         Text(
-            text="Adding account for ${platform.name}",
+            text= stringResource(R.string.adding_account_for, platform.name),
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom=16.dp)
         )
@@ -532,7 +535,7 @@ private fun ComposeMessages(
         },
         modifier = Modifier.fillMaxWidth()
     ) {
-        Text("Send Message")
+        Text(stringResource(R.string.send_message))
     }
 }
 
@@ -546,7 +549,7 @@ private fun ManageAccounts(
         onClick = { addAccountsCallback() },
         modifier = Modifier.fillMaxWidth()
     ) {
-        Text("Add Account")
+        Text(stringResource(R.string.add_account))
     }
     Spacer(modifier = Modifier.height(8.dp))
     if (isActive) {
@@ -555,37 +558,37 @@ private fun ManageAccounts(
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)
         ) {
-            Text("Remove Accounts")
+            Text(stringResource(R.string.remove_accounts))
         }
     }
 }
 
-private fun getServiceBasedAvailableDescription(serviceType: String) : String {
+private fun getServiceBasedAvailableDescription(serviceType: String, context: Context) : String {
     if(serviceType == ServiceTypes.EMAIL.type) {
-        return "Adding emails to your RelaySMS account enables you use them to send emails using SMS messaging.\n\nGmail are currently supported."
+        return context.getString(R.string.adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported)
     }
     else if(serviceType == ServiceTypes.MESSAGE.type) {
-        return "Adding numbers to your RelaySMS account enables you use them to send messages using SMS messaging.\n\nTelegram messaging is currently supported."
+        return context.getString(R.string.adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported)
     }
     else if(serviceType == ServiceTypes.TEXT.type) {
-        return "Adding accounts to your RelaySMS account enables you use them to make post using SMS messaging.\n\nPosting is currently supported."
+        return context.getString(R.string.adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported)
     }
 
-    return "Your RelaySMS account is an alias of your phone number with the domain @relaysms.me.\n\nYou can receive replies by SMS whenever a message is sent to your alias."
+    return context.getString(R.string.your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias)
 }
 
-private fun getServiceBasedComposeDescriptions(serviceType: String) : String {
+private fun getServiceBasedComposeDescriptions(serviceType: String, context: Context) : String {
     if(serviceType == ServiceTypes.EMAIL.type) {
-        return "Continue to send an email from your saved email account. You can choose a message forwarding country from the 'Countries' tab below.\n\nContinue to send message"
+        return context.getString(R.string.continue_to_send_an_email_from_your_saved_email_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
     }
     else if(serviceType == ServiceTypes.MESSAGE.type) {
-        return "Continue to send messages from your saved messaging account. You can choose a message forwarding country from the 'Countries' tab below.\n\nContinue to send message"
+        return context.getString(R.string.continue_to_send_messages_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
     }
     else if(serviceType == ServiceTypes.TEXT.type) {
-        return "Continue to make posts from your saved messaging account. You can choose a message forwarding country from the 'Countries' tab below.\n\nContinue to send message"
+        return context.getString(R.string.continue_to_make_posts_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
     }
 
-    return "Your RelaySMS account is an alias of your phone number with the domain @relaysms.me.\n\nYou can receive replies by SMS whenever a message is sent to your alias.\nYou can choose a message forwarding country from the 'Countries' tab below.\n\nContinue to send message"
+    return context.getString(R.string.your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

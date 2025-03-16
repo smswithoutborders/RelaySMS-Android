@@ -32,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,6 +43,7 @@ import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.ComposeHandlers
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.navigation.HomepageScreen
@@ -116,7 +118,8 @@ fun EmailComposeView(
                 if (selectedAccount == null) {
                     navController.popBackStack()
                 }
-                Toast.makeText(context, "No account selected", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context,
+                    context.getString(R.string.no_account_selected), Toast.LENGTH_SHORT).show()
             },
             onAccountSelected = { account ->
                 selectedAccount = account
@@ -129,7 +132,7 @@ fun EmailComposeView(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Compose Email") },
+                title = { Text(stringResource(R.string.compose_email)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -173,7 +176,7 @@ fun EmailComposeView(
                 OutlinedTextField(
                     value = from,
                     onValueChange = { },
-                    label = { Text("From") },
+                    label = { Text(stringResource(R.string.from)) },
                     enabled = false,
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -193,7 +196,7 @@ fun EmailComposeView(
             OutlinedTextField(
                 value = to,
                 onValueChange = { to = it },
-                label = { Text("To", style = MaterialTheme.typography.bodyMedium) },
+                label = { Text(stringResource(R.string.to), style = MaterialTheme.typography.bodyMedium) },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email,
@@ -232,7 +235,7 @@ fun EmailComposeView(
             OutlinedTextField(
                 value = subject,
                 onValueChange = { subject = it },
-                label = { Text("Subject", style = MaterialTheme.typography.bodyMedium) },
+                label = { Text(stringResource(R.string.subject), style = MaterialTheme.typography.bodyMedium) },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(
                     imeAction = ImeAction.Next
@@ -244,7 +247,7 @@ fun EmailComposeView(
             OutlinedTextField(
                 value = body,
                 onValueChange = { body = it },
-                label = { Text("Compose Email", style = MaterialTheme.typography.bodyMedium) },
+                label = { Text(stringResource(R.string.compose_email), style = MaterialTheme.typography.bodyMedium) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)

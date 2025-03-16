@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -79,13 +80,13 @@ fun EmptyInboxContent(onPasteNewMessageClicked: () -> Unit) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "No messages in inbox",
+            text = stringResource(R.string.no_messages_in_inbox),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(64.dp))
         Button(onClick = onPasteNewMessageClicked) {
-            Text("Paste new incoming message")
+            Text(stringResource(R.string.paste_new_incoming_message))
         }
     }
 }

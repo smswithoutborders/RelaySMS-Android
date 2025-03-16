@@ -74,7 +74,7 @@ fun RecentAppBar(
                 onDismissRequest = { showMenu = false }
             ) {
                 DropdownMenuItem(
-                    text = { Text("Settings") },
+                    text = { Text(stringResource(R.string.settings)) },
                     onClick = {
                         context.startActivity(
                             Intent(context, SettingsActivity::class.java).apply {
@@ -85,7 +85,7 @@ fun RecentAppBar(
                     }
                 )
                 DropdownMenuItem(
-                    text = { Text("About") },
+                    text = { Text(stringResource(R.string.about)) },
                     onClick = {
                         navController.navigate(AboutScreen)
                         showMenu = false

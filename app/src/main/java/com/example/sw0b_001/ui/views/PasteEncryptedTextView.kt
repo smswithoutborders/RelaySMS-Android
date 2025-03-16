@@ -25,11 +25,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.sw0b_001.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,7 +68,7 @@ fun PasteEncryptedTextView(
                 .padding(16.dp)
         ) {
             Text(
-                text = "Paste encrypted text into this box...",
+                text = stringResource(R.string.paste_encrypted_text_into_this_box),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
@@ -75,7 +77,7 @@ fun PasteEncryptedTextView(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "This is an example of an encrypted message that you would paste here...",
+                text = stringResource(R.string.this_is_an_example_of_an_encrypted_message_that_you_would_paste_here),
                 style = MaterialTheme.typography.bodySmall
             )
 
@@ -83,7 +85,7 @@ fun PasteEncryptedTextView(
 
 
             Text(
-                text = "RelaySMS Reply Please paste this entire message in your RelaySMS app",
+                text = stringResource(R.string.relaysms_reply_please_paste_this_entire_message_in_your_relaysms_app),
                 style = MaterialTheme.typography.bodySmall
             )
 
@@ -99,9 +101,8 @@ fun PasteEncryptedTextView(
                 onValueChange = { pastedText = it },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
-                ,
-                placeholder = { Text("Click to paste") },
+                    .height(200.dp),
+                placeholder = { Text(stringResource(R.string.click_to_paste)) },
                 enabled = true,
                 readOnly = false,
                 shape = RoundedCornerShape(16.dp),
@@ -119,7 +120,7 @@ fun PasteEncryptedTextView(
                 enabled = isDecryptButtonEnabled,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Decrypt message")
+                Text(stringResource(R.string.decrypt_message))
             }
         }
     }

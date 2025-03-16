@@ -50,6 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -213,7 +214,7 @@ fun OtpCodeVerificationView(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Input Your Code",
+                text = stringResource(R.string.input_your_code),
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.primary
@@ -222,7 +223,7 @@ fun OtpCodeVerificationView(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Please enter the 6-digit code we sent to you via SMS",
+                text = stringResource(R.string.please_enter_the_6_digit_code_we_sent_to_you_via_sms),
                 style = MaterialTheme.typography.labelLarge,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface
@@ -241,7 +242,7 @@ fun OtpCodeVerificationView(
 
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "The code would automatically be detected in some cases",
+                text = stringResource(R.string.the_code_would_automatically_be_detected_in_some_cases),
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f) ,
@@ -282,7 +283,7 @@ fun OtpCodeVerificationView(
                     )
                 }
                 else {
-                    Text("Submit")
+                    Text(stringResource(R.string.submit))
                 }
             }
 
@@ -296,7 +297,7 @@ fun OtpCodeVerificationView(
             )
             if (timeLeft == 0L){
                 Button(onClick = onResendClicked) {
-                    Text(text = "Resend Code")
+                    Text(text = stringResource(R.string.resend_code))
                 }
             }
         }

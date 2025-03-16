@@ -32,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -55,7 +56,7 @@ fun OnboardingWelcome(
         ) {
 
             Text(
-                text = "Welcome to RelaySMS!",
+                text = stringResource(R.string.welcome_to_relaysms_),
                 style = MaterialTheme.typography.headlineMedium
             )
 
@@ -102,7 +103,7 @@ fun OnboardingWelcome(
 
             // Welcome Text
             Text(
-                text = "Use SMS to make a post, send emails and messages with no internet connection",
+                text = stringResource(R.string.use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection),
                 style = MaterialTheme.typography.headlineMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface
@@ -122,14 +123,14 @@ fun OnboardingWelcome(
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text(text = "Learn how it works", color = Color.White)
+                    Text(text = stringResource(R.string.learn_how_it_works_), color = Color.White)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Privacy Policy Link
                 Text(
-                    text = "Read our privacy policy",
+                    text = stringResource(R.string.read_our_privacy_policy),
                     modifier = Modifier.clickable(onClick = onPrivacyPolicyClicked),
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.bodySmall

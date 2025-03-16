@@ -16,8 +16,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.views.BottomTabsItems
 
 @Composable
@@ -35,7 +37,9 @@ fun BottomNavBar(
             ) },
             label = {
                 Text(
-                    text = if(isLoggedIn)  "Recents" else "Get started",
+                    text = if(isLoggedIn) stringResource(R.string.recents_text) else stringResource(
+                        R.string.get_started_text
+                    ),
                     style = MaterialTheme.typography.labelSmall
                 )
             },
@@ -59,7 +63,7 @@ fun BottomNavBar(
                     modifier = Modifier.size(20.dp)
                 ) },
                 label = { Text(
-                    text = "Platforms",
+                    text = stringResource(R.string.platforms),
                     style = MaterialTheme.typography.labelSmall
                 ) },
                 selected = selectedTab == BottomTabsItems.BottomBarPlatformsTab,
@@ -83,7 +87,7 @@ fun BottomNavBar(
                 modifier = Modifier.size(20.dp)
             ) },
             label = { Text(
-                text = "Inbox",
+                text = stringResource(R.string.inbox),
                 style = MaterialTheme.typography.labelSmall
             ) },
             selected = selectedTab == BottomTabsItems.BottomBarInboxTab,
@@ -106,7 +110,7 @@ fun BottomNavBar(
                 modifier = Modifier.size(20.dp)
             ) },
             label = { Text(
-                text = "Countries",
+                text = stringResource(R.string.countries),
                 style = MaterialTheme.typography.labelSmall
             ) },
             selected = selectedTab == BottomTabsItems.BottomBarCountriesTab,

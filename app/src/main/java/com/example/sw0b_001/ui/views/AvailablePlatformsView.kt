@@ -53,6 +53,7 @@ import com.example.sw0b_001.ui.theme.AppTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.res.stringResource
 import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 
@@ -86,7 +87,7 @@ fun AvailablePlatformsView(
                 .padding(16.dp)
         ) {
             Text(
-                text = if(isCompose) "Send new message" else "Available platforms",
+                text = if(isCompose) stringResource(R.string.send_new_message) else stringResource(R.string.available_platforms),
                 style = MaterialTheme.typography.displayMedium,
                 modifier = Modifier.padding(bottom = 16.dp),
             )
@@ -134,7 +135,7 @@ fun PlatformListContent(
             .padding(16.dp)
     ) {
         Text(
-            text = "Use your RelaySMS account",
+            text = stringResource(R.string.use_your_relaysms_account),
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onBackground
@@ -153,7 +154,7 @@ fun PlatformListContent(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Use your online accounts",
+            text = stringResource(R.string.use_your_online_accounts),
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onBackground

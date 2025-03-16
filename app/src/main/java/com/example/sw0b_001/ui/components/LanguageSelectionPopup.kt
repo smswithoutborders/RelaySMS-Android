@@ -20,12 +20,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.example.sw0b_001.R
 
-// Data class to represent a language option
 data class LanguageOption(val name: String, val code: String)
 
 @Composable
@@ -35,11 +36,14 @@ fun LanguageSelectionPopup(
     onDismiss: () -> Unit
 ) {
     val languageOptions = listOf(
-        LanguageOption("English", "en"),
-        LanguageOption("French", "fr"),
-        LanguageOption("Farsi", "fa"),
-        LanguageOption("Spanish", "es"),
-        LanguageOption("Turkish", "tr")
+        LanguageOption(stringResource(R.string.english), "en"),
+        LanguageOption(stringResource(R.string.arabic), "ar"),
+        LanguageOption(stringResource(R.string.french), "fr"),
+        LanguageOption(stringResource(R.string.farsi), "fa"),
+        LanguageOption(stringResource(R.string.spanish), "es"),
+        LanguageOption(stringResource(R.string.german), "de"),
+        LanguageOption(stringResource(R.string.swahili), "sw"),
+        LanguageOption(stringResource(R.string.turkish), "tr")
     )
 
     var selectedLanguageCode by remember { mutableStateOf(currentLanguageCode) }
@@ -82,7 +86,7 @@ fun LanguageSelectionPopup(
             Spacer(modifier = Modifier.padding(8.dp))
             Row(modifier = Modifier.align(Alignment.End)) {
                 Text(
-                    text = "Cancel",
+                    text = stringResource(R.string.cancel),
                     modifier = Modifier
                         .clickable { onDismiss() }
                         .padding(8.dp),
@@ -90,10 +94,11 @@ fun LanguageSelectionPopup(
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Text(
-                    text = "Ok",
+                    text = stringResource(R.string.ok),
                     modifier = Modifier
                         .clickable {
-                            val selectedLanguage = languageOptions.first { it.code == selectedLanguageCode }
+                            val selectedLanguage =
+                                languageOptions.first { it.code == selectedLanguageCode }
                             onLanguageSelected(selectedLanguage)
                             onDismiss()
                         }

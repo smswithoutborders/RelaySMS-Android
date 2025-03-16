@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,6 +39,7 @@ import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.ComposeHandlers
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.navigation.HomepageScreen
@@ -88,7 +90,7 @@ fun TextComposeView(
                 if (selectedAccount == null) {
                     navController.popBackStack()
                 }
-                Toast.makeText(context, "No account selected", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.no_account_selected), Toast.LENGTH_SHORT).show()
             },
             onAccountSelected = { account ->
                 selectedAccount = account
@@ -107,7 +109,7 @@ fun TextComposeView(
             TopAppBar(
                 title = {
                     Column {
-                        Text("New Post")
+                        Text(stringResource(R.string.new_post))
 
                         if(from.isNotEmpty())
                             Text(
@@ -153,7 +155,7 @@ fun TextComposeView(
             OutlinedTextField(
                 value = message,
                 onValueChange = { message = it },
-                label = { Text("What's happening?", style = MaterialTheme.typography.bodyMedium) },
+                label = { Text(stringResource(R.string.what_s_happening), style = MaterialTheme.typography.bodyMedium) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),

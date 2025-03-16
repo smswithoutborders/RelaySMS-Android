@@ -28,9 +28,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 
@@ -38,7 +40,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun ConfirmationModal(
     showBottomSheet: Boolean = true,
-    message: String = "Click continue to confirm this action. Do not worry, it has no dangerous effects.",
+    message: String = stringResource(R.string.click_continue_to_confirm_this_action_do_not_worry_it_has_no_dangerous_effects),
+
     onContinue: () -> Unit,
     onCancel: () -> Unit,
 ) {
@@ -82,7 +85,7 @@ fun ConfirmationModal(
                             }
                         },
                     ) {
-                        Text("Cancel")
+                        Text(stringResource(R.string.cancel))
                     }
                     Spacer(modifier = Modifier.width(16.dp))
                     Button(
@@ -90,7 +93,7 @@ fun ConfirmationModal(
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer)
                     ) {
                         Text(
-                            text = "Continue",
+                            text = stringResource(R.string.continue_text),
                             color = MaterialTheme.colorScheme.onErrorContainer
                         )
                     }

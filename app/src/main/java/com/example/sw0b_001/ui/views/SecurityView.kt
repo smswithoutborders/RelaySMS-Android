@@ -33,10 +33,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.modals.ConfirmationModal
 import com.example.sw0b_001.ui.theme.AppTheme
@@ -66,11 +68,11 @@ fun SecurityView(
                     .padding(16.dp)
             ) {
                 // Phone Lockscreen Options Section
-                SecuritySection(title = "Phone Lockscreen options") {
+                SecuritySection(title = stringResource(R.string.phone_lockscreen_options)) {
                     var isLockscreenEnabled by remember { mutableStateOf(false) }
                     SecurityRowWithToggle(
-                        title = "Enable lockscreen",
-                        subtext = "Require lockscreen pin/fingerprint when starting the app",
+                        title = stringResource(R.string.enable_lockscreen),
+                        subtext = stringResource(R.string.require_lockscreen_pin_fingerprint_when_starting_the_app),
                         isChecked = isLockscreenEnabled,
                         onCheckedChange = { isLockscreenEnabled = it }
                     )
@@ -79,10 +81,10 @@ fun SecurityView(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // Vault Section
-                SecuritySection(title = "Vault") {
+                SecuritySection(title = stringResource(R.string.vault)) {
                     SecurityRow(
-                        title = "Revoke Platforms",
-                        subtext = "Choose which platforms you want to remove from the vault",
+                        title = stringResource(R.string.revoke_platforms),
+                        subtext = stringResource(R.string.choose_which_platforms_you_want_to_remove_from_the_vault),
                         onClick = {TODO("Implement platform revoking")}
                     )
                 }
@@ -90,23 +92,23 @@ fun SecurityView(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // Account Section
-                SecuritySection(title = "Account") {
+                SecuritySection(title = stringResource(R.string.account)) {
                     SecurityRow(
-                        title = "Clear aliasing",
-                        subtext = "This would delete your auth codes stored for aliasing. You can request for another code at anytime.",
+                        title = stringResource(R.string.clear_aliasing),
+                        subtext = stringResource(R.string.this_would_delete_your_auth_codes_stored_for_aliasing_you_can_request_for_another_code_at_anytime),
                         onClick = {},
                         isEnabled = false,
                         icon = Icons.Filled.Refresh
                     )
                     SecurityRow(
-                        title = "Logout",
-                        subtext = "Logout of your account. You can always log back in, however your current messages would be deleted.",
+                        title = stringResource(R.string.logout),
+                        subtext = stringResource(R.string.logout_of_your_account_you_can_always_log_back_in_however_your_current_messages_would_be_deleted),
                         onClick = {showLogoutBottomSheet = true},
                         icon = Icons.AutoMirrored.Filled.ExitToApp
                     )
                     SecurityRow(
-                        title = "Delete",
-                        subtext = "Deleting your account means deleting all your saved accounts online. You can always recreate your account once needed.",
+                        title = stringResource(R.string.delete_),
+                        subtext = stringResource(R.string.deleting_your_account_means_deleting_all_your_saved_accounts_online_you_can_always_recreate_your_account_once_needed),
                         onClick = {showDeleteBottomSheet = true},
                         icon = Icons.Filled.Delete
                     )

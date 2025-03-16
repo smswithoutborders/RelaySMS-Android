@@ -29,10 +29,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.components.LanguageOption
 import com.example.sw0b_001.ui.components.LanguageSelectionPopup
@@ -56,10 +58,10 @@ fun SettingsView(
                 .padding(16.dp)
         ) {
             // Accessibility Section
-            SettingsSection(title = "Accessibility") {
+            SettingsSection(title = stringResource(R.string.accessibility)) {
                 SettingsRow(
                     icon = Icons.Filled.Language,
-                    title = "Language",
+                    title = stringResource(R.string.language),
                     subtext = currentLanguage.name,
                     onClick = { showLanguagePopup = true }
                 )
@@ -68,12 +70,12 @@ fun SettingsView(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Messaging Section
-            SettingsSection(title = "Messaging") {
+            SettingsSection(title = stringResource(R.string.messaging_)) {
                 var isPhoneValidationEnabled by remember { mutableStateOf(false) }
                 SettingsRowWithToggle(
                     icon = Icons.AutoMirrored.Filled.Message,
-                    title = "Validate with phone number",
-                    subtext = "You have a Device ID for the device you log into. It is used to identify you on the Vault. You can switch to phone number to reduce size of SMS message.",
+                    title = stringResource(R.string.validate_with_phone_number),
+                    subtext = stringResource(R.string.you_have_a_device_id_for_the_device_you_log_into_it_is_used_to_identify_you_on_the_vault_you_can_switch_to_phone_number_to_reduce_size_of_sms_message),
                     isChecked = isPhoneValidationEnabled,
                     onCheckedChange = { isPhoneValidationEnabled = it }
                 )
@@ -82,11 +84,11 @@ fun SettingsView(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Security and Privacy Section
-            SettingsSection(title = "Security and Privacy") {
+            SettingsSection(title = stringResource(R.string.security_and_privacy)) {
                 SettingsRow(
                     icon = Icons.Filled.Security,
-                    title = "Security",
-                    subtext = "Enable app locks and pin codes",
+                    title = stringResource(R.string.security),
+                    subtext = stringResource(R.string.enable_app_locks_and_pin_codes),
                     onClick = {}
                 )
             }

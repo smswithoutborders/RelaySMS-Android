@@ -130,7 +130,7 @@ fun EmailDetailsView(
             HorizontalDivider(color = MaterialTheme.colorScheme.outline)
             Spacer(modifier = Modifier.height(16.dp))
 
-            EmailDetailsRow(label = "To", email = to)
+            EmailDetailsRow(label = stringResource(R.string.to), email = to)
 
             if (cc.isNotEmpty()) {
                 EmailDetailsRow(label = "Cc", email = cc)

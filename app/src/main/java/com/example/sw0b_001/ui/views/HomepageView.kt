@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
@@ -39,6 +40,7 @@ import com.example.sw0b_001.Models.Messages.EncryptedContent
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Vaults
+import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.appbars.GatewayClientsAppBar
 import com.example.sw0b_001.ui.appbars.RecentAppBar
@@ -83,7 +85,8 @@ fun HomepageView(
     var showAddGatewayClientsModal by remember { mutableStateOf(false) }
 
     val refreshSuccess = Runnable {
-        Toast.makeText(context, "Gateway clients refreshed successfully!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context,
+            context.getString(R.string.gateway_clients_refreshed_successfully), Toast.LENGTH_SHORT).show()
         Log.d("GatewayClients", "Gateway clients refreshed successfully!")
     }
 
@@ -116,7 +119,7 @@ fun HomepageView(
                     TopAppBar(
                         title = {
                             Text(
-                                text = "Inbox",
+                                text = stringResource(R.string.inbox),
                                 style = MaterialTheme.typography.headlineLarge,
                                 fontWeight = FontWeight.Bold
                             )
@@ -153,7 +156,7 @@ fun HomepageView(
                                 },
                                 text = {
                                     Text(
-                                        text = "Compose",
+                                        text = stringResource(R.string.compose),
                                         color = MaterialTheme.colorScheme.onSecondary
                                     )
                                 }

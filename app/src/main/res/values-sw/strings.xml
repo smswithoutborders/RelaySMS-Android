@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RelaySMS</string>
+
+    <!-- Homepage menu -->
+    <string name="settings_settings">Mipangilio</string>
+
+    <!-- settings saved platforms -->
+    <string name="settings_accessibility_category">Ufikivu</string>
+    <string name="settings_language">Lugha</string>
+
+    <string name="settings_security_category">Usalama na Faragha</string>
+    <string name="settings_security">Usalama</string>
+    <string name="settings_security_category_summary">Washa kufuli za programu na nambari za siri</string>
+
+    <!-- settings security -->
+    <string name="settings_lock_screen_preference_category">Chaguzi za Kufunga Skrini ya Simu</string>
+    <string name="settings_security_and_privacy_enable_lockscreen_open">Washa kufunga skrini</string>
+    <string name="settings_security_and_privacy_enable_lockscreen_open_summary">Hitaji PIN/alama ya kidole ya kufunga skrini unapoanzisha programu</string>
+
+    <string name="settings_security_and_privacy_account">"Akaunti</string>
+    <string name="settings_security_and_privacy_account_logout">Ondoka</string>
+    <string name="settings_security_and_privacy_account_logout_summary">Ondoka kwenye akaunti yako. Unaweza kuingia tena wakati wowote, lakini ujumbe wako wa sasa utafutwa.</string>
+
+    <string name="settings_security_and_privacy_account_delete">Futa</string>
+
+    <string name="settings_security_and_privacy_account_delete_summary">"Kufuta akaunti yako kunamaanisha kufuta akaunti zako zote zilizohifadhiwa mtandaoni. Unaweza kuunda upya akaunti yako wakati wowote utakapohitaji.     "</string>
+
+    <!-- settings language -->
+    <string name="language_english">Kiingereza</string>
+    <string name="language_french">Kifaransa</string>
+    <string name="language_farsi">Kiajemi</string>
+    <string name="language_spanish">Kihispania</string>
+    <string name="language_turkish">Kituruki</string>
+    <string name="language_arabic">Kiarabu</string>
+    <string name="language_german">Kijerumani</string>
+    <string name="language_swahili">Kiswahili</string>
+
+    <string name="gateway_client_settings_add_custom_empty_error">Tafadhali toa nambari ya simu</string>
+
+    <string name="new_gateway_client_alias">Jina la utani (si lazima)</string>
+    <string name="gateway_client_alias_description">Jina la kukusaidia kukumbuka mteja wa Lango</string>
+    <string name="gateway_client_save_btn_text">Hifadhi</string>
+
+    <string name="choose_sms_app">Chagua programu ya kutuma ujumbe wa SMS</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+
+    <string name="security_settings_failed_to_switch_security">Imeshindwa kuwasha usalama…</string>
+    <string name="settings_security_biometric_user_cannot_add_this_functionality_at_this_time">Mtumiaji hawezi kuongeza utendaji huu kwa sasa.</string>
+    <string name="lock_screen_relay_sms_is_locked">Programu ya RelaySMS imefungwa</string>
+    <string name="lock_screen_unlock_with_your_phone_s_locking_system">Fungua kwa kutumia mfumo wa kufunga wa simu yako</string>
+    <string name="gateway_client_add_custom_example_text">k.m. +237123456789 au chagua anwani</string>
+    <string name="gateway_client_add_gateway_client_text">Ongeza Mteja wa Lango</string>
+    <string name="logout_you_have_no_accounts_logged_into_vaults_at_this_time">Huna akaunti zozote zilizosajiliwa kwenye Vault kwa sasa</string>
+    <string name="security_settings_you_have_no_accounts_to_delete_in_vault_at_this_time">Huna akaunti zozote za kufuta kwenye Vault kwa sasa</string>
+    <string name="helper_yesterday">jana</string>
+
+    <string name="recovery_continue">Endelea</string>
+
+    <string name="cancel">Ghairi</string>
+    <string name="click_continue_to_confirm_this_action_do_not_worry_this_has_no_dangerous_effects">Bonyeza endelea ili kuthibitisha kitendo hiki. Usijali, hakina madhara yoyote.</string>
+    <string name="messaging">Ujumbe</string>
+    <string name="you_have_a_device_id_for_the_device_you_log_into_it_is_used_to_identify_you_on_the_vault_you_can_switch_to_phone_number_to_reduce_size_of_sms_message">Una Kitambulisho cha Kifaa kwa kifaa unachoingia. Kinatumika kukutambulisha kwenye Vault. Unaweza kubadilisha hadi nambari ya simu ili kupunguza ukubwa wa ujumbe wa SMS.</string>
+    <string name="validate_with_phone_number">Thibitisha kwa nambari ya simu</string>
+    <string name="enter_phone_number_with_country_code">Ingiza nambari ya simu na msimbo wa nchi</string>
+    <string name="about">Kuhusu</string>
+    <string name="recents_text">Hivi Karibuni</string>
+    <string name="get_started_text">Anza</string>
+    <string name="platforms">Majukwaa</string>
+    <string name="inbox">Sanduku la Ujumbe</string>
+    <string name="countries">Nchi</string>
+    <string name="settings">Mipangilio</string>
+    <string name="permission_denied">Ruhusa Imekataliwa!</string>
+    <string name="add_gateway_client">Ongeza Mteja wa Lango</string>
+    <string name="edit_gateway_client">Hariri Mteja wa Lango</string>
+    <string name="e_g_237123456_or_select_contact">k.m. +237123456 au chagua anwani</string>
+    <string name="alias_optional">Jina la utani (si lazima)</string>
+    <string name="name_to_help_remember_the_gateway_client">Jina la kukusaidia kukumbuka Mteja wa Lango</string>
+    <string name="saving">Inahifadhi…</string>
+    <string name="save">Hifadhi</string>
+    <string name="error_saving_gateway_client">Hitilafu kuhifadhi mteja wa lango</string>
+    <string name="click_continue_to_confirm_this_action_do_not_worry_it_has_no_dangerous_effects">Bonyeza endelea ili kuthibitisha kitendo hiki. Usijali, hakina madhara yoyote.</string>
+    <string name="continue_text">Endelea</string>
+    <string name="country_options">Chaguzi za Nchi</string>
+    <string name="revoking_account_for">Inafuta akaunti ya %1$s</string>
+    <string name="adding_account_for">Inaongeza akaunti ya %1$s</string>
+    <string name="send_message">Tuma Ujumbe</string>
+    <string name="add_account">Ongeza Akaunti</string>
+    <string name="remove_accounts">Ondoa Akaunti</string>
+    <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported">Kuongeza barua pepe kwenye akaunti yako ya RelaySMS hukuwezesha kuzitumia kutuma barua pepe kwa kutumia ujumbe wa SMS.\n\nGmail inatumika kwa sasa.</string>
+    <string name="adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported">Kuongeza nambari kwenye akaunti yako ya RelaySMS hukuwezesha kuzitumia kutuma ujumbe kwa kutumia ujumbe wa SMS.\n\nUjumbe wa Telegramu unatumika kwa sasa.</string>
+    <string name="adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported">Kuongeza akaunti kwenye akaunti yako ya RelaySMS hukuwezesha kuzitumia kutengeneza machapisho kwa kutumia ujumbe wa SMS.\n\nUchapishaji unatumika kwa sasa.</string>
+    <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias">Akaunti yako ya RelaySMS ni jina la utani la nambari yako ya simu na kikoa @relaysms.me.\n\nUnaweza kupokea majibu kwa SMS wakati wowote ujumbe unapotumwa kwa jina lako la utani.</string>
+    <string name="continue_to_send_an_email_from_your_saved_email_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">Endelea kutuma barua pepe kutoka kwa akaunti yako ya barua pepe iliyohifadhiwa. Unaweza kuchagua nchi ya kusambaza ujumbe kutoka kwenye kichupo cha \'Nchi\' hapa chini.\n\nEndelea kutuma ujumbe</string>
+    <string name="continue_to_send_messages_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">Endelea kutuma ujumbe kutoka kwa akaunti yako ya ujumbe iliyohifadhiwa. Unaweza kuchagua nchi ya kusambaza ujumbe kutoka kwenye kichupo cha \'Nchi\' hapa chini.\n\nEndelea kutuma ujumbe</string>
+    <string name="continue_to_make_posts_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">Endelea kutengeneza machapisho kutoka kwa akaunti yako ya ujumbe iliyohifadhiwa. Unaweza kuchagua nchi ya kusambaza ujumbe kutoka kwenye kichupo cha \'Nchi\' hapa chini.\n\nEndelea kutuma ujumbe</string>
+    <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">Akaunti yako ya RelaySMS ni jina la utani la nambari yako ya simu na kikoa @relaysms.me.\n\nUnaweza kupokea majibu kwa SMS wakati wowote ujumbe unapotumwa kwa jina lako la utani.\nUnaweza kuchagua nchi ya kusambaza ujumbe kutoka kwenye kichupo cha \'Nchi\' hapa chini.\n\nEndelea kutuma ujumbe</string>
+    <string name="select_an_account">Chagua akaunti</string>
+    <string name="please_enter_your_telegram_code_without_copying_it_from_the_message_copying_might_get_flagged_and_telegram_might_block_your_account">Tafadhali ingiza msimbo wako wa Telegramu bila kuunakili kutoka kwenye ujumbe - kunakili kunaweza kuwekwa alama na Telegramu inaweza kuzuia akaunti yako.</string>
+    <string name="phone_number">Nambari ya Simu</string>
+    <string name="code">Msimbo</string>
+    <string name="hide_password">Ficha nenosiri</string>
+    <string name="show_password">Onyesha nenosiri</string>
+    <string name="no_account_selected">Hakuna akaunti iliyochaguliwa</string>
+    <string name="compose_email">Andika Barua Pepe</string>
+    <string name="to">Kwa</string>
+    <string name="subject">Mada</string>
+    <string name="no_account_selected_">Hakuna akaunti iliyochaguliwa</string>
+    <string name="new_message">Ujumbe Mpya</string>
+    <string name="sender">Mtumaji</string>
+    <string name="recipient_number">Nambari ya Mpokeaji</string>
+    <string name="message">Ujumbe</string>
+    <string name="new_post">Chapisho Jipya</string>
+    <string name="what_s_happening">Nini kinaendelea?</string>
+    <string name="connecting_the_world_one_sms_at_a_time">Kuunganisha ulimwengu, SMS moja kwa wakati</string>
+    <string name="relaysms_is_an_open_source_initiative_focused_on_enabling_communication_through_sms_without_relying_on_internet_connectivity_we_believe_in_a_connected_world_and_we_re_making_it_happen_one_sms_at_a_time_relaysms_remains_free_and_open_source">RelaySMS ni mpango wa chanzo huria unaolenga kuwezesha mawasiliano kupitia SMS bila kutegemea muunganisho wa intaneti. Tunaamini katika ulimwengu uliounganishwa, na tunafanikisha hilo SMS moja kwa wakati. RelaySMS inasalia kuwa huru na chanzo huria.</string>
+    <string name="app_tutorial">Mafunzo ya Programu</string>
+    <string name="support_us_by_starring_our_github_repository_and_sharing_it_with_your_friends">Tuunge mkono kwa kuweka nyota kwenye hazina yetu ya GitHub na kuishiriki na marafiki zako!</string>
+    <string name="send_new_message_">Tuma ujumbe mpya</string>
+    <string name="available_platforms">Majukwaa yanayopatikana</string>
+    <string name="use_your_relaysms_account">Tumia akaunti yako ya RelaySMS</string>
+    <string name="use_your_online_accounts">Tumia akaunti zako za mtandaoni</string>
+    <string name="navigate_back_to_home_screen">Rudi kwenye skrini ya nyumbani</string>
+    <string name="create_relaysms_account">Unda Akaunti ya RelaySMS</string>
+    <string name="create_your_account_and">"Unda akaunti yako na "</string>
+    <string name="save_platforms">hifadhi majukwaa</string>
+    <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline">" kwa RelaySMS kutuma ujumbe kwa Gmail, X, na Telegram kwa niaba yako ukiwa nje ya mtandao"</string>
+    <string name="i_have_read_the">"Nimesoma  "</string>
+    <string name="privacy_policy">sera ya faragha</string>
+    <string name="log_in">Ingia</string>
+    <string name="sign_up">Jisajili</string>
+    <string name="selected_gateway_client">Mteja wa Lango Aliyechaguliwa</string>
+    <string name="no_gateway_client_selected">Hakuna Mteja wa Lango Aliyechaguliwa</string>
+    <string name="available_countries">Nchi Zinazopatikana</string>
+    <string name="gateway_clients_refreshed_successfully">Wateja wa lango wameburudishwa kwa mafanikio!</string>
+    <string name="compose">Andika</string>
+    <string name="no_messages_in_inbox">Hakuna ujumbe kwenye sanduku la ujumbe</string>
+    <string name="paste_new_incoming_message">Bandika ujumbe mpya unaoingia</string>
+    <string name="log_into_relaysms">Ingia Kwenye RelaySMS</string>
+    <string name="log_into_your_account_and">"Ingia kwenye akaunti yako na "</string>
+    <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline_">" kwa RelaySMS kutuma ujumbe kwa Gmail, X, na Telegram kwa niaba yako ukiwa nje ya mtandao"</string>
+    <string name="already_got_code">Tayari umepata msimbo</string>
+    <string name="do_not_have_an_account">"Huna akaunti?  "</string>
+    <string name="get_started_with">Anza na</string>
+    <string name="compose_message">Andika Ujumbe</string>
+    <string name="use_your_phone_number_to_send_an_email_with_the_alias">"Tumia nambari yako ya simu kutuma barua pepe kwa jina la utani: "</string>
+    <string name="login_with_internet">Ingia kwa Intaneti</string>
+    <string name="these_features_requires_you_to_have_an_internet_connection">Vipengele hivi vinahitaji uwe na muunganisho wa intaneti</string>
+    <string name="input_your_code">Ingiza Msimbo Wako</string>
+    <string name="please_enter_the_6_digit_code_we_sent_to_you_via_sms">Tafadhali ingiza msimbo wa tarakimu 6 tulikutumia kupitia SMS</string>
+    <string name="the_code_would_automatically_be_detected_in_some_cases">Msimbo utagunduliwa kiotomatiki katika baadhi ya matukio</string>
+    <string name="paste_encrypted_text_into_this_box">Bandika maandishi yaliyosimbwa kwenye kisanduku hiki…</string>
+    <string name="this_is_an_example_of_an_encrypted_message_that_you_would_paste_here">Huu ni mfano wa ujumbe uliosimbwa ambao ungebandika hapa…</string>
+    <string name="relaysms_reply_please_paste_this_entire_message_in_your_relaysms_app">Jibu la RelaySMS Tafadhali bandika ujumbe huu wote kwenye programu yako ya RelaySMS</string>
+    <string name="click_to_paste">Bonyeza kubandika</string>
+    <string name="decrypt_message">Fumbua ujumbe</string>
+    <string name="send_your_first_message">Tuma ujumbe wako wa kwanza…</string>
+    <string name="save_platforms_">Hifadhi majukwaa</string>
+    <string name="phone_lockscreen_options">Chaguzi za Kufunga Skrini ya Simu</string>
+    <string name="enable_lockscreen">Washa kufunga skrini</string>
+    <string name="require_lockscreen_pin_fingerprint_when_starting_the_app">Hitaji PIN/alama ya kidole ya kufunga skrini unapoanzisha programu</string>
+    <string name="vault">Vault</string>
+    <string name="choose_which_platforms_you_want_to_remove_from_the_vault">Chagua majukwaa unayotaka kuondoa kutoka kwenye vault</string>
+    <string name="account">Akaunti</string>
+    <string name="clear_aliasing">Futa majina ya utani</string>
+    <string name="this_would_delete_your_auth_codes_stored_for_aliasing_you_can_request_for_another_code_at_anytime">Hii itafuta misimbo yako ya uthibitishaji iliyohifadhiwa kwa ajili ya majina ya utani. Unaweza kuomba msimbo mwingine wakati wowote.</string>
+    <string name="logout">Toka</string>
+    <string name="logout_of_your_account_you_can_always_log_back_in_however_your_current_messages_would_be_deleted">Toka kwenye akaunti yako. Unaweza kuingia tena wakati wowote, hata hivyo ujumbe wako wa sasa utafutwa.</string>
+    <string name="delete_">Futa</string>
+    <string name="deleting_your_account_means_deleting_all_your_saved_accounts_online_you_can_always_recreate_your_account_once_needed">Kufuta akaunti yako kunamaanisha kufuta akaunti zako zote zilizohifadhiwa mtandaoni. Unaweza kuunda upya akaunti yako wakati wowote inapohitajika.</string>
+    <string name="accessibility">Ufikivu</string>
+    <string name="language">Lugha</string>
+    <string name="messaging_">Ujumbe</string>
+    <string name="validate_with_phone_number_">Thibitisha kwa nambari ya simu</string>
+    <string name="you_have_a_device_id_for_the_device_you_log_into_it_is_used_to_identify_you_on_the_vault_you_can_switch_to_phone_number_to_reduce_size_of_sms_message_">Una Kitambulisho cha Kifaa kwa kifaa unachoingia. Kinatumika kukutambulisha kwenye Vault. Unaweza kubadilisha hadi nambari ya simu ili kupunguza ukubwa wa ujumbe wa SMS.</string>
+    <string name="security_and_privacy">Usalama na Faragha</string>
+    <string name="security">Usalama</string>
+    <string name="enable_app_locks_and_pin_codes">Washa kufunga programu na misimbo ya PIN</string>
+    <string name="english">Kiingereza</string>
+    <string name="arabic">Kiarabu</string>
+    <string name="french">Kifaransa</string>
+    <string name="farsi">Kiajemi</string>
+    <string name="spanish">Kihispania</string>
+    <string name="german">Kijerumani</string>
+    <string name="swahili">Kiswahili</string>
+    <string name="turkish">Kituruki</string>
+    <string name="welcome_to_relaysms_">Karibu kwenye RelaySMS!</string>
+    <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">Tumia SMS kutengeneza chapisho, kutuma barua pepe na ujumbe bila muunganisho wa intaneti</string>
+    <string name="learn_how_it_works_">Jifunze jinsi inavyofanya kazi</string>
+    <string name="read_our_privacy_policy">Soma sera yetu ya faragha</string>
+    <string name="skip">Ruka</string>
+    <string name="you_are_ready_to_begin_sending_messages_from_relaysms">Uko tayari kuanza kutuma ujumbe kutoka RelaySMS</string>
+    <string name="great">Vizuri!</string>
+    <string name="relaysms_vaults_securely_stores_your_online_accounts_so_that_you_can_access_them_without_an_internet_connection">Vaults za RelaySMS huhifadhi akaunti zako za mtandaoni kwa usalama, ili uweze kuzifikia bila muunganisho wa intaneti</string>
+    <string name="you_can_add_online_accounts_to_your_vault">Unaweza kuongeza akaunti za mtandaoni kwenye vault yako</string>
+
+</resources>

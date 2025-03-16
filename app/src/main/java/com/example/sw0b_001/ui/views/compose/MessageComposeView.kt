@@ -46,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,6 +56,7 @@ import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.ComposeHandlers
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.navigation.HomepageScreen
@@ -122,7 +124,8 @@ fun MessageComposeView(
                 if (selectedAccount == null) {
                     navController.popBackStack()
                 }
-                Toast.makeText(context, "No account selected", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context,
+                    context.getString(R.string.no_account_selected), Toast.LENGTH_SHORT).show()
             },
             onAccountSelected = { account ->
                 selectedAccount = account
@@ -139,7 +142,7 @@ fun MessageComposeView(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("New Message") },
+                title = { Text(stringResource(R.string.new_message)) },
                 navigationIcon = {
                     IconButton(onClick = {
                         navController.popBackStack()
@@ -181,7 +184,7 @@ fun MessageComposeView(
             OutlinedTextField(
                 value = from,
                 onValueChange = { },
-                label = { Text("Sender") },
+                label = { Text(stringResource(R.string.sender)) },
                 enabled = false,
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -203,7 +206,7 @@ fun MessageComposeView(
                 OutlinedTextField(
                     value = recipientNumber,
                     onValueChange = { recipientNumber = it },
-                    label = { Text("Recipient Number", style = MaterialTheme.typography.bodyMedium) },
+                    label = { Text(stringResource(R.string.recipient_number), style = MaterialTheme.typography.bodyMedium) },
                     modifier = Modifier.weight(1f),
                     isError = recipientNumber.isNotEmpty() && !verifyPhoneNumberFormat(recipientNumber),
                     keyboardOptions = KeyboardOptions(
@@ -232,7 +235,7 @@ fun MessageComposeView(
 
             // Dialing Code Hint
             Text(
-                text = "Always add the dialing code if absent. e.g +237",
+                text = stringResource(R.string.always_add_the_dialing_code_if_absent_e_g_237),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -243,7 +246,7 @@ fun MessageComposeView(
             OutlinedTextField(
                 value = message,
                 onValueChange = { message = it },
-                label = { Text("Message", style = MaterialTheme.typography.bodyMedium) },
+                label = { Text(stringResource(R.string.message), style = MaterialTheme.typography.bodyMedium) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
