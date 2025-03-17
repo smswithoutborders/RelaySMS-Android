@@ -5,6 +5,7 @@ import android.content.Intent
 import android.util.Base64
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.Headers
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.States
+import com.example.sw0b_001.Bridges.Bridges
 import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.GatewayClients.GatewayClientsCommunications
 import com.example.sw0b_001.Models.Messages.EncryptedContent
@@ -28,7 +29,7 @@ object ComposeHandlers {
             throw Exception("More than 1 states exist")
         }
 
-        val state = if(states.isNotEmpty())
+        val state = if(states.isNotEmpty() && account != null)
             States(String(Publishers.getEncryptedStates(context, states[0].value),
                 Charsets.UTF_8)) else States()
         val messageComposer = MessageComposer(context, state)
@@ -54,8 +55,8 @@ object ComposeHandlers {
         val encryptedContent = EncryptedContent()
         encryptedContent.encryptedContent = formattedContent
         encryptedContent.date = System.currentTimeMillis()
-        encryptedContent.type = platform?.service_type
-        encryptedContent.platformName = platform?.name
+        encryptedContent.type = platform?.service_type ?: Platforms.ServiceTypes.BRIDGE.type
+        encryptedContent.platformName = platform?.name ?: Platforms.ServiceTypes.BRIDGE.type
         encryptedContent.fromAccount = account?.account
 
         Datastore.getDatastore(context).encryptedContentDAO().insert(encryptedContent)

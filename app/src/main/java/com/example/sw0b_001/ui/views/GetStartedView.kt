@@ -44,6 +44,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
+import com.example.sw0b_001.ui.navigation.BridgeEmailComposeScreen
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.EmailComposeScreen
 import com.example.sw0b_001.ui.navigation.LoginScreen
@@ -91,7 +92,7 @@ fun GetStartedView (
                 .padding(start = 16.dp, end = 16.dp, bottom = 16.dp, top = 16.dp)
         ) {
             Button(
-                onClick = { navController.navigate(EmailComposeScreen) },
+                onClick = { navController.navigate(BridgeEmailComposeScreen) },
                 colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primaryContainer),
                 modifier = Modifier
                     .height(80.dp)

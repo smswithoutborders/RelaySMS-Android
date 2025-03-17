@@ -98,7 +98,7 @@ fun HomepageView(
         topBar = {
             when(bottomBarItem) {
                 BottomTabsItems.BottomBarRecentTab -> {
-                    if (isLoggedIn) {
+                    if (isLoggedIn || messages.isNotEmpty()) {
                         RecentAppBar(
                             navController = navController,
                             isSearchable = messages.isNotEmpty()
@@ -204,7 +204,7 @@ fun HomepageView(
         ) {
             when(bottomBarItem) {
                 BottomTabsItems.BottomBarRecentTab -> {
-                    if (isLoggedIn) {
+                    if (isLoggedIn || messages.isNotEmpty()) {
                         RecentView(
                             _messages = _messages,
                             navController = navController,

@@ -241,7 +241,6 @@ class MainActivity : ComponentActivity() {
                                 vault.refreshStoredTokens(applicationContext)
                             } catch(e: StatusRuntimeException) {
                                 if(e.status.code == Status.UNAUTHENTICATED.code) {
-                                    println("Yep, get me out")
                                     Vaults.setGetMeOut(applicationContext, true)
                                     CoroutineScope(Dispatchers.Main).launch {
                                         navController.navigate(GetMeOutScreen) {

@@ -36,9 +36,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.Bridges.Bridges
+import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.ComposeHandlers
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
@@ -102,6 +104,17 @@ fun EmailComposeView(
     var showSelectAccountModal by remember { mutableStateOf(false) }
     var selectedAccount: StoredPlatformsEntity? by remember { mutableStateOf(null) }
 
+    LaunchedEffect(Unit) {
+        if(BuildConfig.DEBUG && platformsViewModel.message == null) {
+            if(from.isEmpty()) from = if(isBridge) "" else "from@relaysms.me"
+            if(to.isEmpty()) to = "to@relaysms.me"
+            if(cc.isEmpty()) cc = "cc@relaysms.me"
+            if(bcc.isEmpty()) bcc = "bcc@relaysms.me"
+            if(subject.isEmpty()) subject = "subject@relaysms.me"
+            if(body.isEmpty()) body = "Here lies the body of this email message!"
+        }
+    }
+
     LaunchedEffect(isBridge) {
         showSelectAccountModal = !isBridge
     }
@@ -111,7 +124,7 @@ fun EmailComposeView(
     }
 
     // Conditionally show the SelectAccountModal
-    if (showSelectAccountModal) {
+    if (showSelectAccountModal && !isBridge) {
         SelectAccountModal(
             platformsViewModel = platformsViewModel,
             onDismissRequest = {
@@ -285,8 +298,9 @@ private fun processSend(
                     bcc = emailContent.bcc,
                     subject = emailContent.subject,
                     body = emailContent.body
-                ).first
-            } else {
+                ) { onCompleteCallback() }
+            }
+            else {
                 val formattedContent = processEmailForEncryption(
                     emailContent.to,
                     emailContent.cc,
@@ -295,15 +309,14 @@ private fun processSend(
                     emailContent.body,
                     account
                 )
-                val availablePlatforms = Datastore.getDatastore(context)
-                    .availablePlatformsDao().fetch(account!!.name!!)
+
+                val availablePlatforms =
+                    Datastore.getDatastore(context).availablePlatformsDao().fetch(account!!.name!!)
                 ComposeHandlers.compose(context,
                     formattedContent,
-                    availablePlatforms!!,
+                    availablePlatforms,
                     account,
-                ) {
-                    onCompleteCallback()
-                }
+                ) { onCompleteCallback() }
             }
         } catch(e: Exception) {
             e.printStackTrace()

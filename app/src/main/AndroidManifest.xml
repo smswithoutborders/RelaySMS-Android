@@ -34,16 +34,6 @@
         tools:replace="android:label">
 
         <activity
-            android:name=".MainActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:launchMode="singleInstance"
-            android:exported="true" />
-
-        <activity
-            android:name=".SettingsActivity"
-            android:exported="false" />
-
-        <activity
             android:name=".Security.LockScreenActivity"
             android:exported="true">
             <intent-filter>
@@ -52,6 +42,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".MainActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:launchMode="singleInstance"
+            android:exported="true" />
+
+        <activity
+            android:name=".SettingsActivity"
+            android:exported="false" />
 
         <service
             android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"

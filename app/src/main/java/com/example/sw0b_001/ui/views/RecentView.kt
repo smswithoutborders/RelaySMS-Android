@@ -182,7 +182,6 @@ fun RecentView(
                     items(messages) { message ->
                         RecentMessageCard(message) {
                             platformsViewModel.message = it
-                            print(it.type)
                             when(it.type) {
                                 Platforms.ServiceTypes.EMAIL.type -> {
                                     navController.navigate(EmailViewScreen)

@@ -57,6 +57,7 @@ object Bridges {
         bcc: String,
         subject: String,
         body: String,
+        onSuccessCallback: () -> Unit?
     ) : Pair<String?, ByteArray?> {
 
         val isLoggedIn = Vaults.fetchLongLivedToken(context).isNotEmpty()
@@ -82,7 +83,7 @@ object Bridges {
             val messageComposer = ComposeHandlers.compose(
                 context = context,
                 formattedContent = this,
-            )
+            ) { onSuccessCallback() }
             if(!isLoggedIn) {
                 clientPublicKey?.let {
                     authRequestAndPayload(it, messageComposer)
