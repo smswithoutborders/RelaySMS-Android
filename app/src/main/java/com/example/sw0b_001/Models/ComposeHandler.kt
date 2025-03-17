@@ -22,6 +22,7 @@ object ComposeHandlers {
         formattedContent: String,
         platform: AvailablePlatforms? = null,
         account: StoredPlatformsEntity? = null,
+        smsTransmission: Boolean = true,
         onSuccessRunnable: () -> Unit? = {}
     ) : ByteArray {
         val states = Datastore.getDatastore(context).ratchetStatesDAO().fetch()
@@ -44,13 +45,15 @@ object ComposeHandlers {
         val gatewayClientMSISDN = GatewayClientsCommunications(context)
             .getDefaultGatewayClient()
 
-        val sentIntent = SMSHandler.transferToDefaultSMSApp(
-            context,
-            gatewayClientMSISDN!!,
-            encryptedContentBase64).apply {
+        if(smsTransmission) {
+            val sentIntent = SMSHandler.transferToDefaultSMSApp(
+                context,
+                gatewayClientMSISDN!!,
+                encryptedContentBase64).apply {
                 setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
-        context.startActivity(sentIntent)
+            context.startActivity(sentIntent)
+        }
 
         val encryptedContent = EncryptedContent()
         encryptedContent.encryptedContent = formattedContent

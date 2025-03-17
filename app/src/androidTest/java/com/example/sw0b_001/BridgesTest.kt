@@ -54,7 +54,7 @@ class BridgesTest {
             bcc = bcc,
             subject = subject,
             body = body
-        )
+        ){ }
         var payload = Json.encodeToString(GatewayClientRequest(phoneNumber, request.first!!))
         println("Publishing: $payload")
 
@@ -80,7 +80,7 @@ class BridgesTest {
             bcc = bcc,
             subject = subject,
             body = "Second message"
-        )
+        ){}
         payload = Json.encodeToString(GatewayClientRequest(phoneNumber, request.first!!))
         println("Publishing 2: $payload")
 

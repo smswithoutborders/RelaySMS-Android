@@ -8,11 +8,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.DeveloperMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,15 +47,20 @@ import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.ComposeHandlers
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.Modules.Network
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.views.DeveloperHTTPView
 import com.example.sw0b_001.ui.views.compose.EmailComposeHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 data class EmailContent(
     var to: String,
@@ -81,6 +88,27 @@ object EmailComposeHandler {
 }
 
 
+@Serializable
+data class GatewayClientRequest(val address: String, val text: String)
+
+private fun networkRequest(
+    url: String,
+    payload: GatewayClientRequest,
+) : String? {
+    var payload = Json.encodeToString(payload)
+    println("Publishing: $payload")
+
+    try {
+        var response = Network.jsonRequestPost(url, payload)
+        var text = response.result.get()
+        return text
+    } catch(e: Exception) {
+        println(e.message)
+        return e.message
+    }
+}
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmailComposeView(
@@ -103,6 +131,10 @@ fun EmailComposeView(
 
     var showSelectAccountModal by remember { mutableStateOf(false) }
     var selectedAccount: StoredPlatformsEntity? by remember { mutableStateOf(null) }
+
+    var gatewayServerUrl by remember{
+        mutableStateOf("https://gatewayserver.staging.smswithoutborders.com/v3/publish")
+    }
 
     LaunchedEffect(Unit) {
         if(BuildConfig.DEBUG && platformsViewModel.message == null) {
@@ -142,6 +174,45 @@ fun EmailComposeView(
         )
     }
 
+    var showDeveloperDialog by remember { mutableStateOf(false) }
+    var developerIsLoading by remember { mutableStateOf(false) }
+    var developerRequestStatus by remember { mutableStateOf("") }
+
+    if(showDeveloperDialog) {
+        DeveloperHTTPView(
+            dialingUrl = gatewayServerUrl,
+            requestStatus = developerRequestStatus,
+            isLoading = developerIsLoading,
+            httpRequestCallback = { _, dialingUrl ->
+                developerIsLoading = true
+                developerRequestStatus = "dialing...\n"
+
+                val scope = CoroutineScope(Dispatchers.Default).launch {
+                    developerRequestStatus += networkRequest(
+                        url = dialingUrl,
+                        payload = GatewayClientRequest(
+                            address = "+237123456789",
+                            text = Bridges.compose(
+                                context = context,
+                                to = to,
+                                cc = cc,
+                                bcc = bcc,
+                                subject = subject,
+                                body = body,
+                                smsTransmission = false,
+                                onSuccessCallback = {}
+                            ).first!!
+                        ),
+                    )
+                    developerRequestStatus += "\nending..."
+                    developerIsLoading = false
+                }
+            }
+        ) {
+            showDeveloperDialog = false
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -153,25 +224,36 @@ fun EmailComposeView(
                 },
                 actions = {
                     IconButton(
+                        onClick = {
+                            showDeveloperDialog = true
+                        },
                         enabled = to.isNotEmpty() && body.isNotEmpty(),
-                        onClick = { processSend(
-                            context = context,
-                            emailContent = EmailContent(
-                                to = to,
-                                cc = cc,
-                                bcc = bcc,
-                                subject = subject,
-                                body = body
-                            ),
-                            account = selectedAccount,
-                            isBridge = isBridge,
-                            onFailureCallback = {}
-                        ) {
-                            CoroutineScope(Dispatchers.Main).launch {
-                                navController.navigate(HomepageScreen)
+                    ) {
+                        Icon(Icons.Default.DeveloperMode, contentDescription = "Send")
+                    }
+
+                    IconButton(
+                        enabled = to.isNotEmpty() && body.isNotEmpty(),
+                        onClick = {
+                            processSend(
+                                context = context,
+                                emailContent = EmailContent(
+                                    to = to,
+                                    cc = cc,
+                                    bcc = bcc,
+                                    subject = subject,
+                                    body = body
+                                ),
+                                account = selectedAccount,
+                                isBridge = isBridge,
+                                onFailureCallback = {}
+                            ) {
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    navController.navigate(HomepageScreen)
+                                }
                             }
                         }
-                    }) {
+                    ) {
                         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
                     }
                 },
@@ -181,6 +263,7 @@ fun EmailComposeView(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .imePadding()
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {

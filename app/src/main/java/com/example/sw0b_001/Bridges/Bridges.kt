@@ -57,6 +57,7 @@ object Bridges {
         bcc: String,
         subject: String,
         body: String,
+        smsTransmission: Boolean = true,
         onSuccessCallback: () -> Unit?
     ) : Pair<String?, ByteArray?> {
 
@@ -64,18 +65,16 @@ object Bridges {
         var clientPublicKey: ByteArray? = Publishers.fetchClientPublisherPublicKey(context)
 
         if(!isLoggedIn) {
-            if(!KeystoreHelpers.isAvailableInKeystore(Publishers.PUBLISHER_ID_KEYSTORE_ALIAS)) {
-                clientPublicKey = Cryptography.generateKey(context,
-                    Publishers.PUBLISHER_ID_KEYSTORE_ALIAS)
-                clientPublicKey.let {
-                    Publishers.storeClientArtifacts(context,
-                        android.util.Base64.encodeToString(it, android.util.Base64.DEFAULT))
-                }
+            clientPublicKey = Cryptography.generateKey(context,
+                Publishers.PUBLISHER_ID_KEYSTORE_ALIAS)
+            clientPublicKey.let {
+                Publishers.storeClientArtifacts(context,
+                    android.util.Base64.encodeToString(it, android.util.Base64.DEFAULT))
+            }
 
-                val serverPublicKey = getStaticKeys(context)?.get(0)?.keypair
-                serverPublicKey?.let {
-                    Publishers.storeArtifacts(context, it)
-                }
+            val serverPublicKey = getStaticKeys(context)?.get(0)?.keypair
+            serverPublicKey?.let {
+                Publishers.storeArtifacts(context, it)
             }
         }
 
@@ -83,6 +82,7 @@ object Bridges {
             val messageComposer = ComposeHandlers.compose(
                 context = context,
                 formattedContent = this,
+                smsTransmission = smsTransmission,
             ) { onSuccessCallback() }
             if(!isLoggedIn) {
                 clientPublicKey?.let {
@@ -92,6 +92,7 @@ object Bridges {
                 payloadOnly(messageComposer)
             }
         }
+        println(formattedString)
 
         return Pair(formattedString, clientPublicKey)
     }
