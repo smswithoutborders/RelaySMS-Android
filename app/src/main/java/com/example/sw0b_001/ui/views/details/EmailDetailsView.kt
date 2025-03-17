@@ -75,7 +75,9 @@ fun EmailDetailsView(
                     platformsViewModel.platform = platform
 
                     CoroutineScope(Dispatchers.Main).launch {
-                        navController.navigate(if(!isBridge) EmailComposeScreen else BridgeEmailComposeScreen)
+                        navController.navigate(
+                            if(!isBridge) EmailComposeScreen else BridgeEmailComposeScreen
+                        )
                     }
                 }
             }) {

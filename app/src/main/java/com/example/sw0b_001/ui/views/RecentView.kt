@@ -164,64 +164,47 @@ fun RecentView(
         if(LocalInspectionMode.current) _messages
         else messagesViewModel.getMessages(context = context).observeAsState(emptyList()).value
 
-    val isLoading by messagesViewModel.isLoading.collectAsState()
-
     Box(Modifier
         .padding(16.dp)
         .fillMaxSize()
     ) {
-        if(LocalInspectionMode.current || !isLoading) {
-            if(messages.isNotEmpty()) {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    contentPadding = PaddingValues(vertical = 16.dp)
-                ) {
-                    items(messages) { message ->
-                        RecentMessageCard(message) {
-                            platformsViewModel.message = it
-                            when(it.type) {
-                                Platforms.ServiceTypes.EMAIL.type -> {
-                                    navController.navigate(EmailViewScreen)
-                                }
-                                Platforms.ServiceTypes.BRIDGE.type -> {
-                                    navController.navigate(BridgeViewScreen)
-                                }
-                                Platforms.ServiceTypes.TEXT.type -> {
-                                    navController.navigate(TextViewScreen)
-                                }
-                                Platforms.ServiceTypes.MESSAGE.type -> {
-                                    navController.navigate(MessageViewScreen)
-                                }
-                                else -> {
-                                    TODO()
-                                }
+        if(messages.isNotEmpty()) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(vertical = 16.dp)
+            ) {
+                items(messages) { message ->
+                    RecentMessageCard(message) {
+                        platformsViewModel.message = it
+                        when(it.type) {
+                            Platforms.ServiceTypes.EMAIL.type -> {
+                                navController.navigate(EmailViewScreen)
+                            }
+                            Platforms.ServiceTypes.BRIDGE.type -> {
+                                navController.navigate(BridgeViewScreen)
+                            }
+                            Platforms.ServiceTypes.TEXT.type -> {
+                                navController.navigate(TextViewScreen)
+                            }
+                            Platforms.ServiceTypes.MESSAGE.type -> {
+                                navController.navigate(MessageViewScreen)
+                            }
+                            else -> {
+                                TODO()
                             }
                         }
                     }
                 }
             }
-            else {
-                RecentViewNoMessages(
-                    saveNewPlatformCallback = { tabRequestedCallback() },
-                    sendNewMessageCallback = { sendNewMessageRequested = true }
-                )
-            }
-
         }
         else {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.secondary,
-                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                )
-            }
+            RecentViewNoMessages(
+                saveNewPlatformCallback = { tabRequestedCallback() },
+                sendNewMessageCallback = { sendNewMessageRequested = true }
+            )
         }
         if (sendNewMessageRequested) {
             ActivePlatformsModal(

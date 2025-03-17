@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +34,7 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.Models.GatewayClients.GatewayClientViewModel
@@ -45,8 +47,15 @@ import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.appbars.GatewayClientsAppBar
 import com.example.sw0b_001.ui.appbars.RecentAppBar
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
+import com.example.sw0b_001.ui.modals.AddGatewayClientModal
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.theme.AppTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import androidx.compose.runtime.collectAsState
 
 enum class BottomTabsItems {
     BottomBarRecentTab,
@@ -75,7 +84,7 @@ fun HomepageView(
         )
     }
 
-    val messages: List<EncryptedContent> = if(_messages.isNotEmpty()) _messages
+    val messages: List<EncryptedContent> = if(LocalInspectionMode.current) _messages
     else messagesViewModel.getMessages(context).observeAsState(emptyList()).value
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -92,6 +101,7 @@ fun HomepageView(
 
     var sendNewMessageRequested by remember { mutableStateOf(false)}
 
+    val isLoading by messagesViewModel.isLoading.collectAsState()
 
     Scaffold (
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -213,7 +223,7 @@ fun HomepageView(
                         ) {
                             bottomBarItem = BottomTabsItems.BottomBarPlatformsTab
                         }
-                    } else {
+                    } else if(!isLoading){
                         GetStartedView(navController = navController)
                     }
                 }
@@ -224,9 +234,7 @@ fun HomepageView(
                     )
                 }
                 BottomTabsItems.BottomBarCountriesTab -> {
-                    GatewayClientView(addShowBottomSheet = showAddGatewayClientsModal, viewModel = gatewayClientViewModel) {
-//                        showAddGatewayClientsModal = false
-                    }
+                    GatewayClientView( viewModel = gatewayClientViewModel )
                 }
 
                 BottomTabsItems.BottomBarInboxTab -> {
@@ -247,6 +255,18 @@ fun HomepageView(
                     sendNewMessageRequested = false
                 }
             }
+
+            if (showAddGatewayClientsModal) {
+                AddGatewayClientModal(
+                    showBottomSheet = showAddGatewayClientsModal,
+                    onDismiss = { showAddGatewayClientsModal = false },
+                    viewModel = gatewayClientViewModel,
+                    onGatewayClientSaved = {
+                        showAddGatewayClientsModal = false
+                    }
+                )
+            }
+
         }
     }
 }

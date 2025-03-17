@@ -44,8 +44,6 @@ import com.example.sw0b_001.ui.theme.AppTheme
 @Composable
 fun GatewayClientView(
     viewModel: GatewayClientViewModel,
-    addShowBottomSheet: Boolean = false,
-    onDismissCallback: () -> Unit? = {}
 ) {
     val context = LocalContext.current
 
@@ -143,17 +141,6 @@ fun GatewayClientView(
             LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
         }
 
-        if (addShowBottomSheet) {
-            AddGatewayClientModal(
-                showBottomSheet = addShowBottomSheet,
-                onDismiss = { onDismissCallback() },
-                viewModel = viewModel,
-                onGatewayClientSaved = {
-                    onDismissCallback()
-                }
-            )
-        }
-
         if (optionsShowBottomSheet) {
             currentGatewayClient?.let {
                 val isSelected = defaultGatewayClient?.mSISDN == it.mSISDN
@@ -173,7 +160,6 @@ fun GatewayClientView(
 //                        viewModel.selectGatewayClient(currentGatewayClient!!)
                         defaultGatewayClient = gatewayClient
                         optionsShowBottomSheet = false
-                        onDismissCallback()
                     },
                     isDefault = currentGatewayClient!!.isDefault,
                     isSelected = isSelected

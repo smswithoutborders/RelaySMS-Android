@@ -11,6 +11,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 class MessagesViewModel : ViewModel() {
@@ -21,6 +22,7 @@ class MessagesViewModel : ViewModel() {
     private lateinit var messagesList: LiveData<MutableList<EncryptedContent>>
 
     private lateinit var datastore: Datastore
+
     fun getMessages(context: Context): LiveData<MutableList<EncryptedContent>> {
         viewModelScope.launch {
             if (!::messagesList.isInitialized) {
@@ -28,9 +30,9 @@ class MessagesViewModel : ViewModel() {
 
                 datastore = Datastore.getDatastore(context)
                 messagesList = loadEncryptedContents()
+                delay(50)
+                _isLoading.value = false
             }
-            delay(50)
-            _isLoading.value = false
         }
         return messagesList
     }
