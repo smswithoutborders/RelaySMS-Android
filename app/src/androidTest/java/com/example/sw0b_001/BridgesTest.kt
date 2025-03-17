@@ -35,14 +35,6 @@ class BridgesTest {
     var body = "Hello world"
 
     @Test
-    fun bridgeDecomposeTest() {
-        val incomingText = ""
-        val text = Bridges.decryptIncomingMessages(context, incomingText)
-
-        println(text)
-    }
-
-    @Test
     fun bridgeComposeTest() {
         Vaults.logout(context) {}
         Datastore.getDatastore(context).ratchetStatesDAO().deleteAll()
@@ -53,7 +45,8 @@ class BridgesTest {
             cc = cc,
             bcc = bcc,
             subject = subject,
-            body = body
+            body = body,
+            smsTransmission = false
         ){ }
         var payload = Json.encodeToString(GatewayClientRequest(phoneNumber, request.first!!))
         println("Publishing: $payload")

@@ -151,7 +151,7 @@ object Bridges {
 
 
     fun decryptIncomingMessages(context: Context, text: String) : String {
-        val splitPayload = text.split('\n')
+        val splitPayload = text.split("\n")
 
         if(splitPayload.size < 2) {
             throw Exception("Payload is less than 2")

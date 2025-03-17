@@ -175,10 +175,11 @@ fun EmailComposeView(
     }
 
     var showDeveloperDialog by remember { mutableStateOf(false) }
-    var developerIsLoading by remember { mutableStateOf(false) }
-    var developerRequestStatus by remember { mutableStateOf("") }
 
     if(showDeveloperDialog) {
+        var developerIsLoading by remember { mutableStateOf(false) }
+        var developerRequestStatus by remember { mutableStateOf("") }
+
         DeveloperHTTPView(
             dialingUrl = gatewayServerUrl,
             requestStatus = developerRequestStatus,
