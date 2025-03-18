@@ -27,9 +27,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -49,9 +51,14 @@ import com.example.sw0b_001.ui.theme.AppTheme
 
 @Composable
 fun InboxView(
+    _messages: List<EncryptedContent> = emptyList<EncryptedContent>(),
+    messagesViewModel: MessagesViewModel,
     navController: NavController,
-    messages: List<EncryptedContent>,
 ) {
+    val context = LocalContext.current
+    val messages: List<EncryptedContent> = if(LocalInspectionMode.current) _messages
+    else messagesViewModel.getInboxMessages(context).observeAsState(emptyList()).value
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -115,8 +122,8 @@ fun MessageListContent(messages: List<EncryptedContent>, navController: NavContr
 fun InboxViewEmptyPreview() {
     AppTheme {
         InboxView(
+            messagesViewModel = MessagesViewModel(),
             navController = NavController(LocalContext.current),
-            messages = emptyList()
         )
     }
 }
@@ -143,9 +150,9 @@ fun InboxScreenMessages_Preview() {
         text.gatewayClientMSISDN = "+237123456789"
         text.encryptedContent = "@relaysms.me:Hello world"
         InboxView(
-            messages = listOf(encryptedContent, text),
+            _messages = listOf(encryptedContent, text),
+            messagesViewModel = MessagesViewModel(),
             navController = rememberNavController(),
-
         )
     }
 }

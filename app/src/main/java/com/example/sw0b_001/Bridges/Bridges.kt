@@ -1,6 +1,7 @@
 package com.example.sw0b_001.Bridges
 
 import android.content.Context
+import android.icu.text.DateFormat
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.KeystoreHelpers
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.Database.Datastore
@@ -11,6 +12,7 @@ import com.example.sw0b_001.Models.Platforms.Platforms
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.Models.Publishers
 import com.example.sw0b_001.Models.Vaults
+import com.example.sw0b_001.Modules.Helpers
 import com.example.sw0b_001.Security.Cryptography
 import com.example.sw0b_001.ui.views.compose.EmailContent
 import kotlinx.coroutines.CoroutineScope
@@ -22,6 +24,12 @@ import okio.IOException
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.Charset
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+import java.util.TimeZone
+import java.util.concurrent.TimeUnit
 import kotlin.io.encoding.Base64
 
 object Bridges {
@@ -34,11 +42,19 @@ object Bridges {
     )
 
     data class BridgeEmailContent(
+        var to: String,
+        var cc: String,
+        var bcc: String,
+        var subject: String,
+        var body: String
+    )
+    data class BridgeIncomingEmailContent(
         var alias: String,
         var sender: String,
         var cc: String,
         var bcc: String,
         var subject: String,
+        var date: Long,
         var body: String
     )
 
@@ -46,14 +62,30 @@ object Bridges {
         fun decomposeMessage(
             message: String,
         ): BridgeEmailContent {
-            return message.split("\n").let {
+            println(message)
+            return message.split(":").let {
                 BridgeEmailContent(
+                    to = it[0],
+                    cc = it[1],
+                    bcc = it[2],
+                    subject = it[3],
+                    body = it.subList(4, it.size).joinToString()
+                )
+            }
+        }
+
+        fun decomposeInboxMessage(
+            message: String,
+        ): BridgeIncomingEmailContent {
+            return message.split("\n").let {
+                BridgeIncomingEmailContent(
                     alias = it[0],
                     sender = it[1],
                     cc = it[2],
                     bcc = it[3],
                     subject = it[4],
-                    body = it.subList(5, it.size).joinToString()
+                    date = it[5].toLong(),
+                    body = it.subList(6, it.size).joinToString()
                 )
             }
         }
@@ -178,7 +210,11 @@ object Bridges {
     }
 
 
-    fun decryptIncomingMessages(context: Context, text: String) : String? {
+    fun decryptIncomingMessages(
+        context: Context,
+        text: String,
+        onSuccessCallback: () -> Unit?
+    ) : String? {
         val splitPayload = text.split("\n")
 
         if(splitPayload.size < 2) {
@@ -209,31 +245,37 @@ object Bridges {
                 cipherText = cipherText,
                 AD = AD!!
             ) {
-                val encryptedContent = EncryptedContent()
-                encryptedContent.encryptedContent = it.run {
-                    this.substring(0, lenAliasAddress)
-                        .plus("\n")
-                        .plus(this.substring(lenAliasAddress, lenAliasAddress + lenSender))
-                        .plus("\n")
-                        .plus(this.substring(lenAliasAddress + lenSender,
-                            lenAliasAddress + lenSender + lenCC))
-                        .plus("\n")
-                        .plus(this.substring(lenAliasAddress + lenSender + lenCC,
-                            lenAliasAddress + lenSender + lenCC + lenBCC))
-                        .plus("\n")
-                        .plus(this.substring(lenAliasAddress + lenSender + lenCC + lenBCC,
-                            lenAliasAddress + lenSender + lenCC + lenBCC + lenSubject))
-                        .plus("\n")
-                        .plus(this.substring(lenAliasAddress + lenSender + lenCC + lenBCC + lenSubject,
-                            lenAliasAddress + lenSender + lenCC + lenBCC + lenSubject + lenBody))
-                }
-                encryptedContent.date = System.currentTimeMillis()
-                encryptedContent.type = Platforms.ServiceTypes.BRIDGE.type
-                encryptedContent.platformName = Platforms.ServiceTypes.BRIDGE.type
-                encryptedContent.fromAccount = it.substring(lenAliasAddress, lenAliasAddress + lenSender)
+                try {
+                    val encryptedContent = EncryptedContent()
+                    encryptedContent.encryptedContent = it.run {
+                        this.substring(0, lenAliasAddress)
+                            .plus("\n")
+                            .plus(this.substring(lenAliasAddress, lenAliasAddress + lenSender))
+                            .plus("\n")
+                            .plus(this.substring(lenAliasAddress + lenSender,
+                                lenAliasAddress + lenSender + lenCC))
+                            .plus("\n")
+                            .plus(this.substring(lenAliasAddress + lenSender + lenCC,
+                                lenAliasAddress + lenSender + lenCC + lenBCC))
+                            .plus("\n")
+                            .plus(this.substring(lenAliasAddress + lenSender + lenCC + lenBCC,
+                                lenAliasAddress + lenSender + lenCC + lenBCC + lenSubject))
+                            .plus("\n")
+                            .plus(splitPayload[2].split("\\.")[0])
+                            .plus("\n")
+                            .plus(this.substring(lenAliasAddress + lenSender + lenCC + lenBCC + lenSubject,
+                                lenAliasAddress + lenSender + lenCC + lenBCC + lenSubject + lenBody))
+                    }
+                    encryptedContent.date = System.currentTimeMillis()
+                    encryptedContent.type = Platforms.ServiceTypes.BRIDGE_INCOMING.type
+                    encryptedContent.platformName = Platforms.ServiceTypes.BRIDGE.type
+                    encryptedContent.fromAccount = it.substring(lenAliasAddress, lenAliasAddress + lenSender)
 
-                Datastore.getDatastore(context).encryptedContentDAO().insert(encryptedContent)
-                println("Stored in db")
+                    Datastore.getDatastore(context).encryptedContentDAO().insert(encryptedContent)
+                    onSuccessCallback()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         }
         return decryptedText

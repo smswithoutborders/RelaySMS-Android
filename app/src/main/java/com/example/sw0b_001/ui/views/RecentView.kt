@@ -166,7 +166,7 @@ fun RecentView(
         else messagesViewModel.getMessages(context = context).observeAsState(emptyList()).value
 
     Box(Modifier
-        .padding(16.dp)
+        .padding(8.dp)
         .fillMaxSize()
     ) {
         if(messages.isNotEmpty()) {
@@ -258,6 +258,14 @@ fun RecentMessageCard(
     when(message.type) {
         Platforms.ServiceTypes.EMAIL.type -> {
             val decomposed = EmailComposeHandler.decomposeMessage(
+                message.encryptedContent!!,
+            )
+            heading = message.fromAccount ?: "RelaySMS"
+            subHeading = decomposed.subject
+            text = decomposed.body
+        }
+        Platforms.ServiceTypes.BRIDGE_INCOMING.type -> {
+            val decomposed = Bridges.BridgeComposeHandler.decomposeInboxMessage(
                 message.encryptedContent!!,
             )
             heading = message.fromAccount ?: "RelaySMS"

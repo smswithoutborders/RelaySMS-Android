@@ -38,6 +38,7 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
+import com.example.sw0b_001.Bridges.Bridges
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.ui.navigation.BridgeEmailComposeScreen
@@ -54,17 +55,33 @@ fun EmailDetailsView(
     isBridge: Boolean = false
 ) {
     val context = LocalContext.current
-    val decomposedMessage = EmailComposeHandler.decomposeMessage(
-        platformsViewModel.message!!.encryptedContent!!)
-
     var from by remember{ mutableStateOf(
         platformsViewModel.message?.fromAccount ?: "RelaySMS account") }
-    var to by remember{ mutableStateOf(decomposedMessage.to) }
-    var cc by remember{ mutableStateOf(decomposedMessage.cc) }
-    var bcc by remember{ mutableStateOf(decomposedMessage.bcc) }
-    var subject by remember{ mutableStateOf(decomposedMessage.subject) }
-    var body by remember{ mutableStateOf(decomposedMessage.body) }
+    var to by remember{ mutableStateOf("") }
+    var cc by remember{ mutableStateOf("") }
+    var bcc by remember{ mutableStateOf("") }
+    var subject by remember{ mutableStateOf("") }
+    var body by remember{ mutableStateOf("") }
     var date by remember{ mutableLongStateOf(platformsViewModel.message!!.date) }
+
+    if(isBridge)
+        Bridges.BridgeComposeHandler
+            .decomposeMessage(platformsViewModel.message!!.encryptedContent!!).apply {
+                to = this.to
+                cc = this.cc
+                bcc = this.bcc
+                subject = this.subject
+                body = this.body
+            }
+    else
+        EmailComposeHandler.decomposeMessage(platformsViewModel.message!!.encryptedContent!!).apply {
+            to = this.to
+            cc = this.cc
+            bcc = this.bcc
+            subject = this.subject
+            body = this.body
+        }
+
 
     Scaffold(
         topBar = {

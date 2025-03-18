@@ -38,6 +38,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.Bridges.Bridges
 import com.example.sw0b_001.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -125,8 +128,11 @@ fun PasteEncryptedTextView(
 
             Button(
                 onClick = {
-                    val text = Bridges.decryptIncomingMessages(context, pastedText)
-                    println(text)
+                    Bridges.decryptIncomingMessages(context, pastedText) {
+                        val scope = CoroutineScope(Dispatchers.Main).launch {
+                            navController.popBackStack()
+                        }
+                    }
                 },
                 enabled = isDecryptButtonEnabled,
                 modifier = Modifier.fillMaxWidth()

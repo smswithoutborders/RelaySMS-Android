@@ -21,7 +21,8 @@ class Platforms {
         EMAIL("email"),
         TEXT("text"),
         MESSAGE("message"),
-        BRIDGE("bridge")
+        BRIDGE("bridge"),
+        BRIDGE_INCOMING("bridge_incoming")
     }
 
     enum class ProtocolTypes(val type: String) {
