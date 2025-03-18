@@ -137,7 +137,6 @@ class MainActivity : ComponentActivity() {
                 GetMeOutOfHere(navController)
             }
             composable<HomepageScreen> {
-                messagesViewModel.getMessages(applicationContext)
                 HomepageView(
                     navController = navController,
                     platformsViewModel = platformsViewModel,

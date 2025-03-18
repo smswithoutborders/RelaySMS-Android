@@ -47,6 +47,7 @@ import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.ComposeHandlers
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.Models.Publishers
 import com.example.sw0b_001.Modules.Network
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.Account
@@ -74,7 +75,6 @@ object EmailComposeHandler {
     fun decomposeMessage(
         message: String,
     ): EmailContent {
-        println(message)
         return message.split(":").let {
             EmailContent(
                 to = it[0],
@@ -396,8 +396,10 @@ private fun processSend(
 
                 val availablePlatforms =
                     Datastore.getDatastore(context).availablePlatformsDao().fetch(account!!.name!!)
+                val AD = Publishers.fetchPublisherPublicKey(context)
                 ComposeHandlers.compose(context,
                     formattedContent,
+                    AD!!,
                     availablePlatforms,
                     account,
                 ) { onCompleteCallback() }

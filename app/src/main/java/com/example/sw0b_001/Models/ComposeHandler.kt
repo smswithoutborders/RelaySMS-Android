@@ -20,6 +20,7 @@ object ComposeHandlers {
     fun compose(
         context: Context,
         formattedContent: String,
+        AD: ByteArray,
         platform: AvailablePlatforms? = null,
         account: StoredPlatformsEntity? = null,
         smsTransmission: Boolean = true,
@@ -33,7 +34,7 @@ object ComposeHandlers {
         val state = if(states.isNotEmpty() && account != null)
             States(String(Publishers.getEncryptedStates(context, states[0].value),
                 Charsets.UTF_8)) else States()
-        val messageComposer = MessageComposer(context, state)
+        val messageComposer = MessageComposer(context, state, AD)
         var encryptedContentBase64 = if(platform != null)
             messageComposer.compose( platform, formattedContent)
         else messageComposer.composeBridge(formattedContent)
@@ -71,6 +72,7 @@ object ComposeHandlers {
     fun decompose(
         context: Context,
         cipherText: ByteArray,
+        AD: ByteArray,
         onSuccessRunnable: (String) -> Unit?
     ) : String {
         val states = Datastore.getDatastore(context).ratchetStatesDAO().fetch()
@@ -84,17 +86,18 @@ object ComposeHandlers {
             Charsets.UTF_8)
         )
 
-        val messageComposer = MessageComposer(context, state)
+        val messageComposer = MessageComposer(context, state, AD)
         val lenHeader = cipherText.copyOfRange(0, 4).run {
-            ByteBuffer.wrap(this).order(ByteOrder.LITTLE_ENDIAN).short.toUInt().toInt()
+            ByteBuffer.wrap(this).order(ByteOrder.LITTLE_ENDIAN).int
         }
         val header = cipherText.copyOfRange(4, 4 + lenHeader).run {
             Headers.deSerializeHeader(this)
         }
 
+        val ct = cipherText.copyOfRange(4 + lenHeader, cipherText.size)
         val text = messageComposer.decryptBridge(
             header = header,
-            content = cipherText.copyOfRange(4 + lenHeader, cipherText.size)
+            content = ct
         )
 
         val encryptedStates = Publishers.encryptStates(context, state.serializedStates)

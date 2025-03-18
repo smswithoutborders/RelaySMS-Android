@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.room.util.TableInfo
+import com.example.sw0b_001.Bridges.Bridges
 import com.example.sw0b_001.Models.Messages.EncryptedContent
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
 import com.example.sw0b_001.Models.Platforms.Platforms
@@ -255,9 +256,16 @@ fun RecentMessageCard(
     var subHeading by remember { mutableStateOf( "") }
 
     when(message.type) {
-        Platforms.ServiceTypes.EMAIL.type, Platforms.ServiceTypes.BRIDGE.type -> {
-            println(message.encryptedContent)
+        Platforms.ServiceTypes.EMAIL.type -> {
             val decomposed = EmailComposeHandler.decomposeMessage(
+                message.encryptedContent!!,
+            )
+            heading = message.fromAccount ?: "RelaySMS"
+            subHeading = decomposed.subject
+            text = decomposed.body
+        }
+        Platforms.ServiceTypes.BRIDGE.type -> {
+            val decomposed = Bridges.BridgeComposeHandler.decomposeMessage(
                 message.encryptedContent!!,
             )
             heading = message.fromAccount ?: "RelaySMS"

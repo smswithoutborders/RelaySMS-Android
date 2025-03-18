@@ -12,8 +12,12 @@ import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
 import com.example.sw0b_001.Modules.Helpers.toBytes
 import java.nio.charset.Charset
 
-class MessageComposer(val context: Context, val state: States) {
-    private val AD = Publishers.fetchPublisherPublicKey(context)
+class MessageComposer(
+    val context: Context,
+    val state: States,
+    val AD: ByteArray?
+) {
+//    private val AD = Publishers.fetchPublisherPublicKey(context)
 
     init {
         if(state.DHs == null) {

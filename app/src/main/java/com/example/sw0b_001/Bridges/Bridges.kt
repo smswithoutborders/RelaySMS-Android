@@ -5,7 +5,6 @@ import com.afkanerd.smswithoutborders.libsignal_doubleratchet.KeystoreHelpers
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.ComposeHandlers
-import com.example.sw0b_001.Models.MessageComposer
 import com.example.sw0b_001.Models.Messages.EncryptedContent
 import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
 import com.example.sw0b_001.Models.Platforms.Platforms
@@ -13,6 +12,7 @@ import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.Models.Publishers
 import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.Security.Cryptography
+import com.example.sw0b_001.ui.views.compose.EmailContent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,6 +32,32 @@ object Bridges {
         val status: String,
         val version: String
     )
+
+    data class BridgeEmailContent(
+        var alias: String,
+        var sender: String,
+        var cc: String,
+        var bcc: String,
+        var subject: String,
+        var body: String
+    )
+
+    object BridgeComposeHandler {
+        fun decomposeMessage(
+            message: String,
+        ): BridgeEmailContent {
+            return message.split("\n").let {
+                BridgeEmailContent(
+                    alias = it[0],
+                    sender = it[1],
+                    cc = it[2],
+                    bcc = it[3],
+                    subject = it[4],
+                    body = it.subList(5, it.size).joinToString()
+                )
+            }
+        }
+    }
 
     private fun getStaticKeys(context: Context, kid: Int? = null) : List<StaticKeys>? {
         try {
@@ -78,10 +104,12 @@ object Bridges {
             }
         }
 
+        val AD = Publishers.fetchPublisherPublicKey(context)
         val formattedString = "$to:$cc:$bcc:$subject:$body".run {
             val messageComposer = ComposeHandlers.compose(
                 context = context,
                 formattedContent = this,
+                AD = AD!!,
                 smsTransmission = smsTransmission,
             ) { onSuccessCallback() }
             if(!isLoggedIn) {
@@ -150,7 +178,7 @@ object Bridges {
     }
 
 
-    fun decryptIncomingMessages(context: Context, text: String) : String {
+    fun decryptIncomingMessages(context: Context, text: String) : String? {
         val splitPayload = text.split("\n")
 
         if(splitPayload.size < 2) {
@@ -173,18 +201,41 @@ object Bridges {
         val bridgeLetter = payload[9]
         val cipherText = payload.copyOfRange(10, payload.size)
 
-        val text = ComposeHandlers.decompose(context, cipherText) {
-            val encryptedContent = EncryptedContent()
-            encryptedContent.encryptedContent = text
-            encryptedContent.date = System.currentTimeMillis()
-            encryptedContent.type = Platforms.ServiceTypes.BRIDGE.type
-            encryptedContent.platformName = Platforms.ServiceTypes.BRIDGE.type
-            encryptedContent.fromAccount = it.substring(lenAliasAddress, lenAliasAddress + lenSender)
-            val launch = CoroutineScope(Dispatchers.Default).launch {
+        var decryptedText: String? = null
+        val AD = Publishers.fetchClientPublisherPublicKey(context)
+        val scope = CoroutineScope(Dispatchers.Default).launch {
+            decryptedText = ComposeHandlers.decompose(
+                context = context,
+                cipherText = cipherText,
+                AD = AD!!
+            ) {
+                val encryptedContent = EncryptedContent()
+                encryptedContent.encryptedContent = it.run {
+                    this.substring(0, lenAliasAddress)
+                        .plus("\n")
+                        .plus(this.substring(lenAliasAddress, lenAliasAddress + lenSender))
+                        .plus("\n")
+                        .plus(this.substring(lenAliasAddress + lenSender,
+                            lenAliasAddress + lenSender + lenCC))
+                        .plus("\n")
+                        .plus(this.substring(lenAliasAddress + lenSender + lenCC,
+                            lenAliasAddress + lenSender + lenCC + lenBCC))
+                        .plus("\n")
+                        .plus(this.substring(lenAliasAddress + lenSender + lenCC + lenBCC,
+                            lenAliasAddress + lenSender + lenCC + lenBCC + lenSubject))
+                        .plus("\n")
+                        .plus(this.substring(lenAliasAddress + lenSender + lenCC + lenBCC + lenSubject,
+                            lenAliasAddress + lenSender + lenCC + lenBCC + lenSubject + lenBody))
+                }
+                encryptedContent.date = System.currentTimeMillis()
+                encryptedContent.type = Platforms.ServiceTypes.BRIDGE.type
+                encryptedContent.platformName = Platforms.ServiceTypes.BRIDGE.type
+                encryptedContent.fromAccount = it.substring(lenAliasAddress, lenAliasAddress + lenSender)
+
                 Datastore.getDatastore(context).encryptedContentDAO().insert(encryptedContent)
                 println("Stored in db")
             }
         }
-        return text
+        return decryptedText
     }
 }

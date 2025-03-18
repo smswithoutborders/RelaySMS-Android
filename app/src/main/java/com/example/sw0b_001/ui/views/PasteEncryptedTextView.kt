@@ -1,10 +1,14 @@
 package com.example.sw0b_001.ui.views
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -29,8 +33,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.sw0b_001.Bridges.Bridges
 import com.example.sw0b_001.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,6 +44,7 @@ import com.example.sw0b_001.R
 fun PasteEncryptedTextView(
     navController: NavController
 ) {
+    val context = LocalContext.current
     var pastedText by remember { mutableStateOf("") }
     val isDecryptButtonEnabled = pastedText.isNotBlank()
 
@@ -61,6 +68,7 @@ fun PasteEncryptedTextView(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .imePadding()
                 .padding(
                     top = paddingValues.calculateTopPadding(),
                     bottom = paddingValues.calculateBottomPadding()
@@ -100,8 +108,8 @@ fun PasteEncryptedTextView(
                 value = pastedText,
                 onValueChange = { pastedText = it },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp),
+                    .weight(1f)
+                    .fillMaxWidth(),
                 placeholder = { Text(stringResource(R.string.click_to_paste)) },
                 enabled = true,
                 readOnly = false,
@@ -116,7 +124,10 @@ fun PasteEncryptedTextView(
             Spacer(modifier = Modifier.height(16.dp))
 
             Button(
-                onClick = { TODO("Handle decrypt") },
+                onClick = {
+                    val text = Bridges.decryptIncomingMessages(context, pastedText)
+                    println(text)
+                },
                 enabled = isDecryptButtonEnabled,
                 modifier = Modifier.fillMaxWidth()
             ) {

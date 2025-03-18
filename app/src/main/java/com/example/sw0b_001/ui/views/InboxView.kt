@@ -85,7 +85,7 @@ fun EmptyInboxContent(onPasteNewMessageClicked: () -> Unit) {
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(64.dp))
-        Button(onClick = onPasteNewMessageClicked) {
+        Button(onClick = { onPasteNewMessageClicked() }) {
             Text(stringResource(R.string.paste_new_incoming_message))
         }
     }

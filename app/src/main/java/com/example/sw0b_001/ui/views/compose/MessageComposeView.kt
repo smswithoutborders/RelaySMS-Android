@@ -56,6 +56,7 @@ import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.ComposeHandlers
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.Models.Publishers
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
@@ -288,8 +289,10 @@ private fun sendMessage(
             processMessageForEncryption(messageContent.to, messageContent.message, account)
 
         try {
+            val AD = Publishers.fetchPublisherPublicKey(context)
             ComposeHandlers.compose(context,
                 formattedString,
+                AD!!,
                 availablePlatforms!!,
                 account,
             ) {
