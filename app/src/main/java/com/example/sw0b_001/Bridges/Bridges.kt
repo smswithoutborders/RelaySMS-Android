@@ -84,7 +84,7 @@ object Bridges {
                     cc = it[2],
                     bcc = it[3],
                     subject = it[4],
-                    date = it[5].toLong(),
+                    date = it[5].split(".")[0].toLong(),
                     body = it.subList(6, it.size).joinToString()
                 )
             }
@@ -261,7 +261,7 @@ object Bridges {
                             .plus(this.substring(lenAliasAddress + lenSender + lenCC + lenBCC,
                                 lenAliasAddress + lenSender + lenCC + lenBCC + lenSubject))
                             .plus("\n")
-                            .plus(splitPayload[2].split("\\.")[0])
+                            .plus(splitPayload[2].split(".")[0])
                             .plus("\n")
                             .plus(this.substring(lenAliasAddress + lenSender + lenCC + lenBCC + lenSubject,
                                 lenAliasAddress + lenSender + lenCC + lenBCC + lenSubject + lenBody))

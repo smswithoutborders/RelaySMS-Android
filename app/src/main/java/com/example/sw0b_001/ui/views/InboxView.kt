@@ -44,6 +44,7 @@ import com.example.sw0b_001.Models.Messages.EncryptedContent
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.R
+import com.example.sw0b_001.ui.navigation.BridgeViewScreen
 import com.example.sw0b_001.ui.navigation.EmailViewScreen
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.theme.AppTheme
@@ -53,6 +54,7 @@ import com.example.sw0b_001.ui.theme.AppTheme
 fun InboxView(
     _messages: List<EncryptedContent> = emptyList<EncryptedContent>(),
     messagesViewModel: MessagesViewModel,
+    platformsViewModel: PlatformsViewModel,
     navController: NavController,
 ) {
     val context = LocalContext.current
@@ -68,7 +70,21 @@ fun InboxView(
                 navController.navigate(PasteEncryptedTextScreen)
             })
         } else {
-            MessageListContent(messages = messages, navController = navController)
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(messages) { message ->
+                    RecentMessageCard(
+                        message,
+                        onClickCallback = {
+                            platformsViewModel.message = message
+                            navController.navigate(BridgeViewScreen)
+                        }
+                    )
+                }
+            }
         }
     }
 }
@@ -98,31 +114,13 @@ fun EmptyInboxContent(onPasteNewMessageClicked: () -> Unit) {
     }
 }
 
-@Composable
-fun MessageListContent(messages: List<EncryptedContent>, navController: NavController) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(messages) { message ->
-            RecentMessageCard(
-                message,
-                onClickCallback = {
-                    navController.navigate(EmailViewScreen)
-                }
-            )
-        }
-    }
-}
-
-
 @Preview(showBackground = true)
 @Composable
 fun InboxViewEmptyPreview() {
     AppTheme {
         InboxView(
             messagesViewModel = MessagesViewModel(),
+            platformsViewModel = PlatformsViewModel(),
             navController = NavController(LocalContext.current),
         )
     }
@@ -152,6 +150,7 @@ fun InboxScreenMessages_Preview() {
         InboxView(
             _messages = listOf(encryptedContent, text),
             messagesViewModel = MessagesViewModel(),
+            platformsViewModel = PlatformsViewModel(),
             navController = rememberNavController(),
         )
     }

@@ -40,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import com.example.sw0b_001.Bridges.Bridges
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
+import com.example.sw0b_001.Models.Platforms.Platforms
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.ui.navigation.BridgeEmailComposeScreen
 import com.example.sw0b_001.ui.navigation.EmailComposeScreen
@@ -62,17 +63,34 @@ fun EmailDetailsView(
     var bcc by remember{ mutableStateOf("") }
     var subject by remember{ mutableStateOf("") }
     var body by remember{ mutableStateOf("") }
-    var date by remember{ mutableLongStateOf(platformsViewModel.message!!.date) }
+    var date by remember{ mutableLongStateOf(0L) }
 
     if(isBridge)
-        Bridges.BridgeComposeHandler
-            .decomposeMessage(platformsViewModel.message!!.encryptedContent!!).apply {
-                to = this.to
-                cc = this.cc
-                bcc = this.bcc
-                subject = this.subject
-                body = this.body
+        when(platformsViewModel.message?.type) {
+            Platforms.ServiceTypes.BRIDGE.type -> {
+                Bridges.BridgeComposeHandler
+                    .decomposeMessage(platformsViewModel.message!!.encryptedContent!!).apply {
+                        to = this.to
+                        cc = this.cc
+                        bcc = this.bcc
+                        subject = this.subject
+                        body = this.body
+                        date = platformsViewModel.message!!.date
+                    }
             }
+            Platforms.ServiceTypes.BRIDGE_INCOMING.type -> {
+                Bridges.BridgeComposeHandler
+                    .decomposeInboxMessage(platformsViewModel.message!!.encryptedContent!!).apply {
+                        from = this.sender
+                        to = this.alias
+                        cc = this.cc
+                        bcc = this.bcc
+                        subject = this.subject
+                        body = this.body
+                        date = this.date
+                    }
+            }
+        }
     else
         EmailComposeHandler.decomposeMessage(platformsViewModel.message!!.encryptedContent!!).apply {
             to = this.to
@@ -80,6 +98,7 @@ fun EmailDetailsView(
             bcc = this.bcc
             subject = this.subject
             body = this.body
+            date = platformsViewModel.message!!.date
         }
 
 

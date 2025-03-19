@@ -240,6 +240,7 @@ fun HomepageView(
                 BottomTabsItems.BottomBarInboxTab -> {
                     InboxView(
                         messagesViewModel = messagesViewModel,
+                        platformsViewModel = platformsViewModel,
                         navController = navController
                     )
                 }
