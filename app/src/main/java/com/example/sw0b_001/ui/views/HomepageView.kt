@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.Create
@@ -155,25 +156,47 @@ fun HomepageView(
             when(platformsViewModel.bottomTabsItem) {
                 BottomTabsItems.BottomBarRecentTab -> {
                     if(messages.isNotEmpty()) {
-                        ExtendedFloatingActionButton(
-                            onClick = {
-                                sendNewMessageRequested = true
-                            },
-                            containerColor = MaterialTheme.colorScheme.secondary,
-                            icon = {
-                                Icon(
-                                    imageVector = Icons.Filled.PersonAdd,
-                                    contentDescription = "Add Account",
-                                    tint = MaterialTheme.colorScheme.onSecondary
-                                )
-                            },
-                            text = {
-                                Text(
-                                    text = "Add account / Compose new",
-                                    color = MaterialTheme.colorScheme.onSecondary
-                                )
-                            }
-                        )
+                        if(isLoggedIn) {
+                            ExtendedFloatingActionButton(
+                                onClick = {
+                                    sendNewMessageRequested = true
+                                },
+                                containerColor = MaterialTheme.colorScheme.secondary,
+                                icon = {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Default.Message,
+                                        contentDescription = "Add Account",
+                                        tint = MaterialTheme.colorScheme.onSecondary
+                                    )
+                                },
+                                text = {
+                                    Text(
+                                        text = "Compose new",
+                                        color = MaterialTheme.colorScheme.onSecondary
+                                    )
+                                }
+                            )
+                        } else {
+                            ExtendedFloatingActionButton(
+                                onClick = {
+                                    sendNewMessageRequested = true
+                                },
+                                containerColor = MaterialTheme.colorScheme.secondary,
+                                icon = {
+                                    Icon(
+                                        imageVector = Icons.Filled.PersonAdd,
+                                        contentDescription = "Add Account",
+                                        tint = MaterialTheme.colorScheme.onSecondary
+                                    )
+                                },
+                                text = {
+                                    Text(
+                                        text = "Add account / Compose new",
+                                        color = MaterialTheme.colorScheme.onSecondary
+                                    )
+                                }
+                            )
+                        }
                     }
                 }
                 BottomTabsItems.BottomBarPlatformsTab -> {}
@@ -266,8 +289,19 @@ fun HomepageView(
             }
 
             if (sendNewMessageRequested) {
-                GetStartedModal(sendNewMessageRequested, navController) {
-                    sendNewMessageRequested = false
+                if(isLoggedIn) {
+                    ActivePlatformsModal(
+                        sendNewMessageRequested = sendNewMessageRequested,
+                        platformsViewModel = platformsViewModel,
+                        navController = navController,
+                        isCompose = true
+                    ) {
+                        sendNewMessageRequested = false
+                    }
+                } else {
+                    GetStartedModal(sendNewMessageRequested, navController) {
+                        sendNewMessageRequested = false
+                    }
                 }
             }
 
