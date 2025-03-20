@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FloatingActionButton
@@ -57,6 +58,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import androidx.compose.runtime.collectAsState
 import com.example.sw0b_001.Models.NavigationFlowHandler
+import com.example.sw0b_001.ui.modals.GetStartedModal
 
 enum class BottomTabsItems {
     BottomBarRecentTab,
@@ -160,14 +162,14 @@ fun HomepageView(
                             containerColor = MaterialTheme.colorScheme.secondary,
                             icon = {
                                 Icon(
-                                    imageVector = Icons.Filled.Create,
-                                    contentDescription = "Compose Message",
+                                    imageVector = Icons.Filled.PersonAdd,
+                                    contentDescription = "Add Account",
                                     tint = MaterialTheme.colorScheme.onSecondary
                                 )
                             },
                             text = {
                                 Text(
-                                    text = stringResource(R.string.compose),
+                                    text = "Add account / Compose new",
                                     color = MaterialTheme.colorScheme.onSecondary
                                 )
                             }
@@ -264,12 +266,7 @@ fun HomepageView(
             }
 
             if (sendNewMessageRequested) {
-                ActivePlatformsModal(
-                    sendNewMessageRequested = sendNewMessageRequested,
-                    platformsViewModel = platformsViewModel,
-                    navController = navController,
-                    isCompose = true
-                ) {
+                GetStartedModal(sendNewMessageRequested, navController) {
                     sendNewMessageRequested = false
                 }
             }
