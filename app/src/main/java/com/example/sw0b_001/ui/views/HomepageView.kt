@@ -153,57 +153,71 @@ fun HomepageView(
             when(platformsViewModel.bottomTabsItem) {
                 BottomTabsItems.BottomBarRecentTab -> {
                     if(messages.isNotEmpty()) {
-                        Column(horizontalAlignment = Alignment.End) {
-                            ExtendedFloatingActionButton(
-                                onClick = {
-                                    sendNewMessageRequested = true
-                                },
-                                containerColor = MaterialTheme.colorScheme.secondary,
-                                icon = {
-                                    Icon(
-                                        imageVector = Icons.Filled.Create,
-                                        contentDescription = "Compose Message",
-                                        tint = MaterialTheme.colorScheme.onSecondary
-                                    )
-                                },
-                                text = {
-                                    Text(
-                                        text = stringResource(R.string.compose),
-                                        color = MaterialTheme.colorScheme.onSecondary
-                                    )
-                                }
-                            )
-                        }
+                        ExtendedFloatingActionButton(
+                            onClick = {
+                                sendNewMessageRequested = true
+                            },
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Filled.Create,
+                                    contentDescription = "Compose Message",
+                                    tint = MaterialTheme.colorScheme.onSecondary
+                                )
+                            },
+                            text = {
+                                Text(
+                                    text = stringResource(R.string.compose),
+                                    color = MaterialTheme.colorScheme.onSecondary
+                                )
+                            }
+                        )
                     }
                 }
                 BottomTabsItems.BottomBarPlatformsTab -> {}
                 BottomTabsItems.BottomBarCountriesTab -> {
-                    FloatingActionButton(
+                    ExtendedFloatingActionButton(
+                        onClick = {
+                            showAddGatewayClientsModal = true
+                        },
                         containerColor = MaterialTheme.colorScheme.secondary,
-                        onClick = { showAddGatewayClientsModal = true }
-                    ) {
-                        Icon(
-                            Icons.Filled.Add,
-                            contentDescription = "Add Gateway Client",
-                            tint = MaterialTheme.colorScheme.onSecondary
-                        )
-                    }
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Filled.Add,
+                                contentDescription = "Add New Gateway clients",
+                                tint = MaterialTheme.colorScheme.onSecondary
+                            )
+                        },
+                        text = {
+                            Text(
+                                text = "Add Number",
+                                color = MaterialTheme.colorScheme.onSecondary
+                            )
+                        }
+                    )
                 }
 
                 BottomTabsItems.BottomBarInboxTab -> {
                     if (messages.isNotEmpty()) {
-                        FloatingActionButton(
-                            containerColor = MaterialTheme.colorScheme.secondary,
+                        ExtendedFloatingActionButton(
                             onClick = {
                                 navController.navigate(PasteEncryptedTextScreen)
+                            },
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            icon = {
+                                Icon(
+                                    Icons.Filled.ContentPaste,
+                                    contentDescription = "Paste new incoming message",
+                                    tint = MaterialTheme.colorScheme.onSecondary
+                                )
+                            },
+                            text = {
+                                Text(
+                                    text = stringResource(R.string.paste_message),
+                                    color = MaterialTheme.colorScheme.onSecondary
+                                )
                             }
-                        ) {
-                            Icon(
-                                Icons.Filled.ContentPaste,
-                                contentDescription = "Compose Message",
-                                tint = MaterialTheme.colorScheme.onSecondary
-                            )
-                        }
+                        )
                     }
                 }
             }

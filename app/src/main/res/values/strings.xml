@@ -256,5 +256,6 @@
     <string name="always_add_the_dialing_code_if_absent_e_g_237">always add the dialing code if absent, e.g +237</string>
     <string name="cc">Cc</string>
     <string name="bcc">Bcc</string>
+    <string name="paste_message">Paste message</string>
 
 </resources>
