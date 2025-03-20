@@ -1,6 +1,5 @@
 <resources>
 
-    <string name="smswithoutborders_official_privacy_policy" translatable="false">https://staging.smswithoutborders.com/privacy-policy</string>
     <!--    <string name="smswithoutboarders_official_gateway_client_seeding_url" translatable="false">https://mocki.io/v1/a7da7414-6b2d-4d0b-9de9-708f5368e525</string>-->
     <string name="smswithoutboarders_official_gateway_client_seeding_url" translatable="false">https://staging.smswithoutborders.com:15000/v3/clients</string>
 

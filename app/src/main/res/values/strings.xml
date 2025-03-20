@@ -33,9 +33,6 @@
     <string name="language_farsi">Farsi</string>
     <string name="language_spanish">Spanish</string>
     <string name="language_turkish" >Turkish</string>
-    <string name="language_arabic" >Arabic</string>
-    <string name="language_german" >German</string>
-    <string name="language_swahili" >Swahili</string>
 
 
     <string name="language_english_value" translatable="false">
@@ -52,15 +49,6 @@
     </string>
     <string name="language_turkish_value" translatable="false">
         tr
-    </string>
-    <string name="language_arabic_value" translatable="false">
-        ar
-    </string>
-    <string name="language_german_value" translatable="false">
-        de
-    </string>
-    <string name="language_swahili_value" translatable="false">
-        sw
     </string>
 
 
@@ -149,7 +137,6 @@
     <string name="compose_email">Compose Email</string>
     <string name="to">To</string>
     <string name="subject">Subject</string>
-    <string name="no_account_selected_">No account selected</string>
     <string name="new_message">New Message</string>
     <string name="sender">Sender</string>
     <string name="recipient_number">Recipient Number</string>
@@ -160,7 +147,6 @@
     <string name="relaysms_is_an_open_source_initiative_focused_on_enabling_communication_through_sms_without_relying_on_internet_connectivity_we_believe_in_a_connected_world_and_we_re_making_it_happen_one_sms_at_a_time_relaysms_remains_free_and_open_source">RelaySMS is an open-source initiative focused on enabling communication through SMS without relying on internet connectivity. We believe in a connected world, and we\'re making it happen one SMS at a time. RelaySMS remains free and open source.</string>
     <string name="app_tutorial">App Tutorial</string>
     <string name="support_us_by_starring_our_github_repository_and_sharing_it_with_your_friends">Support us by starring our GitHub repository and sharing it with your friends!</string>
-    <string name="send_new_message_">Send new message</string>
     <string name="available_platforms">Available platforms</string>
     <string name="use_your_relaysms_account">Use your RelaySMS account</string>
     <string name="use_your_online_accounts">Use your online accounts</string>
@@ -177,7 +163,6 @@
     <string name="no_gateway_client_selected">No Gateway Client Selected</string>
     <string name="available_countries">Available Countries</string>
     <string name="gateway_clients_refreshed_successfully">Gateway clients refreshed successfully!</string>
-    <string name="compose">Compose</string>
     <string name="no_messages_in_inbox">No messages in inbox</string>
     <string name="paste_new_incoming_message">Paste new incoming message</string>
     <string name="log_into_relaysms">Log Into RelaySMS</string>
@@ -215,8 +200,6 @@
     <string name="accessibility">Accessibility</string>
     <string name="language">Language</string>
     <string name="messaging_">Messaging</string>
-    <string name="validate_with_phone_number_">Validate with phone number</string>
-    <string name="you_have_a_device_id_for_the_device_you_log_into_it_is_used_to_identify_you_on_the_vault_you_can_switch_to_phone_number_to_reduce_size_of_sms_message_">You have a Device ID for the device you log into. It is used to identify you on the Vault. You can switch to phone number to reduce size of SMS message.</string>
     <string name="security_and_privacy">Security and Privacy</string>
     <string name="security">Security</string>
     <string name="enable_app_locks_and_pin_codes">Enable app locks and pin codes</string>
