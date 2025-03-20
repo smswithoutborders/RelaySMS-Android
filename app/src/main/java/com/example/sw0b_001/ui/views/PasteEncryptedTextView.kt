@@ -54,6 +54,7 @@ fun PasteEncryptedTextView(
 ) {
     val context = LocalContext.current
     var pastedText by remember { mutableStateOf("") }
+    var isError by remember { mutableStateOf(false) }
     val isDecryptButtonEnabled = pastedText.isNotBlank()
 
     Scaffold(
@@ -114,7 +115,11 @@ fun PasteEncryptedTextView(
 
             OutlinedTextField(
                 value = pastedText,
-                onValueChange = { pastedText = it },
+                onValueChange = {
+                    pastedText = it
+                    isError = false
+                },
+                isError = isError,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
@@ -145,6 +150,7 @@ fun PasteEncryptedTextView(
                         }
                     ) {
                         val scope = CoroutineScope(Dispatchers.Main).launch {
+                            isError = true
                             Toast.makeText(
                                 context,
                                 it,

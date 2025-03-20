@@ -257,5 +257,6 @@
     <string name="cc">Cc</string>
     <string name="bcc">Bcc</string>
     <string name="paste_message">Paste message</string>
+    <string name="error_decrypting_text">Error decrypting text</string>
 
 </resources>
