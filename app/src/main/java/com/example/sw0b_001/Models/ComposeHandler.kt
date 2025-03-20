@@ -73,39 +73,43 @@ object ComposeHandlers {
         context: Context,
         cipherText: ByteArray,
         AD: ByteArray,
-        onSuccessRunnable: (String) -> Unit?
-    ) : String {
-        val states = Datastore.getDatastore(context).ratchetStatesDAO().fetch()
-        if(states.size > 1) {
-            throw Exception("More than 1 states exist")
+        onSuccessCallback: (String) -> Unit?,
+        onFailureCallback: (String?) -> Unit?
+    ) {
+        try {
+            val states = Datastore.getDatastore(context).ratchetStatesDAO().fetch()
+            if(states.size > 1) {
+                throw Exception("More than 1 states exist")
+            }
+
+            val state = States(String(Publishers.getEncryptedStates(
+                context,
+                states[0].value),
+                Charsets.UTF_8)
+            )
+
+            val messageComposer = MessageComposer(context, state, AD)
+            val lenHeader = cipherText.copyOfRange(0, 4).run {
+                ByteBuffer.wrap(this).order(ByteOrder.LITTLE_ENDIAN).int
+            }
+            val header = cipherText.copyOfRange(4, 4 + lenHeader).run {
+                Headers.deSerializeHeader(this)
+            }
+
+            val ct = cipherText.copyOfRange(4 + lenHeader, cipherText.size)
+            val text = messageComposer.decryptBridge(
+                header = header,
+                content = ct
+            )
+
+            val encryptedStates = Publishers.encryptStates(context, state.serializedStates)
+            val  ratchetsStates = RatchetStates(value = encryptedStates)
+            Datastore.getDatastore(context).ratchetStatesDAO().update(ratchetsStates)
+
+            onSuccessCallback(text)
+        } catch(e: Exception) {
+            e.printStackTrace()
+            onFailureCallback(e.message)
         }
-
-        val state = States(String(Publishers.getEncryptedStates(
-            context,
-            states[0].value),
-            Charsets.UTF_8)
-        )
-
-        val messageComposer = MessageComposer(context, state, AD)
-        val lenHeader = cipherText.copyOfRange(0, 4).run {
-            ByteBuffer.wrap(this).order(ByteOrder.LITTLE_ENDIAN).int
-        }
-        val header = cipherText.copyOfRange(4, 4 + lenHeader).run {
-            Headers.deSerializeHeader(this)
-        }
-
-        val ct = cipherText.copyOfRange(4 + lenHeader, cipherText.size)
-        val text = messageComposer.decryptBridge(
-            header = header,
-            content = ct
-        )
-
-        val encryptedStates = Publishers.encryptStates(context, state.serializedStates)
-        val  ratchetsStates = RatchetStates(value = encryptedStates)
-        Datastore.getDatastore(context).ratchetStatesDAO().update(ratchetsStates)
-
-        onSuccessRunnable(text)
-
-        return text
     }
 }

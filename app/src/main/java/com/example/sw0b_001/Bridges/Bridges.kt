@@ -213,8 +213,9 @@ object Bridges {
     fun decryptIncomingMessages(
         context: Context,
         text: String,
-        onSuccessCallback: () -> Unit?
-    ) : String? {
+        onSuccessCallback: (EncryptedContent) -> Unit?,
+        onFailureCallback: (String?) -> Unit?
+    ) {
         val splitPayload = text.split("\n")
 
         if(splitPayload.size < 2) {
@@ -240,44 +241,46 @@ object Bridges {
         var decryptedText: String? = null
         val AD = Publishers.fetchClientPublisherPublicKey(context)
         val scope = CoroutineScope(Dispatchers.Default).launch {
-            decryptedText = ComposeHandlers.decompose(
+            ComposeHandlers.decompose(
                 context = context,
                 cipherText = cipherText,
-                AD = AD!!
-            ) {
-                try {
-                    val encryptedContent = EncryptedContent()
-                    encryptedContent.encryptedContent = it.run {
-                        this.substring(0, lenAliasAddress)
-                            .plus("\n")
-                            .plus(this.substring(lenAliasAddress, lenAliasAddress + lenSender))
-                            .plus("\n")
-                            .plus(this.substring(lenAliasAddress + lenSender,
-                                lenAliasAddress + lenSender + lenCC))
-                            .plus("\n")
-                            .plus(this.substring(lenAliasAddress + lenSender + lenCC,
-                                lenAliasAddress + lenSender + lenCC + lenBCC))
-                            .plus("\n")
-                            .plus(this.substring(lenAliasAddress + lenSender + lenCC + lenBCC,
-                                lenAliasAddress + lenSender + lenCC + lenBCC + lenSubject))
-                            .plus("\n")
-                            .plus(splitPayload[2].split(".")[0])
-                            .plus("\n")
-                            .plus(this.substring(lenAliasAddress + lenSender + lenCC + lenBCC + lenSubject,
-                                lenAliasAddress + lenSender + lenCC + lenBCC + lenSubject + lenBody))
-                    }
-                    encryptedContent.date = System.currentTimeMillis()
-                    encryptedContent.type = Platforms.ServiceTypes.BRIDGE_INCOMING.type
-                    encryptedContent.platformName = Platforms.ServiceTypes.BRIDGE.type
-                    encryptedContent.fromAccount = it.substring(lenAliasAddress, lenAliasAddress + lenSender)
+                AD = AD!!,
+                onSuccessCallback = {
+                    try {
+                        val encryptedContent = EncryptedContent()
+                        encryptedContent.encryptedContent = it.run {
+                            this.substring(0, lenAliasAddress)
+                                .plus("\n")
+                                .plus(this.substring(lenAliasAddress, lenAliasAddress + lenSender))
+                                .plus("\n")
+                                .plus(this.substring(lenAliasAddress + lenSender,
+                                    lenAliasAddress + lenSender + lenCC))
+                                .plus("\n")
+                                .plus(this.substring(lenAliasAddress + lenSender + lenCC,
+                                    lenAliasAddress + lenSender + lenCC + lenBCC))
+                                .plus("\n")
+                                .plus(this.substring(lenAliasAddress + lenSender + lenCC + lenBCC,
+                                    lenAliasAddress + lenSender + lenCC + lenBCC + lenSubject))
+                                .plus("\n")
+                                .plus(splitPayload[2].split(".")[0])
+                                .plus("\n")
+                                .plus(this.substring(lenAliasAddress + lenSender + lenCC + lenBCC + lenSubject,
+                                    lenAliasAddress + lenSender + lenCC + lenBCC + lenSubject + lenBody))
+                        }
+                        encryptedContent.date = System.currentTimeMillis()
+                        encryptedContent.type = Platforms.ServiceTypes.BRIDGE_INCOMING.type
+                        encryptedContent.platformName = Platforms.ServiceTypes.BRIDGE.type
+                        encryptedContent.fromAccount = it.substring(lenAliasAddress, lenAliasAddress + lenSender)
 
-                    Datastore.getDatastore(context).encryptedContentDAO().insert(encryptedContent)
-                    onSuccessCallback()
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                        Datastore.getDatastore(context).encryptedContentDAO().insert(encryptedContent)
+                        onSuccessCallback(encryptedContent)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
                 }
+            ) {
+                onFailureCallback(it)
             }
         }
-        return decryptedText
     }
 }

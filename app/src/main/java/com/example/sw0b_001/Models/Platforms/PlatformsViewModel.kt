@@ -9,6 +9,7 @@ import com.example.sw0b_001.Database.Datastore
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import com.example.sw0b_001.Models.Messages.EncryptedContent
+import com.example.sw0b_001.ui.views.BottomTabsItems
 
 class PlatformsViewModel : ViewModel() {
     private var availableLiveData: LiveData<List<AvailablePlatforms>> = MutableLiveData()
@@ -16,6 +17,7 @@ class PlatformsViewModel : ViewModel() {
 
     var platform by mutableStateOf<AvailablePlatforms?>(null)
     var message by mutableStateOf<EncryptedContent?>(null)
+    var bottomTabsItem by mutableStateOf<BottomTabsItems>(BottomTabsItems.BottomBarRecentTab)
 
     fun reset() {
         platform = null

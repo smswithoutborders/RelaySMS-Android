@@ -56,6 +56,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import androidx.compose.runtime.collectAsState
+import com.example.sw0b_001.Models.NavigationFlowHandler
 
 enum class BottomTabsItems {
     BottomBarRecentTab,
@@ -72,7 +73,8 @@ fun HomepageView(
     navController: NavController,
     platformsViewModel : PlatformsViewModel,
     messagesViewModel: MessagesViewModel,
-    gatewayClientViewModel: GatewayClientViewModel
+    gatewayClientViewModel: GatewayClientViewModel,
+    navigationFlowHandler: NavigationFlowHandler,
 ) {
     val context = LocalContext.current
     val inspectionMode = LocalInspectionMode.current
@@ -89,7 +91,7 @@ fun HomepageView(
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-    var bottomBarItem by remember { mutableStateOf(BottomTabsItems.BottomBarRecentTab) }
+//    var bottomBarItem by remember { mutableStateOf(navigationFlowHandler.bottomTabsItem) }
 
     var showAddGatewayClientsModal by remember { mutableStateOf(false) }
 
@@ -106,7 +108,7 @@ fun HomepageView(
     Scaffold (
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            when(bottomBarItem) {
+            when(platformsViewModel.bottomTabsItem) {
                 BottomTabsItems.BottomBarRecentTab -> {
                     if (isLoggedIn || messages.isNotEmpty()) {
                         RecentAppBar(
@@ -141,14 +143,14 @@ fun HomepageView(
         },
         bottomBar = {
             BottomNavBar(
-                selectedTab = bottomBarItem,
+                selectedTab = platformsViewModel.bottomTabsItem,
                 isLoggedIn = isLoggedIn
             ) { selectedTab ->
-                bottomBarItem = selectedTab
+                platformsViewModel.bottomTabsItem = selectedTab
             }
         },
         floatingActionButton = {
-            when(bottomBarItem) {
+            when(platformsViewModel.bottomTabsItem) {
                 BottomTabsItems.BottomBarRecentTab -> {
                     if(messages.isNotEmpty()) {
                         Column(horizontalAlignment = Alignment.End) {
@@ -212,7 +214,7 @@ fun HomepageView(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            when(bottomBarItem) {
+            when(platformsViewModel.bottomTabsItem) {
                 BottomTabsItems.BottomBarRecentTab -> {
                     if (isLoggedIn || messages.isNotEmpty()) {
                         RecentView(
@@ -221,7 +223,8 @@ fun HomepageView(
                             messagesViewModel = messagesViewModel,
                             platformsViewModel = platformsViewModel,
                         ) {
-                            bottomBarItem = BottomTabsItems.BottomBarPlatformsTab
+                            platformsViewModel.bottomTabsItem =
+                                BottomTabsItems.BottomBarPlatformsTab
                         }
                     } else if(!isLoading){
                         GetStartedView(navController = navController)
@@ -280,7 +283,8 @@ fun HomepageView_Preview() {
             navController = rememberNavController(),
             platformsViewModel = PlatformsViewModel(),
             messagesViewModel = MessagesViewModel(),
-            gatewayClientViewModel = GatewayClientViewModel()
+            gatewayClientViewModel = GatewayClientViewModel(),
+            navigationFlowHandler = NavigationFlowHandler()
         )
     }
 }
@@ -295,7 +299,8 @@ fun HomepageViewLoggedIn_Preview() {
             navController = rememberNavController(),
             platformsViewModel = PlatformsViewModel(),
             messagesViewModel = MessagesViewModel(),
-            gatewayClientViewModel = GatewayClientViewModel()
+            gatewayClientViewModel = GatewayClientViewModel(),
+            navigationFlowHandler = NavigationFlowHandler()
         )
     }
 }
@@ -320,7 +325,8 @@ fun HomepageViewLoggedInMessages_Preview() {
             navController = rememberNavController(),
             platformsViewModel = PlatformsViewModel(),
             messagesViewModel = MessagesViewModel(),
-            gatewayClientViewModel = GatewayClientViewModel()
+            gatewayClientViewModel = GatewayClientViewModel(),
+            navigationFlowHandler = NavigationFlowHandler()
         )
     }
 }

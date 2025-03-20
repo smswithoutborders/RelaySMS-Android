@@ -1,5 +1,6 @@
 package com.example.sw0b_001.ui.views
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
@@ -37,7 +38,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.Bridges.Bridges
+import com.example.sw0b_001.Models.NavigationFlowHandler
+import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.R
+import com.example.sw0b_001.ui.navigation.BridgeViewScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -45,6 +49,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasteEncryptedTextView(
+    platformsViewModel: PlatformsViewModel,
     navController: NavController
 ) {
     val context = LocalContext.current
@@ -128,9 +133,23 @@ fun PasteEncryptedTextView(
 
             Button(
                 onClick = {
-                    Bridges.decryptIncomingMessages(context, pastedText) {
+                    Bridges.decryptIncomingMessages(
+                        context,
+                        pastedText,
+                        onSuccessCallback = {
+                            val scope = CoroutineScope(Dispatchers.Main).launch {
+//                            navController.popBackStack()
+                                platformsViewModel.message = it
+                                navController.navigate(BridgeViewScreen)
+                            }
+                        }
+                    ) {
                         val scope = CoroutineScope(Dispatchers.Main).launch {
-                            navController.popBackStack()
+                            Toast.makeText(
+                                context,
+                                it,
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                     }
                 },
@@ -147,7 +166,7 @@ fun PasteEncryptedTextView(
 @Composable
 fun PasteTextViewPreview() {
     PasteEncryptedTextView(
+        platformsViewModel = PlatformsViewModel(),
         navController = NavController(LocalContext.current)
-
     )
 }

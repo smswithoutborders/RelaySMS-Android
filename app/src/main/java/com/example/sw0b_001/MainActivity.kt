@@ -141,7 +141,8 @@ class MainActivity : ComponentActivity() {
                     navController = navController,
                     platformsViewModel = platformsViewModel,
                     messagesViewModel = messagesViewModel,
-                    gatewayClientViewModel = gatewayClientViewModel
+                    gatewayClientViewModel = gatewayClientViewModel,
+                    navigationFlowHandler = navigationFlowHandler
                 )
             }
             composable<LoginScreen> {
@@ -215,6 +216,7 @@ class MainActivity : ComponentActivity() {
             }
             composable<PasteEncryptedTextScreen> {
                 PasteEncryptedTextView(
+                    platformsViewModel = platformsViewModel,
                     navController = navController,
                 )
             }
