@@ -137,7 +137,7 @@ fun MessageComposeView(
     }
 
     BackHandler {
-        navController.navigate(HomepageScreen)
+        navController.popBackStack()
     }
 
     Scaffold(

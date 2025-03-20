@@ -1,6 +1,7 @@
 package com.example.sw0b_001.ui.views.compose
 
 import android.content.Context
+import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
@@ -45,9 +46,11 @@ import com.example.sw0b_001.Bridges.Bridges
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.ComposeHandlers
+import com.example.sw0b_001.Models.GatewayClients.GatewayClientsCommunications
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.Models.Publishers
+import com.example.sw0b_001.Models.SMSHandler
 import com.example.sw0b_001.Modules.Network
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.Account
@@ -152,7 +155,7 @@ fun EmailComposeView(
     }
 
     BackHandler {
-        navController.navigate(HomepageScreen)
+        navController.popBackStack()
     }
 
     // Conditionally show the SelectAccountModal
@@ -377,14 +380,25 @@ private fun processSend(
     CoroutineScope(Dispatchers.Default).launch {
         try {
             if(isBridge) {
-                Bridges.compose(
+                val txtTransmission = Bridges.compose(
                     context = context,
                     to = emailContent.to,
                     cc = emailContent.cc,
                     bcc = emailContent.bcc,
                     subject = emailContent.subject,
                     body = emailContent.body
-                ) { onCompleteCallback() }
+                ) { onCompleteCallback() }.first
+
+                val gatewayClientMSISDN = GatewayClientsCommunications(context)
+                    .getDefaultGatewayClient()
+
+                val sentIntent = SMSHandler.transferToDefaultSMSApp(
+                    context,
+                    gatewayClientMSISDN!!,
+                    txtTransmission).apply {
+                    setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                context.startActivity(sentIntent)
             }
             else {
                 val formattedContent = processEmailForEncryption(

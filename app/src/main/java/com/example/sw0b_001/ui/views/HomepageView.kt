@@ -94,8 +94,6 @@ fun HomepageView(
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-//    var bottomBarItem by remember { mutableStateOf(navigationFlowHandler.bottomTabsItem) }
-
     var showAddGatewayClientsModal by remember { mutableStateOf(false) }
 
     val refreshSuccess = Runnable {

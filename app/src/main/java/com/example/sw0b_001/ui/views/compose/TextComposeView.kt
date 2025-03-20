@@ -102,7 +102,7 @@ fun TextComposeView(
     }
 
     BackHandler {
-        navController.navigate(HomepageScreen)
+        navController.popBackStack()
     }
 
     Scaffold(

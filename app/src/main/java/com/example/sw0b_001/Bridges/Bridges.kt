@@ -116,7 +116,7 @@ object Bridges {
         bcc: String,
         subject: String,
         body: String,
-        smsTransmission: Boolean = true,
+        smsTransmission: Boolean = false,
         onSuccessCallback: () -> Unit?
     ) : Pair<String?, ByteArray?> {
 
