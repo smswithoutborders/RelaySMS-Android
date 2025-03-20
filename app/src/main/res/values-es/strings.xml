@@ -51,8 +51,6 @@
     <string name="you_have_a_device_id_for_the_device_you_log_into_it_is_used_to_identify_you_on_the_vault_you_can_switch_to_phone_number_to_reduce_size_of_sms_message">Tiene una ID de dispositivo para el dispositivo en el que inicia sesión. Se utiliza para identificarlo en la Bóveda. Puede cambiar al número de teléfono para reducir el tamaño del mensaje SMS.</string>
     <string name="validate_with_phone_number">Validar con número de teléfono</string>
 
-    <string name="smswithoutborders_official_privacy_policy">https://smswithoutborders.com/privacy-policy</string>
-
     <string name="about">Acerca de</string>
     <string name="recents_text">Recientes</string>
     <string name="get_started_text">Empezar</string>

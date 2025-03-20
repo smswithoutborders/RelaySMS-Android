@@ -34,9 +34,6 @@
     <string name="language_farsi">الفارسية</string>
     <string name="language_spanish">الإسبانية</string>
     <string name="language_turkish">التركية</string>
-    <string name="language_arabic">العربية</string>
-    <string name="language_german">الألمانية</string>
-    <string name="language_swahili">السواحيلية</string>
 
     <string name="gateway_client_settings_add_custom_empty_error">الرجاء إدخال رقم هاتف</string>
 
@@ -92,7 +89,6 @@
     <string name="compose_email">كتابة بريد إلكتروني</string>
     <string name="to">إلى</string>
     <string name="subject">الموضوع</string>
-    <string name="no_account_selected_">لم يتم تحديد حساب</string>
     <string name="new_message">رسالة جديدة</string>
     <string name="sender">المرسل</string>
     <string name="recipient_number">رقم المستلم</string>
@@ -103,7 +99,6 @@
     <string name="relaysms_is_an_open_source_initiative_focused_on_enabling_communication_through_sms_without_relying_on_internet_connectivity_we_believe_in_a_connected_world_and_we_re_making_it_happen_one_sms_at_a_time_relaysms_remains_free_and_open_source">RelaySMS هي مبادرة مفتوحة المصدر تركز على تمكين الاتصال عبر الرسائل القصيرة (SMS) دون الاعتماد على الاتصال بالإنترنت. نحن نؤمن بعالم متصل، ونحن نعمل على تحقيق ذلك رسالة SMS واحدة في كل مرة. تظل RelaySMS مجانية ومفتوحة المصدر.</string>
     <string name="app_tutorial">شرح التطبيق</string>
     <string name="support_us_by_starring_our_github_repository_and_sharing_it_with_your_friends">ادعمنا بوضع نجمة على مستودع GitHub الخاص بنا ومشاركته مع أصدقائك!</string>
-    <string name="send_new_message_">إرسال رسالة جديدة</string>
     <string name="available_platforms">المنصات المتاحة</string>
     <string name="use_your_relaysms_account">استخدم حساب RelaySMS الخاص بك</string>
     <string name="use_your_online_accounts">استخدم حساباتك عبر الإنترنت</string>
@@ -120,7 +115,6 @@
     <string name="no_gateway_client_selected">لم يتم تحديد عميل بوابة</string>
     <string name="available_countries">الدول المتاحة</string>
     <string name="gateway_clients_refreshed_successfully">تم تحديث عملاء البوابة بنجاح!</string>
-    <string name="compose">كتابة</string>
     <string name="no_messages_in_inbox">لا توجد رسائل في صندوق الوارد</string>
     <string name="paste_new_incoming_message">لصق رسالة واردة جديدة</string>
     <string name="log_into_relaysms">تسجيل الدخول إلى RelaySMS</string>
@@ -158,8 +152,6 @@
     <string name="accessibility">إمكانية الوصول</string>
     <string name="language">اللغة</string>
     <string name="messaging_">المراسلة</string>
-    <string name="validate_with_phone_number_">التحقق من رقم الهاتف</string>
-    <string name="you_have_a_device_id_for_the_device_you_log_into_it_is_used_to_identify_you_on_the_vault_you_can_switch_to_phone_number_to_reduce_size_of_sms_message_">لديك مُعرّف جهاز للجهاز الذي تسجل الدخول إليه. يتم استخدامه لتحديد هويتك في الخزنة. يمكنك التبديل إلى رقم الهاتف لتقليل حجم رسالة SMS.</string>
     <string name="security_and_privacy">الأمان والخصوصية</string>
     <string name="security">الأمان</string>
     <string name="enable_app_locks_and_pin_codes">تمكين أقفال التطبيقات ورموز PIN</string>
