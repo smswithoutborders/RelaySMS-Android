@@ -224,13 +224,15 @@ fun EmailComposeView(
                     }
                 },
                 actions = {
-                    IconButton(
-                        onClick = {
-                            showDeveloperDialog = true
-                        },
-                        enabled = to.isNotEmpty() && body.isNotEmpty(),
-                    ) {
-                        Icon(Icons.Default.DeveloperMode, contentDescription = "Send")
+                    if(BuildConfig.DEBUG) {
+                        IconButton(
+                            onClick = {
+                                showDeveloperDialog = true
+                            },
+                            enabled = to.isNotEmpty() && body.isNotEmpty(),
+                        ) {
+                            Icon(Icons.Default.DeveloperMode, contentDescription = "Send")
+                        }
                     }
 
                     IconButton(
