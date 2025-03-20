@@ -34,6 +34,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -109,7 +110,10 @@ fun EmptyInboxContent(onPasteNewMessageClicked: () -> Unit) {
         )
         Spacer(modifier = Modifier.height(64.dp))
         Button(onClick = { onPasteNewMessageClicked() }) {
-            Text(stringResource(R.string.paste_new_incoming_message))
+            Text(
+                stringResource(R.string.paste_new_incoming_message),
+                fontWeight = FontWeight.SemiBold
+            )
         }
     }
 }
