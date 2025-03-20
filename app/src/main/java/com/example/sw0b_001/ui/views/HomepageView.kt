@@ -92,6 +92,9 @@ fun HomepageView(
     val messages: List<EncryptedContent> = if(LocalInspectionMode.current) _messages
     else messagesViewModel.getMessages(context).observeAsState(emptyList()).value
 
+    val inboxMessages: List<EncryptedContent> = if(LocalInspectionMode.current) _messages
+    else messagesViewModel.getInboxMessages(context).observeAsState(emptyList()).value
+
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     var showAddGatewayClientsModal by remember { mutableStateOf(false) }
@@ -221,7 +224,7 @@ fun HomepageView(
                 }
 
                 BottomTabsItems.BottomBarInboxTab -> {
-                    if (messages.isNotEmpty()) {
+                    if (inboxMessages.isNotEmpty()) {
                         ExtendedFloatingActionButton(
                             onClick = {
                                 navController.navigate(PasteEncryptedTextScreen)
