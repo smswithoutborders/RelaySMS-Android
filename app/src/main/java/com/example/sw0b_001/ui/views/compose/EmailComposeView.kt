@@ -6,12 +6,15 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
@@ -138,6 +141,8 @@ fun EmailComposeView(
     var gatewayServerUrl by remember{
         mutableStateOf("https://gatewayserver.staging.smswithoutborders.com/v3/publish")
     }
+
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
         if(BuildConfig.DEBUG && platformsViewModel.message == null) {
@@ -268,10 +273,12 @@ fun EmailComposeView(
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                .fillMaxSize()
+//                .fillMaxSize()
+                .fillMaxWidth()
                 .imePadding()
                 .padding(innerPadding)
                 .padding(16.dp)
+                .verticalScroll(scrollState) // Add vertical scroll modifier
         ) {
             // Sender
             if(!isBridge) {
@@ -290,8 +297,6 @@ fun EmailComposeView(
                         disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 )
-                Spacer(modifier = Modifier.height(16.dp))
-
             }
 
             // To
@@ -305,7 +310,6 @@ fun EmailComposeView(
                     imeAction = ImeAction.Next
                 )
             )
-            Spacer(modifier = Modifier.height(8.dp))
 
             // CC
             OutlinedTextField(
@@ -318,7 +322,6 @@ fun EmailComposeView(
                     imeAction = ImeAction.Next
                 )
             )
-            Spacer(modifier = Modifier.height(8.dp))
 
             // BCC
             OutlinedTextField(
@@ -331,7 +334,6 @@ fun EmailComposeView(
                     imeAction = ImeAction.Next
                 )
             )
-            Spacer(modifier = Modifier.height(16.dp))
 
             // Subject
             OutlinedTextField(
@@ -343,16 +345,19 @@ fun EmailComposeView(
                     imeAction = ImeAction.Next
                 )
             )
-            Spacer(modifier = Modifier.height(16.dp))
 
             // Body
             OutlinedTextField(
                 value = body,
                 onValueChange = { body = it },
-                label = { Text(stringResource(R.string.compose_email), style = MaterialTheme.typography.bodyMedium) },
+                label = {
+                    Text(
+                        stringResource(R.string.compose_email),
+                        style = MaterialTheme.typography.bodyMedium)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .height(350.dp)
             )
         }
     }

@@ -15,6 +15,7 @@ import io.grpc.ManagedChannelBuilder
 import kotlinx.serialization.json.Json
 import publisher.v1.PublisherGrpc
 import publisher.v1.PublisherOuterClass
+import androidx.core.content.edit
 
 class Publishers(val context: Context) {
 
@@ -155,7 +156,7 @@ class Publishers(val context: Context) {
                 .build()
 
             KeystoreHelpers.removeFromKeystore(context, PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS)
-            sharedPreferences.edit().remove(PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS).apply()
+            sharedPreferences.edit() { remove(PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS) }
         }
 
         fun getEncryptedStates(context: Context, states: ByteArray) : ByteArray {

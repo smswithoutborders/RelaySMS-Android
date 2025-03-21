@@ -85,6 +85,9 @@ class Vaults(context: Context) {
         storeArtifacts(context, llt, deviceId, clientDeviceIDPubKey)
         Publishers.storeArtifacts(context, publisherPubKey)
         Publishers.removeEncryptedStates(context)
+        CoroutineScope(Dispatchers.Default).launch {
+            Datastore.getDatastore(context).ratchetStatesDAO().deleteAll()
+        }
     }
 
     fun createEntity(context: Context,
