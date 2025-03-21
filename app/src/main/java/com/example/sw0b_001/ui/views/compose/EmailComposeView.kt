@@ -58,6 +58,7 @@ import com.example.sw0b_001.Modules.Network
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
+import com.example.sw0b_001.ui.navigation.GetMeOutScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.views.DeveloperHTTPView
@@ -260,7 +261,11 @@ fun EmailComposeView(
                                 onFailureCallback = {}
                             ) {
                                 CoroutineScope(Dispatchers.Main).launch {
-                                    navController.navigate(HomepageScreen)
+                                    navController.navigate(HomepageScreen) {
+                                        popUpTo(HomepageScreen) {
+                                            inclusive = true
+                                        }
+                                    }
                                 }
                             }
                         }

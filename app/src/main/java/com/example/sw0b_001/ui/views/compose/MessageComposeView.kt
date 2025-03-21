@@ -164,7 +164,11 @@ fun MessageComposeView(
                             onFailureCallback = {}
                         ) {
                             CoroutineScope(Dispatchers.Main).launch {
-                                navController.navigate(HomepageScreen)
+                                navController.navigate(HomepageScreen) {
+                                    popUpTo(HomepageScreen) {
+                                        inclusive = true
+                                    }
+                                }
                             }
                         }
                     },
