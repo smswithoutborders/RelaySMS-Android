@@ -33,6 +33,9 @@
     <string name="language_farsi">Farsi</string>
     <string name="language_spanish">Spanish</string>
     <string name="language_turkish" >Turkish</string>
+    <string name="language_german" >German</string>
+    <string name="language_arabic" >Arabic</string>
+    <string name="language_swahili" >Swahili</string>
 
 
     <string name="language_english_value" translatable="false">
@@ -48,6 +51,15 @@
         es
     </string>
     <string name="language_turkish_value" translatable="false">
+        tr
+    </string>
+    <string name="language_german_value" translatable="false">
+        tr
+    </string>
+    <string name="language_arabic_value" translatable="false">
+        tr
+    </string>
+    <string name="language_swahili_value" translatable="false">
         tr
     </string>
 
