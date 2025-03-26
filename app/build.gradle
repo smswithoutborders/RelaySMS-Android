@@ -268,5 +268,7 @@ dependencies {
     implementation(libs.country.picker)
 
     implementation libs.accompanist.permissions
+
+    implementation("androidx.leanback:leanback:1.1.0-rc02")
 }
 

@@ -242,4 +242,7 @@
     <string name="bcc">نسخة مخفية الوجهة</string>
     <string name="paste_message">لصق الرسالة</string>
     <string name="error_decrypting_text">خطأ في فك تشفير النص</string>
+    <string name="you_can_also_send_out_emails_without_an_account_or_vault">يمكنك أيضًا إرسال رسائل بريد إلكتروني بدون حساب أو Vault</string>
+    <string name="this_will_create_a_default_email_your_phonenumber_relaysms_me_using_your_phone_number">سيؤدي هذا إلى إنشاء بريد إلكتروني افتراضي (رقم_الهاتف@relaysms.me) باستخدام رقم هاتفك.</string>
+
 </resources>

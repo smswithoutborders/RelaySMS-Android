@@ -233,4 +233,7 @@
     <string name="bcc">Cco</string>
     <string name="paste_message">Pegar mensaje</string>
     <string name="error_decrypting_text">Error al descifrar el texto</string>
+    <string name="you_can_also_send_out_emails_without_an_account_or_vault">También puedes enviar correos electrónicos sin una cuenta o Vault</string>
+    <string name="this_will_create_a_default_email_your_phonenumber_relaysms_me_using_your_phone_number">Esto creará un correo electrónico predeterminado (numero_de_telefono@relaysms.me) usando tu número de teléfono.</string>
+
 </resources>

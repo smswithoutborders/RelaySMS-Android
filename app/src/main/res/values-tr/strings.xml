@@ -228,4 +228,7 @@
     <string name="bcc">Bcc</string>
     <string name="paste_message">Mesajı yapıştır</string>
     <string name="error_decrypting_text">Metin şifresini çözme hatası</string>
+    <string name="you_can_also_send_out_emails_without_an_account_or_vault">Ayrıca bir hesap veya Vault olmadan da e-posta gönderebilirsiniz</string>
+    <string name="this_will_create_a_default_email_your_phonenumber_relaysms_me_using_your_phone_number">Bu, telefon numaranızı kullanarak varsayılan bir e-posta (telefon_numarasi@relaysms.me) oluşturacaktır.</string>
+
 </resources>

@@ -1,5 +1,8 @@
 package com.example.sw0b_001.ui.views
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
@@ -60,6 +63,7 @@ import kotlinx.coroutines.runBlocking
 import androidx.compose.runtime.collectAsState
 import com.example.sw0b_001.Models.NavigationFlowHandler
 import com.example.sw0b_001.ui.modals.GetStartedModal
+
 
 enum class BottomTabsItems {
     BottomBarRecentTab,
@@ -316,10 +320,10 @@ fun HomepageView(
                     }
                 )
             }
-
         }
     }
 }
+
 
 @Preview(showBackground = false)
 @Composable
