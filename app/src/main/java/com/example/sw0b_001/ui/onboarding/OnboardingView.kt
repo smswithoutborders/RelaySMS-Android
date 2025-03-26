@@ -40,24 +40,23 @@ import com.example.sw0b_001.ui.components.OnboardingNextButton
 data class OnboardingStep(
     val title: String,
     val description: String,
-    @DrawableRes val image: Int? = null, // Optional image resource
+    val image: Int? = null,
+    val showBackButton: Boolean = false,
+    val showSkipButton: Boolean = false,
+    val showLanguageButton: Boolean = false,
+    val showPrivacyPolicyLink: Boolean = false,
+    val isCompleteScreen: Boolean = false,
+    val nextButtonText: String = "",
+    val isWelcomeScreen: Boolean = false
 )
 
 @Composable
-fun OnboardingScreen(
-    title: String,
-    description: String,
-    image: Int? = null,
-    showBackButton: Boolean = false,
-    showSkipButton: Boolean = false,
-    showLanguageButton: Boolean = false,
-    showPrivacyPolicyLink: Boolean = false,
-    onBack: (() -> Unit)? = null,
-    onSkip: (() -> Unit)? = null,
+fun OnboardingView(
+    step: OnboardingStep,
+    onBack: () -> Unit,
+    onSkip: () -> Unit,
     onNext: () -> Unit,
-    onPrivacyPolicyClicked: (() -> Unit)? = null,
-    isCompleteScreen: Boolean = false,
-    nextButtonText: String = stringResource(R.string.next)
+    onPrivacyPolicyClicked: (() -> Unit)? = null
 ) {
     Scaffold { innerPadding ->
         Column(
@@ -69,7 +68,7 @@ fun OnboardingScreen(
             verticalArrangement = Arrangement.Center
         ) {
 
-            if (showBackButton || showSkipButton) {
+            if (step.showBackButton || step.showSkipButton) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -77,7 +76,7 @@ fun OnboardingScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (showBackButton && onBack != null) {
+                    if (step.showBackButton) {
                         IconButton(onClick = onBack) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -87,7 +86,7 @@ fun OnboardingScreen(
                     } else {
                         Spacer(modifier = Modifier.width(48.dp))
                     }
-                    if (showSkipButton && onSkip != null) {
+                    if (step.showSkipButton) {
                         Row(
                             modifier = Modifier.clickable(onClick = onSkip),
                             verticalAlignment = Alignment.CenterVertically
@@ -110,8 +109,18 @@ fun OnboardingScreen(
                 }
             }
 
-            // Language Button (Welcome Screen)
-            if (showLanguageButton) {
+
+            // Illustration
+            step.image?.let {
+                Image(
+                    painter = painterResource(id = it),
+                    contentDescription = null,
+                    modifier = Modifier.size(250.dp)
+                )
+                Spacer(modifier = Modifier.height(32.dp))
+            }
+
+            if (step.showLanguageButton) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
@@ -142,19 +151,8 @@ fun OnboardingScreen(
                 Spacer(modifier = Modifier.height(64.dp))
             }
 
-            // Illustration
-            image?.let {
-                Image(
-                    painter = painterResource(id = it),
-                    contentDescription = null,
-                    modifier = Modifier.size(250.dp)
-                )
-                Spacer(modifier = Modifier.height(32.dp))
-            }
-
-            // Title
             Text(
-                text = title,
+                text = step.title,
                 style = MaterialTheme.typography.headlineMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface
@@ -162,9 +160,8 @@ fun OnboardingScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Description
             Text(
-                text = description,
+                text = step.description,
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -172,21 +169,28 @@ fun OnboardingScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            // Next Button
-            if (isCompleteScreen) {
+            if (step.isCompleteScreen) {
                 Button(
                     onClick = onNext,
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text(text = nextButtonText, color = MaterialTheme.colorScheme.onPrimary)
+                    Text(text = step.nextButtonText, color = MaterialTheme.colorScheme.onPrimary)
                 }
-            } else {
-                OnboardingNextButton(onNext = onNext)
+            } else if (step.isWelcomeScreen){
+                Button(
+                    onClick = onNext,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text(text = step.nextButtonText, color = MaterialTheme.colorScheme.onPrimary)
+                }
+            }
+            else {
+                OnboardingNextButton(onNext = onNext, nextButtonText = step.nextButtonText)
             }
 
-            // Privacy Policy Link
-            if (showPrivacyPolicyLink && onPrivacyPolicyClicked != null) {
+            if (step.showPrivacyPolicyLink && onPrivacyPolicyClicked != null) {
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = stringResource(R.string.read_our_privacy_policy),

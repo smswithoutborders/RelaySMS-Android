@@ -63,10 +63,7 @@ import kotlinx.coroutines.runBlocking
 import androidx.compose.runtime.collectAsState
 import com.example.sw0b_001.Models.NavigationFlowHandler
 import com.example.sw0b_001.ui.modals.GetStartedModal
-import com.example.sw0b_001.ui.onboarding.OnboardingCompleteView
-import com.example.sw0b_001.ui.onboarding.OnboardingSaveVaultView
-import com.example.sw0b_001.ui.onboarding.OnboardingVaultStoreView
-import com.example.sw0b_001.ui.onboarding.OnboardingWelcomeView
+
 
 enum class BottomTabsItems {
     BottomBarRecentTab,
