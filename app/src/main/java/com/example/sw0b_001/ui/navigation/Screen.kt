@@ -3,6 +3,9 @@ package com.example.sw0b_001.ui.navigation
 import kotlinx.serialization.Serializable
 
 @Serializable
+object OnboardingScreen
+
+@Serializable
 object GetMeOutScreen
 @Serializable
 object HomepageScreen

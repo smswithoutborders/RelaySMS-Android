@@ -70,10 +70,14 @@ import com.example.sw0b_001.ui.navigation.EmailViewScreen
 import com.example.sw0b_001.ui.navigation.GetMeOutScreen
 import com.example.sw0b_001.ui.navigation.MessageComposeScreen
 import com.example.sw0b_001.ui.navigation.MessageViewScreen
+import com.example.sw0b_001.ui.navigation.OnboardingScreen
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.navigation.TextComposeScreen
 import com.example.sw0b_001.ui.navigation.TextViewScreen
+import com.example.sw0b_001.ui.onboarding.MainOnboarding
 import com.example.sw0b_001.ui.onboarding.OnboardingStep
+import com.example.sw0b_001.ui.onboarding.PREF_USER_ONBOARDED
+import com.example.sw0b_001.ui.onboarding.USER_ONBOARDED
 import com.example.sw0b_001.ui.views.PasteEncryptedTextView
 import com.example.sw0b_001.ui.views.details.EmailDetailsView
 import com.example.sw0b_001.ui.views.details.MessageDetailsView
@@ -122,126 +126,28 @@ class MainActivity : ComponentActivity() {
                     Modifier
                         .fillMaxSize()
                 ) {
-                    MainScreen(navController = navController)
+                    MainNavigation(navController = navController)
                 }
             }
-        }
-    }
-
-    @Composable
-    fun MainScreen(navController: NavHostController) {
-        val context = LocalContext.current
-        val sharedPreferences = context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
-        var hasSeenOnboarding by remember {
-            mutableStateOf(sharedPreferences.getBoolean("hasSeenOnboarding", false))
-        }
-        var currentOnboardingState by remember { mutableStateOf(OnboardingState.Welcome) }
-        var navigateToHomepage by remember { mutableStateOf(false) }
-
-        LaunchedEffect(navigateToHomepage) {
-            if (navigateToHomepage) {
-                navController.navigate(HomepageScreen) {
-                    popUpTo(0) {
-                        inclusive = true
-                    }
-                }
-            }
-        }
-
-        if (!hasSeenOnboarding) {
-            val onboardingSteps = listOf(
-                OnboardingStep(
-                    title = context.getString(R.string.welcome_to_relaysms_),
-                    description = context.getString(R.string.use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection),
-                    image = R.drawable.relay_sms_welcome,
-                    showLanguageButton = true,
-                    showPrivacyPolicyLink = true,
-                    isCompleteScreen = false,
-                    nextButtonText = context.getString(R.string.learn_how_it_works_),
-                    isWelcomeScreen = true
-                ),
-                OnboardingStep(
-                    title = context.getString(R.string.relaysms_vaults_securely_stores_your_online_accounts_so_that_you_can_access_them_without_an_internet_connection),
-                    description = "",
-                    image = R.drawable.vault_illus,
-                    showBackButton = true,
-                    showSkipButton = true,
-                    isCompleteScreen = false,
-                ),
-                OnboardingStep(
-                    title = context.getString(R.string.you_can_add_online_accounts_to_your_vault),
-                    description = "",
-                    image = R.drawable.relay_sms_save_vault,
-                    showBackButton = true,
-                    showSkipButton = true,
-                    isCompleteScreen = false,
-                ),
-                OnboardingStep(
-                    title = context.getString(R.string.you_can_also_send_out_emails_without_an_account_or_vault),
-                    description = context.getString(R.string.this_will_create_a_default_email_your_phonenumber_relaysms_me_using_your_phone_number),
-                    image = R.drawable.try_sending_message_illus,
-                    showBackButton = true,
-                    showSkipButton = true,
-                    isCompleteScreen = false,
-                ),
-                OnboardingStep(
-                    title = context.getString(R.string.you_are_ready_to_begin_sending_messages_from_relaysms),
-                    description = "",
-                    image = R.drawable.ready_to_begin_illus,
-                    showBackButton = true,
-                    showSkipButton = false,
-                    isCompleteScreen = true,
-                    nextButtonText = context.getString(R.string.great),
-                ),
-            )
-            com.example.sw0b_001.ui.onboarding.OnboardingView(
-                step = onboardingSteps[currentOnboardingState.ordinal],
-                onBack = {
-                    currentOnboardingState = when (currentOnboardingState) {
-                        OnboardingState.VaultStore -> OnboardingState.Welcome
-                        OnboardingState.SaveVault -> OnboardingState.VaultStore
-                        OnboardingState.SendMessage -> OnboardingState.SaveVault
-                        OnboardingState.Complete -> OnboardingState.SendMessage
-                        else -> OnboardingState.Welcome
-                    }
-                },
-                onSkip = {
-                    currentOnboardingState = OnboardingState.Complete
-                },
-                onNext = {
-                    if (currentOnboardingState == OnboardingState.Complete) {
-                        hasSeenOnboarding = true
-                        with(sharedPreferences.edit()) {
-                            putBoolean("hasSeenOnboarding", true)
-                            apply()
-                        }
-                        navigateToHomepage = true
-                    } else {
-                        currentOnboardingState = when (currentOnboardingState) {
-                            OnboardingState.Welcome -> OnboardingState.VaultStore
-                            OnboardingState.VaultStore -> OnboardingState.SaveVault
-                            OnboardingState.SaveVault -> OnboardingState.SendMessage
-                            OnboardingState.SendMessage -> OnboardingState.Complete
-                            else -> OnboardingState.Complete
-                        }
-                    }
-                },
-                onPrivacyPolicyClicked = {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://smswithoutborders.com/privacy-policy"))
-                    context.startActivity(intent)
-                }
-            )
-        } else {
-            MainNavigation(navController = navController)
         }
     }
 
     @Composable
     fun MainNavigation(navController: NavHostController) {
+        val context = LocalContext.current
+        val sharedPreferences = context.getSharedPreferences(PREF_USER_ONBOARDED, MODE_PRIVATE)
+
+        var hasSeenOnboarding by remember {
+            mutableStateOf(sharedPreferences.getBoolean(USER_ONBOARDED, false))
+        }
+
         NavHost(
             navController = navController,
-            startDestination = HomepageScreen,
+            startDestination = if(hasSeenOnboarding) HomepageScreen else OnboardingScreen,
         ) {
+            composable<OnboardingScreen> {
+                MainOnboarding(navController)
+            }
             composable<GetMeOutScreen> {
                 GetMeOutOfHere(navController)
             }
@@ -434,7 +340,7 @@ fun GetMeOutOfHere(
                     Vaults.setGetMeOut(context, false)
                     CoroutineScope(Dispatchers.Main).launch {
                         navController.navigate(HomepageScreen) {
-                            popUpTo(HomepageScreen) {
+                            popUpTo(0) {
                                 inclusive = true
                             }
                         }

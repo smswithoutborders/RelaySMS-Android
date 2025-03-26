@@ -1,5 +1,8 @@
 package com.example.sw0b_001.ui.onboarding
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -27,15 +30,24 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.sw0b_001.OnboardingState
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.components.OnboardingNextButton
+import com.example.sw0b_001.ui.navigation.HomepageScreen
+import androidx.core.net.toUri
 
 data class OnboardingStep(
     val title: String,
@@ -49,6 +61,105 @@ data class OnboardingStep(
     val nextButtonText: String = "",
     val isWelcomeScreen: Boolean = false
 )
+
+const val PREF_USER_ONBOARDED = "PREF_USER_ONBOARDED"
+const val USER_ONBOARDED = "USER_ONBOARDED"
+
+@Composable
+fun MainOnboarding(navController: NavController) {
+    val context = LocalContext.current
+    var currentOnboardingState by remember { mutableStateOf(OnboardingState.Welcome) }
+
+    val onboardingSteps = listOf(
+        OnboardingStep(
+            title = context.getString(R.string.welcome_to_relaysms_),
+            description = context.getString(R.string.use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection),
+            image = R.drawable.relay_sms_welcome,
+            showLanguageButton = true,
+            showPrivacyPolicyLink = true,
+            isCompleteScreen = false,
+            nextButtonText = context.getString(R.string.learn_how_it_works_),
+            isWelcomeScreen = true
+        ),
+        OnboardingStep(
+            title = context.getString(R.string.relaysms_vaults_securely_stores_your_online_accounts_so_that_you_can_access_them_without_an_internet_connection),
+            description = "",
+            image = R.drawable.vault_illus,
+            showBackButton = true,
+            showSkipButton = true,
+            isCompleteScreen = false,
+        ),
+        OnboardingStep(
+            title = context.getString(R.string.you_can_add_online_accounts_to_your_vault),
+            description = "",
+            image = R.drawable.relay_sms_save_vault,
+            showBackButton = true,
+            showSkipButton = true,
+            isCompleteScreen = false,
+        ),
+        OnboardingStep(
+            title = context.getString(R.string.you_can_also_send_out_emails_without_an_account_or_vault),
+            description = context.getString(R.string.this_will_create_a_default_email_your_phonenumber_relaysms_me_using_your_phone_number),
+            image = R.drawable.try_sending_message_illus,
+            showBackButton = true,
+            showSkipButton = true,
+            isCompleteScreen = false,
+        ),
+        OnboardingStep(
+            title = context.getString(R.string.you_are_ready_to_begin_sending_messages_from_relaysms),
+            description = "",
+            image = R.drawable.ready_to_begin_illus,
+            showBackButton = true,
+            showSkipButton = false,
+            isCompleteScreen = true,
+            nextButtonText = context.getString(R.string.great),
+        ),
+    )
+
+    OnboardingView(
+        step = onboardingSteps[currentOnboardingState.ordinal],
+        onBack = {
+            currentOnboardingState = when (currentOnboardingState) {
+                OnboardingState.VaultStore -> OnboardingState.Welcome
+                OnboardingState.SaveVault -> OnboardingState.VaultStore
+                OnboardingState.SendMessage -> OnboardingState.SaveVault
+                OnboardingState.Complete -> OnboardingState.SendMessage
+                else -> OnboardingState.Welcome
+            }
+        },
+        onSkip = {
+            currentOnboardingState = OnboardingState.Complete
+        },
+        onNext = {
+            if (currentOnboardingState == OnboardingState.Complete) {
+                val sharedPreferences = context
+                    .getSharedPreferences(PREF_USER_ONBOARDED, Context.MODE_PRIVATE)
+                with(sharedPreferences.edit()) {
+                    putBoolean(USER_ONBOARDED, true)
+                    apply()
+                }
+                navController.navigate(HomepageScreen) {
+                    popUpTo(0) {
+                        inclusive = true
+                    }
+                }
+            } else {
+                currentOnboardingState = when (currentOnboardingState) {
+                    OnboardingState.Welcome -> OnboardingState.VaultStore
+                    OnboardingState.VaultStore -> OnboardingState.SaveVault
+                    OnboardingState.SaveVault -> OnboardingState.SendMessage
+                    OnboardingState.SendMessage -> OnboardingState.Complete
+                    else -> OnboardingState.Complete
+                }
+            }
+        },
+        onPrivacyPolicyClicked = {
+            val intent = Intent(Intent.ACTION_VIEW,
+                context.getString(R.string.https_smswithoutborders_com_privacy_policy).toUri())
+            context.startActivity(intent)
+        }
+    )
+}
 
 @Composable
 fun OnboardingView(
