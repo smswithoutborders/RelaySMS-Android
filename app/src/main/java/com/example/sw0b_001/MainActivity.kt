@@ -55,6 +55,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -153,6 +154,17 @@ class MainActivity : ComponentActivity() {
             mutableStateOf(sharedPreferences.getBoolean("hasSeenOnboarding", false))
         }
         var currentOnboardingState by remember { mutableStateOf(OnboardingState.Welcome) }
+        var navigateToHomepage by remember { mutableStateOf(false) }
+
+        LaunchedEffect(navigateToHomepage) {
+            if (navigateToHomepage) {
+                navController.navigate(HomepageScreen) {
+                    popUpTo(0) {
+                        inclusive = true
+                    }
+                }
+            }
+        }
 
         if (!hasSeenOnboarding) {
             OnboardingScreen(
@@ -167,11 +179,7 @@ class MainActivity : ComponentActivity() {
                         putBoolean("hasSeenOnboarding", true)
                         apply()
                     }
-                    navController.navigate(HomepageScreen) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            inclusive = true
-                        }
-                    }
+                    navigateToHomepage = true
                 }
             )
         } else {
