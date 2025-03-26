@@ -136,7 +136,7 @@ fun HomepageView(
                 OnboardingWelcomeView (
                     onContinueClicked = { currentOnboardingState = OnboardingState.VaultStore },
                     onPrivacyPolicyClicked = {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://relaysms.me/privacy-policy"))
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_policy)))
                         context.startActivity(intent)
                     }
                 )
