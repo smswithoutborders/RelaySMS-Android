@@ -75,14 +75,6 @@ enum class BottomTabsItems {
     BottomBarCountriesTab
 }
 
-enum class OnboardingState {
-    Welcome,
-    VaultStore,
-    SaveVault,
-    SendMessage,
-    Complete
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomepageView(
@@ -96,12 +88,6 @@ fun HomepageView(
 ) {
     val context = LocalContext.current
     val inspectionMode = LocalInspectionMode.current
-
-    val sharedPreferences = context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
-    var hasSeenOnboarding by remember {
-        mutableStateOf(sharedPreferences.getBoolean("hasSeenOnboarding", false))
-    }
-    var currentOnboardingState by remember { mutableStateOf(OnboardingState.Welcome) }
 
     var isLoggedIn by remember {
         mutableStateOf(
@@ -130,193 +116,90 @@ fun HomepageView(
 
     val isLoading by messagesViewModel.isLoading.collectAsState()
 
-    if (!hasSeenOnboarding) {
-        when (currentOnboardingState) {
-            OnboardingState.Welcome -> {
-                OnboardingWelcomeView (
-                    onContinueClicked = { currentOnboardingState = OnboardingState.VaultStore },
-                    onPrivacyPolicyClicked = {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(context.getString(R.string.privacy_policy)))
-                        context.startActivity(intent)
-                    }
-                )
-            }
-
-            OnboardingState.VaultStore -> {
-                OnboardingVaultStoreView(
-                    onBack = { currentOnboardingState = OnboardingState.Welcome },
-                    onSkip = {
-                        currentOnboardingState = OnboardingState.Complete
-                    },
-                    onContinue = { currentOnboardingState = OnboardingState.SaveVault }
-                )
-            }
-
-            OnboardingState.SaveVault -> {
-                OnboardingSaveVaultView(
-                    onBack = { currentOnboardingState = OnboardingState.VaultStore },
-                    onSkip = {
-                        currentOnboardingState = OnboardingState.Complete
-                    },
-                    onContinue = { currentOnboardingState = OnboardingState.SendMessage }
-                )
-            }
-
-            OnboardingState.SendMessage -> {
-                OnboardingSaveVaultView(
-                    onBack = { currentOnboardingState = OnboardingState.SaveVault },
-                    onSkip = {
-                        currentOnboardingState = OnboardingState.Complete
-                    },
-                    onContinue = { currentOnboardingState = OnboardingState.Complete }
-                )
-            }
-
-            OnboardingState.Complete -> {
-                OnboardingCompleteView(
-                    onBack = { currentOnboardingState = OnboardingState.SendMessage },
-                    onContinue = {
-                        hasSeenOnboarding = true
-                        with(sharedPreferences.edit()) {
-                            putBoolean("hasSeenOnboarding", true)
-                            apply()
-                        }
-                    }
-                )
-            }
-        }
-    } else {
-        Scaffold (
-            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-            topBar = {
-                when(platformsViewModel.bottomTabsItem) {
-                    BottomTabsItems.BottomBarRecentTab -> {
-                        if (isLoggedIn || messages.isNotEmpty()) {
-                            RecentAppBar(
-                                navController = navController,
-                                isSearchable = messages.isNotEmpty()
-                            )
-                        }
-                    }
-                    BottomTabsItems.BottomBarPlatformsTab -> {}
-                    BottomTabsItems.BottomBarCountriesTab -> {
-                        GatewayClientsAppBar(
+    Scaffold (
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            when(platformsViewModel.bottomTabsItem) {
+                BottomTabsItems.BottomBarRecentTab -> {
+                    if (isLoggedIn || messages.isNotEmpty()) {
+                        RecentAppBar(
                             navController = navController,
-                            onRefreshClicked = {
-                                gatewayClientViewModel.get(context, refreshSuccess)
-                            }
-                        )
-                    }
-
-                    BottomTabsItems.BottomBarInboxTab -> {
-                        TopAppBar(
-                            title = {
-                                Text(
-                                    text = stringResource(R.string.inbox),
-                                    style = MaterialTheme.typography.headlineLarge,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            },
-                            colors = TopAppBarDefaults.topAppBarColors()
+                            isSearchable = messages.isNotEmpty()
                         )
                     }
                 }
-            },
-            bottomBar = {
-                BottomNavBar(
-                    selectedTab = platformsViewModel.bottomTabsItem,
-                    isLoggedIn = isLoggedIn
-                ) { selectedTab ->
-                    platformsViewModel.bottomTabsItem = selectedTab
-                }
-            },
-            floatingActionButton = {
-                when(platformsViewModel.bottomTabsItem) {
-                    BottomTabsItems.BottomBarRecentTab -> {
-                        if(messages.isNotEmpty()) {
-                            if(isLoggedIn) {
-                                ExtendedFloatingActionButton(
-                                    onClick = {
-                                        sendNewMessageRequested = true
-                                    },
-                                    containerColor = MaterialTheme.colorScheme.secondary,
-                                    icon = {
-                                        Icon(
-                                            imageVector = Icons.AutoMirrored.Default.Message,
-                                            contentDescription = "Add Account",
-                                            tint = MaterialTheme.colorScheme.onSecondary
-                                        )
-                                    },
-                                    text = {
-                                        Text(
-                                            text = "Compose new",
-                                            color = MaterialTheme.colorScheme.onSecondary
-                                        )
-                                    }
-                                )
-                            } else {
-                                ExtendedFloatingActionButton(
-                                    onClick = {
-                                        sendNewMessageRequested = true
-                                    },
-                                    containerColor = MaterialTheme.colorScheme.secondary,
-                                    icon = {
-                                        Icon(
-                                            imageVector = Icons.Filled.PersonAdd,
-                                            contentDescription = "Add Account",
-                                            tint = MaterialTheme.colorScheme.onSecondary
-                                        )
-                                    },
-                                    text = {
-                                        Text(
-                                            text = "Add account / Compose new",
-                                            color = MaterialTheme.colorScheme.onSecondary
-                                        )
-                                    }
-                                )
-                            }
+                BottomTabsItems.BottomBarPlatformsTab -> {}
+                BottomTabsItems.BottomBarCountriesTab -> {
+                    GatewayClientsAppBar(
+                        navController = navController,
+                        onRefreshClicked = {
+                            gatewayClientViewModel.get(context, refreshSuccess)
                         }
-                    }
-                    BottomTabsItems.BottomBarPlatformsTab -> {}
-                    BottomTabsItems.BottomBarCountriesTab -> {
-                        ExtendedFloatingActionButton(
-                            onClick = {
-                                showAddGatewayClientsModal = true
-                            },
-                            containerColor = MaterialTheme.colorScheme.secondary,
-                            icon = {
-                                Icon(
-                                    imageVector = Icons.Filled.Add,
-                                    contentDescription = "Add New Gateway clients",
-                                    tint = MaterialTheme.colorScheme.onSecondary
-                                )
-                            },
-                            text = {
-                                Text(
-                                    text = "Add Number",
-                                    color = MaterialTheme.colorScheme.onSecondary
-                                )
-                            }
-                        )
-                    }
+                    )
+                }
 
-                    BottomTabsItems.BottomBarInboxTab -> {
-                        if (inboxMessages.isNotEmpty()) {
+                BottomTabsItems.BottomBarInboxTab -> {
+                    TopAppBar(
+                        title = {
+                            Text(
+                                text = stringResource(R.string.inbox),
+                                style = MaterialTheme.typography.headlineLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors()
+                    )
+                }
+            }
+        },
+        bottomBar = {
+            BottomNavBar(
+                selectedTab = platformsViewModel.bottomTabsItem,
+                isLoggedIn = isLoggedIn
+            ) { selectedTab ->
+                platformsViewModel.bottomTabsItem = selectedTab
+            }
+        },
+        floatingActionButton = {
+            when(platformsViewModel.bottomTabsItem) {
+                BottomTabsItems.BottomBarRecentTab -> {
+                    if(messages.isNotEmpty()) {
+                        if(isLoggedIn) {
                             ExtendedFloatingActionButton(
                                 onClick = {
-                                    navController.navigate(PasteEncryptedTextScreen)
+                                    sendNewMessageRequested = true
                                 },
                                 containerColor = MaterialTheme.colorScheme.secondary,
                                 icon = {
                                     Icon(
-                                        Icons.Filled.ContentPaste,
-                                        contentDescription = "Paste new incoming message",
+                                        imageVector = Icons.AutoMirrored.Default.Message,
+                                        contentDescription = "Add Account",
                                         tint = MaterialTheme.colorScheme.onSecondary
                                     )
                                 },
                                 text = {
                                     Text(
-                                        text = stringResource(R.string.paste_message),
+                                        text = "Compose new",
+                                        color = MaterialTheme.colorScheme.onSecondary
+                                    )
+                                }
+                            )
+                        } else {
+                            ExtendedFloatingActionButton(
+                                onClick = {
+                                    sendNewMessageRequested = true
+                                },
+                                containerColor = MaterialTheme.colorScheme.secondary,
+                                icon = {
+                                    Icon(
+                                        imageVector = Icons.Filled.PersonAdd,
+                                        contentDescription = "Add Account",
+                                        tint = MaterialTheme.colorScheme.onSecondary
+                                    )
+                                },
+                                text = {
+                                    Text(
+                                        text = "Add account / Compose new",
                                         color = MaterialTheme.colorScheme.onSecondary
                                     )
                                 }
@@ -324,81 +207,126 @@ fun HomepageView(
                         }
                     }
                 }
-            }
-        ) { innerPadding ->
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            ) {
-                when(platformsViewModel.bottomTabsItem) {
-                    BottomTabsItems.BottomBarRecentTab -> {
-                        if (isLoggedIn || messages.isNotEmpty()) {
-                            RecentView(
-                                _messages = _messages,
-                                navController = navController,
-                                messagesViewModel = messagesViewModel,
-                                platformsViewModel = platformsViewModel,
-                            ) {
-                                platformsViewModel.bottomTabsItem =
-                                    BottomTabsItems.BottomBarPlatformsTab
-                            }
-                        } else if(!isLoading){
-                            GetStartedView(navController = navController)
-                        }
-                    }
-                    BottomTabsItems.BottomBarPlatformsTab -> {
-                        AvailablePlatformsView(
-                            navController = navController,
-                            platformsViewModel = platformsViewModel
-                        )
-                    }
-                    BottomTabsItems.BottomBarCountriesTab -> {
-                        GatewayClientView( viewModel = gatewayClientViewModel )
-                    }
-
-                    BottomTabsItems.BottomBarInboxTab -> {
-                        InboxView(
-                            messagesViewModel = messagesViewModel,
-                            platformsViewModel = platformsViewModel,
-                            navController = navController
-                        )
-                    }
-                }
-
-                if (sendNewMessageRequested) {
-                    if(isLoggedIn) {
-                        ActivePlatformsModal(
-                            sendNewMessageRequested = sendNewMessageRequested,
-                            platformsViewModel = platformsViewModel,
-                            navController = navController,
-                            isCompose = true
-                        ) {
-                            sendNewMessageRequested = false
-                        }
-                    } else {
-                        GetStartedModal(sendNewMessageRequested, navController) {
-                            sendNewMessageRequested = false
-                        }
-                    }
-                }
-
-                if (showAddGatewayClientsModal) {
-                    AddGatewayClientModal(
-                        showBottomSheet = showAddGatewayClientsModal,
-                        onDismiss = { showAddGatewayClientsModal = false },
-                        viewModel = gatewayClientViewModel,
-                        onGatewayClientSaved = {
-                            showAddGatewayClientsModal = false
+                BottomTabsItems.BottomBarPlatformsTab -> {}
+                BottomTabsItems.BottomBarCountriesTab -> {
+                    ExtendedFloatingActionButton(
+                        onClick = {
+                            showAddGatewayClientsModal = true
+                        },
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Filled.Add,
+                                contentDescription = "Add New Gateway clients",
+                                tint = MaterialTheme.colorScheme.onSecondary
+                            )
+                        },
+                        text = {
+                            Text(
+                                text = "Add Number",
+                                color = MaterialTheme.colorScheme.onSecondary
+                            )
                         }
                     )
                 }
 
+                BottomTabsItems.BottomBarInboxTab -> {
+                    if (inboxMessages.isNotEmpty()) {
+                        ExtendedFloatingActionButton(
+                            onClick = {
+                                navController.navigate(PasteEncryptedTextScreen)
+                            },
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            icon = {
+                                Icon(
+                                    Icons.Filled.ContentPaste,
+                                    contentDescription = "Paste new incoming message",
+                                    tint = MaterialTheme.colorScheme.onSecondary
+                                )
+                            },
+                            text = {
+                                Text(
+                                    text = stringResource(R.string.paste_message),
+                                    color = MaterialTheme.colorScheme.onSecondary
+                                )
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    ) { innerPadding ->
+        Box(
+            Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            when(platformsViewModel.bottomTabsItem) {
+                BottomTabsItems.BottomBarRecentTab -> {
+                    if (isLoggedIn || messages.isNotEmpty()) {
+                        RecentView(
+                            _messages = _messages,
+                            navController = navController,
+                            messagesViewModel = messagesViewModel,
+                            platformsViewModel = platformsViewModel,
+                        ) {
+                            platformsViewModel.bottomTabsItem =
+                                BottomTabsItems.BottomBarPlatformsTab
+                        }
+                    } else if(!isLoading){
+                        GetStartedView(navController = navController)
+                    }
+                }
+                BottomTabsItems.BottomBarPlatformsTab -> {
+                    AvailablePlatformsView(
+                        navController = navController,
+                        platformsViewModel = platformsViewModel
+                    )
+                }
+                BottomTabsItems.BottomBarCountriesTab -> {
+                    GatewayClientView( viewModel = gatewayClientViewModel )
+                }
+
+                BottomTabsItems.BottomBarInboxTab -> {
+                    InboxView(
+                        messagesViewModel = messagesViewModel,
+                        platformsViewModel = platformsViewModel,
+                        navController = navController
+                    )
+                }
+            }
+
+            if (sendNewMessageRequested) {
+                if(isLoggedIn) {
+                    ActivePlatformsModal(
+                        sendNewMessageRequested = sendNewMessageRequested,
+                        platformsViewModel = platformsViewModel,
+                        navController = navController,
+                        isCompose = true
+                    ) {
+                        sendNewMessageRequested = false
+                    }
+                } else {
+                    GetStartedModal(sendNewMessageRequested, navController) {
+                        sendNewMessageRequested = false
+                    }
+                }
+            }
+
+            if (showAddGatewayClientsModal) {
+                AddGatewayClientModal(
+                    showBottomSheet = showAddGatewayClientsModal,
+                    onDismiss = { showAddGatewayClientsModal = false },
+                    viewModel = gatewayClientViewModel,
+                    onGatewayClientSaved = {
+                        showAddGatewayClientsModal = false
+                    }
+                )
             }
         }
     }
-
 }
+
 
 @Preview(showBackground = false)
 @Composable

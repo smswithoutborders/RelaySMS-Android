@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -93,7 +94,7 @@ fun OnboardingSendMessageView(
 
             // Main Text
             Text(
-                text = "You can also send out emails without a Vault account",
+                text = stringResource(R.string.you_can_also_send_out_emails_without_an_account_or_vault),
                 style = MaterialTheme.typography.headlineMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface
@@ -101,9 +102,9 @@ fun OnboardingSendMessageView(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Subtext 1
+
             Text(
-                text = "This will create a default email (your_phonenumber@relaysms.me) using your phone number.",
+                text = stringResource(R.string.this_will_create_a_default_email_your_phonenumber_relaysms_me_using_your_phone_number),
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,

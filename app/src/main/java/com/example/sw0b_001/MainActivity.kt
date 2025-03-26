@@ -3,6 +3,7 @@ package com.example.sw0b_001
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -54,7 +55,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
@@ -80,6 +85,11 @@ import com.example.sw0b_001.ui.navigation.MessageViewScreen
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.navigation.TextComposeScreen
 import com.example.sw0b_001.ui.navigation.TextViewScreen
+import com.example.sw0b_001.ui.onboarding.OnboardingCompleteView
+import com.example.sw0b_001.ui.onboarding.OnboardingSaveVaultView
+import com.example.sw0b_001.ui.onboarding.OnboardingSendMessageView
+import com.example.sw0b_001.ui.onboarding.OnboardingVaultStoreView
+import com.example.sw0b_001.ui.onboarding.OnboardingWelcomeView
 import com.example.sw0b_001.ui.views.PasteEncryptedTextView
 import com.example.sw0b_001.ui.views.details.EmailDetailsView
 import com.example.sw0b_001.ui.views.details.MessageDetailsView
@@ -91,6 +101,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.net.URL
 
+
+enum class OnboardingState {
+    Welcome,
+    VaultStore,
+    SaveVault,
+    SendMessage,
+    Complete
+}
 
 class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
@@ -121,9 +139,43 @@ class MainActivity : ComponentActivity() {
                     Modifier
                         .fillMaxSize()
                 ) {
-                    MainNavigation(navController = navController)
+                    MainScreen(navController = navController)
                 }
             }
+        }
+    }
+
+    @Composable
+    fun MainScreen(navController: NavHostController) {
+        val context = LocalContext.current
+        val sharedPreferences = context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+        var hasSeenOnboarding by remember {
+            mutableStateOf(sharedPreferences.getBoolean("hasSeenOnboarding", false))
+        }
+        var currentOnboardingState by remember { mutableStateOf(OnboardingState.Welcome) }
+
+        if (!hasSeenOnboarding) {
+            OnboardingScreen(
+                navController = navController,
+                currentOnboardingState = currentOnboardingState,
+                onStateChange = { newState ->
+                    currentOnboardingState = newState
+                },
+                onOnboardingComplete = {
+                    hasSeenOnboarding = true
+                    with(sharedPreferences.edit()) {
+                        putBoolean("hasSeenOnboarding", true)
+                        apply()
+                    }
+                    navController.navigate(HomepageScreen) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
+        } else {
+            MainNavigation(navController = navController)
         }
     }
 
@@ -271,6 +323,62 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
+fun OnboardingScreen(
+    navController: NavHostController,
+    currentOnboardingState: OnboardingState,
+    onStateChange: (OnboardingState) -> Unit,
+    onOnboardingComplete: () -> Unit
+) {
+    val context = LocalContext.current
+    when (currentOnboardingState) {
+        OnboardingState.Welcome -> {
+            OnboardingWelcomeView(
+                onContinueClicked = { onStateChange(OnboardingState.VaultStore) },
+                onPrivacyPolicyClicked = {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://smswithoutborders.com/privacy-policy"))
+                    context.startActivity(intent)
+                }
+            )
+        }
+
+        OnboardingState.VaultStore -> {
+            OnboardingVaultStoreView(
+                onBack = { onStateChange(OnboardingState.Welcome) },
+                onSkip = {
+                    onStateChange(OnboardingState.Complete)
+                },
+                onContinue = { onStateChange(OnboardingState.SaveVault) }
+            )
+        }
+
+        OnboardingState.SaveVault -> {
+            OnboardingSaveVaultView(
+                onBack = { onStateChange(OnboardingState.VaultStore) },
+                onSkip = {
+                    onStateChange(OnboardingState.Complete)
+                },
+                onContinue = { onStateChange(OnboardingState.SendMessage) }
+            )
+        }
+        OnboardingState.SendMessage -> {
+            OnboardingSendMessageView(
+                onBack = { onStateChange(OnboardingState.SaveVault) },
+                onSkip = { onStateChange(OnboardingState.Complete) },
+                onContinue = { onStateChange(OnboardingState.Complete) }
+            )
+        }
+
+        OnboardingState.Complete -> {
+            OnboardingCompleteView(
+                onBack = { onStateChange(OnboardingState.SendMessage) },
+                onContinue = onOnboardingComplete
+            )
+        }
+    }
+}
+
+
+@Composable
 fun GetMeOutOfHere(
     navController: NavController
 ) {
@@ -300,13 +408,14 @@ fun GetMeOutOfHere(
             fontWeight = FontWeight.Thin,
             modifier = Modifier.padding(start=16.dp, end=16.dp)
         )
-        Text("You have logged in on another device",
+        Text(
+            "You have logged in on another device",
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.Thin,
             color = MaterialTheme.colorScheme.secondary,
             modifier = Modifier
-                .padding(bottom=32.dp, top=8.dp),
+                .padding(bottom = 32.dp, top = 8.dp),
         )
         Image(
             painter = painterResource(R.drawable.get_me_out),
@@ -319,7 +428,7 @@ fun GetMeOutOfHere(
         Button(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom=32.dp),
+                .padding(bottom = 32.dp),
             onClick={
                 Vaults.logout(context) {
                     Vaults.setGetMeOut(context, false)
