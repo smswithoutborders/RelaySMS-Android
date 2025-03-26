@@ -78,6 +78,7 @@ import com.example.sw0b_001.ui.onboarding.MainOnboarding
 import com.example.sw0b_001.ui.onboarding.OnboardingStep
 import com.example.sw0b_001.ui.onboarding.PREF_USER_ONBOARDED
 import com.example.sw0b_001.ui.onboarding.USER_ONBOARDED
+import com.example.sw0b_001.ui.views.GetMeOutOfHere
 import com.example.sw0b_001.ui.views.PasteEncryptedTextView
 import com.example.sw0b_001.ui.views.details.EmailDetailsView
 import com.example.sw0b_001.ui.views.details.MessageDetailsView
@@ -284,78 +285,4 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun GetMeOutOfHere(
-    navController: NavController
-) {
-    val activity = LocalActivity.current
-    val context = LocalContext.current
-    BackHandler {
-        activity?.finish()
-    }
-    Column(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Image(
-            painter = painterResource(R.drawable.relaysms_icon_default_shape),
-            contentDescription = "Drink me out of here",
-            modifier = Modifier
-                .size(100.dp)
-                .padding(top = 42.dp)
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        Text("You need to log in again into this device!",
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Thin,
-            modifier = Modifier.padding(start=16.dp, end=16.dp)
-        )
-        Text(
-            "You have logged in on another device",
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.Thin,
-            color = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier
-                .padding(bottom = 32.dp, top = 8.dp),
-        )
-        Image(
-            painter = painterResource(R.drawable.get_me_out),
-            contentDescription = "Drink me out of here",
-            modifier = Modifier
-                .size(200.dp)
-                .padding(bottom = 16.dp)
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 32.dp),
-            onClick={
-                Vaults.logout(context) {
-                    Vaults.setGetMeOut(context, false)
-                    CoroutineScope(Dispatchers.Main).launch {
-                        navController.navigate(HomepageScreen) {
-                            popUpTo(0) {
-                                inclusive = true
-                            }
-                        }
-                    }
-                }
-        }) {
-            Text("Get me out here!", fontWeight = FontWeight.SemiBold)
-        }
-    }
-}
 
-@Preview(showBackground = true)
-@Composable
-fun GetMeOutOfHerePreview() {
-    AppTheme(darkTheme = false) {
-        GetMeOutOfHere(navController = rememberNavController())
-    }
-}
