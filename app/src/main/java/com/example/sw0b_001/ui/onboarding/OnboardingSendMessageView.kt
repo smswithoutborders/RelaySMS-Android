@@ -32,15 +32,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sw0b_001.R
+import com.example.sw0b_001.ui.components.OnboardingNextButton
 import com.example.sw0b_001.ui.theme.AppTheme
 
 @Composable
 fun OnboardingSendMessageView(
     onBack: () -> Unit,
     onSkip: () -> Unit,
-    onTrySendingMessage: () -> Unit,
-    onCreateAccount: () -> Unit,
-    onLogin: () -> Unit
+    onContinue: () -> Unit
 ) {
     Scaffold { innerPadding ->
         Column(
@@ -94,7 +93,7 @@ fun OnboardingSendMessageView(
 
             // Main Text
             Text(
-                text = "Try sending a message using your default account.",
+                text = "You can also send out emails without a Vault account",
                 style = MaterialTheme.typography.headlineMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface
@@ -111,50 +110,10 @@ fun OnboardingSendMessageView(
                 modifier = Modifier.padding(horizontal = 48.dp)
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(144.dp))
 
-            // Try Sending a Message Button
-            Button(
-                onClick = onTrySendingMessage,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-            ) {
-                Text(text = "Try sending a message", color = MaterialTheme.colorScheme.onPrimary)
-            }
+            OnboardingNextButton(onNext = onContinue)
 
-            Spacer(modifier = Modifier.height(64.dp))
-
-            // Subtext 2
-            Text(
-                text = "To use your personal online accounts, create an account or log in below.",
-                style = MaterialTheme.typography.bodySmall,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 48.dp)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Create Account and Login Buttons
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Button(
-                    onClick = onCreateAccount,
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-                ) {
-                    Text(text = "Create account", color = MaterialTheme.colorScheme.onPrimaryContainer)
-                }
-                Button(
-                    onClick = onLogin,
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-                ) {
-                    Text(text = "Login", color = MaterialTheme.colorScheme.onPrimaryContainer)
-                }
-            }
         }
     }
 }
@@ -166,9 +125,7 @@ fun OnboardingSendViewPreview() {
         OnboardingSendMessageView(
             onBack = {},
             onSkip = {},
-            onTrySendingMessage = {},
-            onCreateAccount = {},
-            onLogin = {}
+            onContinue = {}
         )
     }
 }

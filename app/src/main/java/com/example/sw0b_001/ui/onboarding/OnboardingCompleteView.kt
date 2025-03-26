@@ -38,7 +38,6 @@ import com.example.sw0b_001.ui.theme.AppTheme
 @Composable
 fun OnboardingCompleteView(
     onBack: () -> Unit,
-    onSkip: () -> Unit,
     onContinue: () -> Unit
 ) {
     Scaffold { innerPadding ->
@@ -62,19 +61,19 @@ fun OnboardingCompleteView(
                         contentDescription = "Back"
                     )
                 }
-                Row(
-                    modifier = Modifier.clickable(onClick = onSkip),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(R.string.skip),
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                        contentDescription = "Skip",
-                    )
-                }
+//                Row(
+//                    modifier = Modifier.clickable(onClick = onSkip),
+//                    verticalAlignment = Alignment.CenterVertically
+//                ) {
+//                    Text(
+//                        text = stringResource(R.string.skip),
+//                        style = MaterialTheme.typography.bodyMedium,
+//                    )
+//                    Icon(
+//                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+//                        contentDescription = "Skip",
+//                    )
+//                }
             }
 
             Spacer(modifier = Modifier.height(72.dp))
@@ -114,6 +113,6 @@ fun OnboardingCompleteView(
 @Composable
 fun OnboardingCompletePreview() {
     AppTheme(darkTheme = true) {
-        OnboardingCompleteView(onBack = {}, onSkip = {}, onContinue = {})
+        OnboardingCompleteView(onBack = {}, onContinue = {})
     }
 }

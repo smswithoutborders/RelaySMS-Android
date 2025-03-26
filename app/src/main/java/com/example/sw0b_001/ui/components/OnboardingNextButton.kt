@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.sw0b_001.ui.onboarding.OnboardingWelcome
 import com.example.sw0b_001.ui.theme.AppTheme
 
 

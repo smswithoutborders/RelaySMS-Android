@@ -40,7 +40,7 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.theme.AppTheme
 
 @Composable
-fun OnboardingWelcome(
+fun OnboardingWelcomeView(
     onContinueClicked: () -> Unit,
     onPrivacyPolicyClicked: () -> Unit
 ) {
@@ -145,6 +145,6 @@ fun OnboardingWelcome(
 @Composable
 fun OnboardingWelcomePreview() {
     AppTheme(darkTheme = false) {
-        OnboardingWelcome(onContinueClicked = {}, onPrivacyPolicyClicked = {})
+        OnboardingWelcomeView(onContinueClicked = {}, onPrivacyPolicyClicked = {})
     }
 }
