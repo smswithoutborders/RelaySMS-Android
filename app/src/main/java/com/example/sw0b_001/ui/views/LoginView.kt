@@ -270,7 +270,6 @@ fun LoginView(
                                 }
                             }
                         ) {
-
                             isLoading = false
                         }
                     },

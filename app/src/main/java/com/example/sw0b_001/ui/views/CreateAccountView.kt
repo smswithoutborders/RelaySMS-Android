@@ -1,5 +1,7 @@
 package com.example.sw0b_001.ui.views
 
+import android.content.Context
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,6 +23,7 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -56,24 +60,37 @@ import androidx.navigation.compose.rememberNavController
 import com.arpitkatiyarprojects.countrypicker.CountryPickerOutlinedTextField
 import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
+import com.example.sw0b_001.Models.NavigationFlowHandler
+import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
+import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
+import com.example.sw0b_001.ui.theme.AppTheme
+import io.grpc.StatusRuntimeException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlin.contracts.contract
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Preview
 fun CreateAccountView(
-    navController: NavController = rememberNavController()
+    navController: NavController = rememberNavController(),
+    navigationFlowHandler: NavigationFlowHandler
 ) {
+    val context = LocalContext.current
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
     var phoneNumber by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var reenterPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var reenterPasswordVisible by remember { mutableStateOf (false) }
+    var acceptedPrivatePolicy by remember { mutableStateOf (false) }
 
     var showLoginModal by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -232,12 +249,48 @@ fun CreateAccountView(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Button(onClick = {
-                    navController.navigate(OTPCodeScreen)
+                    phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+                    createAccount(
+                        context = context,
+                        phoneNumber = phoneNumber,
+                        countryCode = selectedCountry!!.countryCode,
+                        password = password,
+                        otpRequiredCallback = {
+                            navigationFlowHandler.loginSignupPassword = password
+                            navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
+                            navigationFlowHandler.countryCode = selectedCountry!!.countryCode
+                            navigationFlowHandler.otpRequestType =
+                                OTPCodeVerificationType.AUTHENTICATE
+
+                            CoroutineScope(Dispatchers.Main).launch {
+                                navController.navigate(OTPCodeScreen)
+                            }
+                        },
+                        failedCallback = {
+                            isLoading = false
+                            CoroutineScope(Dispatchers.Main).launch {
+                                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    ) {
+                        isLoading = false
+                    }
                 },
+                    enabled = phoneNumber.isNotEmpty() &&
+                            password.isNotEmpty() &&
+                            reenterPassword.isNotEmpty() && acceptedPrivatePolicy,
                     modifier = Modifier
                         .fillMaxWidth()
                         .align(Alignment.CenterHorizontally)) {
-                    Text(stringResource(R.string.sign_up))
+
+                    if(isLoading) {
+                        CircularProgressIndicator(
+                            color = MaterialTheme.colorScheme.secondary,
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                        )
+                    } else {
+                        Text(stringResource(R.string.sign_up))
+                    }
                 }
             }
 
@@ -249,8 +302,10 @@ fun CreateAccountView(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Checkbox(
-                    checked = false,
-                    onCheckedChange = {}
+                    checked = acceptedPrivatePolicy,
+                    onCheckedChange = {
+                        acceptedPrivatePolicy = it
+                    }
                 )
                 Text(
                     text = buildAnnotatedString {
@@ -280,7 +335,7 @@ fun CreateAccountView(
 
             Text(
                 text = buildAnnotatedString {
-                    append(stringResource(R.string.already_have_an_account))
+                    append(stringResource(R.string.already_have_an_account) + " ")
                     pushStringAnnotation(tag = "login", annotation = "login")
                     withStyle(
                         style = SpanStyle(
@@ -305,5 +360,50 @@ fun CreateAccountView(
 
         }
 
+    }
+}
+
+private fun createAccount(
+    context: Context,
+    phoneNumber: String,
+    countryCode: String,
+    password: String,
+    otpRequiredCallback: () -> Unit,
+    failedCallback: (String?) -> Unit = {},
+    completedCallback: () -> Unit = {},
+) {
+    CoroutineScope(Dispatchers.Default).launch{
+        val vaults = Vaults(context)
+        try {
+            val response = vaults.createEntity(
+                context = context,
+                phoneNumber = phoneNumber,
+                countryCode = countryCode,
+                password = password
+            )
+
+            if(response.requiresOwnershipProof) {
+                otpRequiredCallback()
+            }
+        } catch(e: StatusRuntimeException) {
+            e.printStackTrace()
+            failedCallback(e.message)
+        } catch(e: Exception) {
+            e.printStackTrace()
+            failedCallback(e.message)
+        }
+        finally {
+            vaults.shutdown()
+            completedCallback()
+        }
+    }
+
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CreateAccountPreview() {
+    AppTheme(darkTheme = false) {
+        CreateAccountView(rememberNavController(), NavigationFlowHandler())
     }
 }

@@ -7,6 +7,7 @@ import com.afkanerd.smswithoutborders.libsignal_doubleratchet.KeystoreHelpers
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityAES
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityRSA
 import com.example.sw0b_001.Database.Datastore
+import com.example.sw0b_001.Models.Platforms.Platforms
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.Modules.Crypto
 import com.example.sw0b_001.R
@@ -224,8 +225,29 @@ class Vaults(context: Context) {
 
         fun completeDelete(context: Context, llt: String) {
             val publishers = Publishers(context)
-            Datastore.getDatastore(context).storedPlatformsDao().fetchAllList().forEach {
-                publishers.revokeOAuthPlatforms(llt, it.name!!, it.account!!)
+
+            val availablePlatforms = Datastore.getDatastore(context).availablePlatformsDao()
+                .fetchAllList()
+
+            Datastore.getDatastore(context).storedPlatformsDao().fetchAllList().forEach { platform ->
+                availablePlatforms.filter { it.name == platform.name }.forEach {
+                    when(it.protocol_type) {
+                        Platforms.ProtocolTypes.OAUTH2.type -> {
+                            publishers.revokeOAuthPlatforms(
+                                llt,
+                                platform.name!!,
+                                platform.account!!,
+                            )
+                        }
+                        Platforms.ProtocolTypes.PNBA.type -> {
+                            publishers.revokePNBAPlatforms(
+                                llt,
+                                platform.name!!,
+                                platform.account!!
+                            )
+                        }
+                    }
+                }
             }
             publishers.shutdown()
 
