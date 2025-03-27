@@ -65,6 +65,8 @@ import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.R
+import com.example.sw0b_001.ui.navigation.HomepageScreen
+import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import io.grpc.StatusRuntimeException
@@ -351,7 +353,7 @@ fun CreateAccountView(
                 modifier = Modifier
                     .padding(top = 0.dp)
                     .clickable {
-                        showLoginModal = true
+                        navController.navigate(LoginScreen)
                     },
                 color = MaterialTheme.colorScheme.onBackground
             )
