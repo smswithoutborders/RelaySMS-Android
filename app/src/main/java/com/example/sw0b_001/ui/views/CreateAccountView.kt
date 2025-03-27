@@ -72,6 +72,7 @@ fun CreateAccountView(
     var reenterPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var reenterPasswordVisible by remember { mutableStateOf (false) }
+    var acceptedPrivatePolicy by remember { mutableStateOf (false) }
 
     var showLoginModal by remember { mutableStateOf(false) }
 
@@ -232,8 +233,11 @@ fun CreateAccountView(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Button(onClick = {
-                    navController.navigate(OTPCodeScreen)
+                    TODO("Implement this method")
                 },
+                    enabled = phoneNumber.isNotEmpty() &&
+                            password.isNotEmpty() &&
+                            reenterPassword.isNotEmpty() && acceptedPrivatePolicy,
                     modifier = Modifier
                         .fillMaxWidth()
                         .align(Alignment.CenterHorizontally)) {
@@ -249,8 +253,10 @@ fun CreateAccountView(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Checkbox(
-                    checked = false,
-                    onCheckedChange = {}
+                    checked = acceptedPrivatePolicy,
+                    onCheckedChange = {
+                        acceptedPrivatePolicy = it
+                    }
                 )
                 Text(
                     text = buildAnnotatedString {
