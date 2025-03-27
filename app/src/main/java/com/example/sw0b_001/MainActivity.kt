@@ -168,7 +168,10 @@ class MainActivity : ComponentActivity() {
                 )
             }
             composable<CreateAccountScreen> {
-                CreateAccountView(navController = navController)
+                CreateAccountView(
+                    navController = navController,
+                    navigationFlowHandler=navigationFlowHandler
+                )
             }
             composable<OTPCodeScreen> {
                 OtpCodeVerificationView(
