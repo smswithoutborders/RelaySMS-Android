@@ -1,6 +1,8 @@
 package com.example.sw0b_001.ui.views
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -74,6 +76,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.contracts.contract
+import androidx.core.net.toUri
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -327,7 +330,13 @@ fun CreateAccountView(
                     modifier = Modifier
                         .padding(top = 0.dp)
                         .clickable {
-                            // Handle click on "privacy policy"
+                            val intent = Intent(
+                                Intent.ACTION_VIEW,
+                                context
+                                    .getString(R.string.https_smswithoutborders_com_privacy_policy)
+                                    .toUri()
+                            )
+                            context.startActivity(intent)
                         },
                     color = MaterialTheme.colorScheme.onBackground
                 )
