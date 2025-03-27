@@ -30,6 +30,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +41,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -48,6 +50,10 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.components.OnboardingNextButton
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import androidx.core.net.toUri
+import androidx.work.Configuration
+import com.example.sw0b_001.Settings.SettingsFragment.Companion.changeLanguageLocale
+import com.example.sw0b_001.Settings.SettingsFragment.Companion.getCurrentLocale
+import com.example.sw0b_001.ui.components.LanguageSelectionPopup
 
 data class OnboardingStep(
     val title: String,
@@ -69,6 +75,7 @@ const val USER_ONBOARDED = "USER_ONBOARDED"
 fun MainOnboarding(navController: NavController) {
     val context = LocalContext.current
     var currentOnboardingState by remember { mutableStateOf(OnboardingState.Welcome) }
+
 
     val onboardingSteps = listOf(
         OnboardingStep(
@@ -169,6 +176,14 @@ fun OnboardingView(
     onNext: () -> Unit,
     onPrivacyPolicyClicked: (() -> Unit)? = null
 ) {
+    val context = LocalContext.current
+    var showLanguagePopup by remember { mutableStateOf(false) }
+    var currentLanguageCode by remember { mutableStateOf(getCurrentLocale(context)) }
+
+    LaunchedEffect(currentLanguageCode) {
+        changeLanguageLocale(context, currentLanguageCode)
+    }
+
     Scaffold { innerPadding ->
         Column(
             modifier = Modifier
@@ -238,7 +253,7 @@ fun OnboardingView(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Button(
-                        onClick = { /* TODO: Handle language selection */ },
+                        onClick = { showLanguagePopup = true },
                         shape = RoundedCornerShape(24.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
@@ -312,5 +327,15 @@ fun OnboardingView(
             }
             Spacer(modifier = Modifier.height(64.dp))
         }
+    }
+
+    if (showLanguagePopup) {
+        LanguageSelectionPopup(
+            currentLanguageCode = currentLanguageCode,
+            onLanguageSelected = { selectedLanguage ->
+                currentLanguageCode = selectedLanguage.code
+            },
+            onDismiss = { showLanguagePopup = false }
+        )
     }
 }
