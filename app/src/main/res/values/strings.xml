@@ -258,5 +258,8 @@
     <string name="next">Next</string>
     <string name="https_smswithoutborders_com_privacy_policy" translatable="false">https://smswithoutborders.com/privacy-policy</string>
     <string name="version">Version %1$s</string>
+    <string name="compose_new">Compose new</string>
+    <string name="add_account_compose_new">Add account / Compose new</string>
+    <string name="add_number">Add Number</string>
 
 </resources>

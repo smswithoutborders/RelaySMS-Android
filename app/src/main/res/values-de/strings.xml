@@ -236,5 +236,8 @@
     <string name="this_will_create_a_default_email_your_phonenumber_relaysms_me_using_your_phone_number">Dies erstellt eine Standard-E-Mail (telefonnummer@relaysms.me) unter Verwendung Ihrer Telefonnummer.</string>
     <string name="version">Version %1$s</string>
     <string name="next">Weiter</string>
+    <string name="compose_new">Neu verfassen</string>
+    <string name="add_account_compose_new">Konto hinzufügen / Neu verfassen</string>
+    <string name="add_number">Nummer hinzufügen</string>
 
 </resources>

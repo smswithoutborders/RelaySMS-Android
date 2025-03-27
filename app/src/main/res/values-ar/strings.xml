@@ -246,5 +246,8 @@
     <string name="this_will_create_a_default_email_your_phonenumber_relaysms_me_using_your_phone_number">سيؤدي هذا إلى إنشاء بريد إلكتروني افتراضي (رقم_الهاتف@relaysms.me) باستخدام رقم هاتفك.</string>
     <string name="version">الإصدار %1$s</string>
     <string name="next">التالي</string>
+    <string name="compose_new">إنشاء جديد</string>
+    <string name="add_account_compose_new">إضافة حساب / إنشاء جديد</string>
+    <string name="add_number">إضافة رقم</string>
 
 </resources>
