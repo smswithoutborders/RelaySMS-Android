@@ -295,7 +295,7 @@ private fun triggerAccountRevoke(
                     publishers.revokeOAuthPlatforms(
                         llt,
                         account.name!!,
-                        account.account!!
+                        account.account!!,
                     )
                 }
                 Platforms.ProtocolTypes.PNBA.type -> {
