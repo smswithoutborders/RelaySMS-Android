@@ -235,5 +235,7 @@
     <string name="error_decrypting_text">خطا در رمزگشایی متن</string>
     <string name="you_can_also_send_out_emails_without_an_account_or_vault">شما همچنین می‌توانید بدون حساب کاربری یا Vault ایمیل ارسال کنید</string>
     <string name="this_will_create_a_default_email_your_phonenumber_relaysms_me_using_your_phone_number">با این کار یک ایمیل پیش‌فرض (شماره_تلفن@relaysms.me) با استفاده از شماره تلفن شما ایجاد می‌شود.</string>
+    <string name="version">نسخه %1$s</string>
+    <string name="next">بعدی</string>
 
 </resources>
