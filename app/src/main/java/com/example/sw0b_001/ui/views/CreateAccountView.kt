@@ -183,7 +183,10 @@ fun CreateAccountView(
                     defaultCountryCode = "us",
                     countryListDisplayType = CountryListDisplayType.Dialog,
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text(text = stringResource(R.string.phone_number), style = MaterialTheme.typography.bodySmall) }
+                    label = {
+                        Text(text = stringResource(R.string.phone_number),
+                        style = MaterialTheme.typography.bodySmall)
+                    }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
