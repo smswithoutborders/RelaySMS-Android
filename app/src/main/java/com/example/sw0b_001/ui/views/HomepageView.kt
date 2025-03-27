@@ -176,7 +176,7 @@ fun HomepageView(
                                 },
                                 text = {
                                     Text(
-                                        text = "Compose new",
+                                        text = stringResource(R.string.compose_new),
                                         color = MaterialTheme.colorScheme.onSecondary
                                     )
                                 }
@@ -196,7 +196,7 @@ fun HomepageView(
                                 },
                                 text = {
                                     Text(
-                                        text = "Add account / Compose new",
+                                        text = stringResource(R.string.add_account_compose_new),
                                         color = MaterialTheme.colorScheme.onSecondary
                                     )
                                 }
@@ -220,7 +220,7 @@ fun HomepageView(
                         },
                         text = {
                             Text(
-                                text = "Add Number",
+                                text = stringResource(R.string.add_number),
                                 color = MaterialTheme.colorScheme.onSecondary
                             )
                         }

@@ -1,9 +1,11 @@
 package com.example.sw0b_001.ui.views
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,6 +38,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,6 +53,26 @@ fun AboutView(
     navController: NavController
 ) {
     val context = LocalContext.current
+    val currentLocale = Locale.current
+    val languageCode = currentLocale.language
+    val isDarkTheme = isSystemInDarkTheme()
+
+    val tutorialLink = when (languageCode) {
+        "fr" -> "https://docs.smswithoutborders.com/fr/docs/Android%20Tutorial/Getting-Started-With-Android"
+        "es" -> "https://docs.smswithoutborders.com/es/docs/Android%20Tutorial/Getting-Started-With-Android"
+        "fa" -> "https://docs.smswithoutborders.com/fa/docs/Android%20Tutorial/Getting-Started-With-Android"
+        else -> "https://docs.smswithoutborders.com/docs/Android%20Tutorial/Getting-Started-With-Android"
+    }
+
+    val packageManager = context.packageManager
+    val packageName = context.packageName
+    val appVersion = try {
+        val packageInfo = packageManager.getPackageInfo(packageName, 0)
+        packageInfo.versionName ?: ""
+    } catch (e: PackageManager.NameNotFoundException) {
+        ""
+    }
+
     Scaffold(
         topBar = {
             AboutAppBar(navController = navController)
@@ -78,7 +101,7 @@ fun AboutView(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Version 1.0.0",
+                text =  stringResource(R.string.version, appVersion),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -102,7 +125,10 @@ fun AboutView(
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = {TODO("Implement app tutorial")},
+                onClick = {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(tutorialLink))
+                    context.startActivity(intent)
+                },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
@@ -128,7 +154,7 @@ fun AboutView(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Image(
-                        painter = painterResource(id = R.drawable.github_icon),
+                        painter = painterResource(id = if (isDarkTheme) R.drawable.github_white_icon else R.drawable.github_icon),
                         contentDescription = "GitHub Logo",
                         modifier = Modifier.size(32.dp)
                     )
@@ -166,9 +192,9 @@ fun AboutView(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
-                // TODO:"Remove X"
+
                 Image(
-                    painter = painterResource(id = R.drawable.x_icon),
+                    painter = painterResource(id = if (isDarkTheme) R.drawable.x_white_icon else R.drawable.x_icon),
                     contentDescription = "X Logo",
                     modifier = Modifier
                         .size(32.dp)
@@ -180,7 +206,22 @@ fun AboutView(
                 )
                 Spacer(modifier = Modifier.width(32.dp))
                 Image(
-                    painter = painterResource(id = R.drawable.github_icon),
+                    painter = painterResource(id = R.drawable.bluesky_icon),
+                    contentDescription = "Bluesky Logo",
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clickable {
+                            val intent =
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("https://bsky.app/profile/relaysms.bsky.social")
+                                )
+                            context.startActivity(intent)
+                        }
+                )
+                Spacer(modifier = Modifier.width(32.dp))
+                Image(
+                    painter = painterResource(id = if (isDarkTheme) R.drawable.github_white_icon else R.drawable.github_icon),
                     contentDescription = "GitHub Logo",
                     modifier = Modifier
                         .size(32.dp)
