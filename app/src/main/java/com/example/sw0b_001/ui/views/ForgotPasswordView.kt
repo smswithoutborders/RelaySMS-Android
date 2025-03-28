@@ -83,7 +83,9 @@ fun ForgotPasswordView(
     var phoneNumber by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
+    var reenterPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    var reenterPasswordVisible by remember { mutableStateOf (false) }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -206,6 +208,38 @@ fun ForgotPasswordView(
                         unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                     ),
                     enabled = !isLoading
+                )
+
+//                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = reenterPassword,
+                    onValueChange = { reenterPassword = it },
+                    label = {
+                        Text(text = stringResource(R.string.re_enter_password),
+                            style = MaterialTheme.typography.bodySmall)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp),
+                    visualTransformation = if (reenterPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    trailingIcon = {
+                        val image = if (reenterPasswordVisible)
+                            Icons.Filled.Visibility
+                        else Icons.Filled.VisibilityOff
+
+                        val description = if (reenterPasswordVisible) stringResource(R.string.hide_password) else stringResource(R.string.show_password)
+
+                        IconButton(onClick = { reenterPasswordVisible = !reenterPasswordVisible }) {
+                            Icon(imageVector = image, description)
+                        }
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        focusedBorderColor = MaterialTheme.colorScheme.outline,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    )
                 )
 
 
