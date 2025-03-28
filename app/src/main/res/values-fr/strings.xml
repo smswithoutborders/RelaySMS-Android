@@ -244,5 +244,6 @@
     <string name="enter_your_phone_number_and_new_password_and_we_would_send_you_a_code_via_sms_to_reset_your_password">Entrez votre numéro de téléphone et votre nouveau mot de passe, et nous vous enverrons un code par SMS pour réinitialiser votre mot de passe.</string>
     <string name="new_password">Nouveau mot de passe</string>
     <string name="reset_password">Réinitialiser le mot de passe</string>
+    <string name="passwords_do_not_match">Les mots de passe ne correspondent pas</string>
 
 </resources>
