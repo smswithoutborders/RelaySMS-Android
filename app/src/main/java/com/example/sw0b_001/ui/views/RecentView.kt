@@ -2,6 +2,7 @@ package com.example.sw0b_001.ui.views
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -49,12 +50,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.LiveData
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.room.util.TableInfo
 import com.example.sw0b_001.Bridges.Bridges
 import com.example.sw0b_001.Models.Messages.EncryptedContent
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
+import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
 import com.example.sw0b_001.Models.Platforms.Platforms
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Modules.Helpers
@@ -165,6 +168,9 @@ fun RecentView(
         if(LocalInspectionMode.current) _messages
         else messagesViewModel.getMessages(context = context).observeAsState(emptyList()).value
 
+    val platforms: LiveData<List<AvailablePlatforms>> = platformsViewModel.getAvailablePlatforms(context)
+    val platformsList by platforms.observeAsState(initial = emptyList())
+
     Box(Modifier
         .padding(8.dp)
         .fillMaxSize()
@@ -178,7 +184,9 @@ fun RecentView(
                 contentPadding = PaddingValues(vertical = 16.dp)
             ) {
                 items(messages) { message ->
-                    RecentMessageCard(message) {
+                    val platform = platformsList.find { it.name == message.platformName }
+                    val logo = platform?.logo?.let { BitmapFactory.decodeByteArray(it, 0, it.size) }
+                    RecentMessageCard(message, logo) {
                         platformsViewModel.message = it
                         when(it.type) {
                             Platforms.ServiceTypes.EMAIL.type -> {
