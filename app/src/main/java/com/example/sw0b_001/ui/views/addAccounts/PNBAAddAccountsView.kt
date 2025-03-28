@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -114,19 +115,29 @@ fun PNBAPhoneNumberCodeRequestView(
             OutlinedTextField(
                 value = authCode,
                 onValueChange = { authCode = it },
-                label = { Text(text = stringResource(R.string.code), style = MaterialTheme.typography.bodySmall) },
+                label = {
+                    Text(
+                        text = stringResource(R.string.code),
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                        },
                 modifier = Modifier
                     .padding(bottom = 8.dp)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .imePadding(),
                 shape = RoundedCornerShape(12.dp),
-                visualTransformation = if (isCodeVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation =
+                if (isCodeVisible) VisualTransformation.None
+                else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 trailingIcon = {
                     val image = if (isCodeVisible)
                         Icons.Filled.Visibility
                     else Icons.Filled.VisibilityOff
 
-                    val description = if (isCodeVisible) stringResource(R.string.hide_password) else stringResource(
+                    val description =
+                        if (isCodeVisible) stringResource(R.string.hide_password)
+                        else stringResource(
                         R.string.show_password
                     )
 
@@ -148,19 +159,25 @@ fun PNBAPhoneNumberCodeRequestView(
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text(text = stringResource(R.string.password), style = MaterialTheme.typography.bodySmall) },
+                label = { Text(text = stringResource(R.string.password),
+                    style = MaterialTheme.typography.bodySmall) },
                 modifier = Modifier
                     .padding(bottom = 8.dp)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .imePadding(),
                 shape = RoundedCornerShape(12.dp),
-                visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation =
+                if (isPasswordVisible) VisualTransformation.None
+                else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 trailingIcon = {
                     val image = if (isPasswordVisible)
                         Icons.Filled.Visibility
                     else Icons.Filled.VisibilityOff
 
-                    val description = if (isPasswordVisible) stringResource(R.string.hide_password) else stringResource(R.string.show_password)
+                    val description =
+                        if (isPasswordVisible) stringResource(R.string.hide_password)
+                        else stringResource(R.string.show_password)
 
                     IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
                         Icon(imageVector = image, description)
