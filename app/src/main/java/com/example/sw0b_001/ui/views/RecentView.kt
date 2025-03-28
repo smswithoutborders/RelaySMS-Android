@@ -2,6 +2,7 @@ package com.example.sw0b_001.ui.views
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -183,7 +184,7 @@ fun RecentView(
                 contentPadding = PaddingValues(vertical = 16.dp)
             ) {
                 items(messages) { message ->
-                    val platform = platformsList.find { it.name == message.fromAccount }
+                    val platform = platformsList.find { it.name == message.platformName }
                     val logo = platform?.logo?.let { BitmapFactory.decodeByteArray(it, 0, it.size) }
                     RecentMessageCard(message, logo) {
                         platformsViewModel.message = it
