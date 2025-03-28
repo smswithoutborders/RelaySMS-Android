@@ -306,33 +306,43 @@ fun CreateAccountView(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Button(onClick = {
-                    isLoading = true
-                    val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+                    if (password == reenterPassword) {
+                        isLoading = true
+                        val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
 
-                    createAccount(
-                        context = context,
-                        phoneNumber = phoneNumber,
-                        countryCode = selectedCountry!!.countryCode,
-                        password = password,
-                        otpRequiredCallback = {
-                            navigationFlowHandler.loginSignupPassword = password
-                            navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
-                            navigationFlowHandler.countryCode = selectedCountry!!.countryCode
-                            navigationFlowHandler.otpRequestType =
-                                OTPCodeVerificationType.CREATE
+                        createAccount(
+                            context = context,
+                            phoneNumber = phoneNumber,
+                            countryCode = selectedCountry!!.countryCode,
+                            password = password,
+                            otpRequiredCallback = {
+                                navigationFlowHandler.loginSignupPassword = password
+                                navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
+                                navigationFlowHandler.countryCode = selectedCountry!!.countryCode
+                                navigationFlowHandler.otpRequestType =
+                                    OTPCodeVerificationType.CREATE
 
-                            CoroutineScope(Dispatchers.Main).launch {
-                                navController.navigate(OTPCodeScreen)
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    navController.navigate(OTPCodeScreen)
+                                }
+                            },
+                            failedCallback = {
+                                isLoading = false
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                                }
                             }
-                        },
-                        failedCallback = {
+                        ) {
                             isLoading = false
-                            CoroutineScope(Dispatchers.Main).launch {
-                                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-                            }
                         }
-                    ) {
-                        isLoading = false
+                    } else {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.passwords_do_not_match),
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
                     }
                 },
                     enabled = phoneNumber.isNotEmpty() &&
@@ -384,6 +394,7 @@ fun CreateAccountView(
 
     }
 }
+
 
 private fun createAccount(
     context: Context,

@@ -243,5 +243,6 @@
     <string name="enter_your_phone_number_and_new_password_and_we_would_send_you_a_code_via_sms_to_reset_your_password">Geben Sie Ihre Telefonnummer und Ihr neues Passwort ein. Wir senden Ihnen dann einen Code per SMS, um Ihr Passwort zurückzusetzen.</string>
     <string name="new_password">Neues Passwort</string>
     <string name="reset_password">Passwort zurücksetzen</string>
+    <string name="passwords_do_not_match">Passwörter stimmen nicht überein</string>
 
 </resources>
