@@ -165,7 +165,8 @@ object Bridges {
 
         val cipherTextLength = ByteArray(2)
         ByteBuffer.wrap(cipherTextLength).order(ByteOrder.LITTLE_ENDIAN)
-            .putInt(cipherText.size)
+            .putShort(cipherText.size.toShort())
+
         val bridgeLetter: Byte = "e".encodeToByteArray()[0]
 
         var payload = mode +
