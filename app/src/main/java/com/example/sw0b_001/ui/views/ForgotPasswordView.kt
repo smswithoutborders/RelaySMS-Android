@@ -65,6 +65,7 @@ import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
+import com.example.sw0b_001.ui.theme.AppTheme
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -72,10 +73,9 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Preview
 fun ForgotPasswordView(
     navController: NavController = rememberNavController(),
-    navigationFlowHandler: NavigationFlowHandler = NavigationFlowHandler()
+    navigationFlowHandler: NavigationFlowHandler
 ) {
     val context = LocalContext.current
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
@@ -213,7 +213,32 @@ fun ForgotPasswordView(
             Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = {
-                    TODO("Handle reset password")
+                    isLoading = true
+                    val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+
+                    recoverPassword(
+                        context = context,
+                        phoneNumber = phoneNumber,
+                        password = password,
+                        otpRequiredCallback = {
+                            navigationFlowHandler.loginSignupPassword = password
+                            navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
+                            navigationFlowHandler.otpRequestType =
+                                OTPCodeVerificationType.RECOVER
+
+                            CoroutineScope(Dispatchers.Main).launch {
+                                navController.navigate(OTPCodeScreen)
+                            }
+                        },
+                        failedCallback = {
+                            isLoading = false
+                            CoroutineScope(Dispatchers.Main).launch {
+                                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    ) {
+                        isLoading = false
+                    }
                 },
                 enabled = (phoneNumber.isNotEmpty() && password.isNotEmpty()) && !isLoading,
                 modifier = Modifier
@@ -232,5 +257,48 @@ fun ForgotPasswordView(
                 }
             }
         }
+    }
+}
+
+
+private fun recoverPassword(
+    context: Context,
+    phoneNumber: String,
+    password: String,
+    otpRequiredCallback: () -> Unit,
+    failedCallback: (String?) -> Unit = {},
+    completedCallback: () -> Unit = {},
+) {
+    CoroutineScope(Dispatchers.Default).launch{
+        val vaults = Vaults(context)
+        try {
+            val response = vaults.recoverEntityPassword(
+                context,
+                phoneNumber,
+                password
+            )
+
+            if(response.requiresOwnershipProof) {
+                otpRequiredCallback()
+            }
+        } catch(e: StatusRuntimeException) {
+            e.printStackTrace()
+            failedCallback(e.message)
+        } catch(e: Exception) {
+            e.printStackTrace()
+            failedCallback(e.message)
+        }
+        finally {
+            vaults.shutdown()
+            completedCallback()
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ForgotPasswordPreview() {
+    AppTheme(darkTheme = false) {
+        ForgotPasswordView(rememberNavController(), NavigationFlowHandler())
     }
 }

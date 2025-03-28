@@ -263,8 +263,52 @@ fun CreateAccountView(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = acceptedPrivatePolicy,
+                        onCheckedChange = {
+                            acceptedPrivatePolicy = it
+                        }
+                    )
+                    Text(
+                        text = buildAnnotatedString {
+                            append(stringResource(R.string.i_have_read_the))
+                            pushStringAnnotation(tag = "privacy_policy", annotation = "privacy_policy")
+                            withStyle(
+                                style = SpanStyle(
+                                    color = MaterialTheme.colorScheme.tertiary,
+                                    textDecoration = TextDecoration.Underline
+                                )
+                            ) {
+                                append(stringResource(R.string.privacy_policy))
+                            }
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .padding(top = 0.dp)
+                            .clickable {
+                                val intent = Intent(
+                                    Intent.ACTION_VIEW,
+                                    context
+                                        .getString(R.string.https_smswithoutborders_com_privacy_policy)
+                                        .toUri()
+                                )
+                                context.startActivity(intent)
+                            },
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 Button(onClick = {
-                    phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+                    isLoading = true
+                    val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+
                     createAccount(
                         context = context,
                         phoneNumber = phoneNumber,
@@ -275,7 +319,7 @@ fun CreateAccountView(
                             navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
                             navigationFlowHandler.countryCode = selectedCountry!!.countryCode
                             navigationFlowHandler.otpRequestType =
-                                OTPCodeVerificationType.AUTHENTICATE
+                                OTPCodeVerificationType.CREATE
 
                             CoroutineScope(Dispatchers.Main).launch {
                                 navController.navigate(OTPCodeScreen)
@@ -304,52 +348,9 @@ fun CreateAccountView(
                             trackColor = MaterialTheme.colorScheme.surfaceVariant,
                         )
                     } else {
-                        Text(stringResource(R.string.sign_up))
+                        Text(stringResource(R.string.create_account))
                     }
                 }
-            }
-
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Checkbox(
-                    checked = acceptedPrivatePolicy,
-                    onCheckedChange = {
-                        acceptedPrivatePolicy = it
-                    }
-                )
-                Text(
-                    text = buildAnnotatedString {
-                        append(stringResource(R.string.i_have_read_the))
-                        pushStringAnnotation(tag = "privacy_policy", annotation = "privacy_policy")
-                        withStyle(
-                            style = SpanStyle(
-                                color = MaterialTheme.colorScheme.tertiary,
-                                textDecoration = TextDecoration.Underline
-                            )
-                        ) {
-                            append(stringResource(R.string.privacy_policy))
-                        }
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .padding(top = 0.dp)
-                        .clickable {
-                            val intent = Intent(
-                                Intent.ACTION_VIEW,
-                                context
-                                    .getString(R.string.https_smswithoutborders_com_privacy_policy)
-                                    .toUri()
-                            )
-                            context.startActivity(intent)
-                        },
-                    color = MaterialTheme.colorScheme.onBackground
-                )
             }
 
             Spacer(modifier = Modifier.height(8.dp))

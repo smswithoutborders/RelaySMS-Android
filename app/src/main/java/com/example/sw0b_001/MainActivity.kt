@@ -67,6 +67,7 @@ import com.example.sw0b_001.ui.navigation.BridgeEmailComposeScreen
 import com.example.sw0b_001.ui.navigation.BridgeViewScreen
 import com.example.sw0b_001.ui.navigation.EmailComposeScreen
 import com.example.sw0b_001.ui.navigation.EmailViewScreen
+import com.example.sw0b_001.ui.navigation.ForgotPasswordScreen
 import com.example.sw0b_001.ui.navigation.GetMeOutScreen
 import com.example.sw0b_001.ui.navigation.MessageComposeScreen
 import com.example.sw0b_001.ui.navigation.MessageViewScreen
@@ -78,6 +79,7 @@ import com.example.sw0b_001.ui.onboarding.MainOnboarding
 import com.example.sw0b_001.ui.onboarding.OnboardingStep
 import com.example.sw0b_001.ui.onboarding.PREF_USER_ONBOARDED
 import com.example.sw0b_001.ui.onboarding.USER_ONBOARDED
+import com.example.sw0b_001.ui.views.ForgotPasswordView
 import com.example.sw0b_001.ui.views.GetMeOutOfHere
 import com.example.sw0b_001.ui.views.PasteEncryptedTextView
 import com.example.sw0b_001.ui.views.details.EmailDetailsView
@@ -163,6 +165,12 @@ class MainActivity : ComponentActivity() {
             }
             composable<LoginScreen> {
                 LoginView(
+                    navController = navController,
+                    navigationFlowHandler = navigationFlowHandler
+                )
+            }
+            composable<ForgotPasswordScreen> {
+                ForgotPasswordView(
                     navController = navController,
                     navigationFlowHandler = navigationFlowHandler
                 )

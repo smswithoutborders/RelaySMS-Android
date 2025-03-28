@@ -59,12 +59,16 @@ import androidx.compose.material3.TextButton
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.example.sw0b_001.BuildConfig
+import com.example.sw0b_001.Models.Messages.EncryptedContent
+import com.example.sw0b_001.Models.Messages.MessagesViewModel
 import com.example.sw0b_001.Models.NavigationFlowHandler
+import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
+import com.example.sw0b_001.ui.theme.AppTheme
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -72,7 +76,6 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Preview
 fun LoginView(
     navController: NavController = rememberNavController(),
     navigationFlowHandler: NavigationFlowHandler = NavigationFlowHandler()
@@ -200,7 +203,9 @@ fun LoginView(
                     horizontalAlignment = Alignment.End
                 ) {
                     TextButton(
-                        onClick = { TODO() }
+                        onClick = {
+
+                        }
                     ) {
                         Text(stringResource(R.string.forgot_password))
                     }
@@ -209,7 +214,10 @@ fun LoginView(
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text(text = stringResource(R.string.password), style = MaterialTheme.typography.bodySmall) },
+                    label = {
+                        Text(text = stringResource(R.string.password),
+                            style = MaterialTheme.typography.bodySmall)
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -247,7 +255,7 @@ fun LoginView(
                 Button(
                     onClick = {
                         isLoading = true
-                        phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+                        val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
 
                         login(
                             context = context,
@@ -365,3 +373,12 @@ private fun login(
     }
 
 }
+
+@Preview(showBackground = true)
+@Composable
+fun LoginViewPreview() {
+    AppTheme(darkTheme = false) {
+        LoginView()
+    }
+}
+
