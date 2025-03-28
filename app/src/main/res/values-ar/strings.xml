@@ -249,5 +249,9 @@
     <string name="compose_new">إنشاء جديد</string>
     <string name="add_account_compose_new">إضافة حساب / إنشاء جديد</string>
     <string name="add_number">إضافة رقم</string>
+    <string name="forgot_password_">هل نسيت كلمة المرور؟</string>
+    <string name="enter_your_phone_number_and_new_password_and_we_would_send_you_a_code_via_sms_to_reset_your_password">أدخل رقم هاتفك وكلمة المرور الجديدة وسنرسل لك رمزًا عبر الرسائل القصيرة لإعادة تعيين كلمة المرور الخاصة بك.</string>
+    <string name="new_password">كلمة المرور الجديدة</string>
+    <string name="reset_password">إعادة تعيين كلمة المرور</string>
 
 </resources>

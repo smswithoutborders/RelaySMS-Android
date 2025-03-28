@@ -235,5 +235,9 @@
     <string name="compose_new">Yeni oluştur</string>
     <string name="add_account_compose_new">Hesap ekle / Yeni oluştur</string>
     <string name="add_number">Numara Ekle</string>
+    <string name="forgot_password_">Şifremi Unuttum?</string>
+    <string name="enter_your_phone_number_and_new_password_and_we_would_send_you_a_code_via_sms_to_reset_your_password">Telefon numaranızı ve yeni şifrenizi girin, şifrenizi sıfırlamanız için size SMS ile bir kod gönderelim.</string>
+    <string name="new_password">Yeni Şifre</string>
+    <string name="reset_password">Şifreyi Sıfırla</string>
 
 </resources>
