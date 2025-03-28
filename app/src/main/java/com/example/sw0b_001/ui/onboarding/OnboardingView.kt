@@ -51,6 +51,7 @@ import com.example.sw0b_001.ui.components.OnboardingNextButton
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import androidx.core.net.toUri
 import androidx.work.Configuration
+import com.example.sw0b_001.Modules.Helpers
 import com.example.sw0b_001.Settings.SettingsFragment.Companion.changeLanguageLocale
 import com.example.sw0b_001.Settings.SettingsFragment.Companion.getCurrentLocale
 import com.example.sw0b_001.ui.components.LanguageSelectionPopup
@@ -269,7 +270,7 @@ fun OnboardingView(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "English",
+                            text = Helpers.getLanguageNameFromCode(context, currentLanguageCode),
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     }
