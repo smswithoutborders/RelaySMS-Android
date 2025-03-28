@@ -65,6 +65,7 @@ import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
+import com.example.sw0b_001.ui.theme.AppTheme
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -72,10 +73,9 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Preview
 fun ForgotPasswordView(
     navController: NavController = rememberNavController(),
-    navigationFlowHandler: NavigationFlowHandler = NavigationFlowHandler()
+    navigationFlowHandler: NavigationFlowHandler
 ) {
     val context = LocalContext.current
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
@@ -83,7 +83,9 @@ fun ForgotPasswordView(
     var phoneNumber by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
+    var reenterPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    var reenterPasswordVisible by remember { mutableStateOf (false) }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -208,12 +210,69 @@ fun ForgotPasswordView(
                     enabled = !isLoading
                 )
 
+//                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = reenterPassword,
+                    onValueChange = { reenterPassword = it },
+                    label = {
+                        Text(text = stringResource(R.string.re_enter_password),
+                            style = MaterialTheme.typography.bodySmall)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp),
+                    visualTransformation = if (reenterPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    trailingIcon = {
+                        val image = if (reenterPasswordVisible)
+                            Icons.Filled.Visibility
+                        else Icons.Filled.VisibilityOff
+
+                        val description = if (reenterPasswordVisible) stringResource(R.string.hide_password) else stringResource(R.string.show_password)
+
+                        IconButton(onClick = { reenterPasswordVisible = !reenterPasswordVisible }) {
+                            Icon(imageVector = image, description)
+                        }
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        focusedBorderColor = MaterialTheme.colorScheme.outline,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                    )
+                )
+
 
             }
             Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = {
-                    TODO("Handle reset password")
+                    isLoading = true
+                    val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+
+                    recoverPassword(
+                        context = context,
+                        phoneNumber = phoneNumber,
+                        password = password,
+                        otpRequiredCallback = {
+                            navigationFlowHandler.loginSignupPassword = password
+                            navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
+                            navigationFlowHandler.otpRequestType =
+                                OTPCodeVerificationType.RECOVER
+
+                            CoroutineScope(Dispatchers.Main).launch {
+                                navController.navigate(OTPCodeScreen)
+                            }
+                        },
+                        failedCallback = {
+                            isLoading = false
+                            CoroutineScope(Dispatchers.Main).launch {
+                                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    ) {
+                        isLoading = false
+                    }
                 },
                 enabled = (phoneNumber.isNotEmpty() && password.isNotEmpty()) && !isLoading,
                 modifier = Modifier
@@ -232,5 +291,48 @@ fun ForgotPasswordView(
                 }
             }
         }
+    }
+}
+
+
+private fun recoverPassword(
+    context: Context,
+    phoneNumber: String,
+    password: String,
+    otpRequiredCallback: () -> Unit,
+    failedCallback: (String?) -> Unit = {},
+    completedCallback: () -> Unit = {},
+) {
+    CoroutineScope(Dispatchers.Default).launch{
+        val vaults = Vaults(context)
+        try {
+            val response = vaults.recoverEntityPassword(
+                context,
+                phoneNumber,
+                password
+            )
+
+            if(response.requiresOwnershipProof) {
+                otpRequiredCallback()
+            }
+        } catch(e: StatusRuntimeException) {
+            e.printStackTrace()
+            failedCallback(e.message)
+        } catch(e: Exception) {
+            e.printStackTrace()
+            failedCallback(e.message)
+        }
+        finally {
+            vaults.shutdown()
+            completedCallback()
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ForgotPasswordPreview() {
+    AppTheme(darkTheme = false) {
+        ForgotPasswordView(rememberNavController(), NavigationFlowHandler())
     }
 }

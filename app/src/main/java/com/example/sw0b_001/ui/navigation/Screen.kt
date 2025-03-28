@@ -38,3 +38,6 @@ object MessageViewScreen
 
 @Serializable
 object PasteEncryptedTextScreen
+
+@Serializable
+object ForgotPasswordScreen
