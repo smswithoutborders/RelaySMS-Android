@@ -66,6 +66,7 @@ import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
+import com.example.sw0b_001.ui.navigation.ForgotPasswordScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
@@ -204,7 +205,7 @@ fun LoginView(
                 ) {
                     TextButton(
                         onClick = {
-
+                            navController.navigate(ForgotPasswordScreen)
                         }
                     ) {
                         Text(stringResource(R.string.forgot_password))
