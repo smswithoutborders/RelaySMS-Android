@@ -239,5 +239,9 @@
     <string name="compose_new">Neu verfassen</string>
     <string name="add_account_compose_new">Konto hinzufügen / Neu verfassen</string>
     <string name="add_number">Nummer hinzufügen</string>
+    <string name="forgot_password_">Passwort vergessen?</string>
+    <string name="enter_your_phone_number_and_new_password_and_we_would_send_you_a_code_via_sms_to_reset_your_password">Geben Sie Ihre Telefonnummer und Ihr neues Passwort ein. Wir senden Ihnen dann einen Code per SMS, um Ihr Passwort zurückzusetzen.</string>
+    <string name="new_password">Neues Passwort</string>
+    <string name="reset_password">Passwort zurücksetzen</string>
 
 </resources>

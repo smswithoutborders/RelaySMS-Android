@@ -261,5 +261,9 @@
     <string name="compose_new">Compose new</string>
     <string name="add_account_compose_new">Add account / Compose new</string>
     <string name="add_number">Add Number</string>
+    <string name="forgot_password_">Forgot Password?</string>
+    <string name="enter_your_phone_number_and_new_password_and_we_would_send_you_a_code_via_sms_to_reset_your_password">Enter your phone number and new password and we would send you a code via SMS to reset your password.</string>
+    <string name="new_password">New Password</string>
+    <string name="reset_password">Reset Password</string>
 
 </resources>

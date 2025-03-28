@@ -240,5 +240,9 @@
     <string name="compose_new">نوشتن جدید</string>
     <string name="add_account_compose_new">افزودن حساب / نوشتن جدید</string>
     <string name="add_number">افزودن شماره</string>
+    <string name="forgot_password_">رمز عبور را فراموش کرده‌اید؟</string>
+    <string name="enter_your_phone_number_and_new_password_and_we_would_send_you_a_code_via_sms_to_reset_your_password">شماره تلفن و رمز عبور جدید خود را وارد کنید تا کدی از طریق پیامک برای بازنشانی رمز عبور برای شما ارسال کنیم.</string>
+    <string name="new_password">رمز عبور جدید</string>
+    <string name="reset_password">بازنشانی رمز عبور</string>
 
 </resources>
