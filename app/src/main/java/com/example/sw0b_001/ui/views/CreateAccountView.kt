@@ -170,7 +170,6 @@ fun CreateAccountView(
                 )
             }
 
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -201,14 +200,18 @@ fun CreateAccountView(
                     },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp),
-                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    visualTransformation =
+                        if (passwordVisible) VisualTransformation.None
+                        else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     trailingIcon = {
                         val image = if (passwordVisible)
                             Icons.Filled.Visibility
                         else Icons.Filled.VisibilityOff
 
-                        val description = if (passwordVisible) stringResource(R.string.hide_password) else stringResource(R.string.show_password)
+                        val description =
+                            if (passwordVisible) stringResource(R.string.hide_password)
+                            else stringResource(R.string.show_password)
 
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(imageVector = image, description)
@@ -232,14 +235,18 @@ fun CreateAccountView(
                     },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp),
-                    visualTransformation = if (reenterPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    visualTransformation =
+                        if (reenterPasswordVisible) VisualTransformation.None
+                        else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     trailingIcon = {
                         val image = if (reenterPasswordVisible)
                             Icons.Filled.Visibility
                         else Icons.Filled.VisibilityOff
 
-                        val description = if (reenterPasswordVisible) stringResource(R.string.hide_password) else stringResource(R.string.show_password)
+                        val description = if (reenterPasswordVisible)
+                            stringResource(R.string.hide_password)
+                        else stringResource(R.string.show_password)
 
                         IconButton(onClick = { reenterPasswordVisible = !reenterPasswordVisible }) {
                             Icon(imageVector = image, description)
