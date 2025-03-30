@@ -159,9 +159,9 @@ object Bridges {
     }
 
     private fun payloadOnly(cipherText: ByteArray) : String {
-        val mode: ByteArray = ByteArray(1).apply { 0x00 }
-        val versionMarker: ByteArray = ByteArray(1).apply { 0x0A }
-        val switchValue: ByteArray = ByteArray(1).apply { 0x01 }
+        val mode: ByteArray = ByteArray(1).apply { this[0] = 0x00 }
+        val versionMarker: ByteArray = ByteArray(1).apply { this[0] = 0x0A }
+        val switchValue: ByteArray = ByteArray(1).apply { this[0] = 0x01 }
 
         val cipherTextLength = ByteArray(2)
         ByteBuffer.wrap(cipherTextLength).order(ByteOrder.LITTLE_ENDIAN)

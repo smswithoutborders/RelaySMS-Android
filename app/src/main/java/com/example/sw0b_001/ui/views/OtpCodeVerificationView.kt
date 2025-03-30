@@ -355,6 +355,11 @@ private fun configureVerificationListener(context: Context) {
     val task = SmsRetriever.getClient(context).startSmsUserConsent(smsSenderNumber)
     task.addOnSuccessListener { }
     task.addOnFailureListener { }
+
+    val smsSenderNumberAuthMsg = "AUTHMSG"
+    val task1 = SmsRetriever.getClient(context).startSmsUserConsent(smsSenderNumberAuthMsg)
+    task1.addOnSuccessListener { }
+    task1.addOnFailureListener { }
 }
 
 private fun submitOTPCode(
