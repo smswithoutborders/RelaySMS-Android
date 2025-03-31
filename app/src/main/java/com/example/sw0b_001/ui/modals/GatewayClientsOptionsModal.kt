@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
@@ -105,14 +106,9 @@ fun GatewayClientOptionsModal(
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
                 ) {
                     Text(
                         text = stringResource(R.string.make_default),
-                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
 
@@ -125,19 +121,15 @@ fun GatewayClientOptionsModal(
                             onEditClicked(gatewayClient)
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = MaterialTheme.colorScheme.primary
-                        )
                     ) {
                         Text(
                             text = stringResource(R.string.edit),
-                            color = MaterialTheme.colorScheme.primary
                         )
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Button(
+                    TextButton(
                         onClick = {
                             if (isSelected) {
                                 showDeleteConfirmationDialog = true
@@ -145,34 +137,20 @@ fun GatewayClientOptionsModal(
                             } else {
                                 scope.launch {
                                     val successRunnable = Runnable {
-
-                                        Log.i(
-                                            "GatewayClientOptionsModal",
-                                            "Gateway client deleted successfully"
-                                        )
                                         onDismiss()
                                     }
 
-                                    val failureRunnable = Runnable {
-                                        Log.e(
-                                            "GatewayClientOptionsModal",
-                                            "Failed to delete gateway client"
-                                        )
-                                    }
+                                    val failureRunnable = Runnable {}
                                     viewModel.delete(context, gatewayClient)
                                     viewModel.loadRemote(context, successRunnable, failureRunnable)
                                 }
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.errorContainer,
-                            contentColor = MaterialTheme.colorScheme.onErrorContainer
-                        )
                     ) {
                         Text(
                             text = stringResource(R.string.delete),
-                            color = MaterialTheme.colorScheme.onErrorContainer
+                            color = MaterialTheme.colorScheme.error
                         )
                     }
                     Spacer(modifier = Modifier.height(16.dp))
