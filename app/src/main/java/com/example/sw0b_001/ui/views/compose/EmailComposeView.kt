@@ -57,6 +57,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.sw0b_001.Bridges.Bridges
 import com.example.sw0b_001.BuildConfig
@@ -343,7 +344,8 @@ fun EmailComposeView(
                         value = from,
                         onValueChange = {},
                         textStyle = TextStyle.Default.copy(
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 16.sp
                         ),
                         enabled = false,
                         readOnly = true,
@@ -377,7 +379,8 @@ fun EmailComposeView(
                         value = to,
                         onValueChange = {to = it},
                         textStyle = TextStyle.Default.copy(
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 16.sp
                         ),
                         modifier = Modifier.weight(1f),
                         keyboardOptions = KeyboardOptions(
@@ -415,7 +418,8 @@ fun EmailComposeView(
                             value = cc,
                             onValueChange = { cc = it },
                             textStyle = TextStyle.Default.copy(
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontSize = 16.sp
                             ),
                             modifier = Modifier.fillMaxWidth(),
                             keyboardOptions = KeyboardOptions(
@@ -446,7 +450,8 @@ fun EmailComposeView(
                             value = bcc,
                             onValueChange = { bcc = it },
                             textStyle = TextStyle.Default.copy(
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontSize = 16.sp
                             ),
                             modifier = Modifier.fillMaxWidth(),
                             keyboardOptions = KeyboardOptions(
@@ -476,7 +481,8 @@ fun EmailComposeView(
                     value = subject,
                     onValueChange = { subject = it },
                     textStyle = TextStyle.Default.copy(
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = 16.sp
                     ),
                     modifier = Modifier
                         .weight(1f),
@@ -485,7 +491,8 @@ fun EmailComposeView(
                             Text(
                                 text = stringResource(R.string.subject),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontWeight = FontWeight.Medium
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp
                             )
                         }
                         innerTextField()
@@ -522,7 +529,8 @@ fun EmailComposeView(
                     }
                 },
                 textStyle = TextStyle.Default.copy(
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = 16.sp
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -532,7 +540,8 @@ fun EmailComposeView(
                         Text(
                             text = stringResource(R.string.compose_email),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp
                         )
                     }
                     innerTextField()
