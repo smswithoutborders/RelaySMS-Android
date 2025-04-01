@@ -245,5 +245,7 @@
     <string name="new_password">Nueva Contraseña</string>
     <string name="reset_password">Restablecer Contraseña</string>
     <string name="passwords_do_not_match">Las contraseñas no coinciden</string>
+    <string name="discard">Descartar</string>
+    <string name="message_discarded">¡Mensaje descartado!</string>
 
 </resources>

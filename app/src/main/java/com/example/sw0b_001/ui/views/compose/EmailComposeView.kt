@@ -24,6 +24,9 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DeveloperMode
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -203,11 +206,12 @@ fun EmailComposeView(
         var developerIsLoading by remember { mutableStateOf(false) }
         var developerRequestStatus by remember { mutableStateOf("") }
 
-//        DeveloperHTTPView(
-//            dialingUrl = gatewayServerUrl,
-//            requestStatus = developerRequestStatus,
-//            isLoading = developerIsLoading,
-//            httpRequestCallback = { _, dialingUrl ->
+        DeveloperHTTPView(
+            dialingUrl = gatewayServerUrl,
+            requestStatus = developerRequestStatus,
+            isLoading = developerIsLoading,
+            httpRequestCallback = { _, dialingUrl ->
+                TODO("figure out whats wrong here")
 //                developerIsLoading = true
 //                developerRequestStatus = "dialing...\n"
 //
@@ -231,11 +235,13 @@ fun EmailComposeView(
 //                    developerRequestStatus += "\nending..."
 //                    developerIsLoading = false
 //                }
-//            }
-//        ) {
-//            showDeveloperDialog = false
-//        }
+            }
+        ) {
+            showDeveloperDialog = false
+        }
     }
+
+    var showMoreOptions by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -286,25 +292,45 @@ fun EmailComposeView(
                     ) {
                         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
                     }
+
+                    IconButton(
+                        onClick = {
+                            showMoreOptions = !showMoreOptions
+                        }
+                    ) {
+                        Icon(Icons.Filled.MoreVert, contentDescription = "More")
+                        DropdownMenu(
+                            expanded = showMoreOptions,
+                            onDismissRequest = { showMoreOptions = false }
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.discard)) },
+                                onClick = {
+                                    navController.popBackStack()
+                                    Toast.makeText(context,
+                                        context.getString(R.string.message_discarded), Toast.LENGTH_SHORT).show()
+                                    showMoreOptions = false
+                                }
+                            )
+                        }
+                    }
                 },
             )
         }
     ) { innerPadding ->
         Column(
             modifier = Modifier
-//                .fillMaxSize()
                 .fillMaxWidth()
                 .imePadding()
                 .padding(innerPadding)
                 .padding(16.dp)
-                .verticalScroll(scrollState) // Add vertical scroll modifier
+                .verticalScroll(scrollState)
         ) {
             // Sender
             if(!isBridge) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
-//                        .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
@@ -327,31 +353,17 @@ fun EmailComposeView(
                 }
                 Divider(
                     color = MaterialTheme.colorScheme.outline,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(top = 16.dp),
                     thickness = 0.5.dp
                 )
-//                OutlinedTextField(
-//                    value = from,
-//                    onValueChange = { },
-//                    label = { Text(stringResource(R.string.from)) },
-//                    enabled = false,
-//                    modifier = Modifier.fillMaxWidth(),
-//                    colors = OutlinedTextFieldDefaults.colors(
-//                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
-//                        disabledBorderColor = MaterialTheme.colorScheme.outline,
-//                        disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-//                        disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-//                        disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-//                        disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
-//                    )
-//                )
+
             }
 
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-//                    .padding(16.dp)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
@@ -386,7 +398,8 @@ fun EmailComposeView(
                 if (showCcBcc) {
                     Divider(
                         color = MaterialTheme.colorScheme.outline,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .padding(top = 16.dp, bottom = 16.dp),
                         thickness = 0.5.dp
                     )
@@ -414,7 +427,8 @@ fun EmailComposeView(
 
                     Divider(
                         color = MaterialTheme.colorScheme.outline,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .padding(top = 16.dp, bottom = 16.dp),
                         thickness = 0.5.dp
                     )
@@ -447,36 +461,42 @@ fun EmailComposeView(
 
             Divider(
                 color = MaterialTheme.colorScheme.outline,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(top = 16.dp, bottom = 16.dp),
                 thickness = 0.5.dp
             )
 
-            // Subject Field
+
             Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-//                    .padding(16.dp),
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = stringResource(R.string.subject),
-                    modifier = Modifier.padding(end = 24.dp),
-                    fontWeight = FontWeight.Medium
-                )
                 BasicTextField(
                     value = subject,
                     onValueChange = { subject = it },
                     textStyle = TextStyle.Default.copy(
                         color = MaterialTheme.colorScheme.onSurface
                     ),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f),
+                    decorationBox = { innerTextField ->
+                        if (subject.isEmpty()) {
+                            Text(
+                                text = stringResource(R.string.subject),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                        innerTextField()
+                    }
                 )
             }
 
             Divider(
                 color = MaterialTheme.colorScheme.outline,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(top = 16.dp, bottom = 16.dp),
                 thickness = 0.5.dp
             )
@@ -486,10 +506,8 @@ fun EmailComposeView(
                 onValueChange = { newValue ->
                     body = newValue
 
-
                     val lines = newValue.lines()
                     val lineCount = lines.size
-
 
                     val lineHeight = 20.dp
                     val maxVisibleLines = 10
@@ -508,70 +526,19 @@ fun EmailComposeView(
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight()
-//                    .padding(16.dp)
+                    .fillMaxHeight(),
+                decorationBox = { innerTextField ->
+                    if (body.isEmpty()) {
+                        Text(
+                            text = stringResource(R.string.compose_email),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                    innerTextField()
+                }
             )
 
-//            // To
-//            OutlinedTextField(
-//                value = to,
-//                onValueChange = { to = it },
-//                label = { Text(stringResource(R.string.to), style = MaterialTheme.typography.bodyMedium) },
-//                modifier = Modifier.fillMaxWidth(),
-//                keyboardOptions = KeyboardOptions(
-//                    keyboardType = KeyboardType.Email,
-//                    imeAction = ImeAction.Next
-//                )
-//            )
-
-//            // CC
-//            OutlinedTextField(
-//                value = cc,
-//                onValueChange = { cc = it },
-//                label = { Text("Cc", style = MaterialTheme.typography.bodyMedium) },
-//                modifier = Modifier.fillMaxWidth(),
-//                keyboardOptions = KeyboardOptions(
-//                    keyboardType = KeyboardType.Email,
-//                    imeAction = ImeAction.Next
-//                )
-//            )
-//
-//            // BCC
-//            OutlinedTextField(
-//                value = bcc,
-//                onValueChange = { bcc = it },
-//                label = { Text("Bcc", style = MaterialTheme.typography.bodyMedium) },
-//                modifier = Modifier.fillMaxWidth(),
-//                keyboardOptions = KeyboardOptions(
-//                    keyboardType = KeyboardType.Email,
-//                    imeAction = ImeAction.Next
-//                )
-//            )
-//
-//            // Subject
-//            OutlinedTextField(
-//                value = subject,
-//                onValueChange = { subject = it },
-//                label = { Text(stringResource(R.string.subject), style = MaterialTheme.typography.bodyMedium) },
-//                modifier = Modifier.fillMaxWidth(),
-//                keyboardOptions = KeyboardOptions(
-//                    imeAction = ImeAction.Next
-//                )
-//            )
-//
-//            // Body
-//            OutlinedTextField(
-//                value = body,
-//                onValueChange = { body = it },
-//                label = {
-//                    Text(
-//                        stringResource(R.string.compose_email),
-//                        style = MaterialTheme.typography.bodyMedium)
-//                },
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(350.dp)
-//            )
         }
     }
 }
@@ -631,7 +598,8 @@ private fun processSend(
                 val availablePlatforms =
                     Datastore.getDatastore(context).availablePlatformsDao().fetch(account!!.name!!)
                 val AD = Publishers.fetchPublisherPublicKey(context)
-                ComposeHandlers.compose(context,
+                ComposeHandlers.compose(
+                    context,
                     formattedContent,
                     AD!!,
                     availablePlatforms,

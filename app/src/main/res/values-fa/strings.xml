@@ -245,5 +245,7 @@
     <string name="new_password">رمز عبور جدید</string>
     <string name="reset_password">بازنشانی رمز عبور</string>
     <string name="passwords_do_not_match">رمزهای عبور مطابقت ندارند</string>
+    <string name="discard">لغو</string>
+    <string name="message_discarded">پیام لغو شد!</string>
 
 </resources>

@@ -254,5 +254,7 @@
     <string name="new_password">كلمة المرور الجديدة</string>
     <string name="reset_password">إعادة تعيين كلمة المرور</string>
     <string name="passwords_do_not_match">كلمتا المرور غير متطابقتين</string>
+    <string name="discard">إلغاء</string>
+    <string name="message_discarded">تم إلغاء الرسالة!</string>
 
 </resources>

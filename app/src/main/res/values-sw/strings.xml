@@ -251,5 +251,7 @@
     <string name="new_password">Nenosiri Jipya</string>
     <string name="reset_password">Weka Upya Nenosiri</string>
     <string name="passwords_do_not_match">Nenosiri halilingani</string>
+    <string name="discard">Tupa</string>
+    <string name="message_discarded">Ujumbe umetupwa!</string>
 
 </resources>
