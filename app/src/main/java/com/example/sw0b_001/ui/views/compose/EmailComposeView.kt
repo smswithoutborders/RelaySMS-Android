@@ -5,6 +5,7 @@ import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,12 +13,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DeveloperMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -34,11 +39,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -129,6 +139,10 @@ fun EmailComposeView(
         EmailComposeHandler.decomposeMessage(platformsViewModel.message!!.encryptedContent!!)
     else null
 
+    var showCcBcc by remember { mutableStateOf(false) }
+    val density = LocalDensity.current
+    val coroutineScope = rememberCoroutineScope()
+
     var from by remember { mutableStateOf(platformsViewModel.message?.fromAccount ?: "") }
     var to by remember { mutableStateOf( decomposedMessage?.to ?: "") }
     var cc by remember { mutableStateOf( decomposedMessage?.cc ?: "") }
@@ -189,38 +203,38 @@ fun EmailComposeView(
         var developerIsLoading by remember { mutableStateOf(false) }
         var developerRequestStatus by remember { mutableStateOf("") }
 
-        DeveloperHTTPView(
-            dialingUrl = gatewayServerUrl,
-            requestStatus = developerRequestStatus,
-            isLoading = developerIsLoading,
-            httpRequestCallback = { _, dialingUrl ->
-                developerIsLoading = true
-                developerRequestStatus = "dialing...\n"
-
-                val scope = CoroutineScope(Dispatchers.Default).launch {
-                    developerRequestStatus += networkRequest(
-                        url = dialingUrl,
-                        payload = GatewayClientRequest(
-                            address = "+237123456789",
-                            text = Bridges.compose(
-                                context = context,
-                                to = to,
-                                cc = cc,
-                                bcc = bcc,
-                                subject = subject,
-                                body = body,
-                                smsTransmission = false,
-                                onSuccessCallback = {}
-                            ).first!!
-                        ),
-                    )
-                    developerRequestStatus += "\nending..."
-                    developerIsLoading = false
-                }
-            }
-        ) {
-            showDeveloperDialog = false
-        }
+//        DeveloperHTTPView(
+//            dialingUrl = gatewayServerUrl,
+//            requestStatus = developerRequestStatus,
+//            isLoading = developerIsLoading,
+//            httpRequestCallback = { _, dialingUrl ->
+//                developerIsLoading = true
+//                developerRequestStatus = "dialing...\n"
+//
+//                val scope = CoroutineScope(Dispatchers.Default).launch {
+//                    developerRequestStatus += networkRequest(
+//                        url = dialingUrl,
+//                        payload = GatewayClientRequest(
+//                            address = "+237123456789",
+//                            text = Bridges.compose(
+//                                context = context,
+//                                to = to,
+//                                cc = cc,
+//                                bcc = bcc,
+//                                subject = subject,
+//                                body = body,
+//                                smsTransmission = false,
+//                                onSuccessCallback = {}
+//                            ).first!!
+//                        ),
+//                    )
+//                    developerRequestStatus += "\nending..."
+//                    developerIsLoading = false
+//                }
+//            }
+//        ) {
+//            showDeveloperDialog = false
+//        }
     }
 
     Scaffold(
@@ -287,83 +301,277 @@ fun EmailComposeView(
         ) {
             // Sender
             if(!isBridge) {
-                OutlinedTextField(
-                    value = from,
-                    onValueChange = { },
-                    label = { Text(stringResource(R.string.from)) },
-                    enabled = false,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                        disabledBorderColor = MaterialTheme.colorScheme.outline,
-                        disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+//                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.from),
+                        modifier = Modifier.padding(end = 24.dp),
+                        fontWeight = FontWeight.Medium
+
                     )
+                    BasicTextField(
+                        value = from,
+                        onValueChange = {},
+                        textStyle = TextStyle.Default.copy(
+                            color = MaterialTheme.colorScheme.onSurface
+                        ),
+                        enabled = false,
+                        readOnly = true,
+                        modifier = Modifier.weight(1f),
+
+                    )
+                }
+                Divider(
+                    color = MaterialTheme.colorScheme.outline,
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(top = 16.dp),
+                    thickness = 0.5.dp
+                )
+//                OutlinedTextField(
+//                    value = from,
+//                    onValueChange = { },
+//                    label = { Text(stringResource(R.string.from)) },
+//                    enabled = false,
+//                    modifier = Modifier.fillMaxWidth(),
+//                    colors = OutlinedTextFieldDefaults.colors(
+//                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
+//                        disabledBorderColor = MaterialTheme.colorScheme.outline,
+//                        disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+//                        disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+//                        disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+//                        disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
+//                    )
+//                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+//                    .padding(16.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.to),
+                        modifier = Modifier.padding(end = 24.dp),
+                        fontWeight = FontWeight.Medium
+                    )
+                    BasicTextField(
+                        value = to,
+                        onValueChange = {to = it},
+                        textStyle = TextStyle.Default.copy(
+                            color = MaterialTheme.colorScheme.onSurface
+                        ),
+                        modifier = Modifier.weight(1f),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Email,
+                            imeAction = ImeAction.Next
+                        )
+                    )
+                    IconButton(onClick = {
+                        showCcBcc = !showCcBcc
+                    }) {
+                        Icon(
+                            Icons.Filled.ArrowDropDown,
+                            contentDescription = "Expand To"
+                        )
+                    }
+                }
+
+                if (showCcBcc) {
+                    Divider(
+                        color = MaterialTheme.colorScheme.outline,
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(top = 16.dp, bottom = 16.dp),
+                        thickness = 0.5.dp
+                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.cc),
+                            modifier = Modifier.padding(end = 24.dp),
+                            fontWeight = FontWeight.Medium
+                        )
+                        BasicTextField(
+                            value = cc,
+                            onValueChange = { cc = it },
+                            textStyle = TextStyle.Default.copy(
+                                color = MaterialTheme.colorScheme.onSurface
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Email,
+                                imeAction = ImeAction.Next
+                            )
+                        )
+                    }
+
+                    Divider(
+                        color = MaterialTheme.colorScheme.outline,
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(top = 16.dp, bottom = 16.dp),
+                        thickness = 0.5.dp
+                    )
+
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.bcc),
+                            modifier = Modifier.padding(end = 24.dp),
+                            fontWeight = FontWeight.Medium
+                        )
+                        BasicTextField(
+                            value = bcc,
+                            onValueChange = { bcc = it },
+                            textStyle = TextStyle.Default.copy(
+                                color = MaterialTheme.colorScheme.onSurface
+                            ),
+                            modifier = Modifier.fillMaxWidth(),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Email,
+                                imeAction = ImeAction.Next
+                            )
+                        )
+                    }
+
+                }
+            }
+
+            Divider(
+                color = MaterialTheme.colorScheme.outline,
+                modifier = Modifier.fillMaxWidth()
+                    .padding(top = 16.dp, bottom = 16.dp),
+                thickness = 0.5.dp
+            )
+
+            // Subject Field
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+//                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.subject),
+                    modifier = Modifier.padding(end = 24.dp),
+                    fontWeight = FontWeight.Medium
+                )
+                BasicTextField(
+                    value = subject,
+                    onValueChange = { subject = it },
+                    textStyle = TextStyle.Default.copy(
+                        color = MaterialTheme.colorScheme.onSurface
+                    ),
+                    modifier = Modifier.weight(1f)
                 )
             }
 
-            // To
-            OutlinedTextField(
-                value = to,
-                onValueChange = { to = it },
-                label = { Text(stringResource(R.string.to), style = MaterialTheme.typography.bodyMedium) },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email,
-                    imeAction = ImeAction.Next
-                )
+            Divider(
+                color = MaterialTheme.colorScheme.outline,
+                modifier = Modifier.fillMaxWidth()
+                    .padding(top = 16.dp, bottom = 16.dp),
+                thickness = 0.5.dp
             )
 
-            // CC
-            OutlinedTextField(
-                value = cc,
-                onValueChange = { cc = it },
-                label = { Text("Cc", style = MaterialTheme.typography.bodyMedium) },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email,
-                    imeAction = ImeAction.Next
-                )
-            )
-
-            // BCC
-            OutlinedTextField(
-                value = bcc,
-                onValueChange = { bcc = it },
-                label = { Text("Bcc", style = MaterialTheme.typography.bodyMedium) },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email,
-                    imeAction = ImeAction.Next
-                )
-            )
-
-            // Subject
-            OutlinedTextField(
-                value = subject,
-                onValueChange = { subject = it },
-                label = { Text(stringResource(R.string.subject), style = MaterialTheme.typography.bodyMedium) },
-                modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(
-                    imeAction = ImeAction.Next
-                )
-            )
-
-            // Body
-            OutlinedTextField(
+            BasicTextField(
                 value = body,
-                onValueChange = { body = it },
-                label = {
-                    Text(
-                        stringResource(R.string.compose_email),
-                        style = MaterialTheme.typography.bodyMedium)
+                onValueChange = { newValue ->
+                    body = newValue
+
+
+                    val lines = newValue.lines()
+                    val lineCount = lines.size
+
+
+                    val lineHeight = 20.dp
+                    val maxVisibleLines = 10
+
+                    if (lineCount > maxVisibleLines) {
+                        val scrollOffset = with(density) {
+                            (lineCount - maxVisibleLines) * lineHeight.toPx()
+                        }
+                        coroutineScope.launch {
+                            scrollState.animateScrollTo(scrollOffset.toInt())
+                        }
+                    }
                 },
+                textStyle = TextStyle.Default.copy(
+                    color = MaterialTheme.colorScheme.onSurface
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(350.dp)
+                    .fillMaxHeight()
+//                    .padding(16.dp)
             )
+
+//            // To
+//            OutlinedTextField(
+//                value = to,
+//                onValueChange = { to = it },
+//                label = { Text(stringResource(R.string.to), style = MaterialTheme.typography.bodyMedium) },
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    keyboardType = KeyboardType.Email,
+//                    imeAction = ImeAction.Next
+//                )
+//            )
+
+//            // CC
+//            OutlinedTextField(
+//                value = cc,
+//                onValueChange = { cc = it },
+//                label = { Text("Cc", style = MaterialTheme.typography.bodyMedium) },
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    keyboardType = KeyboardType.Email,
+//                    imeAction = ImeAction.Next
+//                )
+//            )
+//
+//            // BCC
+//            OutlinedTextField(
+//                value = bcc,
+//                onValueChange = { bcc = it },
+//                label = { Text("Bcc", style = MaterialTheme.typography.bodyMedium) },
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    keyboardType = KeyboardType.Email,
+//                    imeAction = ImeAction.Next
+//                )
+//            )
+//
+//            // Subject
+//            OutlinedTextField(
+//                value = subject,
+//                onValueChange = { subject = it },
+//                label = { Text(stringResource(R.string.subject), style = MaterialTheme.typography.bodyMedium) },
+//                modifier = Modifier.fillMaxWidth(),
+//                keyboardOptions = KeyboardOptions(
+//                    imeAction = ImeAction.Next
+//                )
+//            )
+//
+//            // Body
+//            OutlinedTextField(
+//                value = body,
+//                onValueChange = { body = it },
+//                label = {
+//                    Text(
+//                        stringResource(R.string.compose_email),
+//                        style = MaterialTheme.typography.bodyMedium)
+//                },
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(350.dp)
+//            )
         }
     }
 }
