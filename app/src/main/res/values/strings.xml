@@ -266,5 +266,7 @@
     <string name="new_password">New Password</string>
     <string name="reset_password">Reset Password</string>
     <string name="passwords_do_not_match">Passwords do not match</string>
+    <string name="discard">Discard</string>
+    <string name="message_discarded">Message discarded!</string>
 
 </resources>

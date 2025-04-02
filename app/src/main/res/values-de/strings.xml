@@ -244,5 +244,7 @@
     <string name="new_password">Neues Passwort</string>
     <string name="reset_password">Passwort zurücksetzen</string>
     <string name="passwords_do_not_match">Passwörter stimmen nicht überein</string>
+    <string name="discard">Verwerfen</string>
+    <string name="message_discarded">Nachricht verworfen!</string>
 
 </resources>

@@ -240,5 +240,7 @@
     <string name="new_password">Yeni Şifre</string>
     <string name="reset_password">Şifreyi Sıfırla</string>
     <string name="passwords_do_not_match">Şifreler eşleşmiyor</string>
+    <string name="discard">Vazgeç</string>
+    <string name="message_discarded">Mesaj silindi!</string>
 
 </resources>
