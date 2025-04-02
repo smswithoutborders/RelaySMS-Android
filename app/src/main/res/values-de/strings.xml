@@ -246,5 +246,6 @@
     <string name="passwords_do_not_match">Passwörter stimmen nicht überein</string>
     <string name="discard">Verwerfen</string>
     <string name="message_discarded">Nachricht verworfen!</string>
+    <string name="time_left_until_code_expires">Verbleibende Zeit bis zum Ablauf des Codes: %1$ds</string>
 
 </resources>

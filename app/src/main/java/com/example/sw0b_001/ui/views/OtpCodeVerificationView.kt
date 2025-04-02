@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
+import android.os.CountDownTimer
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
@@ -158,11 +159,21 @@ fun OtpCodeVerificationView(
 ) {
     val context = LocalContext.current
     var otpCode by remember { mutableStateOf("") }
-    var timeLeft by remember { mutableLongStateOf(60L) }
+    var isLoading by remember { mutableStateOf(false) }
+    val nextAttemptTimestamp = navigationFlowHandler.nextAttemptTimestamp
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-    var isLoading by remember { mutableStateOf(false) }
+    val initialTimeLeft = if (nextAttemptTimestamp == 0L) {
+        60L
+    } else {
+        val currentTime = System.currentTimeMillis() / 1000
+        val diff = nextAttemptTimestamp?.minus(currentTime)
+        if (diff!! > 0) diff else 0L
+    }
+    var timeLeft by remember { mutableLongStateOf(initialTimeLeft) }
+    var isTimerRunning by remember { mutableStateOf(timeLeft > 0) }
+
 
     SmsRetrieverHandler {
         otpCode = it
@@ -174,14 +185,41 @@ fun OtpCodeVerificationView(
         otpCode = "123456"
     }
 
-    LaunchedEffect(key1 = timeLeft) {
-        if (timeLeft > 0) {
-            delay(1000L)
-            timeLeft--
+    val timer = remember {
+        object : CountDownTimer(timeLeft * 1000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                timeLeft = millisUntilFinished / 1000
+            }
+
+            override fun onFinish() {
+                isTimerRunning = false
+                timeLeft = 0
+                navController.popBackStack()
+            }
         }
     }
 
-    BackHandler {
+    LaunchedEffect(key1 = isTimerRunning) {
+        if (isTimerRunning) {
+            timer.start()
+        } else {
+            timer.cancel()
+        }
+    }
+
+    LaunchedEffect(key1 = nextAttemptTimestamp) {
+        if (nextAttemptTimestamp != 0L) {
+            isTimerRunning = true
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            timer.cancel()
+        }
+    }
+
+            BackHandler {
         navController.popBackStack()
     }
 
@@ -290,16 +328,12 @@ fun OtpCodeVerificationView(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Time left until code expires: 60s",
+                text = stringResource(R.string.time_left_until_code_expires, timeLeft),
                 style = MaterialTheme.typography.labelLarge,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            if (timeLeft == 0L){
-                Button(onClick = onResendClicked) {
-                    Text(text = stringResource(R.string.re_send_code))
-                }
-            }
+
         }
     }
 }

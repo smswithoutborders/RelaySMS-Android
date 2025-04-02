@@ -247,5 +247,6 @@
     <string name="passwords_do_not_match">رمزهای عبور مطابقت ندارند</string>
     <string name="discard">لغو</string>
     <string name="message_discarded">پیام لغو شد!</string>
+    <string name="time_left_until_code_expires">زمان باقی مانده تا انقضای کد: %1$ds</string>
 
 </resources>

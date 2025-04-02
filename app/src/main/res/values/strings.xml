@@ -268,5 +268,6 @@
     <string name="passwords_do_not_match">Passwords do not match</string>
     <string name="discard">Discard</string>
     <string name="message_discarded">Message discarded!</string>
+    <string name="time_left_until_code_expires">Time left until code expires: %1$ds</string>
 
 </resources>
