@@ -255,7 +255,8 @@ fun RecentView(
                             }
 
                             else -> {
-                                Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context,
+                                    context.getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
@@ -273,16 +274,16 @@ fun RecentView(
                 ) {
                     Spacer(modifier = Modifier.weight(1f))
 
-                    Image(
-                        painter = painterResource(id = R.drawable.empty_message),
-                        contentDescription = "No results found",
-                        modifier = Modifier
-                            .size(200.dp)
-                            .padding(bottom = 16.dp)
-                    )
+//                    Image(
+//                        painter = painterResource(id = R.drawable.empty_message),
+//                        contentDescription = "No results found",
+//                        modifier = Modifier
+//                            .size(200.dp)
+//                            .padding(bottom = 16.dp)
+//                    )
 
                     Text(
-                        text = "No results found",
+                        text = stringResource(R.string.no_results_found),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Thin,
                         textAlign = TextAlign.Center,

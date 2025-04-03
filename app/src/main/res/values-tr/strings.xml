@@ -243,5 +243,8 @@
     <string name="discard">Vazgeç</string>
     <string name="message_discarded">Mesaj silindi!</string>
     <string name="time_left_until_code_expires">Kodun süresinin dolmasına kalan süre: %1$ds</string>
+    <string name="something_went_wrong">Bir şeyler ters gitti</string>
+    <string name="no_results_found">Sonuç bulunamadı</string>
+    <string name="search_message">Mesaj ara</string>
 
 </resources>

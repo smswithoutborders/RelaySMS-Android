@@ -136,7 +136,7 @@ fun RecentAppBar(
                     value = searchQuery,
                     onValueChange = onSearchQueryChanged,
                     modifier = Modifier.weight(1f),
-                    placeholder = { Text("Search message") },
+                    placeholder = { Text(stringResource(R.string.search_message)) },
                     textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,

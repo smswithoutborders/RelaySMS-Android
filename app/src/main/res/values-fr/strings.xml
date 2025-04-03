@@ -248,5 +248,8 @@
     <string name="discard">Annuler</string>
     <string name="message_discarded">Message annulé !</string>
     <string name="time_left_until_code_expires">Temps restant avant l\'expiration du code : %1$ds</string>
+    <string name="something_went_wrong">Quelque chose s\'est mal passé</string>
+    <string name="no_results_found">Aucun résultat trouvé</string>
+    <string name="search_message">Rechercher un message</string>
 
 </resources>

@@ -257,5 +257,8 @@
     <string name="discard">إلغاء</string>
     <string name="message_discarded">تم إلغاء الرسالة!</string>
     <string name="time_left_until_code_expires">الوقت المتبقي حتى انتهاء صلاحية الرمز: %1$ds</string>
+    <string name="something_went_wrong">حدث خطأ ما</string>
+    <string name="no_results_found">لم يتم العثور على نتائج</string>
+    <string name="search_message">البحث عن رسالة</string>
 
 </resources>
