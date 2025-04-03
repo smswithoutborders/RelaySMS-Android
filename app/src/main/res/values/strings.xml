@@ -269,5 +269,7 @@
     <string name="discard">Discard</string>
     <string name="message_discarded">Message discarded!</string>
     <string name="time_left_until_code_expires">Time left until code expires: %1$ds</string>
+    <string name="bug_report">Bug Report</string>
+    <string name="relaysms_bug_report">RelaySMS - Bug Report</string>
 
 </resources>

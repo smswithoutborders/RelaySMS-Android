@@ -243,5 +243,7 @@
     <string name="discard">Vazgeç</string>
     <string name="message_discarded">Mesaj silindi!</string>
     <string name="time_left_until_code_expires">Kodun süresinin dolmasına kalan süre: %1$ds</string>
+    <string name="bug_report">Hata Raporu</string>
+    <string name="relaysms_bug_report">RelaySMS - Hata Raporu</string>
 
 </resources>
