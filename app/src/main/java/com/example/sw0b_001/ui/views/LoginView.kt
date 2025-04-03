@@ -262,11 +262,12 @@ fun LoginView(
                             context = context,
                             phoneNumber = phoneNumber,
                             password = password,
-                            otpRequiredCallback = {
+                            otpRequiredCallback = { nextAttemptTimestamp ->
                                 navigationFlowHandler.loginSignupPassword = password
                                 navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
                                 navigationFlowHandler.otpRequestType =
                                     OTPCodeVerificationType.AUTHENTICATE
+                                navigationFlowHandler.nextAttemptTimestamp = nextAttemptTimestamp?.toLong()
 
                                 CoroutineScope(Dispatchers.Main).launch {
                                     navController.navigate(OTPCodeScreen)
@@ -344,7 +345,7 @@ private fun login(
     context: Context,
     phoneNumber: String,
     password: String,
-    otpRequiredCallback: () -> Unit,
+    otpRequiredCallback: (Int?) -> Unit,
     failedCallback: (String?) -> Unit = {},
     completedCallback: () -> Unit = {},
 ) {
@@ -358,7 +359,7 @@ private fun login(
             )
 
             if(response.requiresOwnershipProof) {
-                otpRequiredCallback()
+                otpRequiredCallback(response.nextAttemptTimestamp)
             }
         } catch(e: StatusRuntimeException) {
             e.printStackTrace()

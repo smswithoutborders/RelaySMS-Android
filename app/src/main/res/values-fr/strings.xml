@@ -247,5 +247,6 @@
     <string name="passwords_do_not_match">Les mots de passe ne correspondent pas</string>
     <string name="discard">Annuler</string>
     <string name="message_discarded">Message annulé !</string>
+    <string name="time_left_until_code_expires">Temps restant avant l\'expiration du code : %1$ds</string>
 
 </resources>

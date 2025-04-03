@@ -253,5 +253,6 @@
     <string name="passwords_do_not_match">Nenosiri halilingani</string>
     <string name="discard">Tupa</string>
     <string name="message_discarded">Ujumbe umetupwa!</string>
+    <string name="time_left_until_code_expires">Muda uliobaki hadi msimbo uishe: %1$ds</string>
 
 </resources>
