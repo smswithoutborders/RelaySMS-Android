@@ -3,6 +3,7 @@ package com.example.sw0b_001.ui.views
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -41,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
@@ -73,6 +75,10 @@ import com.example.sw0b_001.ui.views.compose.MessageComposeHandler
 import com.example.sw0b_001.ui.views.compose.TextComposeHandler
 import com.example.sw0b_001.ui.views.details.EmailDetailsView
 import kotlinx.serialization.json.internal.encodeByWriter
+import kotlin.text.contains
+import kotlin.text.filter
+import kotlin.text.isBlank
+import kotlin.text.isNotBlank
 
 @Composable
 fun RecentViewNoMessages(
@@ -159,6 +165,8 @@ fun RecentView(
     navController: NavController,
     messagesViewModel: MessagesViewModel,
     platformsViewModel: PlatformsViewModel,
+    searchQuery: String,
+    isSearchDone: Boolean,
     tabRequestedCallback: () -> Unit
 ) {
     val context = LocalContext.current
@@ -171,11 +179,51 @@ fun RecentView(
     val platforms: LiveData<List<AvailablePlatforms>> = platformsViewModel.getAvailablePlatforms(context)
     val platformsList by platforms.observeAsState(initial = emptyList())
 
-    Box(Modifier
-        .padding(8.dp)
-        .fillMaxSize()
+    val filteredMessages = remember(messages, searchQuery, isSearchDone) {
+        if (searchQuery.isBlank() || !isSearchDone) {
+            messages
+        } else {
+            messages.filter { message ->
+                val text = when (message.type) {
+                    Platforms.ServiceTypes.EMAIL.type -> {
+                        val decomposed = EmailComposeHandler.decomposeMessage(
+                            message.encryptedContent!!,
+                        )
+                        "${message.fromAccount ?: ""} ${decomposed.subject} ${decomposed.body}"
+                    }
+                    Platforms.ServiceTypes.BRIDGE_INCOMING.type -> {
+                        val decomposed = Bridges.BridgeComposeHandler.decomposeInboxMessage(
+                            message.encryptedContent!!,
+                        )
+                        "${message.fromAccount ?: ""} ${decomposed.subject} ${decomposed.body}"
+                    }
+                    Platforms.ServiceTypes.BRIDGE.type -> {
+                        val decomposed = Bridges.BridgeComposeHandler.decomposeMessage(
+                            message.encryptedContent!!,
+                        )
+                        "${message.fromAccount ?: ""} ${decomposed.subject} ${decomposed.body}"
+                    }
+                    Platforms.ServiceTypes.TEXT.type -> {
+                        val decomposed = TextComposeHandler.decomposeMessage(message.encryptedContent!!)
+                        "${decomposed.from} ${decomposed.text}"
+                    }
+                    Platforms.ServiceTypes.MESSAGE.type -> {
+                        val decomposed = MessageComposeHandler.decomposeMessage(message.encryptedContent!!)
+                        "${decomposed.to} ${decomposed.message}"
+                    }
+                    else -> ""
+                }
+                text.contains(searchQuery, ignoreCase = true)
+            }
+        }
+    }
+
+    Box(
+        Modifier
+            .padding(8.dp)
+            .fillMaxSize()
     ) {
-        if(messages.isNotEmpty()) {
+        if (filteredMessages.isNotEmpty()) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -183,37 +231,70 @@ fun RecentView(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(vertical = 16.dp)
             ) {
-                items(messages) { message ->
+                items(filteredMessages) { message ->
                     val platform = platformsList.find { it.name == message.platformName }
-                    val logo = platform?.logo?.let { BitmapFactory.decodeByteArray(it, 0, it.size) }
+                    val logo =
+                        platform?.logo?.let { BitmapFactory.decodeByteArray(it, 0, it.size) }
                     RecentMessageCard(message, logo) {
                         platformsViewModel.message = it
-                        when(it.type) {
+                        when (it.type) {
                             Platforms.ServiceTypes.EMAIL.type -> {
                                 navController.navigate(EmailViewScreen)
                             }
+
                             Platforms.ServiceTypes.BRIDGE.type -> {
                                 navController.navigate(BridgeViewScreen)
                             }
+
                             Platforms.ServiceTypes.TEXT.type -> {
                                 navController.navigate(TextViewScreen)
                             }
+
                             Platforms.ServiceTypes.MESSAGE.type -> {
                                 navController.navigate(MessageViewScreen)
                             }
+
                             else -> {
-                                TODO()
+                                Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
                 }
             }
-        }
-        else {
-            RecentViewNoMessages(
-                saveNewPlatformCallback = { tabRequestedCallback() },
-                sendNewMessageCallback = { sendNewMessageRequested = true }
-            )
+        } else {
+            if (searchQuery.isNotBlank()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 16.dp)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Image(
+                        painter = painterResource(id = R.drawable.empty_message),
+                        contentDescription = "No results found",
+                        modifier = Modifier
+                            .size(200.dp)
+                            .padding(bottom = 16.dp)
+                    )
+
+                    Text(
+                        text = "No results found",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Thin,
+                        textAlign = TextAlign.Center,
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+            } else {
+                RecentViewNoMessages(
+                    saveNewPlatformCallback = { tabRequestedCallback() },
+                    sendNewMessageCallback = { sendNewMessageRequested = true }
+                )
+            }
         }
         if (sendNewMessageRequested) {
             ActivePlatformsModal(
@@ -225,7 +306,6 @@ fun RecentView(
                 sendNewMessageRequested = false
             }
         }
-
     }
 }
 
@@ -379,7 +459,10 @@ fun RecentScreenPreview() {
         RecentView(
             navController = rememberNavController(),
             messagesViewModel = MessagesViewModel(),
-            platformsViewModel = PlatformsViewModel()
+            platformsViewModel = PlatformsViewModel(),
+            searchQuery = "",
+            isSearchDone = false
+
         ) {}
     }
 }
@@ -420,7 +503,10 @@ fun RecentScreenMessages_Preview() {
             _messages = listOf(encryptedContent, text, message),
             navController = rememberNavController(),
             messagesViewModel = MessagesViewModel(),
-            platformsViewModel = PlatformsViewModel()
+            platformsViewModel = PlatformsViewModel(),
+            searchQuery = "",
+            isSearchDone = false
+
         ) {}
     }
 }
