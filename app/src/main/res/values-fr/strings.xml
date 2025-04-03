@@ -248,5 +248,7 @@
     <string name="discard">Annuler</string>
     <string name="message_discarded">Message annulé !</string>
     <string name="time_left_until_code_expires">Temps restant avant l\'expiration du code : %1$ds</string>
+    <string name="bug_report">Rapport de bogue</string>
+    <string name="relaysms_bug_report">RelaySMS - Rapport de bogue</string>
 
 </resources>
