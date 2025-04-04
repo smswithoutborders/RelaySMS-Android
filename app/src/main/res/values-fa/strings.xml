@@ -251,5 +251,7 @@
     <string name="something_went_wrong">مشکلی پیش آمد</string>
     <string name="no_results_found">هیچ نتیجه‌ای یافت نشد</string>
     <string name="search_message">جستجوی پیام</string>
+    <string name="bug_report">گزارش خطا</string>
+    <string name="relaysms_bug_report">RelaySMS - گزارش خطا</string>
 
 </resources>

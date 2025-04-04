@@ -250,5 +250,7 @@
     <string name="something_went_wrong">Etwas ist schiefgelaufen</string>
     <string name="no_results_found">Keine Ergebnisse gefunden</string>
     <string name="search_message">Nachricht suchen</string>
+    <string name="bug_report">Fehlerbericht</string>
+    <string name="relaysms_bug_report">RelaySMS - Fehlerbericht</string>
 
 </resources>

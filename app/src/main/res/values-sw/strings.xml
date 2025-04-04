@@ -257,5 +257,7 @@
     <string name="something_went_wrong">Kuna tatizo limetokea</string>
     <string name="no_results_found">Hakuna matokeo yaliyopatikana</string>
     <string name="search_message">Tafuta ujumbe</string>
+    <string name="bug_report">Ripoti ya Hitilafu</string>
+    <string name="relaysms_bug_report">RelaySMS - Ripoti ya Hitilafu</string>
 
 </resources>

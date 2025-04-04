@@ -246,5 +246,7 @@
     <string name="something_went_wrong">Bir şeyler ters gitti</string>
     <string name="no_results_found">Sonuç bulunamadı</string>
     <string name="search_message">Mesaj ara</string>
+    <string name="bug_report">Hata Raporu</string>
+    <string name="relaysms_bug_report">RelaySMS - Hata Raporu</string>
 
 </resources>

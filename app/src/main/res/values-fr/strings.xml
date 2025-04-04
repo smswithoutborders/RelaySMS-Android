@@ -251,5 +251,7 @@
     <string name="something_went_wrong">Quelque chose s\'est mal passé</string>
     <string name="no_results_found">Aucun résultat trouvé</string>
     <string name="search_message">Rechercher un message</string>
+    <string name="bug_report">Rapport de bogue</string>
+    <string name="relaysms_bug_report">RelaySMS - Rapport de bogue</string>
 
 </resources>
