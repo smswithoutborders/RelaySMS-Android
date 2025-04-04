@@ -7,6 +7,7 @@ import com.afkanerd.smswithoutborders.libsignal_doubleratchet.KeystoreHelpers
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityAES
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityRSA
 import com.example.sw0b_001.Database.Datastore
+import com.example.sw0b_001.Models.Platforms.Platforms
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.Modules.Crypto
 import com.example.sw0b_001.R
@@ -59,8 +60,8 @@ class Vaults(context: Context) {
                     it.platform)
             )
         }
-        Datastore.getDatastore(context).storedPlatformsDao()
-            .insertAll(storedPlatforms)
+        Datastore.getDatastore(context).storedPlatformsDao().deleteAll()
+        Datastore.getDatastore(context).storedPlatformsDao().insertAll(storedPlatforms)
     }
 
     private fun processVaultArtifacts(context: Context,
@@ -85,6 +86,9 @@ class Vaults(context: Context) {
         storeArtifacts(context, llt, deviceId, clientDeviceIDPubKey)
         Publishers.storeArtifacts(context, publisherPubKey)
         Publishers.removeEncryptedStates(context)
+        CoroutineScope(Dispatchers.Default).launch {
+            Datastore.getDatastore(context).ratchetStatesDAO().deleteAll()
+        }
     }
 
     fun createEntity(context: Context,
@@ -215,11 +219,35 @@ class Vaults(context: Context) {
         private const val DEVICE_ID_SECRET_KEY_KEYSTORE_ALIAS =
             "com.afkanerd.relaysms.DEVICE_ID_SECRET_KEY_KEYSTORE_ALIAS"
 
+        private const val IS_GET_ME_OUT =
+            "com.afkanerd.relaysms.IS_GET_ME_OUT"
+
 
         fun completeDelete(context: Context, llt: String) {
             val publishers = Publishers(context)
-            Datastore.getDatastore(context).storedPlatformsDao().fetchAllList().forEach {
-                publishers.revokeOAuthPlatforms(llt, it.name!!, it.account!!)
+
+            val availablePlatforms = Datastore.getDatastore(context).availablePlatformsDao()
+                .fetchAllList()
+
+            Datastore.getDatastore(context).storedPlatformsDao().fetchAllList().forEach { platform ->
+                availablePlatforms.filter { it.name == platform.name }.forEach {
+                    when(it.protocol_type) {
+                        Platforms.ProtocolTypes.OAUTH2.type -> {
+                            publishers.revokeOAuthPlatforms(
+                                llt,
+                                platform.name!!,
+                                platform.account!!,
+                            )
+                        }
+                        Platforms.ProtocolTypes.PNBA.type -> {
+                            publishers.revokePNBAPlatforms(
+                                llt,
+                                platform.name!!,
+                                platform.account!!
+                            )
+                        }
+                    }
+                }
             }
             publishers.shutdown()
 
@@ -231,18 +259,34 @@ class Vaults(context: Context) {
             vaults.shutdown()
         }
 
+        fun setGetMeOut(context: Context, value: Boolean) {
+            var sharedPreferences = Armadillo.create(context, VAULT_ATTRIBUTE_FILES)
+                .encryptionFingerprint(context)
+                .build()
+            sharedPreferences.edit()
+                .putBoolean(IS_GET_ME_OUT, value)
+                .apply()
+        }
+
+        fun isGetMeOut(context: Context) : Boolean {
+            var sharedPreferences = Armadillo.create(context, VAULT_ATTRIBUTE_FILES)
+                .encryptionFingerprint(context)
+                .build()
+
+            return sharedPreferences.getBoolean(IS_GET_ME_OUT, false)
+        }
+
         fun logout(context: Context, successRunnable: Runnable) {
             var sharedPreferences = Armadillo.create(context, VAULT_ATTRIBUTE_FILES)
                 .encryptionFingerprint(context)
                 .build()
             sharedPreferences.edit().clear().apply()
 
-//            sharedPreferences = Armadillo.create(context, Publishers.PUBLISHER_ATTRIBUTE_FILES)
-//                .encryptionFingerprint(context)
-//                .build()
-//            sharedPreferences.edit().clear().apply()
+            sharedPreferences = Armadillo.create(context, Publishers.PUBLISHER_ATTRIBUTE_FILES)
+                .encryptionFingerprint(context)
+                .build()
+            sharedPreferences.edit().clear().apply()
 
-//            KeystoreHelpers.removeAllFromKeystore(context)
             KeystoreHelpers.removeFromKeystore(context, DEVICE_ID_KEYSTORE_ALIAS)
             KeystoreHelpers.removeFromKeystore(context, DEVICE_ID_SECRET_KEY_KEYSTORE_ALIAS)
             KeystoreHelpers.removeFromKeystore(context, DEVICE_ID_PUB_KEY)

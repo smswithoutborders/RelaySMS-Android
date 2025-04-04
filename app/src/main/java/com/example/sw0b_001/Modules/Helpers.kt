@@ -106,4 +106,18 @@ object Helpers {
         random.nextBytes(bytes)
         return bytes
     }
+
+    fun getLanguageNameFromCode(context: Context, languageCode: String): String {
+        return when (languageCode) {
+            "en" -> "English"
+            "es" -> "Español"
+            "fr" -> "Français"
+            "de" -> "Deutsch"
+            "ar" -> "العربية"
+            "fa" -> "فارسی"
+            "sw" -> "Kiswahili"
+            "tr" -> "Türkçe"
+            else -> context.getString(R.string.language)
+        }
+    }
 }

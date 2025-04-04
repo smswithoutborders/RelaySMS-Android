@@ -14,23 +14,7 @@
 
     <PreferenceCategory
         app:iconSpaceReserved="false"
-        app:title="@string/settings_privacy_vault_preference">
-        <Preference
-            app:iconSpaceReserved="false"
-            app:key="revoke"
-            app:summary="@string/settings_privacy_preferences_choose_which_platforms_you_want_to_remove_from_the_vault"
-            app:title="@string/revoke_platforms" />
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        app:iconSpaceReserved="false"
         app:title="@string/settings_security_and_privacy_account">
-        <Preference
-            app:iconSpaceReserved="false"
-            app:key="clear_bridges"
-            app:summary="This would delete your Auth codes stored for Aliasing. You can request for another code at anytime."
-            app:title="Clear aliasing" />
-
         <Preference
             app:iconSpaceReserved="false"
             app:key="logout"

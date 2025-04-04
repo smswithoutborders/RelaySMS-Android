@@ -18,8 +18,11 @@ interface AvailablePlatformsDao {
     fun fetchAllList() : List<AvailablePlatforms>
 
     @Query("SELECT * FROM AvailablePlatforms WHERE name = :name")
-    fun fetch(name: String) : AvailablePlatforms
+    fun fetch(name: String) : AvailablePlatforms?
 
     @Query("DELETE FROM AvailablePlatforms WHERE name = :name")
     fun delete(name: String)
+
+    @Query("DELETE FROM AvailablePlatforms")
+    fun clear()
 }

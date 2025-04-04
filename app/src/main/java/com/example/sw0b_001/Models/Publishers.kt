@@ -15,11 +15,12 @@ import io.grpc.ManagedChannelBuilder
 import kotlinx.serialization.json.Json
 import publisher.v1.PublisherGrpc
 import publisher.v1.PublisherOuterClass
+import androidx.core.content.edit
+import com.example.sw0b_001.Models.Platforms.Platforms
 
 class Publishers(val context: Context) {
 
-     private var REDIRECT_URL_SCHEME = "relaysms://oauth.afkanerd.com/android/"
-
+    private var REDIRECT_URL_SCHEME = "relaysms://oauth.afkanerd.com/android/"
     private var channel: ManagedChannel = ManagedChannelBuilder
         .forAddress(context.getString(R.string.publisher_grpc_url),
             context.getString(R.string.publisher_grpc_port).toInt())
@@ -46,15 +47,14 @@ class Publishers(val context: Context) {
         return publisherStub.getOAuth2AuthorizationUrl(request)
     }
 
-    fun revokeOAuthPlatforms(llt: String, platform: String, account: String) :
-            PublisherOuterClass.RevokeAndDeleteOAuth2TokenResponse {
+    fun revokeOAuthPlatforms(llt: String, platform: String, account: String) {
         val request = PublisherOuterClass.RevokeAndDeleteOAuth2TokenRequest.newBuilder().apply {
             setPlatform(platform)
             setLongLivedToken(llt)
             setAccountIdentifier(account)
         }.build()
 
-        return publisherStub.revokeAndDeleteOAuth2Token(request)
+        publisherStub.revokeAndDeleteOAuth2Token(request)
     }
 
     fun revokePNBAPlatforms(llt: String, platform: String, account: String) :
@@ -125,6 +125,8 @@ class Publishers(val context: Context) {
 
         private const val PUBLISHER_PUBLIC_KEY =
             "com.afkanerd.relaysms.PUBLISHER_PUBLIC_KEY"
+        private const val PUBLISHER_CLIENT_PUBLIC_KEY =
+            "com.afkanerd.relaysms.PUBLISHER_CLIENT_PUBLIC_KEY"
 
         private const val PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS =
             "com.afkanerd.relaysms.PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS"
@@ -154,7 +156,7 @@ class Publishers(val context: Context) {
                 .build()
 
             KeystoreHelpers.removeFromKeystore(context, PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS)
-            sharedPreferences.edit().remove(PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS).apply()
+            sharedPreferences.edit() { remove(PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS) }
         }
 
         fun getEncryptedStates(context: Context, states: ByteArray) : ByteArray {
@@ -201,12 +203,30 @@ class Publishers(val context: Context) {
                 Base64.DEFAULT)
         }
 
-        fun fetchPublisherSharedKey(context: Context) : ByteArray {
-            val pubKey = fetchPublisherPublicKey(context)
+        fun fetchClientPublisherPublicKey(context: Context) : ByteArray? {
+            val sharedPreferences = Armadillo.create(context, PUBLISHER_ATTRIBUTE_FILES)
+                .encryptionFingerprint(context)
+                .build()
+            return Base64.decode(sharedPreferences.getString(PUBLISHER_CLIENT_PUBLIC_KEY, ""),
+                Base64.DEFAULT)
+        }
+
+        fun fetchPublisherSharedKey(context: Context, publicKey: ByteArray? = null) : ByteArray {
+            val pubKey = publicKey ?: fetchPublisherPublicKey(context)
             println("Public key: $pubKey")
             println("Public key: ${Base64.encodeToString(pubKey, Base64.DEFAULT)}")
             return Cryptography.calculateSharedSecret(context, PUBLISHER_ID_KEYSTORE_ALIAS,
                 pubKey!!)
+        }
+
+        fun storeClientArtifacts(context: Context, publisherPubKey: String) {
+            val sharedPreferences = Armadillo.create(context, PUBLISHER_ATTRIBUTE_FILES)
+                .encryptionFingerprint(context)
+                .build()
+
+            sharedPreferences.edit()
+                .putString(PUBLISHER_CLIENT_PUBLIC_KEY, publisherPubKey)
+                .apply()
         }
 
         fun storeArtifacts(context: Context, publisherPubKey: String) {
