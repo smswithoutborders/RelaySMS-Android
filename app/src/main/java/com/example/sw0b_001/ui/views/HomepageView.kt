@@ -112,16 +112,31 @@ fun HomepageView(
     var sendNewMessageRequested by remember { mutableStateOf(false)}
 
     val isLoading by messagesViewModel.isLoading.collectAsState()
+    var searchQuery by remember { mutableStateOf("") }
+    var isSearchActive by remember { mutableStateOf(false) }
+    var isSearchDone by remember { mutableStateOf(false) }
 
     Scaffold (
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            when(platformsViewModel.bottomTabsItem) {
+            when (platformsViewModel.bottomTabsItem) {
                 BottomTabsItems.BottomBarRecentTab -> {
                     if (isLoggedIn || messages.isNotEmpty()) {
                         RecentAppBar(
                             navController = navController,
-                            isSearchable = messages.isNotEmpty()
+                            onSearchQueryChanged = { searchQuery = it },
+                            searchQuery = searchQuery,
+                            isSearchActive = isSearchActive,
+                            onToggleSearch = {
+                                isSearchActive = !isSearchActive
+                                if (!isSearchActive) {
+                                    searchQuery = ""
+                                    isSearchDone = false
+                                }
+                            },
+                            onSearchDone = {
+                                isSearchDone = true
+                            }
                         )
                     }
                 }
@@ -266,6 +281,9 @@ fun HomepageView(
                             navController = navController,
                             messagesViewModel = messagesViewModel,
                             platformsViewModel = platformsViewModel,
+                            searchQuery = searchQuery,
+                            isSearchDone = isSearchDone,
+
                         ) {
                             platformsViewModel.bottomTabsItem =
                                 BottomTabsItems.BottomBarPlatformsTab
