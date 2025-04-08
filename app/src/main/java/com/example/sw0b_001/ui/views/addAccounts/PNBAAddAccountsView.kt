@@ -5,9 +5,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -65,8 +68,13 @@ fun PNBAPhoneNumberCodeRequestView(
     var authCode by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
+    val scrollState = rememberScrollState()
+
     Column(
-        modifier = Modifier.padding(16.dp)
+        modifier = Modifier
+            .padding(16.dp)
+            .verticalScroll(scrollState)
+            .imePadding()
     ) {
         platform?.let {
             if(it.name == "telegram" && isAuthenticationCodeRequested) {
@@ -100,7 +108,8 @@ fun PNBAPhoneNumberCodeRequestView(
                 countryListDisplayType = CountryListDisplayType.Dialog,
                 modifier = Modifier
                     .padding(bottom = 8.dp)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .imePadding(),
                 label = {
                     Text(
                         text = stringResource(R.string.phone_number),
@@ -117,7 +126,8 @@ fun PNBAPhoneNumberCodeRequestView(
                 label = { Text(text = stringResource(R.string.code), style = MaterialTheme.typography.bodySmall) },
                 modifier = Modifier
                     .padding(bottom = 8.dp)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .imePadding(),
                 shape = RoundedCornerShape(12.dp),
                 visualTransformation = if (isCodeVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -151,6 +161,7 @@ fun PNBAPhoneNumberCodeRequestView(
                 label = { Text(text = stringResource(R.string.password), style = MaterialTheme.typography.bodySmall) },
                 modifier = Modifier
                     .padding(bottom = 8.dp)
+                    .imePadding()
                     .fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -199,7 +210,8 @@ fun PNBAPhoneNumberCodeRequestView(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 32.dp, bottom = 24.dp)
-                .align(Alignment.CenterHorizontally),
+                .align(Alignment.CenterHorizontally)
+                .imePadding(),
         ) {
             if(isLoading) {
                 CircularProgressIndicator(
