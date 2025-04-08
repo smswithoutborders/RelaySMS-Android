@@ -248,6 +248,9 @@
     <string name="discard">Descartar</string>
     <string name="message_discarded">¡Mensaje descartado!</string>
     <string name="time_left_until_code_expires">Tiempo restante hasta que el código expire: %1$ds</string>
+    <string name="something_went_wrong">Algo salió mal</string>
+    <string name="no_results_found">No se encontraron resultados</string>
+    <string name="search_message">Buscar mensaje</string>
     <string name="bug_report">Reporte de error</string>
     <string name="relaysms_bug_report">RelaySMS - Reporte de error</string>
 
