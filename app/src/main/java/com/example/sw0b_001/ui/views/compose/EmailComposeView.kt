@@ -47,6 +47,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -380,13 +381,14 @@ fun EmailComposeView(
                         onValueChange = {to = it},
                         textStyle = TextStyle.Default.copy(
                             color = MaterialTheme.colorScheme.onSurface,
-                            fontSize = 16.sp
+                            fontSize = 16.sp,
                         ),
                         modifier = Modifier.weight(1f),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Email,
                             imeAction = ImeAction.Next
-                        )
+                        ),
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
                     )
                     IconButton(onClick = {
                         showCcBcc = !showCcBcc
@@ -425,7 +427,8 @@ fun EmailComposeView(
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Email,
                                 imeAction = ImeAction.Next
-                            )
+                            ),
+                            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
                         )
                     }
 
@@ -457,7 +460,8 @@ fun EmailComposeView(
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Email,
                                 imeAction = ImeAction.Next
-                            )
+                            ),
+                            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
                         )
                     }
 
@@ -484,6 +488,7 @@ fun EmailComposeView(
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 16.sp
                     ),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
                     modifier = Modifier
                         .weight(1f),
                     decorationBox = { innerTextField ->
@@ -528,6 +533,7 @@ fun EmailComposeView(
                         }
                     }
                 },
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
                 textStyle = TextStyle.Default.copy(
                     color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 16.sp
