@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.room.AutoMigration;
 import androidx.room.Database;
 import androidx.room.DatabaseConfiguration;
+import androidx.room.DeleteColumn;
 import androidx.room.DeleteTable;
 import androidx.room.InvalidationTracker;
 import androidx.room.RenameTable;
@@ -40,17 +41,20 @@ import org.jetbrains.annotations.NotNull;
         GatewayClient.class,
         StoredPlatformsEntity.class,
         EncryptedContent.class},
-        version = 17,
-        autoMigrations = { @AutoMigration( from = 8, to = 9, spec = Datastore.DatastoreMigrations.class),
-                @AutoMigration( from = 9, to = 10, spec= Datastore.DatastoreMigrations.class),
-                @AutoMigration( from = 10, to = 11),
-                @AutoMigration( from = 11, to = 12),
-                @AutoMigration( from = 12, to = 13),
-                @AutoMigration( from = 13, to = 14),
-                @AutoMigration( from = 14, to = 15),
-                @AutoMigration( from = 15, to = 16),
-                @AutoMigration( from = 16, to = 17)
+        version = 18,
+        autoMigrations = {
+        @AutoMigration( from = 8, to = 9, spec = Datastore.DatastoreMigrations.class),
+        @AutoMigration( from = 9, to = 10, spec= Datastore.DatastoreMigrations.class),
+        @AutoMigration( from = 10, to = 11),
+        @AutoMigration( from = 11, to = 12),
+        @AutoMigration( from = 12, to = 13),
+        @AutoMigration( from = 13, to = 14),
+        @AutoMigration( from = 14, to = 15),
+        @AutoMigration( from = 15, to = 16),
+        @AutoMigration( from = 16, to = 17),
+        @AutoMigration( from = 17, to = 18, spec = Datastore.Migrate17To18.class),
 })
+
 public abstract class Datastore extends RoomDatabase {
     @RenameTable(fromTableName = "Platform", toTableName = "Platforms")
     @DeleteTable(tableName = "Notifications")
@@ -91,4 +95,9 @@ public abstract class Datastore extends RoomDatabase {
     protected InvalidationTracker createInvalidationTracker() {
         return null;
     }
+
+    @DeleteColumn.Entries({
+            @DeleteColumn(tableName = "EncryptedContent", columnName = "platform_id"),
+    })
+    static class Migrate17To18 implements AutoMigrationSpec { }
 }

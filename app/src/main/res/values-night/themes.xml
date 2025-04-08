@@ -1,5 +1,5 @@
 <resources>
-    <style name="Theme.main" parent="Theme.main.night">
+    <style name="Theme.main" parent="Theme.Material3.Dark.NoActionBar">
         <item name="colorPrimary">@color/md_theme_primary</item>
         <item name="colorOnPrimary">@color/md_theme_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_primaryContainer</item>
@@ -46,5 +46,9 @@
         <item name="colorSurfaceContainer">@color/md_theme_surfaceContainer</item>
         <item name="colorSurfaceContainerHigh">@color/md_theme_surfaceContainerHigh</item>
         <item name="colorSurfaceContainerHighest">@color/md_theme_surfaceContainerHighest</item>
+        <item name="colorCustomColor1">@color/colorCustomColor1</item>
+        <item name="colorOnCustomColor1">@color/colorOnCustomColor1</item>
+        <item name="colorCustomColor1Container">@color/colorCustomColor1Container</item>
+        <item name="colorOnCustomColor1Container">@color/colorOnCustomColor1Container</item>
     </style>
 </resources>

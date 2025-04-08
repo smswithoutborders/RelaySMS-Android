@@ -1,5 +1,6 @@
 package com.example.sw0b_001
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
@@ -49,11 +50,13 @@ class OauthRedirectActivity : AppCompatActivity() {
             try {
                 val llt = Vaults.fetchLongLivedToken(applicationContext)
                 val codeVerifier = Publishers.fetchOauthRequestVerifier(applicationContext)
-                publishers.sendOAuthAuthorizationCode(llt,
+                publishers.sendOAuthAuthorizationCode(
+                    llt,
                     platform,
                     code,
                     codeVerifier,
-                    supportsUrlScheme)
+                    supportsUrlScheme
+                )
 
                 val vaults = Vaults(applicationContext)
                 vaults.refreshStoredTokens(applicationContext)
@@ -73,6 +76,10 @@ class OauthRedirectActivity : AppCompatActivity() {
                 publishers.shutdown()
             }
             runOnUiThread {
+                val intent = Intent(applicationContext, MainActivity::class.java).apply {
+                    setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                startActivity(intent)
                 finish()
             }
         }

@@ -5,6 +5,9 @@
         <item>@string/language_farsi</item>
         <item>@string/language_spanish</item>
         <item>@string/language_turkish</item>
+        <item>@string/language_arabic</item>
+        <item>@string/language_german</item>
+        <item>@string/language_swahili</item>
     </string-array>
     <string-array name="language_values">
         <item>@string/language_english_value</item>
@@ -12,5 +15,8 @@
         <item>@string/language_farsi_value</item>
         <item>@string/language_spanish_value</item>
         <item>@string/language_turkish_value</item>
+        <item>@string/language_arabic_value</item>
+        <item>@string/language_german_value</item>
+        <item>@string/language_swahili_value</item>
     </string-array>
 </resources>

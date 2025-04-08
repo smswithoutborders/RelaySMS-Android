@@ -1,0 +1,256 @@
+<resources>
+    <string name="app_name" translatable="false">RelaySMS</string>
+
+    <string name="settings_settings">Einstellungen</string>
+
+    <string name="settings_accessibility_category">Barrierefreiheit</string>
+    <string name="settings_language">Sprache</string>
+
+    <string name="settings_security_category">Sicherheit und Datenschutz</string>
+    <string name="settings_security">Sicherheit</string>
+    <string name="settings_security_category_summary">App-Sperren und PIN-Codes aktivieren</string>
+
+    <string name="settings_lock_screen_preference_category">Optionen für den Telefon-Sperrbildschirm</string>
+    <string name="settings_security_and_privacy_enable_lockscreen_open">Sperrbildschirm aktivieren</string>
+    <string name="settings_security_and_privacy_enable_lockscreen_open_summary">PIN/Fingerabdruck des Sperrbildschirms beim Starten der App erforderlich</string>
+
+    <string name="settings_security_and_privacy_account">Konto</string>
+    <string name="settings_security_and_privacy_account_logout">Abmelden</string>
+    <string name="settings_security_and_privacy_account_logout_summary">Von Ihrem Konto abmelden. Ihre aktuellen Nachrichten werden gelöscht.</string>
+
+    <string name="settings_security_and_privacy_account_delete">Löschen</string>
+    <string name="settings_security_and_privacy_account_delete_summary">Das Löschen Ihres Kontos bedeutet, dass alle Ihre gespeicherten Konten online gelöscht werden. Sie können Ihr Konto bei Bedarf jederzeit wiederherstellen.</string>
+
+    <string name="language_english">Englisch</string>
+    <string name="language_french">Französisch</string>
+    <string name="language_farsi">Persisch</string>
+    <string name="language_spanish">Spanisch</string>
+    <string name="language_turkish">Türkisch</string>
+    <string name="language_german">Deutsch</string>
+    <string name="language_arabic">Arabisch</string>
+    <string name="language_swahili">Swahili</string>
+
+    <string name="language_english_value" translatable="false">
+        en
+    </string>
+    <string name="language_french_value" translatable="false">
+        fr
+    </string>
+    <string name="language_farsi_value" translatable="false">
+        fa
+    </string>
+    <string name="language_spanish_value" translatable="false">
+        es
+    </string>
+    <string name="language_turkish_value" translatable="false">
+        tr
+    </string>
+
+    <string name="default_gateway_MSISDN_0" translatable="false">+237679466332</string>
+    <string name="default_gateway_MSISDN_2" translatable="false">+237690826242</string>
+    <string name="default_gateway_MSISDN_3" translatable="false">+2348131498393</string>
+
+    <string name="gateway_client_settings_add_custom_empty_error">Bitte geben Sie eine Telefonnummer an</string>
+
+    <string name="new_gateway_client_alias">Alias (optional)</string>
+    <string name="gateway_client_alias_description">Name zur Erinnerung an den Gateway-Client</string>
+    <string name="gateway_client_save_btn_text">Speichern</string>
+
+    <string name="choose_sms_app">SMS-Messaging-App auswählen</string>
+
+    <string name="security_settings_failed_to_switch_security">Sicherheit konnte nicht aktiviert werden…</string>
+    <string name="settings_security_biometric_user_cannot_add_this_functionality_at_this_time">Benutzer kann diese Funktion derzeit nicht hinzufügen.</string>
+    <string name="lock_screen_relay_sms_is_locked">RelaySMS App ist gesperrt</string>
+    <string name="lock_screen_unlock_with_your_phone_s_locking_system">Mit dem Sperrsystem Ihres Telefons entsperren</string>
+    <string name="gateway_client_add_custom_example_text">z. B. +237123456789 oder Kontakt auswählen</string>
+    <string name="gateway_client_add_gateway_client_text">Gateway-Client hinzufügen</string>
+    <string name="otp_verification_code_template" translatable="false">Ihr SMSWithoutBorders-Auth-Verifizierungscode lautet:</string>
+
+    <string name="logout_you_have_no_accounts_logged_into_vaults_at_this_time">Sie haben derzeit keine Konten in Vaults angemeldet</string>
+    <string name="security_settings_you_have_no_accounts_to_delete_in_vault_at_this_time">Sie haben derzeit keine Konten in Vault zu löschen</string>
+    <string name="helper_yesterday">gestern</string>
+
+    <string name="smswithoutboarders_official_gateway_client_seeding_url" translatable="false">https://smswithoutborders.com:15000/v3/clients</string>
+    <string name="recovery_continue">Fortfahren</string>
+
+    <string name="vault_grpc_url" translatable="false">vault.smswithoutborders.com</string>
+    <string name="vault_grpc_port" translatable="false">443</string>
+
+    <string name="publisher_grpc_url" translatable="false">publisher.smswithoutborders.com</string>
+    <string name="publisher_grpc_port" translatable="false">443</string>
+
+    <string name="publisher_get_platforms_url" translatable="false">https://raw.githubusercontent.com/smswithoutborders/SMSWithoutBorders-Publisher/master/resources/platforms.json</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="click_continue_to_confirm_this_action_do_not_worry_this_has_no_dangerous_effects">Klicken Sie zum Bestätigen auf Fortfahren. Keine Sorge, dies hat keine gefährlichen Auswirkungen.</string>
+    <string name="messaging">Messaging</string>
+    <string name="you_have_a_device_id_for_the_device_you_log_into_it_is_used_to_identify_you_on_the_vault_you_can_switch_to_phone_number_to_reduce_size_of_sms_message">Sie haben eine Geräte-ID für das Gerät, auf dem Sie sich anmelden. Sie wird verwendet, um Sie im Vault zu identifizieren. Sie können zur Telefonnummer wechseln, um die Größe der SMS-Nachricht zu verringern.</string>
+    <string name="validate_with_phone_number">Mit Telefonnummer bestätigen</string>
+    <string name="enter_phone_number_with_country_code">Telefonnummer mit Ländervorwahl eingeben</string>
+    <string name="about">Über</string>
+    <string name="recents_text">Letzte</string>
+    <string name="get_started_text">Los gehts</string>
+    <string name="platforms">Plattformen</string>
+    <string name="inbox">Posteingang</string>
+    <string name="countries">Länder</string>
+    <string name="settings">Einstellungen</string>
+    <string name="permission_denied">Berechtigung verweigert!</string>
+    <string name="add_gateway_client">Gateway-Client hinzufügen</string>
+    <string name="edit_gateway_client">Gateway-Client bearbeiten</string>
+    <string name="e_g_237123456_or_select_contact">z. B. +237123456 oder Kontakt auswählen</string>
+    <string name="alias_optional">Alias (optional)</string>
+    <string name="name_to_help_remember_the_gateway_client">Name zur Erinnerung an den Gateway-Client</string>
+    <string name="saving">Speichern…</string>
+    <string name="save">Speichern</string>
+    <string name="error_saving_gateway_client">Fehler beim Speichern des Gateway-Clients</string>
+    <string name="click_continue_to_confirm_this_action_do_not_worry_it_has_no_dangerous_effects">Klicken Sie zum Bestätigen auf Fortfahren. Keine Sorge, dies hat keine gefährlichen Auswirkungen.</string>
+    <string name="continue_text">Fortfahren</string>
+    <string name="country_options">Länderoptionen</string>
+    <string name="revoking_account_for">Konto für %1$s widerrufen</string>
+    <string name="adding_account_for">Konto für %1$s hinzufügen</string>
+    <string name="send_message">Nachricht senden</string>
+    <string name="add_account">Konto hinzufügen</string>
+    <string name="remove_accounts">Konten entfernen</string>
+    <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported">Durch das Hinzufügen von E-Mails zu Ihrem RelaySMS-Konto können Sie diese verwenden, um E-Mails per SMS zu senden.\n\nGmail wird derzeit unterstützt.</string>
+    <string name="adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported">Durch das Hinzufügen von Nummern zu Ihrem RelaySMS-Konto können Sie diese verwenden, um Nachrichten per SMS zu senden.\n\nTelegram Messaging wird derzeit unterstützt.</string>
+    <string name="adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported">Durch das Hinzufügen von Konten zu Ihrem RelaySMS-Konto können Sie diese verwenden, um Beiträge per SMS zu erstellen.\n\nDas Posten wird derzeit unterstützt.</string>
+    <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias">Ihr RelaySMS-Konto ist ein Alias Ihrer Telefonnummer mit der Domain @relaysms.me.\n\nSie können Antworten per SMS erhalten, wenn eine Nachricht an Ihren Alias gesendet wird.</string>
+    <string name="continue_to_send_an_email_from_your_saved_email_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">Fahren Sie fort, um eine E-Mail von Ihrem gespeicherten E-Mail-Konto zu senden. Sie können ein Land für die Nachrichtenweiterleitung auf der Registerkarte „Länder“ unten auswählen.\n\nFahren Sie mit dem Senden der Nachricht fort</string>
+    <string name="continue_to_send_messages_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">Fahren Sie fort, um Nachrichten von Ihrem gespeicherten Messaging-Konto zu senden. Sie können ein Land für die Nachrichtenweiterleitung auf der Registerkarte „Länder“ unten auswählen.\n\nFahren Sie mit dem Senden der Nachricht fort</string>
+    <string name="continue_to_make_posts_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">Fahren Sie fort, um Beiträge von Ihrem gespeicherten Messaging-Konto zu erstellen. Sie können ein Land für die Nachrichtenweiterleitung auf der Registerkarte „Länder“ unten auswählen.\n\nFahren Sie mit dem Senden der Nachricht fort</string>
+    <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">Ihr RelaySMS-Konto ist ein Alias Ihrer Telefonnummer mit der Domain @relaysms.me.\n\nSie können Antworten per SMS erhalten, wenn eine Nachricht an Ihren Alias gesendet wird.\nSie können ein Land für die Nachrichtenweiterleitung auf der Registerkarte „Länder“ unten auswählen.\n\nFahren Sie mit dem Senden der Nachricht fort</string>
+    <string name="select_an_account">Wählen Sie ein Konto aus</string>
+    <string name="please_enter_your_telegram_code_without_copying_it_from_the_message_copying_might_get_flagged_and_telegram_might_block_your_account">Bitte geben Sie Ihren Telegram-Code ein, ohne ihn aus der Nachricht zu kopieren - das Kopieren kann dazu führen, dass er markiert wird, und Telegram kann Ihr Konto sperren.</string>
+    <string name="phone_number">Telefonnummer</string>
+    <string name="code">Code</string>
+    <string name="hide_password">Passwort ausblenden</string>
+    <string name="show_password">Passwort anzeigen</string>
+    <string name="no_account_selected">Kein Konto ausgewählt</string>
+    <string name="compose_email">E-Mail schreiben</string>
+    <string name="to">An</string>
+    <string name="subject">Betreff</string>
+    <string name="new_message">Neue Nachricht</string>
+    <string name="sender">Absender</string>
+    <string name="recipient_number">Empfängernummer</string>
+    <string name="message">Nachricht</string>
+    <string name="new_post">Neuer Beitrag</string>
+    <string name="what_s_happening">Was passiert?</string>
+    <string name="connecting_the_world_one_sms_at_a_time">Die Welt verbinden, eine SMS nach der anderen</string>
+    <string name="relaysms_is_an_open_source_initiative_focused_on_enabling_communication_through_sms_without_relying_on_internet_connectivity_we_believe_in_a_connected_world_and_we_re_making_it_happen_one_sms_at_a_time_relaysms_remains_free_and_open_source">RelaySMS ist eine Open-Source-Initiative, die sich auf die Ermöglichung der Kommunikation per SMS konzentriert, ohne auf Internetverbindung angewiesen zu sein. Wir glauben an eine vernetzte Welt und verwirklichen sie mit jeder SMS. RelaySMS bleibt kostenlos und Open Source.</string>
+    <string name="app_tutorial">App-Tutorial</string>
+    <string name="support_us_by_starring_our_github_repository_and_sharing_it_with_your_friends">Unterstützen Sie uns, indem Sie unser GitHub-Repository mit einem Stern versehen und es mit Ihren Freunden teilen!</string>
+    <string name="available_platforms">Verfügbare Plattformen</string>
+    <string name="use_your_relaysms_account">Verwenden Sie Ihr RelaySMS-Konto</string>
+    <string name="use_your_online_accounts">Verwenden Sie Ihre Online-Konten</string>
+    <string name="navigate_back_to_home_screen">Zurück zum Startbildschirm</string>
+    <string name="create_relaysms_account">RelaySMS-Konto erstellen</string>
+    <string name="create_your_account_and">Erstellen Sie Ihr Konto und</string>
+    <string name="save_platforms">Plattformen speichern</string>
+    <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline">damit RelaySMS in Ihrem Namen Nachrichten an Gmail, X und Telegram senden kann, wenn Sie offline sind</string>
+    <string name="i_have_read_the">Ich habe die</string>
+    <string name="privacy_policy">Datenschutzrichtlinie</string>
+    <string name="log_in">Anmelden</string>
+    <string name="sign_up">Anmelden</string>
+    <string name="selected_gateway_client">Ausgewählter Gateway-Client</string>
+    <string name="no_gateway_client_selected">Kein Gateway-Client ausgewählt</string>
+    <string name="available_countries">Verfügbare Länder</string>
+    <string name="gateway_clients_refreshed_successfully">Gateway-Clients erfolgreich aktualisiert!</string>
+    <string name="no_messages_in_inbox">Keine Nachrichten im Posteingang</string>
+    <string name="paste_new_incoming_message">Neue eingehende Nachricht einfügen</string>
+    <string name="log_into_relaysms">Bei RelaySMS anmelden</string>
+    <string name="log_into_your_account_and">Melden Sie sich bei Ihrem Konto an und</string>
+    <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline_">damit RelaySMS in Ihrem Namen Nachrichten an Gmail, X und Telegram senden kann, wenn Sie offline sind</string>
+    <string name="already_got_code">Code bereits erhalten</string>
+    <string name="do_not_have_an_account">Haben Sie kein Konto?</string>
+    <string name="get_started_with">Los gehts mit</string>
+    <string name="compose_message">Nachricht verfassen</string>
+    <string name="use_your_phone_number_to_send_an_email_with_the_alias">Verwenden Sie Ihre Telefonnummer, um eine E-Mail mit dem Alias zu senden:</string>
+    <string name="login_with_internet">Mit Internet anmelden</string>
+    <string name="these_features_requires_you_to_have_an_internet_connection">Für diese Funktionen ist eine Internetverbindung erforderlich</string>
+    <string name="input_your_code">Code eingeben</string>
+    <string name="please_enter_the_6_digit_code_we_sent_to_you_via_sms">Bitte geben Sie den 6-stelligen Code ein, den wir Ihnen per SMS gesendet haben</string>
+    <string name="the_code_would_automatically_be_detected_in_some_cases">Der Code wird in einigen Fällen automatisch erkannt</string>
+    <string name="paste_encrypted_text_into_this_box">Verschlüsselten Text in dieses Feld einfügen…</string>
+    <string name="this_is_an_example_of_an_encrypted_message_that_you_would_paste_here">Dies ist ein Beispiel für eine verschlüsselte Nachricht, die Sie hier einfügen würden…</string>
+    <string name="relaysms_reply_please_paste_this_entire_message_in_your_relaysms_app">RelaySMS-Antwort Bitte fügen Sie diese gesamte Nachricht in Ihre RelaySMS-App ein</string>
+    <string name="click_to_paste">Zum Einfügen klicken</string>
+    <string name="decrypt_message">Nachricht entschlüsseln</string>
+    <string name="send_your_first_message">Senden Sie Ihre erste Nachricht…</string>
+    <string name="save_platforms_">Plattformen speichern</string>
+    <string name="phone_lockscreen_options">Optionen für den Telefon-Sperrbildschirm</string>
+    <string name="enable_lockscreen">Sperrbildschirm aktivieren</string>
+    <string name="require_lockscreen_pin_fingerprint_when_starting_the_app">PIN/Fingerabdruck des Sperrbildschirms beim Starten der App erforderlich</string>
+    <string name="vault">Vault</string>
+    <string name="choose_which_platforms_you_want_to_remove_from_the_vault">Wählen Sie aus, welche Plattformen Sie aus dem Vault entfernen möchten</string>
+    <string name="account">Konto</string>
+    <string name="clear_aliasing">Alias entfernen</string>
+    <string name="this_would_delete_your_auth_codes_stored_for_aliasing_you_can_request_for_another_code_at_anytime">Dadurch werden Ihre für Alias gespeicherten Authentifizierungscodes gelöscht. Sie können jederzeit einen anderen Code anfordern.</string>
+    <string name="logout">Abmelden</string>
+    <string name="logout_of_your_account_you_can_always_log_back_in_however_your_current_messages_would_be_deleted">Von Ihrem Konto abmelden. Sie können sich jederzeit wieder anmelden, aber Ihre aktuellen Nachrichten werden gelöscht.</string>
+    <string name="delete_">Löschen</string>
+    <string name="deleting_your_account_means_deleting_all_your_saved_accounts_online_you_can_always_recreate_your_account_once_needed">Das Löschen Ihres Kontos bedeutet, dass alle Ihre gespeicherten Konten online gelöscht werden. Sie können Ihr Konto bei Bedarf jederzeit wiederherstellen.</string>
+    <string name="accessibility">Barrierefreiheit</string>
+    <string name="language">Sprache</string>
+    <string name="messaging_">Messaging</string>
+    <string name="security_and_privacy">Sicherheit und Datenschutz</string>
+    <string name="security">Sicherheit</string>
+    <string name="enable_app_locks_and_pin_codes">App-Sperren und PIN-Codes aktivieren</string>
+    <string name="english">Englisch</string>
+    <string name="arabic">Arabisch</string>
+    <string name="french">Französisch</string>
+    <string name="farsi">Farsi</string>
+    <string name="spanish">Spanisch</string>
+    <string name="german">Deutsch</string>
+    <string name="swahili">Suaheli</string>
+    <string name="turkish">Türkisch</string>
+    <string name="welcome_to_relaysms_">Willkommen bei RelaySMS!</string>
+    <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">Verwenden Sie SMS, um Beiträge zu erstellen, E-Mails und Nachrichten ohne Internetverbindung zu senden</string>
+    <string name="learn_how_it_works_">Funktionsweise erfahren</string>
+    <string name="read_our_privacy_policy">Unsere Datenschutzrichtlinie lesen</string>
+    <string name="skip">Überspringen</string>
+    <string name="you_are_ready_to_begin_sending_messages_from_relaysms">Sie können jetzt mit dem Senden von Nachrichten von RelaySMS beginnen</string>
+    <string name="great">Großartig!</string>
+    <string name="relaysms_vaults_securely_stores_your_online_accounts_so_that_you_can_access_them_without_an_internet_connection">RelaySMS Vaults speichert Ihre Online-Konten sicher, sodass Sie ohne Internetverbindung darauf zugreifen können</string>
+    <string name="you_can_add_online_accounts_to_your_vault">Sie können Ihrem Vault Online-Konten hinzufügen</string>
+    <string name="ok">OK</string>
+    <string name="make_default">Als Standard festlegen</string>
+    <string name="edit">Bearbeiten</string>
+    <string name="delete">Löschen</string>
+    <string name="view_on_github">Auf GitHub anzeigen</string>
+    <string name="send_new_message">Neue Nachricht senden</string>
+    <string name="password">Passwort</string>
+    <string name="re_enter_password">Passwort erneut eingeben</string>
+    <string name="already_have_an_account">Habe bereits ein Konto</string>
+    <string name="create_account">Konto erstellen</string>
+    <string name="login">Anmelden</string>
+    <string name="forgot_password">Passwort vergessen</string>
+    <string name="submit">Absenden</string>
+    <string name="re_send_code">Code erneut senden</string>
+    <string name="revoke_platforms">Plattformen widerrufen</string>
+    <string name="from">Von</string>
+    <string name="always_add_the_dialing_code_if_absent_e_g_237">Wählen Sie immer die Vorwahl, wenn sie fehlt, z. B. +237</string>
+    <string name="cc">Cc</string>
+    <string name="bcc">Bcc</string>
+    <string name="paste_message">Nachricht einfügen</string>
+    <string name="error_decrypting_text">Fehler beim Entschlüsseln des Textes</string>
+    <string name="you_can_also_send_out_emails_without_an_account_or_vault">Sie können auch E-Mails ohne Konto oder Vault versenden</string>
+    <string name="this_will_create_a_default_email_your_phonenumber_relaysms_me_using_your_phone_number">Dies erstellt eine Standard-E-Mail (telefonnummer@relaysms.me) unter Verwendung Ihrer Telefonnummer.</string>
+    <string name="version">Version %1$s</string>
+    <string name="next">Weiter</string>
+    <string name="compose_new">Neu verfassen</string>
+    <string name="add_account_compose_new">Konto hinzufügen / Neu verfassen</string>
+    <string name="add_number">Nummer hinzufügen</string>
+    <string name="forgot_password_">Passwort vergessen?</string>
+    <string name="enter_your_phone_number_and_new_password_and_we_would_send_you_a_code_via_sms_to_reset_your_password">Geben Sie Ihre Telefonnummer und Ihr neues Passwort ein. Wir senden Ihnen dann einen Code per SMS, um Ihr Passwort zurückzusetzen.</string>
+    <string name="new_password">Neues Passwort</string>
+    <string name="reset_password">Passwort zurücksetzen</string>
+    <string name="passwords_do_not_match">Passwörter stimmen nicht überein</string>
+    <string name="discard">Verwerfen</string>
+    <string name="message_discarded">Nachricht verworfen!</string>
+    <string name="time_left_until_code_expires">Verbleibende Zeit bis zum Ablauf des Codes: %1$ds</string>
+    <string name="something_went_wrong">Etwas ist schiefgelaufen</string>
+    <string name="no_results_found">Keine Ergebnisse gefunden</string>
+    <string name="search_message">Nachricht suchen</string>
+    <string name="bug_report">Fehlerbericht</string>
+    <string name="relaysms_bug_report">RelaySMS - Fehlerbericht</string>
+
+</resources>

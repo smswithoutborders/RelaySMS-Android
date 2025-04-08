@@ -1,35 +1,31 @@
 package com.example.sw0b_001.Settings
 
+import com.example.sw0b_001.R
 import android.app.Activity
 import android.content.Intent
+import android.hardware.biometrics.BiometricManager
+import android.hardware.biometrics.BiometricManager.Authenticators.BIOMETRIC_STRONG
+import android.hardware.biometrics.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.biometric.BiometricManager
-import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
-import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import androidx.preference.Preference
 import androidx.preference.Preference.OnPreferenceChangeListener
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreferenceCompat
-import com.example.sw0b_001.HomepageActivity
-import com.example.sw0b_001.Modals.AvailablePlatformsModalFragment
-import com.example.sw0b_001.Modals.LogoutDeleteConfirmationModalFragment
-import com.example.sw0b_001.Models.Bridges
+import com.example.sw0b_001.MainActivity
 import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.Modules.Security
-import com.example.sw0b_001.OnboardingActivity
-import com.example.sw0b_001.R
 import com.example.sw0b_001.Security.LockScreenFragment
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import android.provider.Settings
 
 class SecurityPrivacyFragment : PreferenceFragmentCompat() {
 
@@ -37,38 +33,16 @@ class SecurityPrivacyFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.security_privacy_preferences, rootKey)
 
-        val revokeVaults = findPreference<Preference>("revoke")
-        revokeVaults?.setOnPreferenceClickListener {
-            showPlatformsModal(AvailablePlatformsModalFragment.Type.REVOKE)
-            true
-        }
-
         val lockScreenAlwaysOn = findPreference<SwitchPreferenceCompat>(lockScreenAlwaysOnSettingsKey)
         when(Security.isBiometricLockAvailable(requireContext())) {
             BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE,
             BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
                 lockScreenAlwaysOn?.isEnabled = false
                 lockScreenAlwaysOn?.summary =
-                        getString(R.string.settings_security_biometric_user_cannot_add_this_functionality_at_this_time)
+                    getString(R.string.settings_security_biometric_user_cannot_add_this_functionality_at_this_time)
             }
         }
         lockScreenAlwaysOn?.onPreferenceChangeListener = switchSecurityPreferences()
-
-        val clearBridges = findPreference<Preference>("clear_bridges")
-        clearBridges?.setOnPreferenceClickListener {
-            val onSuccessRunnable = Runnable {
-                Bridges.deleteAuthCode(requireContext())
-                returnToHomepage()
-            }
-
-            val fragmentTransaction = activity?.supportFragmentManager?.beginTransaction()
-            val loginModalFragment = LogoutDeleteConfirmationModalFragment(onSuccessRunnable)
-            fragmentTransaction?.add(loginModalFragment, "logout_delete_fragment")
-            fragmentTransaction?.show(loginModalFragment)
-            fragmentTransaction?.commit()
-
-            true
-        }
 
         val logout = findPreference<Preference>("logout")
         logout?.setOnPreferenceClickListener {
@@ -127,23 +101,19 @@ class SecurityPrivacyFragment : PreferenceFragmentCompat() {
             true
         }
 
-        if(!Bridges.canPublish(requireContext())) {
-            clearBridges?.isEnabled = false
-        }
-
         if(Vaults.fetchLongLivedToken(requireContext()).isBlank()) {
             logout?.isEnabled = false
             logout?.summary = getString(R.string
-                    .logout_you_have_no_accounts_logged_into_vaults_at_this_time)
+                .logout_you_have_no_accounts_logged_into_vaults_at_this_time)
 
             delete?.isEnabled = false
             delete?.summary = getString(R.string
-                    .security_settings_you_have_no_accounts_to_delete_in_vault_at_this_time)
+                .security_settings_you_have_no_accounts_to_delete_in_vault_at_this_time)
         }
     }
 
     private fun returnToStart() {
-        val intent = Intent(activity, OnboardingActivity::class.java)
+        val intent = Intent(activity, MainActivity::class.java)
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
                 Intent.FLAG_ACTIVITY_CLEAR_TASK or
                 Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -151,7 +121,7 @@ class SecurityPrivacyFragment : PreferenceFragmentCompat() {
     }
 
     private fun returnToHomepage() {
-        val intent = Intent(activity, HomepageActivity::class.java)
+        val intent = Intent(activity, MainActivity::class.java)
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
                 Intent.FLAG_ACTIVITY_CLEAR_TASK or
                 Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -166,7 +136,7 @@ class SecurityPrivacyFragment : PreferenceFragmentCompat() {
                         val enrollIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                             Intent(Settings.ACTION_BIOMETRIC_ENROLL).apply {
                                 putExtra(Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED,
-                                        BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
+                                    BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
                             }
                         } else {
                             Intent(Settings.ACTION_SECURITY_SETTINGS)
@@ -178,16 +148,16 @@ class SecurityPrivacyFragment : PreferenceFragmentCompat() {
             } else {
                 val fragmentTransaction = activity?.supportFragmentManager?.beginTransaction()
                 val lockScreenFragment = LockScreenFragment(
-                        successRunnable = {
-                            val sharedPreferences = PreferenceManager
-                                    .getDefaultSharedPreferences(requireContext())
-                            sharedPreferences.edit().putBoolean(lockScreenAlwaysOnSettingsKey, false)
-                                    .apply()
-                            findPreference<SwitchPreferenceCompat>("lock_screen_always_on")
-                                    ?.isChecked = false
-                        },
-                        failedRunnable = null,
-                        errorRunnable = null)
+                    successRunnable = {
+                        val sharedPreferences = PreferenceManager
+                            .getDefaultSharedPreferences(requireContext())
+                        sharedPreferences.edit().putBoolean(lockScreenAlwaysOnSettingsKey, false)
+                            .apply()
+                        findPreference<SwitchPreferenceCompat>("lock_screen_always_on")
+                            ?.isChecked = false
+                    },
+                    failedRunnable = null,
+                    errorRunnable = null)
                 fragmentTransaction?.add(lockScreenFragment, "lock_screen_frag_tag")
                 fragmentTransaction?.show(lockScreenFragment)
                 fragmentTransaction?.commitNow()
@@ -197,24 +167,16 @@ class SecurityPrivacyFragment : PreferenceFragmentCompat() {
     }
 
     private val registerActivityResult =
-            registerForActivityResult(
-                    ActivityResultContracts.StartActivityForResult()) {
-                if(it.resultCode == Activity.RESULT_OK) {
-                    findPreference<SwitchPreferenceCompat>("lock_screen_always_on")
-                            ?.isChecked = true
-                } else {
-                    Toast.makeText(requireContext(),
-                            getString(R.string.security_settings_failed_to_switch_security),
-                            Toast.LENGTH_SHORT)
-                            .show()
-                }
+        registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()) {
+            if(it.resultCode == Activity.RESULT_OK) {
+                findPreference<SwitchPreferenceCompat>("lock_screen_always_on")
+                    ?.isChecked = true
+            } else {
+                Toast.makeText(requireContext(),
+                    getString(R.string.security_settings_failed_to_switch_security),
+                    Toast.LENGTH_SHORT)
+                    .show()
             }
-
-    private fun showPlatformsModal(type: AvailablePlatformsModalFragment.Type) {
-        val fragmentTransaction = activity?.supportFragmentManager?.beginTransaction()
-        val platformsModalFragment = AvailablePlatformsModalFragment(type)
-        fragmentTransaction?.add(platformsModalFragment, "store_platforms_tag")
-        fragmentTransaction?.show(platformsModalFragment)
-        activity?.runOnUiThread { fragmentTransaction?.commit() }
-    }
+        }
 }

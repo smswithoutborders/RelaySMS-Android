@@ -1,22 +1,29 @@
 /// Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
     ext {
-//        kotlin_version = '1.8.20-RC'
-        kotlin_version = '1.9.23'
-        agp_version = '8.6.0'
+        kotlin_version = '2.0.0'
+        agp_version = '8.5.0'
+        agp_version1 = '8.8.0'
     }
     repositories {
         google()
         mavenCentral()
+        maven { url 'https://jitpack.io' }
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:$agp_version"
+        classpath "com.android.tools.build:gradle:$agp_version1"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "com.google.protobuf:protobuf-gradle-plugin:0.9.4"
+        classpath libs.protobuf.gradle.plugin
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
+}
+
+plugins {
+    // Existing plugins
+    alias(libs.plugins.compose.compiler) apply false
+    alias(libs.plugins.org.jetbrains.kotlin.android) apply false
 }
 
 allprojects {
@@ -26,7 +33,6 @@ allprojects {
         maven { url 'https://jitpack.io' }
     }
 }
-
 
 task clean(type: Delete) {
     delete rootProject.buildDir

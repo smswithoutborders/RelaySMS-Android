@@ -1,50 +1,9 @@
 <resources>
     <string name="app_name" translatable="false">RelaySMS</string>
 
-    <string name="email_compose_to">
-        To
-    </string>
-
-    <string name="email_compose_cc">
-        cc
-    </string>
-
-    <string name="email_compose_bcc">
-       bcc
-    </string>
-
-    <string name="email_compose_subject">
-       Subject
-    </string>
-
-    <string name="email_compose_body">Compose email</string>
-
-    <string name="selected_gateway_client_text">Selected Gateway Client</string>
-
     <!-- Homepage menu -->
-    <string name="homepage_recent">Recent"</string>
-
-    <string name="homepage_no_recent_messages">No Recent Messages</string>
-
-    <string name="message_compose_phonenumber">Contact\'s phone number</string>
-
-    <string name="message_compose_body">Message</string>
-
-    <string name="message_compose_empty_recipient">Recipient cannot be empty!</string>
-
-    <string name="message_compose_empty_body">Body should not be empty!</string>
-
-    <string name="homepage_read_our_privacy_policy">Read our privacy policy</string>
 
     <string name="settings_settings">Settings</string>
-
-    <string name="tweet_compose_tweet">Post</string>
-
-    <string name="tweet_compose_prompt">What\'s happening?</string>
-
-    <string name="main_navigation_settings">Settings</string>
-
-    <string name="message_compose_header">Message…</string>
 
     <!-- settings saved platforms -->
 
@@ -54,8 +13,6 @@
     <string name="settings_security_category">Security and Privacy</string>
     <string name="settings_security">Security</string>
     <string name="settings_security_category_summary">Enable app locks and pin codes</string>
-
-    <string name="settings_gateway_clients_text">Gateway Clients</string>
 
     <!-- settings security -->
     <string name="settings_lock_screen_preference_category">Phone Lockscreen options</string>
@@ -71,14 +28,16 @@
     <string name="settings_security_and_privacy_account_delete_summary">"Deleting your account means deleting all your saved accounts online. You can always recreate your account once needed.     "</string>
 
     <!-- settings language -->
-    <string name="language_choose_text">"Choose your preferred language     "</string>
     <string name="language_english">English</string>
     <string name="language_french">"French</string>
     <string name="language_farsi">Farsi</string>
     <string name="language_spanish">Spanish</string>
-    <string name="language_turkish" >
-        Turkish
-    </string>
+    <string name="language_turkish" >Turkish</string>
+    <string name="language_german" >German</string>
+    <string name="language_arabic" >Arabic</string>
+    <string name="language_swahili" >Swahili</string>
+
+
     <string name="language_english_value" translatable="false">
         en
     </string>
@@ -92,6 +51,15 @@
         es
     </string>
     <string name="language_turkish_value" translatable="false">
+        tr
+    </string>
+    <string name="language_german_value" translatable="false">
+        tr
+    </string>
+    <string name="language_arabic_value" translatable="false">
+        tr
+    </string>
+    <string name="language_swahili_value" translatable="false">
         tr
     </string>
 
@@ -110,94 +78,21 @@
 
     <!-- TODO: Remove or change this placeholder text -->
 
-    <string name="email_compose_title">Compose email</string>
     <string name="security_settings_failed_to_switch_security">Failed to switch security on…</string>
     <string name="settings_security_biometric_user_cannot_add_this_functionality_at_this_time">User cannot add this functionality at this time.</string>
-    <string name="gateway_client_add_label">Add</string>
-    <string name="gateway_client_refresh_label">Refresh</string>
     <string name="lock_screen_relay_sms_is_locked">RelaySMS App is locked</string>
     <string name="lock_screen_unlock_with_your_phone_s_locking_system">Unlock with your phone\'s locking system</string>
     <string name="gateway_client_add_custom_example_text">e.g +237123456789 or select contact</string>
     <string name="gateway_client_add_gateway_client_text">Add Gateway Client</string>
     <string name="otp_verification_code_template" translatable="false">Your SMSWithoutBorders-Auth verification code is: </string>
 
-    <string name="signup_phonenumber_empty_error">Please provide a phone number</string>
-    <string name="signup_please_provide_a_strong_password">Please provide a strong password</string>
-    <string name="signup_please_re_enter_your_password">Please re-enter your password</string>
-    <string name="signup_your_passwords_do_not_match">Your passwords do not match!</string>
-    <string name="owernship_otp_please_enter_a_valid_code">Please enter a valid code</string>
-    <string name="ownership_resend_code_by_sms">Time left until code sent via SMS expires: %1$d</string>
-    <string name="resend_code">Resend code</string>
-    <string name="sms_code_expired">The SMS code has expired. Please try again.</string>
-    <string name="copy_code_telegram">In case of Telegram, please enter the code without copying it from Telegram. Copying the code is a security risk and Telegram may take some actions to protect your account.</string>
-    <string name="login_password_empty_please_provide_a_password">Please provide a password</string>
-    <string name="onboarding_next">Next</string>
-    <string name="onboarding_finish">Finish</string>
-    <string name="onboarding_previous">Previous</string>
-    <string name="onboarding_let_s_get_you_started">Let\'s get you started</string>
-    <string name="onboarding_try_example">Try Example!</string>
-    <string name="onboarding_log_into_vault">Login</string>
-    <string name="login_password">Password</string>
     <string name="logout_you_have_no_accounts_logged_into_vaults_at_this_time">You have no accounts logged into Vaults at this time</string>
-    <string name="login_telephone_number_hint">Telephone number</string>
-    <string name="signup_i_have_read_the_privacy_policy_start">I have read the </string>
-    <string name="signup_i_have_read_the_privacy_policy_end">Privacy policy</string>
-    <string name="signup_you_have_to_read_the_privacy_policy_to_proceed">You have to read the privacy policy to proceed!</string>
-    <string name="platforms_these_are_platforms_stored_in_your_vault_and_can_be_used_when_you_are_offline">These are platforms stored in your Vault and can be used when you are offline.</string>
-    <string name="platforms_saved_platforms">Saved Platforms</string>
-    <string name="platforms_unsaved_platforms">Add Platforms to use offline</string>
-    <string name="platform_your_vault_is_empty">Your Vault is empty</string>
-    <string name="settings_privacy_vault_preference">Vault</string>
-    <string name="settings_privacy_preferences_choose_which_platforms_you_want_to_remove_from_the_vault">Choose which platforms you want to remove from the Vault</string>
-    <string name="login_login">Login</string>
-    <string name="store_select_platforms_you_will_like_to_utilize_without_an_internet_connection_this_would_still_require_you_to_have_sms_messages_activated">Select platforms you will like to utilize without an internet connection. This would still require you to have SMS messages activated</string>
-    <string name="platforms_no_platform_to_store">No platform to store</string>
-    <string name="homepage_save_platforms">Save platforms</string>
     <string name="security_settings_you_have_no_accounts_to_delete_in_vault_at_this_time">You have no accounts to delete in Vault at this time</string>
     <string name="helper_yesterday">yesterday</string>
-    <string name="text_compose_you_need_some_content_for_posting">You need some content for posting</string>
 
 
-    <string name="smswithoutborders_official_privacy_policy">https://smswithoutborders.com/privacy-policy</string>
     <string name="smswithoutboarders_official_gateway_client_seeding_url" translatable="false">https://smswithoutborders.com:15000/v3/clients</string>
-    <string name="log_into_your_vault_account_or_create_one_if_you_do_not_have_yet">Log into your Vault account or create one if you do not have yet</string>
-    <string name="login_signup_create_new">Create new</string>
-    <string name="compose_edit">Edit</string>
-    <string name="compose_delete">Delete</string>
-    <string name="welcome_back_nsign_in_to_continue_with_existing_account">Welcome back Sign in to continue with existing account</string>
-    <string name="forgot_password">Forgot password?</string>
-    <string name="create_new_vault_account">Create account</string>
-    <string name="signup">Signup</string>
-    <string name="if_you_do_not_have_an_account_nplease_create_one_to_save_your_platforms">If you do not have an account Please create one to save your platforms</string>
-    <string name="already_have_an_account">Already have an account? Log in</string>
-    <string name="already_got_sms_code">Already got SMS code</string>
-    <string name="forgot_password_recovery">Forgot password?</string>
-    <string name="if_you_forgot_your_password_nenter_your_phone_number_and_new_passwords">If you forgot your password Enter your phone number and new passwords</string>
     <string name="recovery_continue">Continue</string>
-    <string name="re_enter_new_password">Re-enter new password</string>
-    <string name="new_password">New password</string>
-    <string name="telephone_number">Telephone number</string>
-    <string name="welcome_to_relaysms">Welcome to RelaySMS</string>
-    <string name="use_sms_to_make_a_post_send_emails_and_messages_nwith_no_internet_connection">Use SMS to make a post, send emails and messages with no internet connection</string>
-    <string name="get_started">Get started!</string>
-    <string name="relaysms_vaults_keep_secure_access_to_your_online_accounts_while_you_are_offline">RelaySMS Vaults keep secure access to your online accounts while you are offline</string>
-    <string name="introducing_vaults">Introducing Vaults</string>
-    <string name="create_account">Create Account</string>
-    <string name="login">Login</string>
-    <string name="add_accounts_you_vault">Add platforms to your Vault</string>
-    <string name="let_s_get_you_started">Let\'s get you started</string>
-    <string name="save_accounts_to_vault">Save Accounts to Vault</string>
-    <string name="you_can_add_accounts_to_vault_this_accounts_are_accessible_to_you_when_you_are_offline">You can add accounts to Vault. This accounts are accessible to you when you are offline</string>
-    <string name="the_vault_supports_storing_for_multiple_online_platforms_click_save_accounts_to_vault_to_see_the_list">The Vault supports storing for multiple online platforms. Click Save accounts to Vault to see the list</string>
-    <string name="messages_are_shared_with_your_default_sms_messaging_app_which_you_use_to_send_out_sms_messages_from_your_device">Messages are shared with your default SMS messaging app which you use to send out SMS messages from your device</string>
-    <string name="learn_how_it_works">Learn how it works</string>
-    <string name="send_your_first_messages">Send your first messages</string>
-    <string name="create_a_new_relaysms_vault_account_or_signup_to_your_existing">Create a new RelaySMS Vault account or signup to your existing.</string>
-    <string name="messages_are_encrypted_meaning_the_messages_will_be_scrambled_don_t_worry_that_s_intended">Messages are encrypted meaning the messages will be scrambled - don\'t worry that\'s intended</string>
-    <string name="you_can_add_platforms_from_the_homepage_once_you_are_logged_in">You can add platforms from the homepage once you are logged in</string>
-    <string name="you_are_ready_to_begin_sending_messages_from_you_added_platforms">You are ready to begin sending messages from you added platforms.</string>
-    <string name="you_are_ready">You are ready!</string>
-    <string name="come_back_anytime">Come back anytime</string>
 
     <string name="vault_grpc_url" translatable="false">vault.smswithoutborders.com</string>
     <string name="vault_grpc_port" translatable="false">443</string>
@@ -206,86 +101,178 @@
     <string name="publisher_grpc_port" translatable="false">443</string>
 
     <string name="publisher_get_platforms_url" translatable="false">https://raw.githubusercontent.com/smswithoutborders/SMSWithoutBorders-Publisher/master/resources/platforms.json</string>
-    <string name="skip_all">skip all</string>
-    <string name="create_new_account_or_log_into_existing_one_to_begin_sending_messages_from_stored_online_platforms">Create new account or log into existing one to begin sending messages from stored online platforms</string>
-    <string name="no_vault_account">No Vault account</string>
-    <string name="recents">Recents</string>
-    <string name="gateway_clients">Gateway Clients</string>
-    <string name="unknown_service_type">Unknown service type</string>
     <string name="cancel">Cancel</string>
-    <string name="select_an_account_to_send_a_message">Select an account to send a message</string>
     <string name="click_continue_to_confirm_this_action_do_not_worry_this_has_no_dangerous_effects">Click continue to confirm this action. Do not worry, this has no dangerous effects.</string>
-    <string name="re_enter_password">Re-enter Password</string>
-    <string name="password">Password</string>
-    <string name="submit">Submit</string>
-    <string name="enter_verification_code">Enter verification code</string>
-    <string name="enter_the_verification_code_we_sent_you">Enter the verification code we sent you</string>
-    <string name="from">From</string>
-    <string name="send_new_message">Send new message</string>
-    <string name="unknown_platform_protocol">Unknown platform protocol</string>
-    <string name="always_add_the_dialing_code_if_absent_e_g_237">Always add the dialing code if absent. e.g +237</string>
-    <string name="please_verify_the_phone_number_is_valid">Please verify the phone number is valid.</string>
-    <string name="don_t_have_an_account_create_account">Don\'t have an account? Create account</string>
-    <string name="main_navigation_about">About</string>
-    <string name="about_slogan">Connecting the world, one SMS at a time.</string>
-    <string name="about_app_text">RelaySMS is an open-source initiative focused on enabling communication through SMS without relying on internet connectivity. We believe in a connected world, and we\'re making it happen one SMS at a time. RelaySMS remains free and open source.</string>
-    <string name="about_app_tutorial">App Tutorial</string>
-    <string name="about_app_github_text">Support us by starring our GitHub repository and sharing it with your friends!</string>
-    <string name="view_on_github"><![CDATA[View on GitHub >>>]]></string>
-    <string name="about_follow_us_text">Follow us</string>
-    <string name="relay_sms_website" translatable="false">https://relay.smswithoutborders.com/</string>
-    <string name="relay_sms_contact_email" translatable="false">developers@smswithoutborders.com</string>
     <string name="messaging">Messaging</string>
     <string name="you_have_a_device_id_for_the_device_you_log_into_it_is_used_to_identify_you_on_the_vault_you_can_switch_to_phone_number_to_reduce_size_of_sms_message">You have a Device ID for the device you log into. It is used to identify you on the Vault. You can switch to phone number to reduce size of SMS message.</string>
-    <string name="revoke_platforms">Revoke Platforms</string>
     <string name="validate_with_phone_number">Validate with phone number</string>
-    <string name="the_code_can_be_automatically_detected_in_some_cases">The code can be automatically detected in some cases</string>
-    <string name="delete_gateway_client_title">Delete Gateway Client</string>
-    <string name="delete_gateway_client_message">Are you sure you want to delete this gateway client?</string>
-    <string name="cannot_delete_selected_title">Cannot Delete Selected Gateway Client</string>
-    <string name="cannot_delete_selected_message">Please switch to another gateway client before deleting this one.</string>
-    <string name="delete">Delete</string>
-    <string name="ok">Request authentication</string>
-    <string name="edit">Edit</string>
-    <string name="make_default">Make Default</string>
-    <string name="gateway_client_options">Gateway Client Options</string>
-    <string name="select_account_to_revoke_access">Select account to revoke access</string>
-    <string name="two_fa_password_hint_text">Enter your two-factor authentication password</string>
-    <string name="error_title">Error</string>
-    <string name="incorrect_password_message">Incorrect password. Please try again.</string>
-    <string name="ok_button_text">OK</string>
-    <string name="telegram_auth_error">Error occurred during Telegram authentication.</string>
-    <string name="two_factor_auth_enabled">Two factor authentication is enabled. Input your password.</string>
-    <string name="telegram_two_factor_auth_enabled">You enabled two-factor authentication in your Telegram account. Input your password.</string>
-    <string name="bridges">Bridges</string>
-    <string name="welcome_to_bridges">Welcome to Bridges</string>
-    <string name="authenticate_with_bridges">Authenticate with Bridges</string>
-    <string name="submit_code">Submit Code</string>
-    <string name="code_expires_in_2hrs">The code expires in 2hrs</string>
-    <string name="input_sms_code">Input SMS code</string>
-    <string name="send_now">Send now</string>
-    <string name="send_now_info">Send only the authentication code via SMS</string>
-    <string name="compose_and_send">Compose and send</string>
-    <string name="compose_and_send_info">Compose your first message alongside sending your auth code to save SMS cost</string>
-    <string name="bridges_submit_code_info">Once you send an authentication request via SMS, you will receive a message containing the code. Copy the entire SMS without adding or removing anything from it and paste it here.</string>
-    <string name="already_got_the_code_verify_now">Already got the code? Verify now.</string>
-    <string name="bridges_auth_info">An alias uses your phone number to communicate on your behalf. An example alias would be 12345@relaysms.me.</string>
     <string name="enter_phone_number_with_country_code">Enter phone number with country code</string>
-    <string name="continue_without_an_account">Continue without an internet connection</string>
-    <string name="send_an_authentication_request_and_paste_the_sms_message_sent_back_to_begin_communicating_with_your_alias">Send an authentication request and paste the SMS message sent back to begin communicating with your Alias</string>
-    <string name="authenticate_your_alias">Alias authentication</string>
-    <string name="the_code_would_be_automatically_detected_sometimes_n_nin_case_it_is_not_automatically_received_please_copy_the_entire_sms_message_and_paste_in_the_box_below">The code would be automatically detected sometimes.\n\nIn case it is not automatically received, please copy the entire SMS message and paste in the box below</string>
-    <string name="paste_entire_sms_message_in_here">Paste Entire SMS message in here...</string>
-    <string name="authenticate_code">Verify and save code</string>
-    <string name="the_code_would_be_attached_to_the_first_message_you_send_from_the_app">The code would be attached to the first message you send from the app</string>
-    <string name="please_set_a_default_gateway_client">Please set a default Gateway Client</string>
-    <string name="send_message_without_an_account">Send message without an account</string>
-    <string name="alias_authentication_request">Alias Authentication Request</string>
-    <string name="publishing_with_aliases">Publishing with Aliases</string>
-    <string name="only_emailing_is_supported_with_aliasing_at_this_time">Only emailing is supported with Aliasing at this time</string>
-    <string name="compose_new_message">Compose new message</string>
-    <string name="aliases_configured_successfully">Aliases configured successfully!</string>
-    <string name="default_relaysms_twilio" translatable="false">+15024439537</string>
-    <string name="default_relaysms_twilio_2" translatable="false">SWOB ONLINE</string>
+    <string name="about">About</string>
+    <string name="recents_text">Recents</string>
+    <string name="get_started_text">Get started</string>
+    <string name="platforms">Platforms</string>
+    <string name="inbox">Inbox</string>
+    <string name="countries">Countries</string>
+    <string name="settings">Settings</string>
+    <string name="permission_denied">Permission Denied!</string>
+    <string name="add_gateway_client">Add Gateway Client</string>
+    <string name="edit_gateway_client">Edit Gateway Client</string>
+    <string name="e_g_237123456_or_select_contact">e.g +237123456 or select contact</string>
+    <string name="alias_optional">Alias (optional)</string>
+    <string name="name_to_help_remember_the_gateway_client">Name to help remember the Gateway Client</string>
+    <string name="saving">Saving…</string>
+    <string name="save">Save</string>
+    <string name="error_saving_gateway_client">Error saving gateway client</string>
+    <string name="click_continue_to_confirm_this_action_do_not_worry_it_has_no_dangerous_effects">Click continue to confirm this action. Do not worry, it has no dangerous effects.</string>
+    <string name="continue_text">Continue</string>
+    <string name="country_options">Country Options</string>
+    <string name="revoking_account_for">Revoking account for %1$s</string>
+    <string name="adding_account_for">Adding account for %1$s</string>
+    <string name="send_message">Send Message</string>
+    <string name="add_account">Add Account</string>
+    <string name="remove_accounts">Remove Accounts</string>
+    <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported">Adding emails to your RelaySMS account enables you use them to send emails using SMS messaging.\n\nGmail are currently supported.</string>
+    <string name="adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported">Adding numbers to your RelaySMS account enables you use them to send messages using SMS messaging.\n\nTelegram messaging is currently supported.</string>
+    <string name="adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported">Adding accounts to your RelaySMS account enables you use them to make post using SMS messaging.\n\nPosting is currently supported.</string>
+    <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias">Your RelaySMS account is an alias of your phone number with the domain @relaysms.me.\n\nYou can receive replies by SMS whenever a message is sent to your alias.</string>
+    <string name="continue_to_send_an_email_from_your_saved_email_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">Continue to send an email from your saved email account. You can choose a message forwarding country from the \'Countries\' tab below.\n\nContinue to send message</string>
+    <string name="continue_to_send_messages_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">Continue to send messages from your saved messaging account. You can choose a message forwarding country from the \'Countries\' tab below.\n\nContinue to send message</string>
+    <string name="continue_to_make_posts_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">Continue to make posts from your saved messaging account. You can choose a message forwarding country from the \'Countries\' tab below.\n\nContinue to send message</string>
+    <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">Your RelaySMS account is an alias of your phone number with the domain @relaysms.me.\n\nYou can receive replies by SMS whenever a message is sent to your alias.\nYou can choose a message forwarding country from the \'Countries\' tab below.\n\nContinue to send message</string>
+    <string name="select_an_account">Select an account</string>
+    <string name="please_enter_your_telegram_code_without_copying_it_from_the_message_copying_might_get_flagged_and_telegram_might_block_your_account">Please enter your Telegram code without copying it from the message - copying might get flagged and Telegram might block your account.</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="code">Code</string>
+    <string name="hide_password">Hide password</string>
+    <string name="show_password">Show password</string>
+    <string name="no_account_selected">No account selected</string>
+    <string name="compose_email">Compose Email</string>
+    <string name="to">To</string>
+    <string name="subject">Subject</string>
+    <string name="new_message">New Message</string>
+    <string name="sender">Sender</string>
+    <string name="recipient_number">Recipient Number</string>
+    <string name="message">Message</string>
+    <string name="new_post">New Post</string>
+    <string name="what_s_happening">What\'s happening?</string>
+    <string name="connecting_the_world_one_sms_at_a_time">Connecting the world, one SMS at a time</string>
+    <string name="relaysms_is_an_open_source_initiative_focused_on_enabling_communication_through_sms_without_relying_on_internet_connectivity_we_believe_in_a_connected_world_and_we_re_making_it_happen_one_sms_at_a_time_relaysms_remains_free_and_open_source">RelaySMS is an open-source initiative focused on enabling communication through SMS without relying on internet connectivity. We believe in a connected world, and we\'re making it happen one SMS at a time. RelaySMS remains free and open source.</string>
+    <string name="app_tutorial">App Tutorial</string>
+    <string name="support_us_by_starring_our_github_repository_and_sharing_it_with_your_friends">Support us by starring our GitHub repository and sharing it with your friends!</string>
+    <string name="available_platforms">Available platforms</string>
+    <string name="use_your_relaysms_account">Use your RelaySMS account</string>
+    <string name="use_your_online_accounts">Use your online accounts</string>
+    <string name="navigate_back_to_home_screen">Navigate back to home screen</string>
+    <string name="create_relaysms_account">Create RelaySMS Account</string>
+    <string name="create_your_account_and">"Create your account and "</string>
+    <string name="save_platforms">save platforms</string>
+    <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline">" for RelaySMS to send messages to Gmail, X, and Telegram on your behalf when offline"</string>
+    <string name="i_have_read_the">"I have read the  "</string>
+    <string name="privacy_policy">privacy policy</string>
+    <string name="log_in">Log in</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="selected_gateway_client">Selected Gateway Client</string>
+    <string name="no_gateway_client_selected">No Gateway Client Selected</string>
+    <string name="available_countries">Available Countries</string>
+    <string name="gateway_clients_refreshed_successfully">Gateway clients refreshed successfully!</string>
+    <string name="no_messages_in_inbox">No messages in inbox</string>
+    <string name="paste_new_incoming_message">Paste new incoming message</string>
+    <string name="log_into_relaysms">Log Into RelaySMS</string>
+    <string name="log_into_your_account_and">"Log into your account and "</string>
+    <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline_">" for RelaySMS to send messages to Gmail, X, and Telegram on your behalf when offline"</string>
+    <string name="already_got_code">Already got code</string>
+    <string name="do_not_have_an_account">"Do not have an account?  "</string>
+    <string name="get_started_with">Get started with</string>
+    <string name="compose_message">Compose Message</string>
+    <string name="use_your_phone_number_to_send_an_email_with_the_alias">"Use your phone number to send an email with the alias: "</string>
+    <string name="login_with_internet">Login with Internet</string>
+    <string name="these_features_requires_you_to_have_an_internet_connection">These features requires you to have an internet connection</string>
+    <string name="input_your_code">Input Your Code</string>
+    <string name="please_enter_the_6_digit_code_we_sent_to_you_via_sms">Please enter the 6-digit code we sent to you via SMS</string>
+    <string name="the_code_would_automatically_be_detected_in_some_cases">The code would automatically be detected in some cases</string>
+    <string name="paste_encrypted_text_into_this_box">Paste encrypted text into this box…</string>
+    <string name="this_is_an_example_of_an_encrypted_message_that_you_would_paste_here">This is an example of an encrypted message that you would paste here…</string>
+    <string name="relaysms_reply_please_paste_this_entire_message_in_your_relaysms_app">RelaySMS Reply Please paste this entire message in your RelaySMS app</string>
+    <string name="click_to_paste">Click to paste</string>
+    <string name="decrypt_message">Decrypt message</string>
+    <string name="send_your_first_message">Send your first message…</string>
+    <string name="save_platforms_">Save platforms</string>
+    <string name="phone_lockscreen_options">Phone Lockscreen options</string>
+    <string name="enable_lockscreen">Enable lockscreen</string>
+    <string name="require_lockscreen_pin_fingerprint_when_starting_the_app">Require lockscreen pin/fingerprint when starting the app</string>
+    <string name="vault">Vault</string>
+    <string name="choose_which_platforms_you_want_to_remove_from_the_vault">Choose which platforms you want to remove from the vault</string>
+    <string name="account">Account</string>
+    <string name="clear_aliasing">Clear aliasing</string>
+    <string name="this_would_delete_your_auth_codes_stored_for_aliasing_you_can_request_for_another_code_at_anytime">This would delete your auth codes stored for aliasing. You can request for another code at anytime.</string>
+    <string name="logout">Logout</string>
+    <string name="logout_of_your_account_you_can_always_log_back_in_however_your_current_messages_would_be_deleted">Logout of your account. You can always log back in, however your current messages would be deleted.</string>
+    <string name="delete_">Delete</string>
+    <string name="deleting_your_account_means_deleting_all_your_saved_accounts_online_you_can_always_recreate_your_account_once_needed">Deleting your account means deleting all your saved accounts online. You can always recreate your account once needed.</string>
+    <string name="accessibility">Accessibility</string>
+    <string name="language">Language</string>
+    <string name="messaging_">Messaging</string>
+    <string name="security_and_privacy">Security and Privacy</string>
+    <string name="security">Security</string>
+    <string name="enable_app_locks_and_pin_codes">Enable app locks and pin codes</string>
+    <string name="english">English</string>
+    <string name="arabic">Arabic</string>
+    <string name="french">French</string>
+    <string name="farsi">Farsi</string>
+    <string name="spanish">Spanish</string>
+    <string name="german">German</string>
+    <string name="swahili">Swahili</string>
+    <string name="turkish">Turkish</string>
+    <string name="welcome_to_relaysms_">Welcome to RelaySMS!</string>
+    <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">Use SMS to make a post, send emails and messages with no internet connection</string>
+    <string name="learn_how_it_works_">Learn how it works</string>
+    <string name="read_our_privacy_policy">Read our privacy policy</string>
+    <string name="skip">Skip</string>
+    <string name="you_are_ready_to_begin_sending_messages_from_relaysms">You are ready to begin sending messages from RelaySMS</string>
+    <string name="great">Great!</string>
+    <string name="relaysms_vaults_securely_stores_your_online_accounts_so_that_you_can_access_them_without_an_internet_connection">RelaySMS Vaults securely stores your online accounts, so that you can access them without an internet connection</string>
+    <string name="you_can_add_online_accounts_to_your_vault">You can add online accounts to your vault</string>
+    <string name="ok">OK</string>
+    <string name="make_default">Make default</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="view_on_github">View on GitHub</string>
+    <string name="send_new_message">Send new message</string>
+    <string name="password">Password</string>
+    <string name="re_enter_password">Re-enter password</string>
+    <string name="already_have_an_account">Already have an account</string>
+    <string name="create_account">Create account</string>
+    <string name="login">Login</string>
+    <string name="forgot_password">Forgot password</string>
+    <string name="submit">Submit</string>
+    <string name="re_send_code">Re-send code</string>
+    <string name="revoke_platforms">Revoke platforms</string>
+    <string name="from">From</string>
+    <string name="always_add_the_dialing_code_if_absent_e_g_237">always add the dialing code if absent, e.g +237</string>
+    <string name="cc">Cc</string>
+    <string name="bcc">Bcc</string>
+    <string name="paste_message">Paste message</string>
+    <string name="error_decrypting_text">Error decrypting text</string>
+    <string name="you_can_also_send_out_emails_without_an_account_or_vault">You can also send out emails without an account or Vault</string>
+    <string name="this_will_create_a_default_email_your_phonenumber_relaysms_me_using_your_phone_number">This will create a default email (your_phonenumber@relaysms.me) using your phone number.</string>
+    <string name="next">Next</string>
+    <string name="https_smswithoutborders_com_privacy_policy" translatable="false">https://smswithoutborders.com/privacy-policy</string>
+    <string name="version">Version %1$s</string>
+    <string name="compose_new">Compose new</string>
+    <string name="add_account_compose_new">Add account / Compose new</string>
+    <string name="add_number">Add Number</string>
+    <string name="forgot_password_">Forgot Password?</string>
+    <string name="enter_your_phone_number_and_new_password_and_we_would_send_you_a_code_via_sms_to_reset_your_password">Enter your phone number and new password and we would send you a code via SMS to reset your password.</string>
+    <string name="new_password">New Password</string>
+    <string name="reset_password">Reset Password</string>
+    <string name="passwords_do_not_match">Passwords do not match</string>
+    <string name="discard">Discard</string>
+    <string name="message_discarded">Message discarded!</string>
+    <string name="time_left_until_code_expires">Time left until code expires: %1$ds</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="no_results_found">No results found</string>
+    <string name="search_message">Search message</string>
+    <string name="bug_report">Bug Report</string>
+    <string name="relaysms_bug_report">RelaySMS - Bug Report</string>
 
 </resources>

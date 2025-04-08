@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <queries>
         <intent>
@@ -29,25 +30,9 @@
         android:usesCleartextTraffic="false"
         android:versionCode="48"
         android:versionName="2.5.8"
+        android:enableOnBackInvokedCallback="true"
         tools:replace="android:label">
 
-        <activity
-            android:name=".Bridges.BridgesSubmitCodeActivity"
-            android:exported="false"
-            android:parentActivityName=".HomepageActivity" />
-
-        <activity
-            android:name=".MessageViewActivity"
-            android:exported="false"
-            android:parentActivityName=".HomepageActivity" />
-        <activity
-            android:name=".EmailViewActivity"
-            android:exported="false"
-            android:parentActivityName=".HomepageActivity" />
-        <activity
-            android:name=".TextViewActivity"
-            android:exported="false"
-            android:parentActivityName=".HomepageActivity" />
         <activity
             android:name=".Security.LockScreenActivity"
             android:exported="true">
@@ -57,28 +42,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
-            android:name=".AboutActivity"
-            android:exported="false"
-            android:parentActivityName=".HomepageActivity" />
+            android:name=".MainActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:launchMode="singleInstance"
+            android:exported="true" />
+
         <activity
             android:name=".SettingsActivity"
-            android:exported="true"
-            android:parentActivityName=".HomepageActivity" />
-        <activity
-            android:name=".OTPVerificationActivity"
             android:exported="false" />
-        <activity
-            android:name=".OnboardingActivity"
-            android:exported="false">
-
-            <!-- <intent-filter> -->
-            <!-- <action android:name="android.intent.action.MAIN" /> -->
-
-
-            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
-            <!-- </intent-filter> -->
-        </activity>
 
         <service
             android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
@@ -89,19 +62,6 @@
                 android:value="true" />
         </service>
 
-        <activity
-            android:name=".HomepageActivity"
-            android:exported="false"
-            android:launchMode="singleTask" />
-        <activity
-            android:name=".Homepage.GatewayClientListingFragment"
-            android:exported="false"
-            android:parentActivityName=".SettingsActivity" />
-        <activity
-            android:name=".Modals.PlatformComposers.MessageComposeModalFragment"
-            android:exported="false"
-            android:label="@string/message_compose_header"
-            android:parentActivityName=".HomepageActivity" />
         <activity
             android:name=".OauthRedirectActivity"
             android:exported="true"

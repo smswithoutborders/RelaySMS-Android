@@ -1,13 +1,15 @@
 package com.example.sw0b_001.Security
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.preference.PreferenceManager
-import com.example.sw0b_001.OnboardingActivity
+import com.example.sw0b_001.MainActivity
 import com.example.sw0b_001.R
 
 class LockScreenActivity : AppCompatActivity() {
@@ -33,10 +35,14 @@ class LockScreenActivity : AppCompatActivity() {
     }
 
     private fun boot() {
-        val intent = Intent(this, OnboardingActivity::class.java).apply {
+//        val intent = Intent(this, OnboardingActivity::class.java).apply {
+//            setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//        }
+        val intent = Intent(this, MainActivity::class.java).apply {
             setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         startActivity(intent)
+        overridePendingTransition(0, 0)
         finish()
     }
 }
