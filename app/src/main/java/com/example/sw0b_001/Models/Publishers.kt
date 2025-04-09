@@ -72,7 +72,8 @@ class Publishers(val context: Context) {
                                    platform: String,
                                    code: String,
                                    codeVerifier: String,
-                                   supportsUrlScheme: Boolean):
+                                   supportsUrlScheme: Boolean,
+                                   storeOnDevice: Boolean = false):
             PublisherOuterClass.ExchangeOAuth2CodeAndStoreResponse {
         val request = PublisherOuterClass.ExchangeOAuth2CodeAndStoreRequest.newBuilder().apply {
             setLongLivedToken(llt)
@@ -80,6 +81,7 @@ class Publishers(val context: Context) {
             setAuthorizationCode(code)
             setCodeVerifier(codeVerifier)
             setRedirectUrl(if (supportsUrlScheme) REDIRECT_URL_SCHEME else oAuthRedirectUrl)
+            setStoreOnDevice(storeOnDevice)
         }.build()
 
         return publisherStub.exchangeOAuth2CodeAndStore(request)
