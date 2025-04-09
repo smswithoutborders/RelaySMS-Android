@@ -62,6 +62,8 @@ message AuthenticateEntityResponse {
     string message = 5;
     // The next available time to request another proof of ownership.
     int32 next_attempt_timestamp = 6;
+    // indicates if user must reset their password
+    bool requires_password_reset = 7;
 }
 
 // Request message for listing entity's stored tokens.
@@ -147,6 +149,8 @@ message DecryptPayloadResponse {
     string message = 2;
     // Indicates whether the operation was successful.
     bool success = 3;
+    // The ISO 3166-1 alpha-2 country code of the entity.
+    string country_code = 4;
 }
 
 // Request message for encrypting payload.
@@ -155,6 +159,8 @@ message EncryptPayloadRequest {
     string device_id = 1;
     // Plaintext payload to be encrypted.
     string payload_plaintext = 2;
+    // The phone number of the entity.
+    string phone_number = 3;
 }
 
 // Response message for encrypting payload.
@@ -269,6 +275,49 @@ message UpdateEntityPasswordResponse {
     bool success = 2;
 }
 
+// Request message for creating a bridge entity.
+message CreateBridgeEntityRequest {
+    // The ISO 3166-1 alpha-2 country code of the entity.
+    string country_code = 1;
+    // The phone number of the entity.
+    string phone_number = 2;
+    // The client's public key for publishing.
+    string client_publish_pub_key = 3;
+    // The ownership proof response from the client.
+    string ownership_proof_response = 4;
+    // The server's public key identifier.
+    string server_pub_key_identifier = 5;
+    // The server's public key version.
+    string server_pub_key_version = 6;
+    // The preferred language of the entity in ISO 639-1 format.
+    string language = 7;
+}
+
+// Response message for creating a bridge entity.
+message CreateBridgeEntityResponse {
+    // A response message.
+    string message = 1;
+    // Indicates whether the operation was successful.
+    bool success = 2;
+}
+
+// Response message for authenticating a bridge entity,
+message AuthenticateBridgeEntityRequest {
+    // The phone number of the entity.
+    string phone_number = 1;
+    // The preferred language of the entity in ISO 639-1 format.
+    string language = 2;
+}
+
+message AuthenticateBridgeEntityResponse {
+    // A response message.
+    string message = 1;
+    // Indicates whether the operation was successful.
+    bool success = 2;
+    // The preferred language of the entity in ISO 639-1 format.
+    string language = 3;
+}
+
 // Service for managing entities.
 service Entity {
     // Creates an entity.
@@ -299,4 +348,8 @@ service EntityInternal {
     rpc UpdateEntityToken(UpdateEntityTokenRequest) returns (UpdateEntityTokenResponse);
     // Deletes an entity's access token.
     rpc DeleteEntityToken(DeleteEntityTokenRequest) returns (DeleteEntityTokenResponse);
+    // Creates a bridge entity.
+    rpc CreateBridgeEntity(CreateBridgeEntityRequest) returns (CreateBridgeEntityResponse);
+    // Authenticates a bridge entity.
+    rpc AuthenticateBridgeEntity(AuthenticateBridgeEntityRequest) returns (AuthenticateBridgeEntityResponse);
 }
