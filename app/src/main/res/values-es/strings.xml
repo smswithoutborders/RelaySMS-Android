@@ -253,5 +253,7 @@
     <string name="search_message">Buscar mensaje</string>
     <string name="bug_report">Reporte de error</string>
     <string name="relaysms_bug_report">RelaySMS - Reporte de error</string>
+    <string name="request_new_code_in">Solicitar nuevo código en:</string>
+    <string name="request_new_code">¡Solicita nuevo código!</string>
 
 </resources>
