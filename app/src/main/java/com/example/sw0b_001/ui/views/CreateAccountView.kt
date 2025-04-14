@@ -375,7 +375,9 @@ fun CreateAccountView(
                         OTPCodeVerificationType.AUTHENTICATE
                     navController.navigate(OTPCodeScreen)
                 },
-                enabled = (phoneNumber.isNotEmpty() && password.isNotEmpty()) && !isLoading,
+                enabled = (phoneNumber.isNotEmpty()
+                        && password.isNotEmpty()
+                        && reenterPassword.isNotEmpty()) && !isLoading,
                 modifier = Modifier.padding(bottom=16.dp)) {
                 Text(stringResource(R.string.already_got_code))
             }
