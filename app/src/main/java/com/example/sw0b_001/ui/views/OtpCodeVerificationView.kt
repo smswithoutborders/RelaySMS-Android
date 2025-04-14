@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.CountDownTimer
+import android.text.format.DateUtils
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
@@ -36,6 +37,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -51,6 +53,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -75,6 +78,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 enum class OTPCodeVerificationType {
     CREATE,
@@ -155,7 +159,6 @@ fun SmsRetrieverHandler(onSmsRetrieved: (String) -> Unit) {
 fun OtpCodeVerificationView(
     navController: NavController = rememberNavController(),
     navigationFlowHandler: NavigationFlowHandler = NavigationFlowHandler(),
-    onResendClicked: () -> Unit = {},
 ) {
     val context = LocalContext.current
     var otpCode by remember { mutableStateOf("") }
@@ -164,12 +167,12 @@ fun OtpCodeVerificationView(
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-    val initialTimeLeft = if (nextAttemptTimestamp == 0L) {
-        60L
+    val initialTimeLeft = if (nextAttemptTimestamp == 0) {
+        60
     } else {
         val currentTime = System.currentTimeMillis() / 1000
-        val diff = nextAttemptTimestamp?.minus(currentTime)
-        if (diff!! > 0) diff else 0L
+        val diff = nextAttemptTimestamp?.minus(currentTime) ?: 0
+        if (diff > 0) diff else 0
     }
     var timeLeft by remember { mutableLongStateOf(initialTimeLeft) }
     var isTimerRunning by remember { mutableStateOf(timeLeft > 0) }
@@ -194,7 +197,6 @@ fun OtpCodeVerificationView(
             override fun onFinish() {
                 isTimerRunning = false
                 timeLeft = 0
-                navController.popBackStack()
             }
         }
     }
@@ -208,7 +210,7 @@ fun OtpCodeVerificationView(
     }
 
     LaunchedEffect(key1 = nextAttemptTimestamp) {
-        if (nextAttemptTimestamp != 0L) {
+        if (nextAttemptTimestamp != 0) {
             isTimerRunning = true
         }
     }
@@ -327,13 +329,38 @@ fun OtpCodeVerificationView(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = stringResource(R.string.time_left_until_code_expires, timeLeft),
-                style = MaterialTheme.typography.labelLarge,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            TextButton(onClick ={
+                navController.popBackStack()
+            }, enabled = timeLeft <= 0) {
+                if(timeLeft <= 0 && !LocalInspectionMode.current) {
+                    Text(
+                        text = stringResource(R.string.request_new_code),
+                        style = MaterialTheme.typography.labelLarge,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+                else {
+                    Row {
+                        Text(
+                            text = stringResource(R.string.request_new_code_in),
+                            style = MaterialTheme.typography.labelLarge,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Spacer(Modifier.padding(3.dp))
 
+                        Text(
+                            text = String.format(Locale.ENGLISH, "%02d:%02d",
+                                (timeLeft % 3600 / 60), (timeLeft % 60)),
+//                        text = DateUtils.formatElapsedTime(timeLeft).replace("\\(\\)".toRegex(), ""),
+                            style = MaterialTheme.typography.labelLarge,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
         }
     }
 }
