@@ -1,9 +1,11 @@
 package com.example.sw0b_001.ui.views.compose
 
 import android.content.Context
+import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,6 +16,7 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -37,9 +40,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.ComposeHandlers
+import com.example.sw0b_001.Models.GatewayClients.GatewayClientsCommunications
+import com.example.sw0b_001.Models.Platforms.Platforms
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.Models.Publishers
+import com.example.sw0b_001.Models.SMSHandler
+import com.example.sw0b_001.Modules.Network
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
@@ -48,6 +55,15 @@ import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Date
+import java.util.Locale
 
 data class TextContent(val from: String, val text: String)
 
@@ -71,8 +87,8 @@ fun TextComposeView(
     navController: NavController,
     platformsViewModel: PlatformsViewModel
 ) {
-    val inspectMode = LocalInspectionMode.current
     val context = LocalContext.current
+    val previewMode = LocalInspectionMode.current
 
     val decomposedMessage = if(platformsViewModel.message != null)
         MessageComposeHandler.decomposeMessage(platformsViewModel.message!!.encryptedContent!!)
@@ -81,8 +97,12 @@ fun TextComposeView(
     var from by remember { mutableStateOf( decomposedMessage?.from ?: "") }
     var message by remember { mutableStateOf( decomposedMessage?.message ?: "" ) }
 
-    var showSelectAccountModal by remember { mutableStateOf(!inspectMode) }
+    var showSelectAccountModal by remember { mutableStateOf(
+        !previewMode && platformsViewModel.platform?.service_type != Platforms.ServiceTypes.TEST.type)
+    }
     var selectedAccount by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
+
+    var loading by remember { mutableStateOf(false) }
 
     if (showSelectAccountModal) {
         SelectAccountModal(
@@ -126,24 +146,50 @@ fun TextComposeView(
                 },
                 actions = {
                     IconButton(onClick = {
-                        processPost(
-                            context = context,
-                            textContent = TextContent(
-                                from = from,
-                                text = message,
-                            ),
-                            account = selectedAccount!!,
-                            onFailureCallback = {}
-                        ) {
-                            CoroutineScope(Dispatchers.Main).launch {
-                                navController.navigate(HomepageScreen) {
-                                    popUpTo(HomepageScreen) {
-                                        inclusive = true
+                        loading = true
+                        message = run {
+                            val date = Date(System.currentTimeMillis())
+                            val formatter = SimpleDateFormat(
+                                "yyyy-MM-dd'T'HH:mm:ss", Locale.US )
+                            formatter.format(date)
+                        }
+                        if(platformsViewModel.platform?.service_type == Platforms.ServiceTypes.TEST.type) {
+                            processTest(
+                                context,
+                                data = message,
+                                onFailureCallback = { loading = false }
+                            ) {
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    navController.navigate(HomepageScreen) {
+                                        popUpTo(HomepageScreen) {
+                                            inclusive = true
+                                        }
                                     }
                                 }
+                                loading = false
                             }
                         }
-                    }) {
+                        else {
+                            processPost(
+                                context = context,
+                                textContent = TextContent(
+                                    from = from,
+                                    text = message,
+                                ),
+                                account = selectedAccount!!,
+                                onFailureCallback = { loading = false }
+                            ) {
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    navController.navigate(HomepageScreen) {
+                                        popUpTo(HomepageScreen) {
+                                            inclusive = true
+                                        }
+                                    }
+                                }
+                                loading = false
+                            }
+                        }
+                    }, enabled = !loading) {
                         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Post")
                     }
                 },
@@ -156,9 +202,15 @@ fun TextComposeView(
                 .padding(innerPadding)
                 .padding(16.dp)
         ) {
+            if(loading ) {
+                LinearProgressIndicator(Modifier.fillMaxWidth())
+                Spacer(Modifier.padding(bottom = 16.dp))
+            }
             // Message Body
             OutlinedTextField(
                 value = message,
+                enabled = platformsViewModel.platform?.service_type !=
+                        Platforms.ServiceTypes.TEST.type,
                 onValueChange = { message = it },
                 label = { Text(stringResource(R.string.what_s_happening), style = MaterialTheme.typography.bodyMedium) },
                 modifier = Modifier
@@ -173,6 +225,51 @@ fun TextComposeView(
     }
 }
 
+
+@Serializable
+data class ReliabilityTestRequestPayload(val test_start_time: String)
+
+@Serializable
+data class ReliabilityTestResponsePayload(
+    val message: String,
+    val test_id: Int,
+    val test_start_time: Int,
+)
+
+private fun processTest(
+    context: Context,
+    data: String,
+    onFailureCallback: () -> Unit,
+    onCompleteCallback: () -> Unit
+) {
+    val payload = Json.encodeToString(ReliabilityTestRequestPayload(data))
+
+    CoroutineScope(Dispatchers.Default).launch {
+        val gatewayClientMSISDN = GatewayClientsCommunications(context)
+            .getDefaultGatewayClient()
+        val url = context.getString(R.string.test_url, gatewayClientMSISDN)
+        try {
+            val response = Network.jsonRequestPost(url, payload)
+            Json.decodeFromString<ReliabilityTestResponsePayload>(response.result.get()).let {
+                val sentIntent = SMSHandler.transferToDefaultSMSApp(
+                    context,
+                    gatewayClientMSISDN!!,
+                    it.test_id.toString()
+                ).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+                context.startActivity(sentIntent)
+                onCompleteCallback()
+            }
+        } catch(e: Exception) {
+            e.printStackTrace()
+            CoroutineScope(Dispatchers.Main).launch {
+                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+            }
+            onFailureCallback()
+        }
+    }
+}
 
 private fun processPost(
     context: Context,

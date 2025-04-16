@@ -143,7 +143,9 @@ fun PlatformOptionsModal(
                     }
                 } else {
                     Image(
-                        bitmap = if(platformsViewModel.platform != null) {
+                        bitmap = if(platformsViewModel.platform != null &&
+                            platformsViewModel.platform!!.logo != null
+                        ) {
                             BitmapFactory.decodeByteArray(
                                 platformsViewModel.platform!!.logo,
                                 0,
@@ -529,7 +531,7 @@ private fun ComposeMessages(
                     ServiceTypes.MESSAGE.type -> {
                         navController.navigate(MessageComposeScreen)
                     }
-                    ServiceTypes.TEXT.type -> {
+                    ServiceTypes.TEXT.type, ServiceTypes.TEST.type -> {
                         navController.navigate(TextComposeScreen)
                     }
                 }
@@ -566,31 +568,33 @@ private fun ManageAccounts(
 }
 
 private fun getServiceBasedAvailableDescription(serviceType: String, context: Context) : String {
-    if(serviceType == ServiceTypes.EMAIL.type) {
-        return context.getString(R.string.adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported)
+    return when(serviceType) {
+        ServiceTypes.EMAIL.type -> {
+            context.getString(R.string.adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported)
+        }
+        ServiceTypes.MESSAGE.type -> {
+            context.getString(R.string.adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported)
+        }
+        ServiceTypes.TEXT.type, ServiceTypes.TEST.type -> {
+            return context.getString(R.string.adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported)
+        }
+        else -> context.getString(R.string.your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias)
     }
-    else if(serviceType == ServiceTypes.MESSAGE.type) {
-        return context.getString(R.string.adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported)
-    }
-    else if(serviceType == ServiceTypes.TEXT.type) {
-        return context.getString(R.string.adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported)
-    }
-
-    return context.getString(R.string.your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias)
 }
 
 private fun getServiceBasedComposeDescriptions(serviceType: String, context: Context) : String {
-    if(serviceType == ServiceTypes.EMAIL.type) {
-        return context.getString(R.string.continue_to_send_an_email_from_your_saved_email_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
+    return when(serviceType) {
+        ServiceTypes.EMAIL.type -> {
+            context.getString(R.string.continue_to_send_an_email_from_your_saved_email_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
+        }
+        ServiceTypes.MESSAGE.type -> {
+            context.getString(R.string.continue_to_send_messages_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
+        }
+        ServiceTypes.TEXT.type, ServiceTypes.TEST.type -> {
+            context.getString(R.string.continue_to_make_posts_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
+        }
+        else ->  context.getString(R.string.your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
     }
-    else if(serviceType == ServiceTypes.MESSAGE.type) {
-        return context.getString(R.string.continue_to_send_messages_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
-    }
-    else if(serviceType == ServiceTypes.TEXT.type) {
-        return context.getString(R.string.continue_to_make_posts_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
-    }
-
-    return context.getString(R.string.your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

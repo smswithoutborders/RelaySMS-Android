@@ -276,5 +276,6 @@
     <string name="relaysms_bug_report">RelaySMS - Bug Report</string>
     <string name="request_new_code_in">Request new code in: </string>
     <string name="request_new_code">Request new code!</string>
+    <string name="test_url" translatable="false">https://gatewayserver.smswithoutborders.com/v3/clients/%1$s/tests</string>
 
 </resources>
