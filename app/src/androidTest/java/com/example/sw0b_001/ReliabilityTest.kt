@@ -40,6 +40,6 @@ class ReliabilityTest {
         val response = Network.jsonRequestPost(url, payload)
         val values = Json.decodeFromString<ReliabilityTestResponsePayload>(response.result.get())
 
-        assertTrue(values.test_id.isNotEmpty())
+        assertTrue(values.test_id > 0)
     }
 }
