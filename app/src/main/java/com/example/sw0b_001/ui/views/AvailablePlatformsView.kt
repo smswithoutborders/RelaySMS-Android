@@ -194,7 +194,7 @@ fun PlatformListContent(
                         isActive = true,
                         onClick = onPlatformClick
                     )
-                } else {
+                } else if(platform.service_type != Platforms.ServiceTypes.TEST.type) {
                     PlatformCard(
                         logo =
                             if(platform.logo != null)

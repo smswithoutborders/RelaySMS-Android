@@ -41,6 +41,8 @@ import androidx.navigation.NavController
 import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.ComposeHandlers
 import com.example.sw0b_001.Models.GatewayClients.GatewayClientsCommunications
+import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
+import com.example.sw0b_001.Models.Platforms.AvailablePlatformsDao
 import com.example.sw0b_001.Models.Platforms.Platforms
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
@@ -157,6 +159,7 @@ fun TextComposeView(
                             processTest(
                                 context,
                                 data = message,
+                                availablePlatforms = platformsViewModel.platform,
                                 onFailureCallback = { loading = false }
                             ) {
                                 CoroutineScope(Dispatchers.Main).launch {
@@ -239,6 +242,7 @@ data class ReliabilityTestResponsePayload(
 private fun processTest(
     context: Context,
     data: String,
+    availablePlatforms: AvailablePlatforms?,
     onFailureCallback: () -> Unit,
     onCompleteCallback: () -> Unit
 ) {
@@ -251,14 +255,18 @@ private fun processTest(
         try {
             val response = Network.jsonRequestPost(url, payload)
             Json.decodeFromString<ReliabilityTestResponsePayload>(response.result.get()).let {
-                val sentIntent = SMSHandler.transferToDefaultSMSApp(
-                    context,
-                    gatewayClientMSISDN!!,
-                    it.test_id.toString()
-                ).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                val availablePlatforms = Datastore.getDatastore(context)
+                    .availablePlatformsDao().fetch(availablePlatforms?.name ?: "reliability")
+
+                val AD = Publishers.fetchPublisherPublicKey(context)
+                ComposeHandlers.compose(context,
+                    it.test_id.toString(),
+                    AD!!,
+                    availablePlatforms!!,
+                    null,
+                ) {
+                    onCompleteCallback()
                 }
-                context.startActivity(sentIntent)
                 onCompleteCallback()
             }
         } catch(e: Exception) {
