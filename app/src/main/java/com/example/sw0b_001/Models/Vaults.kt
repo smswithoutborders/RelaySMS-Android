@@ -2,6 +2,7 @@ package com.example.sw0b_001.Models
 
 import android.content.Context
 import android.util.Base64
+import android.util.Log
 import at.favre.lib.armadillo.Armadillo
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.KeystoreHelpers
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityAES
@@ -49,7 +50,7 @@ class Vaults(context: Context) {
 
     fun refreshStoredTokens(context: Context) {
         val llt = fetchLongLivedToken(context)
-        val response = listStoredEntityTokens(llt)
+        val response = listStoredEntityTokens(llt, false)
 
         val storedPlatforms = ArrayList<StoredPlatformsEntity>()
         response.storedTokensList.forEach {
@@ -187,12 +188,17 @@ class Vaults(context: Context) {
         return response
     }
 
-    private fun listStoredEntityTokens(llt: String) : Vault.ListEntityStoredTokensResponse {
+    fun listStoredEntityTokens(llt: String, migrateToDevice: Boolean = false): Vault.ListEntityStoredTokensResponse {
         val request = Vault.ListEntityStoredTokensRequest.newBuilder().apply {
             setLongLivedToken(llt)
+            setMigrateToDevice(migrateToDevice)
         }.build()
 
-        return entityStub.listEntityStoredTokens(request)
+        val res = entityStub.listEntityStoredTokens(request)
+        Log.d("Response tokens", res.toString())
+        println(res.storedTokensList)
+
+        return res
     }
 
     fun deleteEntity(longLivedToken: String) : Vault.DeleteEntityResponse {
