@@ -259,5 +259,7 @@
     <string name="search_message">Tafuta ujumbe</string>
     <string name="bug_report">Ripoti ya Hitilafu</string>
     <string name="relaysms_bug_report">RelaySMS - Ripoti ya Hitilafu</string>
+    <string name="request_new_code_in">Omba nambari mpya katika:</string>
+    <string name="request_new_code">Omba nambari mpya!</string>
 
 </resources>

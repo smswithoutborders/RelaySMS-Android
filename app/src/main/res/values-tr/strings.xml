@@ -248,5 +248,7 @@
     <string name="search_message">Mesaj ara</string>
     <string name="bug_report">Hata Raporu</string>
     <string name="relaysms_bug_report">RelaySMS - Hata Raporu</string>
+    <string name="request_new_code_in">Yeni kod isteğinde bulunun:</string>
+    <string name="request_new_code">Yeni kod isteyin!</string>
 
 </resources>

@@ -8,5 +8,5 @@ class NavigationFlowHandler {
     var loginSignupPassword: String = ""
     var countryCode: String = ""
     var otpRequestType: OTPCodeVerificationType? = null
-    var nextAttemptTimestamp: Long? = null
+    var nextAttemptTimestamp: Int? = null
 }

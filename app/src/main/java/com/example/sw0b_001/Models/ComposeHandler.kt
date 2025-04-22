@@ -23,6 +23,7 @@ object ComposeHandlers {
         AD: ByteArray,
         platform: AvailablePlatforms? = null,
         account: StoredPlatformsEntity? = null,
+        isTesting: Boolean = false,
         smsTransmission: Boolean = true,
         onSuccessRunnable: () -> Unit? = {}
     ) : ByteArray {
@@ -31,7 +32,7 @@ object ComposeHandlers {
             throw Exception("More than 1 states exist")
         }
 
-        val state = if(states.isNotEmpty() && account != null)
+        val state = if(states.isNotEmpty() && (account != null || isTesting))
             States(String(Publishers.getEncryptedStates(context, states[0].value),
                 Charsets.UTF_8)) else States()
         val messageComposer = MessageComposer(context, state, AD)

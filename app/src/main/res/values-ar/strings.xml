@@ -262,5 +262,7 @@
     <string name="search_message">البحث عن رسالة</string>
     <string name="bug_report">تقرير عن خطأ</string>
     <string name="relaysms_bug_report">RelaySMS - تقرير عن خطأ</string>
+    <string name="request_new_code_in">طلب رمز جديد في:</string>
+    <string name="request_new_code">اطلب رمزًا جديدًا!</string>
 
 </resources>

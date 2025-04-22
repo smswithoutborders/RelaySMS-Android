@@ -10,5 +10,6 @@
     <string name="publisher_grpc_port" translatable="false">443</string>
 
     <string name="publisher_get_platforms_url" translatable="false">https://raw.githubusercontent.com/smswithoutborders/SMSWithoutBorders-Publisher/staging/resources/platforms.json</string>
+    <string name="test_url" translatable="false">https://gatewayserver.staging.smswithoutborders.com/v3/clients/%1$s/tests</string>
 
 </resources>

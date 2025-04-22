@@ -245,6 +245,7 @@ fun ForgotPasswordView(
 
             }
             Spacer(modifier = Modifier.height(24.dp))
+
             Button(
                 onClick = {
                     if (password == reenterPassword) {
@@ -260,6 +261,7 @@ fun ForgotPasswordView(
                                 navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
                                 navigationFlowHandler.otpRequestType =
                                     OTPCodeVerificationType.RECOVER
+                                navigationFlowHandler.nextAttemptTimestamp = it
 
                                 CoroutineScope(Dispatchers.Main).launch {
                                     navController.navigate(OTPCodeScreen)
@@ -297,6 +299,22 @@ fun ForgotPasswordView(
                     Text(stringResource(R.string.reset_password))
                 }
             }
+
+            TextButton(
+                onClick = {
+                    navigationFlowHandler.loginSignupPassword = password
+                    navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
+                    navigationFlowHandler.otpRequestType =
+                        OTPCodeVerificationType.AUTHENTICATE
+                    navController.navigate(OTPCodeScreen)
+                },
+                enabled = (phoneNumber.isNotEmpty()
+                        && password.isNotEmpty()
+                        && reenterPassword.isNotEmpty()) && !isLoading,
+                modifier = Modifier.padding(bottom=16.dp)) {
+                Text(stringResource(R.string.already_got_code))
+            }
+
         }
     }
 }
@@ -306,7 +324,7 @@ private fun recoverPassword(
     context: Context,
     phoneNumber: String,
     password: String,
-    otpRequiredCallback: () -> Unit,
+    otpRequiredCallback: (Int) -> Unit,
     failedCallback: (String?) -> Unit = {},
     completedCallback: () -> Unit = {},
 ) {
@@ -320,7 +338,7 @@ private fun recoverPassword(
             )
 
             if(response.requiresOwnershipProof) {
-                otpRequiredCallback()
+                otpRequiredCallback(response.nextAttemptTimestamp)
             }
         } catch(e: StatusRuntimeException) {
             e.printStackTrace()

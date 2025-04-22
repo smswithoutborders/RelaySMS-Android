@@ -109,6 +109,7 @@ class PublishersTest {
             val emailSubject = "Testing RelaySMS"
             val emailBody = "This is a test email from you"
 
+            // make sure to add the correct account id
             val account =  StoredPlatformsEntity(id="Oldy29bpiwvXdfyDg+fY3HTJgrxLi6kr8GLeU2d8k4U=", account=from, name="gmail")
             val contentString = processEmailForEncryption(from, emailTo, emailCc, emailBcc, emailSubject, emailBody, accessToken, refreshToken)
 

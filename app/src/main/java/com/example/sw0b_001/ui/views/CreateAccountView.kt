@@ -34,6 +34,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -179,12 +180,12 @@ fun CreateAccountView(
                     mobileNumber = phoneNumber,
                     onMobileNumberChange = { phoneNumber = it },
                     onCountrySelected = { selectedCountry = it },
-                    defaultCountryCode = "us",
+                    defaultCountryCode = "cm",
                     countryListDisplayType = CountryListDisplayType.Dialog,
                     modifier = Modifier.fillMaxWidth(),
                     label = {
                         Text(text = stringResource(R.string.phone_number),
-                        style = MaterialTheme.typography.bodySmall)
+                            style = MaterialTheme.typography.bodySmall)
                     }
                 )
 
@@ -201,8 +202,8 @@ fun CreateAccountView(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp),
                     visualTransformation =
-                        if (passwordVisible) VisualTransformation.None
-                        else PasswordVisualTransformation(),
+                    if (passwordVisible) VisualTransformation.None
+                    else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     trailingIcon = {
                         val image = if (passwordVisible)
@@ -236,8 +237,8 @@ fun CreateAccountView(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp),
                     visualTransformation =
-                        if (reenterPasswordVisible) VisualTransformation.None
-                        else PasswordVisualTransformation(),
+                    if (reenterPasswordVisible) VisualTransformation.None
+                    else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     trailingIcon = {
                         val image = if (reenterPasswordVisible)
@@ -315,13 +316,13 @@ fun CreateAccountView(
                             phoneNumber = phoneNumber,
                             countryCode = selectedCountry!!.countryCode,
                             password = password,
-                            otpRequiredCallback = { nextAttemptTimestamp ->
+                            otpRequiredCallback = {
                                 navigationFlowHandler.loginSignupPassword = password
                                 navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
                                 navigationFlowHandler.countryCode = selectedCountry!!.countryCode
+                                navigationFlowHandler.nextAttemptTimestamp = it
                                 navigationFlowHandler.otpRequestType =
                                     OTPCodeVerificationType.CREATE
-                                navigationFlowHandler.nextAttemptTimestamp = nextAttemptTimestamp?.toLong()
 
                                 CoroutineScope(Dispatchers.Main).launch {
                                     navController.navigate(OTPCodeScreen)
@@ -366,6 +367,21 @@ fun CreateAccountView(
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            TextButton(
+                onClick = {
+                    navigationFlowHandler.loginSignupPassword = password
+                    navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
+                    navigationFlowHandler.otpRequestType =
+                        OTPCodeVerificationType.AUTHENTICATE
+                    navController.navigate(OTPCodeScreen)
+                },
+                enabled = (phoneNumber.isNotEmpty()
+                        && password.isNotEmpty()
+                        && reenterPassword.isNotEmpty()) && !isLoading,
+                modifier = Modifier.padding(bottom=16.dp)) {
+                Text(stringResource(R.string.already_got_code))
+            }
+
             Text(
                 text = buildAnnotatedString {
                     append(stringResource(R.string.already_have_an_account) + " ")
@@ -402,7 +418,7 @@ private fun createAccount(
     phoneNumber: String,
     countryCode: String,
     password: String,
-    otpRequiredCallback: (Int?) -> Unit,
+    otpRequiredCallback: (Int) -> Unit,
     failedCallback: (String?) -> Unit = {},
     completedCallback: () -> Unit = {},
 ) {

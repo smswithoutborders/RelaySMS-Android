@@ -253,5 +253,7 @@
     <string name="search_message">جستجوی پیام</string>
     <string name="bug_report">گزارش خطا</string>
     <string name="relaysms_bug_report">RelaySMS - گزارش خطا</string>
+    <string name="request_new_code_in">درخواست کد جدید در:</string>
+    <string name="request_new_code">درخواست کد جدید!</string>
 
 </resources>

@@ -267,7 +267,7 @@ fun LoginView(
                                 navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
                                 navigationFlowHandler.otpRequestType =
                                     OTPCodeVerificationType.AUTHENTICATE
-                                navigationFlowHandler.nextAttemptTimestamp = nextAttemptTimestamp?.toLong()
+                                navigationFlowHandler.nextAttemptTimestamp = nextAttemptTimestamp
 
                                 CoroutineScope(Dispatchers.Main).launch {
                                     navController.navigate(OTPCodeScreen)
@@ -345,7 +345,7 @@ private fun login(
     context: Context,
     phoneNumber: String,
     password: String,
-    otpRequiredCallback: (Int?) -> Unit,
+    otpRequiredCallback: (Int) -> Unit,
     failedCallback: (String?) -> Unit = {},
     completedCallback: () -> Unit = {},
 ) {
