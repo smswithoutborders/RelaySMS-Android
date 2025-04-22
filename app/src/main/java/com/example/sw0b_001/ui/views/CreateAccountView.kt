@@ -315,12 +315,13 @@ fun CreateAccountView(
                             phoneNumber = phoneNumber,
                             countryCode = selectedCountry!!.countryCode,
                             password = password,
-                            otpRequiredCallback = {
+                            otpRequiredCallback = { nextAttemptTimestamp ->
                                 navigationFlowHandler.loginSignupPassword = password
                                 navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
                                 navigationFlowHandler.countryCode = selectedCountry!!.countryCode
                                 navigationFlowHandler.otpRequestType =
                                     OTPCodeVerificationType.CREATE
+                                navigationFlowHandler.nextAttemptTimestamp = nextAttemptTimestamp?.toLong()
 
                                 CoroutineScope(Dispatchers.Main).launch {
                                     navController.navigate(OTPCodeScreen)
@@ -401,7 +402,7 @@ private fun createAccount(
     phoneNumber: String,
     countryCode: String,
     password: String,
-    otpRequiredCallback: () -> Unit,
+    otpRequiredCallback: (Int?) -> Unit,
     failedCallback: (String?) -> Unit = {},
     completedCallback: () -> Unit = {},
 ) {
@@ -416,7 +417,7 @@ private fun createAccount(
             )
 
             if(response.requiresOwnershipProof) {
-                otpRequiredCallback()
+                otpRequiredCallback(response.nextAttemptTimestamp)
             }
         } catch(e: StatusRuntimeException) {
             e.printStackTrace()

@@ -47,14 +47,8 @@ class PublishersTest {
     private lateinit var publishers: Publishers
     private lateinit var vault: Vaults
 
-    private val globalPhoneNumber = "+237672872115"
-    private val globalCountryCode = "CM"
-    private val globalPassword = "#237Asshole"
-
-//    private val globalPhoneNumber = "+237123456789"
-//    private val globalCountryCode = "CM"
-//    private val globalPassword = "dummy_password"
-
+    private val globalPhoneNumber = "+237123456789"
+    private val globalPassword = "dummy_password"
 
     private var context = InstrumentationRegistry.getInstrumentation().targetContext
 
@@ -115,7 +109,7 @@ class PublishersTest {
             val emailSubject = "Testing RelaySMS"
             val emailBody = "This is a test email from you"
 
-            val account =  StoredPlatformsEntity(id="Oldy29bpiwvXdfyDg+fY3HTJgrxLi6kr8GLeU2d8k4U=", account="idadelm@gmail.com", name="gmail")
+            val account =  StoredPlatformsEntity(id="Oldy29bpiwvXdfyDg+fY3HTJgrxLi6kr8GLeU2d8k4U=", account=from, name="gmail")
             val contentString = processEmailForEncryption(from, emailTo, emailCc, emailBcc, emailSubject, emailBody, accessToken, refreshToken)
 
             val AD = Publishers.fetchPublisherPublicKey(context)
@@ -124,19 +118,6 @@ class PublishersTest {
 
             val base64DecodedPayload = ComposeHandlers.compose(context, contentString, AD!!, platform, account)
             val base64EncodedPayload = Base64.encodeToString(base64DecodedPayload, Base64.DEFAULT)
-
-
-//            val states = Datastore.getDatastore(context).ratchetStatesDAO().fetch()
-//            if(states.size > 1) {
-//                throw Exception("More than 1 states exist")
-//            }
-//
-//            val state = if(states.isNotEmpty() && account != null)
-//                States(String(Publishers.getEncryptedStates(context, states[0].value),
-//                    Charsets.UTF_8)) else States()
-//            val messageComposer = MessageComposer(context, state, AD)
-//            val base64EncodedPayload = messageComposer.compose( platform, contentString)
-
 
             // Construct json and send http request
             val jsonPayload = constructJsonPayload(base64EncodedPayload, globalPhoneNumber)

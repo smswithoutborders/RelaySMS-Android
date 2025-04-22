@@ -2,6 +2,7 @@ package com.example.sw0b_001.ui.views.compose
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
@@ -198,6 +199,7 @@ fun EmailComposeView(
                 selectedAccount = account
                 from = account.account!!
                 showSelectAccountModal = false
+                Log.d("EmailComposeView", "Selected account: $account")
             }
         )
     }
