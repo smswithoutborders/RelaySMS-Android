@@ -46,7 +46,9 @@ playServicesAuthApiPhone = "18.1.0"
 preferenceKtx = "1.2.1"
 protobufGradlePlugin = "0.9.4"
 protobufJava = "3.25.1"
-roomRuntime = "2.6.1"
+roomCompiler = "2.7.0"
+roomKtx = "2.7.0"
+roomRuntime = "2.7.0"
 smswithoutborders_libsignal = "0.0.10"
 startupRuntime = "1.2.0"
 swiperefreshlayout = "1.2.0-beta01"
@@ -88,6 +90,8 @@ androidx-navigation-compose = { module = "androidx.navigation:navigation-compose
 androidx-preference = { module = "androidx.preference:preference", version.ref = "preferenceKtx" }
 androidx-preference-ktx = { module = "androidx.preference:preference-ktx", version.ref = "preferenceKtx" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
+androidx-room-compiler-v270 = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
 androidx-runtime-rxjava2 = { module = "androidx.compose.runtime:runtime-rxjava2" }
