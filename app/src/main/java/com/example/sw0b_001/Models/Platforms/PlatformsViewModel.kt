@@ -15,9 +15,11 @@ class PlatformsViewModel : ViewModel() {
     private var availableLiveData: LiveData<List<AvailablePlatforms>> = MutableLiveData()
     private var storedLiveData: LiveData<List<StoredPlatformsEntity>> = MutableLiveData()
 
+
     var platform by mutableStateOf<AvailablePlatforms?>(null)
     var message by mutableStateOf<EncryptedContent?>(null)
     var bottomTabsItem by mutableStateOf<BottomTabsItems>(BottomTabsItems.BottomBarRecentTab)
+
 
     fun reset() {
         platform = null
@@ -48,5 +50,13 @@ class PlatformsViewModel : ViewModel() {
 
     fun getSavedCount(context: Context) : Int {
         return Datastore.getDatastore(context).platformDao().countSaved()
+    }
+
+    suspend fun getStoredTokens(context: Context, accountId: String): StoredTokenEntity? {
+        return Datastore.getDatastore(context).storedTokenDao().getTokensByAccountId(accountId)
+    }
+    suspend fun addStoredTokens(context: Context, accountId: String, accessToken: String, refreshToken: String) {
+        val tokens = StoredTokenEntity(accountId = accountId, accessToken = accessToken, refreshToken = refreshToken)
+        return Datastore.getDatastore(context).storedTokenDao().insertOrUpdateTokens(tokens)
     }
 }
