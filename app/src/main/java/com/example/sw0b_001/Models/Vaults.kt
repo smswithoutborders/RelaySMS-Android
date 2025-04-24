@@ -56,6 +56,7 @@ class Vaults(context: Context) {
         response.storedTokensList.forEach {
             val uuid = Base64.encodeToString(buildPlatformsUUID(it.platform,
                 it.accountIdentifier), Base64.DEFAULT)
+            Log.d("UUID", "User uuid after refresh: $uuid")
             storedPlatforms.add(
                 StoredPlatformsEntity(uuid, it.accountIdentifier,
                     it.platform)

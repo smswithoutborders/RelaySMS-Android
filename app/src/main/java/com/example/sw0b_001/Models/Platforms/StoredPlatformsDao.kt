@@ -12,6 +12,9 @@ interface StoredPlatformsDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertAll(platforms: ArrayList<StoredPlatformsEntity>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertOrUpdate(platform: StoredPlatformsEntity)
+
     @Query("SELECT * FROM StoredPlatformsEntity")
     fun fetchAll() : LiveData<List<StoredPlatformsEntity>>
 

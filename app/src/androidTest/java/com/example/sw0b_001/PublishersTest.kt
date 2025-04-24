@@ -17,7 +17,11 @@ import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.ComposeHandlers
 import com.example.sw0b_001.Models.MessageComposer
 import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
+import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
+import com.example.sw0b_001.Models.Platforms.StoredPlatformsDao
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.Models.Platforms.StoredTokenDao
+import com.example.sw0b_001.Models.Platforms.StoredTokenEntity
 import com.example.sw0b_001.Models.Vaults
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaType
@@ -27,6 +31,8 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONObject
 import org.junit.Assert.assertTrue
+import java.security.DigestException
+import java.security.MessageDigest
 import java.util.concurrent.TimeUnit
 
 
@@ -46,6 +52,10 @@ class PublishersTest {
 
     private lateinit var publishers: Publishers
     private lateinit var vault: Vaults
+
+    private lateinit var datastore: Datastore
+    private lateinit var storedTokenDao: StoredTokenDao
+    private lateinit var platformsViewModel: PlatformsViewModel
 
     private val globalPhoneNumber = "+237123456789"
     private val globalPassword = "dummy_password"
@@ -71,6 +81,9 @@ class PublishersTest {
 
         publishers = Publishers(context)
         vault = Vaults(context)
+        datastore = Datastore.getDatastore(context)
+        storedTokenDao = datastore.storedTokenDao()
+        platformsViewModel = PlatformsViewModel()
 
         // Authenticate the user
         Log.d("PublishersTest", "Authenticating...")
@@ -92,17 +105,40 @@ class PublishersTest {
     fun storeTokensToPublishTest() {
 
         Log.d("PublishersTest", "Starting storeTokensToPublishTest...")
+        val accountId = "Oldy29bpiwvXdfyDg+fY3HTJgrxLi6kr8GLeU2d8k4U="
+
         try {
             // Get Tokens
             Log.d("PublishersTest", "Listing tokens using LLT: $longLivedToken")
             val responseTokens = vault.listStoredEntityTokens(longLivedToken, true)
-            if (responseTokens.storedTokensList.isEmpty()) Assert.fail("No tokens found.")
+            if (responseTokens.storedTokensList.isEmpty()) Assert.fail("No tokens found from vault.")
             val firstToken = responseTokens.storedTokensList[0]
-            val accessToken = firstToken.accountTokensMap[accessTokenKey] ?: Assert.fail("Access token missing")
-            val refreshToken = firstToken.accountTokensMap[refreshTokenKey] ?: Assert.fail("Refresh token missing")
-            Log.d("PublishersTest", "Got tokens.")
+            val fetchedAccessToken = firstToken.accountTokensMap[accessTokenKey]
+                ?: Assert.fail("Access token missing from vault response")
+            val fetchedRefreshToken = firstToken.accountTokensMap[refreshTokenKey]
+                ?: Assert.fail("Refresh token missing from vault response")
+            Log.d("PublishersTest", "Got tokens from vault.")
 
+            // Store tokens using PlatformsViewModel
+            Log.d("PublishersTest", "Storing tokens using PlatformsViewModel for accountId: $accountId")
             val from = firstToken.accountIdentifier
+            val account =  StoredPlatformsEntity(id=accountId, account=from, name="gmail")
+            runBlocking {
+                datastore.storedPlatformsDao().insertOrUpdate(account)
+                platformsViewModel.addStoredTokens(context, accountId, fetchedAccessToken.toString(), fetchedRefreshToken.toString())
+            }
+            Log.d("PublishersTest", "Tokens stored.")
+
+            // Retrieve tokens using PlatformsViewModel
+            Log.d("PublishersTest", "Retrieving tokens from Room DB using PlatformsViewModel for accountId: $accountId")
+            var retrievedTokenEntity: StoredTokenEntity?
+            runBlocking {
+                retrievedTokenEntity = platformsViewModel.getStoredTokens(context, accountId)
+            }
+            Assert.assertNotNull("Failed to retrieve tokens from database for accountId: $accountId", retrievedTokenEntity)
+            val retrievedAccessToken = retrievedTokenEntity!!.accessToken
+            val retrievedRefreshToken = retrievedTokenEntity!!.refreshToken
+
             val emailTo = "idameh2000@gmail.com"
             val emailCc = "idadelveloper@gmail.com"
             val emailBcc = "wisdomnji@gmail.com"
@@ -110,8 +146,12 @@ class PublishersTest {
             val emailBody = "This is a test email from you"
 
             // make sure to add the correct account id
-            val account =  StoredPlatformsEntity(id="Oldy29bpiwvXdfyDg+fY3HTJgrxLi6kr8GLeU2d8k4U=", account=from, name="gmail")
-            val contentString = processEmailForEncryption(from, emailTo, emailCc, emailBcc, emailSubject, emailBody, accessToken, refreshToken)
+//            val account =  StoredPlatformsEntity(id=accountId, account=from, name="gmail")
+            val contentString = processEmailForEncryption(
+                from, emailTo, emailCc, emailBcc, emailSubject, emailBody,
+                retrievedAccessToken,
+                retrievedRefreshToken
+            )
 
             val AD = Publishers.fetchPublisherPublicKey(context)
             val platform = AvailablePlatforms(name="gmail", shortcode="g", service_type="email", protocol_type="oauth2", icon_svg="https://raw.githubusercontent.com/smswithoutborders/SMSWithoutBorders-Publisher/main/resources/icons/gmail.svg", icon_png="https://raw.githubusercontent.com/smswithoutborders/SMSWithoutBorders-Publisher/main/resources/icons/gmail.png", support_url_scheme=false, logo=null)
@@ -195,8 +235,9 @@ class PublishersTest {
         accessToken: Any,
         refreshToken: Any
     ): String {
-        return "$from:$to:$cc:$bcc:$subject:$body[:$accessToken:$refreshToken]"
+        return "$from:$to:$cc:$bcc:$subject:$body:$accessToken:$refreshToken"
     }
+
 
 }
 
