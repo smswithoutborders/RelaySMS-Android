@@ -17,6 +17,7 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.Security.Cryptography
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
+import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -456,5 +457,113 @@ class Vaults(context: Context) {
             println("pk: ${Base64.encodeToString(publicKey, Base64.DEFAULT)}")
             return Crypto.HMAC(derivedKey, combinedData)
         }
+
+        fun revokeAllOAuthPlatforms(
+            context: Context,
+            onCompleted: () -> Unit = {}, // Optional completion callback
+            onFailure: (Exception) -> Unit = {} // Optional failure callback
+        ) {
+            Log.i("Vaults_Revoke", "Starting revokeAllOAuthPlatforms process.")
+            // Use CoroutineScope for background operations
+            CoroutineScope(Dispatchers.IO).launch {
+                var encounteredError = false
+                val appContext = context.applicationContext // Use application context
+                var publishers: Publishers? = null // Initialize publishers instance
+
+                try {
+                    val llt = fetchLongLivedToken(appContext)
+                    if (llt.isEmpty()) {
+                        Log.w("Vaults_Revoke", "LLT is empty, cannot revoke platforms.")
+                        throw IllegalStateException("Missing Long Lived Token for revocation.")
+                    }
+
+                    val datastore = Datastore.getDatastore(appContext)
+                    val storedPlatformsDao = datastore.storedPlatformsDao()
+                    val availablePlatformsDao = datastore.availablePlatformsDao()
+                    publishers = Publishers(appContext) // Instantiate Publishers
+
+                    Log.d("Vaults_Revoke", "Fetching all locally stored platforms...")
+                    // Assuming fetchAllList() is now suspend
+                    val allStoredPlatforms = storedPlatformsDao.fetchAllList()
+                    Log.d("Vaults_Revoke", "Found ${allStoredPlatforms.size} stored platforms locally.")
+
+                    if (allStoredPlatforms.isEmpty()) {
+                        Log.i("Vaults_Revoke", "No stored platforms found to revoke.")
+                        onCompleted() // Report completion
+                        return@launch
+                    }
+
+                    var revokedCount = 0
+                    allStoredPlatforms.forEach { storedPlatform ->
+                        try {
+                            // Fetch available platform details to check protocol_type
+                            // Assuming fetchByName is suspend and returns AvailablePlatforms?
+                            val availableInfo = availablePlatformsDao.fetch(storedPlatform.name!!)
+                            Log.d("Vaults_Revoke", "Checking platform: ${storedPlatform.name}, Account: ${storedPlatform.account}, ID: ${storedPlatform.id}")
+
+                            if (availableInfo != null && availableInfo.protocol_type == Platforms.ProtocolTypes.OAUTH2.type) {
+                                Log.i("Vaults_Revoke", "Platform '${storedPlatform.name}' is OAuth2. Attempting revocation...")
+
+                                // Ensure required fields aren't null before calling revoke
+                                val platformName = storedPlatform.name
+                                val platformAccount = storedPlatform.account
+                                if (platformName.isNullOrEmpty() || platformAccount.isNullOrEmpty()) {
+                                    Log.w("Vaults_Revoke", "Skipping revocation for platform ID ${storedPlatform.id} due to missing name or account.")
+                                    return@forEach // Skip to next platform
+                                }
+
+                                // Call backend revoke function (assuming it's blocking or handles its own thread)
+                                // If revokeOAuthPlatforms becomes suspend, await it here.
+                                publishers.revokeOAuthPlatforms(
+                                    llt,
+                                    platformName,
+                                    platformAccount,
+                                )
+                                Log.d("Vaults_Revoke", "Backend revocation successful for ${storedPlatform.name} (${storedPlatform.account}).")
+
+                                // Delete locally ONLY after successful backend revocation
+                                // Assuming deleteById is suspend
+                                val deletedRows = storedPlatformsDao.delete(storedPlatform.id)
+                                Log.d("Vaults_Revoke", "Local platform deleted (Rows: $deletedRows) for ID: ${storedPlatform.id}. Associated tokens deleted via CASCADE.")
+                                revokedCount++
+
+                            } else {
+                                Log.d("Vaults_Revoke", "Platform '${storedPlatform.name}' is not OAuth2 or details not found. Skipping revocation.")
+                            }
+                        } catch (eRevoke: StatusRuntimeException) {
+                            Log.e("Vaults_Revoke", "gRPC Error revoking ${storedPlatform.name} (${storedPlatform.account})", eRevoke)
+                            encounteredError = true // Mark that an error occurred
+                            // Decide whether to continue with others or stop
+                        } catch (eDelete: Exception) {
+                            Log.e("Vaults_Revoke", "Error deleting local platform ${storedPlatform.id} after revocation", eDelete)
+                            encounteredError = true // Mark that an error occurred
+                        } catch (eLookup: Exception) {
+                            Log.e("Vaults_Revoke", "Error looking up platform details for ${storedPlatform.name}", eLookup)
+                            encounteredError = true
+                        }
+                    } // End forEach
+
+                    Log.i("Vaults_Revoke", "Finished processing platforms. Total OAuth2 revoked: $revokedCount")
+
+                } catch (eOuter: Exception) {
+                    Log.e("Vaults_Revoke", "Error during revokeAllOAuthPlatforms setup or platform fetch", eOuter)
+                    encounteredError = true
+                    onFailure(eOuter) // Call failure callback immediately for outer errors
+                } finally {
+                    publishers?.shutdown() // Safely shut down publishers
+                    if (!encounteredError) {
+                        // Only call general onCompleted if no errors were encountered during the loop
+                        Log.i("Vaults_Revoke", "Revocation process completed without critical errors.")
+                        onCompleted()
+                    } else {
+                        // Optionally call onFailure here as well if errors happened inside loop
+                        // but we didn't throw/rethrow them
+                        Log.w("Vaults_Revoke", "Revocation process completed with one or more errors.")
+                        // You might want a more specific error callback here
+                        onFailure(Exception("One or more platforms failed to revoke or delete."))
+                    }
+                }
+            } // End CoroutineScope launch
+        } // End revokeAllOAuthPlatforms function
     }
 }

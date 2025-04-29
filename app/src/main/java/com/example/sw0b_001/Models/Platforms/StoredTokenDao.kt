@@ -30,5 +30,9 @@ interface StoredTokenDao {
     @Query("DELETE FROM stored_tokens WHERE account_id = :accountId")
     suspend fun delete(accountId: String)
 
+    @Query("DELETE FROM stored_tokens")
+    suspend fun deleteAllTokens()
+
+
 
 }
