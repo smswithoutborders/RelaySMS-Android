@@ -19,7 +19,8 @@
             app:iconSpaceReserved="false"
             app:key="store_tokens_on_device"
             app:summary="When adding accounts for platforms that utilize OAuth2.0 (e.g Gmail, X), enabling this makes sure your access tokens are rather stored on your current device"
-            app:title="Store Tokens On-device" />
+            app:title="Store Tokens On-device"
+            app:defaultValue="true" />
     </PreferenceCategory>
 
     <PreferenceCategory
