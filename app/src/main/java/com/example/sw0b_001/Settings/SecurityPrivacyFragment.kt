@@ -26,10 +26,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import android.provider.Settings
+import android.util.Log
 
 class SecurityPrivacyFragment : PreferenceFragmentCompat() {
 
     private val lockScreenAlwaysOnSettingsKey = "lock_screen_always_on"
+    private val storeTokensOnDeviceKey = "store_tokens_on_device"
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.security_privacy_preferences, rootKey)
 
@@ -43,6 +46,9 @@ class SecurityPrivacyFragment : PreferenceFragmentCompat() {
             }
         }
         lockScreenAlwaysOn?.onPreferenceChangeListener = switchSecurityPreferences()
+
+        val storeTokensOnDevice = findPreference<SwitchPreferenceCompat>(storeTokensOnDeviceKey)
+        storeTokensOnDevice?.onPreferenceChangeListener = storeTokensOnDevicePreferenceChangeListener()
 
         val logout = findPreference<Preference>("logout")
         logout?.setOnPreferenceClickListener {
@@ -163,6 +169,15 @@ class SecurityPrivacyFragment : PreferenceFragmentCompat() {
                 fragmentTransaction?.commitNow()
             }
             false
+        }
+    }
+
+    private fun storeTokensOnDevicePreferenceChangeListener(): OnPreferenceChangeListener {
+        Log.d("SecurityPrivacyFragment", "storeTokensOnDevicePreferenceChangeListener toggle touched")
+        return OnPreferenceChangeListener { _, newValue ->
+            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+            sharedPreferences.edit().putBoolean(storeTokensOnDeviceKey, newValue as Boolean).apply()
+            true
         }
     }
 

@@ -9,7 +9,17 @@
             app:key="lock_screen_always_on"
             app:summary="@string/settings_security_and_privacy_enable_lockscreen_open_summary"
             app:title="@string/settings_security_and_privacy_enable_lockscreen_open" />
+    </PreferenceCategory>
 
+    <PreferenceCategory
+        app:iconSpaceReserved="false"
+        app:key="platform_accounts_storage"
+        app:title="Storing Platform Accounts">
+        <SwitchPreferenceCompat
+            app:iconSpaceReserved="false"
+            app:key="store_tokens_on_device"
+            app:summary="When adding accounts for platforms that utilize OAuth2.0 (e.g Gmail, X), enabling this makes sure your access tokens are rather stored on your current device"
+            app:title="Store Tokens On-device" />
     </PreferenceCategory>
 
     <PreferenceCategory

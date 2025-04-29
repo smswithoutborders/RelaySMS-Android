@@ -3,6 +3,9 @@ package com.example.sw0b_001.Models
 import android.content.Context
 import android.util.Base64
 import android.util.Log
+import androidx.compose.foundation.layout.add
+import androidx.compose.material3.adaptive.layout.forEach
+import androidx.preference.PreferenceManager
 import at.favre.lib.armadillo.Armadillo
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.KeystoreHelpers
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityAES
@@ -10,6 +13,7 @@ import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityRSA
 import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.Platforms.Platforms
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.Models.Platforms.StoredTokenEntity
 import com.example.sw0b_001.Modules.Crypto
 import com.example.sw0b_001.R
 import com.example.sw0b_001.Security.Cryptography
@@ -18,6 +22,7 @@ import io.grpc.ManagedChannelBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import vault.v1.EntityGrpc
 import vault.v1.EntityGrpc.EntityBlockingStub
 import vault.v1.Vault
@@ -50,20 +55,74 @@ class Vaults(context: Context) {
 
     fun refreshStoredTokens(context: Context) {
         val llt = fetchLongLivedToken(context)
-        val response = listStoredEntityTokens(llt, false)
+
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+        val storeTokensOnDevice = sharedPreferences.getBoolean("store_tokens_on_device", false)
+
+        val response = listStoredEntityTokens(llt, storeTokensOnDevice)
 
         val storedPlatforms = ArrayList<StoredPlatformsEntity>()
+        val storedTokensToInsert = ArrayList<StoredTokenEntity>()
+
         response.storedTokensList.forEach {
-            val uuid = Base64.encodeToString(buildPlatformsUUID(it.platform,
-                it.accountIdentifier), Base64.DEFAULT)
+            val uuid = Base64.encodeToString(
+                buildPlatformsUUID(it.platform, it.accountIdentifier),
+                Base64.DEFAULT
+            )
             Log.d("UUID", "User uuid after refresh: $uuid")
             storedPlatforms.add(
-                StoredPlatformsEntity(uuid, it.accountIdentifier,
-                    it.platform)
+                StoredPlatformsEntity(uuid, it.accountIdentifier, it.platform)
             )
+
+            val accessToken = it.accountTokensMap["access_token"] ?: ""
+            val refreshToken = it.accountTokensMap["refresh_token"] ?: ""
+            // Check if tokens are empty
+            if (accessToken.isNotEmpty() && refreshToken.isNotEmpty()) {
+                storedTokensToInsert.add(
+                    StoredTokenEntity(
+                        accountId = uuid,
+                        accessToken = accessToken,
+                        refreshToken = refreshToken
+                    )
+                )
+            } else {
+                Log.w("Vaults", "Empty tokens received from server for account: ${it.accountIdentifier}. Skipping update.")
+            }
         }
-        Datastore.getDatastore(context).storedPlatformsDao().deleteAll()
-        Datastore.getDatastore(context).storedPlatformsDao().insertAll(storedPlatforms)
+        val datastore = Datastore.getDatastore(context)
+       runBlocking {
+           val existingTokens = datastore.storedTokenDao().getAllTokens() as ArrayList<StoredTokenEntity>
+           datastore.storedPlatformsDao().deleteAll()
+           datastore.storedPlatformsDao().insertAll(storedPlatforms)
+           datastore.storedTokenDao().insertAll(existingTokens)
+
+           storedTokensToInsert.forEach { tokenEntity ->
+               val existingToken = datastore.storedTokenDao().getTokensByAccountId(tokenEntity.accountId)
+               Log.d("Vaults", "Existing tokens: $existingToken")
+               if (existingToken == null) {
+                   Log.d("Vaults", "About to insert tokens $tokenEntity")
+                   datastore.storedTokenDao().insertTokens(tokenEntity)
+                   Log.d("Vaults", "Inserted tokens to db")
+               } else {
+                   Log.d("Vaults", "Found existing tokens $existingToken")
+                   // Compare tokens
+//                   if (existingToken.accessToken != tokenEntity.accessToken ||
+//                       existingToken.refreshToken != tokenEntity.refreshToken
+//                   ) {
+//                       Log.d("Vaults", "Tokens have changed. Updating...")
+//                       val updatedToken = existingToken.copy(
+//                           accessToken = tokenEntity.accessToken,
+//                           refreshToken = tokenEntity.refreshToken
+//                       )
+//                       datastore.storedTokenDao().updateTokens(updatedToken)
+//                       Log.d("Vaults", "Tokens updated.")
+//                   } else {
+//                       Log.d("Vaults", "Tokens are the same. No update needed.")
+//                   }
+               }
+           }
+       }
+
     }
 
     private fun processVaultArtifacts(context: Context,
@@ -189,7 +248,7 @@ class Vaults(context: Context) {
         return response
     }
 
-    fun listStoredEntityTokens(llt: String, migrateToDevice: Boolean = false): Vault.ListEntityStoredTokensResponse {
+    fun listStoredEntityTokens(llt: String, migrateToDevice: Boolean): Vault.ListEntityStoredTokensResponse {
         val request = Vault.ListEntityStoredTokensRequest.newBuilder().apply {
             setLongLivedToken(llt)
             setMigrateToDevice(migrateToDevice)

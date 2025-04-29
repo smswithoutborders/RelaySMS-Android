@@ -61,6 +61,7 @@ import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.preference.PreferenceManager
 import com.example.sw0b_001.Bridges.Bridges
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.Database.Datastore
@@ -68,6 +69,7 @@ import com.example.sw0b_001.Models.ComposeHandlers
 import com.example.sw0b_001.Models.GatewayClients.GatewayClientsCommunications
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.Models.Platforms.StoredTokenEntity
 import com.example.sw0b_001.Models.Publishers
 import com.example.sw0b_001.Models.SMSHandler
 import com.example.sw0b_001.Modules.Network
@@ -281,6 +283,7 @@ fun EmailComposeView(
                                     body = body
                                 ),
                                 account = selectedAccount,
+                                platformsViewModel = platformsViewModel,
                                 isBridge = isBridge,
                                 onFailureCallback = {}
                             ) {
@@ -566,9 +569,12 @@ private fun processEmailForEncryption(
     bcc: String,
     subject: String,
     body: String,
-    account: StoredPlatformsEntity?
+    account: StoredPlatformsEntity?,
+    accessToken: String = "",
+    refreshToken: String = ""
 ): String {
-    return "${account!!.account}:$to:$cc:$bcc:$subject:$body"
+    if (accessToken.isEmpty() || refreshToken.isEmpty()) return "${account!!.account}:$to:$cc:$bcc:$subject:$body"
+    return "${account!!.account}:$to:$cc:$bcc:$subject:$body:$accessToken:$refreshToken"
 }
 
 private fun processSend(
@@ -576,6 +582,7 @@ private fun processSend(
     emailContent: EmailContent,
     account: StoredPlatformsEntity?,
     isBridge: Boolean,
+    platformsViewModel: PlatformsViewModel,
     onFailureCallback: (String?) -> Unit,
     onCompleteCallback: () -> Unit
 ) {
@@ -603,14 +610,62 @@ private fun processSend(
                 context.startActivity(sentIntent)
             }
             else {
-                val formattedContent = processEmailForEncryption(
-                    emailContent.to,
-                    emailContent.cc,
-                    emailContent.bcc,
-                    emailContent.subject,
-                    emailContent.body,
-                    account
-                )
+                val storeTokensOnDevice = platformsViewModel.getStoreTokensOnDevice(context)
+                val formattedContent: String
+
+                if (storeTokensOnDevice) {
+                    Log.d("EmailComposeView", "Attempting to retrieve tokens for account ID: ${account!!.id}")
+                    val storedTokenEntity: StoredTokenEntity? =
+                        platformsViewModel.getStoredTokens(context, account.id)
+                    Log.d("EmailComposeView", "StoredTokenEntity: $storedTokenEntity")
+
+                    if (storedTokenEntity != null) {
+                        val accessToken = storedTokenEntity.accessToken
+                        val refreshToken = storedTokenEntity.refreshToken
+
+                        formattedContent = processEmailForEncryption(
+                            emailContent.to,
+                            emailContent.cc,
+                            emailContent.bcc,
+                            emailContent.subject,
+                            emailContent.body,
+                            account,
+                            accessToken,
+                            refreshToken
+                        )
+                    } else {
+                        // Handle missing tokens
+                        Log.e("EmailComposeView", "Tokens not found for account: ${account.id}")
+                        onFailureCallback("Tokens not found. Please re-authenticate.")
+                        CoroutineScope(Dispatchers.Main).launch {
+                            Toast.makeText(
+                                context,
+                                "Tokens not found for ${account.account}. Please revoke and store again",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                        return@launch // Exit the coroutine
+                    }
+                } else {
+                    formattedContent = processEmailForEncryption(
+                        emailContent.to,
+                        emailContent.cc,
+                        emailContent.bcc,
+                        emailContent.subject,
+                        emailContent.body,
+                        account
+                    )
+                }
+
+
+//                val formattedContent = processEmailForEncryption(
+//                    emailContent.to,
+//                    emailContent.cc,
+//                    emailContent.bcc,
+//                    emailContent.subject,
+//                    emailContent.body,
+//                    account
+//                )
 
                 val availablePlatforms =
                     Datastore.getDatastore(context).availablePlatformsDao().fetch(account!!.name!!)
