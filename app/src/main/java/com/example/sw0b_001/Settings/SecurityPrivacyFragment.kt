@@ -27,6 +27,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import android.provider.Settings
 import android.util.Log
+import androidx.navigation.activity
 
 class SecurityPrivacyFragment : PreferenceFragmentCompat() {
 
@@ -175,8 +176,35 @@ class SecurityPrivacyFragment : PreferenceFragmentCompat() {
     private fun storeTokensOnDevicePreferenceChangeListener(): OnPreferenceChangeListener {
         Log.d("SecurityPrivacyFragment", "storeTokensOnDevicePreferenceChangeListener toggle touched")
         return OnPreferenceChangeListener { _, newValue ->
+            val isEnabled = newValue as Boolean
             val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
             sharedPreferences.edit().putBoolean(storeTokensOnDeviceKey, newValue as Boolean).apply()
+            if (isEnabled) {
+
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        val vaults = Vaults(requireContext())
+                        vaults.refreshStoredTokens(requireContext())
+                        activity?.runOnUiThread {
+                            Toast.makeText(
+                                requireContext(),
+                                "Tokens successfully retrieved",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    } catch (e: Exception) {
+                        Log.e("SecurityPrivacyFragment", "Error refreshing tokens", e)
+
+                        activity?.runOnUiThread {
+                            Toast.makeText(
+                                requireContext(),
+                                "Failed to refresh tokens: ${e.message}",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
+                }
+            }
             true
         }
     }

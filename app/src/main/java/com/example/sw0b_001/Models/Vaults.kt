@@ -3,8 +3,6 @@ package com.example.sw0b_001.Models
 import android.content.Context
 import android.util.Base64
 import android.util.Log
-import androidx.compose.foundation.layout.add
-import androidx.compose.material3.adaptive.layout.forEach
 import androidx.preference.PreferenceManager
 import at.favre.lib.armadillo.Armadillo
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.KeystoreHelpers
@@ -94,7 +92,14 @@ class Vaults(context: Context) {
            val existingTokens = datastore.storedTokenDao().getAllTokens() as ArrayList<StoredTokenEntity>
            datastore.storedPlatformsDao().deleteAll()
            datastore.storedPlatformsDao().insertAll(storedPlatforms)
-           datastore.storedTokenDao().insertAll(existingTokens)
+//           datastore.storedTokenDao().insertAll(existingTokens)
+
+           val platformAccountIds = datastore.storedPlatformsDao().getAllAccountIds()
+           existingTokens.forEach { tokenEntity ->
+               if (tokenEntity.accountId in platformAccountIds) {
+                   datastore.storedTokenDao().insertTokens(tokenEntity)
+               }
+           }
 
            storedTokensToInsert.forEach { tokenEntity ->
                val existingToken = datastore.storedTokenDao().getTokensByAccountId(tokenEntity.accountId)
