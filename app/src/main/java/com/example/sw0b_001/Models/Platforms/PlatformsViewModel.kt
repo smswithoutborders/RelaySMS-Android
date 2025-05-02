@@ -67,16 +67,20 @@ class PlatformsViewModel : ViewModel() {
         Log.d("PlatformsViewModel", "Retrieved StoredTokenEntity: $storedTokenEntity")
         return@withContext storedTokenEntity
     }
-    suspend fun addStoredTokens(context: Context, accountId: String, accessToken: String, refreshToken: String) = withContext(Dispatchers.IO) {
-        Log.d("PlatformsViewModel", "addStoredTokens called with accountId: $accountId, accessToken: $accessToken, refreshToken: $refreshToken")
-        val tokens = StoredTokenEntity(accountId = accountId, accessToken = accessToken, refreshToken = refreshToken)
+    suspend fun addStoredTokens(context: Context, tokens: StoredTokenEntity) = withContext(Dispatchers.IO) {
+        Log.d("PlatformsViewModel", "addStoredTokens called with accountId: ${tokens.accountId}, accessToken: ${tokens.accessToken}, refreshToken: ${tokens.refreshToken}")
         try {
             Datastore.getDatastore(context).storedTokenDao().insertTokens(tokens)
-            Log.d("PlatformsViewModel", "Successfully inserted tokens for accountId: $accountId")
+            Log.d("PlatformsViewModel", "Successfully inserted tokens for accountId: ${tokens.accountId}")
         } catch (e: Exception) {
-            Log.e("PlatformsViewModel", "Error inserting tokens for accountId: $accountId", e)
+            Log.e("PlatformsViewModel", "Error inserting tokens for accountId: ${tokens.accountId}", e)
         }
     }
+
+    suspend fun getTokenByAccountId(context: Context, accountId: String): StoredTokenEntity? {
+        return Datastore.getDatastore(context).storedTokenDao().getTokensByAccountId(accountId)
+    }
+
     suspend fun getAllStoredTokens(context: Context): List<StoredTokenEntity> =
         withContext(Dispatchers.IO) {
         return@withContext Datastore.getDatastore(context).storedTokenDao().getAllTokens()
@@ -86,4 +90,5 @@ class PlatformsViewModel : ViewModel() {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
         return sharedPreferences.getBoolean("store_tokens_on_device", false)
     }
+
 }

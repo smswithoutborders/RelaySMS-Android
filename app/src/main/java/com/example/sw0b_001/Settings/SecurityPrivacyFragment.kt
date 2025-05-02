@@ -190,7 +190,6 @@ class SecurityPrivacyFragment : PreferenceFragmentCompat() {
             val isBeingEnabled = newValue as Boolean
             val switchPreference = preference as SwitchPreferenceCompat
 
-            // Determine dialog messages
             val dialogTitle = if (isBeingEnabled) {
                 getString(R.string.store_tokens_on_device_dialog_title)
             } else {
@@ -202,90 +201,72 @@ class SecurityPrivacyFragment : PreferenceFragmentCompat() {
                 getString(R.string.store_tokens_on_device_disable_dialog_message) + "\n\n" + getString(R.string.are_you_sure_you_want_to_continue)
             }
 
-            // Build and show the confirmation dialog
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle(dialogTitle)
                 .setMessage(dialogMessage)
                 .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
-                    // User cancelled. Do nothing. The switch state won't change
-                    // because we return false from the main listener below.
                     Log.d("SecurityPrivacyFragment", "Token storage change cancelled by user.")
                     dialog.dismiss()
                 }
                 .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
-                    // User confirmed. Apply the changes.
                     Log.d("SecurityPrivacyFragment", "Token storage change confirmed by user. New state: $isBeingEnabled")
 
-                    // 1. Update SharedPreferences
                     val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
                     sharedPreferences.edit().putBoolean(storeTokensOnDeviceKey, isBeingEnabled).apply()
                     Log.d("SecurityPrivacyFragment", "SharedPreferences updated.")
 
-                    // 2. Manually update the switch's checked state in the UI
                     switchPreference.isChecked = isBeingEnabled
                     Log.d("SecurityPrivacyFragment", "Switch UI state updated.")
 
-                    // 3. Trigger token refresh ONLY if enabling
                     if (isBeingEnabled) {
                         Log.d("SecurityPrivacyFragment", "Launching token refresh coroutine...")
-                        // Use lifecycleScope for fragment coroutines
-                        lifecycleScope.launch(Dispatchers.IO) { // Use IO for network/DB
+                        lifecycleScope.launch(Dispatchers.IO) {
                             try {
-                                val vaults = Vaults(requireContext().applicationContext) // Use application context
-                                vaults.refreshStoredTokens(requireContext().applicationContext) // Use application context
-                                vaults.shutdown() // Shutdown if Vaults instance is temporary
+                                val vaults = Vaults(requireContext().applicationContext)
+                                vaults.refreshStoredTokens(requireContext().applicationContext)
+                                vaults.shutdown()
                                 Log.i("SecurityPrivacyFragment", "Token refresh successful.")
-                                // Show success message on UI thread
                                 launch(Dispatchers.Main) {
                                     Toast.makeText(
-                                        activity, // Use activity context for Toast if available
-                                        "Successfuly refreshed tokens", // Define in strings.xml
+                                        activity,
+                                        "Successfuly refreshed tokens",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
                             } catch (e: Exception) {
                                 Log.e("SecurityPrivacyFragment", "Error refreshing tokens", e)
-                                // Show error message on UI thread
                                 launch(Dispatchers.Main) {
                                     Toast.makeText(
-                                        activity, // Use activity context for Toast if available
-                                        "${e.message}", // Define in strings.xml
+                                        activity,
+                                        "${e.message}",
                                         Toast.LENGTH_LONG
                                     ).show()
                                 }
                             }
                         }
                     } else {
-                        // 3b. Trigger revoke all OAuth platforms if disabling
-                        Log.d("SecurityPrivacyFragment", "Token storage disabled. Revoking OAuth platforms...")
-                        Vaults.revokeAllOAuthPlatforms(
-                            context = requireContext().applicationContext,
-                            onCompleted = {
-                                // Run UI updates on the main thread
-                                lifecycleScope.launch(Dispatchers.Main) {
-                                    Toast.makeText(activity, "OAuth platforms revoked successfully.", Toast.LENGTH_SHORT).show() // Use string resource
-                                    Log.i("SecurityPrivacyFragment", "Revoke all OAuth platforms completed successfully.")
+
+                        Log.d("SecurityPrivacyFragment", "Token storage disabled. ")
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            try {
+//                                Datastore.getDatastore(requireContext().applicationContext)
+//                                    .storedTokenDao()
+//                                    .deleteAllTokens()
+//                                Log.i("SecurityPrivacyFragment", "Local tokens cleared.")
+                                launch(Dispatchers.Main) {
+                                    Toast.makeText(activity, "Tokens for subsequent accounts won't be stored on device", Toast.LENGTH_SHORT).show()
                                 }
-                            },
-                            onFailure = { exception ->
-                                // Run UI updates on the main thread
-                                lifecycleScope.launch(Dispatchers.Main) {
-                                    Toast.makeText(activity, "Failed to revoke some platforms: ${exception.message}", Toast.LENGTH_LONG).show() // Use string resource
-                                    Log.e("SecurityPrivacyFragment", "Revoke all OAuth platforms failed.", exception)
+                            } catch (e: Exception) {
+                                Log.e("SecurityPrivacyFragment", "Error clearing local tokens", e)
+                                launch(Dispatchers.Main) {
+                                    Toast.makeText(activity, "Error clearing local tokens:${e.message}", Toast.LENGTH_LONG).show()
                                 }
                             }
-                        )
-                        // Note: We are NOT explicitly deleting tokens here anymore, relying on CASCADE delete
-                        // Log.d("SecurityPrivacyFragment", "Token storage disabled. Clearing local tokens...")
-                        // lifecycleScope.launch(Dispatchers.IO) { ... delete tokens ... } // Removed this part
+                        }
                     }
                     dialog.dismiss()
                 }
-                .show() // Display the dialog
-
-            // Return false HERE to prevent the preference system from
-            // changing the switch state immediately. We handle the state change
-            // manually *only* if the user confirms the dialog.
+                .show()
             return@OnPreferenceChangeListener false
         }
     }

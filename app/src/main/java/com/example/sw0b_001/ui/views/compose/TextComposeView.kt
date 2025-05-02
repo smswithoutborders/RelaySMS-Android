@@ -52,6 +52,7 @@ import com.example.sw0b_001.Models.Publishers
 import com.example.sw0b_001.Models.SMSHandler
 import com.example.sw0b_001.Modules.Network
 import com.example.sw0b_001.R
+import com.example.sw0b_001.ui.components.MissingTokenDialog
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.navigation.HomepageScreen
@@ -59,6 +60,7 @@ import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -108,6 +110,9 @@ fun TextComposeView(
 
     var loading by remember { mutableStateOf(false) }
 
+    var showMissingTokenDialog by remember { mutableStateOf(false) }
+    var accountForDialog by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
+
     if (showSelectAccountModal) {
         SelectAccountModal(
             platformsViewModel = platformsViewModel,
@@ -127,6 +132,20 @@ fun TextComposeView(
 
     BackHandler {
         navController.popBackStack()
+    }
+
+    if (showMissingTokenDialog && accountForDialog != null) {
+        MissingTokenDialog(
+            account = accountForDialog!!,
+            onDismiss = { showMissingTokenDialog = false },
+            onRevoke = { accountToRevoke ->
+                showMissingTokenDialog = false
+                Log.d("EmailComposeView", "Revoke confirmed for account: ${accountToRevoke.account}")
+                triggerAccountRevokeHelper(context, platformsViewModel, accountToRevoke) {
+                    Log.d("EmailComposeView", "Revocation process completed for ${accountToRevoke.account}")
+                }
+            }
+        )
     }
 
     Scaffold(
@@ -183,17 +202,22 @@ fun TextComposeView(
                                 ),
                                 platformsViewModel = platformsViewModel,
                                 account = selectedAccount!!,
-                                onFailureCallback = { loading = false }
-                            ) {
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    navController.navigate(HomepageScreen) {
-                                        popUpTo(HomepageScreen) {
-                                            inclusive = true
+                                onFailureCallback = { loading = false },
+                                onCompleteCallback = {
+                                    CoroutineScope(Dispatchers.Main).launch {
+                                        navController.navigate(HomepageScreen) {
+                                            popUpTo(HomepageScreen) {
+                                                inclusive = true
+                                            }
                                         }
                                     }
+                                    loading = false
+                                },
+                                showMissingTokenDialogCallback = {
+                                    selectedAccount = it
+                                    showSelectAccountModal = true
                                 }
-                                loading = false
-                            }
+                            )
                         }
                     }, enabled = !loading) {
                         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Post")
@@ -288,7 +312,8 @@ private fun processPost(
     account: StoredPlatformsEntity,
     platformsViewModel: PlatformsViewModel,
     onFailureCallback: (String?) -> Unit,
-    onCompleteCallback: () -> Unit
+    onCompleteCallback: () -> Unit,
+    showMissingTokenDialogCallback: (StoredPlatformsEntity) -> Unit
 ) {
     CoroutineScope(Dispatchers.Default).launch {
         try {
@@ -319,20 +344,28 @@ private fun processPost(
                     Log.e("TextComposeView", "Tokens not found for account: ${account.id}")
                     onFailureCallback("Tokens not found. Please re-authenticate.")
                     CoroutineScope(Dispatchers.Main).launch {
-                        Toast.makeText(
-                            context,
-                            "Tokens not found for ${account.account}. Please revoke and" +
-                                    " store again.",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        withContext(Dispatchers.Main) {
+                            showMissingTokenDialogCallback(account)
+                        }
                     }
-                    return@launch // Exit the coroutine
+                    return@launch
                 }
             } else {
-                formattedContent = processTextForEncryption(
-                    textContent.text,
-                    account
-                )
+                val currentTokens = Datastore.getDatastore(context).storedTokenDao().getTokensByAccountId(account!!.id)
+                formattedContent = if (currentTokens != null) {
+                    processTextForEncryption(
+                        textContent.text,
+                        account,
+                        currentTokens.accessToken,
+                        currentTokens.refreshToken
+                    )
+                } else {
+                    processTextForEncryption(
+                        textContent.text,
+                        account
+                    )
+                }
+
             }
 
             val AD = Publishers.fetchPublisherPublicKey(context)

@@ -113,7 +113,8 @@ class PublishersTest {
         try {
             // Get Tokens
             Log.d("PublishersTest", "Listing tokens using LLT: $longLivedToken")
-            val responseTokens = vault.listStoredEntityTokens(longLivedToken, true)
+            val responseTokens = vault.listStoredEntityTokens(longLivedToken, false)
+            Log.d("PublishersTest", "Listing tokens response: $responseTokens")
             if (responseTokens.storedTokensList.isEmpty()) Assert.fail("No tokens found from vault.")
             val firstToken = responseTokens.storedTokensList[0]
             val fetchedAccessToken = firstToken.accountTokensMap[accessTokenKey]

@@ -10,6 +10,7 @@ import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityAES
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityRSA
 import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.Platforms.Platforms
+import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.Models.Platforms.StoredTokenEntity
 import com.example.sw0b_001.Modules.Crypto
@@ -62,48 +63,68 @@ class Vaults(context: Context) {
 
         val storedPlatforms = ArrayList<StoredPlatformsEntity>()
         val storedTokensToInsert = ArrayList<StoredTokenEntity>()
+        val accountsWithDeletedTokens = ArrayList<String>()
 
-        response.storedTokensList.forEach {
-            val uuid = Base64.encodeToString(
-                buildPlatformsUUID(it.platform, it.accountIdentifier),
-                Base64.DEFAULT
-            )
-            Log.d("UUID", "User uuid after refresh: $uuid")
-            storedPlatforms.add(
-                StoredPlatformsEntity(uuid, it.accountIdentifier, it.platform)
-            )
-
-            val accessToken = it.accountTokensMap["access_token"] ?: ""
-            val refreshToken = it.accountTokensMap["refresh_token"] ?: ""
-            // Check if tokens are empty
-            if (accessToken.isNotEmpty() && refreshToken.isNotEmpty()) {
-                storedTokensToInsert.add(
-                    StoredTokenEntity(
-                        accountId = uuid,
-                        accessToken = accessToken,
-                        refreshToken = refreshToken
-                    )
-                )
-            } else {
-                Log.w("Vaults", "Empty tokens received from server for account: ${it.accountIdentifier}. Skipping update.")
-            }
-        }
-        val datastore = Datastore.getDatastore(context)
        runBlocking {
-           val existingTokens = datastore.storedTokenDao().getAllTokens() as ArrayList<StoredTokenEntity>
-           datastore.storedPlatformsDao().deleteAll()
-           datastore.storedPlatformsDao().insertAll(storedPlatforms)
-//           datastore.storedTokenDao().insertAll(existingTokens)
+           val datastore = Datastore.getDatastore(context)
+           val existingTokens = getAllStoredTokens(context)
+           val existingTokensIds = existingTokens.map { it.accountId } // used to check for tokens stored on device
 
-           val platformAccountIds = datastore.storedPlatformsDao().getAllAccountIds()
-           existingTokens.forEach { tokenEntity ->
-               if (tokenEntity.accountId in platformAccountIds) {
-                   datastore.storedTokenDao().insertTokens(tokenEntity)
+           response.storedTokensList.forEach {
+               val uuid = Base64.encodeToString(
+                   buildPlatformsUUID(it.platform, it.accountIdentifier),
+                   Base64.DEFAULT
+               )
+               Log.d("UUID", "User uuid after refresh: $uuid")
+               storedPlatforms.add(
+                   StoredPlatformsEntity(uuid, it.accountIdentifier, it.platform)
+               )
+               val isStoredOnDevice = it.accountTokensMap["is_stored_on_device"]?.toBoolean() ?: false
+               Log.d("Vaults", "isStoredOnDevice from server: $isStoredOnDevice")
+               val accessToken = it.accountTokensMap["access_token"] ?: ""
+               val refreshToken = it.accountTokensMap["refresh_token"] ?: ""
+
+
+               // Check if tokens are empty
+               if (accessToken.isNotEmpty() && refreshToken.isNotEmpty()) { // if tokens exist store them
+                   storedTokensToInsert.add(
+                       StoredTokenEntity(
+                           accountId = uuid,
+                           accessToken = accessToken,
+                           refreshToken = refreshToken
+                       )
+                   )
+               } else if ( // if the store on device setting is off but no tokens exist stored on device or gotten from server
+                   !storeTokensOnDevice &&
+                   isStoredOnDevice &&
+                   accessToken.isEmpty() &&
+                   refreshToken.isEmpty() &&
+                   uuid !in existingTokensIds
+                   ) {
+                   accountsWithDeletedTokens.add(it.accountIdentifier)
+                   Log.d("Vaults", "Account with deleted tokens: $it")
+               }
+               else {
+                   Log.w("Vaults", "Empty tokens received from server for account: ${it.accountIdentifier}. Skipping update.")
                }
            }
 
+           datastore.storedPlatformsDao().deleteAll()
+           datastore.storedPlatformsDao().insertAll(storedPlatforms)
+
+           // deleting and inserting back platforms deletes tokens so this puts back previous deleted tokens based on existing platform ids
+           val platformAccountIds = datastore.storedPlatformsDao().getAllAccountIds()
+           existingTokens.forEach { tokenEntity ->
+               if (tokenEntity.accountId in platformAccountIds) {
+                   insertTokens(context, tokenEntity)
+               }
+           }
+
+           Log.d("Vaults", "Accounts with deleted tokens: $accountsWithDeletedTokens")
+
+           // This inserts any new tokens received from the server
            storedTokensToInsert.forEach { tokenEntity ->
-               val existingToken = datastore.storedTokenDao().getTokensByAccountId(tokenEntity.accountId)
+               val existingToken = getTokenEntity(context, tokenEntity.accountId)
                Log.d("Vaults", "Existing tokens: $existingToken")
                if (existingToken == null) {
                    Log.d("Vaults", "About to insert tokens $tokenEntity")
@@ -111,20 +132,6 @@ class Vaults(context: Context) {
                    Log.d("Vaults", "Inserted tokens to db")
                } else {
                    Log.d("Vaults", "Found existing tokens $existingToken")
-                   // Compare tokens
-//                   if (existingToken.accessToken != tokenEntity.accessToken ||
-//                       existingToken.refreshToken != tokenEntity.refreshToken
-//                   ) {
-//                       Log.d("Vaults", "Tokens have changed. Updating...")
-//                       val updatedToken = existingToken.copy(
-//                           accessToken = tokenEntity.accessToken,
-//                           refreshToken = tokenEntity.refreshToken
-//                       )
-//                       datastore.storedTokenDao().updateTokens(updatedToken)
-//                       Log.d("Vaults", "Tokens updated.")
-//                   } else {
-//                       Log.d("Vaults", "Tokens are the same. No update needed.")
-//                   }
                }
            }
        }
@@ -458,112 +465,20 @@ class Vaults(context: Context) {
             return Crypto.HMAC(derivedKey, combinedData)
         }
 
-        fun revokeAllOAuthPlatforms(
-            context: Context,
-            onCompleted: () -> Unit = {}, // Optional completion callback
-            onFailure: (Exception) -> Unit = {} // Optional failure callback
-        ) {
-            Log.i("Vaults_Revoke", "Starting revokeAllOAuthPlatforms process.")
-            // Use CoroutineScope for background operations
-            CoroutineScope(Dispatchers.IO).launch {
-                var encounteredError = false
-                val appContext = context.applicationContext // Use application context
-                var publishers: Publishers? = null // Initialize publishers instance
-
-                try {
-                    val llt = fetchLongLivedToken(appContext)
-                    if (llt.isEmpty()) {
-                        Log.w("Vaults_Revoke", "LLT is empty, cannot revoke platforms.")
-                        throw IllegalStateException("Missing Long Lived Token for revocation.")
-                    }
-
-                    val datastore = Datastore.getDatastore(appContext)
-                    val storedPlatformsDao = datastore.storedPlatformsDao()
-                    val availablePlatformsDao = datastore.availablePlatformsDao()
-                    publishers = Publishers(appContext) // Instantiate Publishers
-
-                    Log.d("Vaults_Revoke", "Fetching all locally stored platforms...")
-                    // Assuming fetchAllList() is now suspend
-                    val allStoredPlatforms = storedPlatformsDao.fetchAllList()
-                    Log.d("Vaults_Revoke", "Found ${allStoredPlatforms.size} stored platforms locally.")
-
-                    if (allStoredPlatforms.isEmpty()) {
-                        Log.i("Vaults_Revoke", "No stored platforms found to revoke.")
-                        onCompleted() // Report completion
-                        return@launch
-                    }
-
-                    var revokedCount = 0
-                    allStoredPlatforms.forEach { storedPlatform ->
-                        try {
-                            // Fetch available platform details to check protocol_type
-                            // Assuming fetchByName is suspend and returns AvailablePlatforms?
-                            val availableInfo = availablePlatformsDao.fetch(storedPlatform.name!!)
-                            Log.d("Vaults_Revoke", "Checking platform: ${storedPlatform.name}, Account: ${storedPlatform.account}, ID: ${storedPlatform.id}")
-
-                            if (availableInfo != null && availableInfo.protocol_type == Platforms.ProtocolTypes.OAUTH2.type) {
-                                Log.i("Vaults_Revoke", "Platform '${storedPlatform.name}' is OAuth2. Attempting revocation...")
-
-                                // Ensure required fields aren't null before calling revoke
-                                val platformName = storedPlatform.name
-                                val platformAccount = storedPlatform.account
-                                if (platformName.isNullOrEmpty() || platformAccount.isNullOrEmpty()) {
-                                    Log.w("Vaults_Revoke", "Skipping revocation for platform ID ${storedPlatform.id} due to missing name or account.")
-                                    return@forEach // Skip to next platform
-                                }
-
-                                // Call backend revoke function (assuming it's blocking or handles its own thread)
-                                // If revokeOAuthPlatforms becomes suspend, await it here.
-                                publishers.revokeOAuthPlatforms(
-                                    llt,
-                                    platformName,
-                                    platformAccount,
-                                )
-                                Log.d("Vaults_Revoke", "Backend revocation successful for ${storedPlatform.name} (${storedPlatform.account}).")
-
-                                // Delete locally ONLY after successful backend revocation
-                                // Assuming deleteById is suspend
-                                val deletedRows = storedPlatformsDao.delete(storedPlatform.id)
-                                Log.d("Vaults_Revoke", "Local platform deleted (Rows: $deletedRows) for ID: ${storedPlatform.id}. Associated tokens deleted via CASCADE.")
-                                revokedCount++
-
-                            } else {
-                                Log.d("Vaults_Revoke", "Platform '${storedPlatform.name}' is not OAuth2 or details not found. Skipping revocation.")
-                            }
-                        } catch (eRevoke: StatusRuntimeException) {
-                            Log.e("Vaults_Revoke", "gRPC Error revoking ${storedPlatform.name} (${storedPlatform.account})", eRevoke)
-                            encounteredError = true // Mark that an error occurred
-                            // Decide whether to continue with others or stop
-                        } catch (eDelete: Exception) {
-                            Log.e("Vaults_Revoke", "Error deleting local platform ${storedPlatform.id} after revocation", eDelete)
-                            encounteredError = true // Mark that an error occurred
-                        } catch (eLookup: Exception) {
-                            Log.e("Vaults_Revoke", "Error looking up platform details for ${storedPlatform.name}", eLookup)
-                            encounteredError = true
-                        }
-                    } // End forEach
-
-                    Log.i("Vaults_Revoke", "Finished processing platforms. Total OAuth2 revoked: $revokedCount")
-
-                } catch (eOuter: Exception) {
-                    Log.e("Vaults_Revoke", "Error during revokeAllOAuthPlatforms setup or platform fetch", eOuter)
-                    encounteredError = true
-                    onFailure(eOuter) // Call failure callback immediately for outer errors
-                } finally {
-                    publishers?.shutdown() // Safely shut down publishers
-                    if (!encounteredError) {
-                        // Only call general onCompleted if no errors were encountered during the loop
-                        Log.i("Vaults_Revoke", "Revocation process completed without critical errors.")
-                        onCompleted()
-                    } else {
-                        // Optionally call onFailure here as well if errors happened inside loop
-                        // but we didn't throw/rethrow them
-                        Log.w("Vaults_Revoke", "Revocation process completed with one or more errors.")
-                        // You might want a more specific error callback here
-                        onFailure(Exception("One or more platforms failed to revoke or delete."))
-                    }
-                }
-            } // End CoroutineScope launch
-        } // End revokeAllOAuthPlatforms function
     }
+}
+
+suspend fun getAllStoredTokens(context: Context): List<StoredTokenEntity> {
+    val platformsViewModel = PlatformsViewModel()
+    return platformsViewModel.getAllStoredTokens(context)
+}
+
+suspend fun insertTokens(context: Context, tokenEntity: StoredTokenEntity) {
+    val platformsViewModel = PlatformsViewModel()
+    platformsViewModel.addStoredTokens(context, tokenEntity)
+}
+
+suspend fun getTokenEntity(context: Context, accountId: String): StoredTokenEntity? {
+    val platformsViewModel = PlatformsViewModel()
+    return platformsViewModel.getTokenByAccountId(context, accountId)
 }
