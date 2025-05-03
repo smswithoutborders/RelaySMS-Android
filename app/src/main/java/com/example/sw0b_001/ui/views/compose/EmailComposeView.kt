@@ -600,7 +600,8 @@ private fun processEmailForEncryption(
     accessToken: String = "",
     refreshToken: String = ""
 ): String {
-    if (accessToken.isEmpty() || refreshToken.isEmpty()) return "${account!!.account}:$to:$cc:$bcc:$subject:$body"
+    if (accessToken.isEmpty() || refreshToken.isEmpty())
+        return "${account!!.account}:$to:$cc:$bcc:$subject:$body"
     return "${account!!.account}:$to:$cc:$bcc:$subject:$body:$accessToken:$refreshToken"
 }
 
@@ -633,79 +634,39 @@ private fun processSend(
                     context,
                     gatewayClientMSISDN!!,
                     txtTransmission).apply {
-                    setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 }
                 context.startActivity(sentIntent)
             }
             else { // if its a regular email like Gmail
-                val storeTokensOnDevice = platformsViewModel.getStoreTokensOnDevice(context)
-                val formattedContent: String
+                var formattedContent: String
 
-                if (storeTokensOnDevice) { // if store on device is on
-                    Log.d("EmailComposeView", "Attempting to retrieve tokens for account ID: ${account!!.id}")
-                    val storedTokenEntity: StoredTokenEntity? =
-                        platformsViewModel.getStoredTokens(context, account.id)
-                    Log.d("EmailComposeView", "StoredTokenEntity: $storedTokenEntity")
+                val storedTokenEntity: StoredTokenEntity? =
+                    platformsViewModel.getStoredTokens(context, account!!.id)
 
-                    if (storedTokenEntity != null) { // if stored on device on and existing stored tokens
-                        val accessToken = storedTokenEntity.accessToken
-                        val refreshToken = storedTokenEntity.refreshToken
-
-                        formattedContent = processEmailForEncryption(
-                            emailContent.to,
-                            emailContent.cc,
-                            emailContent.bcc,
-                            emailContent.subject,
-                            emailContent.body,
-                            account,
-                            accessToken,
-                            refreshToken
-                        )
-                    } else {
-                        Log.e("EmailComposeView", "Tokens not found for account: ${account.id}")
-                        onFailureCallback("Tokens not found. Please re-authenticate.")
-                        withContext(Dispatchers.Main) {
-                            showMissingTokenDialogCallback(account)
-                        }
-                        return@launch
-
-                    }
+                formattedContent = if(storedTokenEntity != null) {
+                    val accessToken = storedTokenEntity.accessToken
+                    val refreshToken = storedTokenEntity.refreshToken
+                    processEmailForEncryption(
+                        emailContent.to,
+                        emailContent.cc,
+                        emailContent.bcc,
+                        emailContent.subject,
+                        emailContent.body,
+                        account,
+                        accessToken,
+                        refreshToken
+                    )
                 } else {
-                    val currentTokens = Datastore.getDatastore(context).storedTokenDao().getTokensByAccountId(account!!.id)
-                    if (currentTokens != null) { // if store on device is off but existing stored tokens
-                        formattedContent = processEmailForEncryption(
-                            emailContent.to,
-                            emailContent.cc,
-                            emailContent.bcc,
-                            emailContent.subject,
-                            emailContent.body,
-                            account,
-                            currentTokens.accessToken,
-                            currentTokens.refreshToken
-                        )
-                    } else { // if store on device is off and no existing stored tokens o
-                        formattedContent = processEmailForEncryption(
-                            emailContent.to,
-                            emailContent.cc,
-                            emailContent.bcc,
-                            emailContent.subject,
-                            emailContent.body,
-                            account
-                        )
-                    }
-
+                    processEmailForEncryption(
+                        emailContent.to,
+                        emailContent.cc,
+                        emailContent.bcc,
+                        emailContent.subject,
+                        emailContent.body,
+                        account
+                    )
                 }
-
-
-
-//                val formattedContent = processEmailForEncryption(
-//                    emailContent.to,
-//                    emailContent.cc,
-//                    emailContent.bcc,
-//                    emailContent.subject,
-//                    emailContent.body,
-//                    account
-//                )
 
                 val availablePlatforms =
                     Datastore.getDatastore(context).availablePlatformsDao().fetch(account.name!!)
