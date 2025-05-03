@@ -331,7 +331,7 @@ class MainActivity : ComponentActivity() {
                                                 valueTransform = { it.accountIdentifier }
                                             )
 
-                                            sharedPreferences.edit().remove(Vaults.Companion.PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_JSON).apply()
+//                                            sharedPreferences.edit().remove(Vaults.Companion.PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_JSON).apply()
 
                                             withContext(Dispatchers.Main) {
                                                 Log.d("MainActivity", "Updating state to show missing tokens dialog.")

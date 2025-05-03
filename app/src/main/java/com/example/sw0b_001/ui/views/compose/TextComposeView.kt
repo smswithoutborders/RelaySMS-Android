@@ -39,6 +39,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.preference.PreferenceManager
 import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.ComposeHandlers
 import com.example.sw0b_001.Models.GatewayClients.GatewayClientsCommunications
@@ -50,8 +51,10 @@ import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.Models.Platforms.StoredTokenEntity
 import com.example.sw0b_001.Models.Publishers
 import com.example.sw0b_001.Models.SMSHandler
+import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.Modules.Network
 import com.example.sw0b_001.R
+import com.example.sw0b_001.ui.components.MissingTokenAccountInfo
 import com.example.sw0b_001.ui.components.MissingTokenDialog
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
@@ -62,6 +65,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.text.SimpleDateFormat
@@ -213,9 +217,9 @@ fun TextComposeView(
                                     }
                                     loading = false
                                 },
-                                showMissingTokenDialogCallback = {
-                                    selectedAccount = it
-                                    showSelectAccountModal = true
+                                showMissingTokenDialogCallback = { acc ->
+                                    accountForDialog = acc
+                                    showMissingTokenDialog = true
                                 }
                             )
                         }
@@ -319,6 +323,37 @@ private fun processPost(
         try {
             val availablePlatforms = Datastore.getDatastore(context)
                 .availablePlatformsDao().fetch(account.name!!)
+
+            // find out if s current account has missing tokens so that the message doesn't send'
+            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
+            val jsonString = sharedPreferences.getString(Vaults.Companion.PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_JSON, null)
+            var isCurrentAccountMissingTokens = false
+
+            if (!jsonString.isNullOrEmpty()) {
+                try {
+                    val missingTokensInfoList = Json.decodeFromString<List<MissingTokenAccountInfo>>(jsonString)
+                    Log.d("EmailComposeView", "Deserialized missing tokens list: $missingTokensInfoList")
+
+                    isCurrentAccountMissingTokens = missingTokensInfoList.any { missingInfo ->
+                        missingInfo.accountId == account.id
+                    }
+                    if (isCurrentAccountMissingTokens) {
+                        Log.w("EmailComposeView", "Current account (${account.id}) is flagged with missing tokens in SharedPreferences.")
+                    }
+                } catch (e: Exception) {
+                    Log.e("EmailComposeView", "Error checking missing tokens list", e)
+                }
+            }
+
+            if (isCurrentAccountMissingTokens) {
+                Log.e("EmailComposeView", "Send aborted: Account ${account.id} flagged with missing tokens.")
+                onFailureCallback("Account ${account.id} flagged with missing tokens. Please revoke and re-add.")
+
+                withContext(Dispatchers.Main) {
+                    showMissingTokenDialogCallback(account)
+                }
+                return@launch
+            }
 
             val storeTokensOnDevice = platformsViewModel.getStoreTokensOnDevice(context)
             val formattedContent: String
