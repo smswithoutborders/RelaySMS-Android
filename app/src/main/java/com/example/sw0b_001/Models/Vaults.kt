@@ -17,6 +17,7 @@ import com.example.sw0b_001.Models.Platforms.StoredTokenEntity
 import com.example.sw0b_001.Modules.Crypto
 import com.example.sw0b_001.R
 import com.example.sw0b_001.Security.Cryptography
+import com.example.sw0b_001.ui.components.MissingTokenAccountInfo
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
 import kotlinx.coroutines.CoroutineScope
@@ -24,6 +25,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import vault.v1.EntityGrpc
 import vault.v1.EntityGrpc.EntityBlockingStub
 import vault.v1.Vault
@@ -34,6 +37,7 @@ import kotlin.text.toBoolean
 
 class Vaults(val context: Context) {
     private val DEVICE_ID_KEYSTORE_ALIAS = "DEVICE_ID_KEYSTORE_ALIAS"
+    private val KEY_ACCOUNTS_MISSING_TOKENS_JSON = "accounts_with_missing_tokens_ids"
 
     private var channel: ManagedChannel = ManagedChannelBuilder
         .forAddress(context.getString(R.string.vault_grpc_url),
@@ -83,11 +87,12 @@ class Vaults(val context: Context) {
 
             val storedPlatforms = ArrayList<StoredPlatformsEntity>()
             val storedTokensToInsert = ArrayList<StoredTokenEntity>()
-            val accountsWithDeletedTokens = ArrayList<String>()
+            val accountsWithMissingTokensInfo = ArrayList<MissingTokenAccountInfo>()
 
             val datastore = Datastore.getDatastore(context)
             val existingTokens = getAllStoredTokens()
             val existingTokensIds = existingTokens.map { it.accountId } // used to check for tokens stored on device
+            Log.d("Vaults", "Existing tokens ids: $existingTokensIds")
 
             response.storedTokensList.forEach {
                 val uuid = Base64.encodeToString(
@@ -98,7 +103,7 @@ class Vaults(val context: Context) {
                 storedPlatforms.add(
                     StoredPlatformsEntity(uuid, it.accountIdentifier, it.platform)
                 )
-                val isStoredOnDevice = it.accountTokensMap["is_stored_on_device"]?.toBoolean() ?: false
+                val isStoredOnDevice = it.isStoredOnDevice
                 Log.d("Vaults", "isStoredOnDevice from server: $isStoredOnDevice")
                 val accessToken = it.accountTokensMap["access_token"] ?: ""
                 val refreshToken = it.accountTokensMap["refresh_token"] ?: ""
@@ -114,14 +119,16 @@ class Vaults(val context: Context) {
                         )
                     )
                 } else if ( // if the store on device setting is off but no tokens exist stored on device or gotten from server
-                    !storeTokensOnDevice &&
-                    isStoredOnDevice &&
-                    accessToken.isEmpty() &&
-                    refreshToken.isEmpty() &&
-                    uuid !in existingTokensIds
+                    !storeTokensOnDevice && isStoredOnDevice && accessToken.isEmpty() && refreshToken.isEmpty() && uuid !in existingTokensIds
                 ) {
-                    accountsWithDeletedTokens.add(it.accountIdentifier)
-                    Log.d("Vaults", "Account with deleted tokens: $it")
+                    Log.w("Vaults", "storeTokensOnDevice is ON, but server sent no tokens for account: ${it.accountIdentifier} (UUID: $uuid). Adding to missing list.")
+                    accountsWithMissingTokensInfo.add(
+                        MissingTokenAccountInfo(
+                            platform = it.platform,
+                            accountIdentifier = it.accountIdentifier,
+                            accountId = uuid
+                        )
+                    )
                 } else {
                     Log.w(
                         "Vaults",
@@ -142,7 +149,7 @@ class Vaults(val context: Context) {
                     }
                 }
 
-                Log.d("Vaults", "Accounts with deleted tokens: $accountsWithDeletedTokens")
+                Log.d("Vaults", "Accounts with missing tokens: $accountsWithMissingTokensInfo")
 
                 // This inserts any new tokens received from the server
                 storedTokensToInsert.forEach { tokenEntity ->
@@ -156,6 +163,24 @@ class Vaults(val context: Context) {
                         Log.d("Vaults", "Found existing tokens $existingToken")
                     }
                 }
+
+                // store missing tokens in shared preferences
+                if (accountsWithMissingTokensInfo.isNotEmpty()) {
+                    Log.d("Vaults", "Storing accounts with missing tokens: $accountsWithMissingTokensInfo")
+                    try {
+                        val jsonString = Json.encodeToString(accountsWithMissingTokensInfo)
+                        sharedPreferences.edit()
+                            .putString(PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_JSON, jsonString)
+                            .apply()
+                        Log.i("Vaults", "Stored ${accountsWithMissingTokensInfo.size} accounts with missing tokens in SharedPreferences.")
+                    } catch (eJson: Exception) {
+                        Log.e("Vaults", "Failed to serialize or save missing tokens list to SharedPreferences", eJson)
+                    }
+                } else {
+                    Log.d("Vaults", "No accounts with missing tokens found. Clearing preference.")
+                    sharedPreferences.edit().remove(PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_JSON).apply()
+                }
+
             } catch (e: Exception) {
                 Log.e("Vaults", "Error refreshing tokens", e)
             }
@@ -489,6 +514,11 @@ class Vaults(val context: Context) {
                     "${combinedData.size}")
             println("pk: ${Base64.encodeToString(publicKey, Base64.DEFAULT)}")
             return Crypto.HMAC(derivedKey, combinedData)
+        }
+
+        object PrefKeys {
+            const val KEY_ACCOUNTS_MISSING_TOKENS_JSON = "accounts_with_missing_tokens_json"
+            const val KEY_DO_NOT_SHOW_MISSING_TOKEN_DIALOG = "do_not_show_missing_token_dialog"
         }
 
     }

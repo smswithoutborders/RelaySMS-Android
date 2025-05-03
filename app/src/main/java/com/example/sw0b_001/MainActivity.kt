@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
@@ -59,9 +60,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.preference.PreferenceManager
+import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.GatewayClients.GatewayClientViewModel
 import com.example.sw0b_001.Models.Platforms.Platforms
 import com.example.sw0b_001.Models.Vaults
+import com.example.sw0b_001.ui.components.MissingTokenAccountInfo
+import com.example.sw0b_001.ui.components.MissingTokenInfoDialog
 import com.example.sw0b_001.ui.navigation.AboutScreen
 import com.example.sw0b_001.ui.navigation.BridgeEmailComposeScreen
 import com.example.sw0b_001.ui.navigation.BridgeViewScreen
@@ -90,6 +95,8 @@ import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 
 
 enum class OnboardingState {
@@ -109,6 +116,11 @@ class MainActivity : ComponentActivity() {
     val messagesViewModel: MessagesViewModel by viewModels()
     val gatewayClientViewModel: GatewayClientViewModel by viewModels()
 
+    var showMissingTokenDialog by mutableStateOf(false)
+    var accountsForMissingDialog by mutableStateOf<Map<String, List<String>>>(emptyMap())
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -125,6 +137,23 @@ class MainActivity : ComponentActivity() {
 
             AppTheme {
                 navController = rememberNavController()
+
+                if (showMissingTokenDialog && accountsForMissingDialog.isNotEmpty()) {
+                    MissingTokenInfoDialog(
+                        groupedAccounts = accountsForMissingDialog,
+                        onDismiss = { showMissingTokenDialog = false },
+                        onConfirm = { doNotShowAgain ->
+                            showMissingTokenDialog = false
+                            if (doNotShowAgain) {
+                                PreferenceManager.getDefaultSharedPreferences(applicationContext).edit()
+                                    .putBoolean(Vaults.Companion.PrefKeys.KEY_DO_NOT_SHOW_MISSING_TOKEN_DIALOG, true)
+                                    .apply()
+                                Log.d("MainActivity", "Set 'Do not show again' preference for missing tokens dialog.")
+                            }
+                        }
+                    )
+                }
+
                 Surface(
                     Modifier
                         .fillMaxSize()
@@ -283,6 +312,41 @@ class MainActivity : ComponentActivity() {
                                 }
                             } finally {
                                 vault.shutdown()
+                            }
+                            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+                            val doNotShowDialog = sharedPreferences.getBoolean(Vaults.Companion.PrefKeys.KEY_DO_NOT_SHOW_MISSING_TOKEN_DIALOG, false)
+                            if (doNotShowDialog) {
+                                Log.d("MainActivity", "Missing token dialog suppressed by user preference.")
+                            } else {
+                                val jsonString = sharedPreferences.getString(Vaults.Companion.PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_JSON, null)
+
+                                if (!jsonString.isNullOrEmpty()) {
+                                    Log.d("MainActivity", "Found missing tokens JSON in Prefs: $jsonString")
+                                    try {
+                                        val missingTokenInfoList = Json.decodeFromString<List<MissingTokenAccountInfo>>(jsonString)
+
+                                        if (missingTokenInfoList.isNotEmpty()) {
+                                            val groupedData = missingTokenInfoList.groupBy(
+                                                keySelector = { it.platform },
+                                                valueTransform = { it.accountIdentifier }
+                                            )
+
+//                                            sharedPreferences.edit().remove(Vaults.Companion.PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_JSON).apply()
+
+                                            withContext(Dispatchers.Main) {
+                                                Log.d("MainActivity", "Updating state to show missing tokens dialog.")
+                                                accountsForMissingDialog = groupedData
+                                                showMissingTokenDialog = true
+                                            }
+                                        } else {
+                                            Log.d("MainActivity","Missing token JSON was empty after parsing.")
+                                        }
+                                    } catch (e: Exception) {
+                                        Log.e("MainActivity", "Error processing missing tokens list", e)
+                                    }
+                                } else {
+                                    Log.d("MainActivity", "No missing tokens JSON found in Prefs.")
+                                }
                             }
                         }
                     }

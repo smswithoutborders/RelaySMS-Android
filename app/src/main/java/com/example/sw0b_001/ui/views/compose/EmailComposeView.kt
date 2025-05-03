@@ -72,9 +72,11 @@ import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.Models.Platforms.StoredTokenEntity
 import com.example.sw0b_001.Models.Publishers
 import com.example.sw0b_001.Models.SMSHandler
+import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.Modules.Helpers
 import com.example.sw0b_001.Modules.Network
 import com.example.sw0b_001.R
+import com.example.sw0b_001.ui.components.MissingTokenAccountInfo
 import com.example.sw0b_001.ui.components.MissingTokenDialog
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
@@ -88,6 +90,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -308,7 +311,6 @@ fun EmailComposeView(
                                 isBridge = isBridge,
                                 onFailureCallback = { errorMsg ->
                                     Log.e("EmailComposeView", "Send failed: $errorMsg")
-                                    // Maybe show a different toast for general failures
                                 },
                                 onCompleteCallback = {
                                     CoroutineScope(Dispatchers.Main).launch {
@@ -317,7 +319,7 @@ fun EmailComposeView(
                                         }
                                     }
                                 },
-                                showMissingTokenDialogCallback = { acc -> // Lambda implementation
+                                showMissingTokenDialogCallback = { acc ->
                                     accountForDialog = acc
                                     showMissingTokenDialog = true
                                 }
@@ -639,7 +641,43 @@ private fun processSend(
                 context.startActivity(sentIntent)
             }
             else { // if its a regular email like Gmail
-                var formattedContent: String
+                // get any missing tokens
+                val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
+                val jsonString = sharedPreferences.getString(Vaults.Companion.PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_JSON, null)
+                Log.d("EmailComposeView", "Deserialized missing tokens JSON: $jsonString")
+                var isCurrentAccountMissingTokens = false
+
+                if (!jsonString.isNullOrEmpty()) {
+                    try {
+                        // Deserialize into the correct List<MissingTokenAccountInfo> type
+                        val missingTokensInfoList = Json.decodeFromString<List<MissingTokenAccountInfo>>(jsonString)
+                        Log.d("EmailComposeView", "Deserialized missing tokens list: $missingTokensInfoList")
+
+                        // Check if the *current* account's ID is in the list of missing ones
+                        isCurrentAccountMissingTokens = missingTokensInfoList.any { missingInfo ->
+                            missingInfo.accountId == account!!.id // Compare against the accountId field
+                        }
+
+                        if (isCurrentAccountMissingTokens) {
+                            Log.w("EmailComposeView", "Current account (${account!!.id}) is flagged with missing tokens in SharedPreferences.")
+                        }
+                    } catch (e: Exception) {
+                        Log.e("EmailComposeView", "Error checking missing tokens list", e)
+                    }
+                }
+
+                if (isCurrentAccountMissingTokens) {
+                    Log.e("EmailComposeView", "Send aborted: Account ${account!!.id} flagged with missing tokens.")
+                    onFailureCallback("Account ${account.id} flagged with missing tokens. Please revoke and re-add.") // Inform caller
+
+                    withContext(Dispatchers.Main) {
+                        showMissingTokenDialogCallback(account)
+                    }
+                    return@launch
+                }
+
+                val storeTokensOnDevice = platformsViewModel.getStoreTokensOnDevice(context)
+                val formattedContent: String
 
                 val storedTokenEntity: StoredTokenEntity? =
                     platformsViewModel.getStoredTokens(context, account!!.id)
