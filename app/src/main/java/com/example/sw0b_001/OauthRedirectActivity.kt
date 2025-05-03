@@ -7,6 +7,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.PreferenceManager
 import com.example.sw0b_001.Models.Publishers
 import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.Modules.Helpers
@@ -50,13 +51,30 @@ class OauthRedirectActivity : AppCompatActivity() {
             try {
                 val llt = Vaults.fetchLongLivedToken(applicationContext)
                 val codeVerifier = Publishers.fetchOauthRequestVerifier(applicationContext)
-                publishers.sendOAuthAuthorizationCode(
-                    llt,
-                    platform,
-                    code,
-                    codeVerifier,
-                    supportsUrlScheme
-                )
+
+                val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
+                val storeTokensOnDevice = sharedPreferences.getBoolean("store_tokens_on_device", false)
+                Log.d("Oauth redirect", "Store on device is $storeTokensOnDevice")
+
+                if (storeTokensOnDevice) {
+                    Log.d("Oauth redirect", "Store on device is true")
+                    publishers.sendOAuthAuthorizationCode(
+                        llt,
+                        platform,
+                        code,
+                        codeVerifier,
+                        supportsUrlScheme,
+                        false
+                    )
+                } else {
+                    publishers.sendOAuthAuthorizationCode(
+                        llt,
+                        platform,
+                        code,
+                        codeVerifier,
+                        supportsUrlScheme
+                    )
+                }
 
                 val vaults = Vaults(applicationContext)
                 vaults.refreshStoredTokens(applicationContext)

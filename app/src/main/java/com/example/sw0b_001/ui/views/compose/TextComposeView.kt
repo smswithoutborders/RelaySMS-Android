@@ -2,6 +2,7 @@ package com.example.sw0b_001.ui.views.compose
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
@@ -46,10 +47,12 @@ import com.example.sw0b_001.Models.Platforms.AvailablePlatformsDao
 import com.example.sw0b_001.Models.Platforms.Platforms
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.Models.Platforms.StoredTokenEntity
 import com.example.sw0b_001.Models.Publishers
 import com.example.sw0b_001.Models.SMSHandler
 import com.example.sw0b_001.Modules.Network
 import com.example.sw0b_001.R
+import com.example.sw0b_001.ui.components.MissingTokenDialog
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.navigation.HomepageScreen
@@ -57,6 +60,7 @@ import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -106,6 +110,9 @@ fun TextComposeView(
 
     var loading by remember { mutableStateOf(false) }
 
+    var showMissingTokenDialog by remember { mutableStateOf(false) }
+    var accountForDialog by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
+
     if (showSelectAccountModal) {
         SelectAccountModal(
             platformsViewModel = platformsViewModel,
@@ -125,6 +132,20 @@ fun TextComposeView(
 
     BackHandler {
         navController.popBackStack()
+    }
+
+    if (showMissingTokenDialog && accountForDialog != null) {
+        MissingTokenDialog(
+            account = accountForDialog!!,
+            onDismiss = { showMissingTokenDialog = false },
+            onRevoke = { accountToRevoke ->
+                showMissingTokenDialog = false
+                Log.d("EmailComposeView", "Revoke confirmed for account: ${accountToRevoke.account}")
+                triggerAccountRevokeHelper(context, platformsViewModel, accountToRevoke) {
+                    Log.d("EmailComposeView", "Revocation process completed for ${accountToRevoke.account}")
+                }
+            }
+        )
     }
 
     Scaffold(
@@ -179,18 +200,24 @@ fun TextComposeView(
                                     from = from,
                                     text = message,
                                 ),
+                                platformsViewModel = platformsViewModel,
                                 account = selectedAccount!!,
-                                onFailureCallback = { loading = false }
-                            ) {
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    navController.navigate(HomepageScreen) {
-                                        popUpTo(HomepageScreen) {
-                                            inclusive = true
+                                onFailureCallback = { loading = false },
+                                onCompleteCallback = {
+                                    CoroutineScope(Dispatchers.Main).launch {
+                                        navController.navigate(HomepageScreen) {
+                                            popUpTo(HomepageScreen) {
+                                                inclusive = true
+                                            }
                                         }
                                     }
+                                    loading = false
+                                },
+                                showMissingTokenDialogCallback = {
+                                    selectedAccount = it
+                                    showSelectAccountModal = true
                                 }
-                                loading = false
-                            }
+                            )
                         }
                     }, enabled = !loading) {
                         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Post")
@@ -283,26 +310,75 @@ private fun processPost(
     context: Context,
     textContent: TextContent,
     account: StoredPlatformsEntity,
+    platformsViewModel: PlatformsViewModel,
     onFailureCallback: (String?) -> Unit,
-    onCompleteCallback: () -> Unit
+    onCompleteCallback: () -> Unit,
+    showMissingTokenDialogCallback: (StoredPlatformsEntity) -> Unit
 ) {
     CoroutineScope(Dispatchers.Default).launch {
-        val availablePlatforms = Datastore.getDatastore(context)
-            .availablePlatformsDao().fetch(account.name!!)
-        val formattedString =
-            processTextForEncryption(textContent.text, account)
-
         try {
+            val availablePlatforms = Datastore.getDatastore(context)
+                .availablePlatformsDao().fetch(account.name!!)
+
+            val storeTokensOnDevice = platformsViewModel.getStoreTokensOnDevice(context)
+            val formattedContent: String
+
+            if (storeTokensOnDevice) {
+                Log.d("TextComposeView", "Attempting to retrieve tokens for account ID: ${account.id}")
+                val storedTokenEntity: StoredTokenEntity? =
+                    platformsViewModel.getStoredTokens(context, account.id)
+                Log.d("TextComposeView", "StoredTokenEntity: $storedTokenEntity")
+
+                if (storedTokenEntity != null) {
+                    val accessToken = storedTokenEntity.accessToken
+                    val refreshToken = storedTokenEntity.refreshToken
+
+                    formattedContent = processTextForEncryption(
+                        textContent.text,
+                        account,
+                        accessToken,
+                        refreshToken
+                    )
+                } else {
+                    // Handle missing tokens
+                    Log.e("TextComposeView", "Tokens not found for account: ${account.id}")
+                    onFailureCallback("Tokens not found. Please re-authenticate.")
+                    CoroutineScope(Dispatchers.Main).launch {
+                        withContext(Dispatchers.Main) {
+                            showMissingTokenDialogCallback(account)
+                        }
+                    }
+                    return@launch
+                }
+            } else {
+                val currentTokens = Datastore.getDatastore(context).storedTokenDao().getTokensByAccountId(account!!.id)
+                formattedContent = if (currentTokens != null) {
+                    processTextForEncryption(
+                        textContent.text,
+                        account,
+                        currentTokens.accessToken,
+                        currentTokens.refreshToken
+                    )
+                } else {
+                    processTextForEncryption(
+                        textContent.text,
+                        account
+                    )
+                }
+
+            }
+
             val AD = Publishers.fetchPublisherPublicKey(context)
-            ComposeHandlers.compose(context,
-                formattedString,
+            ComposeHandlers.compose(
+                context,
+                formattedContent,
                 AD!!,
                 availablePlatforms!!,
                 account,
             ) {
                 onCompleteCallback()
             }
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
             onFailureCallback(e.message)
             CoroutineScope(Dispatchers.Main).launch {
@@ -312,8 +388,14 @@ private fun processPost(
     }
 }
 
-private fun processTextForEncryption(body: String, account: StoredPlatformsEntity): String {
-    return "${account.account}:$body"
+private fun processTextForEncryption(
+    body: String,
+    account: StoredPlatformsEntity?,
+    accessToken: String = "",
+    refreshToken: String = ""
+): String {
+    if (accessToken.isEmpty() || refreshToken.isEmpty()) return "${account!!.account}:$body"
+    return "${account!!.account}:$body:$accessToken:$refreshToken"
 }
 
 

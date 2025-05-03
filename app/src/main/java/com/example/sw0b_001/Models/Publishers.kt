@@ -18,7 +18,7 @@ import publisher.v1.PublisherOuterClass
 import androidx.core.content.edit
 import com.example.sw0b_001.Models.Platforms.Platforms
 
-class Publishers(val context: Context) {
+class Publishers(val context: Context, ) {
 
     private var REDIRECT_URL_SCHEME = "relaysms://oauth.afkanerd.com/android/"
     private var channel: ManagedChannel = ManagedChannelBuilder
@@ -72,7 +72,8 @@ class Publishers(val context: Context) {
                                    platform: String,
                                    code: String,
                                    codeVerifier: String,
-                                   supportsUrlScheme: Boolean):
+                                   supportsUrlScheme: Boolean,
+                                   storeOnDevice: Boolean = false):
             PublisherOuterClass.ExchangeOAuth2CodeAndStoreResponse {
         val request = PublisherOuterClass.ExchangeOAuth2CodeAndStoreRequest.newBuilder().apply {
             setLongLivedToken(llt)
@@ -80,6 +81,7 @@ class Publishers(val context: Context) {
             setAuthorizationCode(code)
             setCodeVerifier(codeVerifier)
             setRedirectUrl(if (supportsUrlScheme) REDIRECT_URL_SCHEME else oAuthRedirectUrl)
+            setStoreOnDevice(storeOnDevice)
         }.build()
 
         return publisherStub.exchangeOAuth2CodeAndStore(request)
@@ -110,6 +112,15 @@ class Publishers(val context: Context) {
         }.build()
 
         return publisherStub.exchangePNBACodeAndStore(request)
+    }
+
+    fun publishContent(content: String, metadata: Map<String, String>): PublisherOuterClass.PublishContentResponse {
+        val request = PublisherOuterClass.PublishContentRequest.newBuilder().apply {
+            setContent(content)
+            putAllMetadata(metadata)
+        }.build()
+
+        return publisherStub.publishContent(request)
     }
 
     fun shutdown() {

@@ -185,7 +185,7 @@ fun CreateAccountView(
                     modifier = Modifier.fillMaxWidth(),
                     label = {
                         Text(text = stringResource(R.string.phone_number),
-                        style = MaterialTheme.typography.bodySmall)
+                            style = MaterialTheme.typography.bodySmall)
                     }
                 )
 
@@ -202,8 +202,8 @@ fun CreateAccountView(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp),
                     visualTransformation =
-                        if (passwordVisible) VisualTransformation.None
-                        else PasswordVisualTransformation(),
+                    if (passwordVisible) VisualTransformation.None
+                    else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     trailingIcon = {
                         val image = if (passwordVisible)
@@ -237,8 +237,8 @@ fun CreateAccountView(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp),
                     visualTransformation =
-                        if (reenterPasswordVisible) VisualTransformation.None
-                        else PasswordVisualTransformation(),
+                    if (reenterPasswordVisible) VisualTransformation.None
+                    else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     trailingIcon = {
                         val image = if (reenterPasswordVisible)

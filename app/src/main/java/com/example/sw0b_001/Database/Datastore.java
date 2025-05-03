@@ -30,6 +30,8 @@ import com.example.sw0b_001.Models.Platforms.Platforms;
 import com.example.sw0b_001.Models.Platforms.PlatformDao;
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsDao;
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity;
+import com.example.sw0b_001.Models.Platforms.StoredTokenDao;
+import com.example.sw0b_001.Models.Platforms.StoredTokenEntity;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -40,8 +42,9 @@ import org.jetbrains.annotations.NotNull;
         AvailablePlatforms.class,
         GatewayClient.class,
         StoredPlatformsEntity.class,
-        EncryptedContent.class},
-        version = 18,
+        StoredTokenEntity.class,
+        EncryptedContent.class,},
+        version = 21,
         autoMigrations = {
         @AutoMigration( from = 8, to = 9, spec = Datastore.DatastoreMigrations.class),
         @AutoMigration( from = 9, to = 10, spec= Datastore.DatastoreMigrations.class),
@@ -53,6 +56,9 @@ import org.jetbrains.annotations.NotNull;
         @AutoMigration( from = 15, to = 16),
         @AutoMigration( from = 16, to = 17),
         @AutoMigration( from = 17, to = 18, spec = Datastore.Migrate17To18.class),
+                @AutoMigration( from = 18, to = 19),
+                @AutoMigration( from = 19, to = 20),
+                @AutoMigration( from = 20, to = 21),
 })
 
 public abstract class Datastore extends RoomDatabase {
@@ -81,6 +87,7 @@ public abstract class Datastore extends RoomDatabase {
     public abstract EncryptedContentDAO encryptedContentDAO();
     public abstract StoredPlatformsDao storedPlatformsDao();
     public abstract RatchetStatesDAO ratchetStatesDAO();
+    public abstract StoredTokenDao storedTokenDao();
 
     @NonNull
     @NotNull

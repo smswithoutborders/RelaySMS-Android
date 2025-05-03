@@ -2,6 +2,7 @@ package com.example.sw0b_001.ui.views.compose
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
@@ -60,6 +61,7 @@ import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.preference.PreferenceManager
 import com.example.sw0b_001.Bridges.Bridges
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.Database.Datastore
@@ -67,10 +69,13 @@ import com.example.sw0b_001.Models.ComposeHandlers
 import com.example.sw0b_001.Models.GatewayClients.GatewayClientsCommunications
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.Models.Platforms.StoredTokenEntity
 import com.example.sw0b_001.Models.Publishers
 import com.example.sw0b_001.Models.SMSHandler
+import com.example.sw0b_001.Modules.Helpers
 import com.example.sw0b_001.Modules.Network
 import com.example.sw0b_001.R
+import com.example.sw0b_001.ui.components.MissingTokenDialog
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.navigation.GetMeOutScreen
@@ -81,6 +86,7 @@ import com.example.sw0b_001.ui.views.compose.EmailComposeHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -99,11 +105,11 @@ object EmailComposeHandler {
     ): EmailContent {
         return message.split(":").let {
             EmailContent(
-                to = it[0],
-                cc = it[1],
-                bcc = it[2],
-                subject = it[3],
-                body = it.subList(4, it.size).joinToString()
+                to = it[1],
+                cc = it[2],
+                bcc = it[3],
+                subject = it[4],
+                body = it.subList(5, it.size).joinToString()
             )
         }
     }
@@ -164,6 +170,9 @@ fun EmailComposeView(
 
     val scrollState = rememberScrollState()
 
+    var showMissingTokenDialog by remember { mutableStateOf(false) }
+    var accountForDialog by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
+
     LaunchedEffect(Unit) {
         if(BuildConfig.DEBUG && platformsViewModel.message == null) {
             if(from.isEmpty()) from = if(isBridge) "" else "from@relaysms.me"
@@ -185,6 +194,7 @@ fun EmailComposeView(
 
     // Conditionally show the SelectAccountModal
     if (showSelectAccountModal && !isBridge) {
+        Log.d("EmailComposeView", "Showing SelectAccountModal")
         SelectAccountModal(
             platformsViewModel = platformsViewModel,
             onDismissRequest = {
@@ -198,6 +208,7 @@ fun EmailComposeView(
                 selectedAccount = account
                 from = account.account!!
                 showSelectAccountModal = false
+                Log.d("EmailComposeView", "Selected account: $account")
             }
         )
     }
@@ -245,6 +256,20 @@ fun EmailComposeView(
 
     var showMoreOptions by remember { mutableStateOf(false) }
 
+    if (showMissingTokenDialog && accountForDialog != null) {
+        MissingTokenDialog(
+            account = accountForDialog!!,
+            onDismiss = { showMissingTokenDialog = false },
+            onRevoke = { accountToRevoke ->
+                showMissingTokenDialog = false
+                Log.d("EmailComposeView", "Revoke confirmed for account: ${accountToRevoke.account}")
+                triggerAccountRevokeHelper(context, platformsViewModel, accountToRevoke) {
+                    Log.d("EmailComposeView", "Revocation process completed for ${accountToRevoke.account}")
+                }
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -279,17 +304,24 @@ fun EmailComposeView(
                                     body = body
                                 ),
                                 account = selectedAccount,
+                                platformsViewModel = platformsViewModel,
                                 isBridge = isBridge,
-                                onFailureCallback = {}
-                            ) {
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    navController.navigate(HomepageScreen) {
-                                        popUpTo(HomepageScreen) {
-                                            inclusive = true
+                                onFailureCallback = { errorMsg ->
+                                    Log.e("EmailComposeView", "Send failed: $errorMsg")
+                                    // Maybe show a different toast for general failures
+                                },
+                                onCompleteCallback = {
+                                    CoroutineScope(Dispatchers.Main).launch {
+                                        navController.navigate(HomepageScreen) {
+                                            popUpTo(HomepageScreen) { inclusive = true }
                                         }
                                     }
+                                },
+                                showMissingTokenDialogCallback = { acc -> // Lambda implementation
+                                    accountForDialog = acc
+                                    showMissingTokenDialog = true
                                 }
-                            }
+                            )
                         }
                     ) {
                         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
@@ -564,9 +596,12 @@ private fun processEmailForEncryption(
     bcc: String,
     subject: String,
     body: String,
-    account: StoredPlatformsEntity?
+    account: StoredPlatformsEntity?,
+    accessToken: String = "",
+    refreshToken: String = ""
 ): String {
-    return "${account!!.account}:$to:$cc:$bcc:$subject:$body"
+    if (accessToken.isEmpty() || refreshToken.isEmpty()) return "${account!!.account}:$to:$cc:$bcc:$subject:$body"
+    return "${account!!.account}:$to:$cc:$bcc:$subject:$body:$accessToken:$refreshToken"
 }
 
 private fun processSend(
@@ -574,12 +609,14 @@ private fun processSend(
     emailContent: EmailContent,
     account: StoredPlatformsEntity?,
     isBridge: Boolean,
+    platformsViewModel: PlatformsViewModel,
     onFailureCallback: (String?) -> Unit,
-    onCompleteCallback: () -> Unit
+    onCompleteCallback: () -> Unit,
+    showMissingTokenDialogCallback: (StoredPlatformsEntity) -> Unit
 ) {
     CoroutineScope(Dispatchers.Default).launch {
         try {
-            if(isBridge) {
+            if(isBridge) { // if its a bridge message
                 val txtTransmission = Bridges.compose(
                     context = context,
                     to = emailContent.to,
@@ -600,18 +637,78 @@ private fun processSend(
                 }
                 context.startActivity(sentIntent)
             }
-            else {
-                val formattedContent = processEmailForEncryption(
-                    emailContent.to,
-                    emailContent.cc,
-                    emailContent.bcc,
-                    emailContent.subject,
-                    emailContent.body,
-                    account
-                )
+            else { // if its a regular email like Gmail
+                val storeTokensOnDevice = platformsViewModel.getStoreTokensOnDevice(context)
+                val formattedContent: String
+
+                if (storeTokensOnDevice) { // if store on device is on
+                    Log.d("EmailComposeView", "Attempting to retrieve tokens for account ID: ${account!!.id}")
+                    val storedTokenEntity: StoredTokenEntity? =
+                        platformsViewModel.getStoredTokens(context, account.id)
+                    Log.d("EmailComposeView", "StoredTokenEntity: $storedTokenEntity")
+
+                    if (storedTokenEntity != null) { // if stored on device on and existing stored tokens
+                        val accessToken = storedTokenEntity.accessToken
+                        val refreshToken = storedTokenEntity.refreshToken
+
+                        formattedContent = processEmailForEncryption(
+                            emailContent.to,
+                            emailContent.cc,
+                            emailContent.bcc,
+                            emailContent.subject,
+                            emailContent.body,
+                            account,
+                            accessToken,
+                            refreshToken
+                        )
+                    } else {
+                        Log.e("EmailComposeView", "Tokens not found for account: ${account.id}")
+                        onFailureCallback("Tokens not found. Please re-authenticate.")
+                        withContext(Dispatchers.Main) {
+                            showMissingTokenDialogCallback(account)
+                        }
+                        return@launch
+
+                    }
+                } else {
+                    val currentTokens = Datastore.getDatastore(context).storedTokenDao().getTokensByAccountId(account!!.id)
+                    if (currentTokens != null) { // if store on device is off but existing stored tokens
+                        formattedContent = processEmailForEncryption(
+                            emailContent.to,
+                            emailContent.cc,
+                            emailContent.bcc,
+                            emailContent.subject,
+                            emailContent.body,
+                            account,
+                            currentTokens.accessToken,
+                            currentTokens.refreshToken
+                        )
+                    } else { // if store on device is off and no existing stored tokens o
+                        formattedContent = processEmailForEncryption(
+                            emailContent.to,
+                            emailContent.cc,
+                            emailContent.bcc,
+                            emailContent.subject,
+                            emailContent.body,
+                            account
+                        )
+                    }
+
+                }
+
+
+
+//                val formattedContent = processEmailForEncryption(
+//                    emailContent.to,
+//                    emailContent.cc,
+//                    emailContent.bcc,
+//                    emailContent.subject,
+//                    emailContent.body,
+//                    account
+//                )
 
                 val availablePlatforms =
-                    Datastore.getDatastore(context).availablePlatformsDao().fetch(account!!.name!!)
+                    Datastore.getDatastore(context).availablePlatformsDao().fetch(account.name!!)
                 val AD = Publishers.fetchPublisherPublicKey(context)
                 ComposeHandlers.compose(
                     context,
@@ -629,6 +726,28 @@ private fun processSend(
             }
         }
     }
+}
+
+fun triggerAccountRevokeHelper(
+    context: Context,
+    platformsViewModel: PlatformsViewModel, // jic
+    account: StoredPlatformsEntity,
+    onCompleted: () -> Unit
+) {
+    Helpers.triggerAccountRevoke(
+        context = context,
+        account = account,
+        onCompletedCallback = {
+            Log.d("EmailComposeView", "Revoke successful callback received.")
+
+            Toast.makeText(context, "Account ${account.account} revoked.", Toast.LENGTH_SHORT).show()
+            onCompleted()
+        },
+        onFailureCallback = { e ->
+            Log.e("EmailComposeView", "Revoke failed callback received.", e)
+            Toast.makeText(context, "Failed to revoke account: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    )
 }
 
 @Preview(showBackground = true)

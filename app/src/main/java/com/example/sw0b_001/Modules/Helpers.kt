@@ -4,7 +4,16 @@ import android.content.Context
 import android.content.Intent
 import android.text.format.DateUtils
 import android.util.Log
+import com.example.sw0b_001.Database.Datastore
+import com.example.sw0b_001.Models.Platforms.Platforms
+import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.Models.Publishers
+import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.net.URL
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -118,6 +127,66 @@ object Helpers {
             "sw" -> "Kiswahili"
             "tr" -> "Türkçe"
             else -> context.getString(R.string.language)
+        }
+    }
+
+    fun triggerAccountRevoke(
+        context: Context,
+        // platform: AvailablePlatforms,
+        account: StoredPlatformsEntity,
+        onCompletedCallback: () -> Unit = {},
+        onFailureCallback: (Exception) -> Unit = {}
+    ) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val appContext = context.applicationContext
+            var publishers: Publishers? = null
+            try {
+                val availablePlatform = Datastore.getDatastore(appContext)
+                    .availablePlatformsDao()
+                    .fetch(account.name!!)
+
+                if (availablePlatform == null) {
+                    throw IllegalStateException("Platform details not found for ${account.name}")
+                }
+
+                val llt = Vaults.fetchLongLivedToken(appContext)
+                if (llt.isEmpty()) {
+                    throw IllegalStateException("Cannot revoke without Long Lived Token.")
+                }
+
+                publishers = Publishers(appContext)
+
+                val platformName = account.name!!
+                val platformAccount = account.account!!
+
+                Log.i("Helpers", "Revoking ${availablePlatform.protocol_type} platform: $platformName ($platformAccount)")
+                when(availablePlatform.protocol_type) {
+                    Platforms.ProtocolTypes.OAUTH2.type -> {
+                        publishers.revokeOAuthPlatforms(llt, platformName, platformAccount)
+                    }
+                    Platforms.ProtocolTypes.PNBA.type -> {
+                        publishers.revokePNBAPlatforms(llt, platformName, platformAccount)
+                    }
+                    else -> {
+                        Log.w("Helpers", "Unknown protocol type for revocation: ${availablePlatform.protocol_type}")
+
+                    }
+                }
+                Log.d("Helpers", "Backend revocation successful for $platformName.")
+
+
+                val deletedRows = Datastore.getDatastore(appContext).storedPlatformsDao()
+                    .delete(account.id)
+                Log.d("Helpers", "Local platform deleted (Rows: $deletedRows) for ID: ${account.id}.")
+
+                withContext(Dispatchers.Main) { onCompletedCallback() }
+
+            } catch(e: Exception) {
+                Log.e("Helpers", "Error during account revocation", e)
+                withContext(Dispatchers.Main) { onFailureCallback(e) }
+            } finally {
+                publishers?.shutdown()
+            }
         }
     }
 }

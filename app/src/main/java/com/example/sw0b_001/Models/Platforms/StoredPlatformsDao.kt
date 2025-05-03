@@ -12,6 +12,9 @@ interface StoredPlatformsDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertAll(platforms: ArrayList<StoredPlatformsEntity>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertOrUpdate(platform: StoredPlatformsEntity)
+
     @Query("SELECT * FROM StoredPlatformsEntity")
     fun fetchAll() : LiveData<List<StoredPlatformsEntity>>
 
@@ -29,4 +32,9 @@ interface StoredPlatformsDao {
 
     @Query("DELETE FROM StoredPlatformsEntity WHERE id = :id")
     fun delete(id: String)
+
+    @Query("SELECT id FROM StoredPlatformsEntity")
+    fun getAllAccountIds(): List<String>
+
+
 }
