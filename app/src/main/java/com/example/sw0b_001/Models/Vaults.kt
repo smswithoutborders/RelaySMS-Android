@@ -35,7 +35,7 @@ import java.security.MessageDigest
 import kotlin.text.map
 import kotlin.text.toBoolean
 
-class Vaults(context: Context) {
+class Vaults(val context: Context) {
     private val DEVICE_ID_KEYSTORE_ALIAS = "DEVICE_ID_KEYSTORE_ALIAS"
     private val KEY_ACCOUNTS_MISSING_TOKENS_JSON = "accounts_with_missing_tokens_ids"
 
@@ -60,6 +60,21 @@ class Vaults(context: Context) {
         }
     }
 
+    fun getAllStoredTokens(): List<StoredTokenEntity> {
+        val platformsViewModel = PlatformsViewModel()
+        return platformsViewModel.getAllStoredTokens(context)
+    }
+
+    fun insertTokens(tokenEntity: StoredTokenEntity) {
+        val platformsViewModel = PlatformsViewModel()
+        platformsViewModel.addStoredTokens(context, tokenEntity)
+    }
+
+    fun getTokenEntity(accountId: String): StoredTokenEntity? {
+        val platformsViewModel = PlatformsViewModel()
+        return platformsViewModel.getTokenByAccountId(context, accountId)
+    }
+
     fun refreshStoredTokens(context: Context) {
         try {
             val llt = fetchLongLivedToken(context)
@@ -75,7 +90,7 @@ class Vaults(context: Context) {
             val accountsWithMissingTokensInfo = ArrayList<MissingTokenAccountInfo>()
 
             val datastore = Datastore.getDatastore(context)
-            val existingTokens = getAllStoredTokens(context)
+            val existingTokens = getAllStoredTokens()
             val existingTokensIds = existingTokens.map { it.accountId } // used to check for tokens stored on device
             Log.d("Vaults", "Existing tokens ids: $existingTokensIds")
 
@@ -130,7 +145,7 @@ class Vaults(context: Context) {
                 val platformAccountIds = datastore.storedPlatformsDao().getAllAccountIds()
                 existingTokens.forEach { tokenEntity ->
                     if (tokenEntity.accountId in platformAccountIds) {
-                        insertTokens(context, tokenEntity)
+                        insertTokens(tokenEntity)
                     }
                 }
 
@@ -138,7 +153,7 @@ class Vaults(context: Context) {
 
                 // This inserts any new tokens received from the server
                 storedTokensToInsert.forEach { tokenEntity ->
-                    val existingToken = getTokenEntity(context, tokenEntity.accountId)
+                    val existingToken = getTokenEntity(tokenEntity.accountId)
                     Log.d("Vaults", "Existing tokens: $existingToken")
                     if (existingToken == null) {
                         Log.d("Vaults", "About to insert tokens $tokenEntity")
@@ -507,19 +522,4 @@ class Vaults(context: Context) {
         }
 
     }
-}
-
-fun getAllStoredTokens(context: Context): List<StoredTokenEntity> {
-    val platformsViewModel = PlatformsViewModel()
-    return platformsViewModel.getAllStoredTokens(context)
-}
-
-fun insertTokens(context: Context, tokenEntity: StoredTokenEntity) {
-    val platformsViewModel = PlatformsViewModel()
-    platformsViewModel.addStoredTokens(context, tokenEntity)
-}
-
-fun getTokenEntity(context: Context, accountId: String): StoredTokenEntity? {
-    val platformsViewModel = PlatformsViewModel()
-    return platformsViewModel.getTokenByAccountId(context, accountId)
 }

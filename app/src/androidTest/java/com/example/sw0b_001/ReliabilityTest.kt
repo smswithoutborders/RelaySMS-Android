@@ -36,7 +36,6 @@ class ReliabilityTest {
         val gatewayClientMSISDN = "+237690826242"
         val url = context.getString(R.string.test_url, gatewayClientMSISDN)
 
-
         val response = Network.jsonRequestPost(url, payload)
         val values = Json.decodeFromString<ReliabilityTestResponsePayload>(response.result.get())
 
