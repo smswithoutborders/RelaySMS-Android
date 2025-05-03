@@ -97,6 +97,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import androidx.core.content.edit
 
 
 enum class OnboardingState {
@@ -119,8 +120,6 @@ class MainActivity : ComponentActivity() {
     var showMissingTokenDialog by mutableStateOf(false)
     var accountsForMissingDialog by mutableStateOf<Map<String, List<String>>>(emptyMap())
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -138,17 +137,21 @@ class MainActivity : ComponentActivity() {
             AppTheme {
                 navController = rememberNavController()
 
-                if (showMissingTokenDialog && accountsForMissingDialog.isNotEmpty()) {
+                if (showMissingTokenDialog) {
                     MissingTokenInfoDialog(
                         groupedAccounts = accountsForMissingDialog,
                         onDismiss = { showMissingTokenDialog = false },
                         onConfirm = { doNotShowAgain ->
                             showMissingTokenDialog = false
                             if (doNotShowAgain) {
-                                PreferenceManager.getDefaultSharedPreferences(applicationContext).edit()
-                                    .putBoolean(Vaults.Companion.PrefKeys.KEY_DO_NOT_SHOW_MISSING_TOKEN_DIALOG, true)
-                                    .apply()
-                                Log.d("MainActivity", "Set 'Do not show again' preference for missing tokens dialog.")
+                                PreferenceManager
+                                    .getDefaultSharedPreferences(applicationContext).edit {
+                                        putBoolean(
+                                            Vaults.Companion.PrefKeys
+                                                .KEY_DO_NOT_SHOW_MISSING_TOKEN_DIALOG,
+                                            true
+                                        )
+                                    }
                             }
                         }
                     )
@@ -279,6 +282,20 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    fun refreshTokensCallback(accountsInfo: Map<String, List<String>> ){
+        val sharedPreferences = PreferenceManager
+            .getDefaultSharedPreferences(applicationContext)
+        val doNotShowDialog = sharedPreferences
+            .getBoolean(Vaults.Companion.PrefKeys
+                .KEY_DO_NOT_SHOW_MISSING_TOKEN_DIALOG, false)
+
+        if (!doNotShowDialog) {
+            showMissingTokenDialog = true
+            accountsForMissingDialog = accountsInfo
+        }
+
+    }
+
 
     override fun onResume() {
         super.onResume()
@@ -298,7 +315,10 @@ class MainActivity : ComponentActivity() {
                         if(it.isNotEmpty()) {
                             val vault = Vaults(applicationContext)
                             try {
-                                vault.refreshStoredTokens(applicationContext)
+                                vault.refreshStoredTokens(applicationContext, ) {
+                                    if(it.isNotEmpty())
+                                        refreshTokensCallback(it)
+                                }
                             } catch(e: StatusRuntimeException) {
                                 if(e.status.code == Status.UNAUTHENTICATED.code) {
                                     Vaults.setGetMeOut(applicationContext, true)
@@ -313,41 +333,7 @@ class MainActivity : ComponentActivity() {
                             } finally {
                                 vault.shutdown()
                             }
-                            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-                            val doNotShowDialog = sharedPreferences.getBoolean(Vaults.Companion.PrefKeys.KEY_DO_NOT_SHOW_MISSING_TOKEN_DIALOG, false)
-                            if (doNotShowDialog) {
-                                Log.d("MainActivity", "Missing token dialog suppressed by user preference.")
-                            } else {
-                                val jsonString = sharedPreferences.getString(Vaults.Companion.PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_JSON, null)
 
-                                if (!jsonString.isNullOrEmpty()) {
-                                    Log.d("MainActivity", "Found missing tokens JSON in Prefs: $jsonString")
-                                    try {
-                                        val missingTokenInfoList = Json.decodeFromString<List<MissingTokenAccountInfo>>(jsonString)
-
-                                        if (missingTokenInfoList.isNotEmpty()) {
-                                            val groupedData = missingTokenInfoList.groupBy(
-                                                keySelector = { it.platform },
-                                                valueTransform = { it.accountIdentifier }
-                                            )
-
-//                                            sharedPreferences.edit().remove(Vaults.Companion.PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_JSON).apply()
-
-                                            withContext(Dispatchers.Main) {
-                                                Log.d("MainActivity", "Updating state to show missing tokens dialog.")
-                                                accountsForMissingDialog = groupedData
-                                                showMissingTokenDialog = true
-                                            }
-                                        } else {
-                                            Log.d("MainActivity","Missing token JSON was empty after parsing.")
-                                        }
-                                    } catch (e: Exception) {
-                                        Log.e("MainActivity", "Error processing missing tokens list", e)
-                                    }
-                                } else {
-                                    Log.d("MainActivity", "No missing tokens JSON found in Prefs.")
-                                }
-                            }
                         }
                     }
                 }
@@ -359,5 +345,3 @@ class MainActivity : ComponentActivity() {
         Platforms.refreshAvailablePlatforms(applicationContext)
     }
 }
-
-
