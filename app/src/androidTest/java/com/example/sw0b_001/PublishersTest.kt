@@ -129,7 +129,8 @@ class PublishersTest {
             val account =  StoredPlatformsEntity(id=accountId, account=from, name="gmail")
             runBlocking {
                 datastore.storedPlatformsDao().insertOrUpdate(account)
-                platformsViewModel.addStoredTokens(context, accountId, fetchedAccessToken.toString(), fetchedRefreshToken.toString())
+                val tokenEntity = StoredTokenEntity(accountId= accountId, accessToken = fetchedAccessToken.toString(), refreshToken = fetchedRefreshToken.toString())
+                platformsViewModel.addStoredTokens(context, tokenEntity)
             }
             Log.d("PublishersTest", "Tokens stored.")
 

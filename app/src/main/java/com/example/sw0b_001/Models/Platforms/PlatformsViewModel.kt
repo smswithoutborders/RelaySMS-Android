@@ -56,7 +56,7 @@ class PlatformsViewModel : ViewModel() {
         return Datastore.getDatastore(context).platformDao().countSaved()
     }
 
-    suspend fun getStoredTokens(context: Context, accountId: String): StoredTokenEntity? = withContext(Dispatchers.IO) {
+    fun getStoredTokens(context: Context, accountId: String): StoredTokenEntity? {
         Log.d("PlatformsViewModel", "Attempting to retrieve tokens for account ID: $accountId")
         val storedTokenEntity = try {
             Datastore.getDatastore(context).storedTokenDao().getTokensByAccountId(accountId)
@@ -65,9 +65,9 @@ class PlatformsViewModel : ViewModel() {
             null
         }
         Log.d("PlatformsViewModel", "Retrieved StoredTokenEntity: $storedTokenEntity")
-        return@withContext storedTokenEntity
+        return storedTokenEntity
     }
-    suspend fun addStoredTokens(context: Context, tokens: StoredTokenEntity) = withContext(Dispatchers.IO) {
+    fun addStoredTokens(context: Context, tokens: StoredTokenEntity) {
         Log.d("PlatformsViewModel", "addStoredTokens called with accountId: ${tokens.accountId}, accessToken: ${tokens.accessToken}, refreshToken: ${tokens.refreshToken}")
         try {
             Datastore.getDatastore(context).storedTokenDao().insertTokens(tokens)
@@ -77,13 +77,12 @@ class PlatformsViewModel : ViewModel() {
         }
     }
 
-    suspend fun getTokenByAccountId(context: Context, accountId: String): StoredTokenEntity? {
+    fun getTokenByAccountId(context: Context, accountId: String): StoredTokenEntity? {
         return Datastore.getDatastore(context).storedTokenDao().getTokensByAccountId(accountId)
     }
 
-    suspend fun getAllStoredTokens(context: Context): List<StoredTokenEntity> =
-        withContext(Dispatchers.IO) {
-        return@withContext Datastore.getDatastore(context).storedTokenDao().getAllTokens()
+    fun getAllStoredTokens(context: Context): List<StoredTokenEntity> {
+        return  Datastore.getDatastore(context).storedTokenDao().getAllTokens()
     }
 
     fun getStoreTokensOnDevice(context: Context): Boolean {

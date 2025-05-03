@@ -3,6 +3,7 @@ package com.example.sw0b_001.Models
 import android.content.Context
 import android.util.Base64
 import android.util.Log
+import androidx.compose.material3.adaptive.layout.forEach
 import androidx.preference.PreferenceManager
 import at.favre.lib.armadillo.Armadillo
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.KeystoreHelpers
@@ -18,16 +19,18 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.Security.Cryptography
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
-import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import vault.v1.EntityGrpc
 import vault.v1.EntityGrpc.EntityBlockingStub
 import vault.v1.Vault
 import java.security.DigestException
 import java.security.MessageDigest
+import kotlin.text.map
+import kotlin.text.toBoolean
 
 class Vaults(context: Context) {
     private val DEVICE_ID_KEYSTORE_ALIAS = "DEVICE_ID_KEYSTORE_ALIAS"
@@ -54,88 +57,96 @@ class Vaults(context: Context) {
     }
 
     fun refreshStoredTokens(context: Context) {
-        val llt = fetchLongLivedToken(context)
+        try {
+            val llt = fetchLongLivedToken(context)
 
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        val storeTokensOnDevice = sharedPreferences.getBoolean("store_tokens_on_device", false)
+            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+            val storeTokensOnDevice = sharedPreferences.getBoolean("store_tokens_on_device", false)
 
-        val response = listStoredEntityTokens(llt, storeTokensOnDevice)
+            val response = listStoredEntityTokens(llt, storeTokensOnDevice)
+            Log.d("Vaults", "Response: $response")
 
-        val storedPlatforms = ArrayList<StoredPlatformsEntity>()
-        val storedTokensToInsert = ArrayList<StoredTokenEntity>()
-        val accountsWithDeletedTokens = ArrayList<String>()
+            val storedPlatforms = ArrayList<StoredPlatformsEntity>()
+            val storedTokensToInsert = ArrayList<StoredTokenEntity>()
+            val accountsWithDeletedTokens = ArrayList<String>()
 
-       runBlocking {
-           val datastore = Datastore.getDatastore(context)
-           val existingTokens = getAllStoredTokens(context)
-           val existingTokensIds = existingTokens.map { it.accountId } // used to check for tokens stored on device
+            val datastore = Datastore.getDatastore(context)
+            val existingTokens = getAllStoredTokens(context)
+            val existingTokensIds = existingTokens.map { it.accountId } // used to check for tokens stored on device
 
-           response.storedTokensList.forEach {
-               val uuid = Base64.encodeToString(
-                   buildPlatformsUUID(it.platform, it.accountIdentifier),
-                   Base64.DEFAULT
-               )
-               Log.d("UUID", "User uuid after refresh: $uuid")
-               storedPlatforms.add(
-                   StoredPlatformsEntity(uuid, it.accountIdentifier, it.platform)
-               )
-               val isStoredOnDevice = it.accountTokensMap["is_stored_on_device"]?.toBoolean() ?: false
-               Log.d("Vaults", "isStoredOnDevice from server: $isStoredOnDevice")
-               val accessToken = it.accountTokensMap["access_token"] ?: ""
-               val refreshToken = it.accountTokensMap["refresh_token"] ?: ""
+            response.storedTokensList.forEach {
+                val uuid = Base64.encodeToString(
+                    buildPlatformsUUID(it.platform, it.accountIdentifier),
+                    Base64.DEFAULT
+                )
+                Log.d("UUID", "User uuid after refresh: $uuid")
+                storedPlatforms.add(
+                    StoredPlatformsEntity(uuid, it.accountIdentifier, it.platform)
+                )
+                val isStoredOnDevice = it.accountTokensMap["is_stored_on_device"]?.toBoolean() ?: false
+                Log.d("Vaults", "isStoredOnDevice from server: $isStoredOnDevice")
+                val accessToken = it.accountTokensMap["access_token"] ?: ""
+                val refreshToken = it.accountTokensMap["refresh_token"] ?: ""
 
 
-               // Check if tokens are empty
-               if (accessToken.isNotEmpty() && refreshToken.isNotEmpty()) { // if tokens exist store them
-                   storedTokensToInsert.add(
-                       StoredTokenEntity(
-                           accountId = uuid,
-                           accessToken = accessToken,
-                           refreshToken = refreshToken
-                       )
-                   )
-               } else if ( // if the store on device setting is off but no tokens exist stored on device or gotten from server
-                   !storeTokensOnDevice &&
-                   isStoredOnDevice &&
-                   accessToken.isEmpty() &&
-                   refreshToken.isEmpty() &&
-                   uuid !in existingTokensIds
-                   ) {
-                   accountsWithDeletedTokens.add(it.accountIdentifier)
-                   Log.d("Vaults", "Account with deleted tokens: $it")
-               }
-               else {
-                   Log.w("Vaults", "Empty tokens received from server for account: ${it.accountIdentifier}. Skipping update.")
-               }
-           }
+                // Check if tokens are empty
+                if (accessToken.isNotEmpty() && refreshToken.isNotEmpty()) { // if tokens exist store them
+                    storedTokensToInsert.add(
+                        StoredTokenEntity(
+                            accountId = uuid,
+                            accessToken = accessToken,
+                            refreshToken = refreshToken
+                        )
+                    )
+                } else if ( // if the store on device setting is off but no tokens exist stored on device or gotten from server
+                    !storeTokensOnDevice &&
+                    isStoredOnDevice &&
+                    accessToken.isEmpty() &&
+                    refreshToken.isEmpty() &&
+                    uuid !in existingTokensIds
+                ) {
+                    accountsWithDeletedTokens.add(it.accountIdentifier)
+                    Log.d("Vaults", "Account with deleted tokens: $it")
+                } else {
+                    Log.w(
+                        "Vaults",
+                        "Empty tokens received from server for account: ${it.accountIdentifier}. Skipping update."
+                    )
+                }
+            }
 
-           datastore.storedPlatformsDao().deleteAll()
-           datastore.storedPlatformsDao().insertAll(storedPlatforms)
+            try {
+                datastore.storedPlatformsDao().deleteAll()
+                datastore.storedPlatformsDao().insertAll(storedPlatforms)
 
-           // deleting and inserting back platforms deletes tokens so this puts back previous deleted tokens based on existing platform ids
-           val platformAccountIds = datastore.storedPlatformsDao().getAllAccountIds()
-           existingTokens.forEach { tokenEntity ->
-               if (tokenEntity.accountId in platformAccountIds) {
-                   insertTokens(context, tokenEntity)
-               }
-           }
+                // deleting and inserting back platforms deletes tokens so this puts back previous deleted tokens based on existing platform ids
+                val platformAccountIds = datastore.storedPlatformsDao().getAllAccountIds()
+                existingTokens.forEach { tokenEntity ->
+                    if (tokenEntity.accountId in platformAccountIds) {
+                        insertTokens(context, tokenEntity)
+                    }
+                }
 
-           Log.d("Vaults", "Accounts with deleted tokens: $accountsWithDeletedTokens")
+                Log.d("Vaults", "Accounts with deleted tokens: $accountsWithDeletedTokens")
 
-           // This inserts any new tokens received from the server
-           storedTokensToInsert.forEach { tokenEntity ->
-               val existingToken = getTokenEntity(context, tokenEntity.accountId)
-               Log.d("Vaults", "Existing tokens: $existingToken")
-               if (existingToken == null) {
-                   Log.d("Vaults", "About to insert tokens $tokenEntity")
-                   datastore.storedTokenDao().insertTokens(tokenEntity)
-                   Log.d("Vaults", "Inserted tokens to db")
-               } else {
-                   Log.d("Vaults", "Found existing tokens $existingToken")
-               }
-           }
-       }
-
+                // This inserts any new tokens received from the server
+                storedTokensToInsert.forEach { tokenEntity ->
+                    val existingToken = getTokenEntity(context, tokenEntity.accountId)
+                    Log.d("Vaults", "Existing tokens: $existingToken")
+                    if (existingToken == null) {
+                        Log.d("Vaults", "About to insert tokens $tokenEntity")
+                        datastore.storedTokenDao().insertTokens(tokenEntity)
+                        Log.d("Vaults", "Inserted tokens to db")
+                    } else {
+                        Log.d("Vaults", "Found existing tokens $existingToken")
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("Vaults", "Error refreshing tokens", e)
+            }
+        } catch (e: Exception) {
+            Log.e("Vaults", "Error refreshing tokens", e)
+        }
     }
 
     private fun processVaultArtifacts(context: Context,
@@ -468,17 +479,17 @@ class Vaults(context: Context) {
     }
 }
 
-suspend fun getAllStoredTokens(context: Context): List<StoredTokenEntity> {
+fun getAllStoredTokens(context: Context): List<StoredTokenEntity> {
     val platformsViewModel = PlatformsViewModel()
     return platformsViewModel.getAllStoredTokens(context)
 }
 
-suspend fun insertTokens(context: Context, tokenEntity: StoredTokenEntity) {
+fun insertTokens(context: Context, tokenEntity: StoredTokenEntity) {
     val platformsViewModel = PlatformsViewModel()
     platformsViewModel.addStoredTokens(context, tokenEntity)
 }
 
-suspend fun getTokenEntity(context: Context, accountId: String): StoredTokenEntity? {
+fun getTokenEntity(context: Context, accountId: String): StoredTokenEntity? {
     val platformsViewModel = PlatformsViewModel()
     return platformsViewModel.getTokenByAccountId(context, accountId)
 }

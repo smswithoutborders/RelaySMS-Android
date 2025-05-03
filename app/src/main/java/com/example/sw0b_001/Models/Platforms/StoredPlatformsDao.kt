@@ -34,7 +34,7 @@ interface StoredPlatformsDao {
     fun delete(id: String)
 
     @Query("SELECT id FROM StoredPlatformsEntity")
-    suspend fun getAllAccountIds(): List<String>
+    fun getAllAccountIds(): List<String>
 
 
 }
