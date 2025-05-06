@@ -77,17 +77,59 @@ import java.util.Locale
 
 data class TextContent(val from: String, val text: String)
 
+//object TextComposeHandler {
+//    fun decomposeMessage(
+//        text: String
+//    ): TextContent {
+//        println(text)
+//        return text.split(":").let {
+//            TextContent(
+//                from=it[0],
+//                text = it.subList(1, it.size).joinToString()
+//            )
+//        }
+//    }
+//}
+
 object TextComposeHandler {
-    fun decomposeMessage(
-        text: String
-    ): TextContent {
-        println(text)
-        return text.split(":").let {
-            TextContent(
-                from=it[0],
-                text = it.subList(1, it.size).joinToString()
-            )
+
+    // Function to create a default/error state
+    private fun errorContent(originalMessage: String): TextContent {
+        Log.e("TextComposeHandler", "Failed to decompose message, returning defaults. Original: $originalMessage")
+        return TextContent(from = "Unknown", text = "Error: Could not parse message content.")
+    }
+
+    fun decomposeMessage(message: String): TextContent {
+        val parts = message.split(":", limit = 2)
+
+        if (parts.size < 2) {
+            return errorContent(message)
         }
+
+
+        val from = parts[0]
+        val textAndMaybeTokens = parts[1]
+
+        val lastColonIdx = textAndMaybeTokens.lastIndexOf(':')
+        val secondLastColonIdx = if (lastColonIdx > 0) {
+            textAndMaybeTokens.lastIndexOf(':', startIndex = lastColonIdx - 1)
+        } else {
+            -1
+        }
+
+        val actualTextBody: String
+        if (secondLastColonIdx != -1) {
+            actualTextBody = textAndMaybeTokens.substring(0, secondLastColonIdx)
+            Log.d("TextComposeHandler", "Tokens likely present, extracted body.")
+        } else {
+            actualTextBody = textAndMaybeTokens
+            Log.d("TextComposeHandler", "Tokens likely absent, using full remainder as body.")
+        }
+
+        return TextContent(
+            from = from,
+            text = actualTextBody
+        )
     }
 }
 
