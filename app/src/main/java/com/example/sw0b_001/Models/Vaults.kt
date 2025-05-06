@@ -106,8 +106,13 @@ class Vaults(val context: Context) {
                     StoredPlatformsEntity(uuid, it.accountIdentifier, it.platform)
                 )
                 val isStoredOnDevice = it.isStoredOnDevice
+                val accessToken = it.accountTokensMap["access_token"]
+                val refreshToken = it.accountTokensMap["refresh_token"]
+                Log.d("Vaults", "Is stored on device: $isStoredOnDevice")
                 // TODO: add storing in case there's something to store
-                if (isStoredOnDevice && it.accountTokensMap["access_token"].isNullOrEmpty()) {
+                if (isStoredOnDevice &&
+                    accessToken.isNullOrEmpty() &&
+                    uuid !in existingTokensIds) {
                     accountsMissingTokens[it.platform].let { accountsIds ->
                         if (accountsIds.isNullOrEmpty())
                             accountsMissingTokens[it.platform] = mutableListOf(it.accountIdentifier)
@@ -116,13 +121,16 @@ class Vaults(val context: Context) {
                     }
                 }
                 else {
-                    storedTokensToInsert.add(
-                        StoredTokenEntity(
-                            accountId = uuid,
-                            accessToken = it.accountTokensMap["access_token"]!!,
-                            refreshToken = it.accountTokensMap["refresh_token"]!!,
+                    if (uuid !in existingTokensIds && accessToken != null && refreshToken != null) {
+                        storedTokensToInsert.add(
+                            StoredTokenEntity(
+                                accountId = uuid,
+                                accessToken = accessToken,
+                                refreshToken = refreshToken,
+                            )
                         )
-                    )
+                        Log.d("Vaults", "Inserted tokens to stored tokens to insert list")
+                    }
                 }
             }
             missingCallback(accountsMissingTokens)
