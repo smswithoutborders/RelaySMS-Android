@@ -261,5 +261,20 @@
     <string name="relaysms_bug_report">RelaySMS - Ripoti ya Hitilafu</string>
     <string name="request_new_code_in">Omba nambari mpya katika:</string>
     <string name="request_new_code">Omba nambari mpya!</string>
+    <string name="store_tokens_on_device_dialog_title">Hifadhi Tokeni za OAuth2.0 kwenye Kifaa</string>
+    <string name="store_tokens_on_device_enable_dialog_message">Kuwasha kipengele hiki hufuta kiotomatiki tokeni zako kwa majukwaa yanayotumia OAuth2.0 (Gmail na X) kwenye seva na kuzihifadhi kwenye kifaa chako. Kumbuka kwamba RelaySMS hutumia tokeni hizi kutuma ujumbe kwa niaba yako kwa majukwaa yaliyotajwa hapo juu. Kwa hivyo, ikiwa utapoteza kifaa chako au ukifanya usakinishaji upya wa programu hii, tokeni zako zitapotea na utalazimika kufuta akaunti zilizohifadhiwa zilizopo na kuzihifadhi tena ili kupata tokeni mpya.</string>
+    <string name="store_tokens_on_device_disable_dialog_message">Kuzima mpangilio huu kutazuia tokeni zinazofuata kuhifadhiwa kwenye kifaa chako. Ujumbe kwa majukwaa yenye tokeni zilizopo zilizohifadhiwa kwenye kifaa chako bado utaweza kuchapishwa bila kujali. Katika hali yoyote ya tokeni zinazokosekana, tafadhali futa akaunti zinazohusika na uzihifadhi tena.</string>
+    <string name="are_you_sure_you_want_to_continue">Una uhakika unataka kuendelea na hatua hii?</string>
+    <string name="missing_token_text">Akaunti zako zifuatazo zinaweza kuwa na tokeni zinazokosekana. Unaweza kuhitaji kuzifuta na kuziongeza tena ili kuhakikisha uchapishaji wa ujumbe unafanya kazi kwa usahihi, hasa ikiwa \'Hifadhi Tokeni Kwenye Kifaa\' imewashwa:</string>
+    <string name="toast_tokens_refreshed_successfully">Tokeni zimeonyeshwa upya kwa mafanikio</string>
+    <string name="toast_error_refreshing_tokens">Hitilafu wakati wa kuonyesha upya tokeni: %s</string>
+    <string name="toast_tokens_not_stored_subsequent">Tokeni kwa akaunti zinazofuata hazitahifadhiwa kwenye kifaa</string>
+    <string name="an_unexpected_error_occurred">Hitilafu isiyotarajiwa imetokea: %s</string>
+    <string name="do_not_show_this_again">Usionyeshe hii tena</string>
+    <string name="missing_tokens_info">Taarifa za Tokeni Zinazokosekana</string>
+    <string name="store_tokens_on_device">Hifadhi Tokeni Kwenye Kifaa</string>
+    <string name="storing_platform_accounts">Kuhifadhi Akaunti za Jukwaa</string>
+    <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">Wakati wa kuongeza akaunti kwa majukwaa yanayotumia OAuth2.0 (k.m. Gmail, X), kuwezesha hii huhakikisha kuwa tokeni zako za kufikia zinahifadhiwa kwenye kifaa chako cha sasa badala yake.</string>
+
 
 </resources>

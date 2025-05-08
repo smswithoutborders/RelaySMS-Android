@@ -444,6 +444,7 @@ private fun processPost(
                 }
 
             }
+            Log.d("TextComposeView", "Formatted content: $formattedContent")
 
             val AD = Publishers.fetchPublisherPublicKey(context)
             ComposeHandlers.compose(
