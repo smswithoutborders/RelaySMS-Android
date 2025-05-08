@@ -254,5 +254,20 @@
     <string name="relaysms_bug_report">RelaySMS - Fehlerbericht</string>
     <string name="request_new_code_in">Neuen Code anfordern in:</string>
     <string name="request_new_code">Neuen Code anfordern!</string>
+    <string name="store_tokens_on_device_dialog_title">OAuth2.0-Token auf dem Gerät speichern</string>
+    <string name="store_tokens_on_device_enable_dialog_message">Durch Aktivieren dieser Funktion werden Ihre Token für Plattformen, die OAuth2.0 (Gmail und X) verwenden, automatisch auf dem Server gelöscht und auf Ihrem Gerät gespeichert. Beachten Sie, dass RelaySMS diese Token verwendet, um Nachrichten im Namen der oben genannten Plattformen zu senden. Wenn Sie Ihr Gerät verlieren oder diese Anwendung neu installieren, gehen Ihre Token verloren und Sie müssen vorhandene gespeicherte Konten widerrufen und erneut speichern, um neue Token zu erhalten.</string>
+    <string name="store_tokens_on_device_disable_dialog_message">Durch Deaktivieren dieser Einstellung wird verhindert, dass nachfolgende Token auf Ihrem Gerät gespeichert werden. Nachrichten für Plattformen mit vorhandenen auf Ihrem Gerät gespeicherten Token können unabhängig davon weiterhin veröffentlicht werden. Im Falle fehlender Token widerrufen Sie bitte die betroffenen Konten und speichern Sie sie erneut.</string>
+    <string name="are_you_sure_you_want_to_continue">Sind Sie sicher, dass Sie mit dieser Aktion fortfahren möchten?</string>
+    <string name="missing_token_text">Ihre folgenden Konten haben möglicherweise fehlende Token. Möglicherweise müssen Sie sie widerrufen und erneut hinzufügen, um sicherzustellen, dass die Nachrichtenveröffentlichung ordnungsgemäß funktioniert, insbesondere wenn "Token auf dem Gerät speichern" aktiviert ist:</string>
+    <string name="toast_tokens_refreshed_successfully">Token erfolgreich aktualisiert</string>
+    <string name="toast_error_refreshing_tokens">Fehler beim Aktualisieren der Token: %s</string>
+    <string name="toast_tokens_not_stored_subsequent">Token für nachfolgende Konten werden nicht auf dem Gerät gespeichert</string>
+    <string name="an_unexpected_error_occurred">Ein unerwarteter Fehler ist aufgetreten: %s</string>
+    <string name="do_not_show_this_again">Dies nicht erneut anzeigen</string>
+    <string name="missing_tokens_info">Informationen zu fehlenden Token</string>
+    <string name="store_tokens_on_device">Token auf dem Gerät speichern</string>
+    <string name="storing_platform_accounts">Plattformkonten speichern</string>
+    <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">Beim Hinzufügen von Konten für Plattformen, die OAuth2.0 (z. B. Gmail, X) verwenden, stellt die Aktivierung sicher, dass Ihre Zugriffstoken stattdessen auf Ihrem aktuellen Gerät gespeichert werden.</string>
+
 
 </resources>

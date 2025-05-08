@@ -79,7 +79,7 @@ fun MissingTokenInfoDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Missing Tokens Info") },
+        title = { Text(stringResource(R.string.missing_tokens_info)) },
         text = {
             Column {
                 Text(stringResource(R.string.missing_token_text))
@@ -111,13 +111,13 @@ fun MissingTokenInfoDialog(
                         onCheckedChange = { isChecked -> doNotShowAgain = isChecked }
                     )
                     Spacer(Modifier.width(4.dp))
-                    Text("Do not show this again")
+                    Text(stringResource(R.string.do_not_show_this_again))
                 }
             }
         },
         confirmButton = {
             TextButton(onClick = { onConfirm(doNotShowAgain) }) {
-                Text("OK")
+                Text(stringResource(R.string.ok))
             }
         }
 

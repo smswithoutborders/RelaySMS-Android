@@ -277,10 +277,20 @@
     <string name="request_new_code_in">Request new code in: </string>
     <string name="request_new_code">Request new code!</string>
     <string name="test_url" translatable="false">https://gatewayserver.smswithoutborders.com/v3/clients/%1$s/tests</string>
-    <string name="store_tokens_on_device_dialog_title">Store Tokens on Device</string>
+    <string name="store_tokens_on_device_dialog_title">Store OAuth2.0 Tokens on Device</string>
     <string name="store_tokens_on_device_enable_dialog_message">Turning on this feature automatically deletes your tokens for platforms that utilize OAuth2.0 (Gmail and X) on the server and saves them in your device. Bear in mind RelaySMS utilizes these tokens to send messages on your behalf for the above platforms.  Therefore in case you lose your device or happen to re-install this application, your tokens will be lost and you will have to revoke existing stored accounts and store them again to get new tokens</string>
-    <string name="store_tokens_on_device_disable_dialog_message">Turning off this setting you prevent subsequent tokens from being stored on your device. Messages for tokens stored on your device will still be able to public regardless. In any case of missing tokens, please revoke for the accounts involved and store again. </string>
+    <string name="store_tokens_on_device_disable_dialog_message">Turning off this setting will prevent subsequent tokens from being stored on your device. Messages for platforms with existing tokens stored on your device will still be able to publish regardless. In any case of missing tokens, please revoke for the accounts involved and store again. </string>
     <string name="are_you_sure_you_want_to_continue">Are you sure you want to continue with this action?</string>
     <string name="missing_token_text">Your following accounts may have missing tokens. You might need to revoke and add them again to ensure message publishing works correctly, especially if \'Store Tokens On-device\' is enabled:</string>
+    <string name="toast_tokens_refreshed_successfully">Successfully refreshed tokens</string>
+    <string name="toast_error_refreshing_tokens">Error refreshing tokens: %s</string>
+    <string name="toast_tokens_not_stored_subsequent">Tokens for subsequent accounts won\'t be stored on device</string>
+    <string name="an_unexpected_error_occurred">An unexpected error occuered: %s</string>
+    <string name="do_not_show_this_again">Do not show this again</string>
+    <string name="missing_tokens_info">Missing Tokens Info</string>
+    <string name="store_tokens_on_device">Store Tokens On-device</string>
+    <string name="storing_platform_accounts">Storing Platform Accounts</string>
+    <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">When adding accounts for platforms that utilize OAuth2.0 (e.g Gmail, X), enabling this makes sure your access tokens are rather stored on your current device</string>
+
 
 </resources>

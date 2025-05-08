@@ -102,19 +102,74 @@ data class EmailContent(
     var body: String
 )
 
+//object EmailComposeHandler {
+//    fun decomposeMessage(
+//        message: String,
+//    ): EmailContent {
+//        return message.split(":").let {
+//            EmailContent(
+//                to = it[1],
+//                cc = it[2],
+//                bcc = it[3],
+//                subject = it[4],
+//                body = it.subList(5, it.size).joinToString()
+//            )
+//        }
+//    }
+//}
+
 object EmailComposeHandler {
-    fun decomposeMessage(
-        message: String,
-    ): EmailContent {
-        return message.split(":").let {
-            EmailContent(
-                to = it[1],
-                cc = it[2],
-                bcc = it[3],
-                subject = it[4],
-                body = it.subList(5, it.size).joinToString()
-            )
+
+    private const val TO_INDEX = 1
+    private const val CC_INDEX = 2
+    private const val BCC_INDEX = 3
+    private const val SUBJECT_INDEX = 4
+    private const val BODY_START_INDEX = 5
+
+    // Function to create a default/error state
+    private fun errorContent(originalMessage: String): EmailContent {
+        Log.e("EmailComposeHandler", "Failed to decompose message, returning defaults. Original: $originalMessage")
+        return EmailContent(to = "", cc = "", bcc = "", subject = "", body = "Error: Could not parse message content.")
+    }
+
+    fun decomposeMessage(message: String): EmailContent {
+
+        val parts = message.split(":", limit = 6)
+
+        if (parts.size < 6) {
+            return errorContent(message)
         }
+
+        val to = parts.getOrElse(TO_INDEX) { "" }
+        val cc = parts.getOrElse(CC_INDEX) { "" }
+        val bcc = parts.getOrElse(BCC_INDEX) { "" }
+        val subject = parts.getOrElse(SUBJECT_INDEX) { "" }
+        val bodyAndMaybeTokens = parts[BODY_START_INDEX]
+
+
+        val lastColonIdx = bodyAndMaybeTokens.lastIndexOf(':')
+        val secondLastColonIdx = if (lastColonIdx > 0) {
+            bodyAndMaybeTokens.lastIndexOf(':', startIndex = lastColonIdx - 1)
+        } else {
+            -1
+        }
+
+        val actualBody: String
+        if (secondLastColonIdx != -1) {
+            actualBody = bodyAndMaybeTokens.substring(0, secondLastColonIdx)
+            Log.d("EmailComposeHandler", "Tokens likely present, extracted body.")
+        } else {
+            actualBody = bodyAndMaybeTokens
+            Log.d("EmailComposeHandler", "Tokens likely absent, using full remainder as body.")
+        }
+
+        return EmailContent(
+            to = to,
+            cc = cc,
+            bcc = bcc,
+            subject = subject,
+            body = actualBody
+        )
     }
 }
 

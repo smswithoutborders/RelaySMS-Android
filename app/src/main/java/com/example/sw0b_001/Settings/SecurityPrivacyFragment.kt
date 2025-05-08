@@ -229,7 +229,7 @@ class SecurityPrivacyFragment : PreferenceFragmentCompat() {
                                 launch(Dispatchers.Main) {
                                     Toast.makeText(
                                         activity,
-                                        "Successfuly refreshed tokens",
+                                        getString(R.string.toast_tokens_refreshed_successfully),
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
@@ -238,7 +238,7 @@ class SecurityPrivacyFragment : PreferenceFragmentCompat() {
                                 launch(Dispatchers.Main) {
                                     Toast.makeText(
                                         activity,
-                                        "${e.message}",
+                                        getString(R.string.toast_error_refreshing_tokens, e.message),
                                         Toast.LENGTH_LONG
                                     ).show()
                                 }
@@ -254,12 +254,16 @@ class SecurityPrivacyFragment : PreferenceFragmentCompat() {
 //                                    .deleteAllTokens()
 //                                Log.i("SecurityPrivacyFragment", "Local tokens cleared.")
                                 launch(Dispatchers.Main) {
-                                    Toast.makeText(activity, "Tokens for subsequent accounts won't be stored on device", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        activity,
+                                        getString(R.string.toast_tokens_not_stored_subsequent),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
                             } catch (e: Exception) {
-                                Log.e("SecurityPrivacyFragment", "Error clearing local tokens", e)
+                                Log.e("SecurityPrivacyFragment", "An error occurred while storing local tokens", e)
                                 launch(Dispatchers.Main) {
-                                    Toast.makeText(activity, "Error clearing local tokens:${e.message}", Toast.LENGTH_LONG).show()
+                                    Toast.makeText(activity, getString(R.string.an_unexpected_error_occurred, e.message), Toast.LENGTH_LONG).show()
                                 }
                             }
                         }

@@ -264,5 +264,20 @@
     <string name="relaysms_bug_report">RelaySMS - تقرير عن خطأ</string>
     <string name="request_new_code_in">طلب رمز جديد في:</string>
     <string name="request_new_code">اطلب رمزًا جديدًا!</string>
+    <string name="store_tokens_on_device_dialog_title">تخزين رموز OAuth2.0 على الجهاز</string>
+    <string name="store_tokens_on_device_enable_dialog_message">يؤدي تشغيل هذه الميزة إلى حذف رموزك تلقائيًا للمنصات التي تستخدم OAuth2.0 (Gmail و X) على الخادم وحفظها في جهازك. ضع في اعتبارك أن RelaySMS يستخدم هذه الرموز لإرسال الرسائل نيابة عنك للمنصات المذكورة أعلاه. لذلك في حالة فقدان جهازك أو إعادة تثبيت هذا التطبيق، ستفقد رموزك وسيتعين عليك إلغاء حساباتك المخزنة الحالية وتخزينها مرة أخرى للحصول على رموز جديدة.</string>
+    <string name="store_tokens_on_device_disable_dialog_message">سيؤدي إيقاف تشغيل هذا الإعداد إلى منع تخزين الرموز اللاحقة على جهازك. ستظل رسائل المنصات التي تحتوي على رموز موجودة مخزنة على جهازك قادرة على النشر بغض النظر عن ذلك. في أي حالة من الرموز المفقودة، يرجى الإلغاء للحسابات المعنية وتخزينها مرة أخرى.</string>
+    <string name="are_you_sure_you_want_to_continue">هل أنت متأكد أنك تريد المتابعة بهذا الإجراء؟</string>
+    <string name="missing_token_text">قد تحتوي حساباتك التالية على رموز مفقودة. قد تحتاج إلى إلغائها وإضافتها مرة أخرى لضمان عمل نشر الرسائل بشكل صحيح، خاصة إذا كان "تخزين الرموز على الجهاز" ممكّنًا:</string>
+    <string name="toast_tokens_refreshed_successfully">تم تحديث الرموز بنجاح</string>
+    <string name="toast_error_refreshing_tokens">خطأ في تحديث الرموز: %s</string>
+    <string name="toast_tokens_not_stored_subsequent">لن يتم تخزين الرموز للحسابات اللاحقة على الجهاز</string>
+    <string name="an_unexpected_error_occurred">حدث خطأ غير متوقع: %s</string>
+    <string name="do_not_show_this_again">لا تظهر هذا مرة أخرى</string>
+    <string name="missing_tokens_info">معلومات الرموز المفقودة</string>
+    <string name="store_tokens_on_device">تخزين الرموز على الجهاز</string>
+    <string name="storing_platform_accounts">تخزين حسابات المنصات</string>
+    <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">عند إضافة حسابات للمنصات التي تستخدم OAuth2.0 (مثل Gmail و X)، يضمن تمكين هذا أن يتم تخزين رموز الوصول الخاصة بك على جهازك الحالي بدلاً من ذلك.</string>
+
 
 </resources>

@@ -106,8 +106,13 @@ class Vaults(val context: Context) {
                     StoredPlatformsEntity(uuid, it.accountIdentifier, it.platform)
                 )
                 val isStoredOnDevice = it.isStoredOnDevice
+                val accessToken = it.accountTokensMap["access_token"]
+                val refreshToken = it.accountTokensMap["refresh_token"]
+                Log.d("Vaults", "Is stored on device: $isStoredOnDevice")
                 // TODO: add storing in case there's something to store
-                if (isStoredOnDevice && it.accountTokensMap["access_token"].isNullOrEmpty()) {
+                if (isStoredOnDevice &&
+                    accessToken.isNullOrEmpty() &&
+                    uuid !in existingTokensIds) {
                     accountsMissingTokens[it.platform].let { accountsIds ->
                         if (accountsIds.isNullOrEmpty())
                             accountsMissingTokens[it.platform] = mutableListOf(it.accountIdentifier)
@@ -116,19 +121,28 @@ class Vaults(val context: Context) {
                     }
                 }
                 else {
-                    storedTokensToInsert.add(
-                        StoredTokenEntity(
-                            accountId = uuid,
-                            accessToken = it.accountTokensMap["access_token"]!!,
-                            refreshToken = it.accountTokensMap["refresh_token"]!!,
+                    if (uuid !in existingTokensIds && accessToken != null && refreshToken != null) {
+                        storedTokensToInsert.add(
+                            StoredTokenEntity(
+                                accountId = uuid,
+                                accessToken = accessToken,
+                                refreshToken = refreshToken,
+                            )
                         )
-                    )
+                        Log.d("Vaults", "Inserted tokens to stored tokens to insert list")
+                    }
                 }
             }
             missingCallback(accountsMissingTokens)
 
+            // filter out platform accounts with missing  tokens so they don't display as active platforms
+            val platformsToInsert = storedPlatforms.filter { platformEntity ->
+                !accountsMissingTokens.containsKey(platformEntity.name)
+            }.toCollection(ArrayList())
+            Log.d("Vaults", "Platforms to insert: $platformsToInsert")
+
             datastore.storedPlatformsDao().deleteAll()
-            datastore.storedPlatformsDao().insertAll(storedPlatforms)
+            datastore.storedPlatformsDao().insertAll(platformsToInsert)
 
             // deleting and inserting back platforms deletes tokens so this puts back previous deleted tokens based on existing platform ids
             val platformAccountIds = datastore.storedPlatformsDao().getAllAccountIds()
@@ -138,7 +152,7 @@ class Vaults(val context: Context) {
                 }
             }
 
-            Log.d("Vaults", "Accounts with missing tokens: $accountsWithMissingTokensInfo")
+            Log.d("Vaults", "Accounts with missing tokens: $accountsMissingTokens")
 
             // This inserts any new tokens received from the server
             storedTokensToInsert.forEach { tokenEntity ->
@@ -154,20 +168,26 @@ class Vaults(val context: Context) {
             }
 
             // store missing tokens in shared preferences
-            if (accountsWithMissingTokensInfo.isNotEmpty()) {
-                Log.d("Vaults", "Storing accounts with missing tokens: $accountsWithMissingTokensInfo")
+            if (accountsMissingTokens.isNotEmpty()) {
+                Log.d("Vaults", "Storing accounts map with missing tokens: $accountsMissingTokens")
                 try {
-                    val jsonString = Json.encodeToString(accountsWithMissingTokensInfo)
-                    sharedPreferences.edit() {
-                        putString(PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_JSON, jsonString)
+                    val jsonString = Json.encodeToString(accountsMissingTokens)
+                    sharedPreferences.edit {
+                        putString(PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_MAP_JSON, jsonString)
+                        remove(PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_JSON)
+                        remove(PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_IDS)
                     }
-                    Log.i("Vaults", "Stored ${accountsWithMissingTokensInfo.size} accounts with missing tokens in SharedPreferences.")
+                    Log.i("Vaults", "Stored ${accountsMissingTokens.size} platforms with missing tokens accounts in SharedPreferences.")
                 } catch (eJson: Exception) {
-                    Log.e("Vaults", "Failed to serialize or save missing tokens list to SharedPreferences", eJson)
+                    Log.e("Vaults", "Failed to serialize or save missing tokens map to SharedPreferences", eJson)
                 }
             } else {
-                Log.d("Vaults", "No accounts with missing tokens found. Clearing preference.")
-                sharedPreferences.edit() { remove(PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_JSON) }
+                Log.d("Vaults", "No accounts with missing tokens found. Clearing map preference.")
+                sharedPreferences.edit {
+                    remove(PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_MAP_JSON)
+                    remove(PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_JSON)
+                    remove(PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_IDS)
+                }
             }
         } catch (e: Exception) {
             Log.e("Vaults", "Error refreshing tokens", e)
@@ -504,6 +524,8 @@ class Vaults(val context: Context) {
         object PrefKeys {
             const val KEY_ACCOUNTS_MISSING_TOKENS_JSON = "accounts_with_missing_tokens_json"
             const val KEY_DO_NOT_SHOW_MISSING_TOKEN_DIALOG = "do_not_show_missing_token_dialog"
+            const val KEY_ACCOUNTS_MISSING_TOKENS_MAP_JSON = "accounts_with_missing_tokens_map_json"
+            const val KEY_ACCOUNTS_MISSING_TOKENS_IDS = "accounts_with_missing_tokens_ids"
         }
 
     }

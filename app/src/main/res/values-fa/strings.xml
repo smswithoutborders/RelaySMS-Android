@@ -255,5 +255,20 @@
     <string name="relaysms_bug_report">RelaySMS - گزارش خطا</string>
     <string name="request_new_code_in">درخواست کد جدید در:</string>
     <string name="request_new_code">درخواست کد جدید!</string>
+    <string name="store_tokens_on_device_dialog_title">ذخیره توکن‌های OAuth2.0 در دستگاه</string>
+    <string name="store_tokens_on_device_enable_dialog_message">روشن کردن این ویژگی به طور خودکار توکن‌های شما را برای پلتفرم‌هایی که از OAuth2.0 (Gmail و X) استفاده می‌کنند، در سرور حذف کرده و در دستگاه شما ذخیره می‌کند. به خاطر داشته باشید که RelaySMS از این توکن‌ها برای ارسال پیام به نمایندگی از شما برای پلتفرم‌های فوق استفاده می‌کند. بنابراین در صورت گم کردن دستگاه یا نصب مجدد این برنامه، توکن‌های شما از بین می‌روند و باید حساب‌های ذخیره شده موجود را لغو کرده و دوباره ذخیره کنید تا توکن‌های جدید دریافت کنید.</string>
+    <string name="store_tokens_on_device_disable_dialog_message">خاموش کردن این تنظیم از ذخیره توکن‌های بعدی در دستگاه شما جلوگیری می‌کند. پیام‌ها برای پلتفرم‌هایی با توکن‌های موجود که در دستگاه شما ذخیره شده‌اند، همچنان قادر به انتشار خواهند بود. در هر صورت توکن‌های مفقود شده، لطفاً برای حساب‌های مربوطه لغو کرده و دوباره ذخیره کنید.</string>
+    <string name="are_you_sure_you_want_to_continue">آیا مطمئن هستید که می‌خواهید با این اقدام ادامه دهید؟</string>
+    <string name="missing_token_text">حساب‌های زیر ممکن است توکن‌های مفقود داشته باشند. ممکن است نیاز باشد آنها را لغو کرده و دوباره اضافه کنید تا اطمینان حاصل شود که انتشار پیام به درستی کار می‌کند، به خصوص اگر "ذخیره توکن‌ها در دستگاه" فعال باشد:</string>
+    <string name="toast_tokens_refreshed_successfully">توکن‌ها با موفقیت به‌روزرسانی شدند</string>
+    <string name="toast_error_refreshing_tokens">خطا در به‌روزرسانی توکن‌ها: %s</string>
+    <string name="toast_tokens_not_stored_subsequent">توکن‌ها برای حساب‌های بعدی در دستگاه ذخیره نخواهند شد</string>
+    <string name="an_unexpected_error_occurred">خطای غیرمنتظره‌ای رخ داد: %s</string>
+    <string name="do_not_show_this_again">این را دوباره نشان نده</string>
+    <string name="missing_tokens_info">اطلاعات توکن‌های مفقود شده</string>
+    <string name="store_tokens_on_device">ذخیره توکن‌ها در دستگاه</string>
+    <string name="storing_platform_accounts">ذخیره حساب‌های پلتفرم</string>
+    <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">هنگام افزودن حساب برای پلتفرم‌هایی که از OAuth2.0 (مانند Gmail، X) استفاده می‌کنند، فعال کردن این گزینه اطمینان حاصل می‌کند که توکن‌های دسترسی شما به جای آن در دستگاه فعلی شما ذخیره می‌شوند.</string>
+
 
 </resources>

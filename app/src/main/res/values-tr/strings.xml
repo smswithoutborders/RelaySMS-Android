@@ -250,5 +250,20 @@
     <string name="relaysms_bug_report">RelaySMS - Hata Raporu</string>
     <string name="request_new_code_in">Yeni kod isteğinde bulunun:</string>
     <string name="request_new_code">Yeni kod isteyin!</string>
+    <string name="store_tokens_on_device_dialog_title">OAuth2.0 Tokenlarını Cihazda Sakla</string>
+    <string name="store_tokens_on_device_enable_dialog_message">Bu özelliği açmak, OAuth2.0 (Gmail ve X) kullanan platformlar için tokenlarınızı sunucudan otomatik olarak siler ve cihazınıza kaydeder. RelaySMS\'in yukarıdaki platformlar için sizin adınıza mesaj göndermek için bu tokenları kullandığını unutmayın. Bu nedenle cihazınızı kaybederseniz veya bu uygulamayı yeniden yüklerseniz, tokenlarınız kaybolur ve yeni tokenlar almak için mevcut kayıtlı hesapları iptal edip tekrar kaydetmeniz gerekir.</string>
+    <string name="store_tokens_on_device_disable_dialog_message">Bu ayarı kapatmak, sonraki tokenların cihazınızda saklanmasını önleyecektir. Cihazınızda kayıtlı mevcut tokenları olan platformlar için mesajlar yine de yayınlanabilir. Eksik token olması durumunda, lütfen ilgili hesapları iptal edin ve tekrar kaydedin.</string>
+    <string name="are_you_sure_you_want_to_continue">Bu eyleme devam etmek istediğinizden emin misiniz?</string>
+    <string name="missing_token_text">Aşağıdaki hesaplarınızda eksik tokenlar olabilir. Özellikle \'Tokenları Cihazda Sakla\' etkinse, mesaj yayınlamanın doğru çalıştığından emin olmak için bunları iptal edip tekrar eklemeniz gerekebilir:</string>
+    <string name="toast_tokens_refreshed_successfully">Tokenlar başarıyla yenilendi</string>
+    <string name="toast_error_refreshing_tokens">Tokenlar yenilenirken hata oluştu: %s</string>
+    <string name="toast_tokens_not_stored_subsequent">Sonraki hesaplar için tokenlar cihazda saklanmayacaktır</string>
+    <string name="an_unexpected_error_occurred">Beklenmeyen bir hata oluştu: %s</string>
+    <string name="do_not_show_this_again">Bunu bir daha gösterme</string>
+    <string name="missing_tokens_info">Eksik Token Bilgisi</string>
+    <string name="store_tokens_on_device">Tokenları Cihazda Sakla</string>
+    <string name="storing_platform_accounts">Platform Hesapları Saklanıyor</string>
+    <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">OAuth2.0 (örneğin Gmail, X) kullanan platformlar için hesap eklerken, bunu etkinleştirmek erişim tokenlarınızın bunun yerine mevcut cihazınızda saklanmasını sağlar.</string>
+
 
 </resources>
