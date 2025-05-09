@@ -143,11 +143,11 @@ fun TextComposeView(
     val previewMode = LocalInspectionMode.current
 
     val decomposedMessage = if(platformsViewModel.message != null)
-        MessageComposeHandler.decomposeMessage(platformsViewModel.message!!.encryptedContent!!)
+        TextComposeHandler.decomposeMessage(platformsViewModel.message!!.encryptedContent!!)
     else null
 
     var from by remember { mutableStateOf( decomposedMessage?.from ?: "") }
-    var message by remember { mutableStateOf( decomposedMessage?.message ?: "" ) }
+    var message by remember { mutableStateOf( decomposedMessage?.text ?: "" ) }
 
     var showSelectAccountModal by remember { mutableStateOf(
         !previewMode && platformsViewModel.platform?.service_type != Platforms.ServiceTypes.TEST.type)
@@ -216,7 +216,7 @@ fun TextComposeView(
                 actions = {
                     IconButton(onClick = {
                         loading = true
-                        message = run {
+                        val testMessage = run {
                             val date = Date(System.currentTimeMillis())
                             val formatter = SimpleDateFormat(
                                 "yyyy-MM-dd'T'HH:mm:ss", Locale.US )
@@ -225,7 +225,7 @@ fun TextComposeView(
                         if(platformsViewModel.platform?.service_type == Platforms.ServiceTypes.TEST.type) {
                             processTest(
                                 context,
-                                data = message,
+                                data = testMessage,
                                 availablePlatforms = platformsViewModel.platform,
                                 onFailureCallback = { loading = false }
                             ) {
