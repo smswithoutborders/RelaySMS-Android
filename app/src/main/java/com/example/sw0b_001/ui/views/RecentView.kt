@@ -188,6 +188,7 @@ fun RecentView(
                     Platforms.ServiceTypes.EMAIL.type -> {
                         val decomposed = EmailComposeHandler.decomposeMessage(
                             message.encryptedContent!!,
+                            isBridge = false
                         )
                         "${message.fromAccount ?: ""} ${decomposed.subject} ${decomposed.body}"
                     }
@@ -348,6 +349,7 @@ fun RecentMessageCard(
         Platforms.ServiceTypes.EMAIL.type -> {
             val decomposed = EmailComposeHandler.decomposeMessage(
                 message.encryptedContent!!,
+                isBridge = false
             )
             heading = message.fromAccount ?: "RelaySMS"
             subHeading = decomposed.subject

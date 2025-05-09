@@ -120,54 +120,70 @@ data class EmailContent(
 
 object EmailComposeHandler {
 
-    private const val TO_INDEX = 1
-    private const val CC_INDEX = 2
-    private const val BCC_INDEX = 3
-    private const val SUBJECT_INDEX = 4
-    private const val BODY_START_INDEX = 5
-
-    // Function to create a default/error state
-    private fun errorContent(originalMessage: String): EmailContent {
-        Log.e("EmailComposeHandler", "Failed to decompose message, returning defaults. Original: $originalMessage")
+    private fun errorContent(originalMessage: String, reason: String): EmailContent {
+        Log.e("EmailComposeHandler", "Failed to decompose message ($reason). Original: $originalMessage")
         return EmailContent(to = "", cc = "", bcc = "", subject = "", body = "Error: Could not parse message content.")
     }
 
-    fun decomposeMessage(message: String): EmailContent {
+    fun decomposeMessage(message: String, isBridge: Boolean): EmailContent {
+        val toValue: String
+        val ccValue: String
+        val bccValue: String
+        val subjectValue: String
+        var actualBody: String
 
-        val parts = message.split(":", limit = 6)
+        if (isBridge) {
+            val splitLimit = 5
+            val parts = message.split(":", limit = splitLimit)
 
-        if (parts.size < 6) {
-            return errorContent(message)
-        }
+            if (parts.size < splitLimit) {
+                return errorContent(message, "isBridge=true, parts.size (${parts.size}) < required minimum ($splitLimit)")
+            }
 
-        val to = parts.getOrElse(TO_INDEX) { "" }
-        val cc = parts.getOrElse(CC_INDEX) { "" }
-        val bcc = parts.getOrElse(BCC_INDEX) { "" }
-        val subject = parts.getOrElse(SUBJECT_INDEX) { "" }
-        val bodyAndMaybeTokens = parts[BODY_START_INDEX]
+            toValue = parts.getOrElse(0) { "" }
+            ccValue = parts.getOrElse(1) { "" }
+            bccValue = parts.getOrElse(2) { "" }
+            subjectValue = parts.getOrElse(3) { "" }
+            actualBody = parts[4]
 
-
-        val lastColonIdx = bodyAndMaybeTokens.lastIndexOf(':')
-        val secondLastColonIdx = if (lastColonIdx > 0) {
-            bodyAndMaybeTokens.lastIndexOf(':', startIndex = lastColonIdx - 1)
         } else {
-            -1
+
+            val splitLimit = 6
+            val parts = message.split(":", limit = splitLimit)
+
+            if (parts.size < splitLimit) {
+                return errorContent(message, "isBridge=false, parts.size (${parts.size}) < required minimum ($splitLimit)")
+            }
+
+            toValue = parts.getOrElse(1) { "" }
+            ccValue = parts.getOrElse(2) { "" }
+            bccValue = parts.getOrElse(3) { "" }
+            subjectValue = parts.getOrElse(4) { "" }
+            val bodyAndMaybeTokens = parts[5]
+
+            val lastColonIdx = bodyAndMaybeTokens.lastIndexOf(':')
+            val secondLastColonIdx = if (lastColonIdx > 0) {
+                bodyAndMaybeTokens.lastIndexOf(':', startIndex = lastColonIdx - 1)
+            } else {
+                -1
+            }
+
+            if (secondLastColonIdx != -1) {
+                actualBody = bodyAndMaybeTokens.substring(0, secondLastColonIdx)
+                Log.d("EmailComposeHandler", "isBridge=false. Tokens likely present, extracted body: \"$actualBody\" from \"$bodyAndMaybeTokens\"")
+            } else {
+                actualBody = bodyAndMaybeTokens
+                Log.d("EmailComposeHandler", "isBridge=false. Tokens likely absent in \"$bodyAndMaybeTokens\", using full remainder as body.")
+            }
         }
 
-        val actualBody: String
-        if (secondLastColonIdx != -1) {
-            actualBody = bodyAndMaybeTokens.substring(0, secondLastColonIdx)
-            Log.d("EmailComposeHandler", "Tokens likely present, extracted body.")
-        } else {
-            actualBody = bodyAndMaybeTokens
-            Log.d("EmailComposeHandler", "Tokens likely absent, using full remainder as body.")
-        }
+        Log.d("EmailComposeHandler", "Decomposed (isBridge=$isBridge): To: \"$toValue\", CC: \"$ccValue\", BCC: \"$bccValue\", Subject: \"$subjectValue\", Body: \"$actualBody\"")
 
         return EmailContent(
-            to = to,
-            cc = cc,
-            bcc = bcc,
-            subject = subject,
+            to = toValue,
+            cc = ccValue,
+            bcc = bccValue,
+            subject = subjectValue,
             body = actualBody
         )
     }
@@ -205,7 +221,7 @@ fun EmailComposeView(
     val context = LocalContext.current
 
     val decomposedMessage = if(platformsViewModel.message != null)
-        EmailComposeHandler.decomposeMessage(platformsViewModel.message!!.encryptedContent!!)
+        EmailComposeHandler.decomposeMessage(platformsViewModel.message!!.encryptedContent!!, isBridge)
     else null
 
     var showCcBcc by remember { mutableStateOf(false) }
