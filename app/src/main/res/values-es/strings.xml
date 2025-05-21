@@ -255,5 +255,20 @@
     <string name="relaysms_bug_report">RelaySMS - Reporte de error</string>
     <string name="request_new_code_in">Solicitar nuevo código en:</string>
     <string name="request_new_code">¡Solicita nuevo código!</string>
+    <string name="store_tokens_on_device_dialog_title">Almacenar tokens de OAuth2.0 en el dispositivo</string>
+    <string name="store_tokens_on_device_enable_dialog_message">Al activar esta función, se eliminan automáticamente sus tokens para las plataformas que utilizan OAuth2.0 (Gmail y X) en el servidor y se guardan en su dispositivo. Tenga en cuenta que RelaySMS utiliza estos tokens para enviar mensajes en su nombre para las plataformas mencionadas. Por lo tanto, en caso de que pierda su dispositivo o vuelva a instalar esta aplicación, sus tokens se perderán y tendrá que revocar las cuentas almacenadas existentes y volver a almacenarlas para obtener nuevos tokens.</string>
+    <string name="store_tokens_on_device_disable_dialog_message">Al desactivar esta configuración, se evitará que los tokens posteriores se almacenen en su dispositivo. Los mensajes para las plataformas con tokens existentes almacenados en su dispositivo aún podrán publicarse independientemente. En cualquier caso de tokens faltantes, revoque las cuentas involucradas y vuelva a almacenarlas.</string>
+    <string name="are_you_sure_you_want_to_continue">¿Está seguro de que desea continuar con esta acción?</string>
+    <string name="missing_token_text">Sus siguientes cuentas pueden tener tokens faltantes. Es posible que deba revocarlos y agregarlos nuevamente para asegurarse de que la publicación de mensajes funcione correctamente, especialmente si la opción "Almacenar tokens en el dispositivo" está habilitada:</string>
+    <string name="toast_tokens_refreshed_successfully">Tokens actualizados correctamente</string>
+    <string name="toast_error_refreshing_tokens">Error al actualizar los tokens: %s</string>
+    <string name="toast_tokens_not_stored_subsequent">Los tokens para cuentas posteriores no se almacenarán en el dispositivo</string>
+    <string name="an_unexpected_error_occurred">Ocurrió un error inesperado: %s</string>
+    <string name="do_not_show_this_again">No mostrar esto de nuevo</string>
+    <string name="missing_tokens_info">Información de tokens faltantes</string>
+    <string name="store_tokens_on_device">Almacenar tokens en el dispositivo</string>
+    <string name="storing_platform_accounts">Almacenando cuentas de plataforma</string>
+    <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">Al agregar cuentas para plataformas que utilizan OAuth2.0 (por ejemplo, Gmail, X), habilitar esto asegura que sus tokens de acceso se almacenen en su dispositivo actual en su lugar.</string>
+
 
 </resources>

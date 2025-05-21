@@ -93,7 +93,7 @@ fun EmailDetailsView(
             }
         }
     else
-        EmailComposeHandler.decomposeMessage(platformsViewModel.message!!.encryptedContent!!).apply {
+        EmailComposeHandler.decomposeMessage(platformsViewModel.message!!.encryptedContent!!, isBridge = false).apply {
             to = this.to
             cc = this.cc
             bcc = this.bcc

@@ -255,5 +255,20 @@
     <string name="relaysms_bug_report">RelaySMS - Rapport de bogue</string>
     <string name="request_new_code_in">Demander un nouveau code dans :</string>
     <string name="request_new_code">Demandez un nouveau code !</string>
+    <string name="store_tokens_on_device_dialog_title">Stocker les jetons OAuth2.0 sur l\'appareil</string>
+    <string name="store_tokens_on_device_enable_dialog_message">L\'activation de cette fonctionnalité supprime automatiquement vos jetons pour les plateformes qui utilisent OAuth2.0 (Gmail et X) sur le serveur et les enregistre sur votre appareil. Gardez à l\'esprit que RelaySMS utilise ces jetons pour envoyer des messages en votre nom pour les plateformes ci-dessus. Par conséquent, si vous perdez votre appareil ou si vous réinstallez cette application, vos jetons seront perdus et vous devrez révoquer les comptes stockés existants et les stocker à nouveau pour obtenir de nouveaux jetons.</string>
+    <string name="store_tokens_on_device_disable_dialog_message">La désactivation de ce paramètre empêchera le stockage des jetons ultérieurs sur votre appareil. Les messages pour les plateformes avec des jetons existants stockés sur votre appareil pourront toujours être publiés indépendamment. En cas de jetons manquants, veuillez révoquer les comptes concernés et les stocker à nouveau.</string>
+    <string name="are_you_sure_you_want_to_continue">Êtes-vous sûr de vouloir continuer cette action ?</string>
+    <string name="missing_token_text">Vos comptes suivants peuvent avoir des jetons manquants. Vous devrez peut-être les révoquer et les ajouter à nouveau pour vous assurer que la publication des messages fonctionne correctement, surtout si l\'option "Stocker les jetons sur l\'appareil" est activée :</string>
+    <string name="toast_tokens_refreshed_successfully">Jetons actualisés avec succès</string>
+    <string name="toast_error_refreshing_tokens">Erreur lors de l\'actualisation des jetons : %s</string>
+    <string name="toast_tokens_not_stored_subsequent">Les jetons pour les comptes ultérieurs ne seront pas stockés sur l\'appareil</string>
+    <string name="an_unexpected_error_occurred">Une erreur inattendue est survenue : %s</string>
+    <string name="do_not_show_this_again">Ne plus afficher ceci</string>
+    <string name="missing_tokens_info">Informations sur les jetons manquants</string>
+    <string name="store_tokens_on_device">Stocker les jetons sur l\'appareil</string>
+    <string name="storing_platform_accounts">Stockage des comptes de plateforme</string>
+    <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">Lors de l\'ajout de comptes pour les plateformes qui utilisent OAuth2.0 (par exemple Gmail, X), l\'activation de cette option garantit que vos jetons d\'accès sont plutôt stockés sur votre appareil actuel.</string>
+
 
 </resources>
