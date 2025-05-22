@@ -269,6 +269,10 @@
     <string name="store_tokens_on_device">Stocker les jetons sur l\'appareil</string>
     <string name="storing_platform_accounts">Stockage des comptes de plateforme</string>
     <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">Lors de l\'ajout de comptes pour les plateformes qui utilisent OAuth2.0 (par exemple Gmail, X), l\'activation de cette option garantit que vos jetons d\'accès sont plutôt stockés sur votre appareil actuel.</string>
-
+    <string name="stored_tokens_detected_title">Jetons stockés détectés</string>
+    <string name="stored_tokens_dialog_message_part1">Des jetons stockés pour ce compte</string>
+    <string name="stored_tokens_dialog_message_part2"> ont été détectés. Vous pouvez utiliser vos jetons stockés pour publier sur X</string>
+    <string name="stored_tokens_dialog_message_part3">UNE SEULE FOIS. Tant que le paramètre \"Stocker les jetons sur l\'appareil\" est activé, vous ne pourrez publier qu\'une seule fois sur X. Pour effectuer d\'autres publications avec ce compte, révoquez et rajoutez ce compte pour chaque publication.</string>
+    <string name="stored_tokens_dialog_note">Remarque : Désactiver la fonction \"Stocker les jetons sur l\'appareil\" tout en vous assurant que des jetons sont stockés en ligne vous permettrait de faire plusieurs publications sur X sans avoir à révoquer et stocker à nouveau.</string>
 
 </resources>

@@ -278,6 +278,11 @@
     <string name="store_tokens_on_device">تخزين الرموز على الجهاز</string>
     <string name="storing_platform_accounts">تخزين حسابات المنصات</string>
     <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">عند إضافة حسابات للمنصات التي تستخدم OAuth2.0 (مثل Gmail و X)، يضمن تمكين هذا أن يتم تخزين رموز الوصول الخاصة بك على جهازك الحالي بدلاً من ذلك.</string>
+    <string name="stored_tokens_detected_title">تم اكتشاف رموز مميزة مخزنة</string>
+    <string name="stored_tokens_dialog_message_part1">تم اكتشاف رموز مميزة مخزنة لهذا الحساب</string>
+    <string name="stored_tokens_dialog_message_part2">. يمكنك استخدام الرموز المميزة المخزنة لإنشاء منشور على X</string>
+    <string name="stored_tokens_dialog_message_part3">مرة واحدة فقط. طالما أن إعداد \"تخزين الرموز المميزة على الجهاز\" قيد التشغيل، ستتمكن من إنشاء منشورات X مرة واحدة فقط. لإنشاء المزيد من المنشورات باستخدام هذا الحساب، قم بإلغاء هذا الحساب وإضافته مرة أخرى لكل منشور.</string>
+    <string name="stored_tokens_dialog_note">ملاحظة: إن إيقاف تشغيل ميزة \"تخزين الرموز المميزة على الجهاز\" مع التأكد من أن لديك رموزًا مميزة مخزنة عبر الإنترنت سيسمح لك بإنشاء منشورات متعددة على X دون الحاجة إلى الإلغاء والتخزين مرة أخرى.</string>
 
 
 </resources>

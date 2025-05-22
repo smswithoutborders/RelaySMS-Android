@@ -269,6 +269,11 @@
     <string name="store_tokens_on_device">ذخیره توکن‌ها در دستگاه</string>
     <string name="storing_platform_accounts">ذخیره حساب‌های پلتفرم</string>
     <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">هنگام افزودن حساب برای پلتفرم‌هایی که از OAuth2.0 (مانند Gmail، X) استفاده می‌کنند، فعال کردن این گزینه اطمینان حاصل می‌کند که توکن‌های دسترسی شما به جای آن در دستگاه فعلی شما ذخیره می‌شوند.</string>
+    <string name="stored_tokens_detected_title">توکن‌های ذخیره‌شده شناسایی شدند</string>
+    <string name="stored_tokens_dialog_message_part1">توکن‌های ذخیره‌شده برای این حساب</string>
+    <string name="stored_tokens_dialog_message_part2"> شناسایی شده‌اند. شما می‌توانید از توکن‌های ذخیره‌شده خود برای ارسال پست در X</string>
+    <string name="stored_tokens_dialog_message_part3">فقط یک بار استفاده کنید. تا زمانی که تنظیم «ذخیره توکن‌ها در دستگاه» روشن باشد، فقط یک بار می‌توانید پست‌های X ارسال کنید. برای ارسال پست‌های بیشتر با این حساب، این حساب را لغو کرده و برای هر پست دوباره آن را اضافه کنید.</string>
+    <string name="stored_tokens_dialog_note">توجه: غیرفعال کردن ویژگی «ذخیره توکن‌ها در دستگاه» در حالی که اطمینان حاصل می‌کنید توکن‌هایی به صورت آنلاین ذخیره کرده‌اید، به شما امکان می‌دهد چندین پست در X بدون نیاز به لغو و ذخیره مجدد ارسال کنید.</string>
 
 
 </resources>

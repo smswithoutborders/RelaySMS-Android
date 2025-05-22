@@ -291,6 +291,11 @@
     <string name="store_tokens_on_device">Store Tokens On-device</string>
     <string name="storing_platform_accounts">Storing Platform Accounts</string>
     <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">When adding accounts for platforms that utilize OAuth2.0 (e.g Gmail, X), enabling this makes sure your access tokens are rather stored on your current device</string>
+    <string name="stored_tokens_detected_title">Stored Tokens Detected</string>
+    <string name="stored_tokens_dialog_message_part1">Stored tokens for this</string>
+    <string name="stored_tokens_dialog_message_part2">account have been detected. You can use your stored tokens to make a post on</string>
+    <string name="stored_tokens_dialog_message_part3">just ONCE. As long as the \"Store Tokens on Device\" setting is on, you\'ll be able to make X posts just once. To make more posts with this account, revoke and add this account again for every post.</string>
+    <string name="stored_tokens_dialog_note">Note: Turning off the \"Store Tokens on Device\" feature while making sure you have tokens stored online would allow you to make multiple posts on X without having to revoke and store again.</string>
 
 
 </resources>

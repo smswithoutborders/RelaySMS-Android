@@ -264,6 +264,11 @@
     <string name="store_tokens_on_device">Tokenları Cihazda Sakla</string>
     <string name="storing_platform_accounts">Platform Hesapları Saklanıyor</string>
     <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">OAuth2.0 (örneğin Gmail, X) kullanan platformlar için hesap eklerken, bunu etkinleştirmek erişim tokenlarınızın bunun yerine mevcut cihazınızda saklanmasını sağlar.</string>
+    <string name="stored_tokens_detected_title">Kaydedilmiş Jetonlar Algılandı</string>
+    <string name="stored_tokens_dialog_message_part1">Bu hesap için kaydedilmiş jetonlar</string>
+    <string name="stored_tokens_dialog_message_part2"> algılandı. Kayıtlı jetonlarınızı kullanarak X platformunda</string>
+    <string name="stored_tokens_dialog_message_part3">SADECE BİR KEZ paylaşım yapabilirsiniz. \"Jetonları Cihazda Sakla\" ayarı açık olduğu sürece, X gönderilerini yalnızca bir kez yapabilirsiniz. Bu hesapla daha fazla gönderi yapmak için, her gönderi için bu hesabı iptal edip yeniden ekleyin.</string>
+    <string name="stored_tokens_dialog_note">Not: Çevrimiçi olarak saklanan jetonlarınız olduğundan emin olurken \"Jetonları Cihazda Sakla\" özelliğini kapatmak, X\'te yeniden iptal etmeye ve saklamaya gerek kalmadan birden fazla gönderi yapmanıza olanak tanır.</string>
 
 
 </resources>

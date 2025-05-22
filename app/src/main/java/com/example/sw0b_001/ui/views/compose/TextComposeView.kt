@@ -14,6 +14,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -22,6 +23,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -34,8 +36,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -74,6 +80,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
+import kotlin.text.append
 
 data class TextContent(val from: String, val text: String)
 
@@ -158,6 +165,39 @@ fun TextComposeView(
 
     var showMissingTokenDialog by remember { mutableStateOf(false) }
     var accountForDialog by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
+    var showStoredTokensInfoDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = selectedAccount, key2 = previewMode) {
+        if (previewMode) return@LaunchedEffect
+
+        selectedAccount?.let { account ->
+
+            val platformName = account.name ?: "this platform"
+            CoroutineScope(Dispatchers.IO).launch {
+                withContext(Dispatchers.IO) {
+                    val storeTokensOnDevice = platformsViewModel.getStoreTokensOnDevice(context)
+                    var hasStoredTokensInDb = false
+
+
+                    val dbTokens = platformsViewModel.getStoredTokens(context, account.id)
+                    hasStoredTokensInDb = dbTokens != null
+
+                    Log.d("TextComposeView", "Checking for StoredTokensInfoDialog: storeOnDevice=$storeTokensOnDevice, hasDbTokens=$hasStoredTokensInDb for account ${account.account}")
+
+                    if (storeTokensOnDevice || hasStoredTokensInDb) {
+                        showStoredTokensInfoDialog = true
+                    }
+                }
+            }
+        }
+    }
+
+    if (showStoredTokensInfoDialog && selectedAccount != null) {
+        StoredTokensInfoDialog(
+            platformName = selectedAccount?.name ?: "this platform",
+            onDismissRequest = { showStoredTokensInfoDialog = false }
+        )
+    }
 
     if (showSelectAccountModal) {
         SelectAccountModal(
@@ -332,7 +372,8 @@ private fun processTest(
                     .availablePlatformsDao().fetch(availablePlatforms?.name ?: "reliability")
 
                 val AD = Publishers.fetchPublisherPublicKey(context)
-                ComposeHandlers.compose(context,
+                ComposeHandlers.compose(
+                    context,
                     it.test_id.toString(),
                     AD!!,
                     availablePlatforms!!,
@@ -429,7 +470,9 @@ private fun processPost(
                 }
             } else {
                 val currentTokens = Datastore.getDatastore(context).storedTokenDao().getTokensByAccountId(account!!.id)
-                formattedContent = if (currentTokens != null) {
+                Log.d("TextComposeView", "Current tokens: $currentTokens")
+                formattedContent = if (currentTokens != null && currentTokens.accessToken.isNotEmpty()) {
+                    Log.d("TextComposeView", "Attempting to use stored tokens for account ID: ${account.id}")
                     processTextForEncryption(
                         textContent.text,
                         account,
@@ -437,6 +480,7 @@ private fun processPost(
                         currentTokens.refreshToken
                     )
                 } else {
+                    Log.d("TextComposeView", "No stored tokens found for account ID: ${account.id}")
                     processTextForEncryption(
                         textContent.text,
                         account
@@ -476,6 +520,43 @@ private fun processTextForEncryption(
     return "${account!!.account}:$body:$accessToken:$refreshToken"
 }
 
+@Composable
+fun StoredTokensInfoDialog(
+    platformName: String,
+    onDismissRequest: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        title = { Text(stringResource(R.string.stored_tokens_detected_title)) },
+        text = {
+            Column {
+                Text(
+                    buildAnnotatedString {
+                        append(stringResource(R.string.stored_tokens_dialog_message_part1))
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append(" $platformName ")
+                        }
+                        append(stringResource(R.string.stored_tokens_dialog_message_part2))
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append(" $platformName ")
+                        }
+                        append(stringResource(R.string.stored_tokens_dialog_message_part3))
+                    }
+                )
+                Spacer(modifier = Modifier.padding(8.dp))
+                Text(
+                    text = stringResource(R.string.stored_tokens_dialog_note),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(stringResource(android.R.string.ok))
+            }
+        }
+    )
+}
 
 @Preview(showBackground = true)
 @Composable
