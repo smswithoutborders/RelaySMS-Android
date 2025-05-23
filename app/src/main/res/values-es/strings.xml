@@ -269,6 +269,10 @@
     <string name="store_tokens_on_device">Almacenar tokens en el dispositivo</string>
     <string name="storing_platform_accounts">Almacenando cuentas de plataforma</string>
     <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">Al agregar cuentas para plataformas que utilizan OAuth2.0 (por ejemplo, Gmail, X), habilitar esto asegura que sus tokens de acceso se almacenen en su dispositivo actual en su lugar.</string>
-
+    <string name="stored_tokens_detected_title">Tokens almacenados detectados</string>
+    <string name="stored_tokens_dialog_message_part1">Se han detectado tokens almacenados para esta cuenta</string>
+    <string name="stored_tokens_dialog_message_part2">. Puedes usar tus tokens almacenados para hacer una publicación en X</string>
+    <string name="stored_tokens_dialog_message_part3">SOLO UNA VEZ. Mientras la configuración \"Almacenar tokens en el dispositivo\" esté activada, solo podrás hacer publicaciones en X una vez. Para hacer más publicaciones con esta cuenta, revoca y vuelve a añadir esta cuenta para cada publicación.</string>
+    <string name="stored_tokens_dialog_note">Nota: Desactivar la función \"Almacenar tokens en el dispositivo\" mientras te aseguras de tener tokens almacenados en línea te permitiría realizar múltiples publicaciones en X sin tener que revocar y almacenar de nuevo.</string>
 
 </resources>

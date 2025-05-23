@@ -57,11 +57,8 @@ class PublishersTest {
     private lateinit var storedTokenDao: StoredTokenDao
     private lateinit var platformsViewModel: PlatformsViewModel
 
-//    private val globalPhoneNumber = "+237123456789"
-//    private val globalPassword = "dummy_password"
-
-    private val globalPhoneNumber = "+237672872115"
-    private val globalPassword = "#237Asshole"
+    private val globalPhoneNumber = "+237123456789"
+    private val globalPassword = "dummy_password"
 
     private var context = InstrumentationRegistry.getInstrumentation().targetContext
 

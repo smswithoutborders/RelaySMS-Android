@@ -275,6 +275,10 @@
     <string name="store_tokens_on_device">Hifadhi Tokeni Kwenye Kifaa</string>
     <string name="storing_platform_accounts">Kuhifadhi Akaunti za Jukwaa</string>
     <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">Wakati wa kuongeza akaunti kwa majukwaa yanayotumia OAuth2.0 (k.m. Gmail, X), kuwezesha hii huhakikisha kuwa tokeni zako za kufikia zinahifadhiwa kwenye kifaa chako cha sasa badala yake.</string>
-
+    <string name="stored_tokens_detected_title">Tokeni Zilizohifadhiwa Zimegunduliwa</string>
+    <string name="stored_tokens_dialog_message_part1">Tokeni zilizohifadhiwa za akaunti hii</string>
+    <string name="stored_tokens_dialog_message_part2"> zimegunduliwa. Unaweza kutumia tokeni zako zilizohifadhiwa kutuma chapisho kwenye X</string>
+    <string name="stored_tokens_dialog_message_part3">MARA MOJA TU. Maadamu mpangilio wa \"Hifadhi Tokeni kwenye Kifaa\" umewashwa, utaweza kutuma machapisho ya X mara moja tu. Ili kutuma machapisho zaidi ukitumia akaunti hii, batilisha na uongeze akaunti hii tena kwa kila chapisho.</string>
+    <string name="stored_tokens_dialog_note">Kumbuka: Kuzima kipengele cha \"Hifadhi Tokeni kwenye Kifaa\" huku ukihakikisha una tokeni zilizohifadhiwa mtandaoni kutakuruhusu kutuma machapisho mengi kwenye X bila kulazimika kubatilisha na kuhifadhi tena.</string>
 
 </resources>

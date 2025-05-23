@@ -268,6 +268,11 @@
     <string name="store_tokens_on_device">Token auf dem Gerät speichern</string>
     <string name="storing_platform_accounts">Plattformkonten speichern</string>
     <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">Beim Hinzufügen von Konten für Plattformen, die OAuth2.0 (z. B. Gmail, X) verwenden, stellt die Aktivierung sicher, dass Ihre Zugriffstoken stattdessen auf Ihrem aktuellen Gerät gespeichert werden.</string>
+    <string name="stored_tokens_detected_title">Gespeicherte Tokens erkannt</string>
+    <string name="stored_tokens_dialog_message_part1">Gespeicherte Tokens für dieses</string>
+    <string name="stored_tokens_dialog_message_part2">Konto wurden erkannt. Sie können Ihre gespeicherten Tokens verwenden, um EINMAL einen Beitrag auf X zu erstellen.</string>
+    <string name="stored_tokens_dialog_message_part3">Solange die Einstellung \"Tokens auf Gerät speichern\" aktiviert ist, können Sie X-Beiträge nur einmal erstellen. Um weitere Beiträge mit diesem Konto zu erstellen, widerrufen Sie dieses Konto und fügen Sie es für jeden Beitrag erneut hinzu.</string>
+    <string name="stored_tokens_dialog_note">Hinweis: Wenn Sie die Funktion \"Tokens auf Gerät speichern\" deaktivieren und gleichzeitig sicherstellen, dass Sie Tokens online gespeichert haben, können Sie mehrere Beiträge auf X erstellen, ohne sie erneut widerrufen und speichern zu müssen.</string>
 
 
 </resources>
