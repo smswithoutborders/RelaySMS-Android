@@ -54,7 +54,6 @@ import com.example.sw0b_001.Models.Platforms.AvailablePlatformsDao
 import com.example.sw0b_001.Models.Platforms.Platforms
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
-import com.example.sw0b_001.Models.Platforms.StoredTokenEntity
 import com.example.sw0b_001.Models.Publishers
 import com.example.sw0b_001.Models.SMSHandler
 import com.example.sw0b_001.Models.Vaults
@@ -167,31 +166,6 @@ fun TextComposeView(
     var accountForDialog by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
     var showStoredTokensInfoDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(key1 = selectedAccount, key2 = previewMode) {
-        if (previewMode) return@LaunchedEffect
-
-        selectedAccount?.let { account ->
-
-            val platformName = account.name ?: "this platform"
-            CoroutineScope(Dispatchers.IO).launch {
-                withContext(Dispatchers.IO) {
-                    val storeTokensOnDevice = platformsViewModel.getStoreTokensOnDevice(context)
-                    var hasStoredTokensInDb = false
-
-
-                    val dbTokens = platformsViewModel.getStoredTokens(context, account.id)
-                    hasStoredTokensInDb = dbTokens != null
-
-                    Log.d("TextComposeView", "Checking for StoredTokensInfoDialog: storeOnDevice=$storeTokensOnDevice, hasDbTokens=$hasStoredTokensInDb for account ${account.account}")
-
-                    if (storeTokensOnDevice || hasStoredTokensInDb) {
-                        showStoredTokensInfoDialog = true
-                    }
-                }
-            }
-        }
-    }
-
     if (showStoredTokensInfoDialog && selectedAccount != null) {
         StoredTokensInfoDialog(
             platformName = selectedAccount?.name ?: "this platform",
@@ -218,20 +192,6 @@ fun TextComposeView(
 
     BackHandler {
         navController.popBackStack()
-    }
-
-    if (showMissingTokenDialog && accountForDialog != null) {
-        MissingTokenDialog(
-            account = accountForDialog!!,
-            onDismiss = { showMissingTokenDialog = false },
-            onRevoke = { accountToRevoke ->
-                showMissingTokenDialog = false
-                Log.d("EmailComposeView", "Revoke confirmed for account: ${accountToRevoke.account}")
-                triggerAccountRevokeHelper(context, platformsViewModel, accountToRevoke) {
-                    Log.d("EmailComposeView", "Revocation process completed for ${accountToRevoke.account}")
-                }
-            }
-        )
     }
 
     Scaffold(
@@ -286,7 +246,6 @@ fun TextComposeView(
                                     from = from,
                                     text = message,
                                 ),
-                                platformsViewModel = platformsViewModel,
                                 account = selectedAccount!!,
                                 onFailureCallback = { loading = false },
                                 onCompleteCallback = {
@@ -397,7 +356,6 @@ private fun processPost(
     context: Context,
     textContent: TextContent,
     account: StoredPlatformsEntity,
-    platformsViewModel: PlatformsViewModel,
     onFailureCallback: (String?) -> Unit,
     onCompleteCallback: () -> Unit,
     showMissingTokenDialogCallback: (StoredPlatformsEntity) -> Unit
@@ -438,55 +396,18 @@ private fun processPost(
                 return@launch
             }
 
-            val storeTokensOnDevice = platformsViewModel.getStoreTokensOnDevice(context)
-            val formattedContent: String
-
-            if (storeTokensOnDevice) {
-                Log.d("TextComposeView", "Attempting to retrieve tokens for account ID: ${account.id}")
-                val storedTokenEntity: StoredTokenEntity? =
-                    platformsViewModel.getStoredTokens(context, account.id)
-                Log.d("TextComposeView", "StoredTokenEntity: $storedTokenEntity")
-
-                if (storedTokenEntity != null) {
-                    val accessToken = storedTokenEntity.accessToken
-                    val refreshToken = storedTokenEntity.refreshToken
-
-                    formattedContent = processTextForEncryption(
-                        textContent.text,
-                        account,
-                        accessToken,
-                        refreshToken
-                    )
-                } else {
-                    // Handle missing tokens
-                    Log.e("TextComposeView", "Tokens not found for account: ${account.id}")
-                    onFailureCallback("Tokens not found. Please re-authenticate.")
-                    CoroutineScope(Dispatchers.Main).launch {
-                        withContext(Dispatchers.Main) {
-                            showMissingTokenDialogCallback(account)
-                        }
-                    }
-                    return@launch
-                }
+            val formattedContent: String = if (account.accessToken?.isNotEmpty() == true) {
+                processTextForEncryption(
+                    textContent.text,
+                    account,
+                    account.accessToken,
+                    account.refreshToken!!
+                )
             } else {
-                val currentTokens = Datastore.getDatastore(context).storedTokenDao().getTokensByAccountId(account!!.id)
-                Log.d("TextComposeView", "Current tokens: $currentTokens")
-                formattedContent = if (currentTokens != null && currentTokens.accessToken.isNotEmpty()) {
-                    Log.d("TextComposeView", "Attempting to use stored tokens for account ID: ${account.id}")
-                    processTextForEncryption(
-                        textContent.text,
-                        account,
-                        currentTokens.accessToken,
-                        currentTokens.refreshToken
-                    )
-                } else {
-                    Log.d("TextComposeView", "No stored tokens found for account ID: ${account.id}")
-                    processTextForEncryption(
-                        textContent.text,
-                        account
-                    )
-                }
-
+                processTextForEncryption(
+                    textContent.text,
+                    account
+                )
             }
             Log.d("TextComposeView", "Formatted content: $formattedContent")
 

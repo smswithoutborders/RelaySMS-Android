@@ -69,7 +69,6 @@ import com.example.sw0b_001.Models.ComposeHandlers
 import com.example.sw0b_001.Models.GatewayClients.GatewayClientsCommunications
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
-import com.example.sw0b_001.Models.Platforms.StoredTokenEntity
 import com.example.sw0b_001.Models.Publishers
 import com.example.sw0b_001.Models.SMSHandler
 import com.example.sw0b_001.Models.Vaults
@@ -244,9 +243,6 @@ fun EmailComposeView(
 
     val scrollState = rememberScrollState()
 
-    var showMissingTokenDialog by remember { mutableStateOf(false) }
-    var accountForDialog by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
-
     LaunchedEffect(Unit) {
         if(BuildConfig.DEBUG && platformsViewModel.message == null) {
             if(from.isEmpty()) from = if(isBridge) "" else "from@relaysms.me"
@@ -330,20 +326,6 @@ fun EmailComposeView(
 
     var showMoreOptions by remember { mutableStateOf(false) }
 
-    if (showMissingTokenDialog && accountForDialog != null) {
-        MissingTokenDialog(
-            account = accountForDialog!!,
-            onDismiss = { showMissingTokenDialog = false },
-            onRevoke = { accountToRevoke ->
-                showMissingTokenDialog = false
-                Log.d("EmailComposeView", "Revoke confirmed for account: ${accountToRevoke.account}")
-                triggerAccountRevokeHelper(context, platformsViewModel, accountToRevoke) {
-                    Log.d("EmailComposeView", "Revocation process completed for ${accountToRevoke.account}")
-                }
-            }
-        )
-    }
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -378,7 +360,6 @@ fun EmailComposeView(
                                     body = body
                                 ),
                                 account = selectedAccount,
-                                platformsViewModel = platformsViewModel,
                                 isBridge = isBridge,
                                 onFailureCallback = { errorMsg ->
                                     Log.e("EmailComposeView", "Send failed: $errorMsg")
@@ -389,10 +370,6 @@ fun EmailComposeView(
                                             popUpTo(HomepageScreen) { inclusive = true }
                                         }
                                     }
-                                },
-                                showMissingTokenDialogCallback = { acc ->
-                                    accountForDialog = acc
-                                    showMissingTokenDialog = true
                                 }
                             )
                         }
@@ -683,10 +660,8 @@ private fun processSend(
     emailContent: EmailContent,
     account: StoredPlatformsEntity?,
     isBridge: Boolean,
-    platformsViewModel: PlatformsViewModel,
     onFailureCallback: (String?) -> Unit,
     onCompleteCallback: () -> Unit,
-    showMissingTokenDialogCallback: (StoredPlatformsEntity) -> Unit
 ) {
     CoroutineScope(Dispatchers.Default).launch {
         try {
@@ -711,51 +686,8 @@ private fun processSend(
                 }
                 context.startActivity(sentIntent)
             }
-            else { // if its a regular email like Gmail
-                // get any missing tokens
-                val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
-                val jsonString = sharedPreferences.getString(Vaults.Companion.PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_JSON, null)
-                Log.d("EmailComposeView", "Deserialized missing tokens JSON: $jsonString")
-                var isCurrentAccountMissingTokens = false
-
-                if (!jsonString.isNullOrEmpty()) {
-                    try {
-                        // Deserialize into the correct List<MissingTokenAccountInfo> type
-                        val missingTokensInfoList = Json.decodeFromString<List<MissingTokenAccountInfo>>(jsonString)
-                        Log.d("EmailComposeView", "Deserialized missing tokens list: $missingTokensInfoList")
-
-                        // Check if the *current* account's ID is in the list of missing ones
-                        isCurrentAccountMissingTokens = missingTokensInfoList.any { missingInfo ->
-                            missingInfo.accountId == account!!.id // Compare against the accountId field
-                        }
-
-                        if (isCurrentAccountMissingTokens) {
-                            Log.w("EmailComposeView", "Current account (${account!!.id}) is flagged with missing tokens in SharedPreferences.")
-                        }
-                    } catch (e: Exception) {
-                        Log.e("EmailComposeView", "Error checking missing tokens list", e)
-                    }
-                }
-
-                if (isCurrentAccountMissingTokens) {
-                    Log.e("EmailComposeView", "Send aborted: Account ${account!!.id} flagged with missing tokens.")
-                    onFailureCallback("Account ${account.id} flagged with missing tokens. Please revoke and re-add.") // Inform caller
-
-                    withContext(Dispatchers.Main) {
-                        showMissingTokenDialogCallback(account)
-                    }
-                    return@launch
-                }
-
-                val storeTokensOnDevice = platformsViewModel.getStoreTokensOnDevice(context)
-                val formattedContent: String
-
-                val storedTokenEntity: StoredTokenEntity? =
-                    platformsViewModel.getStoredTokens(context, account!!.id)
-
-                formattedContent = if(storedTokenEntity != null) {
-                    val accessToken = storedTokenEntity.accessToken
-                    val refreshToken = storedTokenEntity.refreshToken
+            else {
+                val formattedContent: String = if(account?.accessToken?.isNotEmpty() == true) {
                     processEmailForEncryption(
                         emailContent.to,
                         emailContent.cc,
@@ -763,8 +695,8 @@ private fun processSend(
                         emailContent.subject,
                         emailContent.body,
                         account,
-                        accessToken,
-                        refreshToken
+                        account.accessToken,
+                        account.refreshToken!!
                     )
                 } else {
                     processEmailForEncryption(
@@ -778,7 +710,7 @@ private fun processSend(
                 }
 
                 val availablePlatforms =
-                    Datastore.getDatastore(context).availablePlatformsDao().fetch(account.name!!)
+                    Datastore.getDatastore(context).availablePlatformsDao().fetch(account!!.name!!)
                 val AD = Publishers.fetchPublisherPublicKey(context)
                 ComposeHandlers.compose(
                     context,
@@ -800,7 +732,6 @@ private fun processSend(
 
 fun triggerAccountRevokeHelper(
     context: Context,
-    platformsViewModel: PlatformsViewModel, // jic
     account: StoredPlatformsEntity,
     onCompleted: () -> Unit
 ) {
@@ -840,6 +771,8 @@ fun AccountModalPreview() {
             id= "0",
             account = "developers@relaysms.me",
             name = "gmail",
+            accessToken = "",
+            refreshToken = ""
         )
         SelectAccountModal(
             _accounts = listOf(storedPlatform),

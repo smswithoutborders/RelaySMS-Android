@@ -9,5 +9,13 @@ import androidx.room.PrimaryKey
 data class StoredPlatformsEntity(
     @PrimaryKey val id: String,
     @ColumnInfo(name="account") val account: String?,
-    @ColumnInfo(name="name") val name: String?
+    @ColumnInfo(name="name") val name: String?,
+    @ColumnInfo(
+        name="access_token",
+        defaultValue = ""
+    ) val accessToken: String?,
+    @ColumnInfo(
+        name="refresh_token",
+        defaultValue = ""
+    ) val refreshToken: String?
 )

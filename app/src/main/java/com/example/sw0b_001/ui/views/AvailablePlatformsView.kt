@@ -301,6 +301,8 @@ fun AvailablePlatformsCardPreview() {
             id= "0",
             account = "developers@relaysms.me",
             name = "gmail",
+            accessToken = "",
+            refreshToken = ""
         )
 
         PlatformListContent(

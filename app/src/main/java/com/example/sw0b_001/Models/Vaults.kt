@@ -13,7 +13,6 @@ import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.Platforms.Platforms
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
-import com.example.sw0b_001.Models.Platforms.StoredTokenEntity
 import com.example.sw0b_001.Modules.Crypto
 import com.example.sw0b_001.R
 import com.example.sw0b_001.Security.Cryptography
@@ -61,21 +60,6 @@ class Vaults(val context: Context) {
         }
     }
 
-    fun getAllStoredTokens(): List<StoredTokenEntity> {
-        val platformsViewModel = PlatformsViewModel()
-        return platformsViewModel.getAllStoredTokens(context)
-    }
-
-    fun insertTokens(tokenEntity: StoredTokenEntity) {
-        val platformsViewModel = PlatformsViewModel()
-        platformsViewModel.addStoredTokens(context, tokenEntity)
-    }
-
-    fun getTokenEntity(accountId: String): StoredTokenEntity? {
-        val platformsViewModel = PlatformsViewModel()
-        return platformsViewModel.getTokenByAccountId(context, accountId)
-    }
-
     fun refreshStoredTokens(
         context: Context,
         missingCallback: (Map<String, List<String>>) -> Unit = {}
@@ -86,111 +70,51 @@ class Vaults(val context: Context) {
             val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
             val storeTokensOnDevice = sharedPreferences.getBoolean("store_tokens_on_device", false)
 
-            val response = listStoredEntityTokens(llt, storeTokensOnDevice)
-
-            val storedPlatforms = ArrayList<StoredPlatformsEntity>()
-            val storedTokensToInsert = ArrayList<StoredTokenEntity>()
-            val accountsWithMissingTokensInfo = ArrayList<MissingTokenAccountInfo>()
+            val response = getStoredAccountTokens(llt, storeTokensOnDevice)
 
             val datastore = Datastore.getDatastore(context)
-            val existingTokens = getAllStoredTokens()
-            val existingTokensIds = existingTokens.map { it.accountId } // used to check for tokens stored on device
+            val platformsToSave = ArrayList<StoredPlatformsEntity>()
+            val storedPlatforms = datastore.storedPlatformsDao().fetchAllList()
 
             val accountsMissingTokens = mutableMapOf<String, MutableList<String>>()
-            response.storedTokensList.forEach {
+            response.storedTokensList.forEach { accountTokens ->
                 val uuid = Base64.encodeToString(
-                    buildPlatformsUUID(it.platform, it.accountIdentifier),
+                    buildPlatformsUUID(accountTokens.platform, accountTokens.accountIdentifier),
                     Base64.DEFAULT
                 )
-                storedPlatforms.add(
-                    StoredPlatformsEntity(uuid, it.accountIdentifier, it.platform)
-                )
-                val isStoredOnDevice = it.isStoredOnDevice
-                val accessToken = it.accountTokensMap["access_token"]
-                val refreshToken = it.accountTokensMap["refresh_token"]
-                Log.d("Vaults", "Is stored on device: $isStoredOnDevice")
+
+                val isStoredOnDevice = accountTokens.isStoredOnDevice
+                val accessToken = accountTokens.accountTokensMap["access_token"]
+                val refreshToken = accountTokens.accountTokensMap["refresh_token"]
+
                 // TODO: add storing in case there's something to store
                 if (isStoredOnDevice &&
                     accessToken.isNullOrEmpty() &&
-                    uuid !in existingTokensIds) {
-                    accountsMissingTokens[it.platform].let { accountsIds ->
+                    storedPlatforms.find { it.id == uuid } == null) {
+                    accountsMissingTokens[accountTokens.platform].let { accountsIds ->
                         if (accountsIds.isNullOrEmpty())
-                            accountsMissingTokens[it.platform] = mutableListOf(it.accountIdentifier)
+                            accountsMissingTokens[accountTokens.platform] = mutableListOf(accountTokens.accountIdentifier)
                         else
-                            accountsMissingTokens[it.platform]?.add(it.accountIdentifier)
+                            accountsMissingTokens[accountTokens.platform]?.add(accountTokens.accountIdentifier)
                     }
                 }
                 else {
-                    if (uuid !in existingTokensIds && accessToken != null && refreshToken != null) {
-                        storedTokensToInsert.add(
-                            StoredTokenEntity(
-                                accountId = uuid,
-                                accessToken = accessToken,
-                                refreshToken = refreshToken,
-                            )
+                    platformsToSave.add(
+                        StoredPlatformsEntity(
+                            id = uuid,
+                            account = accountTokens.accountIdentifier,
+                            name = accountTokens.platform,
+                            accessToken = accessToken,
+                            refreshToken = refreshToken
                         )
-                        Log.d("Vaults", "Inserted tokens to stored tokens to insert list")
-                    }
+                    )
                 }
             }
             missingCallback(accountsMissingTokens)
 
-            // filter out platform accounts with missing  tokens so they don't display as active platforms
-            val platformsToInsert = storedPlatforms.filter { platformEntity ->
-                !accountsMissingTokens.containsKey(platformEntity.name)
-            }.toCollection(ArrayList())
-            Log.d("Vaults", "Platforms to insert: $platformsToInsert")
-
-            datastore.storedPlatformsDao().deleteAll()
-            datastore.storedPlatformsDao().insertAll(platformsToInsert)
-
-            // deleting and inserting back platforms deletes tokens so this puts back previous deleted tokens based on existing platform ids
-            val platformAccountIds = datastore.storedPlatformsDao().getAllAccountIds()
-            existingTokens.forEach { tokenEntity ->
-                if (tokenEntity.accountId in platformAccountIds) {
-                    insertTokens(tokenEntity)
-                }
-            }
-
-            Log.d("Vaults", "Accounts with missing tokens: $accountsMissingTokens")
-
-            // This inserts any new tokens received from the server
-            storedTokensToInsert.forEach { tokenEntity ->
-                val existingToken = getTokenEntity(tokenEntity.accountId)
-                Log.d("Vaults", "Existing tokens: $existingToken")
-                if (existingToken == null) {
-                    Log.d("Vaults", "About to insert tokens $tokenEntity")
-                    datastore.storedTokenDao().insertTokens(tokenEntity)
-                    Log.d("Vaults", "Inserted tokens to db")
-                } else {
-                    Log.d("Vaults", "Found existing tokens $existingToken")
-                }
-            }
-
-            // store missing tokens in shared preferences
-            if (accountsMissingTokens.isNotEmpty()) {
-                Log.d("Vaults", "Storing accounts map with missing tokens: $accountsMissingTokens")
-                try {
-                    val jsonString = Json.encodeToString(accountsMissingTokens)
-                    sharedPreferences.edit {
-                        putString(PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_MAP_JSON, jsonString)
-                        remove(PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_JSON)
-                        remove(PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_IDS)
-                    }
-                    Log.i("Vaults", "Stored ${accountsMissingTokens.size} platforms with missing tokens accounts in SharedPreferences.")
-                } catch (eJson: Exception) {
-                    Log.e("Vaults", "Failed to serialize or save missing tokens map to SharedPreferences", eJson)
-                }
-            } else {
-                Log.d("Vaults", "No accounts with missing tokens found. Clearing map preference.")
-                sharedPreferences.edit {
-                    remove(PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_MAP_JSON)
-                    remove(PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_JSON)
-                    remove(PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_IDS)
-                }
-            }
+            datastore.storedPlatformsDao().insert(platformsToSave)
         } catch (e: Exception) {
-            Log.e("Vaults", "Error refreshing tokens", e)
+            throw e
         }
     }
 
@@ -317,15 +241,16 @@ class Vaults(val context: Context) {
         return response
     }
 
-    fun listStoredEntityTokens(llt: String, migrateToDevice: Boolean): Vault.ListEntityStoredTokensResponse {
+    fun getStoredAccountTokens(
+        llt: String,
+        migrateToDevice: Boolean
+    ): Vault.ListEntityStoredTokensResponse {
         val request = Vault.ListEntityStoredTokensRequest.newBuilder().apply {
             setLongLivedToken(llt)
             setMigrateToDevice(migrateToDevice)
         }.build()
 
         val res = entityStub.listEntityStoredTokens(request)
-        Log.d("Response tokens", res.toString())
-        println(res.storedTokensList)
 
         return res
     }

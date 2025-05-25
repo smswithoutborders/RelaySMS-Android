@@ -78,6 +78,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.contracts.contract
 import androidx.core.net.toUri
+import com.example.sw0b_001.BuildConfig
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,10 +96,15 @@ fun CreateAccountView(
     var reenterPasswordVisible by remember { mutableStateOf (false) }
     var acceptedPrivatePolicy by remember { mutableStateOf (false) }
 
-    var showLoginModal by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
+    if(BuildConfig.DEBUG) {
+        phoneNumber = "1123579"
+        password = "dMd2Kmo9#"
+        reenterPassword = "dMd2Kmo9#"
+    }
 
     BackHandler {
         navController.popBackStack()

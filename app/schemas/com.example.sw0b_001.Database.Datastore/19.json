@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 19,
-    "identityHash": "b26fef47d7a5f025ff793b9ecefa68c2",
+    "identityHash": "535ec2b564797133d0a62b1404747293",
     "entities": [
       {
         "tableName": "RatchetStates",
@@ -26,9 +26,7 @@
           "columnNames": [
             "id"
           ]
-        },
-        "indices": [],
-        "foreignKeys": []
+        }
       },
       {
         "tableName": "GatewayServer",
@@ -67,8 +65,7 @@
           {
             "fieldPath": "seedsUrl",
             "columnName": "seedsUrl",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           }
         ],
         "primaryKey": {
@@ -87,8 +84,7 @@
             "orders": [],
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_GatewayServer_url` ON `${TABLE_NAME}` (`url`)"
           }
-        ],
-        "foreignKeys": []
+        ]
       },
       {
         "tableName": "Platforms",
@@ -103,14 +99,12 @@
           {
             "fieldPath": "name",
             "columnName": "name",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "description",
             "columnName": "description",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "logo",
@@ -121,14 +115,12 @@
           {
             "fieldPath": "letter",
             "columnName": "letter",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "type",
             "columnName": "type",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "isSaved",
@@ -154,8 +146,7 @@
             "orders": [],
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_Platforms_name` ON `${TABLE_NAME}` (`name`)"
           }
-        ],
-        "foreignKeys": []
+        ]
       },
       {
         "tableName": "AvailablePlatforms",
@@ -170,44 +161,37 @@
           {
             "fieldPath": "shortcode",
             "columnName": "shortcode",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "service_type",
             "columnName": "service_type",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "protocol_type",
             "columnName": "protocol_type",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "icon_svg",
             "columnName": "icon_svg",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "icon_png",
             "columnName": "icon_png",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "support_url_scheme",
             "columnName": "support_url_scheme",
-            "affinity": "INTEGER",
-            "notNull": false
+            "affinity": "INTEGER"
           },
           {
             "fieldPath": "logo",
             "columnName": "logo",
-            "affinity": "BLOB",
-            "notNull": false
+            "affinity": "BLOB"
           }
         ],
         "primaryKey": {
@@ -215,9 +199,7 @@
           "columnNames": [
             "name"
           ]
-        },
-        "indices": [],
-        "foreignKeys": []
+        }
       },
       {
         "tableName": "GatewayClient",
@@ -232,14 +214,12 @@
           {
             "fieldPath": "type",
             "columnName": "type",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "mSISDN",
             "columnName": "MSISDN",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "isDefault",
@@ -250,26 +230,22 @@
           {
             "fieldPath": "operatorName",
             "columnName": "operator_name",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "alias",
             "columnName": "alias",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "operatorId",
             "columnName": "operator_id",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "country",
             "columnName": "country",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "lastPingSession",
@@ -301,12 +277,11 @@
             "orders": [],
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_GatewayClient_MSISDN` ON `${TABLE_NAME}` (`MSISDN`)"
           }
-        ],
-        "foreignKeys": []
+        ]
       },
       {
         "tableName": "StoredPlatformsEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `account` TEXT, `name` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `account` TEXT, `name` TEXT, `access_token` TEXT DEFAULT '', `refresh_token` TEXT DEFAULT '', PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -317,14 +292,24 @@
           {
             "fieldPath": "account",
             "columnName": "account",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "name",
             "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "accessToken",
+            "columnName": "access_token",
             "affinity": "TEXT",
-            "notNull": false
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "refreshToken",
+            "columnName": "refresh_token",
+            "affinity": "TEXT",
+            "defaultValue": "''"
           }
         ],
         "primaryKey": {
@@ -344,67 +329,6 @@
             "orders": [],
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_StoredPlatformsEntity_account_name` ON `${TABLE_NAME}` (`account`, `name`)"
           }
-        ],
-        "foreignKeys": []
-      },
-      {
-        "tableName": "stored_tokens",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `account_id` TEXT NOT NULL, `access_token` TEXT NOT NULL, `refresh_token` TEXT NOT NULL, FOREIGN KEY(`account_id`) REFERENCES `StoredPlatformsEntity`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "accountId",
-            "columnName": "account_id",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "accessToken",
-            "columnName": "access_token",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "refreshToken",
-            "columnName": "refresh_token",
-            "affinity": "TEXT",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": true,
-          "columnNames": [
-            "id"
-          ]
-        },
-        "indices": [
-          {
-            "name": "index_stored_tokens_account_id",
-            "unique": false,
-            "columnNames": [
-              "account_id"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_stored_tokens_account_id` ON `${TABLE_NAME}` (`account_id`)"
-          }
-        ],
-        "foreignKeys": [
-          {
-            "table": "StoredPlatformsEntity",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "account_id"
-            ],
-            "referencedColumns": [
-              "id"
-            ]
-          }
         ]
       },
       {
@@ -420,20 +344,17 @@
           {
             "fieldPath": "platformName",
             "columnName": "platformName",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "type",
             "columnName": "type",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "fromAccount",
             "columnName": "fromAccount",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "date",
@@ -444,14 +365,12 @@
           {
             "fieldPath": "gatewayClientMSISDN",
             "columnName": "gateway_client_MSISDN",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "encryptedContent",
             "columnName": "encryptedContent",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           }
         ],
         "primaryKey": {
@@ -459,15 +378,12 @@
           "columnNames": [
             "id"
           ]
-        },
-        "indices": [],
-        "foreignKeys": []
+        }
       }
     ],
-    "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b26fef47d7a5f025ff793b9ecefa68c2')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '535ec2b564797133d0a62b1404747293')"
     ]
   }
 }

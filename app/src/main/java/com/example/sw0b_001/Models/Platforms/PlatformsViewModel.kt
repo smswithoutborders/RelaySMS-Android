@@ -51,43 +51,4 @@ class PlatformsViewModel : ViewModel() {
     fun getAvailablePlatforms(context: Context, name: String): AvailablePlatforms? {
         return Datastore.getDatastore(context).availablePlatformsDao().fetch(name)
     }
-
-    fun getSavedCount(context: Context) : Int {
-        return Datastore.getDatastore(context).platformDao().countSaved()
-    }
-
-    fun getStoredTokens(context: Context, accountId: String): StoredTokenEntity? {
-        Log.d("PlatformsViewModel", "Attempting to retrieve tokens for account ID: $accountId")
-        val storedTokenEntity = try {
-            Datastore.getDatastore(context).storedTokenDao().getTokensByAccountId(accountId)
-        } catch (e: Exception) {
-            Log.e("PlatformsViewModel", "Error fetching tokens for account: $accountId", e)
-            null
-        }
-        Log.d("PlatformsViewModel", "Retrieved StoredTokenEntity: $storedTokenEntity")
-        return storedTokenEntity
-    }
-    fun addStoredTokens(context: Context, tokens: StoredTokenEntity) {
-        Log.d("PlatformsViewModel", "addStoredTokens called with accountId: ${tokens.accountId}, accessToken: ${tokens.accessToken}, refreshToken: ${tokens.refreshToken}")
-        try {
-            Datastore.getDatastore(context).storedTokenDao().insertTokens(tokens)
-            Log.d("PlatformsViewModel", "Successfully inserted tokens for accountId: ${tokens.accountId}")
-        } catch (e: Exception) {
-            Log.e("PlatformsViewModel", "Error inserting tokens for accountId: ${tokens.accountId}", e)
-        }
-    }
-
-    fun getTokenByAccountId(context: Context, accountId: String): StoredTokenEntity? {
-        return Datastore.getDatastore(context).storedTokenDao().getTokensByAccountId(accountId)
-    }
-
-    fun getAllStoredTokens(context: Context): List<StoredTokenEntity> {
-        return  Datastore.getDatastore(context).storedTokenDao().getAllTokens()
-    }
-
-    fun getStoreTokensOnDevice(context: Context): Boolean {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        return sharedPreferences.getBoolean("store_tokens_on_device", false)
-    }
-
 }

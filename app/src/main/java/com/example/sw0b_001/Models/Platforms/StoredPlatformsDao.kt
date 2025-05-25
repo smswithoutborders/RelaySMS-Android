@@ -6,10 +6,11 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 
 @Dao
 interface StoredPlatformsDao {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(platforms: ArrayList<StoredPlatformsEntity>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -36,5 +37,10 @@ interface StoredPlatformsDao {
     @Query("SELECT id FROM StoredPlatformsEntity")
     fun getAllAccountIds(): List<String>
 
+    @Transaction
+    fun insert(platforms: ArrayList<StoredPlatformsEntity>) {
+        deleteAll()
+        insertAll(platforms)
+    }
 
 }
