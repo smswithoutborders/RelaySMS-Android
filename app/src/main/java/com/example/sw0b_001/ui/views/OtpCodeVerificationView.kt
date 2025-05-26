@@ -66,7 +66,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.BuildConfig
-import com.example.sw0b_001.Models.NavigationFlowHandler
+import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
@@ -155,15 +155,14 @@ fun SmsRetrieverHandler(onSmsRetrieved: (String) -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Preview
 fun OtpCodeVerificationView(
     navController: NavController = rememberNavController(),
-    navigationFlowHandler: NavigationFlowHandler = NavigationFlowHandler(),
+    platformsViewModel: PlatformsViewModel,
 ) {
     val context = LocalContext.current
     var otpCode by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
-    val nextAttemptTimestamp = navigationFlowHandler.nextAttemptTimestamp
+    val nextAttemptTimestamp = platformsViewModel.nextAttemptTimestamp
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -296,11 +295,12 @@ fun OtpCodeVerificationView(
                     isLoading = true
                     submitOTPCode(
                         context = context,
-                        phoneNumber = navigationFlowHandler.loginSignupPhoneNumber,
-                        password = navigationFlowHandler.loginSignupPassword,
-                        countryCode = navigationFlowHandler.countryCode,
+                        phoneNumber = platformsViewModel.loginSignupPhoneNumber,
+                        password = platformsViewModel.loginSignupPassword,
+                        countryCode = platformsViewModel.countryCode,
                         code = otpCode,
-                        type = navigationFlowHandler.otpRequestType!!,
+                        platformsViewModel = platformsViewModel,
+                        type = platformsViewModel.otpRequestType,
                         onFailedCallback = {isLoading = false},
                         onCompleteCallback = {isLoading = false}
                     )  {
@@ -430,6 +430,7 @@ private fun submitOTPCode(
     countryCode: String = "",
     code: String,
     type: OTPCodeVerificationType,
+    platformsViewModel: PlatformsViewModel,
     onFailedCallback: (String?) -> Unit,
     onCompleteCallback: () -> Unit,
     onSuccessCallback: () -> Unit,
@@ -465,7 +466,9 @@ private fun submitOTPCode(
                 }
             }
 
-            vault.refreshStoredTokens(context)
+            vault.refreshStoredTokens(context) {
+                platformsViewModel.accountsForMissingDialog = it
+            }
             onSuccessCallback()
         } catch(e: StatusRuntimeException) {
             e.printStackTrace()

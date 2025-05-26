@@ -190,7 +190,12 @@ object EmailComposeHandler {
 
 
 @Serializable
-data class GatewayClientRequest(val address: String, val text: String)
+data class GatewayClientRequest(
+    val address: String,
+    val text: String,
+    val date: String,
+    val date_sent: String
+)
 
 private fun networkRequest(
     url: String,
@@ -294,30 +299,31 @@ fun EmailComposeView(
             requestStatus = developerRequestStatus,
             isLoading = developerIsLoading,
             httpRequestCallback = { _, dialingUrl ->
-                TODO("figure out whats wrong here")
-//                developerIsLoading = true
-//                developerRequestStatus = "dialing...\n"
-//
-//                val scope = CoroutineScope(Dispatchers.Default).launch {
-//                    developerRequestStatus += networkRequest(
-//                        url = dialingUrl,
-//                        payload = GatewayClientRequest(
-//                            address = "+237123456789",
-//                            text = Bridges.compose(
-//                                context = context,
-//                                to = to,
-//                                cc = cc,
-//                                bcc = bcc,
-//                                subject = subject,
-//                                body = body,
-//                                smsTransmission = false,
-//                                onSuccessCallback = {}
-//                            ).first!!
-//                        ),
-//                    )
-//                    developerRequestStatus += "\nending..."
-//                    developerIsLoading = false
-//                }
+                developerIsLoading = true
+                developerRequestStatus = "dialing...\n"
+
+                val scope = CoroutineScope(Dispatchers.Default).launch {
+                    developerRequestStatus += networkRequest(
+                        url = dialingUrl,
+                        payload = GatewayClientRequest(
+                            address = "+2371123579",
+                            date = System.currentTimeMillis().toString(),
+                            date_sent = System.currentTimeMillis().toString(),
+                            text = Bridges.compose(
+                                context = context,
+                                to = to,
+                                cc = cc,
+                                bcc = bcc,
+                                subject = subject,
+                                body = body,
+                                smsTransmission = false,
+                                onSuccessCallback = {}
+                            ).first!!
+                        ),
+                    )
+                    developerRequestStatus += "\nending..."
+                    developerIsLoading = false
+                }
             }
         ) {
             showDeveloperDialog = false

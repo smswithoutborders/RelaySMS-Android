@@ -23,7 +23,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
-import com.example.sw0b_001.Models.NavigationFlowHandler
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.ui.views.CreateAccountView
 import com.example.sw0b_001.ui.views.LoginView
@@ -111,14 +110,11 @@ enum class OnboardingState {
 class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
 
-    val navigationFlowHandler = NavigationFlowHandler()
-
     val platformsViewModel: PlatformsViewModel by viewModels()
     val messagesViewModel: MessagesViewModel by viewModels()
     val gatewayClientViewModel: GatewayClientViewModel by viewModels()
 
     var showMissingTokenDialog by mutableStateOf(false)
-    var accountsForMissingDialog by mutableStateOf<Map<String, List<String>>>(emptyMap())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -137,9 +133,13 @@ class MainActivity : ComponentActivity() {
             AppTheme {
                 navController = rememberNavController()
 
+                LaunchedEffect(platformsViewModel.accountsForMissingDialog) {
+                    refreshTokensCallback(platformsViewModel.accountsForMissingDialog)
+                }
+
                 if (showMissingTokenDialog) {
                     MissingTokenInfoDialog(
-                        groupedAccounts = accountsForMissingDialog,
+                        groupedAccounts = platformsViewModel.accountsForMissingDialog,
                         onDismiss = { showMissingTokenDialog = false },
                         onConfirm = { doNotShowAgain ->
                             showMissingTokenDialog = false
@@ -192,31 +192,30 @@ class MainActivity : ComponentActivity() {
                     platformsViewModel = platformsViewModel,
                     messagesViewModel = messagesViewModel,
                     gatewayClientViewModel = gatewayClientViewModel,
-                    navigationFlowHandler = navigationFlowHandler
                 )
             }
             composable<LoginScreen> {
                 LoginView(
                     navController = navController,
-                    navigationFlowHandler = navigationFlowHandler
+                    platformsViewModel = platformsViewModel,
                 )
             }
             composable<ForgotPasswordScreen> {
                 ForgotPasswordView(
                     navController = navController,
-                    navigationFlowHandler = navigationFlowHandler
+                    platformsViewModel = platformsViewModel,
                 )
             }
             composable<CreateAccountScreen> {
                 CreateAccountView(
                     navController = navController,
-                    navigationFlowHandler=navigationFlowHandler
+                    platformsViewModel = platformsViewModel,
                 )
             }
             composable<OTPCodeScreen> {
                 OtpCodeVerificationView(
                     navController = navController,
-                    navigationFlowHandler = navigationFlowHandler
+                    platformsViewModel = platformsViewModel,
                 )
             }
             composable<AboutScreen> {
@@ -291,11 +290,10 @@ class MainActivity : ComponentActivity() {
 
         if (!doNotShowDialog) {
             showMissingTokenDialog = true
-            accountsForMissingDialog = accountsInfo
+            platformsViewModel.accountsForMissingDialog = accountsInfo
         }
 
     }
-
 
     override fun onResume() {
         super.onResume()

@@ -61,7 +61,6 @@ import androidx.compose.ui.res.stringResource
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.Models.Messages.EncryptedContent
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
-import com.example.sw0b_001.Models.NavigationFlowHandler
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.R
@@ -79,7 +78,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoginView(
     navController: NavController = rememberNavController(),
-    navigationFlowHandler: NavigationFlowHandler = NavigationFlowHandler()
+    platformsViewModel: PlatformsViewModel,
 ) {
     val context = LocalContext.current
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
@@ -260,11 +259,11 @@ fun LoginView(
                             phoneNumber = phoneNumber,
                             password = password,
                             otpRequiredCallback = { nextAttemptTimestamp ->
-                                navigationFlowHandler.loginSignupPassword = password
-                                navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
-                                navigationFlowHandler.otpRequestType =
+                                platformsViewModel.loginSignupPassword = password
+                                platformsViewModel.loginSignupPhoneNumber = phoneNumber
+                                platformsViewModel.otpRequestType =
                                     OTPCodeVerificationType.AUTHENTICATE
-                                navigationFlowHandler.nextAttemptTimestamp = nextAttemptTimestamp
+                                platformsViewModel.nextAttemptTimestamp = nextAttemptTimestamp
 
                                 CoroutineScope(Dispatchers.Main).launch {
                                     navController.navigate(OTPCodeScreen)
@@ -293,15 +292,15 @@ fun LoginView(
                         )
                     }
                     else {
-                        Text("Log In")
+                        Text(stringResource(R.string.log_in))
                     }
                 }
                 
                 TextButton(
                     onClick = {
-                        navigationFlowHandler.loginSignupPassword = password
-                        navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
-                        navigationFlowHandler.otpRequestType =
+                        platformsViewModel.loginSignupPassword = password
+                        platformsViewModel.loginSignupPhoneNumber = phoneNumber
+                        platformsViewModel.otpRequestType =
                             OTPCodeVerificationType.AUTHENTICATE
                         navController.navigate(OTPCodeScreen)
                     },
@@ -377,7 +376,7 @@ private fun login(
 @Composable
 fun LoginViewPreview() {
     AppTheme(darkTheme = false) {
-        LoginView()
+        LoginView(platformsViewModel = PlatformsViewModel())
     }
 }
 

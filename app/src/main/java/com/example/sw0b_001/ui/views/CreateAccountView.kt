@@ -63,7 +63,6 @@ import androidx.navigation.compose.rememberNavController
 import com.arpitkatiyarprojects.countrypicker.CountryPickerOutlinedTextField
 import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
-import com.example.sw0b_001.Models.NavigationFlowHandler
 import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.Models.Vaults
@@ -79,13 +78,14 @@ import kotlinx.coroutines.launch
 import kotlin.contracts.contract
 import androidx.core.net.toUri
 import com.example.sw0b_001.BuildConfig
+import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateAccountView(
     navController: NavController = rememberNavController(),
-    navigationFlowHandler: NavigationFlowHandler
+    platformsViewModel: PlatformsViewModel
 ) {
     val context = LocalContext.current
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
@@ -323,11 +323,11 @@ fun CreateAccountView(
                             countryCode = selectedCountry!!.countryCode,
                             password = password,
                             otpRequiredCallback = {
-                                navigationFlowHandler.loginSignupPassword = password
-                                navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
-                                navigationFlowHandler.countryCode = selectedCountry!!.countryCode
-                                navigationFlowHandler.nextAttemptTimestamp = it
-                                navigationFlowHandler.otpRequestType =
+                                platformsViewModel.loginSignupPassword = password
+                                platformsViewModel.loginSignupPhoneNumber = phoneNumber
+                                platformsViewModel.countryCode = selectedCountry!!.countryCode
+                                platformsViewModel.nextAttemptTimestamp = it
+                                platformsViewModel.otpRequestType =
                                     OTPCodeVerificationType.CREATE
 
                                 CoroutineScope(Dispatchers.Main).launch {
@@ -375,9 +375,9 @@ fun CreateAccountView(
 
             TextButton(
                 onClick = {
-                    navigationFlowHandler.loginSignupPassword = password
-                    navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
-                    navigationFlowHandler.otpRequestType =
+                    platformsViewModel.loginSignupPassword = password
+                    platformsViewModel.loginSignupPhoneNumber = phoneNumber
+                    platformsViewModel.otpRequestType =
                         OTPCodeVerificationType.AUTHENTICATE
                     navController.navigate(OTPCodeScreen)
                 },
@@ -460,6 +460,6 @@ private fun createAccount(
 @Composable
 fun CreateAccountPreview() {
     AppTheme(darkTheme = false) {
-        CreateAccountView(rememberNavController(), NavigationFlowHandler())
+        CreateAccountView(rememberNavController(), PlatformsViewModel())
     }
 }

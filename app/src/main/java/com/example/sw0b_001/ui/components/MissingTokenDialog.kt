@@ -27,7 +27,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.Models.GatewayClients.GatewayClientViewModel
 import com.example.sw0b_001.Models.Messages.EncryptedContent
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
-import com.example.sw0b_001.Models.NavigationFlowHandler
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.R
@@ -42,32 +41,6 @@ data class MissingTokenAccountInfo(
     val accountIdentifier: String,
     val accountId: String
 )
-
-@Composable
-fun MissingTokenDialog(
-    account: StoredPlatformsEntity,
-    onDismiss: () -> Unit,
-    onRevoke: (StoredPlatformsEntity) -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Missing Tokens") },
-        text = {
-            Text("Tokens not found for ${account.account}. Please revoke and store again\"")
-
-        },
-        confirmButton = {
-            TextButton (onClick = { onRevoke(account) }) {
-                Text("Revoke")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel))
-            }
-        }
-    )
-}
 
 @Composable
 fun MissingTokenInfoDialog(

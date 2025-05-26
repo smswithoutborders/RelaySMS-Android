@@ -61,7 +61,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import androidx.compose.runtime.collectAsState
-import com.example.sw0b_001.Models.NavigationFlowHandler
 import com.example.sw0b_001.ui.modals.GetStartedModal
 
 
@@ -81,7 +80,6 @@ fun HomepageView(
     platformsViewModel : PlatformsViewModel,
     messagesViewModel: MessagesViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
-    navigationFlowHandler: NavigationFlowHandler,
 ) {
     val context = LocalContext.current
     val inspectionMode = LocalInspectionMode.current
@@ -352,7 +350,6 @@ fun HomepageView_Preview() {
             platformsViewModel = PlatformsViewModel(),
             messagesViewModel = MessagesViewModel(),
             gatewayClientViewModel = GatewayClientViewModel(),
-            navigationFlowHandler = NavigationFlowHandler()
         )
     }
 }
@@ -368,7 +365,6 @@ fun HomepageViewLoggedIn_Preview() {
             platformsViewModel = PlatformsViewModel(),
             messagesViewModel = MessagesViewModel(),
             gatewayClientViewModel = GatewayClientViewModel(),
-            navigationFlowHandler = NavigationFlowHandler()
         )
     }
 }
@@ -394,7 +390,6 @@ fun HomepageViewLoggedInMessages_Preview() {
             platformsViewModel = PlatformsViewModel(),
             messagesViewModel = MessagesViewModel(),
             gatewayClientViewModel = GatewayClientViewModel(),
-            navigationFlowHandler = NavigationFlowHandler()
         )
     }
 }
