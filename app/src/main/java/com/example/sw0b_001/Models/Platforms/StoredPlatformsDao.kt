@@ -10,7 +10,7 @@ import androidx.room.Transaction
 
 @Dao
 interface StoredPlatformsDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertAll(platforms: ArrayList<StoredPlatformsEntity>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

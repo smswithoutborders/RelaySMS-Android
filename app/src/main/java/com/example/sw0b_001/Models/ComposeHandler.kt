@@ -25,7 +25,7 @@ object ComposeHandlers {
         account: StoredPlatformsEntity? = null,
         isTesting: Boolean = false,
         smsTransmission: Boolean = true,
-        onSuccessRunnable: () -> Unit? = {}
+        onSuccessRunnable: (ByteArray?) -> Unit? = {}
     ) : ByteArray {
         val states = Datastore.getDatastore(context).ratchetStatesDAO().fetch()
         if(states.size > 1) {
@@ -65,9 +65,10 @@ object ComposeHandlers {
         encryptedContent.fromAccount = account?.account
 
         Datastore.getDatastore(context).encryptedContentDAO().insert(encryptedContent)
-        onSuccessRunnable()
+        val decoded =  Base64.decode(encryptedContentBase64, Base64.DEFAULT)
 
-        return Base64.decode(encryptedContentBase64, Base64.DEFAULT)
+        onSuccessRunnable(decoded)
+        return decoded
     }
 
     fun decompose(

@@ -2,6 +2,7 @@ package com.example.sw0b_001.ui.views.compose
 
 import android.content.Context
 import android.content.Intent
+import android.util.Base64
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -76,7 +77,6 @@ import com.example.sw0b_001.Modules.Helpers
 import com.example.sw0b_001.Modules.Network
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.components.MissingTokenAccountInfo
-import com.example.sw0b_001.ui.components.MissingTokenDialog
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.navigation.GetMeOutScreen
@@ -303,26 +303,57 @@ fun EmailComposeView(
                 developerRequestStatus = "dialing...\n"
 
                 val scope = CoroutineScope(Dispatchers.Default).launch {
-                    developerRequestStatus += networkRequest(
-                        url = dialingUrl,
-                        payload = GatewayClientRequest(
-                            address = "+2371123579",
-                            date = System.currentTimeMillis().toString(),
-                            date_sent = System.currentTimeMillis().toString(),
-                            text = Bridges.compose(
-                                context = context,
+                    if(isBridge) {
+                        developerRequestStatus += networkRequest(
+                            url = dialingUrl,
+                            payload = GatewayClientRequest(
+                                address = "+2371123579",
+                                date = System.currentTimeMillis().toString(),
+                                date_sent = System.currentTimeMillis().toString(),
+                                text = Bridges.compose(
+                                    context = context,
+                                    to = to,
+                                    cc = cc,
+                                    bcc = bcc,
+                                    subject = subject,
+                                    body = body,
+                                    smsTransmission = false,
+                                    onSuccessCallback = {}
+                                ).first!!
+                            ),
+                        )
+                        developerRequestStatus += "\nending..."
+                        developerIsLoading = false
+                    } else {
+                        println("Sending for platforms...")
+                        processSend(
+                            context = context,
+                            emailContent = EmailContent(
                                 to = to,
                                 cc = cc,
                                 bcc = bcc,
                                 subject = subject,
-                                body = body,
-                                smsTransmission = false,
-                                onSuccessCallback = {}
-                            ).first!!
-                        ),
-                    )
-                    developerRequestStatus += "\nending..."
-                    developerIsLoading = false
+                                body = body
+                            ),
+                            account = selectedAccount,
+                            isBridge = false,
+                            onFailureCallback = {},
+                            onCompleteCallback = {
+                                developerRequestStatus += networkRequest(
+                                    url = dialingUrl,
+                                    payload = GatewayClientRequest(
+                                        address = "+2371123579",
+                                        date = System.currentTimeMillis().toString(),
+                                        date_sent = System.currentTimeMillis().toString(),
+                                        text = Base64.encodeToString(it, Base64.DEFAULT)
+                                    )
+                                )
+                                developerRequestStatus += "\nending..."
+                                developerIsLoading = false
+                            },
+                            smsTransmission = false,
+                        )
+                    }
                 }
             }
         ) {
@@ -667,7 +698,8 @@ private fun processSend(
     account: StoredPlatformsEntity?,
     isBridge: Boolean,
     onFailureCallback: (String?) -> Unit,
-    onCompleteCallback: () -> Unit,
+    onCompleteCallback: (ByteArray?) -> Unit,
+    smsTransmission: Boolean = true
 ) {
     CoroutineScope(Dispatchers.Default).launch {
         try {
@@ -679,7 +711,7 @@ private fun processSend(
                     bcc = emailContent.bcc,
                     subject = emailContent.subject,
                     body = emailContent.body
-                ) { onCompleteCallback() }.first
+                ) { onCompleteCallback(null) }.first
 
                 val gatewayClientMSISDN = GatewayClientsCommunications(context)
                     .getDefaultGatewayClient()
@@ -724,7 +756,8 @@ private fun processSend(
                     AD!!,
                     availablePlatforms,
                     account,
-                ) { onCompleteCallback() }
+                    smsTransmission = smsTransmission
+                ) { onCompleteCallback(it) }
             }
         } catch(e: Exception) {
             e.printStackTrace()

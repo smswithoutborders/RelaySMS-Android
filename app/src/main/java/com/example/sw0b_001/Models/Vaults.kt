@@ -90,7 +90,8 @@ class Vaults(val context: Context) {
                 // TODO: add storing in case there's something to store
                 if (isStoredOnDevice &&
                     accessToken.isNullOrEmpty() &&
-                    storedPlatforms.find { it.id == uuid } == null) {
+                    storedPlatforms.find { it.id == uuid &&
+                            !it.accessToken.isNullOrEmpty() } == null) {
                     accountsMissingTokens[accountTokens.platform].let { accountsIds ->
                         if (accountsIds.isNullOrEmpty())
                             accountsMissingTokens[accountTokens.platform] = mutableListOf(accountTokens.accountIdentifier)
@@ -100,19 +101,22 @@ class Vaults(val context: Context) {
                 }
                 else {
                     platformsToSave.add(
-                        StoredPlatformsEntity(
-                            id = uuid,
-                            account = accountTokens.accountIdentifier,
-                            name = accountTokens.platform,
-                            accessToken = accessToken,
-                            refreshToken = refreshToken
-                        )
+                        if(!accessToken.isNullOrEmpty()) {
+                            StoredPlatformsEntity(
+                                id = uuid,
+                                account = accountTokens.accountIdentifier,
+                                name = accountTokens.platform,
+                                accessToken = accessToken,
+                                refreshToken = refreshToken
+                            )
+                        } else {
+                            storedPlatforms.first { it.id == uuid }
+                        }
                     )
                 }
             }
-            missingCallback(accountsMissingTokens)
-
             datastore.storedPlatformsDao().insert(platformsToSave)
+            missingCallback(accountsMissingTokens)
         } catch (e: Exception) {
             throw e
         }
@@ -323,9 +327,9 @@ class Vaults(val context: Context) {
             var sharedPreferences = Armadillo.create(context, VAULT_ATTRIBUTE_FILES)
                 .encryptionFingerprint(context)
                 .build()
-            sharedPreferences.edit()
-                .putBoolean(IS_GET_ME_OUT, value)
-                .apply()
+            sharedPreferences.edit {
+                putBoolean(IS_GET_ME_OUT, value)
+            }
         }
 
         fun isGetMeOut(context: Context) : Boolean {
@@ -340,12 +344,12 @@ class Vaults(val context: Context) {
             var sharedPreferences = Armadillo.create(context, VAULT_ATTRIBUTE_FILES)
                 .encryptionFingerprint(context)
                 .build()
-            sharedPreferences.edit().clear().apply()
+            sharedPreferences.edit { clear() }
 
             sharedPreferences = Armadillo.create(context, Publishers.PUBLISHER_ATTRIBUTE_FILES)
                 .encryptionFingerprint(context)
                 .build()
-            sharedPreferences.edit().clear().apply()
+            sharedPreferences.edit { clear() }
 
             KeystoreHelpers.removeFromKeystore(context, DEVICE_ID_KEYSTORE_ALIAS)
             KeystoreHelpers.removeFromKeystore(context, DEVICE_ID_SECRET_KEY_KEYSTORE_ALIAS)
@@ -383,18 +387,28 @@ class Vaults(val context: Context) {
                 .encryptionFingerprint(context)
                 .build()
 
-            sharedPreferences.edit()
-                .putString(LONG_LIVED_TOKEN_KEYSTORE_ALIAS,
-                    Base64.encodeToString(lltEncrypted, Base64.DEFAULT))
-                .putString(DEVICE_ID_KEYSTORE_ALIAS,
-                    Base64.encodeToString(deviceIdEncrypted, Base64.DEFAULT))
-                .putString(LONG_LIVED_TOKEN_SECRET_KEY_KEYSTORE_ALIAS,
-                    Base64.encodeToString(encryptedSecretKey, Base64.DEFAULT))
-                .putString(DEVICE_ID_SECRET_KEY_KEYSTORE_ALIAS,
-                    Base64.encodeToString(encryptedDeviceIdSecretKey, Base64.DEFAULT))
-                .putString(DEVICE_ID_PUB_KEY,
-                    Base64.encodeToString(clientDeviceIDPubKey, Base64.DEFAULT))
-                .apply()
+            sharedPreferences.edit {
+                putString(
+                    LONG_LIVED_TOKEN_KEYSTORE_ALIAS,
+                    Base64.encodeToString(lltEncrypted, Base64.DEFAULT)
+                )
+                    .putString(
+                        DEVICE_ID_KEYSTORE_ALIAS,
+                        Base64.encodeToString(deviceIdEncrypted, Base64.DEFAULT)
+                    )
+                    .putString(
+                        LONG_LIVED_TOKEN_SECRET_KEY_KEYSTORE_ALIAS,
+                        Base64.encodeToString(encryptedSecretKey, Base64.DEFAULT)
+                    )
+                    .putString(
+                        DEVICE_ID_SECRET_KEY_KEYSTORE_ALIAS,
+                        Base64.encodeToString(encryptedDeviceIdSecretKey, Base64.DEFAULT)
+                    )
+                    .putString(
+                        DEVICE_ID_PUB_KEY,
+                        Base64.encodeToString(clientDeviceIDPubKey, Base64.DEFAULT)
+                    )
+            }
         }
 
         fun fetchLongLivedToken(context: Context) : String {

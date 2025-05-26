@@ -133,7 +133,7 @@ class MainActivity : ComponentActivity() {
             AppTheme {
                 navController = rememberNavController()
 
-                LaunchedEffect(platformsViewModel.accountsForMissingDialog) {
+                LaunchedEffect(true) {
                     refreshTokensCallback(platformsViewModel.accountsForMissingDialog)
                 }
 
