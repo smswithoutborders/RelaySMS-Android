@@ -281,14 +281,14 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    fun refreshTokensCallback(accountsInfo: Map<String, List<String>> ){
+    private fun refreshTokensCallback(accountsInfo: Map<String, List<String>> ){
         val sharedPreferences = PreferenceManager
             .getDefaultSharedPreferences(applicationContext)
         val doNotShowDialog = sharedPreferences
             .getBoolean(Vaults.Companion.PrefKeys
                 .KEY_DO_NOT_SHOW_MISSING_TOKEN_DIALOG, false)
 
-        if (!doNotShowDialog) {
+        if (!doNotShowDialog && accountsInfo.isNotEmpty()) {
             showMissingTokenDialog = true
             platformsViewModel.accountsForMissingDialog = accountsInfo
         }
@@ -309,8 +309,8 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 } else {
-                    Vaults.fetchLongLivedToken(applicationContext).let {
-                        if(it.isNotEmpty()) {
+                    Vaults.fetchLongLivedToken(applicationContext).let { llt ->
+                        if(llt.isNotEmpty()) {
                             val vault = Vaults(applicationContext)
                             try {
                                 vault.refreshStoredTokens(applicationContext, ) {
