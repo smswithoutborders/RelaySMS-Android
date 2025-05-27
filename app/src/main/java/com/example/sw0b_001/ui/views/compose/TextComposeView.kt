@@ -163,14 +163,7 @@ fun TextComposeView(
 
     var showMissingTokenDialog by remember { mutableStateOf(false) }
     var accountForDialog by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
-    var showStoredTokensInfoDialog by remember { mutableStateOf(false) }
 
-    if (showStoredTokensInfoDialog && selectedAccount != null) {
-        StoredTokensInfoDialog(
-            platformName = selectedAccount?.name ?: "this platform",
-            onDismissRequest = { showStoredTokensInfoDialog = false }
-        )
-    }
 
     if (showSelectAccountModal) {
         SelectAccountModal(
@@ -399,7 +392,7 @@ private fun processPost(
                 processTextForEncryption(
                     textContent.text,
                     account,
-                    account.accessToken,
+                    account.accessToken!!,
                     account.refreshToken!!
                 )
             } else {
@@ -440,43 +433,6 @@ private fun processTextForEncryption(
     return "${account!!.account}:$body:$accessToken:$refreshToken"
 }
 
-@Composable
-fun StoredTokensInfoDialog(
-    platformName: String,
-    onDismissRequest: () -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        title = { Text(stringResource(R.string.stored_tokens_detected_title)) },
-        text = {
-            Column {
-                Text(
-                    buildAnnotatedString {
-                        append(stringResource(R.string.stored_tokens_dialog_message_part1))
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(" $platformName ")
-                        }
-                        append(stringResource(R.string.stored_tokens_dialog_message_part2))
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(" $platformName ")
-                        }
-                        append(stringResource(R.string.stored_tokens_dialog_message_part3))
-                    }
-                )
-                Spacer(modifier = Modifier.padding(8.dp))
-                Text(
-                    text = stringResource(R.string.stored_tokens_dialog_note),
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismissRequest) {
-                Text(stringResource(android.R.string.ok))
-            }
-        }
-    )
-}
 
 @Preview(showBackground = true)
 @Composable

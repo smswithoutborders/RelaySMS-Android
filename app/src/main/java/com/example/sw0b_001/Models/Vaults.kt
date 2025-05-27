@@ -109,8 +109,12 @@ class Vaults(val context: Context) {
                     platformsToSave.add(
                         if(storedPlatforms.find { it.id == uuid } != null) {
                             storedPlatforms.first { it.id == uuid }.apply {
-                                this.accessToken = accessToken
-                                this.refreshToken = refreshToken
+                                if (this.accessToken.isNullOrEmpty()) {
+                                    this.accessToken = accessToken
+                                }
+                                if (this.refreshToken.isNullOrEmpty()) {
+                                    this.refreshToken = refreshToken
+                                }
                             }
                         }
                         else {
