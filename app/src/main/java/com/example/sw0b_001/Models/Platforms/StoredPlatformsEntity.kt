@@ -13,9 +13,9 @@ data class StoredPlatformsEntity(
     @ColumnInfo(
         name="access_token",
         defaultValue = ""
-    ) val accessToken: String?,
+    ) var accessToken: String?,
     @ColumnInfo(
         name="refresh_token",
         defaultValue = ""
-    ) val refreshToken: String?
+    ) var refreshToken: String?
 )
