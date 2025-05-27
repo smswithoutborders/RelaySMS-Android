@@ -84,8 +84,12 @@ class Vaults(val context: Context) {
                 )
 
                 val isStoredOnDevice = accountTokens.isStoredOnDevice
-                val accessToken = accountTokens.accountTokensMap["access_token"]
-                val refreshToken = accountTokens.accountTokensMap["refresh_token"]
+                val accessToken = if(accountTokens.accountTokensMap.containsKey("access_token")) {
+                    accountTokens.accountTokensMap["access_token"]
+                } else ""
+                val refreshToken = if(accountTokens.accountTokensMap.containsKey("refresh_token")) {
+                    accountTokens.accountTokensMap["refresh_token"]
+                } else ""
 
                 // TODO: add storing in case there's something to store
                 if (isStoredOnDevice &&
@@ -94,14 +98,19 @@ class Vaults(val context: Context) {
                             !it.accessToken.isNullOrEmpty() } == null) {
                     accountsMissingTokens[accountTokens.platform].let { accountsIds ->
                         if (accountsIds.isNullOrEmpty())
-                            accountsMissingTokens[accountTokens.platform] = mutableListOf(accountTokens.accountIdentifier)
+                            accountsMissingTokens[accountTokens.platform] =
+                                mutableListOf(accountTokens.accountIdentifier)
                         else
-                            accountsMissingTokens[accountTokens.platform]?.add(accountTokens.accountIdentifier)
+                            accountsMissingTokens[accountTokens.platform]
+                                ?.add(accountTokens.accountIdentifier)
                     }
                 }
                 else {
                     platformsToSave.add(
-                        if(!accessToken.isNullOrEmpty()) {
+                        if(storedPlatforms.find { it.id == uuid } != null) {
+                            storedPlatforms.first { it.id == uuid }
+                        }
+                        else {
                             StoredPlatformsEntity(
                                 id = uuid,
                                 account = accountTokens.accountIdentifier,
@@ -109,8 +118,6 @@ class Vaults(val context: Context) {
                                 accessToken = accessToken,
                                 refreshToken = refreshToken
                             )
-                        } else {
-                            storedPlatforms.first { it.id == uuid }
                         }
                     )
                 }
@@ -118,6 +125,7 @@ class Vaults(val context: Context) {
             datastore.storedPlatformsDao().insert(platformsToSave)
             missingCallback(accountsMissingTokens)
         } catch (e: Exception) {
+            e.printStackTrace()
             throw e
         }
     }
