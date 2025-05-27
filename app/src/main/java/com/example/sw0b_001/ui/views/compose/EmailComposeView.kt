@@ -733,7 +733,7 @@ private fun processSend(
                         emailContent.subject,
                         emailContent.body,
                         account,
-                        account.accessToken,
+                        account.accessToken!!,
                         account.refreshToken!!
                     )
                 } else {
