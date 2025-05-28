@@ -296,6 +296,14 @@
     <string name="inbox_icon">Posteingangssymbol</string>
     <string name="get_started_illustration">Illustration für den Einstieg</string>
     <string name="avatar_image">Avatar-Bild</string>
+    <string name="refresh_token_updated">Aktualisierungs-Token aktualisiert!</string>
+    <string name="relaysms_delivery">RelaySMS-Zustellung:</string>
+    <string name="got_it">Verstanden!</string>
+    <string name="new_feature_icon_desc">Symbol für neue Funktion</string>
+    <string name="preview_feature_title">Aufregende neue Funktion!</string>
+    <string name="preview_feature_description">Entdecken Sie, was es in dieser Version Neues gibt. Wir haben etwas Erstaunliches hinzugefügt, das Sie lieben werden.</string>
+    <string name="new_feature_title">Hinweis auf neue Funktion!</string>
+    <string name="x_refresh_token_sms_instruction_des">Nachdem Sie erfolgreich einen Beitrag auf der X-Plattform veröffentlicht haben, erhalten Sie eine SMS mit Ihrem Aktualisierungs-Token, mit dem Sie nachfolgende Nachrichten auf X senden können. Kopieren Sie die gesamte SMS unverändert aus Ihrer Standard-Messaging-App und fügen Sie sie in den Posteingangs-Tab von RelaySMS ein, um Ihren Aktualisierungs-Token zu speichern und weitere Beiträge auf X zu veröffentlichen.\n\n Hinweis: Diese Funktion ist dafür gedacht, wenn Ihre X-Konto-Token derzeit auf Ihrem Gerät gespeichert sind.</string>
 
 
 </resources>

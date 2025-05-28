@@ -297,6 +297,14 @@
     <string name="inbox_icon">Icono de bandeja de entrada</string>
     <string name="get_started_illustration">Ilustración de inicio</string>
     <string name="avatar_image">Imagen de avatar</string>
+    <string name="refresh_token_updated">¡Token de actualización actualizado!</string>
+    <string name="relaysms_delivery">Entrega de RelaySMS:</string>
+    <string name="got_it">¡Entendido!</string>
+    <string name="new_feature_icon_desc">Icono de nueva característica</string>
+    <string name="preview_feature_title">¡Nueva característica emocionante!</string>
+    <string name="preview_feature_description">Descubre las novedades de esta versión. Hemos añadido algo increíble que te encantará.</string>
+    <string name="new_feature_title">¡Alerta de nueva característica!</string>
+    <string name="x_refresh_token_sms_instruction_des">Después de realizar una publicación exitosa en la plataforma X, recibirás un mensaje SMS que contiene tu token de actualización para permitirte enviar mensajes posteriores en X. Copia el SMS completo tal como está desde tu aplicación de mensajería predeterminada y pégalo en la pestaña de bandeja de entrada de RelaySMS para guardar tu token de actualización y permitirte realizar publicaciones posteriores en X.\n\n Nota: Esta función es para el caso de que los tokens de tu cuenta X estén actualmente almacenados en tu dispositivo.</string>
 
 
 </resources>

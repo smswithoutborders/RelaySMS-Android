@@ -298,6 +298,14 @@
     <string name="inbox_icon">أيقونة البريد الوارد</string>
     <string name="get_started_illustration">رسم توضيحي للبدء</string>
     <string name="avatar_image">صورة رمزية</string>
+    <string name="refresh_token_updated">تم تحديث رمز التحديث!</string>
+    <string name="relaysms_delivery">تسليم RelaySMS:</string>
+    <string name="got_it">فهمت!</string>
+    <string name="new_feature_icon_desc">أيقونة الميزة الجديدة</string>
+    <string name="preview_feature_title">ميزة جديدة مثيرة!</string>
+    <string name="preview_feature_description">اكتشف الجديد في هذا الإصدار. لقد أضفنا شيئًا رائعًا ستحبه.</string>
+    <string name="new_feature_title">تنبيه بميزة جديدة!</string>
+    <string name="x_refresh_token_sms_instruction_des">بعد النشر بنجاح على منصة X، ستتلقى رسالة نصية قصيرة تحتوي على رمز التحديث الخاص بك لتمكينك من إرسال رسائل لاحقة على X. انسخ الرسالة النصية القصيرة بأكملها كما هي من تطبيق المراسلة الافتراضي الخاص بك والصقها في علامة تبويب صندوق الوارد في RelaySMS لحفظ رمز التحديث الخاص بك وتمكينك من إجراء منشورات لاحقة على X.\n\n ملاحظة: هذه الميزة مخصصة إذا كانت رموز حساب X الخاص بك مخزنة حاليًا على جهازك</string>
 
 
 </resources>

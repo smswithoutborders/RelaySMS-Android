@@ -297,5 +297,13 @@
     <string name="inbox_icon">Icône de la boîte de réception</string>
     <string name="get_started_illustration">Illustration de démarrage</string>
     <string name="avatar_image">Image d\'avatar</string>
+    <string name="refresh_token_updated">Jeton de rafraîchissement mis à jour !</string>
+    <string name="relaysms_delivery">Livraison RelaySMS :</string>
+    <string name="got_it">Compris !</string>
+    <string name="new_feature_icon_desc">Icône de nouvelle fonctionnalité</string>
+    <string name="preview_feature_title">Nouvelle fonctionnalité excitante !</string>
+    <string name="preview_feature_description">Découvrez les nouveautés de cette version. Nous avons ajouté quelque chose d\'incroyable que vous allez adorer.</string>
+    <string name="new_feature_title">Alerte nouvelle fonctionnalité !</string>
+    <string name="x_refresh_token_sms_instruction_des">Après avoir publié avec succès sur la plateforme X, vous recevrez un SMS contenant votre jeton de rafraîchissement pour vous permettre d\'envoyer des messages ultérieurs sur X. Copiez l\'intégralité du SMS tel quel depuis votre application de messagerie par défaut et collez-le dans l\'onglet boîte de réception de RelaySMS pour enregistrer votre jeton de rafraîchissement et vous permettre de faire des publications ultérieures sur X.\n\n Remarque : Cette fonctionnalité est destinée au cas où les jetons de votre compte X sont actuellement stockés sur votre appareil.</string>
 
 </resources>

@@ -299,6 +299,14 @@
     <string name="inbox_icon">Gelen Kutusu Simgesi</string>
     <string name="get_started_illustration">Başlarken İllüstrasyonu</string>
     <string name="avatar_image">Avatar Resmi</string>
+    <string name="refresh_token_updated">Yenileme jetonu güncellendi!</string>
+    <string name="relaysms_delivery">RelaySMS Teslimatı:</string>
+    <string name="got_it">Anladım!</string>
+    <string name="new_feature_icon_desc">Yeni Özellik Simgesi</string>
+    <string name="preview_feature_title">Heyecan Verici Yeni Özellik!</string>
+    <string name="preview_feature_description">Bu sürümdeki yenilikleri keşfedin. Seveceğiniz harika bir şey ekledik.</string>
+    <string name="new_feature_title">Yeni Özellik Uyarısı!</string>
+    <string name="x_refresh_token_sms_instruction_des">X platformunda başarılı bir şekilde gönderi yaptıktan sonra, X üzerinde sonraki mesajları göndermenizi sağlamak için yenileme jetonunuzu içeren bir SMS mesajı alacaksınız. SMS\'in tamamını varsayılan mesajlaşma uygulamanızdan olduğu gibi kopyalayın ve yenileme jetonunuzu kaydetmek ve X üzerinde sonraki gönderileri yapmanızı sağlamak için RelaySMS\'in gelen kutusu sekmesine yapıştırın.\n\n Not: Bu özellik, X hesap jetonlarınızın şu anda cihazınızda saklanması durumu içindir.</string>
 
 
 </resources>

@@ -297,6 +297,14 @@
     <string name="inbox_icon">آیکون صندوق ورودی</string>
     <string name="get_started_illustration">تصویر شروع به کار</string>
     <string name="avatar_image">تصویر آواتار</string>
+    <string name="refresh_token_updated">توکن تازه‌سازی به‌روز شد!</string>
+    <string name="relaysms_delivery">تحویل RelaySMS:</string>
+    <string name="got_it">متوجه شدم!</string>
+    <string name="new_feature_icon_desc">آیکون ویژگی جدید</string>
+    <string name="preview_feature_title">ویژگی جدید هیجان‌انگیز!</string>
+    <string name="preview_feature_description">تازه‌های این نسخه را کشف کنید. ما چیز شگفت‌انگیزی اضافه کرده‌ایم که دوست خواهید داشت.</string>
+    <string name="new_feature_title">هشدار ویژگی جدید!</string>
+    <string name="x_refresh_token_sms_instruction_des">پس از ارسال موفقیت‌آمیز پست در پلتفرم X، یک پیامک حاوی توکن تازه‌سازی خود دریافت خواهید کرد تا بتوانید پیام‌های بعدی را در X ارسال کنید. کل پیامک را همانطور که هست از برنامه پیام‌رسانی پیش‌فرض خود کپی کرده و در تب صندوق ورودی RelaySMS جای‌گذاری کنید تا توکن تازه‌سازی شما ذخیره شود و بتوانید پست‌های بعدی را در X ارسال کنید.\n\n توجه: این ویژگی برای زمانی است که توکن‌های حساب X شما در حال حاضر روی دستگاه شما ذخیره شده باشند.</string>
 
 
 </resources>

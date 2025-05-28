@@ -302,5 +302,13 @@
     <string name="inbox_icon">收件箱图标</string>
     <string name="get_started_illustration">入门插图</string>
     <string name="avatar_image">头像图片</string>
+    <string name="refresh_token_updated">刷新令牌已更新！</string>
+    <string name="relaysms_delivery">RelaySMS 投递：</string>
+    <string name="got_it">知道了！</string>
+    <string name="new_feature_icon_desc">新功能图标</string>
+    <string name="preview_feature_title">令人兴奋的新功能！</string>
+    <string name="preview_feature_description">发现此版本中的新功能。我们添加了一些您会喜欢的绝佳内容。</string>
+    <string name="new_feature_title">新功能提醒！</string>
+    <string name="x_refresh_token_sms_instruction_des">在 X 平台上成功发帖后，您将收到一条包含刷新令牌的短信，以便您可以在 X 上发送后续消息。请从您的默认消息应用中原样复制整条短信，并将其粘贴到 RelaySMS 的收件箱选项卡中，以保存您的刷新令牌并使您能够在 X 上进行后续发帖。\n\n 注意：此功能适用于您的 X 帐户令牌当前存储在您设备上的情况。</string>
 
 </resources>
