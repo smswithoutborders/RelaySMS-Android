@@ -8,6 +8,10 @@
         <item>@string/language_arabic</item>
         <item>@string/language_german</item>
         <item>@string/language_swahili</item>
+        <item>@string/language_chinese</item>
+        <item>@string/language_korean</item>
+        <item>@string/language_hindi</item>
+        <item>@string/language_shona</item>
     </string-array>
     <string-array name="language_values">
         <item>@string/language_english_value</item>
@@ -18,5 +22,9 @@
         <item>@string/language_arabic_value</item>
         <item>@string/language_german_value</item>
         <item>@string/language_swahili_value</item>
+        <item>@string/language_chinese_value</item>
+        <item>@string/language_korean_value</item>
+        <item>@string/language_hindi_value</item>
+        <item>@string/language_shona_value</item>
     </string-array>
 </resources>

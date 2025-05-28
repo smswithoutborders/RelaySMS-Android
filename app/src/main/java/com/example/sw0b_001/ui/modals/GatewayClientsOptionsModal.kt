@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
@@ -105,14 +106,9 @@ fun GatewayClientOptionsModal(
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    )
                 ) {
                     Text(
                         text = stringResource(R.string.make_default),
-                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 }
 
@@ -125,54 +121,37 @@ fun GatewayClientOptionsModal(
                             onEditClicked(gatewayClient)
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = MaterialTheme.colorScheme.primary
-                        )
                     ) {
                         Text(
                             text = stringResource(R.string.edit),
-                            color = MaterialTheme.colorScheme.primary
                         )
                     }
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Button(
+                    TextButton(
                         onClick = {
                             if (isSelected) {
                                 showDeleteConfirmationDialog = true
-                                Toast.makeText(context, "Gateway client is already selected. Change default gateway client before deleting this one", Toast.LENGTH_LONG).show()
+                                Toast.makeText(context,
+                                    context.getString(R.string.gateway_client_is_already_selected_change_default_gateway_client_before_deleting_this_one), Toast.LENGTH_LONG).show()
                             } else {
                                 scope.launch {
                                     val successRunnable = Runnable {
-
-                                        Log.i(
-                                            "GatewayClientOptionsModal",
-                                            "Gateway client deleted successfully"
-                                        )
                                         onDismiss()
                                     }
 
-                                    val failureRunnable = Runnable {
-                                        Log.e(
-                                            "GatewayClientOptionsModal",
-                                            "Failed to delete gateway client"
-                                        )
-                                    }
+                                    val failureRunnable = Runnable {}
                                     viewModel.delete(context, gatewayClient)
                                     viewModel.loadRemote(context, successRunnable, failureRunnable)
                                 }
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.errorContainer,
-                            contentColor = MaterialTheme.colorScheme.onErrorContainer
-                        )
                     ) {
                         Text(
                             text = stringResource(R.string.delete),
-                            color = MaterialTheme.colorScheme.onErrorContainer
+                            color = MaterialTheme.colorScheme.error
                         )
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -186,7 +165,7 @@ fun GatewayClientOptionsModal(
             onDismissRequest = { showDeleteConfirmationDialog = false },
             title = {
                 Text(
-                    text = "Cannot Delete",
+                    text = stringResource(R.string.cannot_delete),
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.headlineSmall
                 )
@@ -194,7 +173,7 @@ fun GatewayClientOptionsModal(
             backgroundColor = MaterialTheme.colorScheme.background,
             text = {
                 Text(
-                    text = "Gateway client is already selected. Change default gateway client before deleting this one",
+                    text = stringResource(R.string.gateway_client_is_already_selected_change_default_gateway_client_before_deleting_this_one),
                     color = MaterialTheme.colorScheme.onBackground,
                     style = MaterialTheme.typography.bodyMedium
                 )
@@ -208,7 +187,7 @@ fun GatewayClientOptionsModal(
                     )
                 ) {
                     Text(
-                        text = "OK",
+                        text = stringResource(R.string.ok),
                         color = MaterialTheme.colorScheme.onBackground
                     )
                 }

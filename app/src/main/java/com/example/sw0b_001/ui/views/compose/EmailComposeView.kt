@@ -2,6 +2,8 @@ package com.example.sw0b_001.ui.views.compose
 
 import android.content.Context
 import android.content.Intent
+import android.util.Base64
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
@@ -60,6 +62,7 @@ import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.preference.PreferenceManager
 import com.example.sw0b_001.Bridges.Bridges
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.Database.Datastore
@@ -69,8 +72,11 @@ import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.Models.Publishers
 import com.example.sw0b_001.Models.SMSHandler
+import com.example.sw0b_001.Models.Vaults
+import com.example.sw0b_001.Modules.Helpers
 import com.example.sw0b_001.Modules.Network
 import com.example.sw0b_001.R
+import com.example.sw0b_001.ui.components.MissingTokenAccountInfo
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.navigation.GetMeOutScreen
@@ -81,7 +87,9 @@ import com.example.sw0b_001.ui.views.compose.EmailComposeHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -93,25 +101,101 @@ data class EmailContent(
     var body: String
 )
 
+//object EmailComposeHandler {
+//    fun decomposeMessage(
+//        message: String,
+//    ): EmailContent {
+//        return message.split(":").let {
+//            EmailContent(
+//                to = it[1],
+//                cc = it[2],
+//                bcc = it[3],
+//                subject = it[4],
+//                body = it.subList(5, it.size).joinToString()
+//            )
+//        }
+//    }
+//}
+
 object EmailComposeHandler {
-    fun decomposeMessage(
-        message: String,
-    ): EmailContent {
-        return message.split(":").let {
-            EmailContent(
-                to = it[0],
-                cc = it[1],
-                bcc = it[2],
-                subject = it[3],
-                body = it.subList(4, it.size).joinToString()
-            )
+
+    private fun errorContent(originalMessage: String, reason: String): EmailContent {
+        Log.e("EmailComposeHandler", "Failed to decompose message ($reason). Original: $originalMessage")
+        return EmailContent(to = "", cc = "", bcc = "", subject = "", body = "Error: Could not parse message content.")
+    }
+
+    fun decomposeMessage(message: String, isBridge: Boolean): EmailContent {
+        val toValue: String
+        val ccValue: String
+        val bccValue: String
+        val subjectValue: String
+        var actualBody: String
+
+        if (isBridge) {
+            val splitLimit = 5
+            val parts = message.split(":", limit = splitLimit)
+
+            if (parts.size < splitLimit) {
+                return errorContent(message, "isBridge=true, parts.size (${parts.size}) < required minimum ($splitLimit)")
+            }
+
+            toValue = parts.getOrElse(0) { "" }
+            ccValue = parts.getOrElse(1) { "" }
+            bccValue = parts.getOrElse(2) { "" }
+            subjectValue = parts.getOrElse(3) { "" }
+            actualBody = parts[4]
+
+        } else {
+
+            val splitLimit = 6
+            val parts = message.split(":", limit = splitLimit)
+
+            if (parts.size < splitLimit) {
+                return errorContent(message, "isBridge=false, parts.size (${parts.size}) < required minimum ($splitLimit)")
+            }
+
+            toValue = parts.getOrElse(1) { "" }
+            ccValue = parts.getOrElse(2) { "" }
+            bccValue = parts.getOrElse(3) { "" }
+            subjectValue = parts.getOrElse(4) { "" }
+            val bodyAndMaybeTokens = parts[5]
+
+            val lastColonIdx = bodyAndMaybeTokens.lastIndexOf(':')
+            val secondLastColonIdx = if (lastColonIdx > 0) {
+                bodyAndMaybeTokens.lastIndexOf(':', startIndex = lastColonIdx - 1)
+            } else {
+                -1
+            }
+
+            if (secondLastColonIdx != -1) {
+                actualBody = bodyAndMaybeTokens.substring(0, secondLastColonIdx)
+                Log.d("EmailComposeHandler", "isBridge=false. Tokens likely present, extracted body: \"$actualBody\" from \"$bodyAndMaybeTokens\"")
+            } else {
+                actualBody = bodyAndMaybeTokens
+                Log.d("EmailComposeHandler", "isBridge=false. Tokens likely absent in \"$bodyAndMaybeTokens\", using full remainder as body.")
+            }
         }
+
+        Log.d("EmailComposeHandler", "Decomposed (isBridge=$isBridge): To: \"$toValue\", CC: \"$ccValue\", BCC: \"$bccValue\", Subject: \"$subjectValue\", Body: \"$actualBody\"")
+
+        return EmailContent(
+            to = toValue,
+            cc = ccValue,
+            bcc = bccValue,
+            subject = subjectValue,
+            body = actualBody
+        )
     }
 }
 
 
 @Serializable
-data class GatewayClientRequest(val address: String, val text: String)
+data class GatewayClientRequest(
+    val address: String,
+    val text: String,
+    val date: String,
+    val date_sent: String
+)
 
 private fun networkRequest(
     url: String,
@@ -141,7 +225,7 @@ fun EmailComposeView(
     val context = LocalContext.current
 
     val decomposedMessage = if(platformsViewModel.message != null)
-        EmailComposeHandler.decomposeMessage(platformsViewModel.message!!.encryptedContent!!)
+        EmailComposeHandler.decomposeMessage(platformsViewModel.message!!.encryptedContent!!, isBridge)
     else null
 
     var showCcBcc by remember { mutableStateOf(false) }
@@ -185,6 +269,7 @@ fun EmailComposeView(
 
     // Conditionally show the SelectAccountModal
     if (showSelectAccountModal && !isBridge) {
+        Log.d("EmailComposeView", "Showing SelectAccountModal")
         SelectAccountModal(
             platformsViewModel = platformsViewModel,
             onDismissRequest = {
@@ -198,6 +283,7 @@ fun EmailComposeView(
                 selectedAccount = account
                 from = account.account!!
                 showSelectAccountModal = false
+                Log.d("EmailComposeView", "Selected account: $account")
             }
         )
     }
@@ -213,30 +299,62 @@ fun EmailComposeView(
             requestStatus = developerRequestStatus,
             isLoading = developerIsLoading,
             httpRequestCallback = { _, dialingUrl ->
-                TODO("figure out whats wrong here")
-//                developerIsLoading = true
-//                developerRequestStatus = "dialing...\n"
-//
-//                val scope = CoroutineScope(Dispatchers.Default).launch {
-//                    developerRequestStatus += networkRequest(
-//                        url = dialingUrl,
-//                        payload = GatewayClientRequest(
-//                            address = "+237123456789",
-//                            text = Bridges.compose(
-//                                context = context,
-//                                to = to,
-//                                cc = cc,
-//                                bcc = bcc,
-//                                subject = subject,
-//                                body = body,
-//                                smsTransmission = false,
-//                                onSuccessCallback = {}
-//                            ).first!!
-//                        ),
-//                    )
-//                    developerRequestStatus += "\nending..."
-//                    developerIsLoading = false
-//                }
+                developerIsLoading = true
+                developerRequestStatus = "dialing...\n"
+
+                val scope = CoroutineScope(Dispatchers.Default).launch {
+                    if(isBridge) {
+                        developerRequestStatus += networkRequest(
+                            url = dialingUrl,
+                            payload = GatewayClientRequest(
+                                address = "+2371123579",
+                                date = System.currentTimeMillis().toString(),
+                                date_sent = System.currentTimeMillis().toString(),
+                                text = Bridges.compose(
+                                    context = context,
+                                    to = to,
+                                    cc = cc,
+                                    bcc = bcc,
+                                    subject = subject,
+                                    body = body,
+                                    smsTransmission = false,
+                                    onSuccessCallback = {}
+                                ).first!!
+                            ),
+                        )
+                        developerRequestStatus += "\nending..."
+                        developerIsLoading = false
+                    } else {
+                        println("Sending for platforms...")
+                        processSend(
+                            context = context,
+                            emailContent = EmailContent(
+                                to = to,
+                                cc = cc,
+                                bcc = bcc,
+                                subject = subject,
+                                body = body
+                            ),
+                            account = selectedAccount,
+                            isBridge = false,
+                            onFailureCallback = {},
+                            onCompleteCallback = {
+                                developerRequestStatus += networkRequest(
+                                    url = dialingUrl,
+                                    payload = GatewayClientRequest(
+                                        address = "+2371123579",
+                                        date = System.currentTimeMillis().toString(),
+                                        date_sent = System.currentTimeMillis().toString(),
+                                        text = Base64.encodeToString(it, Base64.DEFAULT)
+                                    )
+                                )
+                                developerRequestStatus += "\nending..."
+                                developerIsLoading = false
+                            },
+                            smsTransmission = false,
+                        )
+                    }
+                }
             }
         ) {
             showDeveloperDialog = false
@@ -251,7 +369,7 @@ fun EmailComposeView(
                 title = { Text(stringResource(R.string.compose_email)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {
@@ -262,7 +380,7 @@ fun EmailComposeView(
                             },
                             enabled = to.isNotEmpty() && body.isNotEmpty(),
                         ) {
-                            Icon(Icons.Default.DeveloperMode, contentDescription = "Send")
+                            Icon(Icons.Default.DeveloperMode, contentDescription = stringResource(R.string.send))
                         }
                     }
 
@@ -280,19 +398,20 @@ fun EmailComposeView(
                                 ),
                                 account = selectedAccount,
                                 isBridge = isBridge,
-                                onFailureCallback = {}
-                            ) {
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    navController.navigate(HomepageScreen) {
-                                        popUpTo(HomepageScreen) {
-                                            inclusive = true
+                                onFailureCallback = { errorMsg ->
+                                    Log.e("EmailComposeView", "Send failed: $errorMsg")
+                                },
+                                onCompleteCallback = {
+                                    CoroutineScope(Dispatchers.Main).launch {
+                                        navController.navigate(HomepageScreen) {
+                                            popUpTo(HomepageScreen) { inclusive = true }
                                         }
                                     }
                                 }
-                            }
+                            )
                         }
                     ) {
-                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
+                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.send))
                     }
 
                     IconButton(
@@ -300,7 +419,7 @@ fun EmailComposeView(
                             showMoreOptions = !showMoreOptions
                         }
                     ) {
-                        Icon(Icons.Filled.MoreVert, contentDescription = "More")
+                        Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.more))
                         DropdownMenu(
                             expanded = showMoreOptions,
                             onDismissRequest = { showMoreOptions = false }
@@ -395,7 +514,7 @@ fun EmailComposeView(
                     }) {
                         Icon(
                             Icons.Filled.ArrowDropDown,
-                            contentDescription = "Expand To"
+                            contentDescription = stringResource(R.string.expand_to)
                         )
                     }
                 }
@@ -564,9 +683,13 @@ private fun processEmailForEncryption(
     bcc: String,
     subject: String,
     body: String,
-    account: StoredPlatformsEntity?
+    account: StoredPlatformsEntity?,
+    accessToken: String = "",
+    refreshToken: String = ""
 ): String {
-    return "${account!!.account}:$to:$cc:$bcc:$subject:$body"
+    if (accessToken.isEmpty() || refreshToken.isEmpty())
+        return "${account!!.account}:$to:$cc:$bcc:$subject:$body"
+    return "${account!!.account}:$to:$cc:$bcc:$subject:$body:$accessToken:$refreshToken"
 }
 
 private fun processSend(
@@ -575,11 +698,12 @@ private fun processSend(
     account: StoredPlatformsEntity?,
     isBridge: Boolean,
     onFailureCallback: (String?) -> Unit,
-    onCompleteCallback: () -> Unit
+    onCompleteCallback: (ByteArray?) -> Unit,
+    smsTransmission: Boolean = true
 ) {
     CoroutineScope(Dispatchers.Default).launch {
         try {
-            if(isBridge) {
+            if(isBridge) { // if its a bridge message
                 val txtTransmission = Bridges.compose(
                     context = context,
                     to = emailContent.to,
@@ -587,7 +711,7 @@ private fun processSend(
                     bcc = emailContent.bcc,
                     subject = emailContent.subject,
                     body = emailContent.body
-                ) { onCompleteCallback() }.first
+                ) { onCompleteCallback(null) }.first
 
                 val gatewayClientMSISDN = GatewayClientsCommunications(context)
                     .getDefaultGatewayClient()
@@ -596,19 +720,32 @@ private fun processSend(
                     context,
                     gatewayClientMSISDN!!,
                     txtTransmission).apply {
-                    setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 }
                 context.startActivity(sentIntent)
             }
             else {
-                val formattedContent = processEmailForEncryption(
-                    emailContent.to,
-                    emailContent.cc,
-                    emailContent.bcc,
-                    emailContent.subject,
-                    emailContent.body,
-                    account
-                )
+                val formattedContent: String = if(account?.accessToken?.isNotEmpty() == true) {
+                    processEmailForEncryption(
+                        emailContent.to,
+                        emailContent.cc,
+                        emailContent.bcc,
+                        emailContent.subject,
+                        emailContent.body,
+                        account,
+                        account.accessToken!!,
+                        account.refreshToken!!
+                    )
+                } else {
+                    processEmailForEncryption(
+                        emailContent.to,
+                        emailContent.cc,
+                        emailContent.bcc,
+                        emailContent.subject,
+                        emailContent.body,
+                        account
+                    )
+                }
 
                 val availablePlatforms =
                     Datastore.getDatastore(context).availablePlatformsDao().fetch(account!!.name!!)
@@ -619,7 +756,8 @@ private fun processSend(
                     AD!!,
                     availablePlatforms,
                     account,
-                ) { onCompleteCallback() }
+                    smsTransmission = smsTransmission
+                ) { onCompleteCallback(it) }
             }
         } catch(e: Exception) {
             e.printStackTrace()
@@ -630,6 +768,7 @@ private fun processSend(
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
@@ -651,6 +790,8 @@ fun AccountModalPreview() {
             id= "0",
             account = "developers@relaysms.me",
             name = "gmail",
+            accessToken = "",
+            refreshToken = ""
         )
         SelectAccountModal(
             _accounts = listOf(storedPlatform),

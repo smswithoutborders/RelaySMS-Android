@@ -46,6 +46,8 @@ message ExchangeOAuth2CodeAndStoreRequest {
   string code_verifier = 4;
   // Optional redirect URL for the OAuth2 application
   string redirect_url = 5;
+  // Indicates if the token should be stored on the device instead of the cloud
+  bool store_on_device = 6;
 }
 
 // Response message for the ExchangeOAuth2Code RPC
@@ -54,6 +56,8 @@ message ExchangeOAuth2CodeAndStoreResponse {
   bool success = 1;
   // A response message
   string message = 2;
+  // Access and refresh tokens
+  map<string, string> tokens = 3;
 }
 
 // Request message for revoking and deleting an OAuth2 token

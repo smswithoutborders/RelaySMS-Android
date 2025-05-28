@@ -60,7 +60,7 @@ import com.arpitkatiyarprojects.countrypicker.CountryPickerOutlinedTextField
 import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
 import com.example.sw0b_001.BuildConfig
-import com.example.sw0b_001.Models.NavigationFlowHandler
+import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
@@ -75,7 +75,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ForgotPasswordView(
     navController: NavController = rememberNavController(),
-    navigationFlowHandler: NavigationFlowHandler
+    platformsViewModel: PlatformsViewModel,
 ) {
     val context = LocalContext.current
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
@@ -107,7 +107,7 @@ fun ForgotPasswordView(
                     }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            "Navigate back to home screen"
+                            stringResource(R.string.navigate_back_to_home_screen)
                         )
                     }
                 }
@@ -257,11 +257,11 @@ fun ForgotPasswordView(
                             phoneNumber = phoneNumber,
                             password = password,
                             otpRequiredCallback = {
-                                navigationFlowHandler.loginSignupPassword = password
-                                navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
-                                navigationFlowHandler.otpRequestType =
+                                platformsViewModel.loginSignupPassword = password
+                                platformsViewModel.loginSignupPhoneNumber = phoneNumber
+                                platformsViewModel.otpRequestType =
                                     OTPCodeVerificationType.RECOVER
-                                navigationFlowHandler.nextAttemptTimestamp = it
+                                platformsViewModel.nextAttemptTimestamp = it
 
                                 CoroutineScope(Dispatchers.Main).launch {
                                     navController.navigate(OTPCodeScreen)
@@ -302,9 +302,9 @@ fun ForgotPasswordView(
 
             TextButton(
                 onClick = {
-                    navigationFlowHandler.loginSignupPassword = password
-                    navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
-                    navigationFlowHandler.otpRequestType =
+                    platformsViewModel.loginSignupPassword = password
+                    platformsViewModel.loginSignupPhoneNumber = phoneNumber
+                    platformsViewModel.otpRequestType =
                         OTPCodeVerificationType.AUTHENTICATE
                     navController.navigate(OTPCodeScreen)
                 },
@@ -358,6 +358,6 @@ private fun recoverPassword(
 @Composable
 fun ForgotPasswordPreview() {
     AppTheme(darkTheme = false) {
-        ForgotPasswordView(rememberNavController(), NavigationFlowHandler())
+        ForgotPasswordView(rememberNavController(), PlatformsViewModel())
     }
 }

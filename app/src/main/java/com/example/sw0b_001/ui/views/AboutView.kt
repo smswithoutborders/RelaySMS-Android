@@ -89,7 +89,7 @@ fun AboutView(
             // App Info
             Image(
                 painter = painterResource(id = R.drawable.relaysms_icon_default_shape),
-                contentDescription = "Relay Icon",
+                contentDescription = stringResource(R.string.relay_icon),
                 modifier = Modifier.size(50.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -137,7 +137,7 @@ fun AboutView(
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                        contentDescription = "App Tutorial",
+                        contentDescription = stringResource(R.string.app_tutorial),
                         tint = Color.White
                     )
                 }
@@ -155,7 +155,7 @@ fun AboutView(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Image(
                         painter = painterResource(id = if (isDarkTheme) R.drawable.github_white_icon else R.drawable.github_icon),
-                        contentDescription = "GitHub Logo",
+                        contentDescription = stringResource(R.string.github_logo),
                         modifier = Modifier.size(32.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -171,7 +171,7 @@ fun AboutView(
                     text = stringResource(R.string.view_on_github),
                     modifier = Modifier.clickable {
                         val intent = Intent(Intent.ACTION_VIEW,
-                            Uri.parse("https://github.com/smswithoutborders/RelaySMS-Android")) // Replace with your GitHub link
+                            Uri.parse("https://github.com/smswithoutborders/RelaySMS-Android"))
                         context.startActivity(intent)
                     },
                     color = MaterialTheme.colorScheme.primary,
@@ -195,7 +195,7 @@ fun AboutView(
 
                 Image(
                     painter = painterResource(id = if (isDarkTheme) R.drawable.x_white_icon else R.drawable.x_icon),
-                    contentDescription = "X Logo",
+                    contentDescription = stringResource(R.string.x_logo),
                     modifier = Modifier
                         .size(32.dp)
                         .clickable {
@@ -207,7 +207,7 @@ fun AboutView(
                 Spacer(modifier = Modifier.width(32.dp))
                 Image(
                     painter = painterResource(id = R.drawable.bluesky_icon),
-                    contentDescription = "Bluesky Logo",
+                    contentDescription = stringResource(R.string.bluesky_logo),
                     modifier = Modifier
                         .size(32.dp)
                         .clickable {
@@ -222,7 +222,7 @@ fun AboutView(
                 Spacer(modifier = Modifier.width(32.dp))
                 Image(
                     painter = painterResource(id = if (isDarkTheme) R.drawable.github_white_icon else R.drawable.github_icon),
-                    contentDescription = "GitHub Logo",
+                    contentDescription = stringResource(R.string.github_logo),
                     modifier = Modifier
                         .size(32.dp)
                         .clickable {

@@ -165,7 +165,8 @@ fun PlatformListContent(
 
         val displayedPlatforms = if (isCompose) {
             platforms.filter { platform ->
-                storedPlatforms.filter { it.name == platform.name }.isNotEmpty()
+                storedPlatforms.any { it.name == platform.name } ||
+                        platform.service_type == Platforms.ServiceTypes.TEST.type
             }
         } else {
             platforms
@@ -178,21 +179,37 @@ fun PlatformListContent(
             maxItemsInEachRow = 2
         ) {
             displayedPlatforms.forEach { platform ->
-                PlatformCard(
-                    logo =
-                    if(platform.logo != null)
-                        BitmapFactory.decodeByteArray(
-                            platform.logo,
-                            0,
-                            platform.logo!!.count()
-                        )
-                    else null,
-                    platform = platform,
-                    modifier = Modifier.width(130.dp),
-                    isActive = isCompose || storedPlatforms
-                        .filter { platform.name == it.name}.isNotEmpty(),
-                    onClick = onPlatformClick
-                )
+                if(platform.service_type == Platforms.ServiceTypes.TEST.type && isCompose) {
+                    PlatformCard(
+                        logo =
+                            if(platform.logo != null)
+                                BitmapFactory.decodeByteArray(
+                                    platform.logo,
+                                    0,
+                                    platform.logo!!.count()
+                                )
+                            else null,
+                        platform = platform,
+                        modifier = Modifier.width(130.dp),
+                        isActive = true,
+                        onClick = onPlatformClick
+                    )
+                } else if(platform.service_type != Platforms.ServiceTypes.TEST.type) {
+                    PlatformCard(
+                        logo =
+                            if(platform.logo != null)
+                                BitmapFactory.decodeByteArray(
+                                    platform.logo,
+                                    0,
+                                    platform.logo!!.count()
+                                )
+                            else null,
+                        platform = platform,
+                        modifier = Modifier.width(130.dp),
+                        isActive = isCompose || storedPlatforms.any { platform.name == it.name },
+                        onClick = onPlatformClick
+                    )
+                }
             }
         }
     }
@@ -224,7 +241,7 @@ fun PlatformCard(
                     context.resources,
                     R.drawable.logo
                 ).asImageBitmap(),
-                contentDescription = "Platform Logo",
+                contentDescription = stringResource(R.string.platform_logo),
                 modifier = Modifier
                     .size(50.dp)
                     .align(Alignment.Center),
@@ -284,6 +301,8 @@ fun AvailablePlatformsCardPreview() {
             id= "0",
             account = "developers@relaysms.me",
             name = "gmail",
+            accessToken = "",
+            refreshToken = ""
         )
 
         PlatformListContent(

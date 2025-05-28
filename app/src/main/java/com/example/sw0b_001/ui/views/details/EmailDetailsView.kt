@@ -93,7 +93,7 @@ fun EmailDetailsView(
             }
         }
     else
-        EmailComposeHandler.decomposeMessage(platformsViewModel.message!!.encryptedContent!!).apply {
+        EmailComposeHandler.decomposeMessage(platformsViewModel.message!!.encryptedContent!!, isBridge = false).apply {
             to = this.to
             cc = this.cc
             bcc = this.bcc
@@ -144,7 +144,7 @@ fun EmailDetailsView(
                 // Sender Avatar
                 Image(
                     painter = painterResource(R.drawable.round_person_24),
-                    contentDescription = "Sender Avatar",
+                    contentDescription = stringResource(R.string.sender_avatar),
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape)

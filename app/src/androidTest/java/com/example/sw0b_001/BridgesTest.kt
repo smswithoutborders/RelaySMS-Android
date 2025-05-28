@@ -24,7 +24,7 @@ class BridgesTest {
     val gatewayServerUrl = "https://gatewayserver.staging.smswithoutborders.com/v3/publish"
 
     @Serializable
-    data class GatewayClientRequest(val address: String, val text: String)
+    data class GatewayClientRequest(val address: String, val text: String, val date: String, val date_sent: String)
 
     val phoneNumber = "+23712345678115"
 
@@ -48,7 +48,7 @@ class BridgesTest {
             body = body,
             smsTransmission = false
         ){ }
-        var payload = Json.encodeToString(GatewayClientRequest(phoneNumber, request.first!!))
+        var payload = Json.encodeToString(GatewayClientRequest(phoneNumber, request.first!!, "2025-04-01", "2025-04-01"))
         println("Publishing: $payload")
 
         // TODO: checks if user already auth, then proceeds to use that information
@@ -74,7 +74,7 @@ class BridgesTest {
             subject = subject,
             body = "Second message"
         ){}
-        payload = Json.encodeToString(GatewayClientRequest(phoneNumber, request.first!!))
+        payload = Json.encodeToString(GatewayClientRequest(phoneNumber, request.first!!,"2025-04-01", "2025-04-01"))
         println("Publishing 2: $payload")
 
         // TODO: checks if user already auth, then proceeds to use that information

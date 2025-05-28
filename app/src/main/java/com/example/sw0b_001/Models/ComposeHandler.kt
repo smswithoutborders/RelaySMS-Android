@@ -23,15 +23,16 @@ object ComposeHandlers {
         AD: ByteArray,
         platform: AvailablePlatforms? = null,
         account: StoredPlatformsEntity? = null,
+        isTesting: Boolean = false,
         smsTransmission: Boolean = true,
-        onSuccessRunnable: () -> Unit? = {}
+        onSuccessRunnable: (ByteArray?) -> Unit? = {}
     ) : ByteArray {
         val states = Datastore.getDatastore(context).ratchetStatesDAO().fetch()
         if(states.size > 1) {
             throw Exception("More than 1 states exist")
         }
 
-        val state = if(states.isNotEmpty() && account != null)
+        val state = if(states.isNotEmpty() && (account != null || isTesting))
             States(String(Publishers.getEncryptedStates(context, states[0].value),
                 Charsets.UTF_8)) else States()
         val messageComposer = MessageComposer(context, state, AD)
@@ -64,9 +65,10 @@ object ComposeHandlers {
         encryptedContent.fromAccount = account?.account
 
         Datastore.getDatastore(context).encryptedContentDAO().insert(encryptedContent)
-        onSuccessRunnable()
+        val decoded =  Base64.decode(encryptedContentBase64, Base64.DEFAULT)
 
-        return Base64.decode(encryptedContentBase64, Base64.DEFAULT)
+        onSuccessRunnable(decoded)
+        return decoded
     }
 
     fun decompose(

@@ -193,7 +193,7 @@ fun AddGatewayClientModal(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Contacts,
-                            contentDescription = "Select Contact",
+                            contentDescription = stringResource(R.string.select_contact),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }

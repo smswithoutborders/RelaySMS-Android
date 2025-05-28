@@ -78,7 +78,7 @@ fun GetStartedView (
 
             Icon(
                 painter = painterResource(id = R.drawable.relaysms_blue),
-                contentDescription = "RelaySMS Logo",
+                contentDescription = stringResource(R.string.relaysms_logo),
                 modifier = Modifier.size(width=200.dp, height=50.dp),
                 tint = MaterialTheme.colorScheme.surfaceTint
             )
@@ -100,7 +100,7 @@ fun GetStartedView (
             ) {
                 Icon(
                     imageVector = Icons.Filled.Create,
-                    contentDescription = "Compose",
+                    contentDescription = stringResource(R.string.compose),
                     modifier = Modifier.size(ButtonDefaults.IconSize),
                     tint = MaterialTheme.colorScheme.onPrimaryContainer
                 )
@@ -171,7 +171,7 @@ fun GetStartedView (
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
                             imageVector = Icons.Filled.PersonAdd,
-                            contentDescription = "Create Account",
+                            contentDescription = stringResource(R.string.create_account),
                             Modifier.padding(bottom = 8.dp)
                         )
                         Text(
@@ -192,7 +192,7 @@ fun GetStartedView (
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Login,
-                            contentDescription = "Log In",
+                            contentDescription = stringResource(R.string.login),
                             Modifier.padding(bottom = 8.dp)
                         )
                         Text(
@@ -211,7 +211,7 @@ fun GetStartedView (
                 onDismissCallback = {
                     showLoginBottomSheet = false
                 },
-                title = "Login"
+                title = stringResource(R.string.login)
             ) {
                 navController.navigate(LoginScreen)
                 showLoginBottomSheet = false
@@ -224,7 +224,7 @@ fun GetStartedView (
                 onDismissCallback = {
                     showCreateAccountBottomSheet = false
                 },
-                title = "Create Account"
+                title = stringResource(R.string.create_account)
             ) {
                 navController.navigate(CreateAccountScreen)
                 showCreateAccountBottomSheet = false
@@ -263,7 +263,7 @@ fun LoginCreateInfoModal(
             ) {
                 Icon(
                     imageVector = Icons.Filled.Person,
-                    contentDescription = "Person Icon",
+                    contentDescription = stringResource(R.string.person_icon),
                     modifier = Modifier.size(48.dp),
                     tint = MaterialTheme.colorScheme.primary
                 )
@@ -276,7 +276,7 @@ fun LoginCreateInfoModal(
                 )
                 Spacer(modifier = Modifier.size(8.dp))
                 Text(
-                    text = "Access your account to save or use your online platforms without an internet connection",
+                    text = stringResource(R.string.access_your_account_to_save_or_use_your_online_platforms_without_an_internet_connection),
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center
                 )
@@ -287,11 +287,11 @@ fun LoginCreateInfoModal(
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Continue")
+                    Text(stringResource(R.string.continue_text))
                 }
                 Spacer(modifier = Modifier.size(16.dp))
                 Text(
-                    text = "An SMS would be sent to your phone number to verify you own the number",
+                    text = stringResource(R.string.an_sms_would_be_sent_to_your_phone_number_to_verify_you_own_the_number),
                     style = MaterialTheme.typography.bodySmall,
                     color = Color.Gray,
                     textAlign = TextAlign.Center

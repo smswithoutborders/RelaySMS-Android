@@ -32,7 +32,7 @@ fun BottomNavBar(
         NavigationBarItem(
             icon = { Icon(
                 Icons.Filled.Home,
-                contentDescription = "Recents",
+                contentDescription = stringResource(R.string.recents),
                 modifier = Modifier.size(20.dp)
             ) },
             label = {
@@ -59,7 +59,7 @@ fun BottomNavBar(
             NavigationBarItem(
                 icon = { Icon(
                     Icons.Filled.PhoneAndroid,
-                    contentDescription = "Platforms",
+                    contentDescription = stringResource(R.string.platforms),
                     modifier = Modifier.size(20.dp)
                 ) },
                 label = { Text(
@@ -83,7 +83,7 @@ fun BottomNavBar(
         NavigationBarItem(
             icon = { Icon(
                 Icons.Filled.Inbox,
-                contentDescription = "Inbox",
+                contentDescription = stringResource(R.string.inbox),
                 modifier = Modifier.size(20.dp)
             ) },
             label = { Text(
@@ -106,7 +106,7 @@ fun BottomNavBar(
         NavigationBarItem(
             icon = { Icon(
                 Icons.Filled.Public,
-                contentDescription = "Countries",
+                contentDescription = stringResource(R.string.countries),
                 modifier = Modifier.size(20.dp)
             ) },
             label = { Text(

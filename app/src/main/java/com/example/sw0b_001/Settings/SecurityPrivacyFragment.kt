@@ -26,10 +26,23 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import android.provider.Settings
+import android.util.Log
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.activity
+import com.example.sw0b_001.Database.Datastore
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class SecurityPrivacyFragment : PreferenceFragmentCompat() {
 
     private val lockScreenAlwaysOnSettingsKey = "lock_screen_always_on"
+    private val storeTokensOnDeviceKey = "store_tokens_on_device"
+    private lateinit var storeTokensOnDevice: SwitchPreferenceCompat
+
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.security_privacy_preferences, rootKey)
 
@@ -43,6 +56,11 @@ class SecurityPrivacyFragment : PreferenceFragmentCompat() {
             }
         }
         lockScreenAlwaysOn?.onPreferenceChangeListener = switchSecurityPreferences()
+
+        storeTokensOnDevice =
+            findPreference<SwitchPreferenceCompat>(storeTokensOnDeviceKey)!!
+        storeTokensOnDevice.onPreferenceChangeListener =
+            storeTokensOnDevicePreferenceChangeListener()
 
         val logout = findPreference<Preference>("logout")
         logout?.setOnPreferenceClickListener {
@@ -165,6 +183,98 @@ class SecurityPrivacyFragment : PreferenceFragmentCompat() {
             false
         }
     }
+
+    private fun storeTokensOnDevicePreferenceChangeListener(): OnPreferenceChangeListener {
+        Log.d("SecurityPrivacyFragment", "storeTokensOnDevicePreferenceChangeListener invoked")
+        return OnPreferenceChangeListener { preference, newValue ->
+            val isBeingEnabled = newValue as Boolean
+            val switchPreference = preference as SwitchPreferenceCompat
+
+            val dialogTitle = if (isBeingEnabled) {
+                getString(R.string.store_tokens_on_device_dialog_title)
+            } else {
+                getString(R.string.store_tokens_on_device_dialog_title)
+            }
+            val dialogMessage = if (isBeingEnabled) {
+                getString(R.string.store_tokens_on_device_enable_dialog_message) + "\n\n" + getString(R.string.are_you_sure_you_want_to_continue)
+            } else {
+                getString(R.string.store_tokens_on_device_disable_dialog_message) + "\n\n" + getString(R.string.are_you_sure_you_want_to_continue)
+            }
+
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(dialogTitle)
+                .setMessage(dialogMessage)
+                .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
+                    Log.d("SecurityPrivacyFragment", "Token storage change cancelled by user.")
+                    dialog.dismiss()
+                }
+                .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
+                    Log.d("SecurityPrivacyFragment", "Token storage change confirmed by user. New state: $isBeingEnabled")
+
+                    val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
+                    sharedPreferences.edit().putBoolean(storeTokensOnDeviceKey, isBeingEnabled).apply()
+                    Log.d("SecurityPrivacyFragment", "SharedPreferences updated.")
+
+                    switchPreference.isChecked = isBeingEnabled
+                    Log.d("SecurityPrivacyFragment", "Switch UI state updated.")
+
+                    if (isBeingEnabled) {
+                        Log.d("SecurityPrivacyFragment", "Launching token refresh coroutine...")
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            try {
+                                val vaults = Vaults(requireContext().applicationContext)
+                                vaults.refreshStoredTokens(requireContext().applicationContext)
+                                vaults.shutdown()
+                                Log.i("SecurityPrivacyFragment", "Token refresh successful.")
+                                launch(Dispatchers.Main) {
+                                    Toast.makeText(
+                                        activity,
+                                        getString(R.string.toast_tokens_refreshed_successfully),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            } catch (e: Exception) {
+                                Log.e("SecurityPrivacyFragment", "Error refreshing tokens", e)
+                                launch(Dispatchers.Main) {
+                                    Toast.makeText(
+                                        activity,
+                                        getString(R.string.toast_error_refreshing_tokens, e.message),
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            }
+                        }
+                    } else {
+
+                        Log.d("SecurityPrivacyFragment", "Token storage disabled. ")
+                        lifecycleScope.launch(Dispatchers.IO) {
+                            try {
+//                                Datastore.getDatastore(requireContext().applicationContext)
+//                                    .storedTokenDao()
+//                                    .deleteAllTokens()
+//                                Log.i("SecurityPrivacyFragment", "Local tokens cleared.")
+                                launch(Dispatchers.Main) {
+                                    Toast.makeText(
+                                        activity,
+                                        getString(R.string.toast_tokens_not_stored_subsequent),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            } catch (e: Exception) {
+                                Log.e("SecurityPrivacyFragment", "An error occurred while storing local tokens", e)
+                                launch(Dispatchers.Main) {
+                                    Toast.makeText(activity, getString(R.string.an_unexpected_error_occurred, e.message), Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        }
+                    }
+                    dialog.dismiss()
+                }
+                .show()
+            return@OnPreferenceChangeListener false
+        }
+    }
+
 
     private val registerActivityResult =
         registerForActivityResult(

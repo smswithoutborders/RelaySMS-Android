@@ -30,26 +30,10 @@
     <string name="language_german">Alemán</string>
     <string name="language_arabic">Árabe</string>
     <string name="language_swahili">Suajili</string>
-
-    <string name="language_english_value" translatable="false">
-        en
-    </string>
-    <string name="language_french_value" translatable="false">
-        fr
-    </string>
-    <string name="language_farsi_value" translatable="false">
-        fa
-    </string>
-    <string name="language_spanish_value" translatable="false">
-        es
-    </string>
-    <string name="language_turkish_value" translatable="false">
-        tr
-    </string>
-
-    <string name="default_gateway_MSISDN_0" translatable="false">+237679466332</string>
-    <string name="default_gateway_MSISDN_2" translatable="false">+237690826242</string>
-    <string name="default_gateway_MSISDN_3" translatable="false">+2348131498393</string>
+    <string name="language_chinese">Chino</string>
+    <string name="language_korean">Coreano</string>
+    <string name="language_hindi">Hindi</string>
+    <string name="language_shona">Shona</string>
 
     <string name="gateway_client_settings_add_custom_empty_error">Por favor, proporcione un número de teléfono</string>
 
@@ -195,6 +179,7 @@
     <string name="security_and_privacy">Seguridad y privacidad</string>
     <string name="security">Seguridad</string>
     <string name="enable_app_locks_and_pin_codes">Activar bloqueos de aplicaciones y códigos PIN</string>
+
     <string name="english">Inglés</string>
     <string name="arabic">Árabe</string>
     <string name="french">Francés</string>
@@ -203,6 +188,11 @@
     <string name="german">Alemán</string>
     <string name="swahili">Suajili</string>
     <string name="turkish">Turco</string>
+    <string name="chinese">Chino</string>
+    <string name="korean">Coreano</string>
+    <string name="hindi">Hindi</string>
+    <string name="shona">Shona</string>
+
     <string name="welcome_to_relaysms_">¡Bienvenido a RelaySMS!</string>
     <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">Utilice SMS para publicar una publicación, enviar correos electrónicos y mensajes sin conexión a Internet</string>
     <string name="learn_how_it_works_">Aprenda cómo funciona</string>
@@ -255,5 +245,71 @@
     <string name="relaysms_bug_report">RelaySMS - Reporte de error</string>
     <string name="request_new_code_in">Solicitar nuevo código en:</string>
     <string name="request_new_code">¡Solicita nuevo código!</string>
+    <string name="store_tokens_on_device_dialog_title">Almacenar tokens de OAuth2.0 en el dispositivo</string>
+    <string name="store_tokens_on_device_enable_dialog_message">Al activar esta función, se eliminan automáticamente sus tokens para las plataformas que utilizan OAuth2.0 (Gmail y X) en el servidor y se guardan en su dispositivo. Tenga en cuenta que RelaySMS utiliza estos tokens para enviar mensajes en su nombre para las plataformas mencionadas. Por lo tanto, en caso de que pierda su dispositivo o vuelva a instalar esta aplicación, sus tokens se perderán y tendrá que revocar las cuentas almacenadas existentes y volver a almacenarlas para obtener nuevos tokens.</string>
+    <string name="store_tokens_on_device_disable_dialog_message">Al desactivar esta configuración, se evitará que los tokens posteriores se almacenen en su dispositivo. Los mensajes para las plataformas con tokens existentes almacenados en su dispositivo aún podrán publicarse independientemente. En cualquier caso de tokens faltantes, revoque las cuentas involucradas y vuelva a almacenarlas.</string>
+    <string name="are_you_sure_you_want_to_continue">¿Está seguro de que desea continuar con esta acción?</string>
+    <string name="missing_token_text">Sus siguientes cuentas pueden tener tokens faltantes. Es posible que deba revocarlos y agregarlos nuevamente para asegurarse de que la publicación de mensajes funcione correctamente, especialmente si la opción "Almacenar tokens en el dispositivo" está habilitada:</string>
+    <string name="toast_tokens_refreshed_successfully">Tokens actualizados correctamente</string>
+    <string name="toast_error_refreshing_tokens">Error al actualizar los tokens: %s</string>
+    <string name="toast_tokens_not_stored_subsequent">Los tokens para cuentas posteriores no se almacenarán en el dispositivo</string>
+    <string name="an_unexpected_error_occurred">Ocurrió un error inesperado: %s</string>
+    <string name="do_not_show_this_again">No mostrar esto de nuevo</string>
+    <string name="missing_tokens_info">Información de tokens faltantes</string>
+    <string name="store_tokens_on_device">Almacenar tokens en el dispositivo</string>
+    <string name="storing_platform_accounts">Almacenando cuentas de plataforma</string>
+    <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">Al agregar cuentas para plataformas que utilizan OAuth2.0 (por ejemplo, Gmail, X), habilitar esto asegura que sus tokens de acceso se almacenen en su dispositivo actual en su lugar.</string>
+    <string name="stored_tokens_detected_title">Tokens almacenados detectados</string>
+    <string name="stored_tokens_dialog_message_part1">Se han detectado tokens almacenados para esta cuenta</string>
+    <string name="stored_tokens_dialog_message_part2">. Puedes usar tus tokens almacenados para hacer una publicación en X</string>
+    <string name="stored_tokens_dialog_message_part3">SOLO UNA VEZ. Mientras la configuración \"Almacenar tokens en el dispositivo\" esté activada, solo podrás hacer publicaciones en X una vez. Para hacer más publicaciones con esta cuenta, revoca y vuelve a añadir esta cuenta para cada publicación.</string>
+    <string name="stored_tokens_dialog_note">Nota: Desactivar la función \"Almacenar tokens en el dispositivo\" mientras te aseguras de tener tokens almacenados en línea te permitiría realizar múltiples publicaciones en X sin tener que revocar y almacenar de nuevo.</string>
+    <string name="menu">Menú</string>
+    <string name="search">Buscar</string>
+    <string name="close_search">Cerrar búsqueda</string>
+    <string name="back">Atrás</string>
+    <string name="report_bug_feedback">Informar error/comentarios</string>
+    <string name="recents">Recientes</string>
+    <string name="select_language">Seleccionar idioma</string>
+    <string name="select_contact">Seleccionar contacto</string>
+    <string name="relay_icon">Icono de Relay</string>
+    <string name="gateway_client_is_already_selected_change_default_gateway_client_before_deleting_this_one">El cliente de puerta de enlace ya está seleccionado. Cambie el cliente de puerta de enlace predeterminado antes de eliminar este.</string>
+    <string name="cannot_delete">No se puede eliminar</string>
+    <string name="selected_platform">Plataforma seleccionada</string>
+    <string name="close_modal">Cerrar modal</string>
+    <string name="profile_photo">Foto de perfil</string>
+    <string name="send">Enviar</string>
+    <string name="more">Más</string>
+    <string name="expand_to">Expandir a</string>
+    <string name="post">Publicar</string>
+    <string name="sender_avatar">Avatar del remitente</string>
+    <string name="user_avatar">Avatar del usuario</string>
+    <string name="github_logo">Logo de GitHub</string>
+    <string name="x_logo">Logo de X</string>
+    <string name="bluesky_logo">Logo de Bluesky</string>
+    <string name="drink_me_out_of_here">Sácame de aquí (coloquial)</string>
+    <string name="you_need_to_log_in_again_into_this_device">¡Necesitas iniciar sesión de nuevo en este dispositivo!</string>
+    <string name="you_have_logged_in_on_another_device">Has iniciado sesión en otro dispositivo</string>
+    <string name="get_me_out_here">¡Sácame de aquí!</string>
+    <string name="platform_logo">Logo de la plataforma</string>
+    <string name="gateway_server_url">URL del servidor de puerta de enlace</string>
+    <string name="http_request">solicitud HTTP</string>
+    <string name="relaysms_logo">Logo de RelaySMS</string>
+    <string name="compose">Redactar</string>
+    <string name="person_icon">Icono de persona</string>
+    <string name="access_your_account_to_save_or_use_your_online_platforms_without_an_internet_connection">Accede a tu cuenta para guardar o usar tus plataformas en línea sin conexión a internet</string>
+    <string name="an_sms_would_be_sent_to_your_phone_number_to_verify_you_own_the_number">Se enviará un SMS a tu número de teléfono para verificar que eres el propietario del número</string>
+    <string name="add_new_gateway_clients">Añadir nuevos clientes de puerta de enlace</string>
+    <string name="inbox_icon">Icono de bandeja de entrada</string>
+    <string name="get_started_illustration">Ilustración de inicio</string>
+    <string name="avatar_image">Imagen de avatar</string>
+    <string name="refresh_token_updated">¡Token de actualización actualizado!</string>
+    <string name="relaysms_delivery">Entrega de RelaySMS:</string>
+    <string name="got_it">¡Entendido!</string>
+    <string name="new_feature_icon_desc">Icono de nueva característica</string>
+    <string name="preview_feature_title">¡Nueva característica emocionante!</string>
+    <string name="preview_feature_description">Descubre las novedades de esta versión. Hemos añadido algo increíble que te encantará.</string>
+    <string name="new_feature_title">¡Alerta de nueva característica!</string>
+    <string name="oauth_token_storage_device_setting_info">Ahora puede solicitar que los tokens de sus cuentas OAuth2.0 se almacenen en su dispositivo yendo a Ajustes > Seguridad.</string>
 
 </resources>

@@ -49,7 +49,7 @@ fun AboutAppBar(
             IconButton(onClick = { navController.popBackStack() }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back"
+                    contentDescription = stringResource(R.string.back)
                 )
             }
         },
@@ -67,7 +67,7 @@ fun AboutAppBar(
                 Spacer(modifier = Modifier.width(4.dp))
                 Icon(
                     imageVector = Icons.Filled.BugReport,
-                    contentDescription = "Report Bug/Feedback"
+                    contentDescription = stringResource(R.string.report_bug_feedback)
                 )
 
 
