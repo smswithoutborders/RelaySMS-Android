@@ -10,5 +10,6 @@
     <locale android:name="sw"/>
     <locale android:name="zh"/>
     <locale android:name="ko"/>
+    <locale android:name="hi"/>
 </locale-config>
 

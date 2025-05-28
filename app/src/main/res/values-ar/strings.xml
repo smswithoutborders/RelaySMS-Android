@@ -32,6 +32,7 @@
     <string name="language_arabic">العربية</string>
     <string name="language_chinese">الصينية</string>
     <string name="language_korean">الكورية</string>
+    <string name="language_hindi">الهندية</string>
 
 
     <string name="gateway_client_settings_add_custom_empty_error">يرجى تقديم رقم هاتف</string>
@@ -189,6 +190,7 @@
     <string name="turkish">التركية</string>
     <string name="chinese">الصينية</string>
     <string name="korean">الكورية</string>
+    <string name="hindi">الهندية</string>
 
     <string name="welcome_to_relaysms_">مرحبًا بك في RelaySMS!</string>
     <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">استخدم الرسائل القصيرة لإنشاء منشور وإرسال رسائل بريد إلكتروني ورسائل بدون اتصال بالإنترنت</string>

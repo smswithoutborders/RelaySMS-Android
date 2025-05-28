@@ -10,6 +10,7 @@
         <item>@string/language_swahili</item>
         <item>@string/language_chinese</item>
         <item>@string/language_korean</item>
+        <item>@string/language_hindi</item>
     </string-array>
     <string-array name="language_values">
         <item>@string/language_english_value</item>
@@ -22,5 +23,6 @@
         <item>@string/language_swahili_value</item>
         <item>@string/language_chinese_value</item>
         <item>@string/language_korean_value</item>
+        <item>@string/language_hindi_value</item>
     </string-array>
 </resources>

@@ -45,7 +45,8 @@ fun LanguageSelectionPopup(
         LanguageOption(stringResource(R.string.swahili), "sw"),
         LanguageOption(stringResource(R.string.turkish), "tr"),
         LanguageOption(stringResource(R.string.chinese), "zh"),
-        LanguageOption(stringResource(R.string.korean), "ko")
+        LanguageOption(stringResource(R.string.korean), "ko"),
+        LanguageOption(stringResource(R.string.hindi), "hi")
     )
 
     var selectedLanguageCode by remember { mutableStateOf(currentLanguageCode) }

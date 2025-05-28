@@ -38,18 +38,12 @@ fun NewFeatureModal(
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true, // Or false, depending on your preference
-        // confirmValueChange = { it != SheetValue.PartiallyExpanded } // Optional: prevent partial expansion
+        skipPartiallyExpanded = true,
     )
     val scope = rememberCoroutineScope()
-    // This modal is controlled by its presence in the composition,
-    // so we don't need an internal `showBottomSheet` state here.
-    // The caller will decide when to show it.
 
     ModalBottomSheet(
         onDismissRequest = {
-            // We call onDismiss directly, which should also trigger
-            // marking the feature as seen and removing the modal from composition.
             onDismiss()
         },
         sheetState = sheetState,
@@ -58,15 +52,15 @@ fun NewFeatureModal(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
-                .navigationBarsPadding(), // Important for bottom sheet content
+                .navigationBarsPadding(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             featureInfo.iconRes?.let { icon ->
                 Image(
                     painter = painterResource(id = icon),
-                    contentDescription = stringResource(R.string.new_feature_icon_desc), // Add a generic description
-                    modifier = Modifier.size(64.dp) // Adjusted size
+                    contentDescription = stringResource(R.string.new_feature_icon_desc),
+                    modifier = Modifier.size(64.dp)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -81,7 +75,7 @@ fun NewFeatureModal(
             Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = stringResource(id = featureInfo.descriptionRes),
-                style = MaterialTheme.typography.bodyLarge, // Slightly larger for better readability
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
@@ -91,7 +85,6 @@ fun NewFeatureModal(
                     scope.launch {
                         sheetState.hide()
                     }.invokeOnCompletion {
-                        // Ensure it's hidden before calling dismiss if there's a race condition
                         if (!sheetState.isVisible) {
                             onDismiss()
                         }
@@ -100,10 +93,8 @@ fun NewFeatureModal(
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
-                Text(text = stringResource(R.string.got_it), color = Color.White) // Generic "Got it"
+                Text(text = stringResource(R.string.got_it), color = MaterialTheme.colorScheme.onPrimary)
             }
-            // Add a spacer at the bottom if not using navigationBarsPadding on the Column
-            // Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
@@ -115,9 +106,9 @@ fun NewFeatureModalPreview() {
         NewFeatureModal(
             featureInfo = FeatureInfo(
                 id = "preview_feature",
-                titleRes = R.string.preview_feature_title, // Add these to your strings.xml for preview
+                titleRes = R.string.preview_feature_title,
                 descriptionRes = R.string.preview_feature_description,
-                iconRes = R.drawable.relaysms_icon_default_shape // Use an existing drawable
+                iconRes = R.drawable.relaysms_icon_default_shape
             ),
             onDismiss = {}
         )

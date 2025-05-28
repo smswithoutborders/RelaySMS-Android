@@ -33,6 +33,7 @@
     <string name="language_swahili">斯瓦希里语</string>
     <string name="language_chinese">中文</string>
     <string name="language_korean">韩语</string>
+    <string name="language_hindi">印地语</string>
 
 
     <string name="gateway_client_settings_add_custom_empty_error">请输入电话号码</string>
@@ -191,6 +192,7 @@
     <string name="turkish">土耳其语</string>
     <string name="chinese">中文</string>
     <string name="korean">韩语</string>
+    <string name="hindi">印地语</string>
 
     <string name="welcome_to_relaysms_">欢迎来到 RelaySMS！</string>
     <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">在没有互联网连接的情况下，使用短信发帖、发送电子邮件和消息</string>
