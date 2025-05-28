@@ -30,6 +30,7 @@
     <string name="language_arabic">Arabisch</string>
     <string name="language_swahili">Swahili</string>
     <string name="language_chinese">Chinesisch</string>
+    <string name="language_korean">Koreanisch</string>
 
     <string name="gateway_client_settings_add_custom_empty_error">Bitte geben Sie eine Telefonnummer an</string>
 
@@ -185,6 +186,7 @@
     <string name="swahili">Suaheli</string>
     <string name="turkish">Türkisch</string>
     <string name="chinese">Chinesisch</string>
+    <string name="korean">Koreanisch</string>
 
     <string name="welcome_to_relaysms_">Willkommen bei RelaySMS!</string>
     <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">Verwenden Sie SMS, um Beiträge zu erstellen, E-Mails und Nachrichten ohne Internetverbindung zu senden</string>

@@ -37,6 +37,7 @@
     <string name="language_arabic" >Arabic</string>
     <string name="language_swahili" >Swahili</string>
     <string name="language_chinese" >Chinese</string>
+    <string name="language_korean" >Korean</string>
 
 
     <string name="language_english_value" translatable="false">
@@ -65,6 +66,9 @@
     </string>
     <string name="language_chinese_value" translatable="false">
         zh
+    </string>
+    <string name="language_korean_value" translatable="false">
+        ko
     </string>
 
 
@@ -229,6 +233,7 @@
     <string name="swahili">Swahili</string>
     <string name="turkish">Turkish</string>
     <string name="chinese">Chinese</string>
+    <string name="korean">Korean</string>
 
     <string name="welcome_to_relaysms_">Welcome to RelaySMS!</string>
     <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">Use SMS to make a post, send emails and messages with no internet connection</string>

@@ -31,6 +31,7 @@
     <string name="language_arabic">عربی</string>
     <string name="language_swahili">سواحیلی</string>
     <string name="language_chinese">چینی</string>
+    <string name="language_korean">کره‌ای</string>
 
     <string name="gateway_client_settings_add_custom_empty_error">لطفاً شماره تلفن ارائه دهید</string>
 
@@ -186,6 +187,7 @@
     <string name="swahili">سواحیلی</string>
     <string name="turkish">ترکی</string>
     <string name="chinese">چینی</string>
+    <string name="korean">کره‌ای</string>
 
     <string name="welcome_to_relaysms_">به RelaySMS خوش آمدید!</string>
     <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">از SMS برای ارسال پست، ارسال ایمیل و پیام بدون اتصال به اینترنت استفاده کنید</string>
