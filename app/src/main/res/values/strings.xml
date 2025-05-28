@@ -297,6 +297,7 @@
     <string name="stored_tokens_dialog_message_part3">just ONCE. As long as the \"Store Tokens on Device\" setting is on, you\'ll be able to make X posts just once. To make more posts with this account, revoke and add this account again for every post.</string>
     <string name="stored_tokens_dialog_note">Note: Turning off the \"Store Tokens on Device\" feature while making sure you have tokens stored online would allow you to make multiple posts on X without having to revoke and store again.</string>
     <string name="refresh_token_updated">Refresh token updated!</string>
+    <string name="relaysms_delivery">RelaySMS Delivery:</string>
 
 
 </resources>

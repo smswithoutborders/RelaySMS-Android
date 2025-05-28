@@ -141,7 +141,7 @@ fun PasteEncryptedTextView(
 
             Button(
                 onClick = {
-                    if(pastedText.contains("RelaySMS Delivery:")) {
+                    if(pastedText.contains(context.getString(R.string.relaysms_delivery))) {
                         try {
                             val accountToken = Vaults.decomposeRefreshToken(pastedText)
                             CoroutineScope(Dispatchers.Default).launch {
