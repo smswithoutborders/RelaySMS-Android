@@ -85,8 +85,10 @@ fun DeveloperHTTPView(
                     value = customDialingUrl,
                     onValueChange = { customDialingUrl = it },
                     label = {
-                        Text("Gateway server Url",
-                            style = MaterialTheme.typography.bodyMedium, )
+                        Text(
+                            stringResource(R.string.gateway_server_url),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
                     },
                     enabled = !isLoading,
                     textStyle = TextStyle(
@@ -127,7 +129,7 @@ fun DeveloperHTTPView(
                         httpRequestCallback(requestStatus, customDialingUrl)
                     }
                 ) {
-                    Text("http request")
+                    Text(stringResource(R.string.http_request))
                 }
 
                 TextButton(
@@ -136,7 +138,7 @@ fun DeveloperHTTPView(
                         onDismissRequest()
                     },
                 ) {
-                    Text("Cancel", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.cancel), color = MaterialTheme.colorScheme.error)
                 }
             }
         }

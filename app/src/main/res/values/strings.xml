@@ -36,6 +36,10 @@
     <string name="language_german" >German</string>
     <string name="language_arabic" >Arabic</string>
     <string name="language_swahili" >Swahili</string>
+    <string name="language_chinese" >Chinese</string>
+    <string name="language_korean" >Korean</string>
+    <string name="language_hindi" >Hindi</string>
+    <string name="language_shona" >Shona</string>
 
 
     <string name="language_english_value" translatable="false">
@@ -54,13 +58,25 @@
         tr
     </string>
     <string name="language_german_value" translatable="false">
-        tr
+        de
     </string>
     <string name="language_arabic_value" translatable="false">
-        tr
+        ar
     </string>
     <string name="language_swahili_value" translatable="false">
-        tr
+        sw
+    </string>
+    <string name="language_chinese_value" translatable="false">
+        zh
+    </string>
+    <string name="language_korean_value" translatable="false">
+        ko
+    </string>
+    <string name="language_hindi_value" translatable="false">
+        hi
+    </string>
+    <string name="language_shona_value" translatable="false">
+        sn
     </string>
 
 
@@ -215,6 +231,7 @@
     <string name="security_and_privacy">Security and Privacy</string>
     <string name="security">Security</string>
     <string name="enable_app_locks_and_pin_codes">Enable app locks and pin codes</string>
+
     <string name="english">English</string>
     <string name="arabic">Arabic</string>
     <string name="french">French</string>
@@ -223,6 +240,11 @@
     <string name="german">German</string>
     <string name="swahili">Swahili</string>
     <string name="turkish">Turkish</string>
+    <string name="chinese">Chinese</string>
+    <string name="korean">Korean</string>
+    <string name="hindi" >Hindi</string>
+    <string name="shona" >Shona</string>
+
     <string name="welcome_to_relaysms_">Welcome to RelaySMS!</string>
     <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">Use SMS to make a post, send emails and messages with no internet connection</string>
     <string name="learn_how_it_works_">Learn how it works</string>
@@ -296,8 +318,52 @@
     <string name="stored_tokens_dialog_message_part2">account have been detected. You can use your stored tokens to make a post on</string>
     <string name="stored_tokens_dialog_message_part3">just ONCE. As long as the \"Store Tokens on Device\" setting is on, you\'ll be able to make X posts just once. To make more posts with this account, revoke and add this account again for every post.</string>
     <string name="stored_tokens_dialog_note">Note: Turning off the \"Store Tokens on Device\" feature while making sure you have tokens stored online would allow you to make multiple posts on X without having to revoke and store again.</string>
+    <string name="menu">Menu</string>
+    <string name="search">Search</string>
+    <string name="close_search">Close Search</string>
+    <string name="back">Back</string>
+    <string name="report_bug_feedback">Report Bug/Feedback</string>
+    <string name="recents">Recents</string>
+    <string name="select_language">Select Language</string>
+    <string name="select_contact">Select Contact</string>
+    <string name="relay_icon">Relay Icon</string>
+    <string name="gateway_client_is_already_selected_change_default_gateway_client_before_deleting_this_one">Gateway client is already selected. Change default gateway client before deleting this one</string>
+    <string name="cannot_delete">Cannot Delete</string>
+    <string name="selected_platform">Selected platform</string>
+    <string name="close_modal">Close Modal</string>
+    <string name="profile_photo">Profile Photo</string>
+    <string name="send">Send</string>
+    <string name="more">More</string>
+    <string name="expand_to">Expand To</string>
+    <string name="post">Post</string>
+    <string name="sender_avatar">Sender Avatar</string>
+    <string name="user_avatar">User Avatar</string>
+    <string name="github_logo">GitHub Logo</string>
+    <string name="x_logo">X Logo</string>
+    <string name="bluesky_logo">Bluesky Logo</string>
+    <string name="drink_me_out_of_here">Drink me out of here</string>
+    <string name="you_need_to_log_in_again_into_this_device">You need to log in again into this device!</string>
+    <string name="you_have_logged_in_on_another_device">You have logged in on another device</string>
+    <string name="get_me_out_here">Get me out here!</string>
+    <string name="platform_logo">Platform Logo</string>
+    <string name="gateway_server_url">Gateway server Url</string>
+    <string name="http_request">http request</string>
+    <string name="relaysms_logo">RelaySMS Logo</string>
+    <string name="compose">Compose</string>
+    <string name="person_icon">Person Icon</string>
+    <string name="access_your_account_to_save_or_use_your_online_platforms_without_an_internet_connection">Access your account to save or use your online platforms without an internet connection</string>
+    <string name="an_sms_would_be_sent_to_your_phone_number_to_verify_you_own_the_number">An SMS would be sent to your phone number to verify you own the number</string>
+    <string name="add_new_gateway_clients">Add New Gateway clients</string>
+    <string name="inbox_icon">Inbox Icon</string>
+    <string name="get_started_illustration">Get Started Illustration</string>
+    <string name="avatar_image">Avatar image</string>
     <string name="refresh_token_updated">Refresh token updated!</string>
     <string name="relaysms_delivery">RelaySMS Delivery:</string>
-
+    <string name="got_it">Got it!</string>
+    <string name="new_feature_icon_desc">New Feature Icon</string>
+    <string name="preview_feature_title">Exciting New Feature!</string>
+    <string name="preview_feature_description">Discover what\'s new in this version. We\'ve added something amazing that you\'ll love.</string>
+    <string name="new_feature_title">New Feature Alert!</string>
+    <string name="oauth_token_storage_device_setting_info">You can now request for the tokens of your OAuth2.0 accounts to be stored on your device by going to Settings > Security.</string>
 
 </resources>

@@ -156,7 +156,7 @@ fun PlatformOptionsModal(
                             context.resources,
                             R.drawable.logo
                         ).asImageBitmap(),
-                        contentDescription = "Selected platform",
+                        contentDescription = stringResource(R.string.selected_platform),
                         modifier = Modifier.size(64.dp),
                         contentScale = ContentScale.Fit
                     )

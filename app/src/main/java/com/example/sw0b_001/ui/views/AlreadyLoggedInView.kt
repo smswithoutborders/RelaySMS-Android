@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,20 +51,21 @@ fun GetMeOutOfHere(
     ) {
         Image(
             painter = painterResource(R.drawable.relaysms_icon_default_shape),
-            contentDescription = "Drink me out of here",
+            contentDescription = stringResource(R.string.drink_me_out_of_here),
             modifier = Modifier
                 .size(100.dp)
                 .padding(top = 42.dp)
         )
         Spacer(modifier = Modifier.weight(1f))
-        Text("You need to log in again into this device!",
+        Text(
+            stringResource(R.string.you_need_to_log_in_again_into_this_device),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Thin,
             modifier = Modifier.padding(start=16.dp, end=16.dp)
         )
         Text(
-            "You have logged in on another device",
+            stringResource(R.string.you_have_logged_in_on_another_device),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.Thin,
@@ -73,7 +75,7 @@ fun GetMeOutOfHere(
         )
         Image(
             painter = painterResource(R.drawable.get_me_out),
-            contentDescription = "Drink me out of here",
+            contentDescription = stringResource(R.string.drink_me_out_of_here),
             modifier = Modifier
                 .size(200.dp)
                 .padding(bottom = 16.dp)
@@ -95,7 +97,7 @@ fun GetMeOutOfHere(
                     }
                 }
             }) {
-            Text("Get me out here!", fontWeight = FontWeight.SemiBold)
+            Text(stringResource(R.string.get_me_out_here), fontWeight = FontWeight.SemiBold)
         }
     }
 }

@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -94,7 +95,7 @@ fun TextDetailsView(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
                     painter = painterResource(R.drawable.round_person_24),
-                    contentDescription = "User Avatar",
+                    contentDescription = stringResource(R.string.user_avatar),
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape)

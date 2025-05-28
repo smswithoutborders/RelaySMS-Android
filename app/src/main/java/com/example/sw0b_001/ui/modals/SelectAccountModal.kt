@@ -110,7 +110,7 @@ fun SelectAccountModal(
                     }) {
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = "Close Modal"
+                            contentDescription = stringResource(R.string.close_modal)
                         )
                     }
                 }
@@ -161,7 +161,7 @@ fun AccountCard(
             val profileImage = R.drawable.round_person_24
             Image(
                 painter = painterResource(id = profileImage),
-                contentDescription = "Profile Photo",
+                contentDescription = stringResource(R.string.profile_photo),
                 modifier = Modifier
                     .size(48.dp)
                     .clip(CircleShape),

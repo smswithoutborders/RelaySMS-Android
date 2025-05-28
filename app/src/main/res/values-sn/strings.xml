@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">RelaySMS</string>
+
+    <string name="settings_settings">Zvirongwa</string>
+
+    <string name="settings_accessibility_category">Kurerutsira Kushandisa</string>
+    <string name="settings_language">Mutauro</string>
+
+    <string name="settings_security_category">Chengetedzo neKuchengetwa Kwezvakavanzika</string>
+    <string name="settings_security">Chengetedzo</string>
+    <string name="settings_security_category_summary">Batidza kukiya app nemapinikhodhi</string>
+
+    <string name="settings_lock_screen_preference_category">Zvekuvhara Foni PaLockscreen</string>
+    <string name="settings_security_and_privacy_enable_lockscreen_open">Batidza lockscreen</string>
+    <string name="settings_security_and_privacy_enable_lockscreen_open_summary">Kumbira pin/chigunwe chelockscreen pakutanga app</string>
+
+    <string name="settings_security_and_privacy_account">Akaundi</string>
+    <string name="settings_security_and_privacy_account_logout">Buda muAkaundi</string>
+    <string name="settings_security_and_privacy_account_logout_summary">Buda muakaundi yako. Unogona kupindazve, asi mashoko ako azvino achadzimwa.</string>
+
+    <string name="settings_security_and_privacy_account_delete">Dzima</string>
+
+    <string name="settings_security_and_privacy_account_delete_summary">Kudzima akaundi yako zvinoreva kudzima maakaundi ako ose akachengetwa online. Unogona kugadzirazve akaundi yako pazvinenge zvichidikanwa.</string>
+
+    <string name="language_english">Chirungu</string>
+    <string name="language_french">ChiFrench</string>
+    <string name="language_farsi">ChiFarsi</string>
+    <string name="language_spanish">ChiSpanish</string>
+    <string name="language_turkish">ChiTurkish</string>
+    <string name="language_german">ChiGerman</string>
+    <string name="language_arabic">ChiArabic</string>
+    <string name="language_swahili">ChiSwahili</string>
+    <string name="language_chinese">ChiChinese</string>
+    <string name="language_korean">ChiKorean</string>
+    <string name="language_hindi">ChiHindi</string>
+    <string name="language_shona">ChiShona</string>
+
+
+    <string name="language_english_value" translatable="false">
+        en
+    </string>
+    <string name="language_french_value" translatable="false">
+        fr
+    </string>
+    <string name="language_farsi_value" translatable="false">
+        fa
+    </string>
+    <string name="language_spanish_value" translatable="false">
+        es
+    </string>
+    <string name="language_turkish_value" translatable="false">
+        tr
+    </string>
+    <string name="language_german_value" translatable="false">
+        de
+    </string>
+    <string name="language_arabic_value" translatable="false">
+        ar
+    </string>
+    <string name="language_swahili_value" translatable="false">
+        sw
+    </string>
+    <string name="language_chinese_value" translatable="false">
+        zh
+    </string>
+    <string name="language_korean_value" translatable="false">
+        ko
+    </string>
+    <string name="language_hindi_value" translatable="false">
+        hi
+    </string>
+    <string name="language_shona_value" translatable="false">
+        sn
+    </string>
+
+
+    <string name="default_gateway_MSISDN_0" translatable="false">+237679466332</string>
+    <string name="default_gateway_MSISDN_2" translatable="false">+237690826242</string>
+    <string name="default_gateway_MSISDN_3" translatable="false">+2348131498393</string>
+
+    <string name="gateway_client_settings_add_custom_empty_error">Ndapota isai nhamba yefoni</string>
+
+    <string name="new_gateway_client_alias">Zita rekunyepedzera (zvisiri zvekumanikidza)</string>
+    <string name="gateway_client_alias_description">Zita rekubatsira kuyeuka Mushandisi weGedhi</string> <string name="gateway_client_save_btn_text">Chengeta</string>
+
+    <string name="choose_sms_app">Sarudza app yekutumira SMS</string>
+
+    <string name="security_settings_failed_to_switch_security">Kukundikana kubatidza chengetedzo…</string>
+    <string name="settings_security_biometric_user_cannot_add_this_functionality_at_this_time">Mushandisi haakwanise kuwedzera chinhu ichi parizvino.</string>
+    <string name="lock_screen_relay_sms_is_locked">RelaySMS App yakiyinwa</string>
+    <string name="lock_screen_unlock_with_your_phone_s_locking_system">Vhura uchishandisa nzira yekukiya yefoni yako</string>
+    <string name="gateway_client_add_custom_example_text">sekuti +237123456789 kana sarudza waunotumira</string>
+    <string name="gateway_client_add_gateway_client_text">Wedzera Mushandisi weGedhi</string> <string name="otp_verification_code_template" translatable="false">Your SMSWithoutBorders-Auth verification code is: </string>
+
+    <string name="logout_you_have_no_accounts_logged_into_vaults_at_this_time">Hapana maakaundi awakapinda nawo muDura parizvino</string> <string name="security_settings_you_have_no_accounts_to_delete_in_vault_at_this_time">Hapana maakaundi ekudzima muDura parizvino</string> <string name="helper_yesterday">nezuro</string>
+
+
+    <string name="smswithoutboarders_official_gateway_client_seeding_url" translatable="false">https://smswithoutborders.com:15000/v3/clients</string>
+    <string name="recovery_continue">Enderera</string>
+
+    <string name="vault_grpc_url" translatable="false">vault.smswithoutborders.com</string>
+    <string name="vault_grpc_port" translatable="false">443</string>
+
+    <string name="publisher_grpc_url" translatable="false">publisher.smswithoutborders.com</string>
+    <string name="publisher_grpc_port" translatable="false">443</string>
+
+    <string name="publisher_get_platforms_url" translatable="false">https://raw.githubusercontent.com/smswithoutborders/SMSWithoutBorders-Publisher/master/resources/platforms.json</string>
+    <string name="cancel">Kanzura</string>
+    <string name="click_continue_to_confirm_this_action_do_not_worry_this_has_no_dangerous_effects">Dzvanya enderera kuti utendere chiitiko ichi. Usanetseke, hapana njodzi.</string>
+    <string name="messaging">Kutumira Mashoko</string>
+    <string name="you_have_a_device_id_for_the_device_you_log_into_it_is_used_to_identify_you_on_the_vault_you_can_switch_to_phone_number_to_reduce_size_of_sms_message">Une ID yeChishandiso chemudziyo waunopinda nawo. Inoshandiswa kukuziva paDura. Unogona kuchinjira kunhamba yefoni kuderedza hukuru hwemashoko eSMS.</string> <string name="validate_with_phone_number">Tondera nenhamba yefoni</string>
+    <string name="enter_phone_number_with_country_code">Isa nhamba yefoni nekodhi yenyika</string>
+    <string name="about">Nezvedu</string>
+    <string name="recents_text">Zvitsva</string>
+    <string name="get_started_text">Tanga</string>
+    <string name="platforms">Puratifomu</string> <string name="inbox">Bhokisi reMashoko Anopinda</string>
+    <string name="countries">Nyika</string>
+    <string name="settings">Zvirongwa</string>
+    <string name="permission_denied">Mvumo Yarambwa!</string>
+    <string name="add_gateway_client">Wedzera Mushandisi weGedhi</string> <string name="edit_gateway_client">Gadzirisa Mushandisi weGedhi</string> <string name="e_g_237123456_or_select_contact">sekuti +237123456 kana sarudza waunotumira</string>
+    <string name="alias_optional">Zita rekunyepedzera (zvisiri zvekumanikidza)</string>
+    <string name="name_to_help_remember_the_gateway_client">Zita rekubatsira kuyeuka Mushandisi weGedhi</string> <string name="saving">Kuchengeta…</string>
+    <string name="save">Chengeta</string>
+    <string name="error_saving_gateway_client">Chinetso pakuchengeta mushandisi wegedhi</string>
+    <string name="click_continue_to_confirm_this_action_do_not_worry_it_has_no_dangerous_effects">Dzvanya enderera kuti utendere chiitiko ichi. Usanetseke, hapana njodzi.</string>
+    <string name="continue_text">Enderera</string>
+    <string name="country_options">Zvisarudzo zvenyika</string>
+    <string name="revoking_account_for">Kubvisa mvumo yeakaundi ya %1$s</string>
+    <string name="adding_account_for">Kuwedzera akaundi ya %1$s</string>
+    <string name="send_message">Tumira Shoko</string>
+    <string name="add_account">Wedzera Akaundi</string>
+    <string name="remove_accounts">Bvisa MaAkaundi</string>
+    <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported">Kuwedzera mae-mail kuRelaySMS akaundi yako kunoita kuti uzvishandise kutumira mae-mail neSMS.\n\nGmail inotsigirwa parizvino.</string>
+    <string name="adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported">Kuwedzera nhamba kuRelaySMS akaundi yako kunoita kuti uzvishandise kutumira mashoko neSMS.\n\nTelegram inotsigirwa parizvino.</string>
+    <string name="adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported">Kuwedzera maakaundi kuRelaySMS akaundi yako kunoita kuti uzvishandise kutumira zvinyorwa neSMS.\n\Kutumira zvinyorwa kunotsigirwa parizvino.</string>
+    <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias">RelaySMS akaundi yako izita rekunyepedzera renhamba yako yefoni rine domeini @relaysms.me.\n\nUnogona kugamuchira mhinduro neSMS pese panotumirwa shoko kuzita rako rekunyepedzera.</string>
+    <string name="continue_to_send_an_email_from_your_saved_email_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">Enderera kutumira e-mail kubva kuakaundi yako ye-email yakachengetwa. Unogona kusarudza nyika yekutumira mashoko kubva pazasi pe\'Nyika\' tab.\n\nEnderera kutumira shoko</string>
+    <string name="continue_to_send_messages_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">Enderera kutumira mashoko kubva kuakaundi yako yekutumira mashoko yakachengetwa. Unogona kusarudza nyika yekutumira mashoko kubva pazasi pe\'Nyika\' tab.\n\nEnderera kutumira shoko</string>
+    <string name="continue_to_make_posts_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">Enderera kutumira zvinyorwa kubva kuakaundi yako yekutumira mashoko yakachengetwa. Unogona kusarudza nyika yekutumira mashoko kubva pazasi pe\'Nyika\' tab.\n\nEnderera kutumira shoko</string>
+    <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">RelaySMS akaundi yako izita rekunyepedzera renhamba yako yefoni rine domeini @relaysms.me.\n\nUnogona kugamuchira mhinduro neSMS pese panotumirwa shoko kuzita rako rekunyepedzera.\nUnogona kusarudza nyika yekutumira mashoko kubva pazasi pe\'Nyika\' tab.\n\nEnderera kutumira shoko</string>
+    <string name="select_an_account">Sarudza akaundi</string>
+    <string name="please_enter_your_telegram_code_without_copying_it_from_the_message_copying_might_get_flagged_and_telegram_might_block_your_account">Ndapota isai kodhi yenyu yeTelegram musina kuikopa kubva mushoko - kukopa kunogona kuonekwa uye Telegram ingavhare akaundi yenyu.</string>
+    <string name="phone_number">Nhamba yeFoni</string>
+    <string name="code">Kodhi</string>
+    <string name="hide_password">Vanza Pasiwedhi</string>
+    <string name="show_password">Ratidza Pasiwedhi</string>
+    <string name="no_account_selected">Hapana akaundi yakasarudzwa</string>
+    <string name="compose_email">Nyora E-mail</string>
+    <string name="to">Kuna</string>
+    <string name="subject">Musoro wenyaya</string>
+    <string name="new_message">Shoko Idzva</string>
+    <string name="sender">Mutumiri</string>
+    <string name="recipient_number">Nhamba yeMugamuchiri</string>
+    <string name="message">Shoko</string>
+    <string name="new_post">Chinyorwa Chitsva</string>
+    <string name="what_s_happening">Chii chiri kuitika?</string>
+    <string name="connecting_the_world_one_sms_at_a_time">Kubatanidza nyika, SMS imwe panguva</string>
+    <string name="relaysms_is_an_open_source_initiative_focused_on_enabling_communication_through_sms_without_relying_on_internet_connectivity_we_believe_in_a_connected_world_and_we_re_making_it_happen_one_sms_at_a_time_relaysms_remains_free_and_open_source">RelaySMS chirongwa cheopen-source chakatarisana nekugonesa kutaurirana neSMS pasina kuvimba neinternet. Tinotenda munyika yakabatana, uye tiri kuzviita SMS imwe panguva. RelaySMS inoramba iri yemahara uye open-source.</string>
+    <string name="app_tutorial">Dzidziso yeApp</string>
+    <string name="support_us_by_starring_our_github_repository_and_sharing_it_with_your_friends">Titsigirei nekuisa nyeredzi paGitHub repository yedu nekuigovana neshamwari dzenyu!</string>
+    <string name="available_platforms">Puratifomu dziripo</string> <string name="use_your_relaysms_account">Shandisa RelaySMS akaundi yako</string>
+    <string name="use_your_online_accounts">Shandisa maakaundi ako epaIndaneti</string>
+    <string name="navigate_back_to_home_screen">Dzokera kuHome screen</string>
+    <string name="create_relaysms_account">Gadzira RelaySMS Akaundi</string>
+    <string name="create_your_account_and">Gadzira akaundi yako uye </string>
+    <string name="save_platforms">chengeta puratifomu</string> <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline"> kuti RelaySMS itumire mashoko kuGmail, X, neTelegram pachinzvimbo chako kana usiri paindaneti</string>
+    <string name="i_have_read_the">Ndakaverenga </string>
+    <string name="privacy_policy">mutemo wezvakavanzika</string>
+    <string name="log_in">Pinda</string>
+    <string name="sign_up">Nyoresa</string>
+    <string name="selected_gateway_client">Mushandisi weGedhi Akasarudzwa</string> <string name="no_gateway_client_selected">Hapana Mushandisi weGedhi Akasarudzwa</string> <string name="available_countries">Nyika dziripo</string>
+    <string name="gateway_clients_refreshed_successfully">Vashandisi veGedhi vavandudzwa zvinobudirira!</string> <string name="no_messages_in_inbox">Hapana mashoko mubhokisi</string>
+    <string name="paste_new_incoming_message">Isa shoko idzva rinopinda</string>
+    <string name="log_into_relaysms">Pinda muRelaySMS</string>
+    <string name="log_into_your_account_and">Pinda muakaundi yako uye </string>
+    <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline_"> kuti RelaySMS itumire mashoko kuGmail, X, neTelegram pachinzvimbo chako kana usiri paindaneti</string>
+    <string name="already_got_code">Ndakatowana kodhi</string>
+    <string name="do_not_have_an_account">Hauna akaundi? </string>
+    <string name="get_started_with">Tanga ne</string>
+    <string name="compose_message">Nyora Shoko</string>
+    <string name="use_your_phone_number_to_send_an_email_with_the_alias">Shandisa nhamba yako yefoni kutumira e-mail ine zita rekunyepedzera: </string>
+    <string name="login_with_internet">Pinda neIndaneti</string>
+    <string name="these_features_requires_you_to_have_an_internet_connection">Zvinhu izvi zvinoda kuti uve neindaneti</string>
+    <string name="input_your_code">Isa Kodhi Yako</string>
+    <string name="please_enter_the_6_digit_code_we_sent_to_you_via_sms">Ndapota isai kodhi ine manhamba matanhatu yatakakutumirai neSMS</string>
+    <string name="the_code_would_automatically_be_detected_in_some_cases">Dzimwe nguva kodhi inozvioneka yoga</string>
+    <string name="paste_encrypted_text_into_this_box">Isa rugwaro rwakavharwa mubhokisi rino…</string> <string name="this_is_an_example_of_an_encrypted_message_that_you_would_paste_here">Uyu muenzaniso weshoko rakavharwa raungaisa pano…</string> <string name="relaysms_reply_please_paste_this_entire_message_in_your_relaysms_app">RelaySMS Mhinduro Ndapota isai shoko rese iri muRelaySMS app yenyu</string>
+    <string name="click_to_paste">Dzvanya kuti uise</string>
+    <string name="decrypt_message">Zarura shoko</string> <string name="send_your_first_message">Tumira shoko rako rekutanga…</string>
+    <string name="save_platforms_">Chengeta puratifomu</string> <string name="phone_lockscreen_options">Zvekuvhara Foni PaLockscreen</string>
+    <string name="enable_lockscreen">Batidza lockscreen</string>
+    <string name="require_lockscreen_pin_fingerprint_when_starting_the_app">Kumbira pin/chigunwe chelockscreen pakutanga app</string>
+    <string name="vault">Dura</string> <string name="choose_which_platforms_you_want_to_remove_from_the_vault">Sarudza puratifomu dzaunoda kubvisa muDura</string> <string name="account">Akaundi</string>
+    <string name="clear_aliasing">Bvisa zita rekunyepedzera</string>
+    <string name="this_would_delete_your_auth_codes_stored_for_aliasing_you_can_request_for_another_code_at_anytime">Izvi zvinodzima makodhi ako ekubvumidza akachengeterwa zita rekunyepedzera. Unogona kukumbira imwe kodhi chero nguva.</string>
+    <string name="logout">Buda</string>
+    <string name="logout_of_your_account_you_can_always_log_back_in_however_your_current_messages_would_be_deleted">Buda muakaundi yako. Unogona kupindazve, asi mashoko ako azvino achadzimwa.</string>
+    <string name="delete_">Dzima</string>
+    <string name="deleting_your_account_means_deleting_all_your_saved_accounts_online_you_can_always_recreate_your_account_once_needed">Kudzima akaundi yako zvinoreva kudzima maakaundi ako ose akachengetwa online. Unogona kugadzirazve akaundi yako pazvinenge zvichidikanwa.</string>
+    <string name="accessibility">Kurerutsira Kushandisa</string>
+    <string name="language">Mutauro</string>
+    <string name="messaging_">Kutumira Mashoko</string>
+    <string name="security_and_privacy">Chengetedzo neKuchengetwa Kwezvakavanzika</string>
+    <string name="security">Chengetedzo</string>
+    <string name="enable_app_locks_and_pin_codes">Batidza kukiya app nemapinikhodhi</string>
+
+    <string name="english">Chirungu</string>
+    <string name="arabic">ChiArabic</string>
+    <string name="french">ChiFrench</string>
+    <string name="farsi">ChiFarsi</string>
+    <string name="spanish">ChiSpanish</string>
+    <string name="german">ChiGerman</string>
+    <string name="swahili">ChiSwahili</string>
+    <string name="turkish">ChiTurkish</string>
+    <string name="chinese">ChiChinese</string>
+    <string name="korean">ChiKorean</string>
+    <string name="hindi">ChiHindi</string>
+    <string name="shona">ChiShona</string>
+
+    <string name="welcome_to_relaysms_">Wagamuchirwa kuRelaySMS!</string>
+    <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">Shandisa SMS kutumira zvinyorwa, mae-mail, nemashoko pasina indaneti</string>
+    <string name="learn_how_it_works_">Dzidza kuti zvinoshanda sei</string>
+    <string name="read_our_privacy_policy">Verenga mutemo wedu wezvakavanzika</string>
+    <string name="skip">Svetuka</string>
+    <string name="you_are_ready_to_begin_sending_messages_from_relaysms">Wagadzirira kutanga kutumira mashoko kubva kuRelaySMS</string>
+    <string name="great">Zvakanaka Kwazvo!</string>
+    <string name="relaysms_vaults_securely_stores_your_online_accounts_so_that_you_can_access_them_without_an_internet_connection">RelaySMS Dura rinochengeta maakaundi ako epaIndaneti zvakachengeteka, kuti ugone kuashandisa pasina indaneti</string> <string name="you_can_add_online_accounts_to_your_vault">Unogona kuwedzera maakaundi epaIndaneti kuDura rako</string> <string name="ok">Zvakanaka</string>
+    <string name="make_default">Ita kuti ive Yekutanga</string>
+    <string name="edit">Gadzirisa</string>
+    <string name="delete">Dzima</string>
+    <string name="view_on_github">Ona paGitHub</string>
+    <string name="send_new_message">Tumira Shoko Idzva</string>
+    <string name="password">Pasiwedhi</string>
+    <string name="re_enter_password">Nyora Pasiwedhi Zvakare</string>
+    <string name="already_have_an_account">Watova neakaundi</string>
+    <string name="create_account">Gadzira Akaundi</string>
+    <string name="login">Pinda</string>
+    <string name="forgot_password">Wakanganwa Pasiwedhi</string>
+    <string name="submit">Tumira</string>
+    <string name="re_send_code">Tumirazve Kodhi</string>
+    <string name="revoke_platforms">Bvisa Mvumo yePuratifomu</string> <string name="from">Kubva</string>
+    <string name="always_add_the_dialing_code_if_absent_e_g_237">gara uchiwedzera kodhi yekufona kana isipo, sekuti +237</string>
+    <string name="cc">Cc</string>
+    <string name="bcc">Bcc</string>
+    <string name="paste_message">Isa shoko</string>
+    <string name="error_decrypting_text">Chinetso pakuzarura rugwaro</string> <string name="you_can_also_send_out_emails_without_an_account_or_vault">Unogonawo kutumira mae-mail usina akaundi kana Dura</string> <string name="this_will_create_a_default_email_your_phonenumber_relaysms_me_using_your_phone_number">Izvi zvinogadzira e-mail yekutanga (nhambayako@relaysms.me) uchishandisa nhamba yako yefoni.</string>
+    <string name="next">Pamberi</string>
+    <string name="https_smswithoutborders_com_privacy_policy" translatable="false">https://smswithoutborders.com/privacy-policy</string>
+    <string name="version">Shanduro %1$s</string>
+    <string name="compose_new">Nyora Idzva</string>
+    <string name="add_account_compose_new">Wedzera akaundi / Nyora idzva</string>
+    <string name="add_number">Wedzera Nhamba</string>
+    <string name="forgot_password_">Wakanganwa Pasiwedhi?</string>
+    <string name="enter_your_phone_number_and_new_password_and_we_would_send_you_a_code_via_sms_to_reset_your_password">Isa nhamba yako yefoni nepasiwedhi itsva uye tichakutumira kodhi neSMS kuti umise patsva pasiwedhi yako.</string>
+    <string name="new_password">Pasiwedhi Itsva</string>
+    <string name="reset_password">Misa Pasiwedhi Patsva</string>
+    <string name="passwords_do_not_match">Mapasiwedhi haafanani</string>
+    <string name="discard">Rasa</string>
+    <string name="message_discarded">Shoko Raraswa!</string>
+    <string name="time_left_until_code_expires">Nguva yasara kusvika kodhi yapera: %1$ds</string>
+    <string name="something_went_wrong">Pane zvakakanganisika</string>
+    <string name="no_results_found">Hapana zvawanikwa</string>
+    <string name="search_message">Tsvaga shoko</string>
+    <string name="bug_report">Chirevo cheChikanganiso</string>
+    <string name="relaysms_bug_report">RelaySMS - Chirevo cheChikanganiso</string>
+    <string name="request_new_code_in">Kumbira kodhi itsva mu: </string>
+    <string name="request_new_code">Kumbira kodhi itsva!</string>
+    <string name="test_url" translatable="false">https://gatewayserver.smswithoutborders.com/v3/clients/%1$s/tests</string>
+    <string name="store_tokens_on_device_dialog_title">Chengeta OAuth2.0 Zviratidzo paChishandiso</string> <string name="store_tokens_on_device_enable_dialog_message">Kubatidza chinhu ichi kunodzima otomatiki zviratidzo zvako zvemapuratifomu anoshandisa OAuth2.0 (Gmail neX) paseva uye kuzvichengeta pachishandiso chako. Rangarira kuti RelaySMS inoshandisa zviratidzo izvi kutumira mashoko pachinzvimbo chako pamapuratifomu ataurwa. Saka kana ukarasikirwa nechishandiso chako kana kuisazve application iyi, zviratidzo zvako zvicharasika uye uchafanira kubvisa mvumo yemaakaundi akachengetwa kare nekuchengetazve kuti uwane zviratidzo zvitsva.</string> <string name="store_tokens_on_device_disable_dialog_message">Kudzima chirongwa ichi kunodzivirira zviratidzo zvinotevera kuchengetwa pachishandiso chako. Mashoko emapuratifomu ane zviratidzo zvakatochengetwa pachishandiso chako acharamba achikwanisa kuburitswa. Kana paine zviratidzo zvisipo, ndapota bvisa mvumo yemaakaundi acho wochengetazve.</string> <string name="are_you_sure_you_want_to_continue">Une chokwadi here kuti unoda kuenderera mberi nechiitiko ichi?</string>
+    <string name="missing_token_text">Maakaundi ako anotevera anogona kunge asina zviratidzo. Ungangoda kuabvisa mvumo wowedzerazve kuti uve nechokwadi chekuti kutumira mashoko kuri kushanda nemazvo, kunyanya kana \'Chengeta Zviratidzo paChishandiso\' yakabatidzwa:</string> <string name="toast_tokens_refreshed_successfully">Zviratidzo zvavandudzwa zvinobudirira</string> <string name="toast_error_refreshing_tokens">Chinetso pakuvandudza zviratidzo: %s</string> <string name="toast_tokens_not_stored_subsequent">Zviratidzo zvemaakaundi anotevera hazvizochengetwi pachishandiso</string> <string name="an_unexpected_error_occurred">Chinetso chisingatarisirwi chaitika: %s</string>
+    <string name="do_not_show_this_again">Usaratidze izvi zvakare</string>
+    <string name="missing_tokens_info">Ruzivo rweZviratidzo Zvisipo</string> <string name="store_tokens_on_device">Chengeta Zviratidzo paChishandiso</string> <string name="storing_platform_accounts">Kuchengeta MaAkaundi ePuratifomu</string> <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">Pakuwedzera maakaundi emapuratifomu anoshandisa OAuth2.0 (sekuti Gmail, X), kubatidza izvi kunoita kuti uve nechokwadi chekuti zviratidzo zvako zvekuwana zvinochengetwa pachishandiso chako chazvino</string> <string name="stored_tokens_detected_title">Zviratidzo Zvakachengetwa Zvaonekwa</string> <string name="stored_tokens_dialog_message_part1">Zviratidzo zvakachengeterwa iyi</string> <string name="stored_tokens_dialog_message_part2">akaundi zvaonekwa. Unogona kushandisa zviratidzo zvako zvakachengetwa kutumira chinyorwa pa</string> <string name="stored_tokens_dialog_message_part3">KAMWE CHETE. Chero bedzi chirongwa che "Chengeta Zviratidzo paChishandiso" chakabatidzwa, uchakwanisa kutumira zvinyorwa paX kamwe chete. Kuti utumire zvimwe zvinyorwa neakaundi iyi, bvisa mvumo wowedzerazve akaundi iyi pachinyorwa chega chega.</string> <string name="stored_tokens_dialog_note">Ziva: Kudzima chirongwa che "Chengeta Zviratidzo paChishandiso" uchiita shuwa kuti une zviratidzo zvakachengetwa online kunoita kuti ukwanise kutumira zvinyorwa zvakawanda paX pasina kubvisa mvumo nekuchengetazve.</string> <string name="menu">Menyu</string>
+    <string name="search">Tsvaga</string>
+    <string name="close_search">Vhara Kutsvaga</string>
+    <string name="back">Dzoka</string>
+    <string name="report_bug_feedback">Taura Chikanganiso/Mhinduro</string>
+    <string name="recents">Zvitsva</string>
+    <string name="select_language">Sarudza Mutauro</string>
+    <string name="select_contact">Sarudza Waunotumira</string>
+    <string name="relay_icon">Chiratidzo cheRelay</string>
+    <string name="gateway_client_is_already_selected_change_default_gateway_client_before_deleting_this_one">Mushandisi weGedhi akatosarudzwa. Chinja mushandisi wegedhi wekutanga usati wadzima uyu</string> <string name="cannot_delete">Haikwanisike Kudzima</string>
+    <string name="selected_platform">Puratifomu yakasarudzwa</string> <string name="close_modal">Vhara Modal</string>
+    <string name="profile_photo">Mufananidzo weProfile</string>
+    <string name="send">Tumira</string>
+    <string name="more">Zvimwe</string>
+    <string name="expand_to">Wedzera Ku</string>
+    <string name="post">Tumira Chinyorwa</string>
+    <string name="sender_avatar">Mufananidzo weMutumiri</string>
+    <string name="user_avatar">Mufananidzo weMushandisi</string>
+    <string name="github_logo">Logo yeGitHub</string>
+    <string name="x_logo">Logo yeX</string>
+    <string name="bluesky_logo">Logo yeBluesky</string>
+    <string name="drink_me_out_of_here">Ndipe chinwiwa ndibude muno</string> <string name="you_need_to_log_in_again_into_this_device">Unofanira kupindazve muchishandiso chino!</string>
+    <string name="you_have_logged_in_on_another_device">Wakambopinda pane chimwe chishandiso</string>
+    <string name="get_me_out_here">Ndibudise muno!</string>
+    <string name="platform_logo">Logo yePuratifomu</string> <string name="gateway_server_url">Kero yeSeva yeGedhi</string> <string name="http_request">Chikumbiro cheHTTP</string>
+    <string name="relaysms_logo">Logo yeRelaySMS</string>
+    <string name="compose">Nyora</string>
+    <string name="person_icon">Chiratidzo cheMunhu</string>
+    <string name="access_your_account_to_save_or_use_your_online_platforms_without_an_internet_connection">Pinda muakaundi yako kuchengeta kana kushandisa mapuratifomu ako epaIndaneti pasina indaneti</string> <string name="an_sms_would_be_sent_to_your_phone_number_to_verify_you_own_the_number">SMS ichatumirwa kunhamba yako yefoni kuti uverifaye kuti ndiwe muridzi wenhamba yacho</string>
+    <string name="add_new_gateway_clients">Wedzera Vashandisi veGedhi Vatsva</string> <string name="inbox_icon">Chiratidzo cheBhokisi reMashoko Anopinda</string>
+    <string name="get_started_illustration">Mufananidzo Wekutanga</string>
+    <string name="avatar_image">Mufananidzo</string>
+    <string name="refresh_token_updated">Chiratidzo chekuvandudza mvumo chavandudzwa!</string> <string name="relaysms_delivery">Kusvitswa kweRelaySMS:</string>
+    <string name="got_it">Ndazvibata!</string>
+    <string name="new_feature_icon_desc">Chiratidzo Chechinhu Chitsva</string>
+    <string name="preview_feature_title">Chinhu Chitsva Chinonakidza!</string>
+    <string name="preview_feature_description">Wana kuziva zvitsva mushanduro iyi. Tawedzera chinhu chinoshamisa chauchafarira.</string>
+    <string name="new_feature_title">Yambiro yeChinhu Chitsva!</string>
+    <string name="oauth_token_storage_device_setting_info">Wava kukwanisa kukumbira kuti zviratidzo zvemaakaundi ako eOAuth2.0 zvichengetwe pachishandiso chako nekuenda kuZvirongwa > Chengetedzo.</string>
+</resources>

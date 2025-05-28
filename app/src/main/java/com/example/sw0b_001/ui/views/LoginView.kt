@@ -113,7 +113,7 @@ fun LoginView(
                     }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            "Navigate back to home screen"
+                            stringResource(R.string.navigate_back_to_home_screen)
                         )
                     }
                 }
@@ -153,7 +153,7 @@ fun LoginView(
                                 textDecoration = TextDecoration.Underline
                             )
                         ) {
-                            append("save platforms")
+                            append(stringResource(R.string.save_platforms))
                         }
                         pop()
                         append(stringResource(R.string.for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline_))

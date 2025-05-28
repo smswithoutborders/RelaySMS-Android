@@ -203,7 +203,7 @@ fun TextComposeView(
                 },
                 navigationIcon = {
                     IconButton(onClick = {navController.popBackStack()}) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {
@@ -258,7 +258,7 @@ fun TextComposeView(
                             )
                         }
                     }, enabled = !loading) {
-                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Post")
+                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.post))
                     }
                 },
             )
