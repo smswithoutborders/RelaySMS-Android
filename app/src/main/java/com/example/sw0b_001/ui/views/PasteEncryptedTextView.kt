@@ -67,7 +67,7 @@ fun PasteEncryptedTextView(
                     }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            "Navigate back to inbox screen"
+                            stringResource(R.string.navigate_back_to_home_screen)
                         )
                     }
                 }

@@ -207,7 +207,7 @@ fun OnboardingView(
                         IconButton(onClick = onBack) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Back"
+                                contentDescription = stringResource(R.string.back)
                             )
                         }
                     } else {
@@ -264,7 +264,7 @@ fun OnboardingView(
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Language,
-                            contentDescription = "Language",
+                            contentDescription = stringResource(R.string.language),
                             modifier = Modifier.size(20.dp),
                             tint = MaterialTheme.colorScheme.onPrimaryContainer
                         )

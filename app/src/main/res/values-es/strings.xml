@@ -274,5 +274,46 @@
     <string name="stored_tokens_dialog_message_part2">. Puedes usar tus tokens almacenados para hacer una publicación en X</string>
     <string name="stored_tokens_dialog_message_part3">SOLO UNA VEZ. Mientras la configuración \"Almacenar tokens en el dispositivo\" esté activada, solo podrás hacer publicaciones en X una vez. Para hacer más publicaciones con esta cuenta, revoca y vuelve a añadir esta cuenta para cada publicación.</string>
     <string name="stored_tokens_dialog_note">Nota: Desactivar la función \"Almacenar tokens en el dispositivo\" mientras te aseguras de tener tokens almacenados en línea te permitiría realizar múltiples publicaciones en X sin tener que revocar y almacenar de nuevo.</string>
+    <string name="menu">Menú</string>
+    <string name="search">Buscar</string>
+    <string name="close_search">Cerrar búsqueda</string>
+    <string name="back">Atrás</string>
+    <string name="report_bug_feedback">Informar error/comentarios</string>
+    <string name="recents">Recientes</string>
+    <string name="chinese">Chino</string>
+    <string name="select_language">Seleccionar idioma</string>
+    <string name="select_contact">Seleccionar contacto</string>
+    <string name="relay_icon">Icono de Relay</string>
+    <string name="gateway_client_is_already_selected_change_default_gateway_client_before_deleting_this_one">El cliente de puerta de enlace ya está seleccionado. Cambie el cliente de puerta de enlace predeterminado antes de eliminar este.</string>
+    <string name="cannot_delete">No se puede eliminar</string>
+    <string name="selected_platform">Plataforma seleccionada</string>
+    <string name="close_modal">Cerrar modal</string>
+    <string name="profile_photo">Foto de perfil</string>
+    <string name="send">Enviar</string>
+    <string name="more">Más</string>
+    <string name="expand_to">Expandir a</string>
+    <string name="post">Publicar</string>
+    <string name="sender_avatar">Avatar del remitente</string>
+    <string name="user_avatar">Avatar del usuario</string>
+    <string name="github_logo">Logo de GitHub</string>
+    <string name="x_logo">Logo de X</string>
+    <string name="bluesky_logo">Logo de Bluesky</string>
+    <string name="drink_me_out_of_here">Sácame de aquí (coloquial)</string>
+    <string name="you_need_to_log_in_again_into_this_device">¡Necesitas iniciar sesión de nuevo en este dispositivo!</string>
+    <string name="you_have_logged_in_on_another_device">Has iniciado sesión en otro dispositivo</string>
+    <string name="get_me_out_here">¡Sácame de aquí!</string>
+    <string name="platform_logo">Logo de la plataforma</string>
+    <string name="gateway_server_url">URL del servidor de puerta de enlace</string>
+    <string name="http_request">solicitud HTTP</string>
+    <string name="relaysms_logo">Logo de RelaySMS</string>
+    <string name="compose">Redactar</string>
+    <string name="person_icon">Icono de persona</string>
+    <string name="access_your_account_to_save_or_use_your_online_platforms_without_an_internet_connection">Accede a tu cuenta para guardar o usar tus plataformas en línea sin conexión a internet</string>
+    <string name="an_sms_would_be_sent_to_your_phone_number_to_verify_you_own_the_number">Se enviará un SMS a tu número de teléfono para verificar que eres el propietario del número</string>
+    <string name="add_new_gateway_clients">Añadir nuevos clientes de puerta de enlace</string>
+    <string name="inbox_icon">Icono de bandeja de entrada</string>
+    <string name="get_started_illustration">Ilustración de inicio</string>
+    <string name="avatar_image">Imagen de avatar</string>
+
 
 </resources>

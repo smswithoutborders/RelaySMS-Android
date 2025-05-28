@@ -50,7 +50,7 @@ fun GatewayClientsAppBar(
             }) {
                 Icon(
                     imageVector = Icons.Filled.Refresh,
-                    contentDescription = "Menu"
+                    contentDescription = stringResource(R.string.menu)
                 )
             }
         },

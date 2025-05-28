@@ -273,6 +273,46 @@
     <string name="stored_tokens_dialog_message_part2">Konto wurden erkannt. Sie können Ihre gespeicherten Tokens verwenden, um EINMAL einen Beitrag auf X zu erstellen.</string>
     <string name="stored_tokens_dialog_message_part3">Solange die Einstellung \"Tokens auf Gerät speichern\" aktiviert ist, können Sie X-Beiträge nur einmal erstellen. Um weitere Beiträge mit diesem Konto zu erstellen, widerrufen Sie dieses Konto und fügen Sie es für jeden Beitrag erneut hinzu.</string>
     <string name="stored_tokens_dialog_note">Hinweis: Wenn Sie die Funktion \"Tokens auf Gerät speichern\" deaktivieren und gleichzeitig sicherstellen, dass Sie Tokens online gespeichert haben, können Sie mehrere Beiträge auf X erstellen, ohne sie erneut widerrufen und speichern zu müssen.</string>
+    <string name="menu">Menü</string>
+    <string name="search">Suchen</string>
+    <string name="close_search">Suche schließen</string>
+    <string name="back">Zurück</string>
+    <string name="report_bug_feedback">Fehler/Feedback melden</string>
+    <string name="recents">Neueste</string>
+    <string name="chinese">Chinesisch</string>
+    <string name="select_language">Sprache auswählen</string>
+    <string name="select_contact">Kontakt auswählen</string>
+    <string name="relay_icon">Relay-Symbol</string>
+    <string name="gateway_client_is_already_selected_change_default_gateway_client_before_deleting_this_one">Gateway-Client ist bereits ausgewählt. Ändern Sie den Standard-Gateway-Client, bevor Sie diesen löschen.</string>
+    <string name="cannot_delete">Kann nicht gelöscht werden</string>
+    <string name="selected_platform">Ausgewählte Plattform</string>
+    <string name="close_modal">Modal schließen</string>
+    <string name="profile_photo">Profilfoto</string>
+    <string name="send">Senden</string>
+    <string name="more">Mehr</string>
+    <string name="expand_to">Erweitern auf</string>
+    <string name="post">Posten</string>
+    <string name="sender_avatar">Absender-Avatar</string>
+    <string name="user_avatar">Benutzer-Avatar</string>
+    <string name="github_logo">GitHub-Logo</string>
+    <string name="x_logo">X-Logo</string>
+    <string name="bluesky_logo">Bluesky-Logo</string>
+    <string name="drink_me_out_of_here">Bring mich hier raus (umgangssprachlich)</string>
+    <string name="you_need_to_log_in_again_into_this_device">Sie müssen sich auf diesem Gerät erneut anmelden!</string>
+    <string name="you_have_logged_in_on_another_device">Sie haben sich auf einem anderen Gerät angemeldet</string>
+    <string name="get_me_out_here">Hol mich hier raus!</string>
+    <string name="platform_logo">Plattform-Logo</string>
+    <string name="gateway_server_url">Gateway-Server-URL</string>
+    <string name="http_request">HTTP-Anfrage</string>
+    <string name="relaysms_logo">RelaySMS-Logo</string>
+    <string name="compose">Verfassen</string>
+    <string name="person_icon">Personen-Symbol</string>
+    <string name="access_your_account_to_save_or_use_your_online_platforms_without_an_internet_connection">Greifen Sie auf Ihr Konto zu, um Ihre Online-Plattformen ohne Internetverbindung zu speichern oder zu nutzen</string>
+    <string name="an_sms_would_be_sent_to_your_phone_number_to_verify_you_own_the_number">Eine SMS wird an Ihre Telefonnummer gesendet, um zu bestätigen, dass Sie der Inhaber der Nummer sind</string>
+    <string name="add_new_gateway_clients">Neue Gateway-Clients hinzufügen</string>
+    <string name="inbox_icon">Posteingangssymbol</string>
+    <string name="get_started_illustration">Illustration für den Einstieg</string>
+    <string name="avatar_image">Avatar-Bild</string>
 
 
 </resources>

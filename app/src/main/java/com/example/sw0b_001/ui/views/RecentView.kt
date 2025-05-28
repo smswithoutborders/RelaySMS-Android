@@ -97,7 +97,7 @@ fun RecentViewNoMessages(
 
         Image(
             painter = painterResource(id = R.drawable.empty_message),
-            contentDescription = "Get Started Illustration",
+            contentDescription = stringResource(R.string.get_started_illustration),
             modifier = Modifier
                 .size(200.dp)
                 .padding(bottom = 16.dp)
@@ -317,7 +317,7 @@ fun GetMessageAvatar(logo: Bitmap? = null) {
     if(LocalInspectionMode.current) {
         Image(
             painterResource(R.drawable.relaysms_icon_default_shape),
-            contentDescription = "Avatar image",
+            contentDescription = stringResource(R.string.avatar_image),
             modifier = Modifier.size(48.dp)
         )
     }
@@ -328,7 +328,7 @@ fun GetMessageAvatar(logo: Bitmap? = null) {
                     context.resources,
                     R.drawable.logo
                 ).asImageBitmap(),
-            contentDescription = "Avatar image",
+            contentDescription = stringResource(R.string.avatar_image),
             modifier = Modifier.size(48.dp)
         )
     }

@@ -101,7 +101,7 @@ fun MessageDetailsView(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
                     painter = painterResource(R.drawable.round_person_24),
-                    contentDescription = "Sender Avatar",
+                    contentDescription = stringResource(R.string.sender_avatar),
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape)

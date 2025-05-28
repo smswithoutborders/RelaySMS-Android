@@ -236,7 +236,7 @@ fun OtpCodeVerificationView(
                     }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            "Navigate back to home screen"
+                            stringResource(R.string.navigate_back_to_home_screen)
                         )
                     }
                 }

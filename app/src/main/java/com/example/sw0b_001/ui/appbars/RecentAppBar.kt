@@ -84,7 +84,7 @@ fun RecentAppBar(
                     IconButton(onClick = onToggleSearch) {
                         Icon(
                             imageVector = Icons.Filled.Search,
-                            contentDescription = "Search"
+                            contentDescription = stringResource(R.string.search)
                         )
                     }
                 }
@@ -92,7 +92,7 @@ fun RecentAppBar(
                 IconButton(onClick = { showMenu = !showMenu }) {
                     Icon(
                         imageVector = Icons.Filled.MoreVert,
-                        contentDescription = "Menu"
+                        contentDescription = stringResource(R.string.menu)
                     )
                 }
                 DropdownMenu(
@@ -159,7 +159,7 @@ fun RecentAppBar(
                 }) {
                     Icon(
                         imageVector = Icons.Filled.Close,
-                        contentDescription = "Close Search"
+                        contentDescription = stringResource(R.string.close_search)
                     )
                 }
             }

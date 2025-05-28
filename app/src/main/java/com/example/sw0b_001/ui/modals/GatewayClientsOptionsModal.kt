@@ -133,7 +133,8 @@ fun GatewayClientOptionsModal(
                         onClick = {
                             if (isSelected) {
                                 showDeleteConfirmationDialog = true
-                                Toast.makeText(context, "Gateway client is already selected. Change default gateway client before deleting this one", Toast.LENGTH_LONG).show()
+                                Toast.makeText(context,
+                                    context.getString(R.string.gateway_client_is_already_selected_change_default_gateway_client_before_deleting_this_one), Toast.LENGTH_LONG).show()
                             } else {
                                 scope.launch {
                                     val successRunnable = Runnable {
@@ -164,7 +165,7 @@ fun GatewayClientOptionsModal(
             onDismissRequest = { showDeleteConfirmationDialog = false },
             title = {
                 Text(
-                    text = "Cannot Delete",
+                    text = stringResource(R.string.cannot_delete),
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.headlineSmall
                 )
@@ -172,7 +173,7 @@ fun GatewayClientOptionsModal(
             backgroundColor = MaterialTheme.colorScheme.background,
             text = {
                 Text(
-                    text = "Gateway client is already selected. Change default gateway client before deleting this one",
+                    text = stringResource(R.string.gateway_client_is_already_selected_change_default_gateway_client_before_deleting_this_one),
                     color = MaterialTheme.colorScheme.onBackground,
                     style = MaterialTheme.typography.bodyMedium
                 )
@@ -186,7 +187,7 @@ fun GatewayClientOptionsModal(
                     )
                 ) {
                     Text(
-                        text = "OK",
+                        text = stringResource(R.string.ok),
                         color = MaterialTheme.colorScheme.onBackground
                     )
                 }

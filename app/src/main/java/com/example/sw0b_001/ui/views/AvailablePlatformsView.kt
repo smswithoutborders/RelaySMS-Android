@@ -241,7 +241,7 @@ fun PlatformCard(
                     context.resources,
                     R.drawable.logo
                 ).asImageBitmap(),
-                contentDescription = "Platform Logo",
+                contentDescription = stringResource(R.string.platform_logo),
                 modifier = Modifier
                     .size(50.dp)
                     .align(Alignment.Center),

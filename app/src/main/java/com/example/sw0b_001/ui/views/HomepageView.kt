@@ -183,7 +183,7 @@ fun HomepageView(
                                 icon = {
                                     Icon(
                                         imageVector = Icons.AutoMirrored.Default.Message,
-                                        contentDescription = "Add Account",
+                                        contentDescription = stringResource(R.string.add_account),
                                         tint = MaterialTheme.colorScheme.onSecondary
                                     )
                                 },
@@ -203,7 +203,7 @@ fun HomepageView(
                                 icon = {
                                     Icon(
                                         imageVector = Icons.Filled.PersonAdd,
-                                        contentDescription = "Add Account",
+                                        contentDescription = stringResource(R.string.add_account),
                                         tint = MaterialTheme.colorScheme.onSecondary
                                     )
                                 },
@@ -227,7 +227,7 @@ fun HomepageView(
                         icon = {
                             Icon(
                                 imageVector = Icons.Filled.Add,
-                                contentDescription = "Add New Gateway clients",
+                                contentDescription = stringResource(R.string.add_new_gateway_clients),
                                 tint = MaterialTheme.colorScheme.onSecondary
                             )
                         },
@@ -250,7 +250,7 @@ fun HomepageView(
                             icon = {
                                 Icon(
                                     Icons.Filled.ContentPaste,
-                                    contentDescription = "Paste new incoming message",
+                                    contentDescription = stringResource(R.string.paste_new_incoming_message),
                                     tint = MaterialTheme.colorScheme.onSecondary
                                 )
                             },

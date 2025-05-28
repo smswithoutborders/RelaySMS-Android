@@ -369,7 +369,7 @@ fun EmailComposeView(
                 title = { Text(stringResource(R.string.compose_email)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {
@@ -380,7 +380,7 @@ fun EmailComposeView(
                             },
                             enabled = to.isNotEmpty() && body.isNotEmpty(),
                         ) {
-                            Icon(Icons.Default.DeveloperMode, contentDescription = "Send")
+                            Icon(Icons.Default.DeveloperMode, contentDescription = stringResource(R.string.send))
                         }
                     }
 
@@ -411,7 +411,7 @@ fun EmailComposeView(
                             )
                         }
                     ) {
-                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
+                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.send))
                     }
 
                     IconButton(
@@ -419,7 +419,7 @@ fun EmailComposeView(
                             showMoreOptions = !showMoreOptions
                         }
                     ) {
-                        Icon(Icons.Filled.MoreVert, contentDescription = "More")
+                        Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.more))
                         DropdownMenu(
                             expanded = showMoreOptions,
                             onDismissRequest = { showMoreOptions = false }
@@ -514,7 +514,7 @@ fun EmailComposeView(
                     }) {
                         Icon(
                             Icons.Filled.ArrowDropDown,
-                            contentDescription = "Expand To"
+                            contentDescription = stringResource(R.string.expand_to)
                         )
                     }
                 }
@@ -769,26 +769,6 @@ private fun processSend(
     }
 }
 
-fun triggerAccountRevokeHelper(
-    context: Context,
-    account: StoredPlatformsEntity,
-    onCompleted: () -> Unit
-) {
-    Helpers.triggerAccountRevoke(
-        context = context,
-        account = account,
-        onCompletedCallback = {
-            Log.d("EmailComposeView", "Revoke successful callback received.")
-
-            Toast.makeText(context, "Account ${account.account} revoked.", Toast.LENGTH_SHORT).show()
-            onCompleted()
-        },
-        onFailureCallback = { e ->
-            Log.e("EmailComposeView", "Revoke failed callback received.", e)
-            Toast.makeText(context, "Failed to revoke account: ${e.message}", Toast.LENGTH_LONG).show()
-        }
-    )
-}
 
 @Preview(showBackground = true)
 @Composable

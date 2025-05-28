@@ -148,7 +148,7 @@ fun MessageComposeView(
                     IconButton(onClick = {
                         navController.popBackStack()
                     }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {
@@ -174,7 +174,7 @@ fun MessageComposeView(
                     },
                         enabled = recipientNumber.isNotEmpty() && message.isNotEmpty() &&
                                 verifyPhoneNumberFormat(recipientNumber)) {
-                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
+                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.send))
                     }
                 },
             )
@@ -230,7 +230,7 @@ fun MessageComposeView(
                 }) {
                     Icon(
                         imageVector = Icons.Filled.Contacts,
-                        contentDescription = "Select Contact",
+                        contentDescription = stringResource(R.string.select_contact),
                         tint = MaterialTheme.colorScheme.primary,
                     )
                 }
