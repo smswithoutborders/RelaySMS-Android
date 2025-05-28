@@ -38,13 +38,16 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.Bridges.Bridges
+import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
+import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.BridgeViewScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import vault.v1.Vault
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -138,24 +141,47 @@ fun PasteEncryptedTextView(
 
             Button(
                 onClick = {
-                    Bridges.decryptIncomingMessages(
-                        context,
-                        pastedText,
-                        onSuccessCallback = {
-                            val scope = CoroutineScope(Dispatchers.Main).launch {
-//                            navController.popBackStack()
-                                platformsViewModel.message = it
-                                navController.navigate(BridgeViewScreen)
+                    if(pastedText.contains(context.getString(R.string.relaysms_delivery))) {
+                        try {
+                            val accountToken = Vaults.decomposeRefreshToken(pastedText)
+                            CoroutineScope(Dispatchers.Default).launch {
+                                Datastore.getDatastore(context).storedPlatformsDao().let { db ->
+                                    db.fetchAccount(accountToken.first)?.let {
+                                        it.refreshToken = accountToken.second
+                                        db.update(it)
+                                        CoroutineScope(Dispatchers.Main).launch {
+                                            Toast.makeText(
+                                                context,
+                                                context.getString(R.string.refresh_token_updated),
+                                                Toast.LENGTH_LONG).show()
+                                            navController.navigate(HomepageScreen)
+                                        }
+                                    }
+                                }
                             }
+                        } catch(e: Exception) {
+                            e.printStackTrace()
                         }
-                    ) {
-                        val scope = CoroutineScope(Dispatchers.Main).launch {
-                            isError = true
-                            Toast.makeText(
-                                context,
-                                it,
-                                Toast.LENGTH_LONG
-                            ).show()
+                    } else {
+                        Bridges.decryptIncomingMessages(
+                            context,
+                            pastedText,
+                            onSuccessCallback = {
+                                val scope = CoroutineScope(Dispatchers.Main).launch {
+//                            navController.popBackStack()
+                                    platformsViewModel.message = it
+                                    navController.navigate(BridgeViewScreen)
+                                }
+                            }
+                        ) {
+                            val scope = CoroutineScope(Dispatchers.Main).launch {
+                                isError = true
+                                Toast.makeText(
+                                    context,
+                                    it,
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
                         }
                     }
                 },

@@ -475,12 +475,22 @@ class Vaults(val context: Context) {
             return Crypto.HMAC(derivedKey, combinedData)
         }
 
+        fun decomposeRefreshToken(data: String): Pair<String, String> {
+            /*
+            RelaySMS Delivery: Successfully sent message to twitter at 2025-05-27 22:10:02 (UTC).
+
+Please paste this message in your RelaySMS app
+YW5hcmNoaXN0LnNvbnNvZnBlcmRpdGlvbkBnbWFpbC5jb206ZWs5T1lqTllVR2RxWjBaVVYzTldaMVZ2TXpoNlNEYzJNbFIxTW0xWmNEbGtOV3hUTTNaSWRXeFpibk01T2pFM05EZ3pPRE00TURJME16WTZNVG94T25KME9qRQ==             */
+            val splitData = data.split("\n")
+            val accountToken = String(Base64.decode(splitData[3], Base64.DEFAULT)).split(":")
+            return Pair(accountToken[0], accountToken[1])
+        }
+
         object PrefKeys {
             const val KEY_ACCOUNTS_MISSING_TOKENS_JSON = "accounts_with_missing_tokens_json"
             const val KEY_DO_NOT_SHOW_MISSING_TOKEN_DIALOG = "do_not_show_missing_token_dialog"
             const val KEY_ACCOUNTS_MISSING_TOKENS_MAP_JSON = "accounts_with_missing_tokens_map_json"
             const val KEY_ACCOUNTS_MISSING_TOKENS_IDS = "accounts_with_missing_tokens_ids"
         }
-
     }
 }

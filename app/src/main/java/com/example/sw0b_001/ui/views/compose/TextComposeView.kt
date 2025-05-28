@@ -172,7 +172,8 @@ fun TextComposeView(
                 if (selectedAccount == null) {
                     navController.popBackStack()
                 }
-                Toast.makeText(context, context.getString(R.string.no_account_selected), Toast.LENGTH_SHORT).show()
+                Toast.makeText(context,
+                    context.getString(R.string.no_account_selected), Toast.LENGTH_SHORT).show()
             },
             onAccountSelected = { account ->
                 selectedAccount = account
@@ -279,7 +280,10 @@ fun TextComposeView(
                 enabled = platformsViewModel.platform?.service_type !=
                         Platforms.ServiceTypes.TEST.type,
                 onValueChange = { message = it },
-                label = { Text(stringResource(R.string.what_s_happening), style = MaterialTheme.typography.bodyMedium) },
+                label = {
+                    Text(stringResource(R.string.what_s_happening),
+                        style = MaterialTheme.typography.bodyMedium)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),

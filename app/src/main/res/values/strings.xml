@@ -342,6 +342,8 @@
     <string name="inbox_icon">Inbox Icon</string>
     <string name="get_started_illustration">Get Started Illustration</string>
     <string name="avatar_image">Avatar image</string>
+    <string name="refresh_token_updated">Refresh token updated!</string>
+    <string name="relaysms_delivery">RelaySMS Delivery:</string>
 
 
 </resources>
