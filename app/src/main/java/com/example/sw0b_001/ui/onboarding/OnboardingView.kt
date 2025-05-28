@@ -226,7 +226,7 @@ fun OnboardingView(
                             )
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                                contentDescription = "Skip",
+                                contentDescription = stringResource(R.string.skip),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }

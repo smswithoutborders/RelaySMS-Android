@@ -30,19 +30,7 @@
     <string name="language_german">Almanca</string>
     <string name="language_arabic">Arapça</string>
     <string name="language_swahili">Svahili</string>
-
-    <string name="language_english_value" translatable="false">en</string>
-    <string name="language_french_value" translatable="false">fr</string>
-    <string name="language_farsi_value" translatable="false">fa</string>
-    <string name="language_spanish_value" translatable="false">es</string>
-    <string name="language_turkish_value" translatable="false">tr</string>
-    <string name="language_german_value" translatable="false">tr</string>
-    <string name="language_arabic_value" translatable="false">tr</string>
-    <string name="language_swahili_value" translatable="false">tr</string>
-
-    <string name="default_gateway_MSISDN_0" translatable="false">+237679466332</string>
-    <string name="default_gateway_MSISDN_2" translatable="false">+237690826242</string>
-    <string name="default_gateway_MSISDN_3" translatable="false">+2348131498393</string>
+    <string name="language_chinese">Çince</string>
 
     <string name="gateway_client_settings_add_custom_empty_error">Lütfen bir telefon numarası girin</string>
 
@@ -190,6 +178,7 @@
     <string name="security_and_privacy">Güvenlik ve Gizlilik</string>
     <string name="security">Güvenlik</string>
     <string name="enable_app_locks_and_pin_codes">Uygulama kilitlerini ve pin kodlarını etkinleştir</string>
+
     <string name="english">İngilizce</string>
     <string name="arabic">Arapça</string>
     <string name="french">Fransızca</string>
@@ -198,6 +187,8 @@
     <string name="german">Almanca</string>
     <string name="swahili">Svahili</string>
     <string name="turkish">Türkçe</string>
+    <string name="chinese">Çince</string>
+
     <string name="welcome_to_relaysms_">RelaySMS\'e Hoş Geldiniz!</string>
     <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">İnternet bağlantısı olmadan gönderi oluşturmak, e-posta ve mesaj göndermek için SMS kullanın</string>
     <string name="learn_how_it_works_">Nasıl çalıştığını öğrenin</string>
@@ -275,7 +266,6 @@
     <string name="back">Geri</string>
     <string name="report_bug_feedback">Hata Bildir/Geri Bildirim</string>
     <string name="recents">Son Kullanılanlar</string>
-    <string name="chinese">Çince</string>
     <string name="select_language">Dil Seçin</string>
     <string name="select_contact">Kişi Seçin</string>
     <string name="relay_icon">Relay Simgesi</string>

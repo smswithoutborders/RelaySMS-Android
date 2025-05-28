@@ -30,35 +30,8 @@
     <string name="language_german">الألمانية</string>
     <string name="language_swahili">السواحيلية</string>
     <string name="language_arabic">العربية</string>
+    <string name="language_chinese">الصينية</string>
 
-    <string name="language_english_value" translatable="false">
-        en
-    </string>
-    <string name="language_french_value" translatable="false">
-        fr
-    </string>
-    <string name="language_farsi_value" translatable="false">
-        fa
-    </string>
-    <string name="language_spanish_value" translatable="false">
-        es
-    </string>
-    <string name="language_turkish_value" translatable="false">
-        tr
-    </string>
-    <string name="language_german_value" translatable="false">
-        de
-    </string>
-    <string name="language_swahili_value" translatable="false">
-        sw
-    </string>
-    <string name="language_arabic_value" translatable="false">
-        ar
-    </string>
-
-    <string name="default_gateway_MSISDN_0" translatable="false">+237679466332</string>
-    <string name="default_gateway_MSISDN_2" translatable="false">+237690826242</string>
-    <string name="default_gateway_MSISDN_3" translatable="false">+2348131498393</string>
 
     <string name="gateway_client_settings_add_custom_empty_error">يرجى تقديم رقم هاتف</string>
 
@@ -204,6 +177,7 @@
     <string name="security_and_privacy">الأمان والخصوصية</string>
     <string name="security">الأمان</string>
     <string name="enable_app_locks_and_pin_codes">تمكين أقفال التطبيقات ورموز PIN</string>
+
     <string name="english">الإنجليزية</string>
     <string name="arabic">العربية</string>
     <string name="french">الفرنسية</string>
@@ -212,6 +186,8 @@
     <string name="german">الألمانية</string>
     <string name="swahili">السواحيلية</string>
     <string name="turkish">التركية</string>
+    <string name="chinese">الصينية</string>
+
     <string name="welcome_to_relaysms_">مرحبًا بك في RelaySMS!</string>
     <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">استخدم الرسائل القصيرة لإنشاء منشور وإرسال رسائل بريد إلكتروني ورسائل بدون اتصال بالإنترنت</string>
     <string name="learn_how_it_works_">تعرف على كيفية عملها</string>
@@ -289,7 +265,6 @@
     <string name="back">رجوع</string>
     <string name="report_bug_feedback">الإبلاغ عن خطأ/ملاحظات</string>
     <string name="recents">الأخيرة</string>
-    <string name="chinese">الصينية</string>
     <string name="select_language">اختر اللغة</string>
     <string name="select_contact">اختر جهة اتصال</string>
     <string name="relay_icon">أيقونة الترحيل</string>

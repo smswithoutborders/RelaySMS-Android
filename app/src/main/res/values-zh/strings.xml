@@ -1,4 +1,306 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">RelaySMS</string>
+    <string name="app_name" translatable="false">RelaySMS</string>
+
+    <string name="settings_settings">设置</string>
+
+    <string name="settings_accessibility_category">辅助功能</string>
+    <string name="settings_language">语言</string>
+
+    <string name="settings_security_category">安全和隐私</string>
+    <string name="settings_security">安全</string>
+    <string name="settings_security_category_summary">启用应用锁和 PIN 码</string>
+
+    <string name="settings_lock_screen_preference_category">手机锁屏选项</string>
+    <string name="settings_security_and_privacy_enable_lockscreen_open">启用锁屏</string>
+    <string name="settings_security_and_privacy_enable_lockscreen_open_summary">启动应用时需要锁屏 PIN 码/指纹</string>
+
+    <string name="settings_security_and_privacy_account">帐户</string>
+    <string name="settings_security_and_privacy_account_logout">退出登录</string>
+    <string name="settings_security_and_privacy_account_logout_summary">退出您的帐户。您可以随时重新登录，但您当前的消息将被删除。</string>
+
+    <string name="settings_security_and_privacy_account_delete">删除</string>
+
+    <string name="settings_security_and_privacy_account_delete_summary">删除您的帐户意味着删除您所有在线保存的帐户。您随时可以在需要时重新创建帐户。</string>
+
+    <string name="language_english">英语</string>
+    <string name="language_french">法语</string>
+    <string name="language_farsi">波斯语</string>
+    <string name="language_spanish">西班牙语</string>
+    <string name="language_turkish">土耳其语</string>
+    <string name="language_german">德语</string>
+    <string name="language_arabic">阿拉伯语</string>
+    <string name="language_swahili">斯瓦希里语</string>
+    <string name="language_chinese">中文</string>
+
+
+    <string name="gateway_client_settings_add_custom_empty_error">请输入电话号码</string>
+
+    <string name="new_gateway_client_alias">别名 (可选)</string>
+    <string name="gateway_client_alias_description">用于帮助记住网关客户端的名称</string>
+    <string name="gateway_client_save_btn_text">保存</string>
+
+    <string name="choose_sms_app">选择短信应用</string>
+
+    <string name="security_settings_failed_to_switch_security">无法开启安全设置…</string>
+    <string name="settings_security_biometric_user_cannot_add_this_functionality_at_this_time">用户当前无法添加此功能。</string>
+    <string name="lock_screen_relay_sms_is_locked">RelaySMS 应用已锁定</string>
+    <string name="lock_screen_unlock_with_your_phone_s_locking_system">使用您手机的锁定系统解锁</string>
+    <string name="gateway_client_add_custom_example_text">例如 +237123456789 或选择联系人</string>
+    <string name="gateway_client_add_gateway_client_text">添加网关客户端</string>
+    <string name="otp_verification_code_template" translatable="false">Your SMSWithoutBorders-Auth verification code is: </string>
+
+    <string name="logout_you_have_no_accounts_logged_into_vaults_at_this_time">您当前没有登录到保险库的帐户</string>
+    <string name="security_settings_you_have_no_accounts_to_delete_in_vault_at_this_time">您当前没有可在保险库中删除的帐户</string>
+    <string name="helper_yesterday">昨天</string>
+
+
+    <string name="smswithoutboarders_official_gateway_client_seeding_url" translatable="false">https://smswithoutborders.com:15000/v3/clients</string>
+    <string name="recovery_continue">继续</string>
+
+    <string name="vault_grpc_url" translatable="false">vault.smswithoutborders.com</string>
+    <string name="vault_grpc_port" translatable="false">443</string>
+
+    <string name="publisher_grpc_url" translatable="false">publisher.smswithoutborders.com</string>
+    <string name="publisher_grpc_port" translatable="false">443</string>
+
+    <string name="publisher_get_platforms_url" translatable="false">https://raw.githubusercontent.com/smswithoutborders/SMSWithoutBorders-Publisher/master/resources/platforms.json</string>
+    <string name="cancel">取消</string>
+    <string name="click_continue_to_confirm_this_action_do_not_worry_this_has_no_dangerous_effects">点击“继续”以确认此操作。不用担心，这没有危险影响。</string>
+    <string name="messaging">消息</string>
+    <string name="you_have_a_device_id_for_the_device_you_log_into_it_is_used_to_identify_you_on_the_vault_you_can_switch_to_phone_number_to_reduce_size_of_sms_message">您登录的设备有一个设备 ID。它用于在保险库中识别您的身份。您可以切换到电话号码以减小短信的大小。</string>
+    <string name="validate_with_phone_number">使用电话号码验证</string>
+    <string name="enter_phone_number_with_country_code">输入带国家代码的电话号码</string>
+    <string name="about">关于</string>
+    <string name="recents_text">最近</string>
+    <string name="get_started_text">开始使用</string>
+    <string name="platforms">平台</string>
+    <string name="inbox">收件箱</string>
+    <string name="countries">国家/地区</string>
+    <string name="settings">设置</string>
+    <string name="permission_denied">权限被拒绝！</string>
+    <string name="add_gateway_client">添加网关客户端</string>
+    <string name="edit_gateway_client">编辑网关客户端</string>
+    <string name="e_g_237123456_or_select_contact">例如 +237123456 或选择联系人</string>
+    <string name="alias_optional">别名 (可选)</string>
+    <string name="name_to_help_remember_the_gateway_client">用于帮助记住网关客户端的名称</string>
+    <string name="saving">正在保存…</string>
+    <string name="save">保存</string>
+    <string name="error_saving_gateway_client">保存网关客户端时出错</string>
+    <string name="click_continue_to_confirm_this_action_do_not_worry_it_has_no_dangerous_effects">点击“继续”以确认此操作。不用担心，这没有危险影响。</string>
+    <string name="continue_text">继续</string>
+    <string name="country_options">国家/地区选项</string>
+    <string name="revoking_account_for">正在撤销 %1$s 的帐户</string>
+    <string name="adding_account_for">正在为 %1$s 添加帐户</string>
+    <string name="send_message">发送消息</string>
+    <string name="add_account">添加帐户</string>
+    <string name="remove_accounts">移除帐户</string>
+    <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported">将电子邮件添加到您的 RelaySMS 帐户后，您可以使用它们通过短信发送电子邮件。\n\n目前支持 Gmail。</string>
+    <string name="adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported">将号码添加到您的 RelaySMS 帐户后，您可以使用它们通过短信发送消息。\n\n目前支持 Telegram 消息。</string>
+    <string name="adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported">将帐户添加到您的 RelaySMS 帐户后，您可以使用它们通过短信发帖。\n\n目前支持发帖功能。</string>
+    <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias">您的 RelaySMS 帐户是您电话号码的别名，域名为 @relaysms.me。\n\n当消息发送到您的别名时，您可以通过短信接收回复。</string>
+    <string name="continue_to_send_an_email_from_your_saved_email_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">继续从您保存的电子邮件帐户发送电子邮件。您可以从下方的“国家/地区”选项卡中选择消息转发国家/地区。\n\n继续发送消息</string>
+    <string name="continue_to_send_messages_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">继续从您保存的消息帐户发送消息。您可以从下方的“国家/地区”选项卡中选择消息转发国家/地区。\n\n继续发送消息</string>
+    <string name="continue_to_make_posts_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">继续从您保存的消息帐户发帖。您可以从下方的“国家/地区”选项卡中选择消息转发国家/地区。\n\n继续发送消息</string>
+    <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">您的 RelaySMS 帐户是您电话号码的别名，域名为 @relaysms.me。\n\n当消息发送到您的别名时，您可以通过短信接收回复。\n您可以从下方的“国家/地区”选项卡中选择消息转发国家/地区。\n\n继续发送消息</string>
+    <string name="select_an_account">选择一个帐户</string>
+    <string name="please_enter_your_telegram_code_without_copying_it_from_the_message_copying_might_get_flagged_and_telegram_might_block_your_account">请输入您的 Telegram 验证码，不要从消息中复制 - 复制可能会被标记，Telegram 可能会阻止您的帐户。</string>
+    <string name="phone_number">电话号码</string>
+    <string name="code">验证码</string>
+    <string name="hide_password">隐藏密码</string>
+    <string name="show_password">显示密码</string>
+    <string name="no_account_selected">未选择帐户</string>
+    <string name="compose_email">撰写电子邮件</string>
+    <string name="to">收件人</string>
+    <string name="subject">主题</string>
+    <string name="new_message">新消息</string>
+    <string name="sender">发件人</string>
+    <string name="recipient_number">收件人号码</string>
+    <string name="message">消息内容</string>
+    <string name="new_post">新帖子</string>
+    <string name="what_s_happening">有什么新鲜事？</string>
+    <string name="connecting_the_world_one_sms_at_a_time">连接世界，一次一条短信</string>
+    <string name="relaysms_is_an_open_source_initiative_focused_on_enabling_communication_through_sms_without_relying_on_internet_connectivity_we_believe_in_a_connected_world_and_we_re_making_it_happen_one_sms_at_a_time_relaysms_remains_free_and_open_source">RelaySMS 是一个开源项目，致力于通过短信实现通信，无需依赖互联网连接。我们相信一个互联的世界，并且我们正在通过一次一条短信的方式来实现它。RelaySMS 始终免费且开源。</string>
+    <string name="app_tutorial">应用教程</string>
+    <string name="support_us_by_starring_our_github_repository_and_sharing_it_with_your_friends">通过在我们的 GitHub 存储库上加星并与您的朋友分享来支持我们！</string>
+    <string name="available_platforms">可用平台</string>
+    <string name="use_your_relaysms_account">使用您的 RelaySMS 帐户</string>
+    <string name="use_your_online_accounts">使用您的在线帐户</string>
+    <string name="navigate_back_to_home_screen">导航回主屏幕</string>
+    <string name="create_relaysms_account">创建 RelaySMS 帐户</string>
+    <string name="create_your_account_and">创建您的帐户并</string>
+    <string name="save_platforms">保存平台</string>
+    <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline">以便 RelaySMS 在您离线时代表您向 Gmail、X 和 Telegram 发送消息</string>
+    <string name="i_have_read_the">我已阅读</string>
+    <string name="privacy_policy">隐私政策</string>
+    <string name="log_in">登录</string>
+    <string name="sign_up">注册</string>
+    <string name="selected_gateway_client">选定的网关客户端</string>
+    <string name="no_gateway_client_selected">未选择网关客户端</string>
+    <string name="available_countries">可用国家/地区</string>
+    <string name="gateway_clients_refreshed_successfully">网关客户端刷新成功！</string>
+    <string name="no_messages_in_inbox">收件箱中没有消息</string>
+    <string name="paste_new_incoming_message">粘贴新的传入消息</string>
+    <string name="log_into_relaysms">登录 RelaySMS</string>
+    <string name="log_into_your_account_and">登录您的帐户并</string>
+    <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline_">以便 RelaySMS 在您离线时代表您向 Gmail、X 和 Telegram 发送消息</string>
+    <string name="already_got_code">已有验证码</string>
+    <string name="do_not_have_an_account">还没有帐户？</string>
+    <string name="get_started_with">开始使用</string>
+    <string name="compose_message">撰写消息</string>
+    <string name="use_your_phone_number_to_send_an_email_with_the_alias">使用您的电话号码发送带有别名的电子邮件：</string>
+    <string name="login_with_internet">通过互联网登录</string>
+    <string name="these_features_requires_you_to_have_an_internet_connection">这些功能需要您连接到互联网</string>
+    <string name="input_your_code">输入您的验证码</string>
+    <string name="please_enter_the_6_digit_code_we_sent_to_you_via_sms">请输入我们通过短信发送给您的 6 位数验证码</string>
+    <string name="the_code_would_automatically_be_detected_in_some_cases">在某些情况下，验证码会自动检测到</string>
+    <string name="paste_encrypted_text_into_this_box">将加密文本粘贴到此框中…</string>
+    <string name="this_is_an_example_of_an_encrypted_message_that_you_would_paste_here">这是您将在此处粘贴的加密消息示例…</string>
+    <string name="relaysms_reply_please_paste_this_entire_message_in_your_relaysms_app">RelaySMS 回复 请将此完整消息粘贴到您的 RelaySMS 应用中</string>
+    <string name="click_to_paste">点击粘贴</string>
+    <string name="decrypt_message">解密消息</string>
+    <string name="send_your_first_message">发送您的第一条消息…</string>
+    <string name="save_platforms_">保存平台</string>
+    <string name="phone_lockscreen_options">手机锁屏选项</string>
+    <string name="enable_lockscreen">启用锁屏</string>
+    <string name="require_lockscreen_pin_fingerprint_when_starting_the_app">启动应用时需要锁屏 PIN 码/指纹</string>
+    <string name="vault">保险库</string>
+    <string name="choose_which_platforms_you_want_to_remove_from_the_vault">选择要从保险库中移除的平台</string>
+    <string name="account">帐户</string>
+    <string name="clear_aliasing">清除别名</string>
+    <string name="this_would_delete_your_auth_codes_stored_for_aliasing_you_can_request_for_another_code_at_anytime">这将删除您存储的用于别名的授权码。您可以随时请求另一个验证码。</string>
+    <string name="logout">退出登录</string>
+    <string name="logout_of_your_account_you_can_always_log_back_in_however_your_current_messages_would_be_deleted">退出您的帐户。您可以随时重新登录，但您当前的消息将被删除。</string>
+    <string name="delete_">删除</string>
+    <string name="deleting_your_account_means_deleting_all_your_saved_accounts_online_you_can_always_recreate_your_account_once_needed">删除您的帐户意味着删除您所有在线保存的帐户。您随时可以在需要时重新创建帐户。</string>
+    <string name="accessibility">辅助功能</string>
+    <string name="language">语言</string>
+    <string name="messaging_">消息</string>
+    <string name="security_and_privacy">安全和隐私</string>
+    <string name="security">安全</string>
+    <string name="enable_app_locks_and_pin_codes">启用应用锁和 PIN 码</string>
+
+    <string name="english">英语</string>
+    <string name="arabic">阿拉伯语</string>
+    <string name="french">法语</string>
+    <string name="farsi">波斯语</string>
+    <string name="spanish">西班牙语</string>
+    <string name="german">德语</string>
+    <string name="swahili">斯瓦希里语</string>
+    <string name="turkish">土耳其语</string>
+    <string name="chinese">中文</string>
+
+    <string name="welcome_to_relaysms_">欢迎来到 RelaySMS！</string>
+    <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">在没有互联网连接的情况下，使用短信发帖、发送电子邮件和消息</string>
+    <string name="learn_how_it_works_">了解它是如何工作的</string>
+    <string name="read_our_privacy_policy">阅读我们的隐私政策</string>
+    <string name="skip">跳过</string>
+    <string name="you_are_ready_to_begin_sending_messages_from_relaysms">您已准备好开始从 RelaySMS 发送消息</string>
+    <string name="great">太棒了！</string>
+    <string name="relaysms_vaults_securely_stores_your_online_accounts_so_that_you_can_access_them_without_an_internet_connection">RelaySMS 保险库安全地存储您的在线帐户，以便您可以在没有互联网连接的情况下访问它们</string>
+    <string name="you_can_add_online_accounts_to_your_vault">您可以将在线帐户添加到您的保险库</string>
+    <string name="ok">确定</string>
+    <string name="make_default">设为默认</string>
+    <string name="edit">编辑</string>
+    <string name="delete">删除</string>
+    <string name="view_on_github">在 GitHub 上查看</string>
+    <string name="send_new_message">发送新消息</string>
+    <string name="password">密码</string>
+    <string name="re_enter_password">重新输入密码</string>
+    <string name="already_have_an_account">已有帐户</string>
+    <string name="create_account">创建帐户</string>
+    <string name="login">登录</string>
+    <string name="forgot_password">忘记密码</string>
+    <string name="submit">提交</string>
+    <string name="re_send_code">重新发送验证码</string>
+    <string name="revoke_platforms">撤销平台</string>
+    <string name="from">发件人</string>
+    <string name="always_add_the_dialing_code_if_absent_e_g_237">如果缺少区号，请始终添加，例如 +237</string>
+    <string name="cc">抄送</string>
+    <string name="bcc">密送</string>
+    <string name="paste_message">粘贴消息</string>
+    <string name="error_decrypting_text">解密文本时出错</string>
+    <string name="you_can_also_send_out_emails_without_an_account_or_vault">您也可以在没有帐户或保险库的情况下发送电子邮件</string>
+    <string name="this_will_create_a_default_email_your_phonenumber_relaysms_me_using_your_phone_number">这将使用您的电话号码创建一个默认电子邮件 (your_phonenumber@relaysms.me)。</string>
+    <string name="next">下一步</string>
+    <string name="https_smswithoutborders_com_privacy_policy" translatable="false">https://smswithoutborders.com/privacy-policy</string>
+    <string name="version">版本 %1$s</string>
+    <string name="compose_new">撰写新内容</string>
+    <string name="add_account_compose_new">添加帐户/撰写新内容</string>
+    <string name="add_number">添加号码</string>
+    <string name="forgot_password_">忘记密码？</string>
+    <string name="enter_your_phone_number_and_new_password_and_we_would_send_you_a_code_via_sms_to_reset_your_password">输入您的电话号码和新密码，我们将通过短信向您发送验证码以重置您的密码。</string>
+    <string name="new_password">新密码</string>
+    <string name="reset_password">重置密码</string>
+    <string name="passwords_do_not_match">密码不匹配</string>
+    <string name="discard">放弃</string>
+    <string name="message_discarded">消息已放弃！</string>
+    <string name="time_left_until_code_expires">验证码过期剩余时间：%1$ds</string>
+    <string name="something_went_wrong">出错了</string>
+    <string name="no_results_found">未找到结果</string>
+    <string name="search_message">搜索消息</string>
+    <string name="bug_report">错误报告</string>
+    <string name="relaysms_bug_report">RelaySMS - 错误报告</string>
+    <string name="request_new_code_in">请求新验证码倒计时：</string>
+    <string name="request_new_code">请求新验证码！</string>
+    <string name="test_url" translatable="false">https://gatewayserver.smswithoutborders.com/v3/clients/%1$s/tests</string>
+    <string name="store_tokens_on_device_dialog_title">在设备上存储 OAuth2.0 令牌</string>
+    <string name="store_tokens_on_device_enable_dialog_message">开启此功能会自动删除服务器上使用 OAuth2.0 的平台 (Gmail 和 X) 的令牌，并将其保存在您的设备上。请注意，RelaySMS 利用这些令牌代表您为上述平台发送消息。因此，如果您丢失设备或重新安装此应用程序，您的令牌将会丢失，您将需要撤销现有的已存储帐户并重新存储它们以获取新的令牌。</string>
+    <string name="store_tokens_on_device_disable_dialog_message">关闭此设置将阻止后续令牌存储在您的设备上。对于设备上已存储令牌的平台，消息仍能发布。如果出现令牌丢失的情况，请撤销相关帐户并重新存储。</string>
+    <string name="are_you_sure_you_want_to_continue">您确定要继续此操作吗？</string>
+    <string name="missing_token_text">您的以下帐户可能缺少令牌。您可能需要撤销并重新添加它们，以确保消息发布正常工作，尤其是在启用了“在设备上存储令牌”的情况下：</string>
+    <string name="toast_tokens_refreshed_successfully">成功刷新令牌</string>
+    <string name="toast_error_refreshing_tokens">刷新令牌时出错：%s</string>
+    <string name="toast_tokens_not_stored_subsequent">后续帐户的令牌将不会存储在设备上</string>
+    <string name="an_unexpected_error_occurred">发生意外错误：%s</string>
+    <string name="do_not_show_this_again">不再显示</string>
+    <string name="missing_tokens_info">缺少令牌信息</string>
+    <string name="store_tokens_on_device">在设备上存储令牌</string>
+    <string name="storing_platform_accounts">存储平台帐户</string>
+    <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">在为使用 OAuth2.0 的平台（例如 Gmail、X）添加帐户时，启用此选项可确保您的访问令牌存储在当前设备上</string>
+    <string name="stored_tokens_detected_title">检测到已存储的令牌</string>
+    <string name="stored_tokens_dialog_message_part1">此</string>
+    <string name="stored_tokens_dialog_message_part2">帐户已检测到存储的令牌。您可以使用存储的令牌在</string>
+    <string name="stored_tokens_dialog_message_part3">上发帖一次。只要“在设备上存储令牌”设置处于开启状态，您将只能在 X 上发帖一次。要使用此帐户发布更多帖子，请为每个帖子撤销并重新添加此帐户。</string>
+    <string name="stored_tokens_dialog_note">注意：关闭“在设备上存储令牌”功能，同时确保您在线存储了令牌，将允许您在 X 上多次发帖，而无需再次撤销和存储。</string>
+    <string name="menu">菜单</string>
+    <string name="search">搜索</string>
+    <string name="close_search">关闭搜索</string>
+    <string name="back">返回</string>
+    <string name="report_bug_feedback">报告错误/反馈</string>
+    <string name="recents">最近</string>
+    <string name="select_language">选择语言</string>
+    <string name="select_contact">选择联系人</string>
+    <string name="relay_icon">中继图标</string>
+    <string name="gateway_client_is_already_selected_change_default_gateway_client_before_deleting_this_one">网关客户端已被选中。删除此客户端前，请更改默认网关客户端</string>
+    <string name="cannot_delete">无法删除</string>
+    <string name="selected_platform">选定平台</string>
+    <string name="close_modal">关闭模式</string>
+    <string name="profile_photo">头像照片</string>
+    <string name="send">发送</string>
+    <string name="more">更多</string>
+    <string name="expand_to">展开到</string>
+    <string name="post">发帖</string>
+    <string name="sender_avatar">发件人头像</string>
+    <string name="user_avatar">用户头像</string>
+    <string name="github_logo">GitHub 标志</string>
+    <string name="x_logo">X 标志</string>
+    <string name="bluesky_logo">Bluesky 标志</string>
+    <string name="drink_me_out_of_here">把我弄出去</string>
+    <string name="you_need_to_log_in_again_into_this_device">您需要在此设备上重新登录！</string>
+    <string name="you_have_logged_in_on_another_device">您已在另一台设备上登录</string>
+    <string name="get_me_out_here">让我离开这里！</string>
+    <string name="platform_logo">平台标志</string>
+    <string name="gateway_server_url">网关服务器 URL</string>
+    <string name="http_request">http 请求</string>
+    <string name="relaysms_logo">RelaySMS 标志</string>
+    <string name="compose">撰写</string>
+    <string name="person_icon">人物图标</string>
+    <string name="access_your_account_to_save_or_use_your_online_platforms_without_an_internet_connection">访问您的帐户以在没有互联网连接的情况下保存或使用您的在线平台</string>
+    <string name="an_sms_would_be_sent_to_your_phone_number_to_verify_you_own_the_number">将向您的电话号码发送一条短信以验证您拥有该号码</string>
+    <string name="add_new_gateway_clients">添加新的网关客户端</string>
+    <string name="inbox_icon">收件箱图标</string>
+    <string name="get_started_illustration">入门插图</string>
+    <string name="avatar_image">头像图片</string>
+
 </resources>

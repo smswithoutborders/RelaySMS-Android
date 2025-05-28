@@ -36,6 +36,7 @@
     <string name="language_german" >German</string>
     <string name="language_arabic" >Arabic</string>
     <string name="language_swahili" >Swahili</string>
+    <string name="language_chinese" >Chinese</string>
 
 
     <string name="language_english_value" translatable="false">
@@ -54,13 +55,16 @@
         tr
     </string>
     <string name="language_german_value" translatable="false">
-        tr
+        de
     </string>
     <string name="language_arabic_value" translatable="false">
-        tr
+        ar
     </string>
     <string name="language_swahili_value" translatable="false">
-        tr
+        sw
+    </string>
+    <string name="language_chinese_value" translatable="false">
+        zh
     </string>
 
 
@@ -215,6 +219,7 @@
     <string name="security_and_privacy">Security and Privacy</string>
     <string name="security">Security</string>
     <string name="enable_app_locks_and_pin_codes">Enable app locks and pin codes</string>
+
     <string name="english">English</string>
     <string name="arabic">Arabic</string>
     <string name="french">French</string>
@@ -223,6 +228,8 @@
     <string name="german">German</string>
     <string name="swahili">Swahili</string>
     <string name="turkish">Turkish</string>
+    <string name="chinese">Chinese</string>
+
     <string name="welcome_to_relaysms_">Welcome to RelaySMS!</string>
     <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">Use SMS to make a post, send emails and messages with no internet connection</string>
     <string name="learn_how_it_works_">Learn how it works</string>
@@ -302,7 +309,6 @@
     <string name="back">Back</string>
     <string name="report_bug_feedback">Report Bug/Feedback</string>
     <string name="recents">Recents</string>
-    <string name="chinese">Chinese</string>
     <string name="select_language">Select Language</string>
     <string name="select_contact">Select Contact</string>
     <string name="relay_icon">Relay Icon</string>

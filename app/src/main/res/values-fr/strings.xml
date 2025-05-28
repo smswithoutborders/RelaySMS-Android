@@ -30,26 +30,7 @@
     <string name="language_german">Allemand</string>
     <string name="language_arabic">Arabe</string>
     <string name="language_swahili">Swahili</string>
-
-    <string name="language_english_value" translatable="false">
-        en
-    </string>
-    <string name="language_french_value" translatable="false">
-        fr
-    </string>
-    <string name="language_farsi_value" translatable="false">
-        fa
-    </string>
-    <string name="language_spanish_value" translatable="false">
-        es
-    </string>
-    <string name="language_turkish_value" translatable="false">
-        tr
-    </string>
-
-    <string name="default_gateway_MSISDN_0" translatable="false">+237679466332</string>
-    <string name="default_gateway_MSISDN_2" translatable="false">+237690826242</string>
-    <string name="default_gateway_MSISDN_3" translatable="false">+2348131498393</string>
+    <string name="language_chinese">Chinois</string>
 
     <string name="gateway_client_settings_add_custom_empty_error">Veuillez fournir un numéro de téléphone</string>
 
@@ -195,6 +176,7 @@
     <string name="security_and_privacy">Sécurité et confidentialité</string>
     <string name="security">Sécurité</string>
     <string name="enable_app_locks_and_pin_codes">Activer les verrouillages d\'application et les codes PIN</string>
+
     <string name="english">Anglais</string>
     <string name="arabic">Arabe</string>
     <string name="french">Français</string>
@@ -203,6 +185,8 @@
     <string name="german">Allemand</string>
     <string name="swahili">Swahili</string>
     <string name="turkish">Turc</string>
+    <string name="chinese">Chinois</string>
+
     <string name="welcome_to_relaysms_">Bienvenue sur RelaySMS !</string>
     <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">Utilisez les SMS pour publier un message, envoyer des e-mails et des messages sans connexion Internet</string>
     <string name="learn_how_it_works_">Découvrez comment ça marche</string>
@@ -280,7 +264,6 @@
     <string name="back">Retour</string>
     <string name="report_bug_feedback">Signaler un bug/commentaire</string>
     <string name="recents">Récents</string>
-    <string name="chinese">Chinois</string>
     <string name="select_language">Sélectionner la langue</string>
     <string name="select_contact">Sélectionner un contact</string>
     <string name="relay_icon">Icône Relay</string>

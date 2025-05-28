@@ -30,32 +30,7 @@
     <string name="language_german">Kijerumani</string>
     <string name="language_arabic">Kiarabu</string>
     <string name="language_swahili">Kiswahili</string>
-
-    <string name="language_english_value" translatable="false">
-        en
-    </string>
-    <string name="language_french_value" translatable="false">
-        fr
-    </string>
-    <string name="language_farsi_value" translatable="false">
-        fa
-    </string>
-    <string name="language_spanish_value" translatable="false">
-        es
-    </string>
-    <string name="language_turkish_value" translatable="false">
-        tr
-    </string>
-    <string name="language_german_value" translatable="false">
-        de
-    </string>
-    <string name="language_swahili_value" translatable="false">
-        sw
-    </string>
-
-    <string name="default_gateway_MSISDN_0" translatable="false">+237679466332</string>
-    <string name="default_gateway_MSISDN_2" translatable="false">+237690826242</string>
-    <string name="default_gateway_MSISDN_3" translatable="false">+2348131498393</string>
+    <string name="language_chinese">Kichina</string>
 
     <string name="gateway_client_settings_add_custom_empty_error">Tafadhali toa nambari ya simu</string>
 
@@ -201,6 +176,7 @@
     <string name="security_and_privacy">Usalama na Faragha</string>
     <string name="security">Usalama</string>
     <string name="enable_app_locks_and_pin_codes">Washa kufuli za programu na misimbo ya siri</string>
+
     <string name="english">Kiingereza</string>
     <string name="arabic">Kiarabu</string>
     <string name="french">Kifaransa</string>
@@ -209,6 +185,8 @@
     <string name="german">Kijerumani</string>
     <string name="swahili">Kiswahili</string>
     <string name="turkish">Kituruki</string>
+    <string name="chinese">Kichina</string>
+
     <string name="welcome_to_relaysms_">Karibu kwenye RelaySMS!</string>
     <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">Tumia SMS kuchapisha, kutuma barua pepe na ujumbe bila muunganisho wa intaneti</string>
     <string name="learn_how_it_works_">Jifunze jinsi inavyofanya kazi</string>
@@ -286,7 +264,6 @@
     <string name="back">Rudi</string>
     <string name="report_bug_feedback">Ripoti Hitilafu/Maoni</string>
     <string name="recents">Za Hivi Karibuni</string>
-    <string name="chinese">Kichina</string>
     <string name="select_language">Chagua Lugha</string>
     <string name="select_contact">Chagua Anwani</string>
     <string name="relay_icon">Aikoni ya Relay</string>
