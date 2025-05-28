@@ -33,6 +33,7 @@
     <string name="language_chinese">Chinois</string>
     <string name="language_korean">Coréen</string>
     <string name="language_hindi">Hindi</string>
+    <string name="language_shona">Shona</string>
 
     <string name="gateway_client_settings_add_custom_empty_error">Veuillez fournir un numéro de téléphone</string>
 
@@ -190,6 +191,7 @@
     <string name="chinese">Chinois</string>
     <string name="korean">Coréen</string>
     <string name="hindi">Hindi</string>
+    <string name="shona">Shona</string>
 
     <string name="welcome_to_relaysms_">Bienvenue sur RelaySMS !</string>
     <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">Utilisez les SMS pour publier un message, envoyer des e-mails et des messages sans connexion Internet</string>

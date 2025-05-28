@@ -33,6 +33,7 @@
     <string name="language_chinese">چینی</string>
     <string name="language_korean">کره‌ای</string>
     <string name="language_hindi">هندی</string>
+    <string name="language_shona">شونا</string>
 
     <string name="gateway_client_settings_add_custom_empty_error">لطفاً شماره تلفن ارائه دهید</string>
 
@@ -190,6 +191,7 @@
     <string name="chinese">چینی</string>
     <string name="korean">کره‌ای</string>
     <string name="hindi">هندی</string>
+    <string name="shona">شونا</string>
 
     <string name="welcome_to_relaysms_">به RelaySMS خوش آمدید!</string>
     <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">از SMS برای ارسال پست، ارسال ایمیل و پیام بدون اتصال به اینترنت استفاده کنید</string>

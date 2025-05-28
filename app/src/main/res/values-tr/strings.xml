@@ -33,6 +33,7 @@
     <string name="language_chinese">Çince</string>
     <string name="language_korean">Korece</string>
     <string name="language_hindi">Hintçe</string>
+    <string name="language_shona">Şona dili</string>
 
     <string name="gateway_client_settings_add_custom_empty_error">Lütfen bir telefon numarası girin</string>
 
@@ -192,6 +193,7 @@
     <string name="chinese">Çince</string>
     <string name="korean">Korece</string>
     <string name="hindi">Hintçe</string>
+    <string name="shona">Şona dili</string>
 
     <string name="welcome_to_relaysms_">RelaySMS\'e Hoş Geldiniz!</string>
     <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">İnternet bağlantısı olmadan gönderi oluşturmak, e-posta ve mesaj göndermek için SMS kullanın</string>

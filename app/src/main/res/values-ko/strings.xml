@@ -34,6 +34,7 @@
     <string name="language_chinese">중국어</string>
     <string name="language_korean">한국어</string>
     <string name="language_hindi">힌디어</string>
+    <string name="language_shona">쇼나어</string>
 
     <string name="gateway_client_settings_add_custom_empty_error">전화번호를 입력하세요</string>
 
@@ -192,6 +193,7 @@
     <string name="chinese">중국어</string>
     <string name="korean">한국어</string>
     <string name="hindi">힌디어</string>
+    <string name="shona">쇼나어</string>
 
     <string name="welcome_to_relaysms_">RelaySMS에 오신 것을 환영합니다!</string>
     <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">인터넷 연결 없이 SMS를 사용하여 게시물 작성, 이메일 및 메시지 보내기</string>

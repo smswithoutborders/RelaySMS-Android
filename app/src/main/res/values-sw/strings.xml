@@ -33,6 +33,7 @@
     <string name="language_chinese">Kichina</string>
     <string name="language_korean">Kikorea</string>
     <string name="language_hindi">Kihindi</string>
+    <string name="language_shona">Kishona</string>
 
     <string name="gateway_client_settings_add_custom_empty_error">Tafadhali toa nambari ya simu</string>
 
@@ -190,6 +191,7 @@
     <string name="chinese">Kichina</string>
     <string name="korean">Kikorea</string>
     <string name="hindi">Kihindi</string>
+    <string name="shona">Kishona</string>
 
     <string name="welcome_to_relaysms_">Karibu kwenye RelaySMS!</string>
     <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">Tumia SMS kuchapisha, kutuma barua pepe na ujumbe bila muunganisho wa intaneti</string>

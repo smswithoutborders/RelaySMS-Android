@@ -34,6 +34,7 @@
     <string name="language_chinese">चीनी</string>
     <string name="language_korean">कोरियाई</string>
     <string name="language_hindi">हिंदी</string>
+    <string name="language_shona">शोना</string>
 
 
     <string name="gateway_client_settings_add_custom_empty_error">कृपया एक फ़ोन नंबर प्रदान करें</string>
@@ -193,6 +194,7 @@
     <string name="chinese">चीनी</string>
     <string name="korean">कोरियाई</string>
     <string name="hindi">हिंदी</string>
+    <string name="shona">शोना</string>
 
     <string name="welcome_to_relaysms_">RelaySMS में आपका स्वागत है!</string>
     <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">बिना इंटरनेट कनेक्शन के पोस्ट करने, ईमेल और संदेश भेजने के लिए SMS का उपयोग करें</string>

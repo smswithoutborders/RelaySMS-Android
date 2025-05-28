@@ -37,7 +37,7 @@ android {
                                       "$projectDir/schemas".toString()]
             }
         }
-        resourceConfigurations += ['en', 'fr', 'fa', 'es', 'tr', 'ar', 'de', 'sw', 'zh', 'ko', 'hi']
+        resourceConfigurations += ['en', 'fr', 'fa', 'es', 'tr', 'ar', 'de', 'sw', 'zh', 'ko', 'hi', 'sn']
 
         manifestPlaceholders =
                 ['appAuthRedirectScheme': 'oauth.afkanerd.com']
