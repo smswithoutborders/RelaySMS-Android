@@ -61,6 +61,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import androidx.compose.runtime.collectAsState
+import com.example.sw0b_001.ui.features.AppFeatures
+import com.example.sw0b_001.ui.features.FeatureInfo
+import com.example.sw0b_001.ui.features.FeatureManager
+import com.example.sw0b_001.ui.features.NewFeatureModal
 import com.example.sw0b_001.ui.modals.GetStartedModal
 
 
@@ -113,6 +117,15 @@ fun HomepageView(
     var searchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
     var isSearchDone by remember { mutableStateOf(false) }
+
+    var featureToShow by remember { mutableStateOf<FeatureInfo?>(null) }
+
+    LaunchedEffect(Unit) {
+        val nextFeature = AppFeatures.ALL_FEATURES.firstOrNull {
+            !FeatureManager.hasFeatureBeenShown(context, it.id)
+        }
+        featureToShow = nextFeature
+    }
 
     Scaffold (
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -266,6 +279,15 @@ fun HomepageView(
             }
         }
     ) { innerPadding ->
+        featureToShow?.let { currentFeature ->
+            NewFeatureModal(
+                featureInfo = currentFeature,
+                onDismiss = {
+                    FeatureManager.markFeatureAsShown(context, currentFeature.id)
+                    featureToShow = null
+                }
+            )
+        }
         Box(
             Modifier
                 .fillMaxSize()
