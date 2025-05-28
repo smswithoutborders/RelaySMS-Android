@@ -7,6 +7,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 
 @Dao
 interface StoredPlatformsDao {
@@ -27,6 +28,12 @@ interface StoredPlatformsDao {
 
     @Query("SELECT * FROM StoredPlatformsEntity WHERE id = :id")
     fun fetch(id: String) : StoredPlatformsEntity
+
+    @Query("SELECT * FROM StoredPlatformsEntity WHERE account = :account")
+    fun fetchAccount(account: String) : StoredPlatformsEntity?
+
+    @Update
+    fun update(storedPlatformsEntity: StoredPlatformsEntity)
 
     @Query("DELETE FROM StoredPlatformsEntity")
     fun deleteAll()

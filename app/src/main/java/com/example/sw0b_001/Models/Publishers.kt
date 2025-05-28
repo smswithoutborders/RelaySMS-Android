@@ -114,15 +114,6 @@ class Publishers(val context: Context, ) {
         return publisherStub.exchangePNBACodeAndStore(request)
     }
 
-    fun publishContent(content: String, metadata: Map<String, String>): PublisherOuterClass.PublishContentResponse {
-        val request = PublisherOuterClass.PublishContentRequest.newBuilder().apply {
-            setContent(content)
-            putAllMetadata(metadata)
-        }.build()
-
-        return publisherStub.publishContent(request)
-    }
-
     fun shutdown() {
         channel.shutdown()
     }
