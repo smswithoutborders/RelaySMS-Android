@@ -310,7 +310,6 @@
     <string name="preview_feature_title">Heyecan Verici Yeni Özellik!</string>
     <string name="preview_feature_description">Bu sürümdeki yenilikleri keşfedin. Seveceğiniz harika bir şey ekledik.</string>
     <string name="new_feature_title">Yeni Özellik Uyarısı!</string>
-    <string name="x_refresh_token_sms_instruction_des">X platformunda başarılı bir şekilde gönderi yaptıktan sonra, X üzerinde sonraki mesajları göndermenizi sağlamak için yenileme jetonunuzu içeren bir SMS mesajı alacaksınız. SMS\'in tamamını varsayılan mesajlaşma uygulamanızdan olduğu gibi kopyalayın ve yenileme jetonunuzu kaydetmek ve X üzerinde sonraki gönderileri yapmanızı sağlamak için RelaySMS\'in gelen kutusu sekmesine yapıştırın.\n\n Not: Bu özellik, X hesap jetonlarınızın şu anda cihazınızda saklanması durumu içindir.</string>
-
+    <string name="oauth_token_storage_device_setting_info">Artık Ayarlar > Güvenlik bölümüne giderek OAuth2.0 hesaplarınızın jetonlarının cihazınızda saklanmasını talep edebilirsiniz.</string>
 
 </resources>

@@ -14,9 +14,9 @@ data class FeatureInfo(
 object AppFeatures {
     val ALL_FEATURES = listOf(
         FeatureInfo(
-            id = "x_refresh_token_sms_instruction",
+            id = "oauth_token_storage_device_setting_info_alert",
             titleRes = R.string.new_feature_title,
-            descriptionRes = R.string.x_refresh_token_sms_instruction_des,
+            descriptionRes = R.string.oauth_token_storage_device_setting_info,
             iconRes = R.drawable.relaysms_icon_default_shape
         ),
 

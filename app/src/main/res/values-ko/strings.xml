@@ -312,6 +312,6 @@
     <string name="preview_feature_title">흥미로운 새 기능!</string>
     <string name="preview_feature_description">이 버전의 새로운 기능을 알아보세요. 여러분이 좋아할 만한 멋진 기능을 추가했습니다.</string>
     <string name="new_feature_title">새 기능 알림!</string>
-    <string name="x_refresh_token_sms_instruction_des">X 플랫폼에 성공적으로 게시물을 작성하면 X에서 후속 메시지를 보낼 수 있도록 새로 고침 토큰이 포함된 SMS 메시지를 받게 됩니다. 기본 메시징 앱에서 SMS 전체를 그대로 복사하여 RelaySMS의 받은 편지함 탭에 붙여넣어 새로 고침 토큰을 저장하고 X에서 후속 게시물을 작성할 수 있도록 하세요.\n\n참고: 이 기능은 X 계정 토큰이 현재 장치에 저장되어 있는 경우에 해당됩니다.</string>
+    <string name="oauth_token_storage_device_setting_info">이제 설정 > 보안으로 이동하여 OAuth2.0 계정의 토큰을 기기에 저장하도록 요청할 수 있습니다.</string>
 
 </resources>

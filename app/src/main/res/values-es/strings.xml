@@ -308,7 +308,6 @@
     <string name="preview_feature_title">¡Nueva característica emocionante!</string>
     <string name="preview_feature_description">Descubre las novedades de esta versión. Hemos añadido algo increíble que te encantará.</string>
     <string name="new_feature_title">¡Alerta de nueva característica!</string>
-    <string name="x_refresh_token_sms_instruction_des">Después de realizar una publicación exitosa en la plataforma X, recibirás un mensaje SMS que contiene tu token de actualización para permitirte enviar mensajes posteriores en X. Copia el SMS completo tal como está desde tu aplicación de mensajería predeterminada y pégalo en la pestaña de bandeja de entrada de RelaySMS para guardar tu token de actualización y permitirte realizar publicaciones posteriores en X.\n\n Nota: Esta función es para el caso de que los tokens de tu cuenta X estén actualmente almacenados en tu dispositivo.</string>
-
+    <string name="oauth_token_storage_device_setting_info">Ahora puede solicitar que los tokens de sus cuentas OAuth2.0 se almacenen en su dispositivo yendo a Ajustes > Seguridad.</string>
 
 </resources>

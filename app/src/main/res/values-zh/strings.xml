@@ -313,6 +313,5 @@
     <string name="preview_feature_title">令人兴奋的新功能！</string>
     <string name="preview_feature_description">发现此版本中的新功能。我们添加了一些您会喜欢的绝佳内容。</string>
     <string name="new_feature_title">新功能提醒！</string>
-    <string name="x_refresh_token_sms_instruction_des">在 X 平台上成功发帖后，您将收到一条包含刷新令牌的短信，以便您可以在 X 上发送后续消息。请从您的默认消息应用中原样复制整条短信，并将其粘贴到 RelaySMS 的收件箱选项卡中，以保存您的刷新令牌并使您能够在 X 上进行后续发帖。\n\n 注意：此功能适用于您的 X 帐户令牌当前存储在您设备上的情况。</string>
-
+    <string name="oauth_token_storage_device_setting_info">您现在可以通过转到“设置”>“安全”来请求将 OAuth2.0 帐户的令牌存储在您的设备上。</string>
 </resources>
