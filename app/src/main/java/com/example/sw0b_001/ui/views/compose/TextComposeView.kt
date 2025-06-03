@@ -333,6 +333,7 @@ private fun processTest(
                     AD!!,
                     availablePlatforms!!,
                     null,
+                    true
                 ) {
                     onCompleteCallback()
                 }
