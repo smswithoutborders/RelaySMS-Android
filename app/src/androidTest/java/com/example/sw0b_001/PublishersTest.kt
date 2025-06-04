@@ -205,21 +205,17 @@ class PublishersTest {
         val accountId = "Oldy29bpiwvXdfyDg+fY3HTJgrxLi6kr8GLeU2d8k4U="
 
         try {
-            // 1. Get Tokens (same logic as V0 test, ensuring tokens are strings)
             Log.d("PublishersTest_V1", "Listing tokens using LLT: $longLivedToken")
             val responseTokens = vault.getStoredAccountTokens(longLivedToken, true)
             Log.d("PublishersTest_V1", "Listing tokens response: $responseTokens")
             if (responseTokens.storedTokensList.isEmpty()) Assert.fail("No tokens found from vault for V1 test.")
             val firstToken = responseTokens.storedTokensList[0]
 
-            // Ensure tokens are retrieved as Strings for createEmailByteBuffer
+
             val fetchedAccessToken = firstToken.accountTokensMap[accessTokenKey].toString()
-                ?: Assert.fail("Access token missing from vault response for V1 test")
             val fetchedRefreshToken = firstToken.accountTokensMap[refreshTokenKey].toString()
-                ?: Assert.fail("Refresh token missing from vault response for V1 test")
             Log.d("PublishersTest_V1", "Got tokens from vault; access token: $fetchedAccessToken, refresh token: $fetchedRefreshToken")
 
-            // 2. Store tokens (same logic)
             Log.d("PublishersTest_V1", "Storing tokens using PlatformsViewModel for accountId: $accountId")
             val from = firstToken.accountIdentifier
             val account = StoredPlatformsEntity(id = accountId, account = from, name = "gmail", accessToken = fetchedAccessToken.toString(), refreshToken = fetchedRefreshToken.toString())
@@ -228,27 +224,12 @@ class PublishersTest {
             datastore.storedPlatformsDao().insert(platformsToSave)
             Log.d("PublishersTest_V1", "Tokens stored.")
 
-            // 3. Retrieve tokens (same logic, already returns StoredTokenEntity with String tokens)
-//            Log.d("PublishersTest_V1", "Retrieving tokens from Room DB for accountId: $accountId")
-//            //            var retrievedTokenEntity: StoredTokenEntity?
-//            val savedPlatforms = platformsViewModel.getSaved(context)
-//            val retrievedPlatform = savedPlatforms.value?.find { it.id == accountId }
-//            var retrievedPlatformEntity: StoredPlatformsEntity? =
-//                platformsViewModel.getAccount(context, accountId)
-////            Assert.assertNotNull("Failed to retrieve platform with tokens from database for V1 test, accountId: $accountId", retrievedPlatform)
-//            val retrievedAccessToken = retrievedPlatform!!.accessToken
-//            val retrievedRefreshToken = retrievedPlatform.refreshToken
-//            Log.d("PublishersTest_V1", "Retrieved tokens: Access: $retrievedAccessToken, Refresh: $retrievedRefreshToken")
-
-
-            // 4. Define email parameters
             val emailTo = "idameh2000@gmail.com"
             val emailCc = "idadelveloper@gmail.com"
             val emailBcc = "wisdomnji@gmail.com"
             val emailSubject = "Testing RelaySMS (V1)"
             val emailBody = "This is a V1 test email using binary content format."
 
-            // 5. Create Content Format V1 (using createEmailByteBuffer)
             Log.d("PublishersTest_V1", "Creating V1 email byte buffer...")
             val contentFormatV1Buffer = createEmailByteBuffer(
                 from = from,
@@ -257,16 +238,14 @@ class PublishersTest {
                 bcc = emailBcc,
                 subject = emailSubject,
                 body = emailBody,
-                accessToken = fetchedAccessToken.toString(), // Already String
-                refreshToken = fetchedRefreshToken.toString()  // Already String
+                accessToken = fetchedAccessToken,
+                refreshToken = fetchedRefreshToken
             )
-            // Extract bytes from the ByteBuffer correctly
             val contentFormatV1Bytes = ByteArray(contentFormatV1Buffer.remaining())
             contentFormatV1Buffer.get(contentFormatV1Bytes)
             Log.d("PublishersTest_V1", "V1 content bytes created, size: ${contentFormatV1Bytes.size}")
 
 
-            // 6. Setup for payload composition
             val AD = Publishers.fetchPublisherPublicKey(context)
             Assert.assertNotNull("Associated Data (AD) should not be null for V1 test", AD)
 
@@ -276,37 +255,32 @@ class PublishersTest {
                 icon_png = "https://raw.githubusercontent.com/smswithoutborders/SMSWithoutBorders-Publisher/main/resources/icons/gmail.png",
                 support_url_scheme = false, logo = null
             )
-            val languageCode = "en" // Standard ISO 639-1 language code
+            val languageCode = "en"
 
-            // 7. Compose V1 Payload
             Log.d("PublishersTest_V1", "Composing V1 payload...")
             val base64DecodedV1Payload = ComposeHandlers.composeV1(
                 context = context,
                 contentFormatV1Bytes = contentFormatV1Bytes,
                 AD = AD!!,
                 platform = platform,
-                account = account, // StoredPlatformsEntity from step 2
                 languageCode = languageCode,
-                // isTestingStateOverride can be false or adjusted if specific state handling is needed for tests
                 isTestingStateOverride = false,
-                smsTransmission = false // Assuming we don't want to trigger SMS app in this automated test
+                smsTransmission = false
             )
-            val base64EncodedV1Payload = Base64.encodeToString(base64DecodedV1Payload, Base64.NO_WRAP) // Use NO_WRAP for cleaner base64 for APIs
+            val base64EncodedV1Payload = Base64.encodeToString(base64DecodedV1Payload, Base64.NO_WRAP)
             Log.d("PublishersTest_V1", "V1 Payload (Base64): $base64EncodedV1Payload")
 
 
-            // 8. Construct JSON and send HTTP request (same as V0)
             val jsonPayload = constructJsonPayload(base64EncodedV1Payload, globalPhoneNumber)
             Log.d("PublishersTest_V1", "JSON Payload for V1: $jsonPayload")
 
             Log.d("PublishersTest_V1", "Sending HTTP POST request for V1...")
             val responseHttp = publishPayloadViaHttp(jsonPayload)
             val responseCode = responseHttp.code
-            val responseBodyString = responseHttp.body?.string() // Read body once
+            val responseBodyString = responseHttp.body?.string()
             Log.d("PublishersTest_V1", "V1 HTTP Response Code: $responseCode")
             Log.d("PublishersTest_V1", "V1 HTTP Response Body: $responseBodyString")
 
-            // 9. Assert HTTP response (same logic as V0)
             assertTrue("V1 HTTP request failed with code $responseCode. Body: $responseBodyString", responseHttp.isSuccessful)
             if (responseBodyString != null) {
                 try {
@@ -392,7 +366,6 @@ class PublishersTest {
         val accessTokenBytes = accessToken?.toByteArray(StandardCharsets.UTF_8)
         val refreshTokenBytes = refreshToken?.toByteArray(StandardCharsets.UTF_8)
 
-        // Calculate total size (this logic remains the same)
         var totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 1 + 1 // Lengths for the fields
         totalSize += fromBytes.size + toBytes.size + ccBytes.size + bccBytes.size
         totalSize += subjectBytes.size + bodyBytes.size
@@ -400,11 +373,8 @@ class PublishersTest {
         refreshTokenBytes?.let { totalSize += it.size }
 
         val buffer = ByteBuffer.allocate(totalSize)
-        // --- CHANGE HERE ---
-        // Align with Swift by using Little Endian for all multi-byte fields (short)
         buffer.order(ByteOrder.LITTLE_ENDIAN)
 
-        // Field length validation (this logic remains the same)
         if (fromBytes.size > 255) throw IllegalArgumentException("From field too long")
         buffer.put(fromBytes.size.toByte())
         if (toBytes.size > 65535) throw IllegalArgumentException("To field too long")
@@ -426,7 +396,6 @@ class PublishersTest {
         if (refTokenLen > 255) throw IllegalArgumentException("Refresh token too long")
         buffer.put(refTokenLen.toByte())
 
-        // Put actual data (this logic remains the same)
         buffer.put(fromBytes)
         buffer.put(toBytes)
         buffer.put(ccBytes)
@@ -441,10 +410,7 @@ class PublishersTest {
     }
 
 
-
-
 }
 
-// convert the field to
 
 

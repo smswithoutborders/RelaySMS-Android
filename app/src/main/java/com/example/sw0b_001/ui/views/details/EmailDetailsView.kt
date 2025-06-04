@@ -1,5 +1,7 @@
 package com.example.sw0b_001.ui.views.details
 
+import android.util.Base64
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -66,22 +68,23 @@ fun EmailDetailsView(
     var body by remember{ mutableStateOf("") }
     var date by remember{ mutableLongStateOf(0L) }
 
-    if(isBridge)
-        when(platformsViewModel.message?.type) {
-            Platforms.ServiceTypes.BRIDGE.type -> {
-                Bridges.BridgeComposeHandler
-                    .decomposeMessage(platformsViewModel.message!!.encryptedContent!!).apply {
+    val message = platformsViewModel.message
+    if (message?.encryptedContent != null) {
+        if (isBridge) {
+            when (message.type) {
+                Platforms.ServiceTypes.BRIDGE.type -> {
+                    Bridges.BridgeComposeHandler.decomposeMessage(message.encryptedContent!!).apply {
+                        from = message.fromAccount ?: "Bridge Message"
                         to = this.to
                         cc = this.cc
                         bcc = this.bcc
                         subject = this.subject
                         body = this.body
-                        date = platformsViewModel.message!!.date
+                        date = message.date
                     }
-            }
-            Platforms.ServiceTypes.BRIDGE_INCOMING.type -> {
-                Bridges.BridgeComposeHandler
-                    .decomposeInboxMessage(platformsViewModel.message!!.encryptedContent!!).apply {
+                }
+                Platforms.ServiceTypes.BRIDGE_INCOMING.type -> {
+                    Bridges.BridgeComposeHandler.decomposeInboxMessage(message.encryptedContent!!).apply {
                         from = this.sender
                         to = this.alias
                         cc = this.cc
@@ -90,17 +93,31 @@ fun EmailDetailsView(
                         body = this.body
                         date = this.date
                     }
+                }
+            }
+        } else {
+            try {
+                val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
+                val decomposed = EmailComposeHandler.decomposeMessage(contentBytes)
+
+
+                from = message.fromAccount ?: "Email Account"
+                to = decomposed.to
+                cc = decomposed.cc
+                bcc = decomposed.bcc
+                subject = decomposed.subject
+                body = decomposed.body
+                date = message.date
+
+            } catch (e: Exception) {
+                Log.e("EmailDetailsView", "Failed to decompose V1 email content: ${e.message}")
+                from = message.fromAccount ?: "Email Account"
+                subject = "Error"
+                body = "This message's content could not be displayed."
+                date = message.date
             }
         }
-    else
-        EmailComposeHandler.decomposeMessage(platformsViewModel.message!!.encryptedContent!!, isBridge = false).apply {
-            to = this.to
-            cc = this.cc
-            bcc = this.bcc
-            subject = this.subject
-            body = this.body
-            date = platformsViewModel.message!!.date
-        }
+    }
 
 
     Scaffold(

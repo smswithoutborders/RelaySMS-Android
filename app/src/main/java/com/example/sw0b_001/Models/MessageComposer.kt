@@ -68,25 +68,21 @@ class MessageComposer(
 
     // New V1 compose method
     fun composeV1(
-        contentFormatV1Bytes: ByteArray, // Serialized Content Format V1 (e.g., from createEmailByteBuffer().array())
+        contentFormatV1Bytes: ByteArray,
         platformShortcodeByte: Byte,
-        languageCodeString: String // e.g., "en"
-    ): String { // Returns Base64 encoded V1 payload string
+        languageCodeString: String
+    ): String {
 
-        // 1. Encrypt the entire ContentFormatV1 byte array
         val (drHeader, drEncryptedBody) = Ratchets.ratchetEncrypt(state, contentFormatV1Bytes, AD)
 
-        // 2. Get Device ID
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
         val usePhoneNumber = sharedPreferences.getBoolean("use_phone_number_switch", false)
-        // For V1, Device ID length is explicit. Send empty array if no ID / using phone number.
         val deviceIDBytes = if (!usePhoneNumber) {
             Vaults.fetchDeviceId(context) ?: ByteArray(0)
         } else {
             ByteArray(0)
         }
 
-        // 3. Convert language code string to 2-byte array (ASCII assumed for ISO 639-1)
         val languageCodeBytes = languageCodeString.toByteArray(StandardCharsets.US_ASCII)
         if (languageCodeBytes.size != 2) {
             throw IllegalArgumentException(
@@ -94,7 +90,6 @@ class MessageComposer(
             )
         }
 
-        // 4. Format the V1 Payload using the new companion object method
         return formatTransmissionV1(
             headers = drHeader,
             encryptedDrBody = drEncryptedBody,
@@ -144,18 +139,14 @@ class MessageComposer(
 
             val versionMarker = 0x01.toByte()
 
-            // 1. Construct the "Ciphertext" block for Payload V1.
-            // The Swift code confirms this needs a 4-byte LITTLE ENDIAN length prefix for the DR header.
             val serializedDrHeader = headers.serialized
-            val drHeaderLengthBytes = serializedDrHeader.size.toLittleEndianBytes(4) // Use Little Endian
+            val drHeaderLengthBytes = serializedDrHeader.size.toLittleEndianBytes(4)
 
             val v1PayloadCiphertextBlock = drHeaderLengthBytes + serializedDrHeader + encryptedDrBody
 
-            // 2. Get lengths for the main V1 Payload structure fields.
             if (v1PayloadCiphertextBlock.size > 65535) {
                 throw IllegalArgumentException("V1 Ciphertext block is too long (max 65535 bytes).")
             }
-            // This length is 2 bytes, Little Endian, which is correct.
             val v1OverallCiphertextLengthBytes = v1PayloadCiphertextBlock.size.toShort().toLittleEndianBytes()
 
             if (deviceID.size > 255) {
@@ -167,7 +158,6 @@ class MessageComposer(
                 throw IllegalArgumentException("Language code must be 2 bytes.")
             }
 
-            // 3. Assemble the full V1 Payload byte array.
             val payloadData = byteArrayOf(versionMarker) +      // 1 byte: Version Marker
                     v1OverallCiphertextLengthBytes + // 2 bytes: Ciphertext Length (Little Endian)
                     deviceIdLengthByte +             // 1 byte:  Device ID Length
@@ -179,8 +169,7 @@ class MessageComposer(
             return Base64.encodeToString(payloadData, Base64.DEFAULT)
         }
 
-        // Helper function for converting to Little Endian (no changes needed)
-        fun Int.toLittleEndianBytes(numBytes: Int = 4): ByteArray {
+        private fun Int.toLittleEndianBytes(numBytes: Int = 4): ByteArray {
             val buffer = ByteBuffer.allocate(numBytes).order(ByteOrder.LITTLE_ENDIAN)
             when (numBytes) {
                 4 -> buffer.putInt(this)
@@ -197,13 +186,11 @@ class MessageComposer(
             return buffer.array()
         }
 
-        // Helper function for Shorts (no changes needed)
-        fun Short.toLittleEndianBytes(): ByteArray {
+        private fun Short.toLittleEndianBytes(): ByteArray {
             return ByteBuffer.allocate(2).order(ByteOrder.LITTLE_ENDIAN).putShort(this).array()
         }
 
-        // Helper function for Bytes (no changes needed)
-        fun Int.toOneByteValue(): Byte {
+        private fun Int.toOneByteValue(): Byte {
             if (this < 0 || this > 255) throw IllegalArgumentException("Value '$this' is out of unsigned byte range (0-255)")
             return this.toByte()
         }
