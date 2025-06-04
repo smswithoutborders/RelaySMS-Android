@@ -209,8 +209,14 @@ fun RecentView(
                         "${message.fromAccount ?: ""} ${decomposed.subject} ${decomposed.body}"
                     }
                     Platforms.ServiceTypes.TEXT.type -> {
-                        val decomposed = TextComposeHandler.decomposeMessage(message.encryptedContent!!)
-                        "${decomposed.from} ${decomposed.text}"
+                        try {
+                            val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
+                            val decomposed = TextComposeHandler.decomposeMessage(contentBytes)
+                            "${decomposed.from} ${decomposed.text}"
+                        } catch (e: Exception) {
+                            Log.e("RecentViewFilter", "Failed to decompose V1 text content: ${e.message}")
+                            message.fromAccount ?: message.encryptedContent ?: ""
+                        }
                     }
                     Platforms.ServiceTypes.MESSAGE.type -> {
                         val decomposed = MessageComposeHandler.decomposeMessage(message.encryptedContent!!)
@@ -381,9 +387,18 @@ fun RecentMessageCard(
             text = decomposed.body
         }
         Platforms.ServiceTypes.TEXT.type -> {
-            val decomposed = TextComposeHandler.decomposeMessage(message.encryptedContent!!)
-            text = decomposed.text
-            heading = decomposed.from
+            try {
+                val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
+                val decomposed = TextComposeHandler.decomposeMessage(contentBytes)
+                heading = decomposed.from
+                subHeading = ""
+                text = decomposed.text
+            } catch (e: Exception) {
+                Log.e("RecentMessageCard", "Failed to decompose V1 text content: ${e.message}")
+                heading = message.fromAccount ?: "Text Message"
+                subHeading = ""
+                text = "Message content could not be displayed"
+            }
         }
         Platforms.ServiceTypes.MESSAGE.type,  -> {
             val decomposed = MessageComposeHandler.decomposeMessage(message.encryptedContent!!)
