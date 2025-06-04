@@ -372,15 +372,15 @@ class PublishersTest {
     }
 
     // Used by V1 test
-    fun createEmailByteBuffer( // Visibility changed to fun from private fun for clarity if it's indeed part of the class structure
+    fun createEmailByteBuffer(
         from: String,
         to: String,
         cc: String,
         bcc: String,
         subject: String,
         body: String,
-        accessToken: String?, // Changed to String? to match expected type
-        refreshToken: String? // Changed to String? to match expected type
+        accessToken: String?,
+        refreshToken: String?
     ): ByteBuffer {
 
         val fromBytes = from.toByteArray(StandardCharsets.UTF_8)
@@ -392,16 +392,19 @@ class PublishersTest {
         val accessTokenBytes = accessToken?.toByteArray(StandardCharsets.UTF_8)
         val refreshTokenBytes = refreshToken?.toByteArray(StandardCharsets.UTF_8)
 
-        var totalSize = 0
-        totalSize += 1; totalSize += 2; totalSize += 2; totalSize += 2; totalSize += 1; totalSize += 2; totalSize += 1; totalSize += 1
-        totalSize += fromBytes.size; totalSize += toBytes.size; totalSize += ccBytes.size; totalSize += bccBytes.size
-        totalSize += subjectBytes.size; totalSize += bodyBytes.size
+        // Calculate total size (this logic remains the same)
+        var totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 1 + 1 // Lengths for the fields
+        totalSize += fromBytes.size + toBytes.size + ccBytes.size + bccBytes.size
+        totalSize += subjectBytes.size + bodyBytes.size
         accessTokenBytes?.let { totalSize += it.size }
         refreshTokenBytes?.let { totalSize += it.size }
 
         val buffer = ByteBuffer.allocate(totalSize)
-        buffer.order(ByteOrder.BIG_ENDIAN) // Ensure this matches parsing logic if any
+        // --- CHANGE HERE ---
+        // Align with Swift by using Little Endian for all multi-byte fields (short)
+        buffer.order(ByteOrder.LITTLE_ENDIAN)
 
+        // Field length validation (this logic remains the same)
         if (fromBytes.size > 255) throw IllegalArgumentException("From field too long")
         buffer.put(fromBytes.size.toByte())
         if (toBytes.size > 65535) throw IllegalArgumentException("To field too long")
@@ -423,8 +426,13 @@ class PublishersTest {
         if (refTokenLen > 255) throw IllegalArgumentException("Refresh token too long")
         buffer.put(refTokenLen.toByte())
 
-        buffer.put(fromBytes); buffer.put(toBytes); buffer.put(ccBytes); buffer.put(bccBytes)
-        buffer.put(subjectBytes); buffer.put(bodyBytes)
+        // Put actual data (this logic remains the same)
+        buffer.put(fromBytes)
+        buffer.put(toBytes)
+        buffer.put(ccBytes)
+        buffer.put(bccBytes)
+        buffer.put(subjectBytes)
+        buffer.put(bodyBytes)
         accessTokenBytes?.let { buffer.put(it) }
         refreshTokenBytes?.let { buffer.put(it) }
 

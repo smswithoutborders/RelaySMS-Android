@@ -15,6 +15,7 @@ import com.example.sw0b_001.Models.Platforms.Platforms
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.nio.charset.StandardCharsets
 
 object ComposeHandlers {
     fun compose(
@@ -215,4 +216,87 @@ object ComposeHandlers {
             onFailureCallback(e.message)
         }
     }
+
+    fun decomposeV1(
+        context: Context,
+        v1Payload: ByteArray,
+        AD: ByteArray,
+        onSuccessCallback: (decryptedContent: ByteArray) -> Unit,
+        onFailureCallback: (error: String) -> Unit
+    ) {
+        try {
+            // 1. Set up state management and MessageComposer instance
+            val states = Datastore.getDatastore(context).ratchetStatesDAO().fetch()
+            if (states.isEmpty()) {
+                throw IllegalStateException("Cannot decompose message: No ratchet state found in database.")
+            }
+            if (states.size > 1) {
+                // For security and simplicity, this implementation expects only one state.
+                System.err.println("Warning: Multiple ratchet states found; using the first one.")
+            }
+
+            val state = States(String(Publishers.getEncryptedStates(context, states[0].value), StandardCharsets.UTF_8))
+            val messageComposer = MessageComposer(context, state, AD)
+
+            // 2. Parse the V1 Payload using a ByteBuffer for safe, sequential reading.
+            // All multi-byte values are Little Endian, matching the compose logic.
+            val buffer = ByteBuffer.wrap(v1Payload).order(ByteOrder.LITTLE_ENDIAN)
+
+            val version = buffer.get()
+            if (version != 0x01.toByte()) {
+                throw IllegalArgumentException("Invalid payload: Not a V1 message (version marker is not 0x01).")
+            }
+
+            // Read the lengths of the variable-sized fields
+            val ciphertextLen = buffer.getShort().toInt() and 0xFFFF // Read 2 bytes as unsigned short
+            val deviceIdLen = buffer.get().toInt() and 0xFF      // Read 1 byte as unsigned byte
+            val platformShortcode = buffer.get() // Read platform shortcode to advance buffer
+
+            // Read the main ciphertext block
+            val ciphertextBlock = ByteArray(ciphertextLen)
+            buffer.get(ciphertextBlock)
+
+            // Read device ID and language code to complete parsing (though not used in decryption)
+            val deviceId = ByteArray(deviceIdLen)
+            buffer.get(deviceId)
+            val languageCode = ByteArray(2)
+            buffer.get(languageCode)
+
+
+            // 3. Parse the inner structure of the Ciphertext block
+            val ciphertextBuffer = ByteBuffer.wrap(ciphertextBlock).order(ByteOrder.LITTLE_ENDIAN)
+            val drHeaderLen = ciphertextBuffer.getInt() // Read 4-byte header length
+
+            val drHeaderBytes = ByteArray(drHeaderLen)
+            ciphertextBuffer.get(drHeaderBytes)
+            val header = Headers.deSerializeHeader(drHeaderBytes)
+                ?: throw IllegalStateException("Failed to deserialize Double Ratchet header.")
+
+            // The rest of the buffer is the encrypted message body
+            val encryptedBody = ByteArray(ciphertextBuffer.remaining())
+            ciphertextBuffer.get(encryptedBody)
+
+            // 4. Decrypt the content
+            // The `decryptBridge` method simply calls the core ratchet decrypt function,
+            // so we can reuse it here.
+            val decryptedContent = messageComposer.decryptBridge(
+                header = header,
+                content = encryptedBody
+            )
+
+            // 5. IMPORTANT: Save the updated ratchet state to the database
+            val encryptedStates = Publishers.encryptStates(context, state.serializedStates)
+            val ratchetStatesEntry = RatchetStates(id = states[0].id, value = encryptedStates)
+            Datastore.getDatastore(context).ratchetStatesDAO().update(ratchetStatesEntry)
+
+            // 6. Return the decrypted binary content via the success callback
+            // The caller will be responsible for parsing this Content Format V1 byte array.
+            onSuccessCallback(decryptedContent.toByteArray(StandardCharsets.UTF_8))
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            onFailureCallback(e.message ?: "An unknown error occurred during V1 decomposition.")
+        }
+    }
+
 }
