@@ -345,7 +345,6 @@ private fun processTest(
             val response = Network.jsonRequestPost(url, requestPayload)
             val responsePayload = Json.decodeFromString<ReliabilityTestResponsePayload>(response.result.get())
             val testId = responsePayload.test_id.toString()
-
             val AD = Publishers.fetchPublisherPublicKey(context)
                 ?: return@launch onFailure("Could not fetch publisher key.")
 
@@ -361,7 +360,8 @@ private fun processTest(
                 platform = platform,
                 account = null,
                 languageCode = validLanguageCode,
-                smsTransmission = false
+                smsTransmission = false,
+                isTesting = true
             )
 
             if (smsTransmission) {

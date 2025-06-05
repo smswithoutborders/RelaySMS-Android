@@ -262,7 +262,7 @@ class PublishersTest {
                 AD = AD!!,
                 platform = platform,
                 languageCode = languageCode,
-                isTestingStateOverride = false,
+                isTesting = false,
                 smsTransmission = false
             )
             val base64EncodedV1Payload = Base64.encodeToString(base64DecodedV1Payload, Base64.NO_WRAP)

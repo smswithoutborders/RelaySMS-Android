@@ -80,7 +80,7 @@ object ComposeHandlers {
         platform: AvailablePlatforms,
         account: StoredPlatformsEntity? = null,
         languageCode: String,
-        isTestingStateOverride: Boolean = false,
+        isTesting: Boolean = false,
         smsTransmission: Boolean = true,
         onSuccessRunnable: () -> Unit? = {}
     ): ByteArray {
@@ -90,7 +90,7 @@ object ComposeHandlers {
             throw IllegalStateException("Multiple Ratchet states found in database. Expected at most one.")
         }
 
-        val state = if (states.isNotEmpty() && (account != null || isTestingStateOverride)) {
+        val state = if (states.isNotEmpty() && (account != null || isTesting)) {
             try {
                 States(String(Publishers.getEncryptedStates(context, states[0].value), Charsets.UTF_8))
             } catch (e: Exception) {

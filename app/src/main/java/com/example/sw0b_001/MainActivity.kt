@@ -3,6 +3,7 @@ package com.example.sw0b_001
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -119,6 +120,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // Fix for three-button nav not properly going edge-to-edge.
+            // TODO: https://issuetracker.google.com/issues/298296168
+            window.isNavigationBarContrastEnforced = false
+        }
 
         setContent {
             val composeView = LocalView.current
