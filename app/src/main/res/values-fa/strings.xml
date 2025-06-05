@@ -311,5 +311,10 @@
     <string name="preview_feature_description">تازه‌های این نسخه را کشف کنید. ما چیز شگفت‌انگیزی اضافه کرده‌ایم که دوست خواهید داشت.</string>
     <string name="new_feature_title">هشدار ویژگی جدید!</string>
     <string name="oauth_token_storage_device_setting_info">اکنون می‌توانید با رفتن به تنظیمات > امنیت، درخواست کنید توکن‌های حساب‌های OAuth2.0 شما در دستگاهتان ذخیره شوند.</string>
+    <string name="unknown">ناشناخته</string>
+    <string name="this_message_s_content_could_not_be_displayed">محتوای این پیام قابل نمایش نبود.</string>
+    <string name="message_">پیام</string>
+    <string name="message_content_could_not_be_displayed">محتوای پیام قابل نمایش نبود</string>
+    <string name="text_message">پیام متنی</string>
 
 </resources>

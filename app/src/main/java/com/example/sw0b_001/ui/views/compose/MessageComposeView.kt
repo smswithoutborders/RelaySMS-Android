@@ -8,6 +8,8 @@ import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
 import android.provider.ContactsContract
+import android.util.Base64
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -54,9 +56,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.ComposeHandlers
+import com.example.sw0b_001.Models.GatewayClients.GatewayClientsCommunications
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.Models.Publishers
+import com.example.sw0b_001.Models.SMSHandler
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
@@ -69,21 +73,34 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.charset.StandardCharsets
+import java.util.Locale
 
 
 data class MessageContent(val from: String, val to: String, val message: String)
 
 object MessageComposeHandler {
-    fun decomposeMessage(
-        text: String
-    ): MessageContent {
-        println(text)
-        return text.split(":").let {
-            MessageContent(
-                from=it[0],
-                to=it[1],
-                message = it.subList(2, it.size).joinToString()
-            )
+    fun decomposeMessage(contentBytes: ByteArray): MessageContent {
+        return try {
+            val buffer = ByteBuffer.wrap(contentBytes).order(ByteOrder.LITTLE_ENDIAN)
+
+            val fromLen = buffer.get().toInt() and 0xFF
+            val toLen = buffer.getShort().toInt() and 0xFFFF
+            buffer.position(buffer.position() + 2 + 2 + 1)
+            val bodyLen = buffer.getShort().toInt() and 0xFFFF
+            buffer.position(buffer.position() + 1 + 1)
+
+            // Extract relevant fields
+            val from = ByteArray(fromLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+            val to = ByteArray(toLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+            val message = ByteArray(bodyLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+
+            MessageContent(from = from, to = to, message = message)
+        } catch (e: Exception) {
+            Log.e("MessageComposeHandler", "Failed to decompose V1 binary message content", e)
+            MessageContent("Unknown", "Unknown", "Error: Could not parse message content.")
         }
     }
 }
@@ -97,9 +114,15 @@ fun MessageComposeView(
     val inspectMode = LocalInspectionMode.current
     val context = LocalContext.current
 
-    val decomposedMessage = if(platformsViewModel.message != null)
-        MessageComposeHandler.decomposeMessage(platformsViewModel.message!!.encryptedContent!!)
-    else null
+    val decomposedMessage = if (platformsViewModel.message?.encryptedContent != null) {
+        try {
+            val contentBytes = Base64.decode(platformsViewModel.message!!.encryptedContent!!, Base64.DEFAULT)
+            MessageComposeHandler.decomposeMessage(contentBytes)
+        } catch (e: Exception) {
+            Log.e("MessageComposeView", "Failed to decode/decompose V1 message content.", e)
+            null
+        }
+    } else null
 
     var recipientNumber by remember { mutableStateOf(decomposedMessage?.to ?: "") }
     var message by remember { mutableStateOf( decomposedMessage?.message ?: "") }
@@ -153,24 +176,31 @@ fun MessageComposeView(
                 },
                 actions = {
                     IconButton(onClick = {
-                        sendMessage(
+                        processSend(
                             context = context,
                             messageContent = MessageContent(
                                 from = from,
                                 to = recipientNumber,
-                                message = message,
+                                message = message
                             ),
                             account = selectedAccount!!,
-                            onFailureCallback = {}
-                        ) {
-                            CoroutineScope(Dispatchers.Main).launch {
-                                navController.navigate(HomepageScreen) {
-                                    popUpTo(HomepageScreen) {
-                                        inclusive = true
+                            onFailure = { errorMsg ->
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    Toast.makeText(
+                                        context,
+                                        errorMsg ?: "Send failed",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            },
+                            onSuccess = {
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    navController.navigate(HomepageScreen) {
+                                        popUpTo(HomepageScreen) { inclusive = true }
                                     }
                                 }
                             }
-                        }
+                        )
                     },
                         enabled = recipientNumber.isNotEmpty() && message.isNotEmpty() &&
                                 verifyPhoneNumberFormat(recipientNumber)) {
@@ -264,14 +294,6 @@ fun MessageComposeView(
     }
 }
 
-private fun processMessageForEncryption(
-    to: String,
-    message: String,
-    account: StoredPlatformsEntity
-): String {
-    return "${account.account}:$to:$message"
-}
-
 fun verifyPhoneNumberFormat(phoneNumber: String): Boolean {
     val newPhoneNumber = phoneNumber
         .replace("[\\s-]".toRegex(), "")
@@ -279,38 +301,89 @@ fun verifyPhoneNumberFormat(phoneNumber: String): Boolean {
 }
 
 
-private fun sendMessage(
+private fun createMessageByteBuffer(
+    from: String,
+    to: String,
+    message: String
+): ByteBuffer {
+    val fromBytes = from.toByteArray(StandardCharsets.UTF_8)
+    val toBytes = to.toByteArray(StandardCharsets.UTF_8)
+    val bodyBytes = message.toByteArray(StandardCharsets.UTF_8)
+
+    // Calculate size for all fields as per V1 "Message" format
+    val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 1 + 1 +
+            fromBytes.size +
+            toBytes.size +
+            bodyBytes.size
+
+    val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
+
+    // Write lengths
+    buffer.put(fromBytes.size.toByte())      // from
+    buffer.putShort(toBytes.size.toShort())  // to
+    buffer.putShort(0)                       // cc (zeroed out)
+    buffer.putShort(0)                       // bcc (zeroed out)
+    buffer.put(0.toByte())                   // subject (zeroed out)
+    buffer.putShort(bodyBytes.size.toShort())// body
+    buffer.put(0.toByte())                   // access_token (zeroed out)
+    buffer.put(0.toByte())                   // refresh_token (zeroed out)
+
+    // Write actual data
+    buffer.put(fromBytes)
+    buffer.put(toBytes)
+    buffer.put(bodyBytes)
+
+    buffer.flip()
+    return buffer
+}
+
+private fun processSend(
     context: Context,
     messageContent: MessageContent,
     account: StoredPlatformsEntity,
-    onFailureCallback: (String?) -> Unit,
-    onCompleteCallback: () -> Unit
+    onFailure: (String?) -> Unit,
+    onSuccess: () -> Unit,
+    smsTransmission: Boolean = true
 ) {
     CoroutineScope(Dispatchers.Default).launch {
-        val availablePlatforms = Datastore.getDatastore(context)
-            .availablePlatformsDao().fetch(account.name!!)
-        val formattedString =
-            processMessageForEncryption(messageContent.to, messageContent.message, account)
-
         try {
             val AD = Publishers.fetchPublisherPublicKey(context)
-            ComposeHandlers.compose(context,
-                formattedString,
-                AD!!,
-                availablePlatforms!!,
-                account,
-            ) {
-                onCompleteCallback()
+                ?: return@launch onFailure("Could not fetch publisher key.")
+
+            val contentFormatV1Bytes = createMessageByteBuffer(
+                from = messageContent.from,
+                to = messageContent.to,
+                message = messageContent.message
+            ).array()
+
+            val platform = Datastore.getDatastore(context).availablePlatformsDao().fetch(account.name!!)
+                ?: return@launch onFailure("Could not find platform details for '${account.name}'.")
+
+            val languageCode = Locale.getDefault().language.take(2).lowercase()
+            val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
+
+            val v1PayloadBytes = ComposeHandlers.composeV1(
+                context = context,
+                contentFormatV1Bytes = contentFormatV1Bytes,
+                AD = AD,
+                platform = platform,
+                account = account,
+                languageCode = validLanguageCode,
+                smsTransmission = smsTransmission
+            )
+
+            if (smsTransmission) {
+                val gatewayClientMSISDN = GatewayClientsCommunications(context).getDefaultGatewayClient()
+                    ?: return@launch onFailure("No default gateway client configured.")
+                val base64Payload = Base64.encodeToString(v1PayloadBytes, Base64.NO_WRAP)
+                SMSHandler.transferToDefaultSMSApp(context, gatewayClientMSISDN, base64Payload)
             }
-        } catch(e: Exception) {
+            onSuccess()
+        } catch (e: Exception) {
             e.printStackTrace()
-            onFailureCallback(e.message)
-            CoroutineScope(Dispatchers.Main).launch {
-                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
-            }
+            onFailure(e.message)
         }
     }
-
 }
 
 fun getContactDetails(context: Context, contactUri: Uri): String {

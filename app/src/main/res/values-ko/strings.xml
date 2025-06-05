@@ -315,5 +315,10 @@
     <string name="preview_feature_description">이 버전의 새로운 기능을 알아보세요. 여러분이 좋아할 만한 멋진 기능을 추가했습니다.</string>
     <string name="new_feature_title">새 기능 알림!</string>
     <string name="oauth_token_storage_device_setting_info">이제 설정 > 보안으로 이동하여 OAuth2.0 계정의 토큰을 기기에 저장하도록 요청할 수 있습니다.</string>
+    <string name="unknown">알 수 없음</string>
+    <string name="this_message_s_content_could_not_be_displayed">이 메시지의 내용을 표시할 수 없습니다.</string>
+    <string name="message_">메시지</string>
+    <string name="message_content_could_not_be_displayed">메시지 내용을 표시할 수 없습니다</string>
+    <string name="text_message">문자 메시지</string>
 
 </resources>

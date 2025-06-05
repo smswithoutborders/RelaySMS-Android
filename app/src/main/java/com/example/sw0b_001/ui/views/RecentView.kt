@@ -2,6 +2,7 @@ package com.example.sw0b_001.ui.views
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Base64
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -186,11 +187,14 @@ fun RecentView(
             messages.filter { message ->
                 val text = when (message.type) {
                     Platforms.ServiceTypes.EMAIL.type -> {
-                        val decomposed = EmailComposeHandler.decomposeMessage(
-                            message.encryptedContent!!,
-                            isBridge = false
-                        )
-                        "${message.fromAccount ?: ""} ${decomposed.subject} ${decomposed.body}"
+                        try {
+                            val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
+                            val decomposed = EmailComposeHandler.decomposeMessage(contentBytes)
+                            "${message.fromAccount ?: ""} ${decomposed.subject} ${decomposed.body}"
+                        } catch (e: Exception) {
+                            Log.e("RecentViewFilter", "Failed to decompose V1 email content: ${e.message}")
+                            message.fromAccount ?: ""
+                        }
                     }
                     Platforms.ServiceTypes.BRIDGE_INCOMING.type -> {
                         val decomposed = Bridges.BridgeComposeHandler.decomposeInboxMessage(
@@ -205,12 +209,24 @@ fun RecentView(
                         "${message.fromAccount ?: ""} ${decomposed.subject} ${decomposed.body}"
                     }
                     Platforms.ServiceTypes.TEXT.type -> {
-                        val decomposed = TextComposeHandler.decomposeMessage(message.encryptedContent!!)
-                        "${decomposed.from} ${decomposed.text}"
+                        try {
+                            val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
+                            val decomposed = TextComposeHandler.decomposeMessage(contentBytes)
+                            "${decomposed.from} ${decomposed.text}"
+                        } catch (e: Exception) {
+                            Log.e("RecentViewFilter", "Failed to decompose V1 text content: ${e.message}")
+                            message.fromAccount ?: message.encryptedContent ?: ""
+                        }
                     }
                     Platforms.ServiceTypes.MESSAGE.type -> {
-                        val decomposed = MessageComposeHandler.decomposeMessage(message.encryptedContent!!)
-                        "${decomposed.to} ${decomposed.message}"
+                        try {
+                            val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
+                            val decomposed = MessageComposeHandler.decomposeMessage(contentBytes)
+                            "${decomposed.to} ${decomposed.message}"
+                        } catch (e: Exception) {
+                            Log.e("RecentViewFilter", "Failed to decompose V1 message content: ${e.message}")
+                            message.fromAccount ?: message.encryptedContent ?: ""
+                        }
                     }
                     else -> ""
                 }
@@ -347,13 +363,18 @@ fun RecentMessageCard(
 
     when(message.type) {
         Platforms.ServiceTypes.EMAIL.type -> {
-            val decomposed = EmailComposeHandler.decomposeMessage(
-                message.encryptedContent!!,
-                isBridge = false
-            )
-            heading = message.fromAccount ?: "RelaySMS"
-            subHeading = decomposed.subject
-            text = decomposed.body
+            try {
+                val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
+                val decomposed = EmailComposeHandler.decomposeMessage(contentBytes)
+                heading = message.fromAccount ?: "Email"
+                subHeading = decomposed.subject
+                text = decomposed.body
+            } catch (e: Exception) {
+                Log.e("RecentMessageCard", "Failed to decompose V1 email content: ${e.message}")
+                heading = message.fromAccount ?: "Email"
+                subHeading = stringResource(R.string.message_content_could_not_be_displayed)
+                text = ""
+            }
         }
         Platforms.ServiceTypes.BRIDGE_INCOMING.type -> {
             val decomposed = Bridges.BridgeComposeHandler.decomposeInboxMessage(
@@ -372,14 +393,37 @@ fun RecentMessageCard(
             text = decomposed.body
         }
         Platforms.ServiceTypes.TEXT.type -> {
-            val decomposed = TextComposeHandler.decomposeMessage(message.encryptedContent!!)
-            text = decomposed.text
-            heading = decomposed.from
+            try {
+                val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
+                val decomposed = TextComposeHandler.decomposeMessage(contentBytes)
+                heading = decomposed.from
+                subHeading = ""
+                text = decomposed.text
+            } catch (e: Exception) {
+                Log.e("RecentMessageCard", "Failed to decompose V1 text content: ${e.message}")
+                heading = message.fromAccount ?: stringResource(R.string.text_message)
+                subHeading = ""
+                text = stringResource(R.string.message_content_could_not_be_displayed)
+            }
         }
-        Platforms.ServiceTypes.MESSAGE.type,  -> {
-            val decomposed = MessageComposeHandler.decomposeMessage(message.encryptedContent!!)
-            text = decomposed.message
-            heading = decomposed.to
+        Platforms.ServiceTypes.MESSAGE.type -> {
+            try {
+                val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
+                val decomposed = MessageComposeHandler.decomposeMessage(contentBytes)
+
+                if (message.fromAccount == decomposed.from) {
+                    heading = decomposed.to
+                } else {
+                    heading = decomposed.from
+                }
+                subHeading = ""
+                text = decomposed.message
+            } catch (e: Exception) {
+                Log.e("RecentMessageCard", "Failed to decompose V1 message content: ${e.message}")
+                heading = message.fromAccount ?: stringResource(R.string.message_)
+                subHeading = ""
+                text = stringResource(R.string.message_content_could_not_be_displayed)
+            }
         }
     }
 
