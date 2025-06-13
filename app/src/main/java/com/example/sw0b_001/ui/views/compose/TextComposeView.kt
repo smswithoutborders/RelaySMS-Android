@@ -305,24 +305,36 @@ data class ReliabilityTestResponsePayload(
 )
 
 private fun createTestByteBuffer(testId: String): ByteBuffer {
-    val fromBytes = testId.toByteArray(StandardCharsets.UTF_8)
+    // Define size constants
+    val BYTE_SIZE_LIMIT = 255
 
-    val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 1 + 1 + fromBytes.size
+    // Convert string to byte array
+    val testIdBytes = testId.toByteArray(StandardCharsets.UTF_8)
 
+    // Get size for validation and buffer allocation
+    val testIdSize = testIdBytes.size
+
+    // Validate field sizes against their specified limits
+    if (testIdSize > BYTE_SIZE_LIMIT) throw IllegalArgumentException("Test ID exceeds maximum size of $BYTE_SIZE_LIMIT bytes")
+
+    // Calculate total buffer size - all header fields + actual data
+    val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 1 + 1 + testIdSize
+
+    // Allocate buffer and set byte order
     val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
 
-    // Write lengths
-    buffer.put(fromBytes.size.toByte()) // from (contains testId)
-    buffer.putShort(0)                  // to
-    buffer.putShort(0)                  // cc
-    buffer.putShort(0)                  // bcc
-    buffer.put(0)                       // subject
-    buffer.putShort(0)                  // body
-    buffer.put(0)                       // access_token
-    buffer.put(0)                       // refresh_token
+    // Write field lengths according to specification
+    buffer.put(testIdSize.toByte())       // 1 byte for from field length (test ID)
+    buffer.putShort(0)                    // 2 bytes for to length (set to 0)
+    buffer.putShort(0)                    // 2 bytes for cc length (set to 0)
+    buffer.putShort(0)                    // 2 bytes for bcc length (set to 0)
+    buffer.put(0)                         // 1 byte for subject length (set to 0)
+    buffer.putShort(0)                    // 2 bytes for body length (set to 0)
+    buffer.put(0)                         // 1 byte for access token length (set to 0)
+    buffer.put(0)                         // 1 byte for refresh token length (set to 0)
 
-    // Write actual data
-    buffer.put(fromBytes)
+    // Write test ID bytes (from field is used as test ID)
+    buffer.put(testIdBytes)
 
     buffer.flip()
     return buffer
@@ -378,34 +390,49 @@ private fun processTest(
 }
 
 private fun createTextByteBuffer(
-    from: String,
-    text: String,
-    accessToken: String?,
-    refreshToken: String?
+    from: String, body: String,
+    accessToken: String? = null, refreshToken: String? = null
 ): ByteBuffer {
+    // Define size constants
+    val BYTE_SIZE_LIMIT = 255
+    val SHORT_SIZE_LIMIT = 65535
+
+    // Convert strings to byte arrays
     val fromBytes = from.toByteArray(StandardCharsets.UTF_8)
-    val bodyBytes = text.toByteArray(StandardCharsets.UTF_8)
+    val bodyBytes = body.toByteArray(StandardCharsets.UTF_8)
     val accessTokenBytes = accessToken?.toByteArray(StandardCharsets.UTF_8)
     val refreshTokenBytes = refreshToken?.toByteArray(StandardCharsets.UTF_8)
 
-    val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 1 + 1 +
-            fromBytes.size +
-            bodyBytes.size +
-            (accessTokenBytes?.size ?: 0) +
-            (refreshTokenBytes?.size ?: 0)
+    // Get sizes for validation and buffer allocation
+    val fromSize = fromBytes.size
+    val bodySize = bodyBytes.size
+    val accessTokenSize = accessTokenBytes?.size ?: 0
+    val refreshTokenSize = refreshTokenBytes?.size ?: 0
 
+    // Validate field sizes against their specified limits
+    if (fromSize > BYTE_SIZE_LIMIT) throw IllegalArgumentException("From field exceeds maximum size of $BYTE_SIZE_LIMIT bytes")
+    if (bodySize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("Body field exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
+    if (accessTokenSize > BYTE_SIZE_LIMIT) throw IllegalArgumentException("Access token exceeds maximum size of $BYTE_SIZE_LIMIT bytes")
+    if (refreshTokenSize > BYTE_SIZE_LIMIT) throw IllegalArgumentException("Refresh token exceeds maximum size of $BYTE_SIZE_LIMIT bytes")
+
+    // Calculate total buffer size - all header fields + actual data
+    val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 1 + 1 +
+            fromSize + bodySize + accessTokenSize + refreshTokenSize
+
+    // Allocate buffer and set byte order
     val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
 
-    // Write lengths
-    buffer.put(fromBytes.size.toByte())        // from
-    buffer.putShort(0)                         // to (zeroed out)
-    buffer.putShort(0)                         // cc (zeroed out)
-    buffer.putShort(0)                         // bcc (zeroed out)
-    buffer.put(0)                              // subject (zeroed out)
-    buffer.putShort(bodyBytes.size.toShort())  // body
-    buffer.put((accessTokenBytes?.size ?: 0).toByte())
-    buffer.put((refreshTokenBytes?.size ?: 0).toByte())
+    // Write field lengths according to specification
+    buffer.put(fromSize.toByte())         // 1 byte for from length
+    buffer.putShort(0)                    // 2 bytes for to length (set to 0)
+    buffer.putShort(0)                    // 2 bytes for cc length (set to 0)
+    buffer.putShort(0)                    // 2 bytes for bcc length (set to 0)
+    buffer.put(0)                         // 1 byte for subject length (set to 0)
+    buffer.putShort(bodySize.toShort())   // 2 bytes for body length
+    buffer.put(accessTokenSize.toByte())  // 1 byte for access token length
+    buffer.put(refreshTokenSize.toByte()) // 1 byte for refresh token length
 
+    // Write field values (only the ones that are actually used)
     buffer.put(fromBytes)
     buffer.put(bodyBytes)
     accessTokenBytes?.let { buffer.put(it) }
@@ -414,6 +441,7 @@ private fun createTextByteBuffer(
     buffer.flip()
     return buffer
 }
+
 
 private fun processPost(
     context: Context,
@@ -430,7 +458,7 @@ private fun processPost(
 
             val contentFormatV1Bytes = createTextByteBuffer(
                 from = account.account!!,
-                text = text,
+                body = text,
                 accessToken = account.accessToken,
                 refreshToken = account.refreshToken
             ).array()

@@ -140,7 +140,7 @@ class MessageComposer(
             val versionMarker = 0x01.toByte()
 
             val serializedDrHeader = headers.serialized
-            val drHeaderLengthBytes = serializedDrHeader.size.toLittleEndianBytes(4)
+            val drHeaderLengthBytes = serializedDrHeader.size.toBytes()
 
             val v1PayloadCiphertextBlock = drHeaderLengthBytes + serializedDrHeader + encryptedDrBody
 
@@ -152,7 +152,7 @@ class MessageComposer(
             if (deviceID.size > 255) {
                 throw IllegalArgumentException("Device ID is too long (max 255 bytes).")
             }
-            val deviceIdLengthByte = deviceID.size.toOneByteValue()
+            val deviceIdLengthByte = deviceID.size.toByte()
 
             if (languageCode.size != 2) {
                 throw IllegalArgumentException("Language code must be 2 bytes.")
@@ -167,23 +167,6 @@ class MessageComposer(
                     languageCode                     // 2 bytes: Language Code
 
             return Base64.encodeToString(payloadData, Base64.DEFAULT)
-        }
-
-        private fun Int.toLittleEndianBytes(numBytes: Int = 4): ByteArray {
-            val buffer = ByteBuffer.allocate(numBytes).order(ByteOrder.LITTLE_ENDIAN)
-            when (numBytes) {
-                4 -> buffer.putInt(this)
-                2 -> {
-                    if (this < Short.MIN_VALUE || this > Short.MAX_VALUE) throw IllegalArgumentException("Int value $this out of Short range")
-                    buffer.putShort(this.toShort())
-                }
-                1 -> {
-                    if (this < Byte.MIN_VALUE || this > Byte.MAX_VALUE) throw IllegalArgumentException("Int value $this out of Byte range")
-                    buffer.put(this.toByte())
-                }
-                else -> throw IllegalArgumentException("Unsupported number of bytes for Int conversion: $numBytes")
-            }
-            return buffer.array()
         }
 
         private fun Short.toLittleEndianBytes(): ByteArray {

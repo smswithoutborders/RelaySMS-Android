@@ -669,6 +669,7 @@ fun EmailComposeView(
     }
 }
 
+
 private fun createEmailByteBuffer(
     from: String, to: String, cc: String, bcc: String, subject: String, body: String,
     accessToken: String? = null, refreshToken: String? = null
@@ -682,6 +683,17 @@ private fun createEmailByteBuffer(
     val accessTokenBytes = accessToken?.toByteArray(StandardCharsets.UTF_8)
     val refreshTokenBytes = refreshToken?.toByteArray(StandardCharsets.UTF_8)
 
+    // Validate field sizes against their specified limits
+    if (fromBytes.size > 255) throw IllegalArgumentException("From field exceeds maximum size of 255 bytes")
+    if (toBytes.size > 65535) throw IllegalArgumentException("To field exceeds maximum size of 65,535 bytes")
+    if (ccBytes.size > 65535) throw IllegalArgumentException("CC field exceeds maximum size of 65,535 bytes")
+    if (bccBytes.size > 65535) throw IllegalArgumentException("BCC field exceeds maximum size of 65,535 bytes")
+    if (subjectBytes.size > 255) throw IllegalArgumentException("Subject field exceeds maximum size of 255 bytes")
+    if (bodyBytes.size > 65535) throw IllegalArgumentException("Body field exceeds maximum size of 65,535 bytes")
+    if ((accessTokenBytes?.size ?: 0) > 255) throw IllegalArgumentException("Access token exceeds maximum size of 255 bytes")
+    if ((refreshTokenBytes?.size ?: 0) > 255) throw IllegalArgumentException("Refresh token exceeds maximum size of 255 bytes")
+
+    // Calculate total size according to specification
     val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 1 + 1 +
             fromBytes.size + toBytes.size + ccBytes.size + bccBytes.size +
             subjectBytes.size + bodyBytes.size +
@@ -689,22 +701,30 @@ private fun createEmailByteBuffer(
 
     val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
 
-    buffer.put(fromBytes.size.toByte())
-    buffer.putShort(toBytes.size.toShort())
-    buffer.putShort(ccBytes.size.toShort())
-    buffer.putShort(bccBytes.size.toShort())
-    buffer.put(subjectBytes.size.toByte())
-    buffer.putShort(bodyBytes.size.toShort())
-    buffer.put((accessTokenBytes?.size ?: 0).toByte())
-    buffer.put((refreshTokenBytes?.size ?: 0).toByte())
+    // Write field lengths according to specification
+    buffer.put(fromBytes.size.toByte())       // 1 byte for from length
+    buffer.putShort(toBytes.size.toShort())   // 2 bytes for to length
+    buffer.putShort(ccBytes.size.toShort())   // 2 bytes for cc length
+    buffer.putShort(bccBytes.size.toShort())  // 2 bytes for bcc length
+    buffer.put(subjectBytes.size.toByte())    // 1 byte for subject length
+    buffer.putShort(bodyBytes.size.toShort()) // 2 bytes for body length
+    buffer.put((accessTokenBytes?.size ?: 0).toByte())    // 1 byte for access token length
+    buffer.put((refreshTokenBytes?.size ?: 0).toByte())   // 1 byte for refresh token length
 
-    buffer.put(fromBytes).put(toBytes).put(ccBytes).put(bccBytes).put(subjectBytes).put(bodyBytes)
+    // Write field values
+    buffer.put(fromBytes)
+    buffer.put(toBytes)
+    buffer.put(ccBytes)
+    buffer.put(bccBytes)
+    buffer.put(subjectBytes)
+    buffer.put(bodyBytes)
     accessTokenBytes?.let { buffer.put(it) }
     refreshTokenBytes?.let { buffer.put(it) }
 
     buffer.flip()
     return buffer
 }
+
 
 private fun processSend(
     context: Context,
