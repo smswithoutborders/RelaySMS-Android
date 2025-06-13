@@ -365,5 +365,10 @@
     <string name="preview_feature_description">Discover what\'s new in this version. We\'ve added something amazing that you\'ll love.</string>
     <string name="new_feature_title">New Feature Alert!</string>
     <string name="oauth_token_storage_device_setting_info">You can now request for the tokens of your OAuth2.0 accounts to be stored on your device by going to Settings > Security.</string>
+    <string name="unknown">Unknown</string>
+    <string name="this_message_s_content_could_not_be_displayed">This message\'s content could not be displayed.</string>
+    <string name="message_">Message</string>
+    <string name="message_content_could_not_be_displayed">Message content could not be displayed</string>
+    <string name="text_message">Text Message</string>
 
 </resources>

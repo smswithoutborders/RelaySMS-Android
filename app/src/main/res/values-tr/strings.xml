@@ -313,5 +313,10 @@
     <string name="preview_feature_description">Bu sürümdeki yenilikleri keşfedin. Seveceğiniz harika bir şey ekledik.</string>
     <string name="new_feature_title">Yeni Özellik Uyarısı!</string>
     <string name="oauth_token_storage_device_setting_info">Artık Ayarlar > Güvenlik bölümüne giderek OAuth2.0 hesaplarınızın jetonlarının cihazınızda saklanmasını talep edebilirsiniz.</string>
+    <string name="unknown">Bilinmiyor</string>
+    <string name="this_message_s_content_could_not_be_displayed">Bu mesajın içeriği görüntülenemedi.</string>
+    <string name="message_">Mesaj</string>
+    <string name="message_content_could_not_be_displayed">Mesaj içeriği görüntülenemedi</string>
+    <string name="text_message">Metin Mesajı</string>
 
 </resources>

@@ -311,5 +311,10 @@
     <string name="preview_feature_description">Gundua kilicho kipya katika toleo hili. Tumeongeza kitu cha kushangaza ambacho utakipenda.</string>
     <string name="new_feature_title">Arifa ya Kipengele Kipya!</string>
     <string name="oauth_token_storage_device_setting_info">Sasa unaweza kuomba tokeni za akaunti zako za OAuth2.0 kuhifadhiwa kwenye kifaa chako kwa kwenda kwenye Mipangilio > Usalama.</string>
+    <string name="unknown">Haijulikani</string>
+    <string name="this_message_s_content_could_not_be_displayed">Maudhui ya ujumbe huu hayakuweza kuonyeshwa.</string>
+    <string name="message_">Ujumbe</string>
+    <string name="message_content_could_not_be_displayed">Maudhui ya ujumbe hayakuweza kuonyeshwa</string>
+    <string name="text_message">Ujumbe wa Maandishi</string>
 
 </resources>

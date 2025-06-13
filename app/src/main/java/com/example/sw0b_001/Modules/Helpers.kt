@@ -69,6 +69,7 @@ object Helpers {
         return mappedParameters
     }
     fun getPath(data: String): String {
+        // TODO:
         return URL(data.replace("relaysms://", "https://")).path
     }
 

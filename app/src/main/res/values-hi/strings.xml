@@ -316,5 +316,10 @@
     <string name="preview_feature_description">इस संस्करण में नया क्या है जानें। हमने कुछ अद्भुत जोड़ा है जो आपको पसंद आएगा।</string>
     <string name="new_feature_title">नई सुविधा चेतावनी!</string>
     <string name="oauth_token_storage_device_setting_info">अब आप सेटिंग्स > सुरक्षा पर जाकर अपने OAuth2.0 खातों के टोकन को अपने डिवाइस पर संग्रहीत करने का अनुरोध कर सकते हैं।</string>
+    <string name="unknown">अज्ञात</string>
+    <string name="this_message_s_content_could_not_be_displayed">इस संदेश की सामग्री प्रदर्शित नहीं की जा सकी।</string>
+    <string name="message_">संदेश</string>
+    <string name="message_content_could_not_be_displayed">संदेश की सामग्री प्रदर्शित नहीं की जा सकी</string>
+    <string name="text_message">पाठ संदेश</string>
 
 </resources>

@@ -312,5 +312,10 @@
     <string name="preview_feature_description">اكتشف الجديد في هذا الإصدار. لقد أضفنا شيئًا رائعًا ستحبه.</string>
     <string name="new_feature_title">تنبيه بميزة جديدة!</string>
     <string name="oauth_token_storage_device_setting_info">يمكنك الآن طلب تخزين رموز حسابات OAuth2.0 الخاصة بك على جهازك بالانتقال إلى الإعدادات > الأمان.</string>
+    <string name="unknown">غير معروف</string>
+    <string name="this_message_s_content_could_not_be_displayed">تعذر عرض محتوى هذه الرسالة.</string>
+    <string name="message_">رسالة</string>
+    <string name="message_content_could_not_be_displayed">تعذر عرض محتوى الرسالة</string>
+    <string name="text_message">رسالة نصية</string>
 
 </resources>

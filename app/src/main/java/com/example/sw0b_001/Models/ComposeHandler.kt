@@ -15,6 +15,7 @@ import com.example.sw0b_001.Models.Platforms.Platforms
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.nio.charset.StandardCharsets
 
 object ComposeHandlers {
     fun compose(
@@ -71,7 +72,92 @@ object ComposeHandlers {
         return decoded
     }
 
-    fun decompose(
+    // New V1 compose method
+    fun composeV1(
+        context: Context,
+        contentFormatV1Bytes: ByteArray,
+        AD: ByteArray,
+        platform: AvailablePlatforms,
+        account: StoredPlatformsEntity? = null,
+        languageCode: String,
+        isTesting: Boolean = false,
+        smsTransmission: Boolean = true,
+        onSuccessRunnable: () -> Unit? = {}
+    ): ByteArray {
+
+        val states = Datastore.getDatastore(context).ratchetStatesDAO().fetch()
+        if (states.size > 1) {
+            throw IllegalStateException("Multiple Ratchet states found in database. Expected at most one.")
+        }
+
+        val state = if (states.isNotEmpty() && (account != null || isTesting)) {
+            try {
+                States(String(Publishers.getEncryptedStates(context, states[0].value), Charsets.UTF_8))
+            } catch (e: Exception) {
+                System.err.println("Failed to load existing Ratchet state: ${e.message}. Initializing new state.")
+                States()
+            }
+        } else {
+            States()
+        }
+
+        val messageComposer = MessageComposer(context, state, AD)
+
+        val platformShortcodeByte = platform.shortcode?.firstOrNull()?.code?.toByte()
+            ?: throw IllegalArgumentException("Platform shortcode is missing or invalid for platform: ${platform.name}")
+
+        val encryptedPayloadV1Base64 = messageComposer.composeV1(
+            contentFormatV1Bytes = contentFormatV1Bytes,
+            platformShortcodeByte = platformShortcodeByte,
+            languageCodeString = languageCode
+        )
+
+        try {
+            val encryptedStatesValue = Publishers.encryptStates(context, state.serializedStates)
+            val ratchetStatesEntry = RatchetStates(id = states.firstOrNull()?.id ?: 0, value = encryptedStatesValue)
+            if (states.isNotEmpty()) {
+                Datastore.getDatastore(context).ratchetStatesDAO().update(ratchetStatesEntry)
+            } else {
+                Datastore.getDatastore(context).ratchetStatesDAO().deleteAll()
+                Datastore.getDatastore(context).ratchetStatesDAO().insert(RatchetStates(value = encryptedStatesValue))
+            }
+        } catch (e: Exception) {
+            System.err.println("Failed to update Ratchet states: ${e.message}")
+        }
+
+        if (smsTransmission) {
+            val gatewayClientMSISDN = GatewayClientsCommunications(context).getDefaultGatewayClient()
+            gatewayClientMSISDN?.let {
+                val sentIntent = SMSHandler.transferToDefaultSMSApp(
+                    context,
+                    it,
+                    encryptedPayloadV1Base64
+                ).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+                context.startActivity(sentIntent)
+            } ?: run {
+                System.err.println("ComposeHandlers V1: Default Gateway Client MSISDN not found. SMS not sent.")
+            }
+        }
+
+
+        val encryptedContentEntry = EncryptedContent()
+        encryptedContentEntry.encryptedContent = Base64.encodeToString(contentFormatV1Bytes, Base64.DEFAULT)
+
+        encryptedContentEntry.date = System.currentTimeMillis()
+        encryptedContentEntry.type = platform.service_type
+        encryptedContentEntry.platformName = platform.name
+        encryptedContentEntry.fromAccount = account?.account
+
+        Datastore.getDatastore(context).encryptedContentDAO().insert(encryptedContentEntry)
+        onSuccessRunnable()
+
+        return Base64.decode(encryptedPayloadV1Base64, Base64.DEFAULT)
+    }
+
+
+        fun decompose(
         context: Context,
         cipherText: ByteArray,
         AD: ByteArray,
@@ -114,4 +200,73 @@ object ComposeHandlers {
             onFailureCallback(e.message)
         }
     }
+
+    fun decomposeV1(
+        context: Context,
+        v1Payload: ByteArray,
+        AD: ByteArray,
+        onSuccessCallback: (decryptedContent: ByteArray) -> Unit,
+        onFailureCallback: (error: String) -> Unit
+    ) {
+        try {
+            val states = Datastore.getDatastore(context).ratchetStatesDAO().fetch()
+            if (states.isEmpty()) {
+                throw IllegalStateException("Cannot decompose message: No ratchet state found in database.")
+            }
+            if (states.size > 1) {
+                System.err.println("Warning: Multiple ratchet states found; using the first one.")
+            }
+
+            val state = States(String(Publishers.getEncryptedStates(context, states[0].value), StandardCharsets.UTF_8))
+            val messageComposer = MessageComposer(context, state, AD)
+
+
+            val buffer = ByteBuffer.wrap(v1Payload).order(ByteOrder.LITTLE_ENDIAN)
+
+            val version = buffer.get()
+            if (version != 0x01.toByte()) {
+                throw IllegalArgumentException("Invalid payload: Not a V1 message (version marker is not 0x01).")
+            }
+
+            val ciphertextLen = buffer.getShort().toInt() and 0xFFFF
+            val deviceIdLen = buffer.get().toInt() and 0xFF
+            val platformShortcode = buffer.get()
+
+            val ciphertextBlock = ByteArray(ciphertextLen)
+            buffer.get(ciphertextBlock)
+
+            val deviceId = ByteArray(deviceIdLen)
+            buffer.get(deviceId)
+            val languageCode = ByteArray(2)
+            buffer.get(languageCode)
+
+
+            val ciphertextBuffer = ByteBuffer.wrap(ciphertextBlock).order(ByteOrder.LITTLE_ENDIAN)
+            val drHeaderLen = ciphertextBuffer.getInt()
+
+            val drHeaderBytes = ByteArray(drHeaderLen)
+            ciphertextBuffer.get(drHeaderBytes)
+            val header = Headers.deSerializeHeader(drHeaderBytes)
+                ?: throw IllegalStateException("Failed to deserialize Double Ratchet header.")
+
+            val encryptedBody = ByteArray(ciphertextBuffer.remaining())
+            ciphertextBuffer.get(encryptedBody)
+
+            val decryptedContent = messageComposer.decryptBridge(
+                header = header,
+                content = encryptedBody
+            )
+
+            val encryptedStates = Publishers.encryptStates(context, state.serializedStates)
+            val ratchetStatesEntry = RatchetStates(id = states[0].id, value = encryptedStates)
+            Datastore.getDatastore(context).ratchetStatesDAO().update(ratchetStatesEntry)
+
+            onSuccessCallback(decryptedContent.toByteArray(StandardCharsets.UTF_8))
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            onFailureCallback(e.message ?: "An unknown error occurred during V1 decomposition.")
+        }
+    }
+
 }

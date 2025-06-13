@@ -311,4 +311,9 @@
     <string name="preview_feature_description">Découvrez les nouveautés de cette version. Nous avons ajouté quelque chose d\'incroyable que vous allez adorer.</string>
     <string name="new_feature_title">Alerte nouvelle fonctionnalité !</string>
     <string name="oauth_token_storage_device_setting_info">Vous pouvez maintenant demander que les jetons de vos comptes OAuth2.0 soient stockés sur votre appareil en allant dans Paramètres > Sécurité.</string>
+    <string name="unknown">Inconnu</string>
+    <string name="this_message_s_content_could_not_be_displayed">Le contenu de ce message n\'a pas pu être affiché.</string>
+    <string name="message_">Message</string>
+    <string name="message_content_could_not_be_displayed">Le contenu du message n\'a pas pu être affiché</string>
+    <string name="text_message">Message texte</string>
 </resources>

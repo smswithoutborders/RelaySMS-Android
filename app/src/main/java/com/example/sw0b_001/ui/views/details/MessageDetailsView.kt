@@ -1,5 +1,7 @@
 package com.example.sw0b_001.ui.views.details
 
+import android.util.Base64
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -62,15 +64,31 @@ fun MessageDetailsView(
     navController: NavController
 ) {
     val context = LocalContext.current
-    var from by remember{ mutableStateOf(
-        platformsViewModel.message?.fromAccount ?: "RelaySMS account") }
+    var fromDisplay by remember { mutableStateOf("") }
+    var toDisplay by remember { mutableStateOf("") }
+    var messageBody by remember { mutableStateOf("") }
+    var date by remember { mutableLongStateOf(0L) }
 
-    val decomposedMessage = MessageComposeHandler.decomposeMessage(
-        platformsViewModel.message!!.encryptedContent!!)
+    val message = platformsViewModel.message
+    if (message?.encryptedContent != null) {
+        try {
+            val contentBytes = Base64.decode(message.encryptedContent, Base64.DEFAULT)
+            val decomposed = MessageComposeHandler.decomposeMessage(contentBytes)
 
-    var text by remember{ mutableStateOf(decomposedMessage.message) }
-    var to by remember{ mutableStateOf(decomposedMessage.to) }
-    var date by remember{ mutableLongStateOf(platformsViewModel.message!!.date) }
+            fromDisplay = decomposed.from
+            toDisplay = decomposed.to
+            messageBody = decomposed.message
+            date = message.date
+
+        } catch (e: Exception) {
+            Log.e("MessageDetailsView", "Failed to decompose V1 message content: ${e.message}")
+            fromDisplay = message.fromAccount ?: stringResource(R.string.unknown)
+            toDisplay = stringResource(R.string.unknown)
+            messageBody = stringResource(R.string.this_message_s_content_could_not_be_displayed)
+            date = message.date
+        }
+    }
+
 
     Scaffold(
         topBar = {
@@ -109,14 +127,14 @@ fun MessageDetailsView(
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
-                        text = from,
+                        text = fromDisplay,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     // Recipient Number
                     Text(
-                        text = "${stringResource(R.string.to)}: $to",
+                        text = "${stringResource(R.string.to)}: $toDisplay",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onBackground
                     )
@@ -133,7 +151,7 @@ fun MessageDetailsView(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = text,
+                text = messageBody,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onBackground
             )
