@@ -2,6 +2,7 @@ package com.example.sw0b_001.ui.views.compose
 
 import android.content.Context
 import android.content.Intent
+import android.util.Base64
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -72,6 +73,9 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.ZoneId
@@ -98,43 +102,37 @@ data class TextContent(val from: String, val text: String)
 
 object TextComposeHandler {
 
-    // Function to create a default/error state
-    private fun errorContent(originalMessage: String): TextContent {
-        Log.e("TextComposeHandler", "Failed to decompose message, returning defaults. Original: $originalMessage")
-        return TextContent(from = "Unknown", text = "Error: Could not parse message content.")
-    }
+    fun decomposeMessage(contentBytes: ByteArray): TextContent {
+        return try {
+            val buffer = ByteBuffer.wrap(contentBytes).order(ByteOrder.LITTLE_ENDIAN)
 
-    fun decomposeMessage(message: String): TextContent {
-        val parts = message.split(":", limit = 2)
+            // Read field lengths from the unified V1 format
+            val fromLen = buffer.get().toInt() and 0xFF
+            val toLen = buffer.getShort().toInt() and 0xFFFF
+            val ccLen = buffer.getShort().toInt() and 0xFFFF
+            val bccLen = buffer.getShort().toInt() and 0xFFFF
+            val subjectLen = buffer.get().toInt() and 0xFF
+            val bodyLen = buffer.getShort().toInt() and 0xFFFF
+            val accessLen = buffer.get().toInt() and 0xFF
+            val refreshLen = buffer.get().toInt() and 0xFF
 
-        if (parts.size < 2) {
-            return errorContent(message)
+            val from = ByteArray(fromLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+
+            if (toLen > 0) buffer.position(buffer.position() + toLen)
+            if (ccLen > 0) buffer.position(buffer.position() + ccLen)
+            if (bccLen > 0) buffer.position(buffer.position() + bccLen)
+            if (subjectLen > 0) buffer.position(buffer.position() + subjectLen)
+
+            val text = ByteArray(bodyLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+
+            if (accessLen > 0) buffer.position(buffer.position() + accessLen)
+            if (refreshLen > 0) buffer.position(buffer.position() + refreshLen)
+
+            TextContent(from = from, text = text)
+        } catch (e: Exception) {
+            Log.e("TextComposeHandler", "Failed to decompose V1 binary text message", e)
+            TextContent("Unknown", "Error: Could not parse message content.")
         }
-
-
-        val from = parts[0]
-        val textAndMaybeTokens = parts[1]
-
-        val lastColonIdx = textAndMaybeTokens.lastIndexOf(':')
-        val secondLastColonIdx = if (lastColonIdx > 0) {
-            textAndMaybeTokens.lastIndexOf(':', startIndex = lastColonIdx - 1)
-        } else {
-            -1
-        }
-
-        val actualTextBody: String
-        if (secondLastColonIdx != -1) {
-            actualTextBody = textAndMaybeTokens.substring(0, secondLastColonIdx)
-            Log.d("TextComposeHandler", "Tokens likely present, extracted body.")
-        } else {
-            actualTextBody = textAndMaybeTokens
-            Log.d("TextComposeHandler", "Tokens likely absent, using full remainder as body.")
-        }
-
-        return TextContent(
-            from = from,
-            text = actualTextBody
-        )
     }
 }
 
@@ -147,9 +145,15 @@ fun TextComposeView(
     val context = LocalContext.current
     val previewMode = LocalInspectionMode.current
 
-    val decomposedMessage = if(platformsViewModel.message != null)
-        TextComposeHandler.decomposeMessage(platformsViewModel.message!!.encryptedContent!!)
-    else null
+    val decomposedMessage = if (platformsViewModel.message?.encryptedContent != null) {
+        try {
+            val contentBytes = Base64.decode(platformsViewModel.message!!.encryptedContent!!, Base64.DEFAULT)
+            TextComposeHandler.decomposeMessage(contentBytes)
+        } catch (e: Exception) {
+            Log.e("TextComposeView", "Failed to decode/decompose V1 text content.", e)
+            null
+        }
+    } else null
 
     var from by remember { mutableStateOf( decomposedMessage?.from ?: "") }
     var message by remember { mutableStateOf( decomposedMessage?.text ?: "" ) }
@@ -209,51 +213,44 @@ fun TextComposeView(
                 actions = {
                     IconButton(onClick = {
                         loading = true
-                        val testMessage = run {
-                            val date = Date(System.currentTimeMillis())
-                            val formatter = SimpleDateFormat(
-                                "yyyy-MM-dd'T'HH:mm:ss", Locale.US )
-                            formatter.format(date)
-                        }
-                        if(platformsViewModel.platform?.service_type == Platforms.ServiceTypes.TEST.type) {
+                        if (platformsViewModel.platform?.service_type == Platforms.ServiceTypes.TEST.type) {
+                            val testStartTime = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).format(Date(System.currentTimeMillis()))
                             processTest(
-                                context,
-                                data = testMessage,
-                                availablePlatforms = platformsViewModel.platform,
-                                onFailureCallback = { loading = false }
-                            ) {
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    navController.navigate(HomepageScreen) {
-                                        popUpTo(HomepageScreen) {
-                                            inclusive = true
-                                        }
+                                context = context,
+                                startTime = testStartTime,
+                                platform = platformsViewModel.platform!!,
+                                onFailure = { errorMsg ->
+                                    loading = false
+                                    CoroutineScope(Dispatchers.Main).launch {
+                                        Toast.makeText(context, errorMsg ?: "Test failed", Toast.LENGTH_LONG).show()
+                                    }
+                                },
+                                onSuccess = {
+                                    loading = false
+                                    CoroutineScope(Dispatchers.Main).launch {
+                                        navController.navigate(HomepageScreen) { popUpTo(HomepageScreen) { inclusive = true } }
                                     }
                                 }
-                                loading = false
-                            }
+                            )
                         }
                         else {
                             processPost(
                                 context = context,
-                                textContent = TextContent(
-                                    from = from,
-                                    text = message,
-                                ),
+                                text = message,
                                 account = selectedAccount!!,
-                                onFailureCallback = { loading = false },
-                                onCompleteCallback = {
+                                onFailure = { errorMsg ->
+                                    loading = false
+                                    CoroutineScope(Dispatchers.Main).launch {
+                                        Toast.makeText(context, errorMsg ?: "Unknown error", Toast.LENGTH_LONG).show()
+                                    }
+                                },
+                                onSuccess = {
+                                    loading = false
                                     CoroutineScope(Dispatchers.Main).launch {
                                         navController.navigate(HomepageScreen) {
-                                            popUpTo(HomepageScreen) {
-                                                inclusive = true
-                                            }
+                                            popUpTo(HomepageScreen) { inclusive = true }
                                         }
                                     }
-                                    loading = false
-                                },
-                                showMissingTokenDialogCallback = { acc ->
-                                    accountForDialog = acc
-                                    showMissingTokenDialog = true
                                 }
                             )
                         }
@@ -307,135 +304,193 @@ data class ReliabilityTestResponsePayload(
     val test_start_time: Int,
 )
 
+private fun createTestByteBuffer(testId: String): ByteBuffer {
+    // Define size constants
+    val BYTE_SIZE_LIMIT = 255
+
+    // Convert string to byte array
+    val testIdBytes = testId.toByteArray(StandardCharsets.UTF_8)
+
+    // Get size for validation and buffer allocation
+    val testIdSize = testIdBytes.size
+
+    // Validate field sizes against their specified limits
+    if (testIdSize > BYTE_SIZE_LIMIT) throw IllegalArgumentException("Test ID exceeds maximum size of $BYTE_SIZE_LIMIT bytes")
+
+    // Calculate total buffer size - all header fields + actual data
+    val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 1 + 1 + testIdSize
+
+    // Allocate buffer and set byte order
+    val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
+
+    // Write field lengths according to specification
+    buffer.put(testIdSize.toByte())       // 1 byte for from field length (test ID)
+    buffer.putShort(0)                    // 2 bytes for to length (set to 0)
+    buffer.putShort(0)                    // 2 bytes for cc length (set to 0)
+    buffer.putShort(0)                    // 2 bytes for bcc length (set to 0)
+    buffer.put(0)                         // 1 byte for subject length (set to 0)
+    buffer.putShort(0)                    // 2 bytes for body length (set to 0)
+    buffer.put(0)                         // 1 byte for access token length (set to 0)
+    buffer.put(0)                         // 1 byte for refresh token length (set to 0)
+
+    // Write test ID bytes (from field is used as test ID)
+    buffer.put(testIdBytes)
+
+    buffer.flip()
+    return buffer
+}
+
 private fun processTest(
     context: Context,
-    data: String,
-    availablePlatforms: AvailablePlatforms?,
-    onFailureCallback: () -> Unit,
-    onCompleteCallback: () -> Unit
+    startTime: String,
+    platform: AvailablePlatforms,
+    onFailure: (String?) -> Unit,
+    onSuccess: () -> Unit,
+    smsTransmission: Boolean = true
 ) {
-    val payload = Json.encodeToString(ReliabilityTestRequestPayload(data))
-
     CoroutineScope(Dispatchers.Default).launch {
-        val gatewayClientMSISDN = GatewayClientsCommunications(context)
-            .getDefaultGatewayClient()
-        val url = context.getString(R.string.test_url, gatewayClientMSISDN)
         try {
-            val response = Network.jsonRequestPost(url, payload)
-            Json.decodeFromString<ReliabilityTestResponsePayload>(response.result.get()).let {
-                val availablePlatforms = Datastore.getDatastore(context)
-                    .availablePlatformsDao().fetch(availablePlatforms?.name ?: "reliability")
+            val gatewayClientMSISDN = GatewayClientsCommunications(context).getDefaultGatewayClient()
+                ?: return@launch onFailure("No Gateway Client set for testing.")
+            val url = context.getString(R.string.test_url, gatewayClientMSISDN)
+            val requestPayload = Json.encodeToString(ReliabilityTestRequestPayload(startTime))
+            val response = Network.jsonRequestPost(url, requestPayload)
+            val responsePayload = Json.decodeFromString<ReliabilityTestResponsePayload>(response.result.get())
+            val testId = responsePayload.test_id.toString()
+            val AD = Publishers.fetchPublisherPublicKey(context)
+                ?: return@launch onFailure("Could not fetch publisher key.")
 
-                val AD = Publishers.fetchPublisherPublicKey(context)
-                ComposeHandlers.compose(
-                    context,
-                    it.test_id.toString(),
-                    AD!!,
-                    availablePlatforms!!,
-                    null,
-                    true
-                ) {
-                    onCompleteCallback()
-                }
-                onCompleteCallback()
+            val contentFormatV1Bytes = createTestByteBuffer(testId).array()
+
+            val languageCode = Locale.getDefault().language.take(2).lowercase()
+            val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
+
+            val v1PayloadBytes = ComposeHandlers.composeV1(
+                context = context,
+                contentFormatV1Bytes = contentFormatV1Bytes,
+                AD = AD,
+                platform = platform,
+                account = null,
+                languageCode = validLanguageCode,
+                smsTransmission = false,
+                isTesting = true
+            )
+
+            if (smsTransmission) {
+                val base64Payload = Base64.encodeToString(v1PayloadBytes, Base64.NO_WRAP)
+                SMSHandler.transferToDefaultSMSApp(context, gatewayClientMSISDN, base64Payload)
             }
-        } catch(e: Exception) {
+            onSuccess()
+
+        } catch (e: Exception) {
             e.printStackTrace()
-            CoroutineScope(Dispatchers.Main).launch {
-                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
-            }
-            onFailureCallback()
+            onFailure(e.message)
         }
     }
 }
+
+private fun createTextByteBuffer(
+    from: String, body: String,
+    accessToken: String? = null, refreshToken: String? = null
+): ByteBuffer {
+    // Define size constants
+    val BYTE_SIZE_LIMIT = 255
+    val SHORT_SIZE_LIMIT = 65535
+
+    // Convert strings to byte arrays
+    val fromBytes = from.toByteArray(StandardCharsets.UTF_8)
+    val bodyBytes = body.toByteArray(StandardCharsets.UTF_8)
+    val accessTokenBytes = accessToken?.toByteArray(StandardCharsets.UTF_8)
+    val refreshTokenBytes = refreshToken?.toByteArray(StandardCharsets.UTF_8)
+
+    // Get sizes for validation and buffer allocation
+    val fromSize = fromBytes.size
+    val bodySize = bodyBytes.size
+    val accessTokenSize = accessTokenBytes?.size ?: 0
+    val refreshTokenSize = refreshTokenBytes?.size ?: 0
+
+    // Validate field sizes against their specified limits
+    if (fromSize > BYTE_SIZE_LIMIT) throw IllegalArgumentException("From field exceeds maximum size of $BYTE_SIZE_LIMIT bytes")
+    if (bodySize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("Body field exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
+    if (accessTokenSize > BYTE_SIZE_LIMIT) throw IllegalArgumentException("Access token exceeds maximum size of $BYTE_SIZE_LIMIT bytes")
+    if (refreshTokenSize > BYTE_SIZE_LIMIT) throw IllegalArgumentException("Refresh token exceeds maximum size of $BYTE_SIZE_LIMIT bytes")
+
+    // Calculate total buffer size - all header fields + actual data
+    val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 1 + 1 +
+            fromSize + bodySize + accessTokenSize + refreshTokenSize
+
+    // Allocate buffer and set byte order
+    val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
+
+    // Write field lengths according to specification
+    buffer.put(fromSize.toByte())         // 1 byte for from length
+    buffer.putShort(0)                    // 2 bytes for to length (set to 0)
+    buffer.putShort(0)                    // 2 bytes for cc length (set to 0)
+    buffer.putShort(0)                    // 2 bytes for bcc length (set to 0)
+    buffer.put(0)                         // 1 byte for subject length (set to 0)
+    buffer.putShort(bodySize.toShort())   // 2 bytes for body length
+    buffer.put(accessTokenSize.toByte())  // 1 byte for access token length
+    buffer.put(refreshTokenSize.toByte()) // 1 byte for refresh token length
+
+    // Write field values (only the ones that are actually used)
+    buffer.put(fromBytes)
+    buffer.put(bodyBytes)
+    accessTokenBytes?.let { buffer.put(it) }
+    refreshTokenBytes?.let { buffer.put(it) }
+
+    buffer.flip()
+    return buffer
+}
+
 
 private fun processPost(
     context: Context,
-    textContent: TextContent,
+    text: String,
     account: StoredPlatformsEntity,
-    onFailureCallback: (String?) -> Unit,
-    onCompleteCallback: () -> Unit,
-    showMissingTokenDialogCallback: (StoredPlatformsEntity) -> Unit
+    onFailure: (String?) -> Unit,
+    onSuccess: () -> Unit,
+    smsTransmission: Boolean = true
 ) {
     CoroutineScope(Dispatchers.Default).launch {
         try {
-            val availablePlatforms = Datastore.getDatastore(context)
-                .availablePlatformsDao().fetch(account.name!!)
-
-            // find out if s current account has missing tokens so that the message doesn't send'
-            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
-            val jsonString = sharedPreferences.getString(Vaults.Companion.PrefKeys.KEY_ACCOUNTS_MISSING_TOKENS_JSON, null)
-            var isCurrentAccountMissingTokens = false
-
-            if (!jsonString.isNullOrEmpty()) {
-                try {
-                    val missingTokensInfoList = Json.decodeFromString<List<MissingTokenAccountInfo>>(jsonString)
-                    Log.d("EmailComposeView", "Deserialized missing tokens list: $missingTokensInfoList")
-
-                    isCurrentAccountMissingTokens = missingTokensInfoList.any { missingInfo ->
-                        missingInfo.accountId == account.id
-                    }
-                    if (isCurrentAccountMissingTokens) {
-                        Log.w("EmailComposeView", "Current account (${account.id}) is flagged with missing tokens in SharedPreferences.")
-                    }
-                } catch (e: Exception) {
-                    Log.e("EmailComposeView", "Error checking missing tokens list", e)
-                }
-            }
-
-            if (isCurrentAccountMissingTokens) {
-                Log.e("EmailComposeView", "Send aborted: Account ${account.id} flagged with missing tokens.")
-                onFailureCallback("Account ${account.id} flagged with missing tokens. Please revoke and re-add.")
-
-                withContext(Dispatchers.Main) {
-                    showMissingTokenDialogCallback(account)
-                }
-                return@launch
-            }
-
-            val formattedContent: String = if (account.accessToken?.isNotEmpty() == true) {
-                processTextForEncryption(
-                    textContent.text,
-                    account,
-                    account.accessToken!!,
-                    account.refreshToken!!
-                )
-            } else {
-                processTextForEncryption(
-                    textContent.text,
-                    account
-                )
-            }
-            Log.d("TextComposeView", "Formatted content: $formattedContent")
-
             val AD = Publishers.fetchPublisherPublicKey(context)
-            ComposeHandlers.compose(
-                context,
-                formattedContent,
-                AD!!,
-                availablePlatforms!!,
-                account,
-            ) {
-                onCompleteCallback()
+                ?: return@launch onFailure("Could not fetch publisher key.")
+
+            val contentFormatV1Bytes = createTextByteBuffer(
+                from = account.account!!,
+                body = text,
+                accessToken = account.accessToken,
+                refreshToken = account.refreshToken
+            ).array()
+
+            val platform = Datastore.getDatastore(context).availablePlatformsDao().fetch(account.name!!)
+                ?: return@launch onFailure("Could not find platform details for '${account.name}'.")
+
+            val languageCode = Locale.getDefault().language.take(2).lowercase()
+            val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
+
+            val v1PayloadBytes = ComposeHandlers.composeV1(
+                context = context,
+                contentFormatV1Bytes = contentFormatV1Bytes,
+                AD = AD,
+                platform = platform,
+                account = account,
+                languageCode = validLanguageCode,
+                smsTransmission = smsTransmission
+            )
+
+            if (smsTransmission) {
+                val gatewayClientMSISDN = GatewayClientsCommunications(context).getDefaultGatewayClient()
+                    ?: return@launch onFailure("No default gateway client configured.")
+                val base64Payload = Base64.encodeToString(v1PayloadBytes, Base64.NO_WRAP)
+                SMSHandler.transferToDefaultSMSApp(context, gatewayClientMSISDN, base64Payload)
             }
+            onSuccess()
         } catch (e: Exception) {
             e.printStackTrace()
-            onFailureCallback(e.message)
-            CoroutineScope(Dispatchers.Main).launch {
-                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
-            }
+            onFailure(e.message)
         }
     }
-}
-
-private fun processTextForEncryption(
-    body: String,
-    account: StoredPlatformsEntity?,
-    accessToken: String = "",
-    refreshToken: String = ""
-): String {
-    if (accessToken.isEmpty() || refreshToken.isEmpty()) return "${account!!.account}:$body"
-    return "${account!!.account}:$body:$accessToken:$refreshToken"
 }
 
 

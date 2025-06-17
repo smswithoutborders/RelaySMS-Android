@@ -92,6 +92,10 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.charset.StandardCharsets
+import java.util.Locale
 
 data class EmailContent(
     var to: String,
@@ -101,90 +105,68 @@ data class EmailContent(
     var body: String
 )
 
-//object EmailComposeHandler {
-//    fun decomposeMessage(
-//        message: String,
-//    ): EmailContent {
-//        return message.split(":").let {
-//            EmailContent(
-//                to = it[1],
-//                cc = it[2],
-//                bcc = it[3],
-//                subject = it[4],
-//                body = it.subList(5, it.size).joinToString()
-//            )
-//        }
-//    }
-//}
-
 object EmailComposeHandler {
 
-    private fun errorContent(originalMessage: String, reason: String): EmailContent {
-        Log.e("EmailComposeHandler", "Failed to decompose message ($reason). Original: $originalMessage")
-        return EmailContent(to = "", cc = "", bcc = "", subject = "", body = "Error: Could not parse message content.")
-    }
+    fun decomposeMessage(contentBytes: ByteArray): EmailContent {
+        try {
+            val buffer = ByteBuffer.wrap(contentBytes).order(ByteOrder.LITTLE_ENDIAN)
 
-    fun decomposeMessage(message: String, isBridge: Boolean): EmailContent {
-        val toValue: String
-        val ccValue: String
-        val bccValue: String
-        val subjectValue: String
-        var actualBody: String
+            val fromLen = buffer.get().toInt() and 0xFF
+            val toLen = buffer.getShort().toInt() and 0xFFFF
+            val ccLen = buffer.getShort().toInt() and 0xFFFF
+            val bccLen = buffer.getShort().toInt() and 0xFFFF
+            val subjectLen = buffer.get().toInt() and 0xFF
+            val bodyLen = buffer.getShort().toInt() and 0xFFFF
+            val accessLen = buffer.get().toInt() and 0xFF
+            val refreshLen = buffer.get().toInt() and 0xFF
 
-        if (isBridge) {
-            val splitLimit = 5
-            val parts = message.split(":", limit = splitLimit)
+            if (fromLen > 0) buffer.position(buffer.position() + fromLen)
 
-            if (parts.size < splitLimit) {
-                return errorContent(message, "isBridge=true, parts.size (${parts.size}) < required minimum ($splitLimit)")
-            }
+            // Read the relevant fields for the EmailContent object
+            val to = ByteArray(toLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+            val cc = ByteArray(ccLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+            val bcc = ByteArray(bccLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+            val subject = ByteArray(subjectLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+            val body = ByteArray(bodyLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
 
-            toValue = parts.getOrElse(0) { "" }
-            ccValue = parts.getOrElse(1) { "" }
-            bccValue = parts.getOrElse(2) { "" }
-            subjectValue = parts.getOrElse(3) { "" }
-            actualBody = parts[4]
+            if (accessLen > 0) buffer.position(buffer.position() + accessLen)
+            if (refreshLen > 0) buffer.position(buffer.position() + refreshLen)
 
-        } else {
-
-            val splitLimit = 6
-            val parts = message.split(":", limit = splitLimit)
-
-            if (parts.size < splitLimit) {
-                return errorContent(message, "isBridge=false, parts.size (${parts.size}) < required minimum ($splitLimit)")
-            }
-
-            toValue = parts.getOrElse(1) { "" }
-            ccValue = parts.getOrElse(2) { "" }
-            bccValue = parts.getOrElse(3) { "" }
-            subjectValue = parts.getOrElse(4) { "" }
-            val bodyAndMaybeTokens = parts[5]
-
-            val lastColonIdx = bodyAndMaybeTokens.lastIndexOf(':')
-            val secondLastColonIdx = if (lastColonIdx > 0) {
-                bodyAndMaybeTokens.lastIndexOf(':', startIndex = lastColonIdx - 1)
-            } else {
-                -1
-            }
-
-            if (secondLastColonIdx != -1) {
-                actualBody = bodyAndMaybeTokens.substring(0, secondLastColonIdx)
-                Log.d("EmailComposeHandler", "isBridge=false. Tokens likely present, extracted body: \"$actualBody\" from \"$bodyAndMaybeTokens\"")
-            } else {
-                actualBody = bodyAndMaybeTokens
-                Log.d("EmailComposeHandler", "isBridge=false. Tokens likely absent in \"$bodyAndMaybeTokens\", using full remainder as body.")
-            }
+            return EmailContent(to, cc, bcc, subject, body)
+        } catch (e: Exception) {
+            Log.e("EmailComposeHandler", "Failed to decompose V1 binary message", e)
+            return EmailContent("", "", "", "", "Error: Could not parse message content.")
         }
 
-        Log.d("EmailComposeHandler", "Decomposed (isBridge=$isBridge): To: \"$toValue\", CC: \"$ccValue\", BCC: \"$bccValue\", Subject: \"$subjectValue\", Body: \"$actualBody\"")
+    }
 
-        return EmailContent(
-            to = toValue,
-            cc = ccValue,
-            bcc = bccValue,
-            subject = subjectValue,
-            body = actualBody
-        )
+    fun decomposeBridgeMessage(message: String): EmailContent {
+        return try {
+            // Bridge messages typically don't include 'from' in their direct content string
+            // Format: to:cc:bcc:subject:body
+            val parts = message.split(":", limit = 5)
+            if (parts.size < 5) {
+                Log.w("EmailComposeHandler", "Bridge message has fewer than 5 parts: '$message'. Parsing as best as possible.")
+                EmailContent(
+                    to = parts.getOrElse(0) { "" },
+                    cc = parts.getOrElse(1) { "" },
+                    bcc = parts.getOrElse(2) { "" },
+                    subject = parts.getOrElse(3) { "" },
+                    body = parts.getOrElse(4) { "" } // If body is missing, this will be empty
+                )
+            } else {
+                EmailContent(
+                    to = parts[0],
+                    cc = parts[1],
+                    bcc = parts[2],
+                    subject = parts[3],
+                    body = parts[4] // The rest of the string is the body
+                )
+            }
+        } catch (e: Exception) {
+            Log.e("EmailComposeHandler", "Failed to decompose bridge message string", e)
+            EmailContent("", "", "", "", "Error: Could not parse bridge message content.")
+        }
     }
 }
 
@@ -224,9 +206,19 @@ fun EmailComposeView(
 ) {
     val context = LocalContext.current
 
-    val decomposedMessage = if(platformsViewModel.message != null)
-        EmailComposeHandler.decomposeMessage(platformsViewModel.message!!.encryptedContent!!, isBridge)
-    else null
+    val decomposedMessage = if (platformsViewModel.message?.encryptedContent != null) {
+        if (isBridge) {
+            EmailComposeHandler.decomposeBridgeMessage(platformsViewModel.message!!.encryptedContent!!)
+        } else {
+            try {
+                val contentBytes = Base64.decode(platformsViewModel.message!!.encryptedContent!!, Base64.DEFAULT)
+                EmailComposeHandler.decomposeMessage(contentBytes)
+            } catch (e: Exception) {
+                Log.e("EmailComposeView", "Error decoding/decomposing V1 message content.", e)
+                null
+            }
+        }
+    } else null
 
     var showCcBcc by remember { mutableStateOf(false) }
     val density = LocalDensity.current
@@ -677,20 +669,62 @@ fun EmailComposeView(
     }
 }
 
-private fun processEmailForEncryption(
-    to: String,
-    cc: String,
-    bcc: String,
-    subject: String,
-    body: String,
-    account: StoredPlatformsEntity?,
-    accessToken: String = "",
-    refreshToken: String = ""
-): String {
-    if (accessToken.isEmpty() || refreshToken.isEmpty())
-        return "${account!!.account}:$to:$cc:$bcc:$subject:$body"
-    return "${account!!.account}:$to:$cc:$bcc:$subject:$body:$accessToken:$refreshToken"
+
+private fun createEmailByteBuffer(
+    from: String, to: String, cc: String, bcc: String, subject: String, body: String,
+    accessToken: String? = null, refreshToken: String? = null
+): ByteBuffer {
+    val fromBytes = from.toByteArray(StandardCharsets.UTF_8)
+    val toBytes = to.toByteArray(StandardCharsets.UTF_8)
+    val ccBytes = cc.toByteArray(StandardCharsets.UTF_8)
+    val bccBytes = bcc.toByteArray(StandardCharsets.UTF_8)
+    val subjectBytes = subject.toByteArray(StandardCharsets.UTF_8)
+    val bodyBytes = body.toByteArray(StandardCharsets.UTF_8)
+    val accessTokenBytes = accessToken?.toByteArray(StandardCharsets.UTF_8)
+    val refreshTokenBytes = refreshToken?.toByteArray(StandardCharsets.UTF_8)
+
+    // Validate field sizes against their specified limits
+    if (fromBytes.size > 255) throw IllegalArgumentException("From field exceeds maximum size of 255 bytes")
+    if (toBytes.size > 65535) throw IllegalArgumentException("To field exceeds maximum size of 65,535 bytes")
+    if (ccBytes.size > 65535) throw IllegalArgumentException("CC field exceeds maximum size of 65,535 bytes")
+    if (bccBytes.size > 65535) throw IllegalArgumentException("BCC field exceeds maximum size of 65,535 bytes")
+    if (subjectBytes.size > 255) throw IllegalArgumentException("Subject field exceeds maximum size of 255 bytes")
+    if (bodyBytes.size > 65535) throw IllegalArgumentException("Body field exceeds maximum size of 65,535 bytes")
+    if ((accessTokenBytes?.size ?: 0) > 255) throw IllegalArgumentException("Access token exceeds maximum size of 255 bytes")
+    if ((refreshTokenBytes?.size ?: 0) > 255) throw IllegalArgumentException("Refresh token exceeds maximum size of 255 bytes")
+
+    // Calculate total size according to specification
+    val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 1 + 1 +
+            fromBytes.size + toBytes.size + ccBytes.size + bccBytes.size +
+            subjectBytes.size + bodyBytes.size +
+            (accessTokenBytes?.size ?: 0) + (refreshTokenBytes?.size ?: 0)
+
+    val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
+
+    // Write field lengths according to specification
+    buffer.put(fromBytes.size.toByte())       // 1 byte for from length
+    buffer.putShort(toBytes.size.toShort())   // 2 bytes for to length
+    buffer.putShort(ccBytes.size.toShort())   // 2 bytes for cc length
+    buffer.putShort(bccBytes.size.toShort())  // 2 bytes for bcc length
+    buffer.put(subjectBytes.size.toByte())    // 1 byte for subject length
+    buffer.putShort(bodyBytes.size.toShort()) // 2 bytes for body length
+    buffer.put((accessTokenBytes?.size ?: 0).toByte())    // 1 byte for access token length
+    buffer.put((refreshTokenBytes?.size ?: 0).toByte())   // 1 byte for refresh token length
+
+    // Write field values
+    buffer.put(fromBytes)
+    buffer.put(toBytes)
+    buffer.put(ccBytes)
+    buffer.put(bccBytes)
+    buffer.put(subjectBytes)
+    buffer.put(bodyBytes)
+    accessTokenBytes?.let { buffer.put(it) }
+    refreshTokenBytes?.let { buffer.put(it) }
+
+    buffer.flip()
+    return buffer
 }
+
 
 private fun processSend(
     context: Context,
@@ -725,45 +759,98 @@ private fun processSend(
                 context.startActivity(sentIntent)
             }
             else {
-                val formattedContent: String = if(account?.accessToken?.isNotEmpty() == true) {
-                    processEmailForEncryption(
-                        emailContent.to,
-                        emailContent.cc,
-                        emailContent.bcc,
-                        emailContent.subject,
-                        emailContent.body,
-                        account,
-                        account.accessToken!!,
-                        account.refreshToken!!
-                    )
-                } else {
-                    processEmailForEncryption(
-                        emailContent.to,
-                        emailContent.cc,
-                        emailContent.bcc,
-                        emailContent.subject,
-                        emailContent.body,
-                        account
-                    )
+                Log.d("processSend", "Processing as V1 PLATFORM message.")
+                if (account == null) {
+                    onFailureCallback("Account is required for V1 platform messages.")
+                    return@launch
                 }
 
-                val availablePlatforms =
-                    Datastore.getDatastore(context).availablePlatformsDao().fetch(account!!.name!!)
                 val AD = Publishers.fetchPublisherPublicKey(context)
-                ComposeHandlers.compose(
-                    context,
-                    formattedContent,
-                    AD!!,
-                    availablePlatforms,
-                    account,
+                if (AD == null) {
+                    onFailureCallback("Could not fetch publisher key. Cannot encrypt message.")
+                    return@launch
+                }
+
+                val contentFormatBytes = if (
+                    account.accessToken?.isNotEmpty() == true
+                ) {
+                    createEmailByteBuffer(
+                        from = account.account!!, // 'from' is from the selected account
+                        to = emailContent.to,
+                        cc = emailContent.cc,
+                        bcc = emailContent.bcc,
+                        subject = emailContent.subject,
+                        body = emailContent.body,
+                        accessToken = account.accessToken,
+                        refreshToken = account.refreshToken
+                    ).array()
+                } else {
+                    createEmailByteBuffer(
+                        from = account.account!!,
+                        to = emailContent.to,
+                        cc = emailContent.cc,
+                        bcc = emailContent.bcc,
+                        subject = emailContent.subject,
+                        body = emailContent.body
+                    ).array()
+                }
+
+
+                val contentFormatV1Bytes = createEmailByteBuffer(
+                    from = account.account,
+                    to = emailContent.to,
+                    cc = emailContent.cc,
+                    bcc = emailContent.bcc,
+                    subject = emailContent.subject,
+                    body = emailContent.body,
+                    accessToken = account.accessToken,
+                    refreshToken = account.refreshToken
+                ).array()
+
+                val platform = Datastore.getDatastore(context).availablePlatformsDao().fetch(account.name!!)
+                if (platform == null) {
+                    onFailureCallback("Could not find platform details for '${account.name}'.")
+                    return@launch
+                }
+
+                val languageCode = Locale.getDefault().language.take(2).lowercase(Locale.ROOT)
+                Log.d("processSend", "Language code: $languageCode")
+                val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
+                Log.d("processSend", "Valid language code: $validLanguageCode")
+
+                val v1PayloadBytes = ComposeHandlers.composeV1(
+                    context = context,
+                    contentFormatV1Bytes = contentFormatBytes,
+                    AD = AD,
+                    platform = platform,
+                    account = account,
+                    languageCode = validLanguageCode,
                     smsTransmission = smsTransmission
-                ) { onCompleteCallback(it) }
+                )
+
+                if (smsTransmission) {
+                    val gatewayClientMSISDN = GatewayClientsCommunications(context)
+                        .getDefaultGatewayClient()
+                    if (gatewayClientMSISDN == null) {
+                        onFailureCallback("No default gateway client configured for SMS.")
+                        return@launch
+                    }
+                    val base64Payload = Base64.encodeToString(v1PayloadBytes, Base64.NO_WRAP)
+                    SMSHandler.transferToDefaultSMSApp(
+                        context,
+                        gatewayClientMSISDN,
+                        base64Payload
+                    ).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                }
+                onCompleteCallback(v1PayloadBytes)
             }
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
             onFailureCallback(e.message)
             CoroutineScope(Dispatchers.Main).launch {
-                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, e.message ?: "An unknown error occurred", Toast.LENGTH_LONG).show()
             }
         }
     }
