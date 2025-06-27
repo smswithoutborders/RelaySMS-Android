@@ -2,6 +2,7 @@ package com.example.sw0b_001.Models
 
 import android.content.Context
 import android.util.Base64
+import android.util.Log
 import androidx.core.util.component1
 import androidx.core.util.component2
 import androidx.preference.PreferenceManager
@@ -40,7 +41,10 @@ class MessageComposer(
     fun composeBridge(
         content: String,
     ): String {
+        Log.d("MessageComposer", "state bridge: $state")
         val (header, cipherMk) = Ratchets.ratchetEncrypt(state, content.encodeToByteArray(), AD)
+
+        Log.d("MessageComposer", "state bridge again: $state")
 
         return formatTransmissionBridge(
             header,
@@ -72,6 +76,7 @@ class MessageComposer(
         platformShortcodeByte: Byte,
         languageCodeString: String
     ): String {
+        Log.d("MessageComposer", "state platforms: $state")
 
         val (drHeader, drEncryptedBody) = Ratchets.ratchetEncrypt(state, contentFormatV1Bytes, AD)
 
@@ -89,6 +94,7 @@ class MessageComposer(
                 "Language code '$languageCodeString' must be 2 ASCII characters to form 2 bytes."
             )
         }
+        Log.d("MessageComposer", "state platforms again: $state")
 
         return formatTransmissionV1(
             headers = drHeader,
@@ -180,3 +186,5 @@ class MessageComposer(
 
     }
 }
+
+

@@ -14,6 +14,8 @@ message GetOAuth2AuthorizationUrlRequest {
   bool autogenerate_code_verifier = 4;
   // Optional redirect URL for the OAuth2 application
   string redirect_url = 5;
+  // Optional request identifier for tracking the request
+  string request_identifier = 6;
 }
 
 // Response message for the OAuth2 GetAuthorizationUrl RPC
@@ -48,6 +50,8 @@ message ExchangeOAuth2CodeAndStoreRequest {
   string redirect_url = 5;
   // Indicates if the token should be stored on the device instead of the cloud
   bool store_on_device = 6;
+  // Optional request identifier for tracking the request
+  string request_identifier = 7;
 }
 
 // Response message for the ExchangeOAuth2Code RPC
@@ -102,6 +106,8 @@ message GetPNBACodeRequest {
   string platform = 1;
   // The identifier for the platform
   string phone_number = 2;
+  // Optional request identifier for tracking the request
+  string request_identifier = 3;
 }
 
 // Response message for getting the PNBA code
@@ -124,6 +130,8 @@ message ExchangePNBACodeAndStoreRequest {
   string authorization_code = 4;
   // The password for two-step verification
   string password = 5;
+  // Optional request identifier for tracking the request
+  string request_identifier = 6;
 }
 
 // Response message for exchanging the PNBA code for a token and storing it

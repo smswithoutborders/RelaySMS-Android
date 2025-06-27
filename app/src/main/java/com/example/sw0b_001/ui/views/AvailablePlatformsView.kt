@@ -71,6 +71,7 @@ fun AvailablePlatformsView(
 
     val platforms: List<AvailablePlatforms> by platformsViewModel
         .getAvailablePlatforms(context).observeAsState(emptyList())
+    println("Available platforms: ${platforms.size}")
 
     val storedPlatforms: List<StoredPlatformsEntity> by platformsViewModel
         .getSaved(context).observeAsState(emptyList())
@@ -236,11 +237,11 @@ fun PlatformCard(
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
-                bitmap = if(logo != null) logo.asImageBitmap()
-                else BitmapFactory.decodeResource(
-                    context.resources,
-                    R.drawable.logo
-                ).asImageBitmap(),
+                bitmap = logo?.asImageBitmap()
+                    ?: BitmapFactory.decodeResource(
+                        context.resources,
+                        R.drawable.logo
+                    ).asImageBitmap(),
                 contentDescription = stringResource(R.string.platform_logo),
                 modifier = Modifier
                     .size(50.dp)
@@ -260,7 +261,7 @@ fun PlatformCard(
                 )
             }
             Text(
-                text = if(platform != null) platform.name else "RelaySMS",
+                text = platform?.name ?: "RelaySMS",
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
