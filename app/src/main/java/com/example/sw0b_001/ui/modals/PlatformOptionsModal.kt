@@ -4,14 +4,19 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Base64
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -60,6 +65,7 @@ import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -224,17 +230,21 @@ private fun triggerAddPlatformRequest(
         when(platform.protocol_type) {
             Platforms.ProtocolTypes.OAUTH2.type -> {
                 val publishers = Publishers(context)
+                val publicKeyBytes = Publishers.fetchPublisherPublicKey(context)
+                val requestIdentifier = Base64.encodeToString(publicKeyBytes, Base64.NO_WRAP)
+                println("Request Identifier: $requestIdentifier")
                 try {
                     val response = publishers.getOAuthURL(
                         availablePlatforms = platform,
                         autogenerateCodeVerifier = true,
-                        supportsUrlScheme = platform.support_url_scheme!!
+                        supportsUrlScheme = platform.support_url_scheme!!,
+                        requestIdentifier = requestIdentifier
                     )
 
                     Publishers.storeOauthRequestCodeVerifier(context, response.codeVerifier)
 
                     CoroutineScope(Dispatchers.Main).launch {
-                        val intentUri = Uri.parse(response.authorizationUrl)
+                        val intentUri = response.authorizationUrl.toUri()
                         val intent = Intent(Intent.ACTION_VIEW, intentUri)
                         context.startActivity(intent)
                     }
@@ -337,7 +347,10 @@ private fun AddAccountLoading(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(16.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+            .imePadding()
     ){
         var isAuthenticationCodeRequested by remember { mutableStateOf(false) }
         var isPasswordRequested by remember { mutableStateOf(false) }

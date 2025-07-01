@@ -33,17 +33,32 @@ object ComposeHandlers {
             throw Exception("More than 1 states exist")
         }
 
-        val state = if(states.isNotEmpty() && (account != null || isTesting))
-            States(String(Publishers.getEncryptedStates(context, states[0].value),
-                Charsets.UTF_8)) else States()
+        val state = if (states.isNotEmpty()) {
+            States(String(Publishers.getEncryptedStates(context, states[0].value)))
+        } else {
+            States()
+        }
+
+//        val state = if(states.isNotEmpty() && (account != null || isTesting))
+//            States(String(Publishers.getEncryptedStates(context, states[0].value),
+//                Charsets.UTF_8)) else States()
         val messageComposer = MessageComposer(context, state, AD)
         var encryptedContentBase64 = if(platform != null)
             messageComposer.compose( platform, formattedContent)
         else messageComposer.composeBridge(formattedContent)
 
-        val encryptedStates = Publishers.encryptStates(context, state.serializedStates)
-        val  ratchetsStates = RatchetStates(value = encryptedStates)
-        Datastore.getDatastore(context).ratchetStatesDAO().update(ratchetsStates)
+        try {
+            val encryptedStatesValue = Publishers.encryptStates(context, state.serializedStates)
+            val ratchetStatesEntry = RatchetStates(id = states.firstOrNull()?.id ?: 0, value = encryptedStatesValue)
+            if (states.isNotEmpty()) {
+                Datastore.getDatastore(context).ratchetStatesDAO().update(ratchetStatesEntry)
+            } else {
+                Datastore.getDatastore(context).ratchetStatesDAO().deleteAll()
+                Datastore.getDatastore(context).ratchetStatesDAO().insert(RatchetStates(value = encryptedStatesValue))
+            }
+        } catch (e: Exception) {
+            System.err.println("Failed to update Ratchet states: ${e.message}")
+        }
 
         val gatewayClientMSISDN = GatewayClientsCommunications(context)
             .getDefaultGatewayClient()
