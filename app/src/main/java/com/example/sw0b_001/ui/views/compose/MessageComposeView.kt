@@ -313,34 +313,33 @@ private fun createMessageByteBuffer(
     val toBytes = to.toByteArray(StandardCharsets.UTF_8)
     val bodyBytes = message.toByteArray(StandardCharsets.UTF_8)
 
-    // Get sizes for validation and buffer allocation
+    // Get sizes for validation
     val fromSize = fromBytes.size
     val toSize = toBytes.size
     val bodySize = bodyBytes.size
 
-    // Validate field sizes against their specified limits
+    // Validate field sizes
     if (fromSize > BYTE_SIZE_LIMIT) throw IllegalArgumentException("From field exceeds maximum size of $BYTE_SIZE_LIMIT bytes")
     if (toSize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("To field exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
     if (bodySize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("Body field exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
 
-    // Calculate total buffer size - all header fields + actual data
-    val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 1 + 1 +
+    val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 2 + 2 +
             fromSize + toSize + bodySize
 
     // Allocate buffer and set byte order
     val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
 
     // Write field lengths according to specification
-    buffer.put(fromSize.toByte())         // 1 byte for from length
-    buffer.putShort(toSize.toShort())     // 2 bytes for to length
-    buffer.putShort(0)                    // 2 bytes for cc length (set to 0)
-    buffer.putShort(0)                    // 2 bytes for bcc length (set to 0)
-    buffer.put(0)                         // 1 byte for subject length (set to 0)
-    buffer.putShort(bodySize.toShort())   // 2 bytes for body length
-    buffer.put(0)                         // 1 byte for access token length (set to 0)
-    buffer.put(0)                         // 1 byte for refresh token length (set to 0)
+    buffer.put(fromSize.toByte())
+    buffer.putShort(toSize.toShort())
+    buffer.putShort(0)
+    buffer.putShort(0)
+    buffer.put(0.toByte())
+    buffer.putShort(bodySize.toShort())
+    buffer.putShort(0)
+    buffer.putShort(0)
 
-    // Write field values (only the ones that are actually used)
+    // Write field values
     buffer.put(fromBytes)
     buffer.put(toBytes)
     buffer.put(bodyBytes)
@@ -362,7 +361,7 @@ private fun processSend(
             val AD = Publishers.fetchPublisherPublicKey(context)
                 ?: return@launch onFailure("Could not fetch publisher key.")
 
-            val contentFormatV1Bytes = createMessageByteBuffer(
+            val contentFormatV2Bytes = createMessageByteBuffer(
                 from = messageContent.from,
                 to = messageContent.to,
                 message = messageContent.message
@@ -374,9 +373,9 @@ private fun processSend(
             val languageCode = Locale.getDefault().language.take(2).lowercase()
             val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
 
-            val v1PayloadBytes = ComposeHandlers.composeV1(
+            val v2PayloadBytes = ComposeHandlers.composeV2(
                 context = context,
-                contentFormatV1Bytes = contentFormatV1Bytes,
+                contentFormatV2Bytes = contentFormatV2Bytes,
                 AD = AD,
                 platform = platform,
                 account = account,
@@ -387,7 +386,7 @@ private fun processSend(
             if (smsTransmission) {
                 val gatewayClientMSISDN = GatewayClientsCommunications(context).getDefaultGatewayClient()
                     ?: return@launch onFailure("No default gateway client configured.")
-                val base64Payload = Base64.encodeToString(v1PayloadBytes, Base64.NO_WRAP)
+                val base64Payload = Base64.encodeToString(v2PayloadBytes, Base64.NO_WRAP)
                 SMSHandler.transferToDefaultSMSApp(context, gatewayClientMSISDN, base64Payload)
             }
             onSuccess()

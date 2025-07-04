@@ -683,33 +683,33 @@ private fun createEmailByteBuffer(
     val accessTokenBytes = accessToken?.toByteArray(StandardCharsets.UTF_8)
     val refreshTokenBytes = refreshToken?.toByteArray(StandardCharsets.UTF_8)
 
-    // Validate field sizes against their specified limits
+    // Field size validation
     if (fromBytes.size > 255) throw IllegalArgumentException("From field exceeds maximum size of 255 bytes")
     if (toBytes.size > 65535) throw IllegalArgumentException("To field exceeds maximum size of 65,535 bytes")
     if (ccBytes.size > 65535) throw IllegalArgumentException("CC field exceeds maximum size of 65,535 bytes")
     if (bccBytes.size > 65535) throw IllegalArgumentException("BCC field exceeds maximum size of 65,535 bytes")
     if (subjectBytes.size > 255) throw IllegalArgumentException("Subject field exceeds maximum size of 255 bytes")
     if (bodyBytes.size > 65535) throw IllegalArgumentException("Body field exceeds maximum size of 65,535 bytes")
-    if ((accessTokenBytes?.size ?: 0) > 255) throw IllegalArgumentException("Access token exceeds maximum size of 255 bytes")
-    if ((refreshTokenBytes?.size ?: 0) > 255) throw IllegalArgumentException("Refresh token exceeds maximum size of 255 bytes")
+    if ((accessTokenBytes?.size ?: 0) > 65535) throw IllegalArgumentException("Access token exceeds maximum size of 65,535 bytes")
+    if ((refreshTokenBytes?.size ?: 0) > 65535) throw IllegalArgumentException("Refresh token exceeds maximum size of 65,535 bytes")
 
-    // Calculate total size according to specification
-    val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 1 + 1 +
+    // Calculate total size for the buffer
+    val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 2 + 2 +
             fromBytes.size + toBytes.size + ccBytes.size + bccBytes.size +
             subjectBytes.size + bodyBytes.size +
             (accessTokenBytes?.size ?: 0) + (refreshTokenBytes?.size ?: 0)
 
     val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
 
-    // Write field lengths according to specification
-    buffer.put(fromBytes.size.toByte())       // 1 byte for from length
-    buffer.putShort(toBytes.size.toShort())   // 2 bytes for to length
-    buffer.putShort(ccBytes.size.toShort())   // 2 bytes for cc length
-    buffer.putShort(bccBytes.size.toShort())  // 2 bytes for bcc length
-    buffer.put(subjectBytes.size.toByte())    // 1 byte for subject length
-    buffer.putShort(bodyBytes.size.toShort()) // 2 bytes for body length
-    buffer.put((accessTokenBytes?.size ?: 0).toByte())    // 1 byte for access token length
-    buffer.put((refreshTokenBytes?.size ?: 0).toByte())   // 1 byte for refresh token length
+    // Write field lengths
+    buffer.put(fromBytes.size.toByte())
+    buffer.putShort(toBytes.size.toShort())
+    buffer.putShort(ccBytes.size.toShort())
+    buffer.putShort(bccBytes.size.toShort())
+    buffer.put(subjectBytes.size.toByte())
+    buffer.putShort(bodyBytes.size.toShort())
+    buffer.putShort((accessTokenBytes?.size ?: 0).toShort())
+    buffer.putShort((refreshTokenBytes?.size ?: 0).toShort())
 
     // Write field values
     buffer.put(fromBytes)
@@ -796,7 +796,7 @@ private fun processSend(
                 }
 
 
-                val contentFormatV1Bytes = createEmailByteBuffer(
+                val contentFormatV2Bytes = createEmailByteBuffer(
                     from = account.account,
                     to = emailContent.to,
                     cc = emailContent.cc,
@@ -818,9 +818,9 @@ private fun processSend(
                 val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
                 Log.d("processSend", "Valid language code: $validLanguageCode")
 
-                val v1PayloadBytes = ComposeHandlers.composeV1(
+                val v2PayloadBytes = ComposeHandlers.composeV2(
                     context = context,
-                    contentFormatV1Bytes = contentFormatBytes,
+                    contentFormatV2Bytes = contentFormatBytes,
                     AD = AD,
                     platform = platform,
                     account = account,
@@ -835,7 +835,7 @@ private fun processSend(
                         onFailureCallback("No default gateway client configured for SMS.")
                         return@launch
                     }
-                    val base64Payload = Base64.encodeToString(v1PayloadBytes, Base64.NO_WRAP)
+                    val base64Payload = Base64.encodeToString(v2PayloadBytes, Base64.NO_WRAP)
                     SMSHandler.transferToDefaultSMSApp(
                         context,
                         gatewayClientMSISDN,
@@ -844,7 +844,7 @@ private fun processSend(
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK
                     }
                 }
-                onCompleteCallback(v1PayloadBytes)
+                onCompleteCallback(v2PayloadBytes)
             }
         } catch (e: Exception) {
             e.printStackTrace()
