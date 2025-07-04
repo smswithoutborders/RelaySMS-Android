@@ -117,9 +117,10 @@ object EmailComposeHandler {
             val bccLen = buffer.getShort().toInt() and 0xFFFF
             val subjectLen = buffer.get().toInt() and 0xFF
             val bodyLen = buffer.getShort().toInt() and 0xFFFF
-            val accessLen = buffer.get().toInt() and 0xFF
-            val refreshLen = buffer.get().toInt() and 0xFF
+            val accessLen = buffer.getShort().toInt() and 0xFFFF
+            val refreshLen = buffer.getShort().toInt() and 0xFFFF
 
+            // Skip 'from' field
             if (fromLen > 0) buffer.position(buffer.position() + fromLen)
 
             // Read the relevant fields for the EmailContent object
@@ -129,16 +130,18 @@ object EmailComposeHandler {
             val subject = ByteArray(subjectLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
             val body = ByteArray(bodyLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
 
+            // Skip token fields
             if (accessLen > 0) buffer.position(buffer.position() + accessLen)
             if (refreshLen > 0) buffer.position(buffer.position() + refreshLen)
 
             return EmailContent(to, cc, bcc, subject, body)
         } catch (e: Exception) {
-            Log.e("EmailComposeHandler", "Failed to decompose V1 binary message", e)
+            Log.e("EmailComposeHandler", "Failed to decompose V2 binary message", e)
             return EmailContent("", "", "", "", "Error: Could not parse message content.")
         }
-
     }
+
+
 
     fun decomposeBridgeMessage(message: String): EmailContent {
         return try {

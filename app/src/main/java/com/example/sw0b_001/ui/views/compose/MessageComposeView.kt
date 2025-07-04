@@ -88,18 +88,28 @@ object MessageComposeHandler {
 
             val fromLen = buffer.get().toInt() and 0xFF
             val toLen = buffer.getShort().toInt() and 0xFFFF
-            buffer.position(buffer.position() + 2 + 2 + 1)
+            val ccLen = buffer.getShort().toInt() and 0xFFFF
+            val bccLen = buffer.getShort().toInt() and 0xFFFF
+            val subjectLen = buffer.get().toInt() and 0xFF
             val bodyLen = buffer.getShort().toInt() and 0xFFFF
-            buffer.position(buffer.position() + 1 + 1)
+            val accessLen = buffer.getShort().toInt() and 0xFFFF
+            val refreshLen = buffer.getShort().toInt() and 0xFFFF
 
-            // Extract relevant fields
             val from = ByteArray(fromLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
             val to = ByteArray(toLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+
+            if (ccLen > 0) buffer.position(buffer.position() + ccLen)
+            if (bccLen > 0) buffer.position(buffer.position() + bccLen)
+            if (subjectLen > 0) buffer.position(buffer.position() + subjectLen)
+
             val message = ByteArray(bodyLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+
+            if (accessLen > 0) buffer.position(buffer.position() + accessLen)
+            if (refreshLen > 0) buffer.position(buffer.position() + refreshLen)
 
             MessageContent(from = from, to = to, message = message)
         } catch (e: Exception) {
-            Log.e("MessageComposeHandler", "Failed to decompose V1 binary message content", e)
+            Log.e("MessageComposeHandler", "Failed to decompose V2 binary message content", e)
             MessageContent("Unknown", "Unknown", "Error: Could not parse message content.")
         }
     }
