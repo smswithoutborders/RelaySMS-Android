@@ -1,6 +1,7 @@
 package com.example.sw0b_001.ui.views
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -269,6 +270,11 @@ fun LoginView(
                                     navController.navigate(OTPCodeScreen)
                                 }
                             },
+                            passwordRequiredCallback = {
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    navController.navigate(ForgotPasswordScreen)
+                                }
+                            },
                             failedCallback = {
                                 isLoading = false
                                 CoroutineScope(Dispatchers.Main).launch {
@@ -342,6 +348,7 @@ private fun login(
     phoneNumber: String,
     password: String,
     otpRequiredCallback: (Int) -> Unit,
+    passwordRequiredCallback: () -> Unit = {},
     failedCallback: (String?) -> Unit = {},
     completedCallback: () -> Unit = {},
 ) {
@@ -354,7 +361,9 @@ private fun login(
                 password
             )
 
-            if(response.requiresOwnershipProof) {
+            if (response.requiresPasswordReset) {
+                passwordRequiredCallback()
+            } else if(response.requiresOwnershipProof) {
                 otpRequiredCallback(response.nextAttemptTimestamp)
             }
         } catch(e: StatusRuntimeException) {

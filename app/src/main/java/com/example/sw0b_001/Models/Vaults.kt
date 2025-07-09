@@ -218,6 +218,11 @@ class Vaults(val context: Context) {
         }.build()
 
         val response = entityStub.authenticateEntity(authenticateEntityRequest)
+
+        if (response.requiresPasswordReset) {
+            return response
+        }
+
         if(!response.requiresOwnershipProof) {
             processVaultArtifacts(context,
                 response.longLivedToken,
