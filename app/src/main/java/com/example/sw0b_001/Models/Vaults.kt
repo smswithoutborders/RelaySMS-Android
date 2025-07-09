@@ -142,22 +142,30 @@ class Vaults(val context: Context) {
                                       deviceIdPubKey: String,
                                       publisherPubKey: String,
                                       phoneNumber: String,
-                                      clientDeviceIDPubKey: ByteArray) {
+                                      clientDeviceIDPubKey: ByteArray,
+                                      clientPublisherPubKey: ByteArray) {
         val deviceIdSharedKey = Cryptography.calculateSharedSecret(
             context,
             DEVICE_ID_KEYSTORE_ALIAS,
-            Base64.decode(deviceIdPubKey, Base64.DEFAULT))
+            Base64.decode(deviceIdPubKey, Base64.DEFAULT),
+        )
         println("DeviceID sk: ${Base64.encodeToString(deviceIdSharedKey, Base64.DEFAULT)}")
 
         val llt = Crypto.decryptFernet(deviceIdSharedKey,
             String(Base64.decode(encodedLlt, Base64.DEFAULT), Charsets.UTF_8))
 
-        val deviceId = getDeviceID(deviceIdSharedKey, phoneNumber, clientDeviceIDPubKey)
+        val deviceId = getDeviceID(
+            deviceIdSharedKey,
+            phoneNumber,
+            clientDeviceIDPubKey
+        )
         println("DeviceID: ${Base64.encodeToString(deviceId, Base64.DEFAULT)}")
         println("Device msisdn: $phoneNumber")
 
         storeArtifacts(context, llt, deviceId, clientDeviceIDPubKey)
-        Publishers.storeArtifacts(context, publisherPubKey)
+        Publishers.storeArtifacts(context, publisherPubKey,
+            Base64.encodeToString(clientPublisherPubKey,
+            Base64.DEFAULT))
         Publishers.removeEncryptedStates(context)
         CoroutineScope(Dispatchers.Default).launch {
             Datastore.getDatastore(context).ratchetStatesDAO().deleteAll()
@@ -193,7 +201,7 @@ class Vaults(val context: Context) {
                 response.serverDeviceIdPubKey,
                 response.serverPublishPubKey,
                 phoneNumber,
-                deviceIdPubKey)
+                deviceIdPubKey, publishPubKey)
         }
         return response
     }
@@ -224,7 +232,7 @@ class Vaults(val context: Context) {
                 response.serverDeviceIdPubKey,
                 response.serverPublishPubKey,
                 phoneNumber,
-                deviceIdPubKey)
+                deviceIdPubKey, publishPubKey)
         }
         return response
     }
@@ -255,7 +263,7 @@ class Vaults(val context: Context) {
                 response.serverDeviceIdPubKey,
                 response.serverPublishPubKey,
                 phoneNumber,
-                deviceIdPubKey)
+                deviceIdPubKey, publishPubKey)
         }
         return response
     }

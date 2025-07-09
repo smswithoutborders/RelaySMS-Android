@@ -94,6 +94,11 @@ fun ForgotPasswordView(
     BackHandler {
         navController.popBackStack()
     }
+    if(BuildConfig.DEBUG) {
+        phoneNumber = "1123579"
+        password = "dMd2Kmo9#"
+        reenterPassword = "dMd2Kmo9#"
+    }
 
     Scaffold(
         modifier = Modifier

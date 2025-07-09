@@ -105,13 +105,8 @@ object ComposeHandlers {
             throw IllegalStateException("Multiple Ratchet states found in database. Expected at most one.")
         }
 
-        val state = if (states.isNotEmpty() && (account != null || isTesting)) {
-            try {
-                States(String(Publishers.getEncryptedStates(context, states[0].value), Charsets.UTF_8))
-            } catch (e: Exception) {
-                System.err.println("Failed to load existing Ratchet state: ${e.message}. Initializing new state.")
-                States()
-            }
+        val state = if (states.isNotEmpty()) {
+            States(String(Publishers.getEncryptedStates(context, states[0].value)))
         } else {
             States()
         }
@@ -172,7 +167,7 @@ object ComposeHandlers {
     }
 
 
-        fun decompose(
+    fun decompose(
         context: Context,
         cipherText: ByteArray,
         AD: ByteArray,
@@ -206,7 +201,7 @@ object ComposeHandlers {
             )
 
             val encryptedStates = Publishers.encryptStates(context, state.serializedStates)
-            val  ratchetsStates = RatchetStates(value = encryptedStates)
+            val ratchetsStates = RatchetStates(value = encryptedStates)
             Datastore.getDatastore(context).ratchetStatesDAO().update(ratchetsStates)
 
             onSuccessCallback(text)
@@ -234,13 +229,8 @@ object ComposeHandlers {
         }
 
         // The state loading logic is the same.
-        val state = if (states.isNotEmpty() && (account != null || isTesting)) {
-            try {
-                States(String(Publishers.getEncryptedStates(context, states[0].value), StandardCharsets.UTF_8))
-            } catch (e: Exception) {
-                System.err.println("Failed to load existing Ratchet state: ${e.message}. Initializing new state.")
-                States()
-            }
+        val state = if (states.isNotEmpty()) {
+            States(String(Publishers.getEncryptedStates(context, states[0].value)))
         } else {
             States()
         }

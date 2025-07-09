@@ -126,14 +126,14 @@ object Bridges {
         if(!isLoggedIn) {
             clientPublicKey = Cryptography.generateKey(context,
                 Publishers.PUBLISHER_ID_KEYSTORE_ALIAS)
-            clientPublicKey.let {
-                Publishers.storeClientArtifacts(context,
-                    android.util.Base64.encodeToString(it, android.util.Base64.DEFAULT))
-            }
 
             val serverPublicKey = getStaticKeys(context)?.get(0)?.keypair
             serverPublicKey?.let {
-                Publishers.storeArtifacts(context, it)
+                Publishers.storeArtifacts(context, it,
+                    android.util.Base64.encodeToString(
+                        clientPublicKey,
+                        android.util.Base64.DEFAULT)
+                )
             }
         }
 
@@ -244,7 +244,9 @@ object Bridges {
             val bridgeLetter = payload[9]
             val cipherText = payload.copyOfRange(10, payload.size)
 
-            var decryptedText: String? = null
+            val decryptedText: String? = null
+
+            val isLoggedIn = Vaults.fetchLongLivedToken(context).isNotEmpty()
             val AD = Publishers.fetchClientPublisherPublicKey(context)
             val scope = CoroutineScope(Dispatchers.Default).launch {
                 ComposeHandlers.decompose(
