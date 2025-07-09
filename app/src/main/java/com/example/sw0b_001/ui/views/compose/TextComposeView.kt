@@ -106,18 +106,18 @@ object TextComposeHandler {
         return try {
             val buffer = ByteBuffer.wrap(contentBytes).order(ByteOrder.LITTLE_ENDIAN)
 
-            // Read field lengths from the unified V1 format
             val fromLen = buffer.get().toInt() and 0xFF
             val toLen = buffer.getShort().toInt() and 0xFFFF
             val ccLen = buffer.getShort().toInt() and 0xFFFF
             val bccLen = buffer.getShort().toInt() and 0xFFFF
             val subjectLen = buffer.get().toInt() and 0xFF
             val bodyLen = buffer.getShort().toInt() and 0xFFFF
-            val accessLen = buffer.get().toInt() and 0xFF
-            val refreshLen = buffer.get().toInt() and 0xFF
+            val accessLen = buffer.getShort().toInt() and 0xFFFF
+            val refreshLen = buffer.getShort().toInt() and 0xFFFF
 
             val from = ByteArray(fromLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
 
+            // Skip unused fields
             if (toLen > 0) buffer.position(buffer.position() + toLen)
             if (ccLen > 0) buffer.position(buffer.position() + ccLen)
             if (bccLen > 0) buffer.position(buffer.position() + bccLen)
@@ -125,12 +125,13 @@ object TextComposeHandler {
 
             val text = ByteArray(bodyLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
 
+            // Skip token fields
             if (accessLen > 0) buffer.position(buffer.position() + accessLen)
             if (refreshLen > 0) buffer.position(buffer.position() + refreshLen)
 
             TextContent(from = from, text = text)
         } catch (e: Exception) {
-            Log.e("TextComposeHandler", "Failed to decompose V1 binary text message", e)
+            Log.e("TextComposeHandler", "Failed to decompose V2 binary text message", e)
             TextContent("Unknown", "Error: Could not parse message content.")
         }
     }
@@ -305,37 +306,25 @@ data class ReliabilityTestResponsePayload(
 )
 
 private fun createTestByteBuffer(testId: String): ByteBuffer {
-    // Define size constants
     val BYTE_SIZE_LIMIT = 255
-
-    // Convert string to byte array
     val testIdBytes = testId.toByteArray(StandardCharsets.UTF_8)
-
-    // Get size for validation and buffer allocation
     val testIdSize = testIdBytes.size
 
-    // Validate field sizes against their specified limits
     if (testIdSize > BYTE_SIZE_LIMIT) throw IllegalArgumentException("Test ID exceeds maximum size of $BYTE_SIZE_LIMIT bytes")
 
-    // Calculate total buffer size - all header fields + actual data
-    val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 1 + 1 + testIdSize
-
-    // Allocate buffer and set byte order
+    val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 2 + 2 + testIdSize
     val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
 
-    // Write field lengths according to specification
-    buffer.put(testIdSize.toByte())       // 1 byte for from field length (test ID)
-    buffer.putShort(0)                    // 2 bytes for to length (set to 0)
-    buffer.putShort(0)                    // 2 bytes for cc length (set to 0)
-    buffer.putShort(0)                    // 2 bytes for bcc length (set to 0)
-    buffer.put(0)                         // 1 byte for subject length (set to 0)
-    buffer.putShort(0)                    // 2 bytes for body length (set to 0)
-    buffer.put(0)                         // 1 byte for access token length (set to 0)
-    buffer.put(0)                         // 1 byte for refresh token length (set to 0)
+    buffer.put(testIdSize.toByte()) // 1 byte for from field length (test ID)
+    buffer.putShort(0)              // 2 bytes for to length
+    buffer.putShort(0)              // 2 bytes for cc length
+    buffer.putShort(0)              // 2 bytes for bcc length
+    buffer.put(0.toByte())          // 1 byte for subject length
+    buffer.putShort(0)              // 2 bytes for body length
+    buffer.putShort(0)              // 2 bytes for access token length
+    buffer.putShort(0)              // 2 bytes for refresh token length
 
-    // Write test ID bytes (from field is used as test ID)
     buffer.put(testIdBytes)
-
     buffer.flip()
     return buffer
 }
@@ -360,14 +349,14 @@ private fun processTest(
             val AD = Publishers.fetchPublisherPublicKey(context)
                 ?: return@launch onFailure("Could not fetch publisher key.")
 
-            val contentFormatV1Bytes = createTestByteBuffer(testId).array()
+            val contentFormatV2Bytes = createTestByteBuffer(testId).array()
 
             val languageCode = Locale.getDefault().language.take(2).lowercase()
             val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
 
-            val v1PayloadBytes = ComposeHandlers.composeV1(
+            val v1PayloadBytes = ComposeHandlers.composeV2(
                 context = context,
-                contentFormatV1Bytes = contentFormatV1Bytes,
+                contentFormatV2Bytes = contentFormatV2Bytes,
                 AD = AD,
                 platform = platform,
                 account = null,
@@ -409,30 +398,28 @@ private fun createTextByteBuffer(
     val accessTokenSize = accessTokenBytes?.size ?: 0
     val refreshTokenSize = refreshTokenBytes?.size ?: 0
 
-    // Validate field sizes against their specified limits
+    // Validate field sizes
     if (fromSize > BYTE_SIZE_LIMIT) throw IllegalArgumentException("From field exceeds maximum size of $BYTE_SIZE_LIMIT bytes")
     if (bodySize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("Body field exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
-    if (accessTokenSize > BYTE_SIZE_LIMIT) throw IllegalArgumentException("Access token exceeds maximum size of $BYTE_SIZE_LIMIT bytes")
-    if (refreshTokenSize > BYTE_SIZE_LIMIT) throw IllegalArgumentException("Refresh token exceeds maximum size of $BYTE_SIZE_LIMIT bytes")
+    if (accessTokenSize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("Access token exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
+    if (refreshTokenSize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("Refresh token exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
 
-    // Calculate total buffer size - all header fields + actual data
-    val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 1 + 1 +
+    val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 2 + 2 +
             fromSize + bodySize + accessTokenSize + refreshTokenSize
 
-    // Allocate buffer and set byte order
     val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
 
-    // Write field lengths according to specification
-    buffer.put(fromSize.toByte())         // 1 byte for from length
-    buffer.putShort(0)                    // 2 bytes for to length (set to 0)
-    buffer.putShort(0)                    // 2 bytes for cc length (set to 0)
-    buffer.putShort(0)                    // 2 bytes for bcc length (set to 0)
-    buffer.put(0)                         // 1 byte for subject length (set to 0)
-    buffer.putShort(bodySize.toShort())   // 2 bytes for body length
-    buffer.put(accessTokenSize.toByte())  // 1 byte for access token length
-    buffer.put(refreshTokenSize.toByte()) // 1 byte for refresh token length
+    // Write field lengths
+    buffer.put(fromSize.toByte())
+    buffer.putShort(0)
+    buffer.putShort(0)
+    buffer.putShort(0)
+    buffer.put(0.toByte())
+    buffer.putShort(bodySize.toShort())
+    buffer.putShort(accessTokenSize.toShort())
+    buffer.putShort(refreshTokenSize.toShort())
 
-    // Write field values (only the ones that are actually used)
+    // Write field values
     buffer.put(fromBytes)
     buffer.put(bodyBytes)
     accessTokenBytes?.let { buffer.put(it) }
@@ -456,7 +443,7 @@ private fun processPost(
             val AD = Publishers.fetchPublisherPublicKey(context)
                 ?: return@launch onFailure("Could not fetch publisher key.")
 
-            val contentFormatV1Bytes = createTextByteBuffer(
+            val contentFormatV2Bytes = createTextByteBuffer(
                 from = account.account!!,
                 body = text,
                 accessToken = account.accessToken,
@@ -469,9 +456,9 @@ private fun processPost(
             val languageCode = Locale.getDefault().language.take(2).lowercase()
             val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
 
-            val v1PayloadBytes = ComposeHandlers.composeV1(
+            val v2PayloadBytes = ComposeHandlers.composeV2(
                 context = context,
-                contentFormatV1Bytes = contentFormatV1Bytes,
+                contentFormatV2Bytes = contentFormatV2Bytes,
                 AD = AD,
                 platform = platform,
                 account = account,
@@ -482,7 +469,7 @@ private fun processPost(
             if (smsTransmission) {
                 val gatewayClientMSISDN = GatewayClientsCommunications(context).getDefaultGatewayClient()
                     ?: return@launch onFailure("No default gateway client configured.")
-                val base64Payload = Base64.encodeToString(v1PayloadBytes, Base64.NO_WRAP)
+                val base64Payload = Base64.encodeToString(v2PayloadBytes, Base64.NO_WRAP)
                 SMSHandler.transferToDefaultSMSApp(context, gatewayClientMSISDN, base64Payload)
             }
             onSuccess()
