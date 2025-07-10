@@ -85,7 +85,8 @@ object Bridges {
                     cc = it[2],
                     bcc = it[3],
                     subject = it[4],
-                    date = it[5].split(".")[0].toLong(),
+                    date = it[5].split(".")[0]
+                        .replace(" ", "").toLong(),
                     body = it.subList(6, it.size).joinToString()
                 )
             }
