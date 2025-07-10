@@ -169,7 +169,7 @@ object Bridges {
 
         val bridgeLetter: Byte = "e".encodeToByteArray()[0]
 
-        var payload = mode +
+        val payload = mode +
                 versionMarker +
                 switchValue +
                 cipherTextLength +
@@ -198,7 +198,7 @@ object Bridges {
 
         val bridgeLetter: Byte = "e".encodeToByteArray()[0]
 
-        var payload = mode +
+        val payload = mode +
                 versionMarker +
                 switchValue +
                 clientPublicKeyLen +
