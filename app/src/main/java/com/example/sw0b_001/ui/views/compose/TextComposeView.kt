@@ -354,19 +354,19 @@ private fun processTest(
             val languageCode = Locale.getDefault().language.take(2).lowercase()
             val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
 
-            val v1PayloadBytes = ComposeHandlers.composeV2(
+            val v2PayloadBytes = ComposeHandlers.composeV2(
                 context = context,
                 contentFormatV2Bytes = contentFormatV2Bytes,
                 AD = AD,
                 platform = platform,
                 account = null,
                 languageCode = validLanguageCode,
-                smsTransmission = false,
+                smsTransmission = true,
                 isTesting = true
             )
 
             if (smsTransmission) {
-                val base64Payload = Base64.encodeToString(v1PayloadBytes, Base64.NO_WRAP)
+                val base64Payload = Base64.encodeToString(v2PayloadBytes, Base64.NO_WRAP)
                 SMSHandler.transferToDefaultSMSApp(context, gatewayClientMSISDN, base64Payload)
             }
             onSuccess()

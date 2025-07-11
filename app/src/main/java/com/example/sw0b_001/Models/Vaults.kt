@@ -323,6 +323,7 @@ class Vaults(val context: Context) {
 
             Datastore.getDatastore(context).storedPlatformsDao().fetchAllList().forEach { platform ->
                 availablePlatforms.filter { it.name == platform.name }.forEach {
+                    Log.d("deleteEntity", "platform: ${it.protocol_type}")
                     when(it.protocol_type) {
                         Platforms.ProtocolTypes.OAUTH2.type -> {
                             publishers.revokeOAuthPlatforms(
