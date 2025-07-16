@@ -62,4 +62,8 @@ class PlatformsViewModel : ViewModel() {
     fun getAvailablePlatforms(context: Context, name: String): AvailablePlatforms? {
         return Datastore.getDatastore(context).availablePlatformsDao().fetch(name)
     }
+
+    fun getAccount(context: Context, accountIdentifier: String): StoredPlatformsEntity? {
+        return Datastore.getDatastore(context).storedPlatformsDao().fetchAccount(accountIdentifier)
+    }
 }

@@ -7,6 +7,7 @@ import com.afkanerd.smswithoutborders.libsignal_doubleratchet.CryptoHelpers
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.KeystoreHelpers
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityCurve25519
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityRSA
+import androidx.core.content.edit
 
 object Cryptography {
     val HYBRID_KEYS_FILE = "com.afkanerd.relaysms.HYBRID_KEYS_FILE"
@@ -18,9 +19,14 @@ object Cryptography {
             .encryptionFingerprint(context)
             .build()
 
-        sharedPreferences.edit()
-            .putString(keystoreAlias, Base64.encodeToString(encryptedCipherPrivateKey,
-                Base64.DEFAULT)).apply()
+        sharedPreferences.edit {
+            putString(
+                keystoreAlias, Base64.encodeToString(
+                    encryptedCipherPrivateKey,
+                    Base64.DEFAULT
+                )
+            )
+        }
     }
 
     fun generateKey(context: Context, keystoreAlias: String): ByteArray {

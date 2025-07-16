@@ -45,12 +45,15 @@ class OauthRedirectActivity : AppCompatActivity() {
         val supportsUrlScheme = values[1] == "true"
         val code: String = URLDecoder.decode(parameters["code"]!!, "UTF-8")
 
+
         val scope = CoroutineScope(Dispatchers.Default)
         scope.launch {
             val publishers = Publishers(applicationContext)
             try {
                 val llt = Vaults.fetchLongLivedToken(applicationContext)
                 val codeVerifier = Publishers.fetchOauthRequestVerifier(applicationContext)
+                val publisherPublicKey = Publishers.fetchPublisherPublicKey(context = applicationContext)
+                val requestIdentifier = Base64.encodeToString(publisherPublicKey, Base64.NO_WRAP)
 
                 val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
                 val storeTokensOnDevice = sharedPreferences.getBoolean("store_tokens_on_device", false)
@@ -64,7 +67,8 @@ class OauthRedirectActivity : AppCompatActivity() {
                         code,
                         codeVerifier,
                         supportsUrlScheme,
-                        false
+                        false,
+                        requestIdentifier
                     )
                 } else {
                     publishers.sendOAuthAuthorizationCode(
@@ -72,7 +76,8 @@ class OauthRedirectActivity : AppCompatActivity() {
                         platform,
                         code,
                         codeVerifier,
-                        supportsUrlScheme
+                        supportsUrlScheme,
+                        requestIdentifier = requestIdentifier
                     )
                 }
 

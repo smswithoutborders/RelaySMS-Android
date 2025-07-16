@@ -2,6 +2,7 @@ package com.example.sw0b_001.Models
 
 import android.content.Context
 import android.util.Base64
+import android.util.Log
 import at.favre.lib.armadillo.Armadillo
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.KeystoreHelpers
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityAES
@@ -18,7 +19,7 @@ import publisher.v1.PublisherOuterClass
 import androidx.core.content.edit
 import com.example.sw0b_001.Models.Platforms.Platforms
 
-class Publishers(val context: Context, ) {
+class Publishers(val context: Context) {
 
     private var REDIRECT_URL_SCHEME = "relaysms://oauth.afkanerd.com/android/"
     private var channel: ManagedChannel = ManagedChannelBuilder
@@ -33,7 +34,8 @@ class Publishers(val context: Context, ) {
 
     fun getOAuthURL(availablePlatforms: AvailablePlatforms,
                     autogenerateCodeVerifier: Boolean = true,
-                    supportsUrlScheme: Boolean = true) : PublisherOuterClass.GetOAuth2AuthorizationUrlResponse {
+                    supportsUrlScheme: Boolean = true,
+                    requestIdentifier: String) : PublisherOuterClass.GetOAuth2AuthorizationUrlResponse {
         val scheme = if (supportsUrlScheme) "true" else "false"
         val request = PublisherOuterClass
             .GetOAuth2AuthorizationUrlRequest.newBuilder().apply {
@@ -42,7 +44,9 @@ class Publishers(val context: Context, ) {
                     Base64.DEFAULT))
                 setRedirectUrl(if (supportsUrlScheme) REDIRECT_URL_SCHEME else oAuthRedirectUrl)
                 setAutogenerateCodeVerifier(autogenerateCodeVerifier)
+                setRequestIdentifier(requestIdentifier)
             }.build()
+        Log.d("getOAuthURL", request.toString())
 
         return publisherStub.getOAuth2AuthorizationUrl(request)
     }
@@ -73,7 +77,8 @@ class Publishers(val context: Context, ) {
                                    code: String,
                                    codeVerifier: String,
                                    supportsUrlScheme: Boolean,
-                                   storeOnDevice: Boolean = false):
+                                   storeOnDevice: Boolean = false,
+                                   requestIdentifier: String = ""):
             PublisherOuterClass.ExchangeOAuth2CodeAndStoreResponse {
         val request = PublisherOuterClass.ExchangeOAuth2CodeAndStoreRequest.newBuilder().apply {
             setLongLivedToken(llt)
@@ -82,6 +87,7 @@ class Publishers(val context: Context, ) {
             setCodeVerifier(codeVerifier)
             setRedirectUrl(if (supportsUrlScheme) REDIRECT_URL_SCHEME else oAuthRedirectUrl)
             setStoreOnDevice(storeOnDevice)
+            setRequestIdentifier(requestIdentifier)
         }.build()
 
         return publisherStub.exchangeOAuth2CodeAndStore(request)
@@ -97,11 +103,13 @@ class Publishers(val context: Context, ) {
         return publisherStub.getPNBACode(request)
     }
 
-    fun phoneNumberBaseAuthenticationExchange(authorizationCode: String,
-                                              llt: String,
-                                              phoneNumber: String,
-                                              platform: String,
-                                              password: String = "") :
+    fun phoneNumberBaseAuthenticationExchange(
+        authorizationCode: String,
+        llt: String,
+        phoneNumber: String,
+        platform: String,
+        password: String = "",
+    ) :
             PublisherOuterClass.ExchangePNBACodeAndStoreResponse {
         val request = PublisherOuterClass.ExchangePNBACodeAndStoreRequest.newBuilder().apply {
             setPlatform(platform)
@@ -143,10 +151,12 @@ class Publishers(val context: Context, ) {
                 .build()
 
             val encryptedSecretKey = SecurityRSA.encrypt(publicKey, secretKey.encoded)
-            sharedPreferences.edit()
-                .putString(PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS,
-                    Base64.encodeToString(encryptedSecretKey, Base64.DEFAULT))
-                .apply()
+            sharedPreferences.edit {
+                putString(
+                    PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS,
+                    Base64.encodeToString(encryptedSecretKey, Base64.DEFAULT)
+                )
+            }
 
             return SecurityAES.encryptAES256CBC(states.encodeToByteArray(), secretKey.encoded,
                 null)
@@ -176,7 +186,8 @@ class Publishers(val context: Context, ) {
         }
 
         fun getAvailablePlatforms(context: Context): ArrayList<AvailablePlatforms> {
-            val response = Network.requestGet(context.getString(R.string.publisher_get_platforms_url))
+            val response = Network.requestGet(context.getString(R.string.get_platforms_url))
+            Log.d("getAvailablePlatforms", response.result.toString())
             return Json.decodeFromString<ArrayList<AvailablePlatforms>>(response.result.get())
         }
 
@@ -192,9 +203,9 @@ class Publishers(val context: Context, ) {
                 .encryptionFingerprint(context)
                 .build()
 
-            sharedPreferences.edit()
-                .putString("code_verifier", codeVerifier)
-                .apply()
+            sharedPreferences.edit {
+                putString("code_verifier", codeVerifier)
+            }
         }
 
         fun fetchPublisherPublicKey(context: Context) : ByteArray? {
@@ -221,24 +232,21 @@ class Publishers(val context: Context, ) {
                 pubKey!!)
         }
 
-        fun storeClientArtifacts(context: Context, publisherPubKey: String) {
+        fun storeArtifacts(
+            context: Context,
+            publisherPubKey: String,
+            clientPublishPublicKey: String,
+        ) {
             val sharedPreferences = Armadillo.create(context, PUBLISHER_ATTRIBUTE_FILES)
                 .encryptionFingerprint(context)
                 .build()
 
-            sharedPreferences.edit()
-                .putString(PUBLISHER_CLIENT_PUBLIC_KEY, publisherPubKey)
-                .apply()
-        }
-
-        fun storeArtifacts(context: Context, publisherPubKey: String) {
-            val sharedPreferences = Armadillo.create(context, PUBLISHER_ATTRIBUTE_FILES)
-                .encryptionFingerprint(context)
-                .build()
-
-            sharedPreferences.edit()
-                .putString(PUBLISHER_PUBLIC_KEY, publisherPubKey)
-                .apply()
+            sharedPreferences.edit {
+                putString(PUBLISHER_PUBLIC_KEY, publisherPubKey)
+            }
+            sharedPreferences.edit {
+                putString(PUBLISHER_CLIENT_PUBLIC_KEY, clientPublishPublicKey)
+            }
         }
     }
 

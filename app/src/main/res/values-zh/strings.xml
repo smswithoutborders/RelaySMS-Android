@@ -316,4 +316,9 @@
     <string name="preview_feature_description">发现此版本中的新功能。我们添加了一些您会喜欢的绝佳内容。</string>
     <string name="new_feature_title">新功能提醒！</string>
     <string name="oauth_token_storage_device_setting_info">您现在可以通过转到“设置”>“安全”来请求将 OAuth2.0 帐户的令牌存储在您的设备上。</string>
+    <string name="unknown">未知</string>
+    <string name="this_message_s_content_could_not_be_displayed">无法显示此消息的内容。</string>
+    <string name="message_">消息</string>
+    <string name="message_content_could_not_be_displayed">无法显示消息内容</string>
+    <string name="text_message">短信</string>
 </resources>

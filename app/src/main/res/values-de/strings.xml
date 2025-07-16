@@ -310,5 +310,10 @@
     <string name="preview_feature_description">Entdecken Sie, was es in dieser Version Neues gibt. Wir haben etwas Erstaunliches hinzugefügt, das Sie lieben werden.</string>
     <string name="new_feature_title">Hinweis auf neue Funktion!</string>
     <string name="oauth_token_storage_device_setting_info">Sie können jetzt beantragen, dass die Token Ihrer OAuth2.0-Konten auf Ihrem Gerät gespeichert werden, indem Sie zu Einstellungen > Sicherheit gehen.</string>
+    <string name="unknown">Unbekannt</string>
+    <string name="this_message_s_content_could_not_be_displayed">Der Inhalt dieser Nachricht konnte nicht angezeigt werden.</string>
+    <string name="message_">Nachricht</string>
+    <string name="message_content_could_not_be_displayed">Nachrichteninhalt konnte nicht angezeigt werden</string>
+    <string name="text_message">Textnachricht</string>
 
 </resources>

@@ -309,4 +309,9 @@
     <string name="preview_feature_description">Wana kuziva zvitsva mushanduro iyi. Tawedzera chinhu chinoshamisa chauchafarira.</string>
     <string name="new_feature_title">Yambiro yeChinhu Chitsva!</string>
     <string name="oauth_token_storage_device_setting_info">Wava kukwanisa kukumbira kuti zviratidzo zvemaakaundi ako eOAuth2.0 zvichengetwe pachishandiso chako nekuenda kuZvirongwa > Chengetedzo.</string>
+    <string name="unknown">Hazvizivikanwe</string>
+    <string name="this_message_s_content_could_not_be_displayed">Zviri mushoko rino hazvina kukwanisa kuratidzwa.</string>
+    <string name="message_">Shoko</string>
+    <string name="message_content_could_not_be_displayed">Zviri mushoko hazvina kukwanisa kuratidzwa</string>
+    <string name="text_message">Shoko reMameseji</string>
 </resources>
