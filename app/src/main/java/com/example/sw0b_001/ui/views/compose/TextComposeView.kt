@@ -287,7 +287,7 @@ fun TextComposeView(
                     .weight(1f),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done
+//                    imeAction = ImeAction.Done
                 )
             )
         }
