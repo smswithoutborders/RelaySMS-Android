@@ -314,4 +314,8 @@
     <string name="message_">Shoko</string>
     <string name="message_content_could_not_be_displayed">Zviri mushoko hazvina kukwanisa kuratidzwa</string>
     <string name="text_message">Shoko reMameseji</string>
+    <string name="recipient_account">Akaundi yemugashiri</string>
+    <string name="recipient_account_format_hint">Iva nechokwadi chekuti akaundi yemugashiri iri mufomati chaiyo.</string>
+    <string name="slack_recipient">Slack Channel kana Mushandisi</string>
+    <string name="slack_hint">Kumachaneli: shandisa #zita kana ID (sekuti, #general kana C123ABC). KumaDM: shandisa @username, email, kana user ID (sekuti, @jane kana @user@gmail.com kana U456DEF).</string>
 </resources>

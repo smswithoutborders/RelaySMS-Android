@@ -166,8 +166,8 @@ fun MessageComposeView(
 
     var showSelectAccountModal by remember { mutableStateOf(!inspectMode) }
     var selectedAccount by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
-    val protocolType = platformsViewModel.platform?.protocol_type
     val fieldInfo = getRecipientFieldInfo(platform = platformsViewModel.platform)
+    val isPnba = platformsViewModel.platform?.protocol_type == "pnba"
 
 
 
@@ -215,6 +215,10 @@ fun MessageComposeView(
                     }
                 },
                 actions = {
+
+                    val isSendEnabled = recipientAccount.isNotEmpty() && message.isNotEmpty() &&
+                            (if (isPnba) verifyPhoneNumberFormat(recipientAccount) else true)
+
                     IconButton(onClick = {
                         processSend(
                             context = context,
@@ -242,8 +246,7 @@ fun MessageComposeView(
                             }
                         )
                     },
-                        enabled = recipientAccount.isNotEmpty() && message.isNotEmpty() &&
-                                verifyPhoneNumberFormat(recipientAccount)) {
+                        enabled = isSendEnabled) {
                         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.send))
                     }
                 },
@@ -278,7 +281,6 @@ fun MessageComposeView(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val isPnba = platformsViewModel.platform?.protocol_type == "pnba"
                 OutlinedTextField(
                     value = recipientAccount,
                     onValueChange = { recipientAccount = it },
@@ -443,43 +445,38 @@ private fun processSend(
 
 fun getContactDetails(context: Context, contactUri: Uri): String {
     val contentResolver: ContentResolver = context.contentResolver
-    val contactDetails = mutableMapOf<String, String?>()
+    var phoneNumber: String? = null
 
     try {
-        val cursor: Cursor? = contentResolver.query(contactUri, null, null, null, null)
-        cursor?.use {
-            if (it.moveToFirst()) {
-                val id = it.getString(it.getColumnIndexOrThrow(ContactsContract.Contacts._ID))
-                val name = it.getString(it.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME))
+        val contactCursor: Cursor? = contentResolver.query(contactUri, arrayOf(ContactsContract.Contacts._ID), null, null, null)
 
-                contactDetails["id"] = id
-                contactDetails["name"] = name
+        contactCursor?.use { cCursor ->
+            if (cCursor.moveToFirst()) {
+                val contactId = cCursor.getString(cCursor.getColumnIndexOrThrow(ContactsContract.Contacts._ID))
 
-                // Retrieve phone numbers
-                val hasPhone = it.getInt(it.getColumnIndexOrThrow(ContactsContract.Contacts.HAS_PHONE_NUMBER))
-                if (hasPhone > 0) {
-                    val phoneCursor = contentResolver.query(
-                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                        null,
-                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                        arrayOf(id),
-                        null
-                    )
-                    phoneCursor?.use { phone ->
-                        if (phone.moveToFirst()) {
-                            return phone.getString(phone.getColumnIndexOrThrow(
-                                ContactsContract.CommonDataKinds.Phone.NUMBER))
-                        }
+                val phoneCursor: Cursor? = contentResolver.query(
+                    ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                    arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER),
+                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                    arrayOf(contactId),
+                    ContactsContract.CommonDataKinds.Phone.IS_PRIMARY + " DESC"
+                )
+
+                phoneCursor?.use { pCursor ->
+                    if (pCursor.moveToFirst()) {
+                        phoneNumber = pCursor.getString(pCursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER))
                     }
                 }
-
             }
         }
     } catch (e: Exception) {
+        Log.e("GetContactDetails", "Error fetching contact details: ${e.message}")
         e.printStackTrace()
+         Toast.makeText(context, "Could not retrieve contact number", Toast.LENGTH_SHORT).show()
     }
+    Log.d("GetContactDetails", "Retrieved phone number: $phoneNumber")
 
-    return ""
+    return phoneNumber ?: ""
 }
 
 

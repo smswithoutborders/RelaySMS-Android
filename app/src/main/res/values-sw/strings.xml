@@ -316,5 +316,9 @@
     <string name="message_">Ujumbe</string>
     <string name="message_content_could_not_be_displayed">Maudhui ya ujumbe hayakuweza kuonyeshwa</string>
     <string name="text_message">Ujumbe wa Maandishi</string>
+    <string name="recipient_account">Akaunti ya mpokeaji</string>
+    <string name="recipient_account_format_hint">Hakikisha akaunti ya mpokeaji iko katika muundo sahihi.</string>
+    <string name="slack_recipient">Chaneli ya Slack au Mtumiaji</string>
+    <string name="slack_hint">Kwa chaneli: tumia #jina au kitambulisho (k.m., #general au C123ABC). Kwa DM: tumia @jinalamtumiaji, barua pepe, au kitambulisho cha mtumiaji (k.m., @jane au @user@gmail.com au U456DEF).</string>
 
 </resources>
