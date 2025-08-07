@@ -57,6 +57,7 @@ import androidx.navigation.NavController
 import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.ComposeHandlers
 import com.example.sw0b_001.Models.GatewayClients.GatewayClientsCommunications
+import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.Models.Publishers
@@ -80,6 +81,31 @@ import java.util.Locale
 
 
 data class MessageContent(val from: String, val to: String, val message: String)
+
+data class RecipientFieldInfo(val label: String, val hint: String)
+
+@Composable
+private fun getRecipientFieldInfo(platform: AvailablePlatforms?): RecipientFieldInfo {
+    if (platform?.protocol_type == "pnba") {
+        return RecipientFieldInfo(
+            label = stringResource(R.string.recipient_number),
+            hint = stringResource(R.string.always_add_the_dialing_code_if_absent_e_g_237)
+        )
+    }
+
+    return when (platform?.name) {
+        "slack" -> RecipientFieldInfo(
+            label = stringResource(R.string.slack_recipient),
+            hint = stringResource(R.string.slack_hint)
+        )
+        // Add other platform-specific cases here
+
+        else -> RecipientFieldInfo(
+            label = stringResource(R.string.recipient_account),
+            hint = stringResource(R.string.recipient_account_format_hint)
+        )
+    }
+}
 
 object MessageComposeHandler {
     fun decomposeMessage(contentBytes: ByteArray): MessageContent {
@@ -134,18 +160,22 @@ fun MessageComposeView(
         }
     } else null
 
-    var recipientNumber by remember { mutableStateOf(decomposedMessage?.to ?: "") }
+    var recipientAccount by remember { mutableStateOf(decomposedMessage?.to ?: "") }
     var message by remember { mutableStateOf( decomposedMessage?.message ?: "") }
     var from by remember { mutableStateOf( decomposedMessage?.from ?: "") }
 
     var showSelectAccountModal by remember { mutableStateOf(!inspectMode) }
     var selectedAccount by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
+    val protocolType = platformsViewModel.platform?.protocol_type
+    val fieldInfo = getRecipientFieldInfo(platform = platformsViewModel.platform)
+
+
 
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.PickContact()
     ) { uri ->
         uri?.let {
-            recipientNumber = getContactDetails(context, uri)
+            recipientAccount = getContactDetails(context, uri)
         }
     }
 
@@ -190,7 +220,7 @@ fun MessageComposeView(
                             context = context,
                             messageContent = MessageContent(
                                 from = from,
-                                to = recipientNumber,
+                                to = recipientAccount,
                                 message = message
                             ),
                             account = selectedAccount!!,
@@ -212,8 +242,8 @@ fun MessageComposeView(
                             }
                         )
                     },
-                        enabled = recipientNumber.isNotEmpty() && message.isNotEmpty() &&
-                                verifyPhoneNumberFormat(recipientNumber)) {
+                        enabled = recipientAccount.isNotEmpty() && message.isNotEmpty() &&
+                                verifyPhoneNumberFormat(recipientAccount)) {
                         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.send))
                     }
                 },
@@ -248,42 +278,46 @@ fun MessageComposeView(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                val isPnba = platformsViewModel.platform?.protocol_type == "pnba"
                 OutlinedTextField(
-                    value = recipientNumber,
-                    onValueChange = { recipientNumber = it },
-                    label = { Text(stringResource(R.string.recipient_number), style = MaterialTheme.typography.bodyMedium) },
+                    value = recipientAccount,
+                    onValueChange = { recipientAccount = it },
+                    label = { Text(fieldInfo.label, style = MaterialTheme.typography.bodyMedium) },
                     modifier = Modifier.weight(1f),
-                    isError = recipientNumber.isNotEmpty() && !verifyPhoneNumberFormat(recipientNumber),
+                    isError = if (isPnba) recipientAccount.isNotEmpty() && !verifyPhoneNumberFormat(recipientAccount) else false,
                     keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Phone,
+                        keyboardType = if (isPnba) KeyboardType.Phone else KeyboardType.Text,
                         imeAction = ImeAction.Next
                     )
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                IconButton(onClick = {
-                    if(readContactPermissions.status.isGranted) {
-                        launcher.launch(null)
-                    } else {
-                        readContactPermissions.launchPermissionRequest()
-                    }
 
-                }) {
-                    Icon(
-                        imageVector = Icons.Filled.Contacts,
-                        contentDescription = stringResource(R.string.select_contact),
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
+                Spacer(modifier = Modifier.width(8.dp))
+                if (isPnba) {
+                    IconButton(onClick = {
+                        if(readContactPermissions.status.isGranted) {
+                            launcher.launch(null)
+                        } else {
+                            readContactPermissions.launchPermissionRequest()
+                        }
+
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.Contacts,
+                            contentDescription = stringResource(R.string.select_contact),
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Dialing Code Hint
             Text(
-                text = stringResource(R.string.always_add_the_dialing_code_if_absent_e_g_237),
+                text = fieldInfo.hint,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+
 
             Spacer(modifier = Modifier.height(16.dp))
 
