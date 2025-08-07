@@ -316,4 +316,8 @@
     <string name="message_">Message</string>
     <string name="message_content_could_not_be_displayed">Le contenu du message n\'a pas pu être affiché</string>
     <string name="text_message">Message texte</string>
+    <string name="recipient_account">Compte du destinataire</string>
+    <string name="recipient_account_format_hint">Assurez-vous que le compte du destinataire est au bon format.</string>
+    <string name="slack_recipient">Canal ou utilisateur Slack</string>
+    <string name="slack_hint">Pour les canaux : utilisez #nom ou un ID (par ex., #general ou C123ABC). Pour les MP : utilisez @nomutilisateur, une adresse e-mail ou un ID utilisateur (par ex., @jane ou @user@gmail.com ou U456DEF).</string>
 </resources>

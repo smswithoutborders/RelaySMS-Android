@@ -321,4 +321,8 @@
     <string name="message_">消息</string>
     <string name="message_content_could_not_be_displayed">无法显示消息内容</string>
     <string name="text_message">短信</string>
+    <string name="recipient_account">接收者账户</string>
+    <string name="recipient_account_format_hint">请确保接收者账户的格式正确。</string>
+    <string name="slack_recipient">Slack 频道或用户</string>
+    <string name="slack_hint">频道：使用 #名称 或 ID (例如 #general 或 C123ABC)。私信：使用 @用户名、电子邮件或用户 ID (例如 @jane 或 @user@gmail.com 或 U456DEF)。</string>
 </resources>

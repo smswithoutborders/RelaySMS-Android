@@ -320,5 +320,9 @@
     <string name="message_">메시지</string>
     <string name="message_content_could_not_be_displayed">메시지 내용을 표시할 수 없습니다</string>
     <string name="text_message">문자 메시지</string>
+    <string name="recipient_account">수신자 계정</string>
+    <string name="recipient_account_format_hint">수신자 계정이 올바른 형식인지 확인하십시오.</string>
+    <string name="slack_recipient">Slack 채널 또는 사용자</string>
+    <string name="slack_hint">채널: #이름 또는 ID(예: #general 또는 C123ABC)를 사용하세요. DM: @사용자이름, 이메일 또는 사용자 ID(예: @jane 또는 @user@gmail.com 또는 U456DEF)를 사용하세요.</string>
 
 </resources>

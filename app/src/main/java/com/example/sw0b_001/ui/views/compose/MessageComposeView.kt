@@ -13,6 +13,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -57,6 +58,7 @@ import androidx.navigation.NavController
 import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.ComposeHandlers
 import com.example.sw0b_001.Models.GatewayClients.GatewayClientsCommunications
+import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.Models.Publishers
@@ -79,7 +81,41 @@ import java.nio.charset.StandardCharsets
 import java.util.Locale
 
 
+class PickPhoneNumberContract : ActivityResultContract<Unit, Uri?>() {
+    override fun createIntent(context: Context, input: Unit): Intent =
+        Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
+
+    override fun parseResult(resultCode: Int, intent: Intent?): Uri? {
+        return if (resultCode == Activity.RESULT_OK) intent?.data else null
+    }
+}
+
 data class MessageContent(val from: String, val to: String, val message: String)
+
+data class RecipientFieldInfo(val label: String, val hint: String)
+
+@Composable
+private fun getRecipientFieldInfo(platform: AvailablePlatforms?): RecipientFieldInfo {
+    if (platform?.protocol_type == "pnba") {
+        return RecipientFieldInfo(
+            label = stringResource(R.string.recipient_number),
+            hint = stringResource(R.string.always_add_the_dialing_code_if_absent_e_g_237)
+        )
+    }
+
+    return when (platform?.name) {
+        "slack" -> RecipientFieldInfo(
+            label = stringResource(R.string.slack_recipient),
+            hint = stringResource(R.string.slack_hint)
+        )
+        // Add other platform-specific cases here
+
+        else -> RecipientFieldInfo(
+            label = stringResource(R.string.recipient_account),
+            hint = stringResource(R.string.recipient_account_format_hint)
+        )
+    }
+}
 
 object MessageComposeHandler {
     fun decomposeMessage(contentBytes: ByteArray): MessageContent {
@@ -134,18 +170,22 @@ fun MessageComposeView(
         }
     } else null
 
-    var recipientNumber by remember { mutableStateOf(decomposedMessage?.to ?: "") }
+    var recipientAccount by remember { mutableStateOf(decomposedMessage?.to ?: "") }
     var message by remember { mutableStateOf( decomposedMessage?.message ?: "") }
     var from by remember { mutableStateOf( decomposedMessage?.from ?: "") }
 
     var showSelectAccountModal by remember { mutableStateOf(!inspectMode) }
     var selectedAccount by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
+    val fieldInfo = getRecipientFieldInfo(platform = platformsViewModel.platform)
+    val isPnba = platformsViewModel.platform?.protocol_type == "pnba"
+
+
 
     val launcher = rememberLauncherForActivityResult(
-        ActivityResultContracts.PickContact()
+        contract = PickPhoneNumberContract()
     ) { uri ->
         uri?.let {
-            recipientNumber = getContactDetails(context, uri)
+            recipientAccount = getPhoneNumberFromUri(context, it)
         }
     }
 
@@ -185,12 +225,16 @@ fun MessageComposeView(
                     }
                 },
                 actions = {
+
+                    val isSendEnabled = recipientAccount.isNotEmpty() && message.isNotEmpty() &&
+                            (if (isPnba) verifyPhoneNumberFormat(recipientAccount) else true)
+
                     IconButton(onClick = {
                         processSend(
                             context = context,
                             messageContent = MessageContent(
                                 from = from,
-                                to = recipientNumber,
+                                to = recipientAccount,
                                 message = message
                             ),
                             account = selectedAccount!!,
@@ -212,8 +256,7 @@ fun MessageComposeView(
                             }
                         )
                     },
-                        enabled = recipientNumber.isNotEmpty() && message.isNotEmpty() &&
-                                verifyPhoneNumberFormat(recipientNumber)) {
+                        enabled = isSendEnabled) {
                         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.send))
                     }
                 },
@@ -249,41 +292,44 @@ fun MessageComposeView(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedTextField(
-                    value = recipientNumber,
-                    onValueChange = { recipientNumber = it },
-                    label = { Text(stringResource(R.string.recipient_number), style = MaterialTheme.typography.bodyMedium) },
+                    value = recipientAccount,
+                    onValueChange = { recipientAccount = it },
+                    label = { Text(fieldInfo.label, style = MaterialTheme.typography.bodyMedium) },
                     modifier = Modifier.weight(1f),
-                    isError = recipientNumber.isNotEmpty() && !verifyPhoneNumberFormat(recipientNumber),
+                    isError = if (isPnba) recipientAccount.isNotEmpty() && !verifyPhoneNumberFormat(recipientAccount) else false,
                     keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Phone,
+                        keyboardType = if (isPnba) KeyboardType.Phone else KeyboardType.Text,
                         imeAction = ImeAction.Next
                     )
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                IconButton(onClick = {
-                    if(readContactPermissions.status.isGranted) {
-                        launcher.launch(null)
-                    } else {
-                        readContactPermissions.launchPermissionRequest()
-                    }
 
-                }) {
-                    Icon(
-                        imageVector = Icons.Filled.Contacts,
-                        contentDescription = stringResource(R.string.select_contact),
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
+                Spacer(modifier = Modifier.width(8.dp))
+                if (isPnba) {
+                    IconButton(onClick = {
+                        if(readContactPermissions.status.isGranted) {
+                            launcher.launch(Unit)
+                        } else {
+                            readContactPermissions.launchPermissionRequest()
+                        }
+
+                    }) {
+                        Icon(
+                            imageVector = Icons.Filled.Contacts,
+                            contentDescription = stringResource(R.string.select_contact),
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Dialing Code Hint
             Text(
-                text = stringResource(R.string.always_add_the_dialing_code_if_absent_e_g_237),
+                text = fieldInfo.hint,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -312,9 +358,9 @@ fun verifyPhoneNumberFormat(phoneNumber: String): Boolean {
 
 
 private fun createMessageByteBuffer(
-    from: String, to: String, message: String
+    from: String, to: String, message: String,
+    accessToken: String? = null, refreshToken: String? = null
 ): ByteBuffer {
-    // Define size constants
     val BYTE_SIZE_LIMIT = 255
     val SHORT_SIZE_LIMIT = 65535
 
@@ -322,19 +368,28 @@ private fun createMessageByteBuffer(
     val fromBytes = from.toByteArray(StandardCharsets.UTF_8)
     val toBytes = to.toByteArray(StandardCharsets.UTF_8)
     val bodyBytes = message.toByteArray(StandardCharsets.UTF_8)
+    val accessTokenBytes = accessToken?.toByteArray(StandardCharsets.UTF_8)
+    val refreshTokenBytes = refreshToken?.toByteArray(StandardCharsets.UTF_8)
+
 
     // Get sizes for validation
     val fromSize = fromBytes.size
     val toSize = toBytes.size
     val bodySize = bodyBytes.size
+    val accessTokenSize = accessTokenBytes?.size ?: 0
+    val refreshTokenSize = refreshTokenBytes?.size ?: 0
 
     // Validate field sizes
     if (fromSize > BYTE_SIZE_LIMIT) throw IllegalArgumentException("From field exceeds maximum size of $BYTE_SIZE_LIMIT bytes")
     if (toSize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("To field exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
     if (bodySize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("Body field exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
+    if (accessTokenSize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("Access Token exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
+    if (refreshTokenSize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("Refresh Token exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
 
+
+    // Update total size to include tokens
     val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 2 + 2 +
-            fromSize + toSize + bodySize
+            fromSize + toSize + bodySize + accessTokenSize + refreshTokenSize
 
     // Allocate buffer and set byte order
     val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
@@ -346,13 +401,16 @@ private fun createMessageByteBuffer(
     buffer.putShort(0)
     buffer.put(0.toByte())
     buffer.putShort(bodySize.toShort())
-    buffer.putShort(0)
-    buffer.putShort(0)
+    buffer.putShort(accessTokenSize.toShort())
+    buffer.putShort(refreshTokenSize.toShort())
 
     // Write field values
     buffer.put(fromBytes)
     buffer.put(toBytes)
     buffer.put(bodyBytes)
+    accessTokenBytes?.let { buffer.put(it) }
+    refreshTokenBytes?.let { buffer.put(it) }
+
 
     buffer.flip()
     return buffer
@@ -371,14 +429,21 @@ private fun processSend(
             val AD = Publishers.fetchPublisherPublicKey(context)
                 ?: return@launch onFailure("Could not fetch publisher key.")
 
+            val platform = Datastore.getDatastore(context).availablePlatformsDao().fetch(account.name!!)
+                ?: return@launch onFailure("Could not find platform details for '${account.name}'.")
+
+
+            val accessToken = if (platform.protocol_type == "oauth2") account.accessToken else null
+            val refreshToken = if (platform.protocol_type == "oauth2") account.refreshToken else null
+            Log.d("MessageComposeView", "Access Token: $accessToken, Refresh Token: $refreshToken")
+
             val contentFormatV2Bytes = createMessageByteBuffer(
                 from = messageContent.from,
                 to = messageContent.to,
-                message = messageContent.message
+                message = messageContent.message,
+                accessToken = accessToken,
+                refreshToken = refreshToken
             ).array()
-
-            val platform = Datastore.getDatastore(context).availablePlatformsDao().fetch(account.name!!)
-                ?: return@launch onFailure("Could not find platform details for '${account.name}'.")
 
             val languageCode = Locale.getDefault().language.take(2).lowercase()
             val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
@@ -407,45 +472,26 @@ private fun processSend(
     }
 }
 
-fun getContactDetails(context: Context, contactUri: Uri): String {
-    val contentResolver: ContentResolver = context.contentResolver
-    val contactDetails = mutableMapOf<String, String?>()
+private fun getPhoneNumberFromUri(context: Context, uri: Uri): String {
+    var phoneNumber: String? = null
+    val projection: Array<String> = arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER)
 
     try {
-        val cursor: Cursor? = contentResolver.query(contactUri, null, null, null, null)
+        val cursor: Cursor? = context.contentResolver.query(uri, projection, null, null, null)
         cursor?.use {
             if (it.moveToFirst()) {
-                val id = it.getString(it.getColumnIndexOrThrow(ContactsContract.Contacts._ID))
-                val name = it.getString(it.getColumnIndexOrThrow(ContactsContract.Contacts.DISPLAY_NAME))
-
-                contactDetails["id"] = id
-                contactDetails["name"] = name
-
-                // Retrieve phone numbers
-                val hasPhone = it.getInt(it.getColumnIndexOrThrow(ContactsContract.Contacts.HAS_PHONE_NUMBER))
-                if (hasPhone > 0) {
-                    val phoneCursor = contentResolver.query(
-                        ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                        null,
-                        ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                        arrayOf(id),
-                        null
-                    )
-                    phoneCursor?.use { phone ->
-                        if (phone.moveToFirst()) {
-                            return phone.getString(phone.getColumnIndexOrThrow(
-                                ContactsContract.CommonDataKinds.Phone.NUMBER))
-                        }
-                    }
+                val numberIndex = it.getColumnIndex(ContactsContract.Contacts.CONTENT_URI.toString())
+                if (numberIndex >= 0) {
+                    phoneNumber = it.getString(numberIndex)
                 }
-
             }
         }
     } catch (e: Exception) {
         e.printStackTrace()
+        Log.e("getPhoneNumberFromUri", "Failed to get phone number from URI", e)
     }
 
-    return ""
+    return phoneNumber ?: ""
 }
 
 
