@@ -13,6 +13,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -79,6 +80,15 @@ import java.nio.ByteOrder
 import java.nio.charset.StandardCharsets
 import java.util.Locale
 
+
+class PickPhoneNumberContract : ActivityResultContract<Unit, Uri?>() {
+    override fun createIntent(context: Context, input: Unit): Intent =
+        Intent(Intent.ACTION_PICK, ContactsContract.CommonDataKinds.Phone.CONTENT_URI)
+
+    override fun parseResult(resultCode: Int, intent: Intent?): Uri? {
+        return if (resultCode == Activity.RESULT_OK) intent?.data else null
+    }
+}
 
 data class MessageContent(val from: String, val to: String, val message: String)
 
@@ -172,10 +182,10 @@ fun MessageComposeView(
 
 
     val launcher = rememberLauncherForActivityResult(
-        ActivityResultContracts.PickContact()
+        contract = PickPhoneNumberContract()
     ) { uri ->
         uri?.let {
-            recipientAccount = getContactDetails(context, uri)
+            recipientAccount = getPhoneNumberFromUri(context, it)
         }
     }
 
@@ -297,7 +307,7 @@ fun MessageComposeView(
                 if (isPnba) {
                     IconButton(onClick = {
                         if(readContactPermissions.status.isGranted) {
-                            launcher.launch(null)
+                            launcher.launch(Unit)
                         } else {
                             readContactPermissions.launchPermissionRequest()
                         }
@@ -348,9 +358,9 @@ fun verifyPhoneNumberFormat(phoneNumber: String): Boolean {
 
 
 private fun createMessageByteBuffer(
-    from: String, to: String, message: String
+    from: String, to: String, message: String,
+    accessToken: String? = null, refreshToken: String? = null
 ): ByteBuffer {
-    // Define size constants
     val BYTE_SIZE_LIMIT = 255
     val SHORT_SIZE_LIMIT = 65535
 
@@ -358,19 +368,28 @@ private fun createMessageByteBuffer(
     val fromBytes = from.toByteArray(StandardCharsets.UTF_8)
     val toBytes = to.toByteArray(StandardCharsets.UTF_8)
     val bodyBytes = message.toByteArray(StandardCharsets.UTF_8)
+    val accessTokenBytes = accessToken?.toByteArray(StandardCharsets.UTF_8)
+    val refreshTokenBytes = refreshToken?.toByteArray(StandardCharsets.UTF_8)
+
 
     // Get sizes for validation
     val fromSize = fromBytes.size
     val toSize = toBytes.size
     val bodySize = bodyBytes.size
+    val accessTokenSize = accessTokenBytes?.size ?: 0
+    val refreshTokenSize = refreshTokenBytes?.size ?: 0
 
     // Validate field sizes
     if (fromSize > BYTE_SIZE_LIMIT) throw IllegalArgumentException("From field exceeds maximum size of $BYTE_SIZE_LIMIT bytes")
     if (toSize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("To field exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
     if (bodySize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("Body field exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
+    if (accessTokenSize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("Access Token exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
+    if (refreshTokenSize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("Refresh Token exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
 
+
+    // Update total size to include tokens
     val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 2 + 2 +
-            fromSize + toSize + bodySize
+            fromSize + toSize + bodySize + accessTokenSize + refreshTokenSize
 
     // Allocate buffer and set byte order
     val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
@@ -382,13 +401,16 @@ private fun createMessageByteBuffer(
     buffer.putShort(0)
     buffer.put(0.toByte())
     buffer.putShort(bodySize.toShort())
-    buffer.putShort(0)
-    buffer.putShort(0)
+    buffer.putShort(accessTokenSize.toShort())
+    buffer.putShort(refreshTokenSize.toShort())
 
     // Write field values
     buffer.put(fromBytes)
     buffer.put(toBytes)
     buffer.put(bodyBytes)
+    accessTokenBytes?.let { buffer.put(it) }
+    refreshTokenBytes?.let { buffer.put(it) }
+
 
     buffer.flip()
     return buffer
@@ -407,14 +429,21 @@ private fun processSend(
             val AD = Publishers.fetchPublisherPublicKey(context)
                 ?: return@launch onFailure("Could not fetch publisher key.")
 
+            val platform = Datastore.getDatastore(context).availablePlatformsDao().fetch(account.name!!)
+                ?: return@launch onFailure("Could not find platform details for '${account.name}'.")
+
+
+            val accessToken = if (platform.protocol_type == "oauth2") account.accessToken else null
+            val refreshToken = if (platform.protocol_type == "oauth2") account.refreshToken else null
+            Log.d("MessageComposeView", "Access Token: $accessToken, Refresh Token: $refreshToken")
+
             val contentFormatV2Bytes = createMessageByteBuffer(
                 from = messageContent.from,
                 to = messageContent.to,
-                message = messageContent.message
+                message = messageContent.message,
+                accessToken = accessToken,
+                refreshToken = refreshToken
             ).array()
-
-            val platform = Datastore.getDatastore(context).availablePlatformsDao().fetch(account.name!!)
-                ?: return@launch onFailure("Could not find platform details for '${account.name}'.")
 
             val languageCode = Locale.getDefault().language.take(2).lowercase()
             val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
@@ -443,38 +472,24 @@ private fun processSend(
     }
 }
 
-fun getContactDetails(context: Context, contactUri: Uri): String {
-    val contentResolver: ContentResolver = context.contentResolver
+private fun getPhoneNumberFromUri(context: Context, uri: Uri): String {
     var phoneNumber: String? = null
+    val projection: Array<String> = arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER)
 
     try {
-        val contactCursor: Cursor? = contentResolver.query(contactUri, arrayOf(ContactsContract.Contacts._ID), null, null, null)
-
-        contactCursor?.use { cCursor ->
-            if (cCursor.moveToFirst()) {
-                val contactId = cCursor.getString(cCursor.getColumnIndexOrThrow(ContactsContract.Contacts._ID))
-
-                val phoneCursor: Cursor? = contentResolver.query(
-                    ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
-                    arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER),
-                    ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
-                    arrayOf(contactId),
-                    ContactsContract.CommonDataKinds.Phone.IS_PRIMARY + " DESC"
-                )
-
-                phoneCursor?.use { pCursor ->
-                    if (pCursor.moveToFirst()) {
-                        phoneNumber = pCursor.getString(pCursor.getColumnIndexOrThrow(ContactsContract.CommonDataKinds.Phone.NUMBER))
-                    }
+        val cursor: Cursor? = context.contentResolver.query(uri, projection, null, null, null)
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val numberIndex = it.getColumnIndex(ContactsContract.Contacts.CONTENT_URI.toString())
+                if (numberIndex >= 0) {
+                    phoneNumber = it.getString(numberIndex)
                 }
             }
         }
     } catch (e: Exception) {
-        Log.e("GetContactDetails", "Error fetching contact details: ${e.message}")
         e.printStackTrace()
-         Toast.makeText(context, "Could not retrieve contact number", Toast.LENGTH_SHORT).show()
+        Log.e("getPhoneNumberFromUri", "Failed to get phone number from URI", e)
     }
-    Log.d("GetContactDetails", "Retrieved phone number: $phoneNumber")
 
     return phoneNumber ?: ""
 }
