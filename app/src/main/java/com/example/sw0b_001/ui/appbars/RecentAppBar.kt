@@ -113,14 +113,14 @@ fun RecentAppBar(
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(
                                         imageVector = Icons.Default.AccountCircle,
-                                        contentDescription = "Your account",
+                                        contentDescription = stringResource(R.string.your_account),
                                         modifier = Modifier.size(40.dp),
                                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                     Spacer(modifier = Modifier.width(16.dp))
                                     Column {
                                         Text(
-                                            text = "Your Account",
+                                            text = stringResource(R.string.your_account),
                                             fontWeight = FontWeight.SemiBold,
                                             style = MaterialTheme.typography.bodyMedium
                                         )

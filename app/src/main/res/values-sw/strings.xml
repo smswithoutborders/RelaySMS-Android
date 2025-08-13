@@ -320,5 +320,7 @@
     <string name="recipient_account_format_hint">Hakikisha akaunti ya mpokeaji iko katika muundo sahihi.</string>
     <string name="slack_recipient">Chaneli ya Slack au Mtumiaji</string>
     <string name="slack_hint">Kwa chaneli: tumia #jina au kitambulisho (k.m., #general au C123ABC). Kwa DM: tumia @jinalamtumiaji, barua pepe, au kitambulisho cha mtumiaji (k.m., @jane au @user@gmail.com au U456DEF).</string>
+    <string name="view_account_menu">Sasa unaweza kuona akaunti uliyoingia kwayo kwa kubofya aikoni ya menyu kwenye upau wa kusogeza</string>
+    <string name="your_account">Akaunti Yako</string>
 
 </resources>

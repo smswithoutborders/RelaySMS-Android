@@ -325,5 +325,7 @@
     <string name="recipient_account_format_hint">सुनिश्चित करें कि प्राप्तकर्ता का खाता सही प्रारूप में है।</string>
     <string name="slack_recipient">स्लैक चैनल या उपयोगकर्ता</string>
     <string name="slack_hint">चैनलों के लिए: #नाम या एक आईडी का उपयोग करें (जैसे, #general या C123ABC)। डीएम के लिए: @उपयोगकर्ता नाम, एक ईमेल, या एक उपयोगकर्ता आईडी का उपयोग करें (जैसे, @jane या @user@gmail.com या U456DEF)।</string>
+    <string name="view_account_menu">अब आप नेविगेशन बार पर मेनू आइकन पर क्लिक करके वह खाता देख सकते हैं जिसमें आपने वर्तमान में लॉग इन किया है</string>
+    <string name="your_account">आपका खाता</string>
 
 </resources>

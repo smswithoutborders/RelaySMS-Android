@@ -433,8 +433,8 @@ private fun processSend(
                 ?: return@launch onFailure("Could not find platform details for '${account.name}'.")
 
 
-            val accessToken = if (platform.protocol_type == "oauth2") account.accessToken else null
-            val refreshToken = if (platform.protocol_type == "oauth2") account.refreshToken else null
+            val accessToken = account.accessToken
+            val refreshToken = account.refreshToken
             Log.d("MessageComposeView", "Access Token: $accessToken, Refresh Token: $refreshToken")
 
             val contentFormatV2Bytes = createMessageByteBuffer(

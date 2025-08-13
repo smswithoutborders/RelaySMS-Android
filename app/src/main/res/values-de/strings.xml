@@ -319,5 +319,7 @@
     <string name="recipient_account_format_hint">Stellen Sie sicher, dass das Empfängerkonto im richtigen Format ist.</string>
     <string name="slack_recipient">Slack-Kanal oder -Benutzer</string>
     <string name="slack_hint">Für Kanäle: Verwenden Sie #Name oder eine ID (z.B. #general oder C123ABC). Für DMs: Verwenden Sie @Benutzername, eine E-Mail-Adresse oder eine Benutzer-ID (z.B. @jane oder @user@gmail.com oder U456DEF).</string>
+    <string name="view_account_menu">Sie können Ihr aktuell angemeldetes Konto jetzt sehen, indem Sie auf das Menü-Symbol in der Navigationsleiste klicken</string>
+    <string name="your_account">Ihr Konto</string>
 
 </resources>
