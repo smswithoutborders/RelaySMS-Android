@@ -51,6 +51,7 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.SettingsActivity
 import com.example.sw0b_001.ui.navigation.AboutScreen
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.utils.getPhoneNumberFromPrefs
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,7 +62,6 @@ fun RecentAppBar(
     isSearchActive: Boolean,
     onToggleSearch: () -> Unit,
     onSearchDone: () -> Unit,
-    phoneNumber: String? = null
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -77,6 +77,9 @@ fun RecentAppBar(
             }
         )
     }
+
+    val phoneNumber = remember { getPhoneNumberFromPrefs(context) }
+
     Column(modifier = Modifier.fillMaxWidth()) {
         CenterAlignedTopAppBar(
             title = {
