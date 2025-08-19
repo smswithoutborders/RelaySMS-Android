@@ -375,5 +375,7 @@
     <string name="recipient_account_format_hint">Make sure the recipient account is in the right format.</string>
     <string name="slack_recipient">Slack Channel or User</string>
     <string name="slack_hint">For channels: use #name or an ID (e.g., #general or C123ABC). For DMs: use @username, an email, or a user ID (e.g., @jane or @user@gmail.com or U456DEF).</string>
+    <string name="view_account_menu">You can now see the account you are currently logged into by clicking the menu icon on the navigation bar"</string>
+    <string name="your_account">Your Account</string>
 
 </resources>

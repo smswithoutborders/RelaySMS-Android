@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
@@ -18,6 +20,7 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -39,6 +42,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -47,6 +51,7 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.SettingsActivity
 import com.example.sw0b_001.ui.navigation.AboutScreen
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.utils.getPhoneNumberFromPrefs
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,7 +61,7 @@ fun RecentAppBar(
     searchQuery: String,
     isSearchActive: Boolean,
     onToggleSearch: () -> Unit,
-    onSearchDone: () -> Unit
+    onSearchDone: () -> Unit,
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -72,6 +77,9 @@ fun RecentAppBar(
             }
         )
     }
+
+    val phoneNumber = remember { getPhoneNumberFromPrefs(context) }
+
     Column(modifier = Modifier.fillMaxWidth()) {
         CenterAlignedTopAppBar(
             title = {
@@ -99,6 +107,36 @@ fun RecentAppBar(
                     expanded = showMenu,
                     onDismissRequest = { showMenu = false }
                 ) {
+                    if (!phoneNumber.isNullOrBlank()) {
+                        DropdownMenuItem(
+                            text = {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Default.AccountCircle,
+                                        contentDescription = stringResource(R.string.your_account),
+                                        modifier = Modifier.size(40.dp),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Spacer(modifier = Modifier.width(16.dp))
+                                    Column {
+                                        Text(
+                                            text = stringResource(R.string.your_account),
+                                            fontWeight = FontWeight.SemiBold,
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                        Text(
+                                            text = phoneNumber,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+                            },
+                            onClick = {  },
+                            enabled = false
+                        )
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                    }
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.settings)) },
                         onClick = {

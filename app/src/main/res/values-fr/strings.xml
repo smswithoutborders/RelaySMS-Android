@@ -320,4 +320,6 @@
     <string name="recipient_account_format_hint">Assurez-vous que le compte du destinataire est au bon format.</string>
     <string name="slack_recipient">Canal ou utilisateur Slack</string>
     <string name="slack_hint">Pour les canaux : utilisez #nom ou un ID (par ex., #general ou C123ABC). Pour les MP : utilisez @nomutilisateur, une adresse e-mail ou un ID utilisateur (par ex., @jane ou @user@gmail.com ou U456DEF).</string>
+    <string name="view_account_menu">Vous pouvez maintenant voir le compte sur lequel vous êtes actuellement connecté en cliquant sur l\'icône du menu dans la barre de navigation</string>
+    <string name="your_account">Votre compte</string>
 </resources>

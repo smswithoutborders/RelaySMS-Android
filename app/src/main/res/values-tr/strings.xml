@@ -322,5 +322,7 @@
     <string name="recipient_account_format_hint">Alıcı hesabının doğru biçimde olduğundan emin olun.</string>
     <string name="slack_recipient">Slack Kanalı veya Kullanıcısı</string>
     <string name="slack_hint">Kanallar için: #isim veya bir ID kullanın (ör. #general veya C123ABC). DM\'ler için: @kullanıcıadı, bir e-posta veya bir kullanıcı ID\'si kullanın (ör. @jane veya @user@gmail.com veya U456DEF).</string>
+    <string name="view_account_menu">Artık navigasyon çubuğundaki menü simgesine tıklayarak şu anda oturum açtığınız hesabı görebilirsiniz</string>
+    <string name="your_account">Hesabınız</string>
 
 </resources>
