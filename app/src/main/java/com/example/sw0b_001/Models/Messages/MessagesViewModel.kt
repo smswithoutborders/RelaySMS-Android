@@ -70,4 +70,13 @@ class MessagesViewModel : ViewModel() {
             }
         }
     }
+
+    fun deleteMultiple(context: Context, messages: List<EncryptedContent>, onCompleteCallback: () -> Unit) {
+        viewModelScope.launch(Dispatchers.Default) {
+            Datastore.getDatastore(context).encryptedContentDAO().deleteMultiple(messages)
+            launch(Dispatchers.Main) {
+                onCompleteCallback()
+            }
+        }
+    }
 }

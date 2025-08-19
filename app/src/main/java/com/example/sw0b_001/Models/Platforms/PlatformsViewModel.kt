@@ -35,6 +35,13 @@ class PlatformsViewModel : ViewModel() {
     var message by mutableStateOf<EncryptedContent?>(null)
     var bottomTabsItem by mutableStateOf<BottomTabsItems>(BottomTabsItems.BottomBarRecentTab)
 
+    // Selection mode properties
+    var isSelectionMode by mutableStateOf(false)
+    var selectedMessagesCount by mutableIntStateOf(0)
+    var onSelectAll: (() -> Unit)? = null
+    var onDeleteSelected: (() -> Unit)? = null
+    var onCancelSelection: (() -> Unit)? = null
+
 
     fun reset() {
         platform = null

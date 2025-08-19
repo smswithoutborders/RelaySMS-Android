@@ -6,7 +6,10 @@ import android.util.Base64
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,10 +39,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
@@ -159,7 +164,7 @@ fun RecentViewNoMessages(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun RecentView(
     _messages: List<EncryptedContent> = emptyList<EncryptedContent>(),
@@ -172,6 +177,10 @@ fun RecentView(
 ) {
     val context = LocalContext.current
     var sendNewMessageRequested by remember { mutableStateOf(false) }
+
+    // Selection mode state
+    var isSelectionMode by remember { mutableStateOf(false) }
+    val selectedMessages = remember { mutableStateListOf<EncryptedContent>() }
 
     val messages: List<EncryptedContent> =
         if(LocalInspectionMode.current) _messages
@@ -235,6 +244,39 @@ fun RecentView(
         }
     }
 
+    // Selection mode callbacks
+    val onSelectAll = {
+        selectedMessages.clear()
+        selectedMessages.addAll(filteredMessages)
+        Unit // Explicitly return Unit to match expected type
+    }
+
+    val onDeleteSelected = {
+        if (selectedMessages.isNotEmpty()) {
+            messagesViewModel.deleteMultiple(context, selectedMessages.toList()) {
+                selectedMessages.clear()
+                isSelectionMode = false
+                Toast.makeText(context, context.getString(R.string.messages_deleted), Toast.LENGTH_SHORT).show()
+            }
+        }
+        Unit // Explicitly return Unit to match expected type
+    }
+
+    val onCancelSelection = {
+        selectedMessages.clear()
+        isSelectionMode = false
+        Unit // Explicitly return Unit to match expected type
+    }
+
+    // Update PlatformsViewModel with selection state
+    LaunchedEffect(isSelectionMode, selectedMessages.size) {
+        platformsViewModel.isSelectionMode = isSelectionMode
+        platformsViewModel.selectedMessagesCount = selectedMessages.size
+        platformsViewModel.onSelectAll = onSelectAll
+        platformsViewModel.onDeleteSelected = onDeleteSelected
+        platformsViewModel.onCancelSelection = onCancelSelection
+    }
+
     Box(
         Modifier
             .padding(8.dp)
@@ -252,31 +294,56 @@ fun RecentView(
                     val platform = platformsList.find { it.name == message.platformName }
                     val logo =
                         platform?.logo?.let { BitmapFactory.decodeByteArray(it, 0, it.size) }
-                    RecentMessageCard(message, logo) {
-                        platformsViewModel.message = it
-                        when (it.type) {
-                            Platforms.ServiceTypes.EMAIL.type -> {
-                                navController.navigate(EmailViewScreen)
-                            }
 
-                            Platforms.ServiceTypes.BRIDGE.type -> {
-                                navController.navigate(BridgeViewScreen)
-                            }
+                    val isSelected = selectedMessages.contains(message)
 
-                            Platforms.ServiceTypes.TEXT.type -> {
-                                navController.navigate(TextViewScreen)
+                    RecentMessageCard(
+                        message = message, 
+                        logo = logo,
+                        isSelected = isSelected,
+                        isSelectionMode = isSelectionMode,
+                        onClickCallback = { clickedMessage ->
+                            if (isSelectionMode) {
+                                // Toggle selection
+                                if (isSelected) {
+                                    selectedMessages.remove(clickedMessage)
+                                    // Exit selection mode if no messages are selected
+                                    if (selectedMessages.isEmpty()) {
+                                        isSelectionMode = false
+                                    }
+                                } else {
+                                    selectedMessages.add(clickedMessage)
+                                }
+                            } else {
+                                // Normal navigation
+                                platformsViewModel.message = clickedMessage
+                                when (clickedMessage.type) {
+                                    Platforms.ServiceTypes.EMAIL.type -> {
+                                        navController.navigate(EmailViewScreen)
+                                    }
+                                    Platforms.ServiceTypes.BRIDGE.type -> {
+                                        navController.navigate(BridgeViewScreen)
+                                    }
+                                    Platforms.ServiceTypes.TEXT.type -> {
+                                        navController.navigate(TextViewScreen)
+                                    }
+                                    Platforms.ServiceTypes.MESSAGE.type -> {
+                                        navController.navigate(MessageViewScreen)
+                                    }
+                                    else -> {
+                                        Toast.makeText(context,
+                                            context.getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show()
+                                    }
+                                }
                             }
-
-                            Platforms.ServiceTypes.MESSAGE.type -> {
-                                navController.navigate(MessageViewScreen)
-                            }
-
-                            else -> {
-                                Toast.makeText(context,
-                                    context.getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show()
+                        },
+                        onLongClickCallback = { longClickedMessage ->
+                            if (!isSelectionMode) {
+                                isSelectionMode = true
+                                selectedMessages.add(longClickedMessage)
                             }
                         }
-                    }
+                    )
                 }
             }
         } else {
@@ -351,11 +418,15 @@ fun GetMessageAvatar(logo: Bitmap? = null) {
 }
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RecentMessageCard(
     message: EncryptedContent,
     logo: Bitmap? = null,
-    onClickCallback: (EncryptedContent) -> Unit
+    isSelected: Boolean = false,
+    isSelectionMode: Boolean = false,
+    onClickCallback: (EncryptedContent) -> Unit,
+    onLongClickCallback: (EncryptedContent) -> Unit
 ) {
     var text by remember { mutableStateOf("" ) }
     var heading by remember { mutableStateOf( "") }
@@ -431,10 +502,16 @@ fun RecentMessageCard(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onClickCallback(message) },
+                .combinedClickable(
+                    onClick = { onClickCallback(message) },
+                    onLongClick = { onLongClickCallback(message) }
+                ),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                containerColor = if (isSelected) 
+                    MaterialTheme.colorScheme.primaryContainer 
+                else 
+                    MaterialTheme.colorScheme.surfaceVariant
             )
         ) {
             Row(
@@ -455,7 +532,10 @@ fun RecentMessageCard(
                         } else {
                             MaterialTheme.typography.bodyLarge
                         },
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = if (isSelected) 
+                            MaterialTheme.colorScheme.onPrimaryContainer 
+                        else 
+                            MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -464,7 +544,10 @@ fun RecentMessageCard(
                         Text(
                             subHeading,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = if (isSelected) 
+                                MaterialTheme.colorScheme.onPrimaryContainer 
+                            else 
+                                MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -475,7 +558,10 @@ fun RecentMessageCard(
                         style = MaterialTheme.typography.bodySmall,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = if (isSelected) 
+                            MaterialTheme.colorScheme.onPrimaryContainer 
+                        else 
+                            MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
 
@@ -483,11 +569,13 @@ fun RecentMessageCard(
                 Text(
                     text = Helpers.formatDate(LocalContext.current, message.date),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = if (isSelected) 
+                        MaterialTheme.colorScheme.onPrimaryContainer 
+                    else 
+                        MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
-
     }
 }
 
@@ -570,6 +658,10 @@ fun RecentsCardPreview() {
         encryptedContent.fromAccount = "developers@relaysms.me"
         encryptedContent.gatewayClientMSISDN = "+237123456789"
         encryptedContent.encryptedContent = "reply@relaysms.me:cc@relaysms.me:bcc@relaysms.me:subject here:This is an encrypted content"
-        RecentMessageCard(encryptedContent) {}
+        RecentMessageCard(
+            message = encryptedContent,
+            onClickCallback = {},
+            onLongClickCallback = {}
+        )
     }
 }
