@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name" translatable="false">RelaySMS</string>
+    <string name="messages_deleted">Ujumbe umefutwa</string>
+    <string name="select_all">Chagua Zote</string>
+    <string name="selected_messages">%d zimechaguliwa</string>
 
     <string name="settings_settings">Mipangilio</string>
 

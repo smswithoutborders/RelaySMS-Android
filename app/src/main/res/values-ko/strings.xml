@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">RelaySMS</string>
+    <string name="messages_deleted">메시지 삭제됨</string>
+    <string name="select_all">모두 선택</string>
+    <string name="selected_messages">%d개 선택됨</string>
 
     <string name="settings_settings">설정</string>
 

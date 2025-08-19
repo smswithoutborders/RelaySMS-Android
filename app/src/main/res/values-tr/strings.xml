@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name" translatable="false">RelaySMS</string>
+    <string name="messages_deleted">Mesajlar silindi</string>
+    <string name="select_all">Tümünü Seç</string>
+    <string name="selected_messages">%d seçildi</string>
 
     <string name="settings_settings">Ayarlar</string>
 
