@@ -13,9 +13,12 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -62,6 +65,11 @@ fun RecentAppBar(
     isSearchActive: Boolean,
     onToggleSearch: () -> Unit,
     onSearchDone: () -> Unit,
+    isSelectionMode: Boolean = false,
+    selectedCount: Int = 0,
+    onSelectAll: (() -> Unit)? = null,
+    onDeleteSelected: (() -> Unit)? = null,
+    onCancelSelection: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -81,87 +89,123 @@ fun RecentAppBar(
     val phoneNumber = remember { getPhoneNumberFromPrefs(context) }
 
     Column(modifier = Modifier.fillMaxWidth()) {
-        CenterAlignedTopAppBar(
-            title = {
-                if (!isSearchActive) {
-                    Text(stringResource(R.string.app_name))
-                }
-            },
-            actions = {
-                if (!isSearchActive) {
-                    IconButton(onClick = onToggleSearch) {
+        if (isSelectionMode) {
+            // Selection mode app bar
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(stringResource(R.string.selected_messages, selectedCount))
+                },
+                navigationIcon = {
+                    IconButton(onClick = { onCancelSelection?.invoke() }) {
                         Icon(
-                            imageVector = Icons.Filled.Search,
-                            contentDescription = stringResource(R.string.search)
+                            imageVector = Icons.Filled.Cancel,
+                            contentDescription = stringResource(R.string.cancel)
                         )
                     }
-                }
+                },
+                actions = {
+                    IconButton(onClick = { onSelectAll?.invoke() }) {
+                        Icon(
+                            imageVector = Icons.Filled.SelectAll,
+                            contentDescription = stringResource(R.string.select_all)
+                        )
+                    }
 
-                IconButton(onClick = { showMenu = !showMenu }) {
-                    Icon(
-                        imageVector = Icons.Filled.MoreVert,
-                        contentDescription = stringResource(R.string.menu)
-                    )
-                }
-                DropdownMenu(
-                    expanded = showMenu,
-                    onDismissRequest = { showMenu = false }
-                ) {
-                    if (!phoneNumber.isNullOrBlank()) {
-                        DropdownMenuItem(
-                            text = {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Default.AccountCircle,
-                                        contentDescription = stringResource(R.string.your_account),
-                                        modifier = Modifier.size(40.dp),
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                    Spacer(modifier = Modifier.width(16.dp))
-                                    Column {
-                                        Text(
-                                            text = stringResource(R.string.your_account),
-                                            fontWeight = FontWeight.SemiBold,
-                                            style = MaterialTheme.typography.bodyMedium
-                                        )
-                                        Text(
-                                            text = phoneNumber,
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-                                }
-                            },
-                            onClick = {  },
-                            enabled = false
+                    IconButton(onClick = { onDeleteSelected?.invoke() }) {
+                        Icon(
+                            imageVector = Icons.Filled.Delete,
+                            contentDescription = stringResource(R.string.delete)
                         )
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                     }
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.settings)) },
-                        onClick = {
-                            context.startActivity(
-                                Intent(context, SettingsActivity::class.java).apply {
-                                    flags =
-                                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_TASK_ON_HOME
-                                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(),
+                scrollBehavior = scrollBehavior,
+                modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+            )
+        } else {
+            // Normal mode app bar
+            CenterAlignedTopAppBar(
+                title = {
+                    if (!isSearchActive) {
+                        Text(stringResource(R.string.app_name))
+                    }
+                },
+                actions = {
+                    if (!isSearchActive) {
+                        IconButton(onClick = onToggleSearch) {
+                            Icon(
+                                imageVector = Icons.Filled.Search,
+                                contentDescription = stringResource(R.string.search)
                             )
-                            showMenu = false
                         }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.about)) },
-                        onClick = {
-                            navController.navigate(AboutScreen)
-                            showMenu = false
+                    }
+
+                    IconButton(onClick = { showMenu = !showMenu }) {
+                        Icon(
+                            imageVector = Icons.Filled.MoreVert,
+                            contentDescription = stringResource(R.string.menu)
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        if (!phoneNumber.isNullOrBlank()) {
+                            DropdownMenuItem(
+                                text = {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Default.AccountCircle,
+                                            contentDescription = stringResource(R.string.your_account),
+                                            modifier = Modifier.size(40.dp),
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Spacer(modifier = Modifier.width(16.dp))
+                                        Column {
+                                            Text(
+                                                text = stringResource(R.string.your_account),
+                                                fontWeight = FontWeight.SemiBold,
+                                                style = MaterialTheme.typography.bodyMedium
+                                            )
+                                            Text(
+                                                text = phoneNumber,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
+                                },
+                                onClick = {  },
+                                enabled = false
+                            )
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         }
-                    )
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(),
-            scrollBehavior = scrollBehavior,
-            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
-        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.settings)) },
+                            onClick = {
+                                context.startActivity(
+                                    Intent(context, SettingsActivity::class.java).apply {
+                                        flags =
+                                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_TASK_ON_HOME
+                                    }
+                                )
+                                showMenu = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.about)) },
+                            onClick = {
+                                navController.navigate(AboutScreen)
+                                showMenu = false
+                            }
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(),
+                scrollBehavior = scrollBehavior,
+                modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+            )
+        }
 
         if (isSearchActive) {
             Row(
@@ -218,6 +262,26 @@ fun RecentsAppBarPreview() {
             isSearchActive = isSearchActive,
             onToggleSearch = { isSearchActive = !isSearchActive },
             onSearchDone = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RecentsAppBarSelectionModePreview() {
+    AppTheme(darkTheme = false) {
+        RecentAppBar(
+            navController = NavController(context = LocalContext.current),
+            onSearchQueryChanged = { },
+            searchQuery = "",
+            isSearchActive = false,
+            onToggleSearch = { },
+            onSearchDone = {},
+            isSelectionMode = true,
+            selectedCount = 3,
+            onSelectAll = { },
+            onDeleteSelected = { },
+            onCancelSelection = { }
         )
     }
 }

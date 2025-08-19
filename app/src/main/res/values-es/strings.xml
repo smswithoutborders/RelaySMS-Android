@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name" translatable="false">RelaySMS</string>
+    <string name="messages_deleted">Mensajes eliminados</string>
+    <string name="select_all">Seleccionar todo</string>
+    <string name="selected_messages">%d seleccionados</string>
 
     <string name="settings_settings">Configuración</string>
 

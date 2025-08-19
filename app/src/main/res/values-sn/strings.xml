@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">RelaySMS</string>
+    <string name="messages_deleted">Mashoko adzimwa</string>
+    <string name="select_all">Sarudza Zvose</string>
+    <string name="selected_messages">%d akasarudzwa</string>
 
     <string name="settings_settings">Zvirongwa</string>
 
