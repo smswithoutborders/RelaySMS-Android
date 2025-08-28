@@ -28,6 +28,9 @@ interface EncryptedContentDAO {
     @Delete
     fun delete(message: EncryptedContent)
 
+    @Delete
+    fun deleteMultiple(messages: List<EncryptedContent>)
+
     @Query("SELECT * FROM EncryptedContent WHERE id=:encryptedContentId")
     fun get(encryptedContentId: Long): EncryptedContent
 

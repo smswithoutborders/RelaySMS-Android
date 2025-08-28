@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name" translatable="false">RelaySMS</string>
+    <string name="messages_deleted">Messages supprimés</string>
+    <string name="select_all">Tout sélectionner</string>
+    <string name="selected_messages">%d sélectionnés</string>
 
     <string name="settings_settings">Paramètres</string>
 
@@ -316,4 +319,10 @@
     <string name="message_">Message</string>
     <string name="message_content_could_not_be_displayed">Le contenu du message n\'a pas pu être affiché</string>
     <string name="text_message">Message texte</string>
+    <string name="recipient_account">Compte du destinataire</string>
+    <string name="recipient_account_format_hint">Assurez-vous que le compte du destinataire est au bon format.</string>
+    <string name="slack_recipient">Canal ou utilisateur Slack</string>
+    <string name="slack_hint">Pour les canaux : utilisez #nom ou un ID (par ex., #general ou C123ABC). Pour les MP : utilisez @nomutilisateur, une adresse e-mail ou un ID utilisateur (par ex., @jane ou @user@gmail.com ou U456DEF).</string>
+    <string name="view_account_menu">Vous pouvez maintenant voir le compte sur lequel vous êtes actuellement connecté en cliquant sur l\'icône du menu dans la barre de navigation</string>
+    <string name="your_account">Votre compte</string>
 </resources>

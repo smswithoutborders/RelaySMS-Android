@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name" translatable="false">RelaySMS</string>
+    <string name="messages_deleted">تم حذف الرسائل</string>
+    <string name="select_all">تحديد الكل</string>
+    <string name="selected_messages">تم تحديد %d</string>
 
     <string name="settings_settings">الإعدادات</string>
 
@@ -317,5 +320,11 @@
     <string name="message_">رسالة</string>
     <string name="message_content_could_not_be_displayed">تعذر عرض محتوى الرسالة</string>
     <string name="text_message">رسالة نصية</string>
+    <string name="recipient_account">حساب المستلم</string>
+    <string name="recipient_account_format_hint">تأكد من أن حساب المستلم بالتنسيق الصحيح.</string>
+    <string name="slack_recipient">قناة أو مستخدم سلاك</string>
+    <string name="slack_hint">للقنوات: استخدم #الاسم أو مُعرّف (مثال: #عام أو C123ABC). للرسائل الخاصة: استخدم @اسم_المستخدم، أو بريد إلكتروني، أو مُعرّف مستخدم (مثال: @jane أو @user@gmail.com أو U456DEF).</string>
+    <string name="view_account_menu">يمكنك الآن رؤية الحساب الذي سجلت دخولك به حاليًا بالنقر على أيقونة القائمة في شريط التنقل</string>
+    <string name="your_account">حسابك</string>
 
 </resources>

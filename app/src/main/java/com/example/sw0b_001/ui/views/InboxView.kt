@@ -82,7 +82,11 @@ fun InboxView(
                         onClickCallback = {
                             platformsViewModel.message = message
                             navController.navigate(BridgeViewScreen)
-                        }
+                        },
+                        logo = TODO(),
+                        isSelected = TODO(),
+                        isSelectionMode = TODO(),
+                        onLongClickCallback = TODO()
                     )
                 }
             }

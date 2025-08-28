@@ -63,13 +63,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import androidx.preference.PreferenceManager
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.utils.savePhoneNumberToPrefs
 import com.google.android.gms.auth.api.phone.SmsRetriever
 import com.google.android.gms.common.api.CommonStatusCodes
 import com.google.android.gms.common.api.Status
@@ -466,6 +469,8 @@ private fun submitOTPCode(
                 }
             }
 
+            savePhoneNumberToPrefs(context, phoneNumber)
+
             vault.refreshStoredTokens(context) {
                 platformsViewModel.accountsForMissingDialog = it
             }
@@ -482,3 +487,4 @@ private fun submitOTPCode(
         }
     }
 }
+

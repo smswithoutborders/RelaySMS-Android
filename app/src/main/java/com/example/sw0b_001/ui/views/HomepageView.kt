@@ -147,7 +147,12 @@ fun HomepageView(
                             },
                             onSearchDone = {
                                 isSearchDone = true
-                            }
+                            },
+                            isSelectionMode = platformsViewModel.isSelectionMode,
+                            selectedCount = platformsViewModel.selectedMessagesCount,
+                            onSelectAll = platformsViewModel.onSelectAll,
+                            onDeleteSelected = platformsViewModel.onDeleteSelected,
+                            onCancelSelection = platformsViewModel.onCancelSelection
                         )
                     }
                 }
@@ -415,5 +420,3 @@ fun HomepageViewLoggedInMessages_Preview() {
         )
     }
 }
-
-

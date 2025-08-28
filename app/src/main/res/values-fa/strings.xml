@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name" translatable="false">RelaySMS</string>
+    <string name="messages_deleted">پیام‌ها حذف شدند</string>
+    <string name="select_all">انتخاب همه</string>
+    <string name="selected_messages">%d انتخاب شده</string>
 
     <string name="settings_settings">تنظیمات</string>
 
@@ -316,5 +319,11 @@
     <string name="message_">پیام</string>
     <string name="message_content_could_not_be_displayed">محتوای پیام قابل نمایش نبود</string>
     <string name="text_message">پیام متنی</string>
+    <string name="recipient_account">حساب گیرنده</string>
+    <string name="recipient_account_format_hint">اطمینان حاصل کنید که فرمت حساب گیرنده صحیح باشد.</string>
+    <string name="slack_recipient">کانال یا کاربر Slack</string>
+    <string name="slack_hint">برای کانال‌ها: از #نام یا یک شناسه (مثلا #general یا C123ABC) استفاده کنید. برای پیام‌های مستقیم: از @نام‌کاربری، یک ایمیل یا شناسه کاربری (مثلا @jane یا @user@gmail.com یا U456DEF) استفاده کنید.</string>
+    <string name="view_account_menu">اکنون می‌توانید حسابی که با آن وارد شده‌اید را با کلیک بر روی آیکون منو در نوار پیمایش مشاهده کنید</string>
+    <string name="your_account">حساب شما</string>
 
 </resources>

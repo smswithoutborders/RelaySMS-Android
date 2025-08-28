@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name" translatable="false">RelaySMS</string>
+    <string name="messages_deleted">消息已删除</string>
+    <string name="select_all">全选</string>
+    <string name="selected_messages">已选择 %d 项</string>
 
     <string name="settings_settings">设置</string>
 
@@ -321,4 +324,10 @@
     <string name="message_">消息</string>
     <string name="message_content_could_not_be_displayed">无法显示消息内容</string>
     <string name="text_message">短信</string>
+    <string name="recipient_account">接收者账户</string>
+    <string name="recipient_account_format_hint">请确保接收者账户的格式正确。</string>
+    <string name="slack_recipient">Slack 频道或用户</string>
+    <string name="slack_hint">频道：使用 #名称 或 ID (例如 #general 或 C123ABC)。私信：使用 @用户名、电子邮件或用户 ID (例如 @jane 或 @user@gmail.com 或 U456DEF)。</string>
+    <string name="view_account_menu">现在您可以通过点击导航栏上的菜单图标来查看当前登录的帐户</string>
+    <string name="your_account">您的帐户</string>
 </resources>
