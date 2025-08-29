@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">RelaySMS</string>
+    <string name="messages_deleted">संदेश हटा दिए गए</string>
+    <string name="select_all">सभी चुनें</string>
+    <string name="selected_messages">%d चयनित</string>
+
+    <string name="settings_settings">सेटिंग्स</string>
+
+    <string name="settings_accessibility_category">अभिगम्यता</string>
+    <string name="settings_language">भाषा</string>
+
+    <string name="settings_security_category">सुरक्षा और गोपनीयता</string>
+    <string name="settings_security">सुरक्षा</string>
+    <string name="settings_security_category_summary">ऐप लॉक और पिन कोड सक्षम करें</string>
+
+    <string name="settings_lock_screen_preference_category">फ़ोन लॉकस्क्रीन विकल्प</string>
+    <string name="settings_security_and_privacy_enable_lockscreen_open">लॉकस्क्रीन सक्षम करें</string>
+    <string name="settings_security_and_privacy_enable_lockscreen_open_summary">ऐप शुरू करते समय लॉकस्क्रीन पिन/फिंगरप्रिंट की आवश्यकता है</string>
+
+    <string name="settings_security_and_privacy_account">खाता</string>
+    <string name="settings_security_and_privacy_account_logout">लॉगआउट</string>
+    <string name="settings_security_and_privacy_account_logout_summary">अपने खाते से लॉगआउट करें। आप हमेशा वापस लॉग इन कर सकते हैं, हालाँकि आपके वर्तमान संदेश हटा दिए जाएँगे।</string>
+
+    <string name="settings_security_and_privacy_account_delete">हटाएं</string>
+
+    <string name="settings_security_and_privacy_account_delete_summary">आपके खाते को हटाने का मतलब है आपके सभी सहेजे गए ऑनलाइन खातों को हटाना। आवश्यकता होने पर आप हमेशा अपना खाता फिर से बना सकते हैं।</string>
+
+    <string name="language_english">अंग्रेज़ी</string>
+    <string name="language_french">फ़्रेंच</string>
+    <string name="language_farsi">फ़ारसी</string>
+    <string name="language_spanish">स्पेनिश</string>
+    <string name="language_turkish">तुर्की</string>
+    <string name="language_german">जर्मन</string>
+    <string name="language_arabic">अरबी</string>
+    <string name="language_swahili">स्वाहिली</string>
+    <string name="language_chinese">चीनी</string>
+    <string name="language_korean">कोरियाई</string>
+    <string name="language_hindi">हिंदी</string>
+    <string name="language_shona">शोना</string>
+
+
+    <string name="gateway_client_settings_add_custom_empty_error">कृपया एक फ़ोन नंबर प्रदान करें</string>
+
+    <string name="new_gateway_client_alias">उपनाम (वैकल्पिक)</string>
+    <string name="gateway_client_alias_description">गेटवे क्लाइंट को याद रखने में मदद करने के लिए नाम</string>
+    <string name="gateway_client_save_btn_text">सहेजें</string>
+
+    <string name="choose_sms_app">एक SMS मैसेजिंग ऐप चुनें</string>
+
+    <string name="security_settings_failed_to_switch_security">सुरक्षा चालू करने में विफल…</string>
+    <string name="settings_security_biometric_user_cannot_add_this_functionality_at_this_time">उपयोगकर्ता इस समय यह कार्यक्षमता नहीं जोड़ सकता है।</string>
+    <string name="lock_screen_relay_sms_is_locked">RelaySMS ऐप लॉक है</string>
+    <string name="lock_screen_unlock_with_your_phone_s_locking_system">अपने फ़ोन की लॉकिंग प्रणाली से अनलॉक करें</string>
+    <string name="gateway_client_add_custom_example_text">जैसे +237123456789 या संपर्क चुनें</string>
+    <string name="gateway_client_add_gateway_client_text">गेटवे क्लाइंट जोड़ें</string>
+    <string name="otp_verification_code_template" translatable="false">Your SMSWithoutBorders-Auth verification code is: </string>
+
+    <string name="logout_you_have_no_accounts_logged_into_vaults_at_this_time">इस समय आपके पास वॉल्ट में कोई खाता लॉग इन नहीं है</string>
+    <string name="security_settings_you_have_no_accounts_to_delete_in_vault_at_this_time">इस समय आपके पास वॉल्ट में हटाने के लिए कोई खाता नहीं है</string>
+    <string name="helper_yesterday">कल</string>
+
+
+    <string name="smswithoutboarders_official_gateway_client_seeding_url" translatable="false">https://smswithoutborders.com:15000/v3/clients</string>
+    <string name="recovery_continue">जारी रखें</string>
+
+    <string name="vault_grpc_url" translatable="false">vault.smswithoutborders.com</string>
+    <string name="vault_grpc_port" translatable="false">443</string>
+
+    <string name="publisher_grpc_url" translatable="false">publisher.smswithoutborders.com</string>
+    <string name="publisher_grpc_port" translatable="false">443</string>
+
+    <string name="publisher_get_platforms_url" translatable="false">https://raw.githubusercontent.com/smswithoutborders/SMSWithoutBorders-Publisher/master/resources/platforms.json</string>
+    <string name="cancel">रद्द करें</string>
+    <string name="click_continue_to_confirm_this_action_do_not_worry_this_has_no_dangerous_effects">इस कार्रवाई की पुष्टि करने के लिए जारी रखें पर क्लिक करें। चिंता न करें, इसका कोई खतरनाक प्रभाव नहीं है।</string>
+    <string name="messaging">मैसेजिंग</string>
+    <string name="you_have_a_device_id_for_the_device_you_log_into_it_is_used_to_identify_you_on_the_vault_you_can_switch_to_phone_number_to_reduce_size_of_sms_message">आपके द्वारा लॉग इन किए गए डिवाइस के लिए आपके पास एक डिवाइस आईडी है। इसका उपयोग वॉल्ट पर आपकी पहचान करने के लिए किया जाता है। SMS संदेश का आकार कम करने के लिए आप फ़ोन नंबर पर स्विच कर सकते हैं।</string>
+    <string name="validate_with_phone_number">फ़ोन नंबर से सत्यापित करें</string>
+    <string name="enter_phone_number_with_country_code">देश कोड के साथ फ़ोन नंबर दर्ज करें</string>
+    <string name="about">के बारे में</string>
+    <string name="recents_text">हाल के</string>
+    <string name="get_started_text">शुरू हो जाओ</string>
+    <string name="platforms">प्लेटफ़ॉर्म</string>
+    <string name="inbox">इनबॉक्स</string>
+    <string name="countries">देश</string>
+    <string name="settings">सेटिंग्स</string>
+    <string name="permission_denied">अनुमति अस्वीकृत!</string>
+    <string name="add_gateway_client">गेटवे क्लाइंट जोड़ें</string>
+    <string name="edit_gateway_client">गेटवे क्लाइंट संपादित करें</string>
+    <string name="e_g_237123456_or_select_contact">जैसे +237123456 या संपर्क चुनें</string>
+    <string name="alias_optional">उपनाम (वैकल्पिक)</string>
+    <string name="name_to_help_remember_the_gateway_client">गेटवे क्लाइंट को याद रखने में मदद करने के लिए नाम</string>
+    <string name="saving">सहेज रहा है…</string>
+    <string name="save">सहेजें</string>
+    <string name="error_saving_gateway_client">गेटवे क्लाइंट सहेजने में त्रुटि</string>
+    <string name="click_continue_to_confirm_this_action_do_not_worry_it_has_no_dangerous_effects">इस कार्रवाई की पुष्टि करने के लिए जारी रखें पर क्लिक करें। चिंता न करें, इसका कोई खतरनाक प्रभाव नहीं है।</string>
+    <string name="continue_text">जारी रखें</string>
+    <string name="country_options">देश विकल्प</string>
+    <string name="revoking_account_for">%1$s के लिए खाता रद्द किया जा रहा है</string>
+    <string name="adding_account_for">%1$s के लिए खाता जोड़ा जा रहा है</string>
+    <string name="send_message">संदेश भेजें</string>
+    <string name="add_account">खाता जोड़ें</string>
+    <string name="remove_accounts">खाते हटाएं</string>
+    <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported">अपने RelaySMS खाते में ईमेल जोड़ने से आप SMS मैसेजिंग का उपयोग करके ईमेल भेज सकते हैं।\n\nGmail वर्तमान में समर्थित है।</string>
+    <string name="adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported">अपने RelaySMS खाते में नंबर जोड़ने से आप SMS मैसेजिंग का उपयोग करके संदेश भेज सकते हैं।\n\nTelegram मैसेजिंग वर्तमान में समर्थित है।</string>
+    <string name="adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported">अपने RelaySMS खाते में खाते जोड़ने से आप SMS मैसेजिंग का उपयोग करके पोस्ट कर सकते हैं।\n\nपोस्टिंग वर्तमान में समर्थित है।</string>
+    <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias">आपका RelaySMS खाता @relaysms.me डोमेन के साथ आपके फ़ोन नंबर का एक उपनाम है।\n\nजब भी आपके उपनाम पर कोई संदेश भेजा जाता है तो आप SMS द्वारा उत्तर प्राप्त कर सकते हैं।</string>
+    <string name="continue_to_send_an_email_from_your_saved_email_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">अपने सहेजे गए ईमेल खाते से एक ईमेल भेजने के लिए जारी रखें। आप नीचे \'देश\' टैब से एक संदेश अग्रेषण देश चुन सकते हैं।\n\nसंदेश भेजने के लिए जारी रखें</string>
+    <string name="continue_to_send_messages_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">अपने सहेजे गए मैसेजिंग खाते से संदेश भेजने के लिए जारी रखें। आप नीचे \'देश\' टैब से एक संदेश अग्रेषण देश चुन सकते हैं।\n\nसंदेश भेजने के लिए जारी रखें</string>
+    <string name="continue_to_make_posts_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">अपने सहेजे गए मैसेजिंग खाते से पोस्ट करने के लिए जारी रखें। आप नीचे \'देश\' टैब से एक संदेश अग्रेषण देश चुन सकते हैं।\n\nसंदेश भेजने के लिए जारी रखें</string>
+    <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">आपका RelaySMS खाता @relaysms.me डोमेन के साथ आपके फ़ोन नंबर का एक उपनाम है।\n\nजब भी आपके उपनाम पर कोई संदेश भेजा जाता है तो आप SMS द्वारा उत्तर प्राप्त कर सकते हैं।\nआप नीचे \'देश\' टैब से एक संदेश अग्रेषण देश चुन सकते हैं।\n\nसंदेश भेजने के लिए जारी रखें</string>
+    <string name="select_an_account">एक खाता चुनें</string>
+    <string name="please_enter_your_telegram_code_without_copying_it_from_the_message_copying_might_get_flagged_and_telegram_might_block_your_account">कृपया संदेश से कॉपी किए बिना अपना Telegram कोड दर्ज करें - कॉपी करने पर फ़्लैग किया जा सकता है और Telegram आपके खाते को ब्लॉक कर सकता है।</string>
+    <string name="phone_number">फ़ोन नंबर</string>
+    <string name="code">कोड</string>
+    <string name="hide_password">पासवर्ड छिपाएँ</string>
+    <string name="show_password">पासवर्ड दिखाएँ</string>
+    <string name="no_account_selected">कोई खाता नहीं चुना गया</string>
+    <string name="compose_email">ईमेल लिखें</string>
+    <string name="to">प्रति</string>
+    <string name="subject">विषय</string>
+    <string name="new_message">नया संदेश</string>
+    <string name="sender">प्रेषक</string>
+    <string name="recipient_number">प्राप्तकर्ता नंबर</string>
+    <string name="message">संदेश</string>
+    <string name="new_post">नई पोस्ट</string>
+    <string name="what_s_happening">क्या हो रहा है?</string>
+    <string name="connecting_the_world_one_sms_at_a_time">दुनिया को जोड़ना, एक समय में एक SMS</string>
+    <string name="relaysms_is_an_open_source_initiative_focused_on_enabling_communication_through_sms_without_relying_on_internet_connectivity_we_believe_in_a_connected_world_and_we_re_making_it_happen_one_sms_at_a_time_relaysms_remains_free_and_open_source">RelaySMS एक ओपन-सोर्स पहल है जो इंटरनेट कनेक्टिविटी पर निर्भर हुए बिना SMS के माध्यम से संचार को सक्षम करने पर केंद्रित है। हम एक जुड़ी हुई दुनिया में विश्वास करते हैं, और हम इसे एक समय में एक SMS करके साकार कर रहे हैं। RelaySMS मुफ़्त और ओपन सोर्स बना हुआ है।</string>
+    <string name="app_tutorial">ऐप ट्यूटोरियल</string>
+    <string name="support_us_by_starring_our_github_repository_and_sharing_it_with_your_friends">हमारे GitHub रिपॉजिटरी को स्टार करके और अपने दोस्तों के साथ साझा करके हमारा समर्थन करें!</string>
+    <string name="available_platforms">उपलब्ध प्लेटफ़ॉर्म</string>
+    <string name="use_your_relaysms_account">अपने RelaySMS खाते का उपयोग करें</string>
+    <string name="use_your_online_accounts">अपने ऑनलाइन खातों का उपयोग करें</string>
+    <string name="navigate_back_to_home_screen">होम स्क्रीन पर वापस जाएँ</string>
+    <string name="create_relaysms_account">RelaySMS खाता बनाएँ</string>
+    <string name="create_your_account_and">अपना खाता बनाएँ और </string>
+    <string name="save_platforms">प्लेटफ़ॉर्म सहेजें</string>
+    <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline"> ताकि RelaySMS ऑफ़लाइन होने पर आपकी ओर से Gmail, X और Telegram को संदेश भेज सके</string>
+    <string name="i_have_read_the">मैंने </string>
+    <string name="privacy_policy">गोपनीयता नीति पढ़ ली है</string>
+    <string name="log_in">लॉग इन करें</string>
+    <string name="sign_up">साइन अप करें</string>
+    <string name="selected_gateway_client">चयनित गेटवे क्लाइंट</string>
+    <string name="no_gateway_client_selected">कोई गेटवे क्लाइंट नहीं चुना गया</string>
+    <string name="available_countries">उपलब्ध देश</string>
+    <string name="gateway_clients_refreshed_successfully">गेटवे क्लाइंट सफलतापूर्वक रीफ़्रेश हो गए!</string>
+    <string name="no_messages_in_inbox">इनबॉक्स में कोई संदेश नहीं</string>
+    <string name="paste_new_incoming_message">नया आने वाला संदेश चिपकाएँ</string>
+    <string name="log_into_relaysms">RelaySMS में लॉग इन करें</string>
+    <string name="log_into_your_account_and">अपने खाते में लॉग इन करें और </string>
+    <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline_"> ताकि RelaySMS ऑफ़लाइन होने पर आपकी ओर से Gmail, X और Telegram को संदेश भेज सके</string>
+    <string name="already_got_code">पहले से ही कोड मिल गया है</string>
+    <string name="do_not_have_an_account">खाता नहीं है? </string>
+    <string name="get_started_with">के साथ शुरू करें</string>
+    <string name="compose_message">संदेश लिखें</string>
+    <string name="use_your_phone_number_to_send_an_email_with_the_alias">उपनाम के साथ एक ईमेल भेजने के लिए अपने फ़ोन नंबर का उपयोग करें: </string>
+    <string name="login_with_internet">इंटरनेट से लॉग इन करें</string>
+    <string name="these_features_requires_you_to_have_an_internet_connection">इन सुविधाओं के लिए आपके पास इंटरनेट कनेक्शन होना आवश्यक है</string>
+    <string name="input_your_code">अपना कोड डालें</string>
+    <string name="please_enter_the_6_digit_code_we_sent_to_you_via_sms">कृपया वह 6-अंकीय कोड दर्ज करें जो हमने आपको SMS के माध्यम से भेजा है</string>
+    <string name="the_code_would_automatically_be_detected_in_some_cases">कुछ मामलों में कोड स्वचालित रूप से पता चल जाएगा</string>
+    <string name="paste_encrypted_text_into_this_box">इस बॉक्स में एन्क्रिप्टेड टेक्स्ट चिपकाएँ…</string>
+    <string name="this_is_an_example_of_an_encrypted_message_that_you_would_paste_here">यह एक एन्क्रिप्टेड संदेश का एक उदाहरण है जिसे आप यहाँ चिपकाएँगे…</string>
+    <string name="relaysms_reply_please_paste_this_entire_message_in_your_relaysms_app">RelaySMS उत्तर कृपया इस पूरे संदेश को अपने RelaySMS ऐप में चिपकाएँ</string>
+    <string name="click_to_paste">चिपकाने के लिए क्लिक करें</string>
+    <string name="decrypt_message">संदेश डिक्रिप्ट करें</string>
+    <string name="send_your_first_message">अपना पहला संदेश भेजें…</string>
+    <string name="save_platforms_">प्लेटफ़ॉर्म सहेजें</string>
+    <string name="phone_lockscreen_options">फ़ोन लॉकस्क्रीन विकल्प</string>
+    <string name="enable_lockscreen">लॉकस्क्रीन सक्षम करें</string>
+    <string name="require_lockscreen_pin_fingerprint_when_starting_the_app">ऐप शुरू करते समय लॉकस्क्रीन पिन/फिंगरप्रिंट की आवश्यकता है</string>
+    <string name="vault">वॉल्ट</string>
+    <string name="choose_which_platforms_you_want_to_remove_from_the_vault">वॉल्ट से कौन से प्लेटफ़ॉर्म हटाना चाहते हैं चुनें</string>
+    <string name="account">खाता</string>
+    <string name="clear_aliasing">उपनाम साफ़ करें</string>
+    <string name="this_would_delete_your_auth_codes_stored_for_aliasing_you_can_request_for_another_code_at_anytime">यह उपनाम के लिए संग्रहीत आपके प्रमाणीकरण कोड को हटा देगा। आप किसी भी समय दूसरे कोड का अनुरोध कर सकते हैं।</string>
+    <string name="logout">लॉगआउट</string>
+    <string name="logout_of_your_account_you_can_always_log_back_in_however_your_current_messages_would_be_deleted">अपने खाते से लॉगआउट करें। आप हमेशा वापस लॉग इन कर सकते हैं, हालाँकि आपके वर्तमान संदेश हटा दिए जाएँगे।</string>
+    <string name="delete_">हटाएं</string>
+    <string name="deleting_your_account_means_deleting_all_your_saved_accounts_online_you_can_always_recreate_your_account_once_needed">आपके खाते को हटाने का मतलब है आपके सभी सहेजे गए ऑनलाइन खातों को हटाना। आवश्यकता होने पर आप हमेशा अपना खाता फिर से बना सकते हैं।</string>
+    <string name="accessibility">अभिगम्यता</string>
+    <string name="language">भाषा</string>
+    <string name="messaging_">मैसेजिंग</string>
+    <string name="security_and_privacy">सुरक्षा और गोपनीयता</string>
+    <string name="security">सुरक्षा</string>
+    <string name="enable_app_locks_and_pin_codes">ऐप लॉक और पिन कोड सक्षम करें</string>
+
+    <string name="english">अंग्रेज़ी</string>
+    <string name="arabic">अरबी</string>
+    <string name="french">फ़्रेंच</string>
+    <string name="farsi">फ़ारसी</string>
+    <string name="spanish">स्पेनिश</string>
+    <string name="german">जर्मन</string>
+    <string name="swahili">स्वाहिली</string>
+    <string name="turkish">तुर्की</string>
+    <string name="chinese">चीनी</string>
+    <string name="korean">कोरियाई</string>
+    <string name="hindi">हिंदी</string>
+    <string name="shona">शोना</string>
+
+    <string name="welcome_to_relaysms_">RelaySMS में आपका स्वागत है!</string>
+    <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">बिना इंटरनेट कनेक्शन के पोस्ट करने, ईमेल और संदेश भेजने के लिए SMS का उपयोग करें</string>
+    <string name="learn_how_it_works_">यह कैसे काम करता है जानें</string>
+    <string name="read_our_privacy_policy">हमारी गोपनीयता नीति पढ़ें</string>
+    <string name="skip">छोड़ें</string>
+    <string name="you_are_ready_to_begin_sending_messages_from_relaysms">आप RelaySMS से संदेश भेजना शुरू करने के लिए तैयार हैं</string>
+    <string name="great">बहुत बढ़िया!</string>
+    <string name="relaysms_vaults_securely_stores_your_online_accounts_so_that_you_can_access_them_without_an_internet_connection">RelaySMS वॉल्ट आपके ऑनलाइन खातों को सुरक्षित रूप से संग्रहीत करता है, ताकि आप बिना इंटरनेट कनेक्शन के उन तक पहुँच सकें</string>
+    <string name="you_can_add_online_accounts_to_your_vault">आप अपने वॉल्ट में ऑनलाइन खाते जोड़ सकते हैं</string>
+    <string name="ok">ठीक है</string>
+    <string name="make_default">डिफ़ॉल्ट बनाएँ</string>
+    <string name="edit">संपादित करें</string>
+    <string name="delete">हटाएं</string>
+    <string name="view_on_github">GitHub पर देखें</string>
+    <string name="send_new_message">नया संदेश भेजें</string>
+    <string name="password">पासवर्ड</string>
+    <string name="re_enter_password">पासवर्ड फिर से दर्ज करें</string>
+    <string name="already_have_an_account">पहले से ही एक खाता है</string>
+    <string name="create_account">खाता बनाएं</string>
+    <string name="login">लॉग इन करें</string>
+    <string name="forgot_password">पासवर्ड भूल गए</string>
+    <string name="submit">प्रस्तुत करें</string>
+    <string name="re_send_code">कोड पुनः भेजें</string>
+    <string name="revoke_platforms">प्लेटफ़ॉर्म रद्द करें</string>
+    <string name="from">से</string>
+    <string name="always_add_the_dialing_code_if_absent_e_g_237">यदि अनुपस्थित हो तो हमेशा डायलिंग कोड जोड़ें, जैसे +237</string>
+    <string name="cc">Cc</string>
+    <string name="bcc">Bcc</string>
+    <string name="paste_message">संदेश चिपकाएँ</string>
+    <string name="error_decrypting_text">टेक्स्ट डिक्रिप्ट करने में त्रुटि</string>
+    <string name="you_can_also_send_out_emails_without_an_account_or_vault">आप बिना खाते या वॉल्ट के भी ईमेल भेज सकते हैं</string>
+    <string name="this_will_create_a_default_email_your_phonenumber_relaysms_me_using_your_phone_number">यह आपके फ़ोन नंबर का उपयोग करके एक डिफ़ॉल्ट ईमेल (your_phonenumber@relaysms.me) बनाएगा।</string>
+    <string name="next">अगला</string>
+    <string name="https_smswithoutborders_com_privacy_policy" translatable="false">https://smswithoutborders.com/privacy-policy</string>
+    <string name="version">संस्करण %1$s</string>
+    <string name="compose_new">नया लिखें</string>
+    <string name="add_account_compose_new">खाता जोड़ें / नया लिखें</string>
+    <string name="add_number">नंबर जोड़ें</string>
+    <string name="forgot_password_">पासवर्ड भूल गए?</string>
+    <string name="enter_your_phone_number_and_new_password_and_we_would_send_you_a_code_via_sms_to_reset_your_password">अपना फ़ोन नंबर और नया पासवर्ड दर्ज करें और हम आपको अपना पासवर्ड रीसेट करने के लिए SMS के माध्यम से एक कोड भेजेंगे।</string>
+    <string name="new_password">नया पासवर्ड</string>
+    <string name="reset_password">पासवर्ड रीसेट करें</string>
+    <string name="passwords_do_not_match">पासवर्ड मेल नहीं खाते</string>
+    <string name="discard">त्यागें</string>
+    <string name="message_discarded">संदेश त्याग दिया गया!</string>
+    <string name="time_left_until_code_expires">कोड समाप्त होने तक शेष समय: %1$ds</string>
+    <string name="something_went_wrong">कुछ गलत हो गया</string>
+    <string name="no_results_found">कोई परिणाम नहीं मिला</string>
+    <string name="search_message">संदेश खोजें</string>
+    <string name="bug_report">बग रिपोर्ट</string>
+    <string name="relaysms_bug_report">RelaySMS - बग रिपोर्ट</string>
+    <string name="request_new_code_in">इसमें नया कोड अनुरोध करें: </string>
+    <string name="request_new_code">नया कोड अनुरोध करें!</string>
+    <string name="test_url" translatable="false">https://gatewayserver.smswithoutborders.com/v3/clients/%1$s/tests</string>
+    <string name="store_tokens_on_device_dialog_title">डिवाइस पर OAuth2.0 टोकन स्टोर करें</string>
+    <string name="store_tokens_on_device_enable_dialog_message">इस सुविधा को चालू करने से सर्वर पर OAuth2.0 (Gmail और X) का उपयोग करने वाले प्लेटफ़ॉर्म के लिए आपके टोकन स्वचालित रूप से हटा दिए जाते हैं और उन्हें आपके डिवाइस में सहेज लिया जाता है। ध्यान रखें कि RelaySMS उपरोक्त प्लेटफ़ॉर्म के लिए आपकी ओर से संदेश भेजने के लिए इन टोकन का उपयोग करता है। इसलिए यदि आप अपना डिवाइस खो देते हैं या इस एप्लिकेशन को फिर से इंस्टॉल करते हैं, तो आपके टोकन खो जाएँगे और आपको मौजूदा संग्रहीत खातों को रद्द करना होगा और नए टोकन प्राप्त करने के लिए उन्हें फिर से स्टोर करना होगा।</string>
+    <string name="store_tokens_on_device_disable_dialog_message">इस सेटिंग को बंद करने से बाद के टोकन आपके डिवाइस पर संग्रहीत नहीं होंगे। आपके डिवाइस पर मौजूदा टोकन संग्रहीत प्लेटफ़ॉर्म के लिए संदेश अभी भी प्रकाशित हो सकेंगे। किसी भी स्थिति में टोकन गायब होने पर, कृपया संबंधित खातों के लिए रद्द करें और फिर से स्टोर करें।</string>
+    <string name="are_you_sure_you_want_to_continue">क्या आप वाकई इस कार्रवाई के साथ जारी रखना चाहते हैं?</string>
+    <string name="missing_token_text">आपके निम्नलिखित खातों में टोकन गायब हो सकते हैं। संदेश प्रकाशन सही ढंग से काम करे यह सुनिश्चित करने के लिए आपको उन्हें रद्द करके फिर से जोड़ना पड़ सकता है, खासकर यदि \'डिवाइस पर टोकन स्टोर करें\' सक्षम है:</string>
+    <string name="toast_tokens_refreshed_successfully">टोकन सफलतापूर्वक रीफ़्रेश हो गए</string>
+    <string name="toast_error_refreshing_tokens">टोकन रीफ़्रेश करने में त्रुटि: %s</string>
+    <string name="toast_tokens_not_stored_subsequent">बाद के खातों के लिए टोकन डिवाइस पर संग्रहीत नहीं होंगे</string>
+    <string name="an_unexpected_error_occurred">एक अप्रत्याशित त्रुटि हुई: %s</string>
+    <string name="do_not_show_this_again">इसे दोबारा न दिखाएँ</string>
+    <string name="missing_tokens_info">गुम टोकन जानकारी</string>
+    <string name="store_tokens_on_device">डिवाइस पर टोकन स्टोर करें</string>
+    <string name="storing_platform_accounts">प्लेटफ़ॉर्म खाते संग्रहीत करना</string>
+    <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">OAuth2.0 (जैसे Gmail, X) का उपयोग करने वाले प्लेटफ़ॉर्म के लिए खाते जोड़ते समय, इसे सक्षम करने से यह सुनिश्चित होता है कि आपके एक्सेस टोकन आपके वर्तमान डिवाइस पर संग्रहीत हैं</string>
+    <string name="stored_tokens_detected_title">संग्रहीत टोकन का पता चला</string>
+    <string name="stored_tokens_dialog_message_part1">इसके लिए संग्रहीत टोकन </string>
+    <string name="stored_tokens_dialog_message_part2">खाते का पता चला है। आप अपने संग्रहीत टोकन का उपयोग करके </string>
+    <string name="stored_tokens_dialog_message_part3">पर केवल एक बार पोस्ट कर सकते हैं। जब तक "डिवाइस पर टोकन स्टोर करें" सेटिंग चालू है, आप X पोस्ट केवल एक बार कर पाएंगे। इस खाते से अधिक पोस्ट करने के लिए, प्रत्येक पोस्ट के लिए इस खाते को रद्द करें और फिर से जोड़ें।</string>
+    <string name="stored_tokens_dialog_note">ध्यान दें: "डिवाइस पर टोकन स्टोर करें" सुविधा को बंद करने से, यह सुनिश्चित करते हुए कि आपके टोकन ऑनलाइन संग्रहीत हैं, आपको X पर कई पोस्ट करने की अनुमति मिलेगी, बिना रद्द किए और फिर से स्टोर किए।</string>
+    <string name="menu">मेनू</string>
+    <string name="search">खोजें</string>
+    <string name="close_search">खोज बंद करें</string>
+    <string name="back">वापस</string>
+    <string name="report_bug_feedback">बग/प्रतिक्रिया रिपोर्ट करें</string>
+    <string name="recents">हाल के</string>
+    <string name="select_language">भाषा चुनें</string>
+    <string name="select_contact">संपर्क चुनें</string>
+    <string name="relay_icon">रिले आइकन</string>
+    <string name="gateway_client_is_already_selected_change_default_gateway_client_before_deleting_this_one">गेटवे क्लाइंट पहले से ही चुना गया है। इसे हटाने से पहले डिफ़ॉल्ट गेटवे क्लाइंट बदलें</string>
+    <string name="cannot_delete">हटाया नहीं जा सकता</string>
+    <string name="selected_platform">चयनित प्लेटफ़ॉर्म</string>
+    <string name="close_modal">मोडल बंद करें</string>
+    <string name="profile_photo">प्रोफ़ाइल फ़ोटो</string>
+    <string name="send">भेजें</string>
+    <string name="more">और</string>
+    <string name="expand_to">तक विस्तृत करें</string>
+    <string name="post">पोस्ट करें</string>
+    <string name="sender_avatar">प्रेषक अवतार</string>
+    <string name="user_avatar">उपयोगकर्ता अवतार</string>
+    <string name="github_logo">GitHub लोगो</string>
+    <string name="x_logo">X लोगो</string>
+    <string name="bluesky_logo">ब्लूस्काई लोगो</string>
+    <string name="drink_me_out_of_here">मुझे यहाँ से बाहर निकालो</string>
+    <string name="you_need_to_log_in_again_into_this_device">आपको इस डिवाइस में फिर से लॉग इन करने की आवश्यकता है!</string>
+    <string name="you_have_logged_in_on_another_device">आपने किसी अन्य डिवाइस पर लॉग इन किया है</string>
+    <string name="get_me_out_here">मुझे यहाँ से बाहर निकालो!</string>
+    <string name="platform_logo">प्लेटफ़ॉर्म लोगो</string>
+    <string name="gateway_server_url">गेटवे सर्वर यूआरएल</string>
+    <string name="http_request">http अनुरोध</string>
+    <string name="relaysms_logo">RelaySMS लोगो</string>
+    <string name="compose">लिखें</string>
+    <string name="person_icon">व्यक्ति आइकन</string>
+    <string name="access_your_account_to_save_or_use_your_online_platforms_without_an_internet_connection">बिना इंटरनेट कनेक्शन के अपने ऑनलाइन प्लेटफ़ॉर्म को सहेजने या उपयोग करने के लिए अपने खाते तक पहुँचें</string>
+    <string name="an_sms_would_be_sent_to_your_phone_number_to_verify_you_own_the_number">आपके नंबर के स्वामी होने की पुष्टि करने के लिए आपके फ़ोन नंबर पर एक SMS भेजा जाएगा</string>
+    <string name="add_new_gateway_clients">नए गेटवे क्लाइंट जोड़ें</string>
+    <string name="inbox_icon">इनबॉक्स आइकन</string>
+    <string name="get_started_illustration">शुरू करने का चित्रण</string>
+    <string name="avatar_image">अवतार छवि</string>
+    <string name="refresh_token_updated">रीफ़्रेश टोकन अपडेट किया गया!</string>
+    <string name="relaysms_delivery">RelaySMS डिलीवरी:</string>
+    <string name="got_it">समझ गया!</string>
+    <string name="new_feature_icon_desc">नई सुविधा आइकन</string>
+    <string name="preview_feature_title">रोमांचक नई सुविधा!</string>
+    <string name="preview_feature_description">इस संस्करण में नया क्या है जानें। हमने कुछ अद्भुत जोड़ा है जो आपको पसंद आएगा।</string>
+    <string name="new_feature_title">नई सुविधा चेतावनी!</string>
+    <string name="oauth_token_storage_device_setting_info">अब आप सेटिंग्स > सुरक्षा पर जाकर अपने OAuth2.0 खातों के टोकन को अपने डिवाइस पर संग्रहीत करने का अनुरोध कर सकते हैं।</string>
+    <string name="unknown">अज्ञात</string>
+    <string name="this_message_s_content_could_not_be_displayed">इस संदेश की सामग्री प्रदर्शित नहीं की जा सकी।</string>
+    <string name="message_">संदेश</string>
+    <string name="message_content_could_not_be_displayed">संदेश की सामग्री प्रदर्शित नहीं की जा सकी</string>
+    <string name="text_message">पाठ संदेश</string>
+    <string name="recipient_account">प्राप्तकर्ता का खाता</string>
+    <string name="recipient_account_format_hint">सुनिश्चित करें कि प्राप्तकर्ता का खाता सही प्रारूप में है।</string>
+    <string name="slack_recipient">स्लैक चैनल या उपयोगकर्ता</string>
+    <string name="slack_hint">चैनलों के लिए: #नाम या एक आईडी का उपयोग करें (जैसे, #general या C123ABC)। डीएम के लिए: @उपयोगकर्ता नाम, एक ईमेल, या एक उपयोगकर्ता आईडी का उपयोग करें (जैसे, @jane या @user@gmail.com या U456DEF)।</string>
+    <string name="view_account_menu">अब आप नेविगेशन बार पर मेनू आइकन पर क्लिक करके वह खाता देख सकते हैं जिसमें आपने वर्तमान में लॉग इन किया है</string>
+    <string name="your_account">आपका खाता</string>
+
+</resources>

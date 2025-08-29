@@ -23,6 +23,8 @@ fragment = "1.8.6"
 fuelVersion = "2.3.1"
 googleMaterial = "1.12.0"
 grpcCore = "1.64.0"
+grpcInprocess = "1.71.0"
+grpcTesting = "1.71.0"
 javaxAnnotationApi = "1.3.2"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -38,12 +40,15 @@ material3 = "1.3.1"
 materialVersion = "1.7.8"
 navigationCompose = "2.8.9"
 okhttp = "2.7.5"
+okhttpBom = "4.12.0"
 playServicesAuth = "21.3.0"
 playServicesAuthApiPhone = "18.1.0"
 preferenceKtx = "1.2.1"
 protobufGradlePlugin = "0.9.4"
 protobufJava = "3.25.1"
-roomRuntime = "2.6.1"
+roomCompiler = "2.7.0"
+roomKtx = "2.7.0"
+roomRuntime = "2.7.0"
 smswithoutborders_libsignal = "0.0.10"
 startupRuntime = "1.2.0"
 swiperefreshlayout = "1.2.0-beta01"
@@ -85,6 +90,8 @@ androidx-navigation-compose = { module = "androidx.navigation:navigation-compose
 androidx-preference = { module = "androidx.preference:preference", version.ref = "preferenceKtx" }
 androidx-preference-ktx = { module = "androidx.preference:preference-ktx", version.ref = "preferenceKtx" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
+androidx-room-compiler-v270 = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
 androidx-runtime-rxjava2 = { module = "androidx.compose.runtime:runtime-rxjava2" }
@@ -107,17 +114,22 @@ fuel = { module = "com.github.kittinunf.fuel:fuel", version.ref = "fuelVersion" 
 fuel-android = { module = "com.github.kittinunf.fuel:fuel-android", version.ref = "fuelVersion" }
 fuel-coroutines = { module = "com.github.kittinunf.fuel:fuel-coroutines", version.ref = "fuelVersion" }
 grpc-core = { module = "io.grpc:grpc-core", version.ref = "grpcCore" }
+grpc-inprocess = { module = "io.grpc:grpc-inprocess", version.ref = "grpcInprocess" }
 grpc-okhttp = { module = "io.grpc:grpc-okhttp", version.ref = "grpcCore" }
 grpc-protobuf-lite = { module = "io.grpc:grpc-protobuf-lite", version.ref = "grpcCore" }
 grpc-stub = { module = "io.grpc:grpc-stub", version.ref = "grpcCore" }
+grpc-testing = { module = "io.grpc:grpc-testing", version.ref = "grpcTesting" }
 javax-annotation-api = { module = "javax.annotation:javax.annotation-api", version.ref = "javaxAnnotationApi" }
 junit = { module = "junit:junit", version.ref = "junit" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 material-v180alpha01 = { module = "com.google.android.material:material", version.ref = "googleMaterial" }
 material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 okhttp = { module = "com.squareup.okhttp:okhttp", version.ref = "okhttp" }
+okhttp-bom = { module = "com.squareup.okhttp3:okhttp-bom", version.ref = "okhttpBom" }
+okhttp3-okhttp = { module = "com.squareup.okhttp3:okhttp" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 play-services-auth-api-phone = { module = "com.google.android.gms:play-services-auth-api-phone", version.ref = "playServicesAuthApiPhone" }
 protobuf-gradle-plugin = { module = "com.google.protobuf:protobuf-gradle-plugin", version.ref = "protobufGradlePlugin" }

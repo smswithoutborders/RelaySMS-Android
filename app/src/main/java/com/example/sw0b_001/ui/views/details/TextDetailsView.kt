@@ -1,6 +1,8 @@
 package com.example.sw0b_001.ui.views.details
 
 
+import android.util.Base64
+import android.util.Log
 import com.example.sw0b_001.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -28,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -54,13 +57,30 @@ fun TextDetailsView(
     navController: NavController,
 ) {
     val context = LocalContext.current
-    val decomposedMessage = TextComposeHandler.decomposeMessage(
-        platformsViewModel.message!!.encryptedContent!!)
 
-    var from by remember{ mutableStateOf(
-        platformsViewModel.message?.fromAccount ?: "RelaySMS account") }
-    var text by remember{ mutableStateOf(decomposedMessage.text) }
-    var date by remember{ mutableLongStateOf(platformsViewModel.message!!.date) }
+    // Define state variables for the UI
+    var from by remember { mutableStateOf("") }
+    var text by remember { mutableStateOf("") }
+    var date by remember { mutableLongStateOf(0L) }
+
+    // Decompose the message content when the view is composed
+    val message = platformsViewModel.message
+    if (message?.encryptedContent != null) {
+        try {
+            val contentBytes = Base64.decode(message.encryptedContent, Base64.DEFAULT)
+            val decomposedMessage = TextComposeHandler.decomposeMessage(contentBytes)
+
+            from = decomposedMessage.from
+            text = decomposedMessage.text
+            date = message.date
+        } catch (e: Exception) {
+            Log.e("TextDetailsView", "Failed to decompose V1 text content: ${e.message}")
+            from = message.fromAccount ?: "Unknown Sender"
+            text = "This message's content could not be displayed."
+            date = message.date
+        }
+
+    }
 
     Scaffold(
         topBar = {
@@ -94,7 +114,7 @@ fun TextDetailsView(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
                     painter = painterResource(R.drawable.round_person_24),
-                    contentDescription = "User Avatar",
+                    contentDescription = stringResource(R.string.user_avatar),
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape)

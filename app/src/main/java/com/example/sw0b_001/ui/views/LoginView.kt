@@ -1,6 +1,7 @@
 package com.example.sw0b_001.ui.views
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -61,7 +62,6 @@ import androidx.compose.ui.res.stringResource
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.Models.Messages.EncryptedContent
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
-import com.example.sw0b_001.Models.NavigationFlowHandler
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Vaults
 import com.example.sw0b_001.R
@@ -79,7 +79,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoginView(
     navController: NavController = rememberNavController(),
-    navigationFlowHandler: NavigationFlowHandler = NavigationFlowHandler()
+    platformsViewModel: PlatformsViewModel,
 ) {
     val context = LocalContext.current
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
@@ -88,11 +88,8 @@ fun LoginView(
     var password by remember { mutableStateOf("") }
 
     if(BuildConfig.DEBUG) {
-//        phoneNumber = "1123457528"
-//        password = "dMd2Kmo9#"
-
-        phoneNumber = "123456789"
-        password = "dummy_password"
+        phoneNumber = "1123579"
+        password = "dMd2Kmo9#"
     }
 
     var passwordVisible by remember { mutableStateOf(false) }
@@ -117,7 +114,7 @@ fun LoginView(
                     }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            "Navigate back to home screen"
+                            stringResource(R.string.navigate_back_to_home_screen)
                         )
                     }
                 }
@@ -157,7 +154,7 @@ fun LoginView(
                                 textDecoration = TextDecoration.Underline
                             )
                         ) {
-                            append("save platforms")
+                            append(stringResource(R.string.save_platforms))
                         }
                         pop()
                         append(stringResource(R.string.for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline_))
@@ -263,14 +260,19 @@ fun LoginView(
                             phoneNumber = phoneNumber,
                             password = password,
                             otpRequiredCallback = { nextAttemptTimestamp ->
-                                navigationFlowHandler.loginSignupPassword = password
-                                navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
-                                navigationFlowHandler.otpRequestType =
+                                platformsViewModel.loginSignupPassword = password
+                                platformsViewModel.loginSignupPhoneNumber = phoneNumber
+                                platformsViewModel.otpRequestType =
                                     OTPCodeVerificationType.AUTHENTICATE
-                                navigationFlowHandler.nextAttemptTimestamp = nextAttemptTimestamp?.toLong()
+                                platformsViewModel.nextAttemptTimestamp = nextAttemptTimestamp
 
                                 CoroutineScope(Dispatchers.Main).launch {
                                     navController.navigate(OTPCodeScreen)
+                                }
+                            },
+                            passwordRequiredCallback = {
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    navController.navigate(ForgotPasswordScreen)
                                 }
                             },
                             failedCallback = {
@@ -296,15 +298,15 @@ fun LoginView(
                         )
                     }
                     else {
-                        Text("Log In")
+                        Text(stringResource(R.string.log_in))
                     }
                 }
                 
                 TextButton(
                     onClick = {
-                        navigationFlowHandler.loginSignupPassword = password
-                        navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
-                        navigationFlowHandler.otpRequestType =
+                        platformsViewModel.loginSignupPassword = password
+                        platformsViewModel.loginSignupPhoneNumber = phoneNumber
+                        platformsViewModel.otpRequestType =
                             OTPCodeVerificationType.AUTHENTICATE
                         navController.navigate(OTPCodeScreen)
                     },
@@ -345,7 +347,8 @@ private fun login(
     context: Context,
     phoneNumber: String,
     password: String,
-    otpRequiredCallback: (Int?) -> Unit,
+    otpRequiredCallback: (Int) -> Unit,
+    passwordRequiredCallback: () -> Unit = {},
     failedCallback: (String?) -> Unit = {},
     completedCallback: () -> Unit = {},
 ) {
@@ -358,7 +361,9 @@ private fun login(
                 password
             )
 
-            if(response.requiresOwnershipProof) {
+            if (response.requiresPasswordReset) {
+                passwordRequiredCallback()
+            } else if(response.requiresOwnershipProof) {
                 otpRequiredCallback(response.nextAttemptTimestamp)
             }
         } catch(e: StatusRuntimeException) {
@@ -380,7 +385,7 @@ private fun login(
 @Composable
 fun LoginViewPreview() {
     AppTheme(darkTheme = false) {
-        LoginView()
+        LoginView(platformsViewModel = PlatformsViewModel())
     }
 }
 

@@ -34,6 +34,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -62,7 +63,6 @@ import androidx.navigation.compose.rememberNavController
 import com.arpitkatiyarprojects.countrypicker.CountryPickerOutlinedTextField
 import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
-import com.example.sw0b_001.Models.NavigationFlowHandler
 import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.Models.Vaults
@@ -77,13 +77,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.contracts.contract
 import androidx.core.net.toUri
+import com.example.sw0b_001.BuildConfig
+import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateAccountView(
     navController: NavController = rememberNavController(),
-    navigationFlowHandler: NavigationFlowHandler
+    platformsViewModel: PlatformsViewModel
 ) {
     val context = LocalContext.current
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
@@ -94,10 +96,15 @@ fun CreateAccountView(
     var reenterPasswordVisible by remember { mutableStateOf (false) }
     var acceptedPrivatePolicy by remember { mutableStateOf (false) }
 
-    var showLoginModal by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
+    if(BuildConfig.DEBUG) {
+        phoneNumber = "1123579"
+        password = "dMd2Kmo9#"
+        reenterPassword = "dMd2Kmo9#"
+    }
 
     BackHandler {
         navController.popBackStack()
@@ -179,12 +186,12 @@ fun CreateAccountView(
                     mobileNumber = phoneNumber,
                     onMobileNumberChange = { phoneNumber = it },
                     onCountrySelected = { selectedCountry = it },
-                    defaultCountryCode = "us",
+                    defaultCountryCode = "cm",
                     countryListDisplayType = CountryListDisplayType.Dialog,
                     modifier = Modifier.fillMaxWidth(),
                     label = {
                         Text(text = stringResource(R.string.phone_number),
-                        style = MaterialTheme.typography.bodySmall)
+                            style = MaterialTheme.typography.bodySmall)
                     }
                 )
 
@@ -201,8 +208,8 @@ fun CreateAccountView(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp),
                     visualTransformation =
-                        if (passwordVisible) VisualTransformation.None
-                        else PasswordVisualTransformation(),
+                    if (passwordVisible) VisualTransformation.None
+                    else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     trailingIcon = {
                         val image = if (passwordVisible)
@@ -236,8 +243,8 @@ fun CreateAccountView(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp),
                     visualTransformation =
-                        if (reenterPasswordVisible) VisualTransformation.None
-                        else PasswordVisualTransformation(),
+                    if (reenterPasswordVisible) VisualTransformation.None
+                    else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     trailingIcon = {
                         val image = if (reenterPasswordVisible)
@@ -316,10 +323,11 @@ fun CreateAccountView(
                             countryCode = selectedCountry!!.countryCode,
                             password = password,
                             otpRequiredCallback = {
-                                navigationFlowHandler.loginSignupPassword = password
-                                navigationFlowHandler.loginSignupPhoneNumber = phoneNumber
-                                navigationFlowHandler.countryCode = selectedCountry!!.countryCode
-                                navigationFlowHandler.otpRequestType =
+                                platformsViewModel.loginSignupPassword = password
+                                platformsViewModel.loginSignupPhoneNumber = phoneNumber
+                                platformsViewModel.countryCode = selectedCountry!!.countryCode
+                                platformsViewModel.nextAttemptTimestamp = it
+                                platformsViewModel.otpRequestType =
                                     OTPCodeVerificationType.CREATE
 
                                 CoroutineScope(Dispatchers.Main).launch {
@@ -365,6 +373,21 @@ fun CreateAccountView(
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            TextButton(
+                onClick = {
+                    platformsViewModel.loginSignupPassword = password
+                    platformsViewModel.loginSignupPhoneNumber = phoneNumber
+                    platformsViewModel.otpRequestType =
+                        OTPCodeVerificationType.AUTHENTICATE
+                    navController.navigate(OTPCodeScreen)
+                },
+                enabled = (phoneNumber.isNotEmpty()
+                        && password.isNotEmpty()
+                        && reenterPassword.isNotEmpty()) && !isLoading,
+                modifier = Modifier.padding(bottom=16.dp)) {
+                Text(stringResource(R.string.already_got_code))
+            }
+
             Text(
                 text = buildAnnotatedString {
                     append(stringResource(R.string.already_have_an_account) + " ")
@@ -401,7 +424,7 @@ private fun createAccount(
     phoneNumber: String,
     countryCode: String,
     password: String,
-    otpRequiredCallback: () -> Unit,
+    otpRequiredCallback: (Int) -> Unit,
     failedCallback: (String?) -> Unit = {},
     completedCallback: () -> Unit = {},
 ) {
@@ -416,7 +439,7 @@ private fun createAccount(
             )
 
             if(response.requiresOwnershipProof) {
-                otpRequiredCallback()
+                otpRequiredCallback(response.nextAttemptTimestamp)
             }
         } catch(e: StatusRuntimeException) {
             e.printStackTrace()
@@ -437,6 +460,6 @@ private fun createAccount(
 @Composable
 fun CreateAccountPreview() {
     AppTheme(darkTheme = false) {
-        CreateAccountView(rememberNavController(), NavigationFlowHandler())
+        CreateAccountView(rememberNavController(), PlatformsViewModel())
     }
 }

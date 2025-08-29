@@ -4,14 +4,19 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Base64
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -60,6 +65,7 @@ import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import androidx.core.net.toUri
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -143,7 +149,9 @@ fun PlatformOptionsModal(
                     }
                 } else {
                     Image(
-                        bitmap = if(platformsViewModel.platform != null) {
+                        bitmap = if(platformsViewModel.platform != null &&
+                            platformsViewModel.platform!!.logo != null
+                        ) {
                             BitmapFactory.decodeByteArray(
                                 platformsViewModel.platform!!.logo,
                                 0,
@@ -154,7 +162,7 @@ fun PlatformOptionsModal(
                             context.resources,
                             R.drawable.logo
                         ).asImageBitmap(),
-                        contentDescription = "Selected platform",
+                        contentDescription = stringResource(R.string.selected_platform),
                         modifier = Modifier.size(64.dp),
                         contentScale = ContentScale.Fit
                     )
@@ -222,17 +230,21 @@ private fun triggerAddPlatformRequest(
         when(platform.protocol_type) {
             Platforms.ProtocolTypes.OAUTH2.type -> {
                 val publishers = Publishers(context)
+                val publicKeyBytes = Publishers.fetchPublisherPublicKey(context)
+                val requestIdentifier = Base64.encodeToString(publicKeyBytes, Base64.NO_WRAP)
+                println("Request Identifier: $requestIdentifier")
                 try {
                     val response = publishers.getOAuthURL(
                         availablePlatforms = platform,
                         autogenerateCodeVerifier = true,
-                        supportsUrlScheme = platform.support_url_scheme!!
+                        supportsUrlScheme = platform.support_url_scheme!!,
+                        requestIdentifier = requestIdentifier
                     )
 
                     Publishers.storeOauthRequestCodeVerifier(context, response.codeVerifier)
 
                     CoroutineScope(Dispatchers.Main).launch {
-                        val intentUri = Uri.parse(response.authorizationUrl)
+                        val intentUri = response.authorizationUrl.toUri()
                         val intent = Intent(Intent.ACTION_VIEW, intentUri)
                         context.startActivity(intent)
                     }
@@ -335,7 +347,10 @@ private fun AddAccountLoading(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(16.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+            .imePadding()
     ){
         var isAuthenticationCodeRequested by remember { mutableStateOf(false) }
         var isPasswordRequested by remember { mutableStateOf(false) }
@@ -529,7 +544,7 @@ private fun ComposeMessages(
                     ServiceTypes.MESSAGE.type -> {
                         navController.navigate(MessageComposeScreen)
                     }
-                    ServiceTypes.TEXT.type -> {
+                    ServiceTypes.TEXT.type, ServiceTypes.TEST.type -> {
                         navController.navigate(TextComposeScreen)
                     }
                 }
@@ -566,31 +581,33 @@ private fun ManageAccounts(
 }
 
 private fun getServiceBasedAvailableDescription(serviceType: String, context: Context) : String {
-    if(serviceType == ServiceTypes.EMAIL.type) {
-        return context.getString(R.string.adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported)
+    return when(serviceType) {
+        ServiceTypes.EMAIL.type -> {
+            context.getString(R.string.adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported)
+        }
+        ServiceTypes.MESSAGE.type -> {
+            context.getString(R.string.adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported)
+        }
+        ServiceTypes.TEXT.type, ServiceTypes.TEST.type -> {
+            return context.getString(R.string.adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported)
+        }
+        else -> context.getString(R.string.your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias)
     }
-    else if(serviceType == ServiceTypes.MESSAGE.type) {
-        return context.getString(R.string.adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported)
-    }
-    else if(serviceType == ServiceTypes.TEXT.type) {
-        return context.getString(R.string.adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported)
-    }
-
-    return context.getString(R.string.your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias)
 }
 
 private fun getServiceBasedComposeDescriptions(serviceType: String, context: Context) : String {
-    if(serviceType == ServiceTypes.EMAIL.type) {
-        return context.getString(R.string.continue_to_send_an_email_from_your_saved_email_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
+    return when(serviceType) {
+        ServiceTypes.EMAIL.type -> {
+            context.getString(R.string.continue_to_send_an_email_from_your_saved_email_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
+        }
+        ServiceTypes.MESSAGE.type -> {
+            context.getString(R.string.continue_to_send_messages_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
+        }
+        ServiceTypes.TEXT.type, ServiceTypes.TEST.type -> {
+            context.getString(R.string.continue_to_make_posts_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
+        }
+        else ->  context.getString(R.string.your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
     }
-    else if(serviceType == ServiceTypes.MESSAGE.type) {
-        return context.getString(R.string.continue_to_send_messages_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
-    }
-    else if(serviceType == ServiceTypes.TEXT.type) {
-        return context.getString(R.string.continue_to_make_posts_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
-    }
-
-    return context.getString(R.string.your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

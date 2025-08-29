@@ -22,7 +22,8 @@ class Platforms {
         TEXT("text"),
         MESSAGE("message"),
         BRIDGE("bridge"),
-        BRIDGE_INCOMING("bridge_incoming")
+        BRIDGE_INCOMING("bridge_incoming"),
+        TEST("test"),
     }
 
     enum class ProtocolTypes(val type: String) {
@@ -68,8 +69,10 @@ class Platforms {
                 try {
                     Publishers.getAvailablePlatforms(context).let{ json ->
                         json.forEach { it->
-                            val url = URL(it.icon_png)
-                            it.logo = url.readBytes()
+                            if(it.icon_png?.isNotEmpty() == true) {
+                                val url = URL(it.icon_png)
+                                it.logo = url.readBytes()
+                            }
                         }
                         Datastore.getDatastore(context).availablePlatformsDao().clear()
                         println("Storing: $json")

@@ -3,7 +3,9 @@ package com.example.sw0b_001
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
@@ -22,7 +24,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.Models.Messages.MessagesViewModel
-import com.example.sw0b_001.Models.NavigationFlowHandler
 import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.ui.views.CreateAccountView
 import com.example.sw0b_001.ui.views.LoginView
@@ -59,9 +60,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.preference.PreferenceManager
+import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.GatewayClients.GatewayClientViewModel
 import com.example.sw0b_001.Models.Platforms.Platforms
 import com.example.sw0b_001.Models.Vaults
+import com.example.sw0b_001.ui.components.MissingTokenAccountInfo
+import com.example.sw0b_001.ui.components.MissingTokenInfoDialog
 import com.example.sw0b_001.ui.navigation.AboutScreen
 import com.example.sw0b_001.ui.navigation.BridgeEmailComposeScreen
 import com.example.sw0b_001.ui.navigation.BridgeViewScreen
@@ -90,6 +95,9 @@ import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
+import androidx.core.content.edit
 
 
 enum class OnboardingState {
@@ -103,15 +111,20 @@ enum class OnboardingState {
 class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
 
-    val navigationFlowHandler = NavigationFlowHandler()
-
     val platformsViewModel: PlatformsViewModel by viewModels()
     val messagesViewModel: MessagesViewModel by viewModels()
     val gatewayClientViewModel: GatewayClientViewModel by viewModels()
 
+    var showMissingTokenDialog by mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // Fix for three-button nav not properly going edge-to-edge.
+            // TODO: https://issuetracker.google.com/issues/298296168
+            window.isNavigationBarContrastEnforced = false
+        }
 
         setContent {
             val composeView = LocalView.current
@@ -125,6 +138,31 @@ class MainActivity : ComponentActivity() {
 
             AppTheme {
                 navController = rememberNavController()
+
+                LaunchedEffect(true) {
+                    refreshTokensCallback(platformsViewModel.accountsForMissingDialog)
+                }
+
+                if (showMissingTokenDialog) {
+                    MissingTokenInfoDialog(
+                        groupedAccounts = platformsViewModel.accountsForMissingDialog,
+                        onDismiss = { showMissingTokenDialog = false },
+                        onConfirm = { doNotShowAgain ->
+                            showMissingTokenDialog = false
+                            if (doNotShowAgain) {
+                                PreferenceManager
+                                    .getDefaultSharedPreferences(applicationContext).edit {
+                                        putBoolean(
+                                            Vaults.Companion.PrefKeys
+                                                .KEY_DO_NOT_SHOW_MISSING_TOKEN_DIALOG,
+                                            true
+                                        )
+                                    }
+                            }
+                        }
+                    )
+                }
+
                 Surface(
                     Modifier
                         .fillMaxSize()
@@ -160,31 +198,30 @@ class MainActivity : ComponentActivity() {
                     platformsViewModel = platformsViewModel,
                     messagesViewModel = messagesViewModel,
                     gatewayClientViewModel = gatewayClientViewModel,
-                    navigationFlowHandler = navigationFlowHandler
                 )
             }
             composable<LoginScreen> {
                 LoginView(
                     navController = navController,
-                    navigationFlowHandler = navigationFlowHandler
+                    platformsViewModel = platformsViewModel,
                 )
             }
             composable<ForgotPasswordScreen> {
                 ForgotPasswordView(
                     navController = navController,
-                    navigationFlowHandler = navigationFlowHandler
+                    platformsViewModel = platformsViewModel,
                 )
             }
             composable<CreateAccountScreen> {
                 CreateAccountView(
                     navController = navController,
-                    navigationFlowHandler=navigationFlowHandler
+                    platformsViewModel = platformsViewModel,
                 )
             }
             composable<OTPCodeScreen> {
                 OtpCodeVerificationView(
                     navController = navController,
-                    navigationFlowHandler = navigationFlowHandler
+                    platformsViewModel = platformsViewModel,
                 )
             }
             composable<AboutScreen> {
@@ -250,6 +287,19 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun refreshTokensCallback(accountsInfo: Map<String, List<String>> ){
+        val sharedPreferences = PreferenceManager
+            .getDefaultSharedPreferences(applicationContext)
+        val doNotShowDialog = sharedPreferences
+            .getBoolean(Vaults.Companion.PrefKeys
+                .KEY_DO_NOT_SHOW_MISSING_TOKEN_DIALOG, false)
+
+        if (!doNotShowDialog && accountsInfo.isNotEmpty()) {
+            showMissingTokenDialog = true
+            platformsViewModel.accountsForMissingDialog = accountsInfo
+        }
+
+    }
 
     override fun onResume() {
         super.onResume()
@@ -265,11 +315,14 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 } else {
-                    Vaults.fetchLongLivedToken(applicationContext).let {
-                        if(it.isNotEmpty()) {
+                    Vaults.fetchLongLivedToken(applicationContext).let { llt ->
+                        if(llt.isNotEmpty()) {
                             val vault = Vaults(applicationContext)
                             try {
-                                vault.refreshStoredTokens(applicationContext)
+                                vault.refreshStoredTokens(applicationContext, ) {
+                                    if(it.isNotEmpty())
+                                        refreshTokensCallback(it)
+                                }
                             } catch(e: StatusRuntimeException) {
                                 if(e.status.code == Status.UNAUTHENTICATED.code) {
                                     Vaults.setGetMeOut(applicationContext, true)
@@ -284,6 +337,7 @@ class MainActivity : ComponentActivity() {
                             } finally {
                                 vault.shutdown()
                             }
+
                         }
                     }
                 }
@@ -295,5 +349,3 @@ class MainActivity : ComponentActivity() {
         Platforms.refreshAvailablePlatforms(applicationContext)
     }
 }
-
-

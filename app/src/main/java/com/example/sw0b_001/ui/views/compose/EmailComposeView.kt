@@ -2,6 +2,8 @@ package com.example.sw0b_001.ui.views.compose
 
 import android.content.Context
 import android.content.Intent
+import android.util.Base64
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
@@ -47,6 +49,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -59,6 +62,7 @@ import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.preference.PreferenceManager
 import com.example.sw0b_001.Bridges.Bridges
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.Database.Datastore
@@ -68,8 +72,11 @@ import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.Models.Publishers
 import com.example.sw0b_001.Models.SMSHandler
+import com.example.sw0b_001.Models.Vaults
+import com.example.sw0b_001.Modules.Helpers
 import com.example.sw0b_001.Modules.Network
 import com.example.sw0b_001.R
+import com.example.sw0b_001.ui.components.MissingTokenAccountInfo
 import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.navigation.GetMeOutScreen
@@ -80,9 +87,15 @@ import com.example.sw0b_001.ui.views.compose.EmailComposeHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.charset.StandardCharsets
+import java.util.Locale
 
 data class EmailContent(
     var to: String,
@@ -93,24 +106,81 @@ data class EmailContent(
 )
 
 object EmailComposeHandler {
-    fun decomposeMessage(
-        message: String,
-    ): EmailContent {
-        return message.split(":").let {
-            EmailContent(
-                to = it[0],
-                cc = it[1],
-                bcc = it[2],
-                subject = it[3],
-                body = it.subList(4, it.size).joinToString()
-            )
+
+    fun decomposeMessage(contentBytes: ByteArray): EmailContent {
+        try {
+            val buffer = ByteBuffer.wrap(contentBytes).order(ByteOrder.LITTLE_ENDIAN)
+
+            val fromLen = buffer.get().toInt() and 0xFF
+            val toLen = buffer.getShort().toInt() and 0xFFFF
+            val ccLen = buffer.getShort().toInt() and 0xFFFF
+            val bccLen = buffer.getShort().toInt() and 0xFFFF
+            val subjectLen = buffer.get().toInt() and 0xFF
+            val bodyLen = buffer.getShort().toInt() and 0xFFFF
+            val accessLen = buffer.getShort().toInt() and 0xFFFF
+            val refreshLen = buffer.getShort().toInt() and 0xFFFF
+
+            // Skip 'from' field
+            if (fromLen > 0) buffer.position(buffer.position() + fromLen)
+
+            // Read the relevant fields for the EmailContent object
+            val to = ByteArray(toLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+            val cc = ByteArray(ccLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+            val bcc = ByteArray(bccLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+            val subject = ByteArray(subjectLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+            val body = ByteArray(bodyLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+
+            // Skip token fields
+            if (accessLen > 0) buffer.position(buffer.position() + accessLen)
+            if (refreshLen > 0) buffer.position(buffer.position() + refreshLen)
+
+            return EmailContent(to, cc, bcc, subject, body)
+        } catch (e: Exception) {
+            Log.e("EmailComposeHandler", "Failed to decompose V2 binary message", e)
+            return EmailContent("", "", "", "", "Error: Could not parse message content.")
+        }
+    }
+
+
+
+    fun decomposeBridgeMessage(message: String): EmailContent {
+        return try {
+            // Bridge messages typically don't include 'from' in their direct content string
+            // Format: to:cc:bcc:subject:body
+            val parts = message.split(":", limit = 5)
+            if (parts.size < 5) {
+                Log.w("EmailComposeHandler", "Bridge message has fewer than 5 parts: '$message'. Parsing as best as possible.")
+                EmailContent(
+                    to = parts.getOrElse(0) { "" },
+                    cc = parts.getOrElse(1) { "" },
+                    bcc = parts.getOrElse(2) { "" },
+                    subject = parts.getOrElse(3) { "" },
+                    body = parts.getOrElse(4) { "" } // If body is missing, this will be empty
+                )
+            } else {
+                EmailContent(
+                    to = parts[0],
+                    cc = parts[1],
+                    bcc = parts[2],
+                    subject = parts[3],
+                    body = parts[4] // The rest of the string is the body
+                )
+            }
+        } catch (e: Exception) {
+            Log.e("EmailComposeHandler", "Failed to decompose bridge message string", e)
+            EmailContent("", "", "", "", "Error: Could not parse bridge message content.")
         }
     }
 }
 
 
 @Serializable
-data class GatewayClientRequest(val address: String, val text: String)
+data class GatewayClientRequest(
+    val address: String,
+    val text: String,
+    val date: String,
+    val date_sent: String
+)
 
 private fun networkRequest(
     url: String,
@@ -139,9 +209,19 @@ fun EmailComposeView(
 ) {
     val context = LocalContext.current
 
-    val decomposedMessage = if(platformsViewModel.message != null)
-        EmailComposeHandler.decomposeMessage(platformsViewModel.message!!.encryptedContent!!)
-    else null
+    val decomposedMessage = if (platformsViewModel.message?.encryptedContent != null) {
+        if (isBridge) {
+            EmailComposeHandler.decomposeBridgeMessage(platformsViewModel.message!!.encryptedContent!!)
+        } else {
+            try {
+                val contentBytes = Base64.decode(platformsViewModel.message!!.encryptedContent!!, Base64.DEFAULT)
+                EmailComposeHandler.decomposeMessage(contentBytes)
+            } catch (e: Exception) {
+                Log.e("EmailComposeView", "Error decoding/decomposing V1 message content.", e)
+                null
+            }
+        }
+    } else null
 
     var showCcBcc by remember { mutableStateOf(false) }
     val density = LocalDensity.current
@@ -184,6 +264,7 @@ fun EmailComposeView(
 
     // Conditionally show the SelectAccountModal
     if (showSelectAccountModal && !isBridge) {
+        Log.d("EmailComposeView", "Showing SelectAccountModal")
         SelectAccountModal(
             platformsViewModel = platformsViewModel,
             onDismissRequest = {
@@ -197,6 +278,7 @@ fun EmailComposeView(
                 selectedAccount = account
                 from = account.account!!
                 showSelectAccountModal = false
+                Log.d("EmailComposeView", "Selected account: $account")
             }
         )
     }
@@ -212,30 +294,62 @@ fun EmailComposeView(
             requestStatus = developerRequestStatus,
             isLoading = developerIsLoading,
             httpRequestCallback = { _, dialingUrl ->
-                TODO("figure out whats wrong here")
-//                developerIsLoading = true
-//                developerRequestStatus = "dialing...\n"
-//
-//                val scope = CoroutineScope(Dispatchers.Default).launch {
-//                    developerRequestStatus += networkRequest(
-//                        url = dialingUrl,
-//                        payload = GatewayClientRequest(
-//                            address = "+237123456789",
-//                            text = Bridges.compose(
-//                                context = context,
-//                                to = to,
-//                                cc = cc,
-//                                bcc = bcc,
-//                                subject = subject,
-//                                body = body,
-//                                smsTransmission = false,
-//                                onSuccessCallback = {}
-//                            ).first!!
-//                        ),
-//                    )
-//                    developerRequestStatus += "\nending..."
-//                    developerIsLoading = false
-//                }
+                developerIsLoading = true
+                developerRequestStatus = "dialing...\n"
+
+                val scope = CoroutineScope(Dispatchers.Default).launch {
+                    if(isBridge) {
+                        developerRequestStatus += networkRequest(
+                            url = dialingUrl,
+                            payload = GatewayClientRequest(
+                                address = "+2371123579",
+                                date = System.currentTimeMillis().toString(),
+                                date_sent = System.currentTimeMillis().toString(),
+                                text = Bridges.compose(
+                                    context = context,
+                                    to = to,
+                                    cc = cc,
+                                    bcc = bcc,
+                                    subject = subject,
+                                    body = body,
+                                    smsTransmission = false,
+                                    onSuccessCallback = {}
+                                ).first!!
+                            ),
+                        )
+                        developerRequestStatus += "\nending..."
+                        developerIsLoading = false
+                    } else {
+                        println("Sending for platforms...")
+                        processSend(
+                            context = context,
+                            emailContent = EmailContent(
+                                to = to,
+                                cc = cc,
+                                bcc = bcc,
+                                subject = subject,
+                                body = body
+                            ),
+                            account = selectedAccount,
+                            isBridge = false,
+                            onFailureCallback = {},
+                            onCompleteCallback = {
+                                developerRequestStatus += networkRequest(
+                                    url = dialingUrl,
+                                    payload = GatewayClientRequest(
+                                        address = "+2371123579",
+                                        date = System.currentTimeMillis().toString(),
+                                        date_sent = System.currentTimeMillis().toString(),
+                                        text = Base64.encodeToString(it, Base64.DEFAULT)
+                                    )
+                                )
+                                developerRequestStatus += "\nending..."
+                                developerIsLoading = false
+                            },
+                            smsTransmission = false,
+                        )
+                    }
+                }
             }
         ) {
             showDeveloperDialog = false
@@ -250,7 +364,7 @@ fun EmailComposeView(
                 title = { Text(stringResource(R.string.compose_email)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {
@@ -261,7 +375,7 @@ fun EmailComposeView(
                             },
                             enabled = to.isNotEmpty() && body.isNotEmpty(),
                         ) {
-                            Icon(Icons.Default.DeveloperMode, contentDescription = "Send")
+                            Icon(Icons.Default.DeveloperMode, contentDescription = stringResource(R.string.send))
                         }
                     }
 
@@ -279,19 +393,20 @@ fun EmailComposeView(
                                 ),
                                 account = selectedAccount,
                                 isBridge = isBridge,
-                                onFailureCallback = {}
-                            ) {
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    navController.navigate(HomepageScreen) {
-                                        popUpTo(HomepageScreen) {
-                                            inclusive = true
+                                onFailureCallback = { errorMsg ->
+                                    Log.e("EmailComposeView", "Send failed: $errorMsg")
+                                },
+                                onCompleteCallback = {
+                                    CoroutineScope(Dispatchers.Main).launch {
+                                        navController.navigate(HomepageScreen) {
+                                            popUpTo(HomepageScreen) { inclusive = true }
                                         }
                                     }
                                 }
-                            }
+                            )
                         }
                     ) {
-                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
+                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.send))
                     }
 
                     IconButton(
@@ -299,7 +414,7 @@ fun EmailComposeView(
                             showMoreOptions = !showMoreOptions
                         }
                     ) {
-                        Icon(Icons.Filled.MoreVert, contentDescription = "More")
+                        Icon(Icons.Filled.MoreVert, contentDescription = stringResource(R.string.more))
                         DropdownMenu(
                             expanded = showMoreOptions,
                             onDismissRequest = { showMoreOptions = false }
@@ -380,20 +495,21 @@ fun EmailComposeView(
                         onValueChange = {to = it},
                         textStyle = TextStyle.Default.copy(
                             color = MaterialTheme.colorScheme.onSurface,
-                            fontSize = 16.sp
+                            fontSize = 16.sp,
                         ),
                         modifier = Modifier.weight(1f),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Email,
                             imeAction = ImeAction.Next
-                        )
+                        ),
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
                     )
                     IconButton(onClick = {
                         showCcBcc = !showCcBcc
                     }) {
                         Icon(
                             Icons.Filled.ArrowDropDown,
-                            contentDescription = "Expand To"
+                            contentDescription = stringResource(R.string.expand_to)
                         )
                     }
                 }
@@ -425,7 +541,8 @@ fun EmailComposeView(
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Email,
                                 imeAction = ImeAction.Next
-                            )
+                            ),
+                            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
                         )
                     }
 
@@ -457,7 +574,8 @@ fun EmailComposeView(
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Email,
                                 imeAction = ImeAction.Next
-                            )
+                            ),
+                            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
                         )
                     }
 
@@ -484,6 +602,7 @@ fun EmailComposeView(
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 16.sp
                     ),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
                     modifier = Modifier
                         .weight(1f),
                     decorationBox = { innerTextField ->
@@ -528,6 +647,7 @@ fun EmailComposeView(
                         }
                     }
                 },
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
                 textStyle = TextStyle.Default.copy(
                     color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 16.sp
@@ -552,16 +672,62 @@ fun EmailComposeView(
     }
 }
 
-private fun processEmailForEncryption(
-    to: String,
-    cc: String,
-    bcc: String,
-    subject: String,
-    body: String,
-    account: StoredPlatformsEntity?
-): String {
-    return "${account!!.account}:$to:$cc:$bcc:$subject:$body"
+
+private fun createEmailByteBuffer(
+    from: String, to: String, cc: String, bcc: String, subject: String, body: String,
+    accessToken: String? = null, refreshToken: String? = null
+): ByteBuffer {
+    val fromBytes = from.toByteArray(StandardCharsets.UTF_8)
+    val toBytes = to.toByteArray(StandardCharsets.UTF_8)
+    val ccBytes = cc.toByteArray(StandardCharsets.UTF_8)
+    val bccBytes = bcc.toByteArray(StandardCharsets.UTF_8)
+    val subjectBytes = subject.toByteArray(StandardCharsets.UTF_8)
+    val bodyBytes = body.toByteArray(StandardCharsets.UTF_8)
+    val accessTokenBytes = accessToken?.toByteArray(StandardCharsets.UTF_8)
+    val refreshTokenBytes = refreshToken?.toByteArray(StandardCharsets.UTF_8)
+
+    // Field size validation
+    if (fromBytes.size > 255) throw IllegalArgumentException("From field exceeds maximum size of 255 bytes")
+    if (toBytes.size > 65535) throw IllegalArgumentException("To field exceeds maximum size of 65,535 bytes")
+    if (ccBytes.size > 65535) throw IllegalArgumentException("CC field exceeds maximum size of 65,535 bytes")
+    if (bccBytes.size > 65535) throw IllegalArgumentException("BCC field exceeds maximum size of 65,535 bytes")
+    if (subjectBytes.size > 255) throw IllegalArgumentException("Subject field exceeds maximum size of 255 bytes")
+    if (bodyBytes.size > 65535) throw IllegalArgumentException("Body field exceeds maximum size of 65,535 bytes")
+    if ((accessTokenBytes?.size ?: 0) > 65535) throw IllegalArgumentException("Access token exceeds maximum size of 65,535 bytes")
+    if ((refreshTokenBytes?.size ?: 0) > 65535) throw IllegalArgumentException("Refresh token exceeds maximum size of 65,535 bytes")
+
+    // Calculate total size for the buffer
+    val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 2 + 2 +
+            fromBytes.size + toBytes.size + ccBytes.size + bccBytes.size +
+            subjectBytes.size + bodyBytes.size +
+            (accessTokenBytes?.size ?: 0) + (refreshTokenBytes?.size ?: 0)
+
+    val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
+
+    // Write field lengths
+    buffer.put(fromBytes.size.toByte())
+    buffer.putShort(toBytes.size.toShort())
+    buffer.putShort(ccBytes.size.toShort())
+    buffer.putShort(bccBytes.size.toShort())
+    buffer.put(subjectBytes.size.toByte())
+    buffer.putShort(bodyBytes.size.toShort())
+    buffer.putShort((accessTokenBytes?.size ?: 0).toShort())
+    buffer.putShort((refreshTokenBytes?.size ?: 0).toShort())
+
+    // Write field values
+    buffer.put(fromBytes)
+    buffer.put(toBytes)
+    buffer.put(ccBytes)
+    buffer.put(bccBytes)
+    buffer.put(subjectBytes)
+    buffer.put(bodyBytes)
+    accessTokenBytes?.let { buffer.put(it) }
+    refreshTokenBytes?.let { buffer.put(it) }
+
+    buffer.flip()
+    return buffer
 }
+
 
 private fun processSend(
     context: Context,
@@ -569,11 +735,12 @@ private fun processSend(
     account: StoredPlatformsEntity?,
     isBridge: Boolean,
     onFailureCallback: (String?) -> Unit,
-    onCompleteCallback: () -> Unit
+    onCompleteCallback: (ByteArray?) -> Unit,
+    smsTransmission: Boolean = true
 ) {
     CoroutineScope(Dispatchers.Default).launch {
         try {
-            if(isBridge) {
+            if(isBridge) { // if its a bridge message
                 val txtTransmission = Bridges.compose(
                     context = context,
                     to = emailContent.to,
@@ -581,7 +748,7 @@ private fun processSend(
                     bcc = emailContent.bcc,
                     subject = emailContent.subject,
                     body = emailContent.body
-                ) { onCompleteCallback() }.first
+                ) { onCompleteCallback(null) }.first
 
                 val gatewayClientMSISDN = GatewayClientsCommunications(context)
                     .getDefaultGatewayClient()
@@ -590,40 +757,108 @@ private fun processSend(
                     context,
                     gatewayClientMSISDN!!,
                     txtTransmission).apply {
-                    setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 }
                 context.startActivity(sentIntent)
             }
             else {
-                val formattedContent = processEmailForEncryption(
-                    emailContent.to,
-                    emailContent.cc,
-                    emailContent.bcc,
-                    emailContent.subject,
-                    emailContent.body,
-                    account
+                Log.d("processSend", "Processing as V1 PLATFORM message.")
+                if (account == null) {
+                    onFailureCallback("Account is required for V1 platform messages.")
+                    return@launch
+                }
+
+                val AD = Publishers.fetchPublisherPublicKey(context)
+                if (AD == null) {
+                    onFailureCallback("Could not fetch publisher key. Cannot encrypt message.")
+                    return@launch
+                }
+
+                val contentFormatBytes = if (
+                    account.accessToken?.isNotEmpty() == true
+                ) {
+                    createEmailByteBuffer(
+                        from = account.account!!, // 'from' is from the selected account
+                        to = emailContent.to,
+                        cc = emailContent.cc,
+                        bcc = emailContent.bcc,
+                        subject = emailContent.subject,
+                        body = emailContent.body,
+                        accessToken = account.accessToken,
+                        refreshToken = account.refreshToken
+                    ).array()
+                } else {
+                    createEmailByteBuffer(
+                        from = account.account!!,
+                        to = emailContent.to,
+                        cc = emailContent.cc,
+                        bcc = emailContent.bcc,
+                        subject = emailContent.subject,
+                        body = emailContent.body
+                    ).array()
+                }
+
+
+                val contentFormatV2Bytes = createEmailByteBuffer(
+                    from = account.account,
+                    to = emailContent.to,
+                    cc = emailContent.cc,
+                    bcc = emailContent.bcc,
+                    subject = emailContent.subject,
+                    body = emailContent.body,
+                    accessToken = account.accessToken,
+                    refreshToken = account.refreshToken
+                ).array()
+
+                val platform = Datastore.getDatastore(context).availablePlatformsDao().fetch(account.name!!)
+                if (platform == null) {
+                    onFailureCallback("Could not find platform details for '${account.name}'.")
+                    return@launch
+                }
+
+                val languageCode = Locale.getDefault().language.take(2).lowercase(Locale.ROOT)
+                Log.d("processSend", "Language code: $languageCode")
+                val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
+                Log.d("processSend", "Valid language code: $validLanguageCode")
+
+                val v2PayloadBytes = ComposeHandlers.composeV2(
+                    context = context,
+                    contentFormatV2Bytes = contentFormatBytes,
+                    AD = AD,
+                    platform = platform,
+                    account = account,
+                    languageCode = validLanguageCode,
+                    smsTransmission = smsTransmission
                 )
 
-                val availablePlatforms =
-                    Datastore.getDatastore(context).availablePlatformsDao().fetch(account!!.name!!)
-                val AD = Publishers.fetchPublisherPublicKey(context)
-                ComposeHandlers.compose(
-                    context,
-                    formattedContent,
-                    AD!!,
-                    availablePlatforms,
-                    account,
-                ) { onCompleteCallback() }
+                if (smsTransmission) {
+                    val gatewayClientMSISDN = GatewayClientsCommunications(context)
+                        .getDefaultGatewayClient()
+                    if (gatewayClientMSISDN == null) {
+                        onFailureCallback("No default gateway client configured for SMS.")
+                        return@launch
+                    }
+                    val base64Payload = Base64.encodeToString(v2PayloadBytes, Base64.NO_WRAP)
+                    SMSHandler.transferToDefaultSMSApp(
+                        context,
+                        gatewayClientMSISDN,
+                        base64Payload
+                    ).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    }
+                }
+                onCompleteCallback(v2PayloadBytes)
             }
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
             onFailureCallback(e.message)
             CoroutineScope(Dispatchers.Main).launch {
-                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, e.message ?: "An unknown error occurred", Toast.LENGTH_LONG).show()
             }
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
@@ -645,6 +880,8 @@ fun AccountModalPreview() {
             id= "0",
             account = "developers@relaysms.me",
             name = "gmail",
+            accessToken = "",
+            refreshToken = ""
         )
         SelectAccountModal(
             _accounts = listOf(storedPlatform),

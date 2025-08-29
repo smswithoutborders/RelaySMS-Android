@@ -43,7 +43,11 @@ fun LanguageSelectionPopup(
         LanguageOption(stringResource(R.string.spanish), "es"),
         LanguageOption(stringResource(R.string.german), "de"),
         LanguageOption(stringResource(R.string.swahili), "sw"),
-        LanguageOption(stringResource(R.string.turkish), "tr")
+        LanguageOption(stringResource(R.string.turkish), "tr"),
+        LanguageOption(stringResource(R.string.chinese), "zh"),
+        LanguageOption(stringResource(R.string.korean), "ko"),
+        LanguageOption(stringResource(R.string.hindi), "hi"),
+        LanguageOption(stringResource(R.string.shona), "sn"),
     )
 
     var selectedLanguageCode by remember { mutableStateOf(currentLanguageCode) }
@@ -56,7 +60,7 @@ fun LanguageSelectionPopup(
                 .padding(16.dp)
         ) {
             Text(
-                text = "Select Language",
+                text = stringResource(R.string.select_language),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface

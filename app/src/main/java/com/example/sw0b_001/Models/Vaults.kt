@@ -2,29 +2,42 @@ package com.example.sw0b_001.Models
 
 import android.content.Context
 import android.util.Base64
+import android.util.Log
+import androidx.compose.material3.adaptive.layout.forEach
+import androidx.preference.PreferenceManager
 import at.favre.lib.armadillo.Armadillo
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.KeystoreHelpers
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityAES
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityRSA
 import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.Platforms.Platforms
+import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.Modules.Crypto
 import com.example.sw0b_001.R
 import com.example.sw0b_001.Security.Cryptography
+import com.example.sw0b_001.ui.components.MissingTokenAccountInfo
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import vault.v1.EntityGrpc
 import vault.v1.EntityGrpc.EntityBlockingStub
 import vault.v1.Vault
 import java.security.DigestException
 import java.security.MessageDigest
+import kotlin.text.map
+import kotlin.text.toBoolean
+import androidx.core.content.edit
 
-class Vaults(context: Context) {
+class Vaults(val context: Context) {
     private val DEVICE_ID_KEYSTORE_ALIAS = "DEVICE_ID_KEYSTORE_ALIAS"
+    private val KEY_ACCOUNTS_MISSING_TOKENS_JSON = "accounts_with_missing_tokens_ids"
 
     private var channel: ManagedChannel = ManagedChannelBuilder
         .forAddress(context.getString(R.string.vault_grpc_url),
@@ -47,21 +60,81 @@ class Vaults(context: Context) {
         }
     }
 
-    fun refreshStoredTokens(context: Context) {
-        val llt = fetchLongLivedToken(context)
-        val response = listStoredEntityTokens(llt)
+    fun refreshStoredTokens(
+        context: Context,
+        missingCallback: (Map<String, List<String>>) -> Unit = {}
+    ) {
+        try {
+            val llt = fetchLongLivedToken(context)
 
-        val storedPlatforms = ArrayList<StoredPlatformsEntity>()
-        response.storedTokensList.forEach {
-            val uuid = Base64.encodeToString(buildPlatformsUUID(it.platform,
-                it.accountIdentifier), Base64.DEFAULT)
-            storedPlatforms.add(
-                StoredPlatformsEntity(uuid, it.accountIdentifier,
-                    it.platform)
-            )
+            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+            val storeTokensOnDevice = sharedPreferences.getBoolean("store_tokens_on_device", false)
+
+            val response = getStoredAccountTokens(llt, storeTokensOnDevice)
+
+            val datastore = Datastore.getDatastore(context)
+            val platformsToSave = ArrayList<StoredPlatformsEntity>()
+            val storedPlatforms = datastore.storedPlatformsDao().fetchAllList()
+
+            val accountsMissingTokens = mutableMapOf<String, MutableList<String>>()
+            response.storedTokensList.forEach { accountTokens ->
+                val uuid = Base64.encodeToString(
+                    buildPlatformsUUID(accountTokens.platform, accountTokens.accountIdentifier),
+                    Base64.DEFAULT
+                )
+
+                val isStoredOnDevice = accountTokens.isStoredOnDevice
+                val accessToken = if(accountTokens.accountTokensMap.containsKey("access_token")) {
+                    accountTokens.accountTokensMap["access_token"]
+                } else ""
+                val refreshToken = if(accountTokens.accountTokensMap.containsKey("refresh_token")) {
+                    accountTokens.accountTokensMap["refresh_token"]
+                } else ""
+
+                // TODO: add storing in case there's something to store
+                if (isStoredOnDevice &&
+                    accessToken.isNullOrEmpty() &&
+                    storedPlatforms.find { it.id == uuid &&
+                            !it.accessToken.isNullOrEmpty() } == null) {
+                    accountsMissingTokens[accountTokens.platform].let { accountsIds ->
+                        if (accountsIds.isNullOrEmpty())
+                            accountsMissingTokens[accountTokens.platform] =
+                                mutableListOf(accountTokens.accountIdentifier)
+                        else
+                            accountsMissingTokens[accountTokens.platform]
+                                ?.add(accountTokens.accountIdentifier)
+                    }
+                }
+                else {
+                    platformsToSave.add(
+                        if(storedPlatforms.find { it.id == uuid } != null) {
+                            storedPlatforms.first { it.id == uuid }.apply {
+                                if (this.accessToken.isNullOrEmpty()) {
+                                    this.accessToken = accessToken
+                                }
+                                if (this.refreshToken.isNullOrEmpty()) {
+                                    this.refreshToken = refreshToken
+                                }
+                            }
+                        }
+                        else {
+                            StoredPlatformsEntity(
+                                id = uuid,
+                                account = accountTokens.accountIdentifier,
+                                name = accountTokens.platform,
+                                accessToken = accessToken,
+                                refreshToken = refreshToken
+                            )
+                        }
+                    )
+                }
+            }
+            datastore.storedPlatformsDao().insert(platformsToSave)
+            missingCallback(accountsMissingTokens)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw e
         }
-        Datastore.getDatastore(context).storedPlatformsDao().deleteAll()
-        Datastore.getDatastore(context).storedPlatformsDao().insertAll(storedPlatforms)
     }
 
     private fun processVaultArtifacts(context: Context,
@@ -69,22 +142,30 @@ class Vaults(context: Context) {
                                       deviceIdPubKey: String,
                                       publisherPubKey: String,
                                       phoneNumber: String,
-                                      clientDeviceIDPubKey: ByteArray) {
+                                      clientDeviceIDPubKey: ByteArray,
+                                      clientPublisherPubKey: ByteArray) {
         val deviceIdSharedKey = Cryptography.calculateSharedSecret(
             context,
             DEVICE_ID_KEYSTORE_ALIAS,
-            Base64.decode(deviceIdPubKey, Base64.DEFAULT))
+            Base64.decode(deviceIdPubKey, Base64.DEFAULT),
+        )
         println("DeviceID sk: ${Base64.encodeToString(deviceIdSharedKey, Base64.DEFAULT)}")
 
         val llt = Crypto.decryptFernet(deviceIdSharedKey,
             String(Base64.decode(encodedLlt, Base64.DEFAULT), Charsets.UTF_8))
 
-        val deviceId = getDeviceID(deviceIdSharedKey, phoneNumber, clientDeviceIDPubKey)
+        val deviceId = getDeviceID(
+            deviceIdSharedKey,
+            phoneNumber,
+            clientDeviceIDPubKey
+        )
         println("DeviceID: ${Base64.encodeToString(deviceId, Base64.DEFAULT)}")
         println("Device msisdn: $phoneNumber")
 
         storeArtifacts(context, llt, deviceId, clientDeviceIDPubKey)
-        Publishers.storeArtifacts(context, publisherPubKey)
+        Publishers.storeArtifacts(context, publisherPubKey,
+            Base64.encodeToString(clientPublisherPubKey,
+            Base64.DEFAULT))
         Publishers.removeEncryptedStates(context)
         CoroutineScope(Dispatchers.Default).launch {
             Datastore.getDatastore(context).ratchetStatesDAO().deleteAll()
@@ -120,7 +201,7 @@ class Vaults(context: Context) {
                 response.serverDeviceIdPubKey,
                 response.serverPublishPubKey,
                 phoneNumber,
-                deviceIdPubKey)
+                deviceIdPubKey, publishPubKey)
         }
         return response
     }
@@ -145,13 +226,18 @@ class Vaults(context: Context) {
         }.build()
 
         val response = entityStub.authenticateEntity(authenticateEntityRequest)
+
+        if (response.requiresPasswordReset) {
+            return response
+        }
+
         if(!response.requiresOwnershipProof) {
             processVaultArtifacts(context,
                 response.longLivedToken,
                 response.serverDeviceIdPubKey,
                 response.serverPublishPubKey,
                 phoneNumber,
-                deviceIdPubKey)
+                deviceIdPubKey, publishPubKey)
         }
         return response
     }
@@ -182,17 +268,23 @@ class Vaults(context: Context) {
                 response.serverDeviceIdPubKey,
                 response.serverPublishPubKey,
                 phoneNumber,
-                deviceIdPubKey)
+                deviceIdPubKey, publishPubKey)
         }
         return response
     }
 
-    private fun listStoredEntityTokens(llt: String) : Vault.ListEntityStoredTokensResponse {
+    fun getStoredAccountTokens(
+        llt: String,
+        migrateToDevice: Boolean
+    ): Vault.ListEntityStoredTokensResponse {
         val request = Vault.ListEntityStoredTokensRequest.newBuilder().apply {
             setLongLivedToken(llt)
+            setMigrateToDevice(migrateToDevice)
         }.build()
 
-        return entityStub.listEntityStoredTokens(request)
+        val res = entityStub.listEntityStoredTokens(request)
+
+        return res
     }
 
     fun deleteEntity(longLivedToken: String) : Vault.DeleteEntityResponse {
@@ -231,6 +323,7 @@ class Vaults(context: Context) {
 
             Datastore.getDatastore(context).storedPlatformsDao().fetchAllList().forEach { platform ->
                 availablePlatforms.filter { it.name == platform.name }.forEach {
+                    Log.d("deleteEntity", "platform: ${it.protocol_type}")
                     when(it.protocol_type) {
                         Platforms.ProtocolTypes.OAUTH2.type -> {
                             publishers.revokeOAuthPlatforms(
@@ -263,9 +356,9 @@ class Vaults(context: Context) {
             var sharedPreferences = Armadillo.create(context, VAULT_ATTRIBUTE_FILES)
                 .encryptionFingerprint(context)
                 .build()
-            sharedPreferences.edit()
-                .putBoolean(IS_GET_ME_OUT, value)
-                .apply()
+            sharedPreferences.edit {
+                putBoolean(IS_GET_ME_OUT, value)
+            }
         }
 
         fun isGetMeOut(context: Context) : Boolean {
@@ -280,12 +373,12 @@ class Vaults(context: Context) {
             var sharedPreferences = Armadillo.create(context, VAULT_ATTRIBUTE_FILES)
                 .encryptionFingerprint(context)
                 .build()
-            sharedPreferences.edit().clear().apply()
+            sharedPreferences.edit { clear() }
 
             sharedPreferences = Armadillo.create(context, Publishers.PUBLISHER_ATTRIBUTE_FILES)
                 .encryptionFingerprint(context)
                 .build()
-            sharedPreferences.edit().clear().apply()
+            sharedPreferences.edit { clear() }
 
             KeystoreHelpers.removeFromKeystore(context, DEVICE_ID_KEYSTORE_ALIAS)
             KeystoreHelpers.removeFromKeystore(context, DEVICE_ID_SECRET_KEY_KEYSTORE_ALIAS)
@@ -323,18 +416,28 @@ class Vaults(context: Context) {
                 .encryptionFingerprint(context)
                 .build()
 
-            sharedPreferences.edit()
-                .putString(LONG_LIVED_TOKEN_KEYSTORE_ALIAS,
-                    Base64.encodeToString(lltEncrypted, Base64.DEFAULT))
-                .putString(DEVICE_ID_KEYSTORE_ALIAS,
-                    Base64.encodeToString(deviceIdEncrypted, Base64.DEFAULT))
-                .putString(LONG_LIVED_TOKEN_SECRET_KEY_KEYSTORE_ALIAS,
-                    Base64.encodeToString(encryptedSecretKey, Base64.DEFAULT))
-                .putString(DEVICE_ID_SECRET_KEY_KEYSTORE_ALIAS,
-                    Base64.encodeToString(encryptedDeviceIdSecretKey, Base64.DEFAULT))
-                .putString(DEVICE_ID_PUB_KEY,
-                    Base64.encodeToString(clientDeviceIDPubKey, Base64.DEFAULT))
-                .apply()
+            sharedPreferences.edit {
+                putString(
+                    LONG_LIVED_TOKEN_KEYSTORE_ALIAS,
+                    Base64.encodeToString(lltEncrypted, Base64.DEFAULT)
+                )
+                    .putString(
+                        DEVICE_ID_KEYSTORE_ALIAS,
+                        Base64.encodeToString(deviceIdEncrypted, Base64.DEFAULT)
+                    )
+                    .putString(
+                        LONG_LIVED_TOKEN_SECRET_KEY_KEYSTORE_ALIAS,
+                        Base64.encodeToString(encryptedSecretKey, Base64.DEFAULT)
+                    )
+                    .putString(
+                        DEVICE_ID_SECRET_KEY_KEYSTORE_ALIAS,
+                        Base64.encodeToString(encryptedDeviceIdSecretKey, Base64.DEFAULT)
+                    )
+                    .putString(
+                        DEVICE_ID_PUB_KEY,
+                        Base64.encodeToString(clientDeviceIDPubKey, Base64.DEFAULT)
+                    )
+            }
         }
 
         fun fetchLongLivedToken(context: Context) : String {
@@ -384,6 +487,24 @@ class Vaults(context: Context) {
                     "${combinedData.size}")
             println("pk: ${Base64.encodeToString(publicKey, Base64.DEFAULT)}")
             return Crypto.HMAC(derivedKey, combinedData)
+        }
+
+        fun decomposeRefreshToken(data: String): Pair<String, String> {
+            /*
+            RelaySMS Delivery: Successfully sent message to twitter at 2025-05-27 22:10:02 (UTC).
+
+Please paste this message in your RelaySMS app
+YW5hcmNoaXN0LnNvbnNvZnBlcmRpdGlvbkBnbWFpbC5jb206ZWs5T1lqTllVR2RxWjBaVVYzTldaMVZ2TXpoNlNEYzJNbFIxTW0xWmNEbGtOV3hUTTNaSWRXeFpibk01T2pFM05EZ3pPRE00TURJME16WTZNVG94T25KME9qRQ==             */
+            val splitData = data.split("\n")
+            val accountToken = String(Base64.decode(splitData[3], Base64.DEFAULT)).split(":")
+            return Pair(accountToken[0], accountToken[1])
+        }
+
+        object PrefKeys {
+            const val KEY_ACCOUNTS_MISSING_TOKENS_JSON = "accounts_with_missing_tokens_json"
+            const val KEY_DO_NOT_SHOW_MISSING_TOKEN_DIALOG = "do_not_show_missing_token_dialog"
+            const val KEY_ACCOUNTS_MISSING_TOKENS_MAP_JSON = "accounts_with_missing_tokens_map_json"
+            const val KEY_ACCOUNTS_MISSING_TOKENS_IDS = "accounts_with_missing_tokens_ids"
         }
     }
 }

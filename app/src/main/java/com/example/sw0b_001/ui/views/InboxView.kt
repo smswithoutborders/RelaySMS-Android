@@ -82,7 +82,11 @@ fun InboxView(
                         onClickCallback = {
                             platformsViewModel.message = message
                             navController.navigate(BridgeViewScreen)
-                        }
+                        },
+                        logo = TODO(),
+                        isSelected = TODO(),
+                        isSelectionMode = TODO(),
+                        onLongClickCallback = TODO()
                     )
                 }
             }
@@ -99,7 +103,7 @@ fun EmptyInboxContent(onPasteNewMessageClicked: () -> Unit) {
     ) {
         Image(
             painter = painterResource(id = R.drawable.empty_message),
-            contentDescription = "Inbox Icon",
+            contentDescription = stringResource(R.string.inbox_icon),
             modifier = Modifier.size(200.dp)
         )
         Spacer(modifier = Modifier.height(16.dp))

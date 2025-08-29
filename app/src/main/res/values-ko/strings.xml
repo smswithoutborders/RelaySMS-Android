@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">RelaySMS</string>
+    <string name="messages_deleted">메시지 삭제됨</string>
+    <string name="select_all">모두 선택</string>
+    <string name="selected_messages">%d개 선택됨</string>
+
+    <string name="settings_settings">설정</string>
+
+    <string name="settings_accessibility_category">접근성</string>
+    <string name="settings_language">언어</string>
+
+    <string name="settings_security_category">보안 및 개인 정보 보호</string>
+    <string name="settings_security">보안</string>
+    <string name="settings_security_category_summary">앱 잠금 및 PIN 코드 활성화</string>
+
+    <string name="settings_lock_screen_preference_category">휴대폰 잠금 화면 옵션</string>
+    <string name="settings_security_and_privacy_enable_lockscreen_open">잠금 화면 활성화</string>
+    <string name="settings_security_and_privacy_enable_lockscreen_open_summary">앱 시작 시 잠금 화면 PIN/지문 필요</string>
+
+    <string name="settings_security_and_privacy_account">계정</string>
+    <string name="settings_security_and_privacy_account_logout">로그아웃</string>
+    <string name="settings_security_and_privacy_account_logout_summary">계정에서 로그아웃합니다. 언제든지 다시 로그인할 수 있지만 현재 메시지는 삭제됩니다.</string>
+
+    <string name="settings_security_and_privacy_account_delete">삭제</string>
+
+    <string name="settings_security_and_privacy_account_delete_summary">계정을 삭제하면 온라인에 저장된 모든 계정이 삭제됩니다. 필요할 때 언제든지 계정을 다시 만들 수 있습니다.</string>
+
+    <string name="language_english">영어</string>
+    <string name="language_french">프랑스어</string>
+    <string name="language_farsi">페르시아어</string>
+    <string name="language_spanish">스페인어</string>
+    <string name="language_turkish">터키어</string>
+    <string name="language_german">독일어</string>
+    <string name="language_arabic">아랍어</string>
+    <string name="language_swahili">스와힐리어</string>
+    <string name="language_chinese">중국어</string>
+    <string name="language_korean">한국어</string>
+    <string name="language_hindi">힌디어</string>
+    <string name="language_shona">쇼나어</string>
+
+    <string name="gateway_client_settings_add_custom_empty_error">전화번호를 입력하세요</string>
+
+    <string name="new_gateway_client_alias">별칭 (선택 사항)</string>
+    <string name="gateway_client_alias_description">게이트웨이 클라이언트를 기억하는 데 도움이 되는 이름</string>
+    <string name="gateway_client_save_btn_text">저장</string>
+
+    <string name="choose_sms_app">SMS 메시지 앱 선택</string>
+
+    <string name="security_settings_failed_to_switch_security">보안을 켜지 못했습니다…</string>
+    <string name="settings_security_biometric_user_cannot_add_this_functionality_at_this_time">사용자가 현재 이 기능을 추가할 수 없습니다.</string>
+    <string name="lock_screen_relay_sms_is_locked">RelaySMS 앱이 잠겼습니다</string>
+    <string name="lock_screen_unlock_with_your_phone_s_locking_system">휴대폰 잠금 시스템으로 잠금 해제</string>
+    <string name="gateway_client_add_custom_example_text">예: +237123456789 또는 연락처 선택</string>
+    <string name="gateway_client_add_gateway_client_text">게이트웨이 클라이언트 추가</string>
+    <string name="otp_verification_code_template" translatable="false">Your SMSWithoutBorders-Auth verification code is: </string>
+
+    <string name="logout_you_have_no_accounts_logged_into_vaults_at_this_time">현재 Vaults에 로그인된 계정이 없습니다</string>
+    <string name="security_settings_you_have_no_accounts_to_delete_in_vault_at_this_time">현재 Vault에서 삭제할 계정이 없습니다</string>
+    <string name="helper_yesterday">어제</string>
+
+
+    <string name="smswithoutboarders_official_gateway_client_seeding_url" translatable="false">https://smswithoutborders.com:15000/v3/clients</string>
+    <string name="recovery_continue">계속</string>
+
+    <string name="vault_grpc_url" translatable="false">vault.smswithoutborders.com</string>
+    <string name="vault_grpc_port" translatable="false">443</string>
+
+    <string name="publisher_grpc_url" translatable="false">publisher.smswithoutborders.com</string>
+    <string name="publisher_grpc_port" translatable="false">443</string>
+
+    <string name="publisher_get_platforms_url" translatable="false">https://raw.githubusercontent.com/smswithoutborders/SMSWithoutBorders-Publisher/master/resources/platforms.json</string>
+    <string name="cancel">취소</string>
+    <string name="click_continue_to_confirm_this_action_do_not_worry_this_has_no_dangerous_effects">계속을 클릭하여 이 작업을 확인하세요. 걱정하지 마세요, 위험한 영향은 없습니다.</string>
+    <string name="messaging">메시징</string>
+    <string name="you_have_a_device_id_for_the_device_you_log_into_it_is_used_to_identify_you_on_the_vault_you_can_switch_to_phone_number_to_reduce_size_of_sms_message">로그인하는 장치에는 장치 ID가 있습니다. 이 ID는 Vault에서 사용자를 식별하는 데 사용됩니다. SMS 메시지 크기를 줄이기 위해 전화번호로 전환할 수 있습니다.</string>
+    <string name="validate_with_phone_number">전화번호로 확인</string>
+    <string name="enter_phone_number_with_country_code">국가 코드를 포함한 전화번호 입력</string>
+    <string name="about">정보</string>
+    <string name="recents_text">최근 항목</string>
+    <string name="get_started_text">시작하기</string>
+    <string name="platforms">플랫폼</string>
+    <string name="inbox">받은 편지함</string>
+    <string name="countries">국가</string>
+    <string name="settings">설정</string>
+    <string name="permission_denied">권한이 거부되었습니다!</string>
+    <string name="add_gateway_client">게이트웨이 클라이언트 추가</string>
+    <string name="edit_gateway_client">게이트웨이 클라이언트 편집</string>
+    <string name="e_g_237123456_or_select_contact">예: +237123456 또는 연락처 선택</string>
+    <string name="alias_optional">별칭 (선택 사항)</string>
+    <string name="name_to_help_remember_the_gateway_client">게이트웨이 클라이언트를 기억하는 데 도움이 되는 이름</string>
+    <string name="saving">저장 중…</string>
+    <string name="save">저장</string>
+    <string name="error_saving_gateway_client">게이트웨이 클라이언트 저장 오류</string>
+    <string name="click_continue_to_confirm_this_action_do_not_worry_it_has_no_dangerous_effects">계속을 클릭하여 이 작업을 확인하세요. 걱정하지 마세요, 위험한 영향은 없습니다.</string>
+    <string name="continue_text">계속</string>
+    <string name="country_options">국가 옵션</string>
+    <string name="revoking_account_for">%1$s 계정 해지 중</string>
+    <string name="adding_account_for">%1$s 계정 추가 중</string>
+    <string name="send_message">메시지 보내기</string>
+    <string name="add_account">계정 추가</string>
+    <string name="remove_accounts">계정 제거</string>
+    <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported">RelaySMS 계정에 이메일을 추가하면 SMS 메시징을 사용하여 이메일을 보낼 수 있습니다.\n\n현재 Gmail이 지원됩니다.</string>
+    <string name="adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported">RelaySMS 계정에 번호를 추가하면 SMS 메시징을 사용하여 메시지를 보낼 수 있습니다.\n\n현재 Telegram 메시징이 지원됩니다.</string>
+    <string name="adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported">RelaySMS 계정에 계정을 추가하면 SMS 메시징을 사용하여 게시물을 작성할 수 있습니다.\n\n현재 게시가 지원됩니다.</string>
+    <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias">RelaySMS 계정은 @relaysms.me 도메인이 있는 전화번호의 별칭입니다.\n\n별칭으로 메시지가 전송될 때마다 SMS로 답장을 받을 수 있습니다.</string>
+    <string name="continue_to_send_an_email_from_your_saved_email_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">저장된 이메일 계정에서 이메일을 계속 보내세요. 아래 \'국가\' 탭에서 메시지 전달 국가를 선택할 수 있습니다.\n\n메시지 계속 보내기</string>
+    <string name="continue_to_send_messages_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">저장된 메시징 계정에서 메시지를 계속 보내세요. 아래 \'국가\' 탭에서 메시지 전달 국가를 선택할 수 있습니다.\n\n메시지 계속 보내기</string>
+    <string name="continue_to_make_posts_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">저장된 메시징 계정에서 게시물을 계속 작성하세요. 아래 \'국가\' 탭에서 메시지 전달 국가를 선택할 수 있습니다.\n\n메시지 계속 보내기</string>
+    <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message">RelaySMS 계정은 @relaysms.me 도메인이 있는 전화번호의 별칭입니다.\n\n별칭으로 메시지가 전송될 때마다 SMS로 답장을 받을 수 있습니다.\n아래 \'국가\' 탭에서 메시지 전달 국가를 선택할 수 있습니다.\n\n메시지 계속 보내기</string>
+    <string name="select_an_account">계정 선택</string>
+    <string name="please_enter_your_telegram_code_without_copying_it_from_the_message_copying_might_get_flagged_and_telegram_might_block_your_account">메시지에서 복사하지 말고 Telegram 코드를 입력하세요. 복사하면 플래그가 지정되어 Telegram이 계정을 차단할 수 있습니다.</string>
+    <string name="phone_number">전화번호</string>
+    <string name="code">코드</string>
+    <string name="hide_password">비밀번호 숨기기</string>
+    <string name="show_password">비밀번호 보기</string>
+    <string name="no_account_selected">선택된 계정 없음</string>
+    <string name="compose_email">이메일 작성</string>
+    <string name="to">받는 사람</string>
+    <string name="subject">제목</string>
+    <string name="new_message">새 메시지</string>
+    <string name="sender">보낸 사람</string>
+    <string name="recipient_number">수신자 번호</string>
+    <string name="message">메시지</string>
+    <string name="new_post">새 게시물</string>
+    <string name="what_s_happening">무슨 일이야?</string>
+    <string name="connecting_the_world_one_sms_at_a_time">한 번에 하나의 SMS로 세상을 연결합니다</string>
+    <string name="relaysms_is_an_open_source_initiative_focused_on_enabling_communication_through_sms_without_relying_on_internet_connectivity_we_believe_in_a_connected_world_and_we_re_making_it_happen_one_sms_at_a_time_relaysms_remains_free_and_open_source">RelaySMS는 인터넷 연결에 의존하지 않고 SMS를 통해 통신을 가능하게 하는 데 중점을 둔 오픈 소스 이니셔티브입니다. 우리는 연결된 세상을 믿으며 한 번에 하나의 SMS로 이를 실현하고 있습니다. RelaySMS는 무료이며 오픈 소스로 유지됩니다.</string>
+    <string name="app_tutorial">앱 튜토리얼</string>
+    <string name="support_us_by_starring_our_github_repository_and_sharing_it_with_your_friends">GitHub 리포지토리에 별표를 표시하고 친구들과 공유하여 지원해주세요!</string>
+    <string name="available_platforms">사용 가능한 플랫폼</string>
+    <string name="use_your_relaysms_account">RelaySMS 계정 사용</string>
+    <string name="use_your_online_accounts">온라인 계정 사용</string>
+    <string name="navigate_back_to_home_screen">홈 화면으로 돌아가기</string>
+    <string name="create_relaysms_account">RelaySMS 계정 만들기</string>
+    <string name="create_your_account_and">계정을 만들고 </string>
+    <string name="save_platforms">플랫폼 저장</string>
+    <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline"> RelaySMS가 오프라인일 때 사용자를 대신하여 Gmail, X 및 Telegram으로 메시지를 보내도록 합니다</string>
+    <string name="i_have_read_the"> 다음을 읽었습니다 </string>
+    <string name="privacy_policy">개인 정보 보호 정책</string>
+    <string name="log_in">로그인</string>
+    <string name="sign_up">가입하기</string>
+    <string name="selected_gateway_client">선택된 게이트웨이 클라이언트</string>
+    <string name="no_gateway_client_selected">선택된 게이트웨이 클라이언트 없음</string>
+    <string name="available_countries">사용 가능한 국가</string>
+    <string name="gateway_clients_refreshed_successfully">게이트웨이 클라이언트가 성공적으로 새로 고쳐졌습니다!</string>
+    <string name="no_messages_in_inbox">받은 편지함에 메시지 없음</string>
+    <string name="paste_new_incoming_message">새 수신 메시지 붙여넣기</string>
+    <string name="log_into_relaysms">RelaySMS에 로그인</string>
+    <string name="log_into_your_account_and">계정에 로그인하고 </string>
+    <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline_"> RelaySMS가 오프라인일 때 사용자를 대신하여 Gmail, X 및 Telegram으로 메시지를 보내도록 합니다</string>
+    <string name="already_got_code">이미 코드 받음</string>
+    <string name="do_not_have_an_account">계정이 없으신가요? </string>
+    <string name="get_started_with">시작하기</string>
+    <string name="compose_message">메시지 작성</string>
+    <string name="use_your_phone_number_to_send_an_email_with_the_alias">전화번호를 사용하여 별칭으로 이메일 보내기: </string>
+    <string name="login_with_internet">인터넷으로 로그인</string>
+    <string name="these_features_requires_you_to_have_an_internet_connection">이러한 기능에는 인터넷 연결이 필요합니다</string>
+    <string name="input_your_code">코드 입력</string>
+    <string name="please_enter_the_6_digit_code_we_sent_to_you_via_sms">SMS를 통해 보내드린 6자리 코드를 입력하세요</string>
+    <string name="the_code_would_automatically_be_detected_in_some_cases">경우에 따라 코드가 자동으로 감지됩니다</string>
+    <string name="paste_encrypted_text_into_this_box">이 상자에 암호화된 텍스트 붙여넣기…</string>
+    <string name="this_is_an_example_of_an_encrypted_message_that_you_would_paste_here">여기에 붙여넣을 암호화된 메시지의 예입니다…</string>
+    <string name="relaysms_reply_please_paste_this_entire_message_in_your_relaysms_app">RelaySMS 답장 이 전체 메시지를 RelaySMS 앱에 붙여넣으세요</string>
+    <string name="click_to_paste">클릭하여 붙여넣기</string>
+    <string name="decrypt_message">메시지 해독</string>
+    <string name="send_your_first_message">첫 메시지 보내기…</string>
+    <string name="save_platforms_">플랫폼 저장</string>
+    <string name="phone_lockscreen_options">휴대폰 잠금 화면 옵션</string>
+    <string name="enable_lockscreen">잠금 화면 활성화</string>
+    <string name="require_lockscreen_pin_fingerprint_when_starting_the_app">앱 시작 시 잠금 화면 PIN/지문 필요</string>
+    <string name="vault">Vault</string>
+    <string name="choose_which_platforms_you_want_to_remove_from_the_vault">Vault에서 제거할 플랫폼 선택</string>
+    <string name="account">계정</string>
+    <string name="clear_aliasing">별칭 지우기</string>
+    <string name="this_would_delete_your_auth_codes_stored_for_aliasing_you_can_request_for_another_code_at_anytime">이렇게 하면 별칭을 위해 저장된 인증 코드가 삭제됩니다. 언제든지 다른 코드를 요청할 수 있습니다.</string>
+    <string name="logout">로그아웃</string>
+    <string name="logout_of_your_account_you_can_always_log_back_in_however_your_current_messages_would_be_deleted">계정에서 로그아웃합니다. 언제든지 다시 로그인할 수 있지만 현재 메시지는 삭제됩니다.</string>
+    <string name="delete_">삭제</string>
+    <string name="deleting_your_account_means_deleting_all_your_saved_accounts_online_you_can_always_recreate_your_account_once_needed">계정을 삭제하면 온라인에 저장된 모든 계정이 삭제됩니다. 필요할 때 언제든지 계정을 다시 만들 수 있습니다.</string>
+    <string name="accessibility">접근성</string>
+    <string name="language">언어</string>
+    <string name="messaging_">메시징</string>
+    <string name="security_and_privacy">보안 및 개인 정보 보호</string>
+    <string name="security">보안</string>
+    <string name="enable_app_locks_and_pin_codes">앱 잠금 및 PIN 코드 활성화</string>
+
+    <string name="english">영어</string>
+    <string name="arabic">아랍어</string>
+    <string name="french">프랑스어</string>
+    <string name="farsi">페르시아어</string>
+    <string name="spanish">스페인어</string>
+    <string name="german">독일어</string>
+    <string name="swahili">스와힐리어</string>
+    <string name="turkish">터키어</string>
+    <string name="chinese">중국어</string>
+    <string name="korean">한국어</string>
+    <string name="hindi">힌디어</string>
+    <string name="shona">쇼나어</string>
+
+    <string name="welcome_to_relaysms_">RelaySMS에 오신 것을 환영합니다!</string>
+    <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">인터넷 연결 없이 SMS를 사용하여 게시물 작성, 이메일 및 메시지 보내기</string>
+    <string name="learn_how_it_works_">작동 방식 알아보기</string>
+    <string name="read_our_privacy_policy">개인 정보 보호 정책 읽기</string>
+    <string name="skip">건너뛰기</string>
+    <string name="you_are_ready_to_begin_sending_messages_from_relaysms">RelaySMS에서 메시지를 보낼 준비가 되었습니다</string>
+    <string name="great">좋아요!</string>
+    <string name="relaysms_vaults_securely_stores_your_online_accounts_so_that_you_can_access_them_without_an_internet_connection">RelaySMS Vaults는 온라인 계정을 안전하게 저장하므로 인터넷 연결 없이 액세스할 수 있습니다</string>
+    <string name="you_can_add_online_accounts_to_your_vault">Vault에 온라인 계정을 추가할 수 있습니다</string>
+    <string name="ok">확인</string>
+    <string name="make_default">기본값으로 설정</string>
+    <string name="edit">편집</string>
+    <string name="delete">삭제</string>
+    <string name="view_on_github">GitHub에서 보기</string>
+    <string name="send_new_message">새 메시지 보내기</string>
+    <string name="password">비밀번호</string>
+    <string name="re_enter_password">비밀번호 재입력</string>
+    <string name="already_have_an_account">이미 계정이 있으신가요</string>
+    <string name="create_account">계정 만들기</string>
+    <string name="login">로그인</string>
+    <string name="forgot_password">비밀번호를 잊으셨나요</string>
+    <string name="submit">제출</string>
+    <string name="re_send_code">코드 재전송</string>
+    <string name="revoke_platforms">플랫폼 해지</string>
+    <string name="from">보낸 사람</string>
+    <string name="always_add_the_dialing_code_if_absent_e_g_237">없는 경우 항상 다이얼 코드를 추가하세요 (예: +237)</string>
+    <string name="cc">참조</string>
+    <string name="bcc">숨은 참조</string>
+    <string name="paste_message">메시지 붙여넣기</string>
+    <string name="error_decrypting_text">텍스트 해독 오류</string>
+    <string name="you_can_also_send_out_emails_without_an_account_or_vault">계정이나 Vault 없이도 이메일을 보낼 수 있습니다</string>
+    <string name="this_will_create_a_default_email_your_phonenumber_relaysms_me_using_your_phone_number">이렇게 하면 전화번호를 사용하여 기본 이메일(your_phonenumber@relaysms.me)이 생성됩니다.</string>
+    <string name="next">다음</string>
+    <string name="https_smswithoutborders_com_privacy_policy" translatable="false">https://smswithoutborders.com/privacy-policy</string>
+    <string name="version">버전 %1$s</string>
+    <string name="compose_new">새로 작성</string>
+    <string name="add_account_compose_new">계정 추가 / 새로 작성</string>
+    <string name="add_number">번호 추가</string>
+    <string name="forgot_password_">비밀번호를 잊으셨나요?</string>
+    <string name="enter_your_phone_number_and_new_password_and_we_would_send_you_a_code_via_sms_to_reset_your_password">전화번호와 새 비밀번호를 입력하시면 SMS를 통해 비밀번호를 재설정할 수 있는 코드를 보내드립니다.</string>
+    <string name="new_password">새 비밀번호</string>
+    <string name="reset_password">비밀번호 재설정</string>
+    <string name="passwords_do_not_match">비밀번호가 일치하지 않습니다</string>
+    <string name="discard">삭제</string>
+    <string name="message_discarded">메시지가 삭제되었습니다!</string>
+    <string name="time_left_until_code_expires">코드 만료까지 남은 시간: %1$ds</string>
+    <string name="something_went_wrong">문제가 발생했습니다</string>
+    <string name="no_results_found">결과를 찾을 수 없습니다</string>
+    <string name="search_message">메시지 검색</string>
+    <string name="bug_report">버그 신고</string>
+    <string name="relaysms_bug_report">RelaySMS - 버그 신고</string>
+    <string name="request_new_code_in">새 코드 요청까지 남은 시간: </string>
+    <string name="request_new_code">새 코드 요청!</string>
+    <string name="test_url" translatable="false">https://gatewayserver.smswithoutborders.com/v3/clients/%1$s/tests</string>
+    <string name="store_tokens_on_device_dialog_title">장치에 OAuth2.0 토큰 저장</string>
+    <string name="store_tokens_on_device_enable_dialog_message">이 기능을 켜면 OAuth2.0(Gmail 및 X)을 사용하는 플랫폼의 토큰이 서버에서 자동으로 삭제되고 장치에 저장됩니다. RelaySMS는 이러한 토큰을 사용하여 위 플랫폼을 대신하여 메시지를 보냅니다. 따라서 장치를 분실하거나 이 애플리케이션을 다시 설치하는 경우 토큰이 손실되며 기존에 저장된 계정을 해지하고 다시 저장하여 새 토큰을 받아야 합니다.</string>
+    <string name="store_tokens_on_device_disable_dialog_message">이 설정을 끄면 이후 토큰이 장치에 저장되지 않습니다. 장치에 기존 토큰이 저장된 플랫폼의 메시지는 계속 게시할 수 있습니다. 토큰이 누락된 경우 관련된 계정을 해지하고 다시 저장하세요.</string>
+    <string name="are_you_sure_you_want_to_continue">이 작업을 계속하시겠습니까?</string>
+    <string name="missing_token_text">다음 계정에 토큰이 누락되었을 수 있습니다. 메시지 게시가 올바르게 작동하도록 하려면, 특히 \'장치에 토큰 저장\'이 활성화된 경우 해당 계정을 해지하고 다시 추가해야 할 수 있습니다:</string>
+    <string name="toast_tokens_refreshed_successfully">토큰을 성공적으로 새로 고쳤습니다</string>
+    <string name="toast_error_refreshing_tokens">토큰 새로 고침 오류: %s</string>
+    <string name="toast_tokens_not_stored_subsequent">이후 계정의 토큰은 장치에 저장되지 않습니다</string>
+    <string name="an_unexpected_error_occurred">예상치 못한 오류가 발생했습니다: %s</string>
+    <string name="do_not_show_this_again">다시 표시 안 함</string>
+    <string name="missing_tokens_info">누락된 토큰 정보</string>
+    <string name="store_tokens_on_device">장치에 토큰 저장</string>
+    <string name="storing_platform_accounts">플랫폼 계정 저장</string>
+    <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">OAuth2.0(예: Gmail, X)을 사용하는 플랫폼에 계정을 추가할 때 이 옵션을 활성화하면 액세스 토큰이 현재 장치에 저장됩니다</string>
+    <string name="stored_tokens_detected_title">저장된 토큰 감지됨</string>
+    <string name="stored_tokens_dialog_message_part1">이 </string>
+    <string name="stored_tokens_dialog_message_part2">계정에 대해 저장된 토큰이 감지되었습니다. 저장된 토큰을 사용하여 </string>
+    <string name="stored_tokens_dialog_message_part3">에 한 번 게시물을 작성할 수 있습니다. "장치에 토큰 저장" 설정이 켜져 있는 동안에는 X 게시물을 한 번만 작성할 수 있습니다. 이 계정으로 더 많은 게시물을 작성하려면 각 게시물에 대해 이 계정을 해지하고 다시 추가하세요.</string>
+    <string name="stored_tokens_dialog_note">참고: "장치에 토큰 저장" 기능을 끄고 토큰이 온라인에 저장되어 있는지 확인하면 해지하고 다시 저장할 필요 없이 X에 여러 게시물을 작성할 수 있습니다.</string>
+    <string name="menu">메뉴</string>
+    <string name="search">검색</string>
+    <string name="close_search">검색 닫기</string>
+    <string name="back">뒤로</string>
+    <string name="report_bug_feedback">버그 신고/피드백</string>
+    <string name="recents">최근 항목</string>
+    <string name="select_language">언어 선택</string>
+    <string name="select_contact">연락처 선택</string>
+    <string name="relay_icon">릴레이 아이콘</string>
+    <string name="gateway_client_is_already_selected_change_default_gateway_client_before_deleting_this_one">게이트웨이 클라이언트가 이미 선택되었습니다. 이 클라이언트를 삭제하기 전에 기본 게이트웨이 클라이언트를 변경하세요.</string>
+    <string name="cannot_delete">삭제할 수 없음</string>
+    <string name="selected_platform">선택된 플랫폼</string>
+    <string name="close_modal">모달 닫기</string>
+    <string name="profile_photo">프로필 사진</string>
+    <string name="send">보내기</string>
+    <string name="more">더 보기</string>
+    <string name="expand_to">확장 대상</string>
+    <string name="post">게시</string>
+    <string name="sender_avatar">보낸 사람 아바타</string>
+    <string name="user_avatar">사용자 아바타</string>
+    <string name="github_logo">GitHub 로고</string>
+    <string name="x_logo">X 로고</string>
+    <string name="bluesky_logo">Bluesky 로고</string>
+    <string name="drink_me_out_of_here">여기서 나가게 해줘</string>
+    <string name="you_need_to_log_in_again_into_this_device">이 장치에 다시 로그인해야 합니다!</string>
+    <string name="you_have_logged_in_on_another_device">다른 장치에서 로그인했습니다</string>
+    <string name="get_me_out_here">여기서 나가게 해줘!</string>
+    <string name="platform_logo">플랫폼 로고</string>
+    <string name="gateway_server_url">게이트웨이 서버 URL</string>
+    <string name="http_request">http 요청</string>
+    <string name="relaysms_logo">RelaySMS 로고</string>
+    <string name="compose">작성</string>
+    <string name="person_icon">사람 아이콘</string>
+    <string name="access_your_account_to_save_or_use_your_online_platforms_without_an_internet_connection">인터넷 연결 없이 온라인 플랫폼을 저장하거나 사용하려면 계정에 액세스하세요</string>
+    <string name="an_sms_would_be_sent_to_your_phone_number_to_verify_you_own_the_number">번호 소유 여부를 확인하기 위해 전화번호로 SMS가 전송됩니다</string>
+    <string name="add_new_gateway_clients">새 게이트웨이 클라이언트 추가</string>
+    <string name="inbox_icon">받은 편지함 아이콘</string>
+    <string name="get_started_illustration">시작하기 그림</string>
+    <string name="avatar_image">아바타 이미지</string>
+    <string name="refresh_token_updated">새로 고침 토큰이 업데이트되었습니다!</string>
+    <string name="relaysms_delivery">RelaySMS 배달:</string>
+    <string name="got_it">알겠습니다!</string>
+    <string name="new_feature_icon_desc">새 기능 아이콘</string>
+    <string name="preview_feature_title">흥미로운 새 기능!</string>
+    <string name="preview_feature_description">이 버전의 새로운 기능을 알아보세요. 여러분이 좋아할 만한 멋진 기능을 추가했습니다.</string>
+    <string name="new_feature_title">새 기능 알림!</string>
+    <string name="oauth_token_storage_device_setting_info">이제 설정 > 보안으로 이동하여 OAuth2.0 계정의 토큰을 기기에 저장하도록 요청할 수 있습니다.</string>
+    <string name="unknown">알 수 없음</string>
+    <string name="this_message_s_content_could_not_be_displayed">이 메시지의 내용을 표시할 수 없습니다.</string>
+    <string name="message_">메시지</string>
+    <string name="message_content_could_not_be_displayed">메시지 내용을 표시할 수 없습니다</string>
+    <string name="text_message">문자 메시지</string>
+    <string name="recipient_account">수신자 계정</string>
+    <string name="recipient_account_format_hint">수신자 계정이 올바른 형식인지 확인하십시오.</string>
+    <string name="slack_recipient">Slack 채널 또는 사용자</string>
+    <string name="slack_hint">채널: #이름 또는 ID(예: #general 또는 C123ABC)를 사용하세요. DM: @사용자이름, 이메일 또는 사용자 ID(예: @jane 또는 @user@gmail.com 또는 U456DEF)를 사용하세요.</string>
+    <string name="view_account_menu">이제 탐색 메뉴 아이콘을 클릭하여 현재 로그인된 계정을 볼 수 있습니다</string>
+    <string name="your_account">내 계정</string>
+
+</resources>

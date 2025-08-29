@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name" translatable="false">RelaySMS</string>
+    <string name="messages_deleted">Messages supprimés</string>
+    <string name="select_all">Tout sélectionner</string>
+    <string name="selected_messages">%d sélectionnés</string>
 
     <string name="settings_settings">Paramètres</string>
 
@@ -30,26 +33,10 @@
     <string name="language_german">Allemand</string>
     <string name="language_arabic">Arabe</string>
     <string name="language_swahili">Swahili</string>
-
-    <string name="language_english_value" translatable="false">
-        en
-    </string>
-    <string name="language_french_value" translatable="false">
-        fr
-    </string>
-    <string name="language_farsi_value" translatable="false">
-        fa
-    </string>
-    <string name="language_spanish_value" translatable="false">
-        es
-    </string>
-    <string name="language_turkish_value" translatable="false">
-        tr
-    </string>
-
-    <string name="default_gateway_MSISDN_0" translatable="false">+237679466332</string>
-    <string name="default_gateway_MSISDN_2" translatable="false">+237690826242</string>
-    <string name="default_gateway_MSISDN_3" translatable="false">+2348131498393</string>
+    <string name="language_chinese">Chinois</string>
+    <string name="language_korean">Coréen</string>
+    <string name="language_hindi">Hindi</string>
+    <string name="language_shona">Shona</string>
 
     <string name="gateway_client_settings_add_custom_empty_error">Veuillez fournir un numéro de téléphone</string>
 
@@ -195,6 +182,7 @@
     <string name="security_and_privacy">Sécurité et confidentialité</string>
     <string name="security">Sécurité</string>
     <string name="enable_app_locks_and_pin_codes">Activer les verrouillages d\'application et les codes PIN</string>
+
     <string name="english">Anglais</string>
     <string name="arabic">Arabe</string>
     <string name="french">Français</string>
@@ -203,6 +191,11 @@
     <string name="german">Allemand</string>
     <string name="swahili">Swahili</string>
     <string name="turkish">Turc</string>
+    <string name="chinese">Chinois</string>
+    <string name="korean">Coréen</string>
+    <string name="hindi">Hindi</string>
+    <string name="shona">Shona</string>
+
     <string name="welcome_to_relaysms_">Bienvenue sur RelaySMS !</string>
     <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">Utilisez les SMS pour publier un message, envoyer des e-mails et des messages sans connexion Internet</string>
     <string name="learn_how_it_works_">Découvrez comment ça marche</string>
@@ -253,5 +246,83 @@
     <string name="search_message">Rechercher un message</string>
     <string name="bug_report">Rapport de bogue</string>
     <string name="relaysms_bug_report">RelaySMS - Rapport de bogue</string>
-
+    <string name="request_new_code_in">Demander un nouveau code dans :</string>
+    <string name="request_new_code">Demandez un nouveau code !</string>
+    <string name="store_tokens_on_device_dialog_title">Stocker les jetons OAuth2.0 sur l\'appareil</string>
+    <string name="store_tokens_on_device_enable_dialog_message">L\'activation de cette fonctionnalité supprime automatiquement vos jetons pour les plateformes qui utilisent OAuth2.0 (Gmail et X) sur le serveur et les enregistre sur votre appareil. Gardez à l\'esprit que RelaySMS utilise ces jetons pour envoyer des messages en votre nom pour les plateformes ci-dessus. Par conséquent, si vous perdez votre appareil ou si vous réinstallez cette application, vos jetons seront perdus et vous devrez révoquer les comptes stockés existants et les stocker à nouveau pour obtenir de nouveaux jetons.</string>
+    <string name="store_tokens_on_device_disable_dialog_message">La désactivation de ce paramètre empêchera le stockage des jetons ultérieurs sur votre appareil. Les messages pour les plateformes avec des jetons existants stockés sur votre appareil pourront toujours être publiés indépendamment. En cas de jetons manquants, veuillez révoquer les comptes concernés et les stocker à nouveau.</string>
+    <string name="are_you_sure_you_want_to_continue">Êtes-vous sûr de vouloir continuer cette action ?</string>
+    <string name="missing_token_text">Vos comptes suivants peuvent avoir des jetons manquants. Vous devrez peut-être les révoquer et les ajouter à nouveau pour vous assurer que la publication des messages fonctionne correctement, surtout si l\'option "Stocker les jetons sur l\'appareil" est activée :</string>
+    <string name="toast_tokens_refreshed_successfully">Jetons actualisés avec succès</string>
+    <string name="toast_error_refreshing_tokens">Erreur lors de l\'actualisation des jetons : %s</string>
+    <string name="toast_tokens_not_stored_subsequent">Les jetons pour les comptes ultérieurs ne seront pas stockés sur l\'appareil</string>
+    <string name="an_unexpected_error_occurred">Une erreur inattendue est survenue : %s</string>
+    <string name="do_not_show_this_again">Ne plus afficher ceci</string>
+    <string name="missing_tokens_info">Informations sur les jetons manquants</string>
+    <string name="store_tokens_on_device">Stocker les jetons sur l\'appareil</string>
+    <string name="storing_platform_accounts">Stockage des comptes de plateforme</string>
+    <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">Lors de l\'ajout de comptes pour les plateformes qui utilisent OAuth2.0 (par exemple Gmail, X), l\'activation de cette option garantit que vos jetons d\'accès sont plutôt stockés sur votre appareil actuel.</string>
+    <string name="stored_tokens_detected_title">Jetons stockés détectés</string>
+    <string name="stored_tokens_dialog_message_part1">Des jetons stockés pour ce compte</string>
+    <string name="stored_tokens_dialog_message_part2"> ont été détectés. Vous pouvez utiliser vos jetons stockés pour publier sur X</string>
+    <string name="stored_tokens_dialog_message_part3">UNE SEULE FOIS. Tant que le paramètre \"Stocker les jetons sur l\'appareil\" est activé, vous ne pourrez publier qu\'une seule fois sur X. Pour effectuer d\'autres publications avec ce compte, révoquez et rajoutez ce compte pour chaque publication.</string>
+    <string name="stored_tokens_dialog_note">Remarque : Désactiver la fonction \"Stocker les jetons sur l\'appareil\" tout en vous assurant que des jetons sont stockés en ligne vous permettrait de faire plusieurs publications sur X sans avoir à révoquer et stocker à nouveau.</string>
+    <string name="menu">Menu</string>
+    <string name="search">Rechercher</string>
+    <string name="close_search">Fermer la recherche</string>
+    <string name="back">Retour</string>
+    <string name="report_bug_feedback">Signaler un bug/commentaire</string>
+    <string name="recents">Récents</string>
+    <string name="select_language">Sélectionner la langue</string>
+    <string name="select_contact">Sélectionner un contact</string>
+    <string name="relay_icon">Icône Relay</string>
+    <string name="gateway_client_is_already_selected_change_default_gateway_client_before_deleting_this_one">Le client de passerelle est déjà sélectionné. Changez le client de passerelle par défaut avant de supprimer celui-ci.</string>
+    <string name="cannot_delete">Impossible de supprimer</string>
+    <string name="selected_platform">Plateforme sélectionnée</string>
+    <string name="close_modal">Fermer la modale</string>
+    <string name="profile_photo">Photo de profil</string>
+    <string name="send">Envoyer</string>
+    <string name="more">Plus</string>
+    <string name="expand_to">Développer vers</string>
+    <string name="post">Publier</string>
+    <string name="sender_avatar">Avatar de l\'expéditeur</string>
+    <string name="user_avatar">Avatar de l\'utilisateur</string>
+    <string name="github_logo">Logo GitHub</string>
+    <string name="x_logo">Logo X</string>
+    <string name="bluesky_logo">Logo Bluesky</string>
+    <string name="drink_me_out_of_here">Sortez-moi de là (familier)</string>
+    <string name="you_need_to_log_in_again_into_this_device">Vous devez vous reconnecter à cet appareil !</string>
+    <string name="you_have_logged_in_on_another_device">Vous vous êtes connecté sur un autre appareil</string>
+    <string name="get_me_out_here">Sortez-moi d\'ici !</string>
+    <string name="platform_logo">Logo de la plateforme</string>
+    <string name="gateway_server_url">URL du serveur de passerelle</string>
+    <string name="http_request">requête HTTP</string>
+    <string name="relaysms_logo">Logo RelaySMS</string>
+    <string name="compose">Composer</string>
+    <string name="person_icon">Icône de personne</string>
+    <string name="access_your_account_to_save_or_use_your_online_platforms_without_an_internet_connection">Accédez à votre compte pour enregistrer ou utiliser vos plateformes en ligne sans connexion Internet</string>
+    <string name="an_sms_would_be_sent_to_your_phone_number_to_verify_you_own_the_number">Un SMS sera envoyé à votre numéro de téléphone pour vérifier que vous en êtes le propriétaire</string>
+    <string name="add_new_gateway_clients">Ajouter de nouveaux clients de passerelle</string>
+    <string name="inbox_icon">Icône de la boîte de réception</string>
+    <string name="get_started_illustration">Illustration de démarrage</string>
+    <string name="avatar_image">Image d\'avatar</string>
+    <string name="refresh_token_updated">Jeton de rafraîchissement mis à jour !</string>
+    <string name="relaysms_delivery">Livraison RelaySMS :</string>
+    <string name="got_it">Compris !</string>
+    <string name="new_feature_icon_desc">Icône de nouvelle fonctionnalité</string>
+    <string name="preview_feature_title">Nouvelle fonctionnalité excitante !</string>
+    <string name="preview_feature_description">Découvrez les nouveautés de cette version. Nous avons ajouté quelque chose d\'incroyable que vous allez adorer.</string>
+    <string name="new_feature_title">Alerte nouvelle fonctionnalité !</string>
+    <string name="oauth_token_storage_device_setting_info">Vous pouvez maintenant demander que les jetons de vos comptes OAuth2.0 soient stockés sur votre appareil en allant dans Paramètres > Sécurité.</string>
+    <string name="unknown">Inconnu</string>
+    <string name="this_message_s_content_could_not_be_displayed">Le contenu de ce message n\'a pas pu être affiché.</string>
+    <string name="message_">Message</string>
+    <string name="message_content_could_not_be_displayed">Le contenu du message n\'a pas pu être affiché</string>
+    <string name="text_message">Message texte</string>
+    <string name="recipient_account">Compte du destinataire</string>
+    <string name="recipient_account_format_hint">Assurez-vous que le compte du destinataire est au bon format.</string>
+    <string name="slack_recipient">Canal ou utilisateur Slack</string>
+    <string name="slack_hint">Pour les canaux : utilisez #nom ou un ID (par ex., #general ou C123ABC). Pour les MP : utilisez @nomutilisateur, une adresse e-mail ou un ID utilisateur (par ex., @jane ou @user@gmail.com ou U456DEF).</string>
+    <string name="view_account_menu">Vous pouvez maintenant voir le compte sur lequel vous êtes actuellement connecté en cliquant sur l\'icône du menu dans la barre de navigation</string>
+    <string name="your_account">Votre compte</string>
 </resources>

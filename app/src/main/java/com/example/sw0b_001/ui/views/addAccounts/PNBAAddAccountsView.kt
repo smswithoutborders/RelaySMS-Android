@@ -1,13 +1,20 @@
 package com.example.sw0b_001.ui.views.addAccounts
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -24,9 +31,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -44,8 +53,10 @@ import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.PlatformOptionsModal
 import com.example.sw0b_001.ui.theme.AppTheme
+import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PNBAPhoneNumberCodeRequestView(
     isLoading: Boolean = false,
@@ -65,8 +76,12 @@ fun PNBAPhoneNumberCodeRequestView(
     var authCode by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
+    val scrollState = rememberScrollState()
+    val coroutineScope = rememberCoroutineScope()
+    val buttonRequester = remember { BringIntoViewRequester() }
+
     Column(
-        modifier = Modifier.padding(16.dp)
+        modifier = Modifier.fillMaxWidth()
     ) {
         platform?.let {
             if(it.name == "telegram" && isAuthenticationCodeRequested) {
@@ -89,24 +104,24 @@ fun PNBAPhoneNumberCodeRequestView(
             }
         }
 
-        if(isPhoneNumberRequested) {
+        if (isPhoneNumberRequested) {
             CountryPickerOutlinedTextField(
                 mobileNumber = phoneNumber,
                 onMobileNumberChange = { phoneNumber = it },
-                onCountrySelected = {
-                    selectedCountry = it
-                },
+                onCountrySelected = { selectedCountry = it },
                 defaultCountryCode = "cm",
                 countryListDisplayType = CountryListDisplayType.Dialog,
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(bottom = 8.dp)
-                    .fillMaxWidth(),
-                label = {
-                    Text(
-                        text = stringResource(R.string.phone_number),
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                },
+                    .onFocusEvent {
+                        if (it.isFocused) {
+                            coroutineScope.launch {
+                                buttonRequester.bringIntoView()
+                            }
+                        }
+                    },
+                label = { Text(stringResource(R.string.phone_number), style = MaterialTheme.typography.bodySmall) },
                 enabled = true
             )
         }
@@ -117,7 +132,14 @@ fun PNBAPhoneNumberCodeRequestView(
                 label = { Text(text = stringResource(R.string.code), style = MaterialTheme.typography.bodySmall) },
                 modifier = Modifier
                     .padding(bottom = 8.dp)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .onFocusEvent {
+                    if (it.isFocused) {
+                        coroutineScope.launch {
+                            buttonRequester.bringIntoView()
+                        }
+                    }
+                },
                 shape = RoundedCornerShape(12.dp),
                 visualTransformation = if (isCodeVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -151,7 +173,14 @@ fun PNBAPhoneNumberCodeRequestView(
                 label = { Text(text = stringResource(R.string.password), style = MaterialTheme.typography.bodySmall) },
                 modifier = Modifier
                     .padding(bottom = 8.dp)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .onFocusEvent {
+                        if (it.isFocused) {
+                            coroutineScope.launch {
+                                buttonRequester.bringIntoView()
+                            }
+                        }
+                    },
                 shape = RoundedCornerShape(12.dp),
                 visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -199,7 +228,7 @@ fun PNBAPhoneNumberCodeRequestView(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 32.dp, bottom = 24.dp)
-                .align(Alignment.CenterHorizontally),
+                .bringIntoViewRequester(buttonRequester),
         ) {
             if(isLoading) {
                 CircularProgressIndicator(

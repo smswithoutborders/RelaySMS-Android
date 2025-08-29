@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name" translatable="false">RelaySMS</string>
+    <string name="messages_deleted">تم حذف الرسائل</string>
+    <string name="select_all">تحديد الكل</string>
+    <string name="selected_messages">تم تحديد %d</string>
 
     <string name="settings_settings">الإعدادات</string>
 
@@ -30,35 +33,11 @@
     <string name="language_german">الألمانية</string>
     <string name="language_swahili">السواحيلية</string>
     <string name="language_arabic">العربية</string>
+    <string name="language_chinese">الصينية</string>
+    <string name="language_korean">الكورية</string>
+    <string name="language_hindi">الهندية</string>
+    <string name="language_shona">الشونا</string>
 
-    <string name="language_english_value" translatable="false">
-        en
-    </string>
-    <string name="language_french_value" translatable="false">
-        fr
-    </string>
-    <string name="language_farsi_value" translatable="false">
-        fa
-    </string>
-    <string name="language_spanish_value" translatable="false">
-        es
-    </string>
-    <string name="language_turkish_value" translatable="false">
-        tr
-    </string>
-    <string name="language_german_value" translatable="false">
-        de
-    </string>
-    <string name="language_swahili_value" translatable="false">
-        sw
-    </string>
-    <string name="language_arabic_value" translatable="false">
-        ar
-    </string>
-
-    <string name="default_gateway_MSISDN_0" translatable="false">+237679466332</string>
-    <string name="default_gateway_MSISDN_2" translatable="false">+237690826242</string>
-    <string name="default_gateway_MSISDN_3" translatable="false">+2348131498393</string>
 
     <string name="gateway_client_settings_add_custom_empty_error">يرجى تقديم رقم هاتف</string>
 
@@ -204,6 +183,7 @@
     <string name="security_and_privacy">الأمان والخصوصية</string>
     <string name="security">الأمان</string>
     <string name="enable_app_locks_and_pin_codes">تمكين أقفال التطبيقات ورموز PIN</string>
+
     <string name="english">الإنجليزية</string>
     <string name="arabic">العربية</string>
     <string name="french">الفرنسية</string>
@@ -212,6 +192,11 @@
     <string name="german">الألمانية</string>
     <string name="swahili">السواحيلية</string>
     <string name="turkish">التركية</string>
+    <string name="chinese">الصينية</string>
+    <string name="korean">الكورية</string>
+    <string name="hindi">الهندية</string>
+    <string name="shona">الشونا</string>
+
     <string name="welcome_to_relaysms_">مرحبًا بك في RelaySMS!</string>
     <string name="use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection">استخدم الرسائل القصيرة لإنشاء منشور وإرسال رسائل بريد إلكتروني ورسائل بدون اتصال بالإنترنت</string>
     <string name="learn_how_it_works_">تعرف على كيفية عملها</string>
@@ -262,5 +247,84 @@
     <string name="search_message">البحث عن رسالة</string>
     <string name="bug_report">تقرير عن خطأ</string>
     <string name="relaysms_bug_report">RelaySMS - تقرير عن خطأ</string>
+    <string name="request_new_code_in">طلب رمز جديد في:</string>
+    <string name="request_new_code">اطلب رمزًا جديدًا!</string>
+    <string name="store_tokens_on_device_dialog_title">تخزين رموز OAuth2.0 على الجهاز</string>
+    <string name="store_tokens_on_device_enable_dialog_message">يؤدي تشغيل هذه الميزة إلى حذف رموزك تلقائيًا للمنصات التي تستخدم OAuth2.0 (Gmail و X) على الخادم وحفظها في جهازك. ضع في اعتبارك أن RelaySMS يستخدم هذه الرموز لإرسال الرسائل نيابة عنك للمنصات المذكورة أعلاه. لذلك في حالة فقدان جهازك أو إعادة تثبيت هذا التطبيق، ستفقد رموزك وسيتعين عليك إلغاء حساباتك المخزنة الحالية وتخزينها مرة أخرى للحصول على رموز جديدة.</string>
+    <string name="store_tokens_on_device_disable_dialog_message">سيؤدي إيقاف تشغيل هذا الإعداد إلى منع تخزين الرموز اللاحقة على جهازك. ستظل رسائل المنصات التي تحتوي على رموز موجودة مخزنة على جهازك قادرة على النشر بغض النظر عن ذلك. في أي حالة من الرموز المفقودة، يرجى الإلغاء للحسابات المعنية وتخزينها مرة أخرى.</string>
+    <string name="are_you_sure_you_want_to_continue">هل أنت متأكد أنك تريد المتابعة بهذا الإجراء؟</string>
+    <string name="missing_token_text">قد تحتوي حساباتك التالية على رموز مفقودة. قد تحتاج إلى إلغائها وإضافتها مرة أخرى لضمان عمل نشر الرسائل بشكل صحيح، خاصة إذا كان "تخزين الرموز على الجهاز" ممكّنًا:</string>
+    <string name="toast_tokens_refreshed_successfully">تم تحديث الرموز بنجاح</string>
+    <string name="toast_error_refreshing_tokens">خطأ في تحديث الرموز: %s</string>
+    <string name="toast_tokens_not_stored_subsequent">لن يتم تخزين الرموز للحسابات اللاحقة على الجهاز</string>
+    <string name="an_unexpected_error_occurred">حدث خطأ غير متوقع: %s</string>
+    <string name="do_not_show_this_again">لا تظهر هذا مرة أخرى</string>
+    <string name="missing_tokens_info">معلومات الرموز المفقودة</string>
+    <string name="store_tokens_on_device">تخزين الرموز على الجهاز</string>
+    <string name="storing_platform_accounts">تخزين حسابات المنصات</string>
+    <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">عند إضافة حسابات للمنصات التي تستخدم OAuth2.0 (مثل Gmail و X)، يضمن تمكين هذا أن يتم تخزين رموز الوصول الخاصة بك على جهازك الحالي بدلاً من ذلك.</string>
+    <string name="stored_tokens_detected_title">تم اكتشاف رموز مميزة مخزنة</string>
+    <string name="stored_tokens_dialog_message_part1">تم اكتشاف رموز مميزة مخزنة لهذا الحساب</string>
+    <string name="stored_tokens_dialog_message_part2">. يمكنك استخدام الرموز المميزة المخزنة لإنشاء منشور على X</string>
+    <string name="stored_tokens_dialog_message_part3">مرة واحدة فقط. طالما أن إعداد \"تخزين الرموز المميزة على الجهاز\" قيد التشغيل، ستتمكن من إنشاء منشورات X مرة واحدة فقط. لإنشاء المزيد من المنشورات باستخدام هذا الحساب، قم بإلغاء هذا الحساب وإضافته مرة أخرى لكل منشور.</string>
+    <string name="stored_tokens_dialog_note">ملاحظة: إن إيقاف تشغيل ميزة \"تخزين الرموز المميزة على الجهاز\" مع التأكد من أن لديك رموزًا مميزة مخزنة عبر الإنترنت سيسمح لك بإنشاء منشورات متعددة على X دون الحاجة إلى الإلغاء والتخزين مرة أخرى.</string>
+    <string name="menu">القائمة</string>
+    <string name="search">بحث</string>
+    <string name="close_search">إغلاق البحث</string>
+    <string name="back">رجوع</string>
+    <string name="report_bug_feedback">الإبلاغ عن خطأ/ملاحظات</string>
+    <string name="recents">الأخيرة</string>
+    <string name="select_language">اختر اللغة</string>
+    <string name="select_contact">اختر جهة اتصال</string>
+    <string name="relay_icon">أيقونة الترحيل</string>
+    <string name="gateway_client_is_already_selected_change_default_gateway_client_before_deleting_this_one">عميل البوابة محدد بالفعل. قم بتغيير عميل البوابة الافتراضي قبل حذف هذا العميل.</string>
+    <string name="cannot_delete">لا يمكن الحذف</string>
+    <string name="selected_platform">المنصة المختارة</string>
+    <string name="close_modal">إغلاق النافذة</string>
+    <string name="profile_photo">صورة الملف الشخصي</string>
+    <string name="send">إرسال</string>
+    <string name="more">المزيد</string>
+    <string name="expand_to">توسيع إلى</string>
+    <string name="post">نشر</string>
+    <string name="sender_avatar">الصورة الرمزية للمرسل</string>
+    <string name="user_avatar">الصورة الرمزية للمستخدم</string>
+    <string name="github_logo">شعار GitHub</string>
+    <string name="x_logo">شعار X</string>
+    <string name="bluesky_logo">شعار Bluesky</string>
+    <string name="drink_me_out_of_here">أخرجني من هنا (بشكل طارئ)</string>
+    <string name="you_need_to_log_in_again_into_this_device">تحتاج إلى تسجيل الدخول مرة أخرى إلى هذا الجهاز!</string>
+    <string name="you_have_logged_in_on_another_device">لقد سجلت الدخول على جهاز آخر</string>
+    <string name="get_me_out_here">أخرجني من هنا!</string>
+    <string name="platform_logo">شعار المنصة</string>
+    <string name="gateway_server_url">عنوان URL لخادم البوابة</string>
+    <string name="http_request">طلب HTTP</string>
+    <string name="relaysms_logo">شعار RelaySMS</string>
+    <string name="compose">إنشاء</string>
+    <string name="person_icon">أيقونة شخص</string>
+    <string name="access_your_account_to_save_or_use_your_online_platforms_without_an_internet_connection">قم بالوصول إلى حسابك لحفظ أو استخدام منصاتك عبر الإنترنت بدون اتصال بالإنترنت</string>
+    <string name="an_sms_would_be_sent_to_your_phone_number_to_verify_you_own_the_number">سيتم إرسال رسالة نصية قصيرة إلى رقم هاتفك للتحقق من ملكيتك للرقم</string>
+    <string name="add_new_gateway_clients">إضافة عملاء بوابة جدد</string>
+    <string name="inbox_icon">أيقونة البريد الوارد</string>
+    <string name="get_started_illustration">رسم توضيحي للبدء</string>
+    <string name="avatar_image">صورة رمزية</string>
+    <string name="refresh_token_updated">تم تحديث رمز التحديث!</string>
+    <string name="relaysms_delivery">تسليم RelaySMS:</string>
+    <string name="got_it">فهمت!</string>
+    <string name="new_feature_icon_desc">أيقونة الميزة الجديدة</string>
+    <string name="preview_feature_title">ميزة جديدة مثيرة!</string>
+    <string name="preview_feature_description">اكتشف الجديد في هذا الإصدار. لقد أضفنا شيئًا رائعًا ستحبه.</string>
+    <string name="new_feature_title">تنبيه بميزة جديدة!</string>
+    <string name="oauth_token_storage_device_setting_info">يمكنك الآن طلب تخزين رموز حسابات OAuth2.0 الخاصة بك على جهازك بالانتقال إلى الإعدادات > الأمان.</string>
+    <string name="unknown">غير معروف</string>
+    <string name="this_message_s_content_could_not_be_displayed">تعذر عرض محتوى هذه الرسالة.</string>
+    <string name="message_">رسالة</string>
+    <string name="message_content_could_not_be_displayed">تعذر عرض محتوى الرسالة</string>
+    <string name="text_message">رسالة نصية</string>
+    <string name="recipient_account">حساب المستلم</string>
+    <string name="recipient_account_format_hint">تأكد من أن حساب المستلم بالتنسيق الصحيح.</string>
+    <string name="slack_recipient">قناة أو مستخدم سلاك</string>
+    <string name="slack_hint">للقنوات: استخدم #الاسم أو مُعرّف (مثال: #عام أو C123ABC). للرسائل الخاصة: استخدم @اسم_المستخدم، أو بريد إلكتروني، أو مُعرّف مستخدم (مثال: @jane أو @user@gmail.com أو U456DEF).</string>
+    <string name="view_account_menu">يمكنك الآن رؤية الحساب الذي سجلت دخولك به حاليًا بالنقر على أيقونة القائمة في شريط التنقل</string>
+    <string name="your_account">حسابك</string>
 
 </resources>

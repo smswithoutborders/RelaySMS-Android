@@ -37,7 +37,7 @@ android {
                                       "$projectDir/schemas".toString()]
             }
         }
-        resourceConfigurations += ['en', 'fr', 'fa', 'es', 'tr', 'ar', 'de', 'sw']
+        resourceConfigurations += ['en', 'fr', 'fa', 'es', 'tr', 'ar', 'de', 'sw', 'zh', 'ko', 'hi', 'sn']
 
         manifestPlaceholders =
                 ['appAuthRedirectScheme': 'oauth.afkanerd.com']
@@ -170,6 +170,9 @@ dependencies {
     implementation libs.androidx.room.runtime
     annotationProcessor libs.androidx.room.compiler
 
+    // Kotlin Extensions and Coroutines support for Room
+    implementation(libs.androidx.room.ktx)
+
 
     // (Java only)
     implementation libs.androidx.work.runtime
@@ -197,6 +200,9 @@ dependencies {
     implementation libs.ccp
 
     implementation libs.okhttp
+    implementation(platform(libs.okhttp.bom))
+    implementation(libs.okhttp3.okhttp)
+    implementation(libs.logging.interceptor)
     implementation libs.javax.annotation.api
     implementation libs.grpc.core
     implementation libs.grpc.stub
@@ -204,6 +210,8 @@ dependencies {
     implementation(libs.grpc.protobuf.lite) {
         exclude module: "protobuf-lite"
     }
+    androidTestImplementation(libs.grpc.testing)
+    androidTestImplementation(libs.grpc.inprocess)
 
 //     Add protobuf-java dependency
     implementation libs.protobuf.java

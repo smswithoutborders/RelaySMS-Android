@@ -1,8 +1,7 @@
 # RelaySMS - Android
 --------
 
-![relay-sms-screenshots](https://github.com/user-attachments/assets/7e542b25-05e6-46a2-8661-69a3cae3e103)
-
+![RelaySMS Screenshot](./relay-sms-screenshots.jpg)
 
 Connecting the world, one SMS at a time.
 
