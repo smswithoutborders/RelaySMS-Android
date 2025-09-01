@@ -1,9 +1,9 @@
 package com.example.sw0b_001.Models
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.util.Base64
 import android.util.Log
-import at.favre.lib.armadillo.Armadillo
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.KeystoreHelpers
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityAES
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityRSA
@@ -146,10 +146,9 @@ class Publishers(val context: Context) {
                 2048)
             val secretKey = SecurityAES.generateSecretKey(256)
 
-            val sharedPreferences = Armadillo.create(context, PUBLISHER_ATTRIBUTE_FILES)
-                .encryptionFingerprint(context)
-                .build()
-
+            val sharedPreferences = context
+                .getSharedPreferences(
+                    PUBLISHER_ATTRIBUTE_FILES, Context.MODE_PRIVATE)
             val encryptedSecretKey = SecurityRSA.encrypt(publicKey, secretKey.encoded)
             sharedPreferences.edit {
                 putString(
@@ -163,18 +162,18 @@ class Publishers(val context: Context) {
         }
 
         fun removeEncryptedStates(context: Context) {
-            val sharedPreferences = Armadillo.create(context, PUBLISHER_ATTRIBUTE_FILES)
-                .encryptionFingerprint(context)
-                .build()
+            val sharedPreferences = context
+                .getSharedPreferences(
+                    PUBLISHER_ATTRIBUTE_FILES, Context.MODE_PRIVATE)
 
             KeystoreHelpers.removeFromKeystore(context, PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS)
             sharedPreferences.edit() { remove(PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS) }
         }
 
         fun getEncryptedStates(context: Context, states: ByteArray) : ByteArray {
-            val sharedPreferences = Armadillo.create(context, PUBLISHER_ATTRIBUTE_FILES)
-                .encryptionFingerprint(context)
-                .build()
+            val sharedPreferences = context
+                .getSharedPreferences(
+                    PUBLISHER_ATTRIBUTE_FILES, Context.MODE_PRIVATE)
 
             val encryptedSecretKey = Base64.decode(sharedPreferences
                 .getString(PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS, ""), Base64.DEFAULT)
@@ -192,16 +191,17 @@ class Publishers(val context: Context) {
         }
 
         fun fetchOauthRequestVerifier(context: Context) : String {
-            val sharedPreferences = Armadillo.create(context, OAUTH2_PARAMETERS_FILE)
-                .encryptionFingerprint(context)
-                .build()
+            val sharedPreferences = context
+                .getSharedPreferences(
+                    OAUTH2_PARAMETERS_FILE, Context.MODE_PRIVATE)
+
             return sharedPreferences.getString("code_verifier", "")!!
         }
 
         fun storeOauthRequestCodeVerifier(context: Context, codeVerifier: String) {
-            val sharedPreferences = Armadillo.create(context, OAUTH2_PARAMETERS_FILE)
-                .encryptionFingerprint(context)
-                .build()
+            val sharedPreferences = context
+                .getSharedPreferences(
+                    OAUTH2_PARAMETERS_FILE, Context.MODE_PRIVATE)
 
             sharedPreferences.edit {
                 putString("code_verifier", codeVerifier)
@@ -209,17 +209,17 @@ class Publishers(val context: Context) {
         }
 
         fun fetchPublisherPublicKey(context: Context) : ByteArray? {
-            val sharedPreferences = Armadillo.create(context, PUBLISHER_ATTRIBUTE_FILES)
-                .encryptionFingerprint(context)
-                .build()
+            val sharedPreferences = context
+                .getSharedPreferences(
+                    PUBLISHER_ATTRIBUTE_FILES, Context.MODE_PRIVATE)
             return Base64.decode(sharedPreferences.getString(PUBLISHER_PUBLIC_KEY, ""),
                 Base64.DEFAULT)
         }
 
         fun fetchClientPublisherPublicKey(context: Context) : ByteArray? {
-            val sharedPreferences = Armadillo.create(context, PUBLISHER_ATTRIBUTE_FILES)
-                .encryptionFingerprint(context)
-                .build()
+            val sharedPreferences = context
+                .getSharedPreferences(
+                    PUBLISHER_ATTRIBUTE_FILES, Context.MODE_PRIVATE)
             return Base64.decode(sharedPreferences.getString(PUBLISHER_CLIENT_PUBLIC_KEY, ""),
                 Base64.DEFAULT)
         }
@@ -237,9 +237,9 @@ class Publishers(val context: Context) {
             publisherPubKey: String,
             clientPublishPublicKey: String,
         ) {
-            val sharedPreferences = Armadillo.create(context, PUBLISHER_ATTRIBUTE_FILES)
-                .encryptionFingerprint(context)
-                .build()
+            val sharedPreferences = context
+                .getSharedPreferences(
+                    PUBLISHER_ATTRIBUTE_FILES, Context.MODE_PRIVATE)
 
             sharedPreferences.edit {
                 putString(PUBLISHER_PUBLIC_KEY, publisherPubKey)

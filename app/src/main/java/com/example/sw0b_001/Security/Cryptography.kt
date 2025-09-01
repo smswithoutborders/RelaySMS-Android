@@ -2,7 +2,6 @@ package com.example.sw0b_001.Security
 
 import android.content.Context
 import android.util.Base64
-import at.favre.lib.armadillo.Armadillo
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.CryptoHelpers
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.KeystoreHelpers
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityCurve25519
@@ -15,9 +14,10 @@ object Cryptography {
     private fun secureStorePrivateKey(context: Context,
                                       keystoreAlias: String,
                                       encryptedCipherPrivateKey: ByteArray) {
-        val sharedPreferences = Armadillo.create(context, HYBRID_KEYS_FILE)
-            .encryptionFingerprint(context)
-            .build()
+
+        val sharedPreferences = context
+            .getSharedPreferences(
+                HYBRID_KEYS_FILE, Context.MODE_PRIVATE)
 
         sharedPreferences.edit {
             putString(
@@ -40,9 +40,9 @@ object Cryptography {
     }
 
     private fun getSecuredStoredPrivateKey(context: Context, keystoreAlias: String) : String {
-        val sharedPreferences = Armadillo.create(context, HYBRID_KEYS_FILE)
-            .encryptionFingerprint(context)
-            .build()
+        val sharedPreferences = context
+            .getSharedPreferences(
+                HYBRID_KEYS_FILE, Context.MODE_PRIVATE)
         return sharedPreferences.getString(keystoreAlias, "")!!
     }
 

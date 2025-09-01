@@ -98,6 +98,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import androidx.core.content.edit
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.window.layout.WindowInfoTracker
+import androidx.window.layout.WindowLayoutInfo
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDatabase
+import com.afkanerd.smswithoutborders_libsmsmms.ui.components.NavHostControllerInstance
+import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.SearchViewModel
+import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ThreadsViewModel
 
 
 enum class OnboardingState {
@@ -110,6 +119,9 @@ enum class OnboardingState {
 
 class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
+
+    val threadsViewModel: ThreadsViewModel by viewModels()
+    private lateinit var searchViewModel: SearchViewModel
 
     val platformsViewModel: PlatformsViewModel by viewModels()
     val messagesViewModel: MessagesViewModel by viewModels()
@@ -125,56 +137,70 @@ class MainActivity : ComponentActivity() {
             // TODO: https://issuetracker.google.com/issues/298296168
             window.isNavigationBarContrastEnforced = false
         }
+        searchViewModel = SearchViewModel(getDatabase().threadsDao()!!)
+        lifecycleScope.launch(Dispatchers.Main) {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                WindowInfoTracker.getOrCreate(this@MainActivity)
+                    .windowLayoutInfo(this@MainActivity)
+                    .collect { newLayoutInfo ->
+                        setContent {
+                            val composeView = LocalView.current
 
-        setContent {
-            val composeView = LocalView.current
-
-            DisposableEffect(Unit) {
-                composeView.filterTouchesWhenObscured = true
-                onDispose {
-                    composeView.filterTouchesWhenObscured = false
-                }
-            }
-
-            AppTheme {
-                navController = rememberNavController()
-
-                LaunchedEffect(true) {
-                    refreshTokensCallback(platformsViewModel.accountsForMissingDialog)
-                }
-
-                if (showMissingTokenDialog) {
-                    MissingTokenInfoDialog(
-                        groupedAccounts = platformsViewModel.accountsForMissingDialog,
-                        onDismiss = { showMissingTokenDialog = false },
-                        onConfirm = { doNotShowAgain ->
-                            showMissingTokenDialog = false
-                            if (doNotShowAgain) {
-                                PreferenceManager
-                                    .getDefaultSharedPreferences(applicationContext).edit {
-                                        putBoolean(
-                                            Vaults.Companion.PrefKeys
-                                                .KEY_DO_NOT_SHOW_MISSING_TOKEN_DIALOG,
-                                            true
-                                        )
-                                    }
+                            DisposableEffect(Unit) {
+                                composeView.filterTouchesWhenObscured = true
+                                onDispose {
+                                    composeView.filterTouchesWhenObscured = false
+                                }
                             }
-                        }
-                    )
-                }
 
-                Surface(
-                    Modifier
-                        .fillMaxSize()
-                ) {
-                    MainNavigation(navController = navController)
-                }
+                            AppTheme {
+                                navController = rememberNavController()
+
+                                LaunchedEffect(true) {
+                                    refreshTokensCallback(platformsViewModel.accountsForMissingDialog)
+                                }
+
+                                if (showMissingTokenDialog) {
+                                    MissingTokenInfoDialog(
+                                        groupedAccounts = platformsViewModel.accountsForMissingDialog,
+                                        onDismiss = { showMissingTokenDialog = false },
+                                        onConfirm = { doNotShowAgain ->
+                                            showMissingTokenDialog = false
+                                            if (doNotShowAgain) {
+                                                PreferenceManager
+                                                    .getDefaultSharedPreferences(applicationContext)
+                                                    .edit {
+                                                        putBoolean(
+                                                            Vaults.Companion.PrefKeys
+                                                                .KEY_DO_NOT_SHOW_MISSING_TOKEN_DIALOG,
+                                                            true
+                                                        )
+                                                    }
+                                            }
+                                        }
+                                    )
+                                }
+
+                                Surface(
+                                    Modifier
+                                        .fillMaxSize()
+                                ) {
+                                    MainNavigation(navController = navController, newLayoutInfo)
+                                }
+                            }
+
+                        }
+                    }
             }
+
         }
     }
 
     @Composable
-    fun MainNavigation(navController: NavHostController) {
+    fun MainNavigation(
+        navController: NavHostController,
+        newLayoutInfo: WindowLayoutInfo,
+    ) {
         val context = LocalContext.current
         val sharedPreferences = context.getSharedPreferences(PREF_USER_ONBOARDED, MODE_PRIVATE)
 
@@ -182,9 +208,15 @@ class MainActivity : ComponentActivity() {
             mutableStateOf(sharedPreferences.getBoolean(USER_ONBOARDED, false))
         }
 
-        NavHost(
-            navController = navController,
-            startDestination = if(hasSeenOnboarding) HomepageScreen else OnboardingScreen,
+//        NavHost(
+//            navController = navController,
+//            startDestination = if(hasSeenOnboarding) HomepageScreen else OnboardingScreen,
+//        ) {
+        NavHostControllerInstance(
+            newLayoutInfo,
+            navController,
+            threadsViewModel,
+            searchViewModel,
         ) {
             composable<OnboardingScreen> {
                 MainOnboarding(navController)

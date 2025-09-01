@@ -2,7 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
 //    id 'org.jetbrains.kotlin.jvm' version '1.9.23'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.9.23'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '2.2.10'
     id "com.google.protobuf"
     alias(libs.plugins.compose.compiler)
 }
@@ -12,7 +12,7 @@ def versionProperties = new Properties()
 versionProperties.load(new FileInputStream(versionsPropertiesFile))
 
 android {
-    compileSdk 35
+    compileSdk 36
 
     buildFeatures {
         viewBinding true
@@ -26,7 +26,7 @@ android {
     defaultConfig {
         applicationId "com.afkanerd.sw0b"
         minSdk 24
-        targetSdk 35
+        targetSdk 36
         versionCode tagVersion
         versionName _versionName
 
@@ -194,7 +194,7 @@ dependencies {
     implementation libs.androidx.swiperefreshlayout
 
     implementation libs.androidx.startup.runtime
-    implementation libs.armadillo
+//    implementation libs.armadillo
     implementation libs.smswithoutborders.libsignal
     implementation libs.appauth
     implementation libs.ccp
@@ -277,6 +277,7 @@ dependencies {
 
     implementation libs.accompanist.permissions
 
-    implementation("androidx.leanback:leanback:1.1.0-rc02")
+    implementation(libs.androidx.leanback)
+    implementation libs.smswithoutborders.libsmsmms
 }
 

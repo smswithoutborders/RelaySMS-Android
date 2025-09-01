@@ -5,7 +5,6 @@ import android.util.Base64
 import android.util.Log
 import androidx.compose.material3.adaptive.layout.forEach
 import androidx.preference.PreferenceManager
-import at.favre.lib.armadillo.Armadillo
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.KeystoreHelpers
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityAES
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityRSA
@@ -34,6 +33,7 @@ import java.security.MessageDigest
 import kotlin.text.map
 import kotlin.text.toBoolean
 import androidx.core.content.edit
+import com.example.sw0b_001.Models.Publishers.Companion.PUBLISHER_ATTRIBUTE_FILES
 
 class Vaults(val context: Context) {
     private val DEVICE_ID_KEYSTORE_ALIAS = "DEVICE_ID_KEYSTORE_ALIAS"
@@ -353,31 +353,31 @@ class Vaults(val context: Context) {
         }
 
         fun setGetMeOut(context: Context, value: Boolean) {
-            var sharedPreferences = Armadillo.create(context, VAULT_ATTRIBUTE_FILES)
-                .encryptionFingerprint(context)
-                .build()
+            val sharedPreferences = context
+                .getSharedPreferences(
+                    VAULT_ATTRIBUTE_FILES, Context.MODE_PRIVATE)
             sharedPreferences.edit {
                 putBoolean(IS_GET_ME_OUT, value)
             }
         }
 
         fun isGetMeOut(context: Context) : Boolean {
-            var sharedPreferences = Armadillo.create(context, VAULT_ATTRIBUTE_FILES)
-                .encryptionFingerprint(context)
-                .build()
+            val sharedPreferences = context
+                .getSharedPreferences(
+                    VAULT_ATTRIBUTE_FILES, Context.MODE_PRIVATE)
 
             return sharedPreferences.getBoolean(IS_GET_ME_OUT, false)
         }
 
         fun logout(context: Context, successRunnable: Runnable) {
-            var sharedPreferences = Armadillo.create(context, VAULT_ATTRIBUTE_FILES)
-                .encryptionFingerprint(context)
-                .build()
+            var sharedPreferences = context
+                .getSharedPreferences(
+                    VAULT_ATTRIBUTE_FILES, Context.MODE_PRIVATE)
             sharedPreferences.edit { clear() }
 
-            sharedPreferences = Armadillo.create(context, Publishers.PUBLISHER_ATTRIBUTE_FILES)
-                .encryptionFingerprint(context)
-                .build()
+            sharedPreferences = context
+                .getSharedPreferences(
+                    PUBLISHER_ATTRIBUTE_FILES, Context.MODE_PRIVATE)
             sharedPreferences.edit { clear() }
 
             KeystoreHelpers.removeFromKeystore(context, DEVICE_ID_KEYSTORE_ALIAS)
@@ -412,9 +412,9 @@ class Vaults(val context: Context) {
             val encryptedDeviceIdSecretKey = SecurityRSA.encrypt(deviceIdPubKey,
                 deviceIdSecretKey.encoded)
 
-            val sharedPreferences = Armadillo.create(context, VAULT_ATTRIBUTE_FILES)
-                .encryptionFingerprint(context)
-                .build()
+            val sharedPreferences = context
+                .getSharedPreferences(
+                    VAULT_ATTRIBUTE_FILES, Context.MODE_PRIVATE)
 
             sharedPreferences.edit {
                 putString(
@@ -445,9 +445,10 @@ class Vaults(val context: Context) {
                 return ""
             }
 
-            val sharedPreferences = Armadillo.create(context, VAULT_ATTRIBUTE_FILES)
-                .encryptionFingerprint(context)
-                .build()
+            val sharedPreferences = context
+                .getSharedPreferences(
+                    VAULT_ATTRIBUTE_FILES, Context.MODE_PRIVATE)
+
             val encryptedLlt = Base64.decode(sharedPreferences
                 .getString(LONG_LIVED_TOKEN_KEYSTORE_ALIAS, "")!!, Base64.DEFAULT)
 
@@ -464,9 +465,10 @@ class Vaults(val context: Context) {
                 return null
             }
 
-            val sharedPreferences = Armadillo.create(context, VAULT_ATTRIBUTE_FILES)
-                .encryptionFingerprint(context)
-                .build()
+            val sharedPreferences = context
+                .getSharedPreferences(
+                    VAULT_ATTRIBUTE_FILES, Context.MODE_PRIVATE)
+
             val encryptedDeviceId = Base64.decode(sharedPreferences
                 .getString(DEVICE_ID_KEYSTORE_ALIAS, "")!!, Base64.DEFAULT)
 
