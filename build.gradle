@@ -8,7 +8,6 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://jitpack.io' }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:$agp_version1"
@@ -24,14 +23,6 @@ plugins {
     // Existing plugins
     alias(libs.plugins.compose.compiler) apply false
     alias(libs.plugins.org.jetbrains.kotlin.android) apply false
-}
-
-allprojects {
-    repositories {
-        google()      //and here
-        mavenCentral()
-        maven { url 'https://jitpack.io' }
-    }
 }
 
 task clean(type: Delete) {

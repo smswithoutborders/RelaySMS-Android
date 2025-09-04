@@ -278,6 +278,7 @@ dependencies {
     implementation libs.accompanist.permissions
 
     implementation(libs.androidx.leanback)
-    implementation libs.smswithoutborders.libsmsmms
+
+    implementation 'com.github.smswithoutborders:lib_smsmms_android:ca6a549'
 }
 
