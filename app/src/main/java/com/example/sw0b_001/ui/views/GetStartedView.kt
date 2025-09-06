@@ -1,5 +1,16 @@
 package com.example.sw0b_001.ui.views
 
+import android.app.Activity.RESULT_OK
+import android.app.role.RoleManager
+import android.content.Context
+import android.content.Context.ROLE_SERVICE
+import android.content.Intent
+import android.os.Build
+import android.provider.Telephony
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,6 +37,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberStandardBottomSheetState
@@ -50,6 +62,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.afkanerd.smswithoutborders_libsmsmms.activities.NotificationsInitializer
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.setNativesLoaded
+import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.BridgeEmailComposeScreen
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
@@ -65,6 +81,14 @@ fun GetStartedView (
 ) {
     var showLoginBottomSheet by remember { mutableStateOf(false) }
     var showCreateAccountBottomSheet by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+
+    var isDefault by remember{ mutableStateOf(false) }
+
+    val getDefaultPermission = getSetDefaultBehaviour(context) {
+       isDefault = context.isDefault()
+    }
 
     Column(
         modifier = Modifier
@@ -240,7 +264,8 @@ fun GetStartedView (
             }
         }
 
-        Spacer(Modifier.padding(16.dp))
+//        Spacer(Modifier.padding(16.dp))
+        Spacer(Modifier.weight(1f))
 
         Column(
             modifier = Modifier
@@ -249,11 +274,9 @@ fun GetStartedView (
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Button(onClick = {
-            },
-                colors = ButtonDefaults
-                    .buttonColors(MaterialTheme.colorScheme.tertiary),
-            ) {
+            OutlinedButton(onClick = {
+                getDefaultPermission.launch(makeDefault(context))
+            }) {
                 Row(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
@@ -264,7 +287,6 @@ fun GetStartedView (
                     Icon(
                         imageVector = Icons.Default.ChatBubbleOutline,
                         contentDescription = stringResource(R.string.compose),
-                        tint = MaterialTheme.colorScheme.primaryContainer,
                     )
 
                     Spacer(Modifier.size(ButtonDefaults.IconSpacing))
@@ -272,7 +294,6 @@ fun GetStartedView (
                     Text(
                         stringResource(R.string.set_as_default_sms_app),
                         fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onTertiary
                     )
                 }
             }
@@ -371,6 +392,20 @@ fun LoginCreateInfoModal(
                 )
                 Spacer(modifier = Modifier.size(16.dp))
             }
+        }
+    }
+}
+
+fun makeDefault(context: Context): Intent {
+    // TODO: replace this with checking other permissions - since this gives null in level 35
+    return if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        val roleManager = context.getSystemService(ROLE_SERVICE) as RoleManager
+        roleManager.createRequestRoleIntent(RoleManager.ROLE_SMS).apply {
+            putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, context.packageName)
+        }
+    } else {
+        Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT).apply {
+            putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME, context.packageName)
         }
     }
 }
