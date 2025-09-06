@@ -261,7 +261,6 @@ dependencies {
     // Optional - Integration with RxJava
     implementation libs.androidx.runtime.rxjava2
 
-    def nav_version = "2.8.5"
     implementation libs.androidx.navigation.compose
 
     implementation libs.material.v180alpha01
@@ -279,6 +278,6 @@ dependencies {
 
     implementation(libs.androidx.leanback)
 
-    implementation 'com.github.smswithoutborders:lib_smsmms_android:ca6a549'
+    implementation 'com.github.smswithoutborders:lib_smsmms_android:61a41b9'
 }
 

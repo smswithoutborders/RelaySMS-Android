@@ -217,6 +217,7 @@ class MainActivity : ComponentActivity() {
             navController,
             threadsViewModel,
             searchViewModel,
+            startDestination = if(hasSeenOnboarding) HomepageScreen else OnboardingScreen,
         ) {
             composable<OnboardingScreen> {
                 MainOnboarding(navController)
