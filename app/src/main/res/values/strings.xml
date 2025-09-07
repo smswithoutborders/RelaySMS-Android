@@ -381,5 +381,6 @@
     <string name="view_account_menu">You can now see the account you are currently logged into by clicking the menu icon on the navigation bar"</string>
     <string name="your_account">Your Account</string>
     <string name="set_as_default_sms_app">Set as default SMS app</string>
+    <string name="log_in_or_sign_up_to_save_your_online_accounts">Log in or sign up to save your online accounts.</string>
 
 </resources>

@@ -50,6 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -110,7 +111,7 @@ fun GetStartedView (
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top=50.dp, bottom = 30.dp),
+                .padding(top = 50.dp, bottom = 30.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
@@ -142,13 +143,13 @@ fun GetStartedView (
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    "Your Account",
+                    stringResource(R.string.your_account),
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(top=16.dp)
                 )
 
                 Text(
-                    "Log in or sign up to save your online accounts.",
+                    stringResource(R.string.log_in_or_sign_up_to_save_your_online_accounts),
                     style = MaterialTheme.typography.labelMedium,
                     modifier = Modifier.padding(16.dp)
                 )
@@ -275,37 +276,38 @@ fun GetStartedView (
             }
         }
 
-//        Spacer(Modifier.padding(16.dp))
-        Spacer(Modifier.weight(1f))
+        if(LocalInspectionMode.current || !isDefault) {
+            Spacer(Modifier.weight(1f))
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            OutlinedButton(onClick = {
-                getDefaultPermission.launch(makeDefault(context))
-            }) {
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ChatBubbleOutline,
-                        contentDescription = stringResource(R.string.compose),
-                    )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                OutlinedButton(onClick = {
+                    getDefaultPermission.launch(makeDefault(context))
+                }) {
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ChatBubbleOutline,
+                            contentDescription = stringResource(R.string.compose),
+                        )
 
-                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
 
-                    Text(
-                        stringResource(R.string.set_as_default_sms_app),
-                        fontWeight = FontWeight.SemiBold,
-                    )
+                        Text(
+                            stringResource(R.string.set_as_default_sms_app),
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    }
                 }
             }
         }

@@ -231,7 +231,7 @@ class MainActivity : ComponentActivity() {
             navController,
             threadsViewModel,
             searchViewModel,
-            modalNavigationModalItems = {
+            modalNavigationModalItems = { inboxType ->
                 NavigationDrawerItem(
                     icon = {
                         Icon(
@@ -250,8 +250,10 @@ class MainActivity : ComponentActivity() {
                     },
                     badge = {
                     },
-                    selected = true,
-                    onClick = { }
+                    selected = false,
+                    onClick = {
+                        navController.navigate(HomepageScreen)
+                    }
                 )
             },
             startDestination = if(hasSeenOnboarding) {
