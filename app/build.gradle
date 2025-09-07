@@ -278,6 +278,6 @@ dependencies {
 
     implementation(libs.androidx.leanback)
 
-    implementation 'com.github.smswithoutborders:lib_smsmms_android:61a41b9'
+    implementation 'com.github.smswithoutborders:lib_smsmms_android:c59a1cb'
 }
 

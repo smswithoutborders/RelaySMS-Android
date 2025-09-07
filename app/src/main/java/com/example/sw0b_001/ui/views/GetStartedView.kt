@@ -66,12 +66,15 @@ import com.afkanerd.smswithoutborders_libsmsmms.activities.NotificationsInitiali
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.setNativesLoaded
 import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
+import com.afkanerd.smswithoutborders_libsmsmms.ui.screens.HomeScreenNav
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.BridgeEmailComposeScreen
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.EmailComposeScreen
+import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.theme.AppTheme
+import kotlinx.coroutines.launch
 import org.intellij.lang.annotations.JdkConstants
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,10 +87,18 @@ fun GetStartedView (
 
     val context = LocalContext.current
 
-    var isDefault by remember{ mutableStateOf(false) }
+    var isDefault by remember{ mutableStateOf(context.isDefault()) }
 
     val getDefaultPermission = getSetDefaultBehaviour(context) {
-       isDefault = context.isDefault()
+        isDefault = context.isDefault()
+        if(isDefault) {
+            navController.navigate(HomeScreenNav()) {
+                popUpTo(HomeScreenNav()) {
+                    inclusive = true
+                }
+                launchSingleTop = true
+            }
+        }
     }
 
     Column(

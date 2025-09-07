@@ -61,6 +61,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.setValue
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.example.sw0b_001.ui.features.AppFeatures
 import com.example.sw0b_001.ui.features.FeatureInfo
 import com.example.sw0b_001.ui.features.FeatureManager
@@ -326,7 +328,6 @@ fun HomepageView(
                 BottomTabsItems.BottomBarCountriesTab -> {
                     GatewayClientView( viewModel = gatewayClientViewModel )
                 }
-
                 BottomTabsItems.BottomBarInboxTab -> {
                     InboxView(
                         messagesViewModel = messagesViewModel,

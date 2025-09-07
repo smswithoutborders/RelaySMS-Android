@@ -45,8 +45,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Block
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -54,11 +58,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.preference.PreferenceManager
 import com.example.sw0b_001.Database.Datastore
@@ -98,13 +106,17 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import androidx.core.content.edit
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.window.layout.WindowInfoTracker
 import androidx.window.layout.WindowLayoutInfo
+import com.afkanerd.lib_smsmms_android.R
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDatabase
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.components.NavHostControllerInstance
+import com.afkanerd.smswithoutborders_libsmsmms.ui.screens.HomeScreenNav
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.SearchViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ThreadsViewModel
 
@@ -116,6 +128,9 @@ enum class OnboardingState {
     SendMessage,
     Complete
 }
+
+val ThreadsViewModel.InboxType.RelayInboxTypes
+    get() = {}
 
 class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
@@ -157,7 +172,8 @@ class MainActivity : ComponentActivity() {
                                 navController = rememberNavController()
 
                                 LaunchedEffect(true) {
-                                    refreshTokensCallback(platformsViewModel.accountsForMissingDialog)
+                                    refreshTokensCallback(platformsViewModel
+                                        .accountsForMissingDialog)
                                 }
 
                                 if (showMissingTokenDialog) {
@@ -208,16 +224,39 @@ class MainActivity : ComponentActivity() {
             mutableStateOf(sharedPreferences.getBoolean(USER_ONBOARDED, false))
         }
 
-//        NavHost(
-//            navController = navController,
-//            startDestination = if(hasSeenOnboarding) HomepageScreen else OnboardingScreen,
-//        ) {
+        val defaultSmsApp = context.isDefault()
+
         NavHostControllerInstance(
             newLayoutInfo,
             navController,
             threadsViewModel,
             searchViewModel,
-            startDestination = if(hasSeenOnboarding) HomepageScreen else OnboardingScreen,
+            modalNavigationModalItems = {
+                NavigationDrawerItem(
+                    icon = {
+                        Icon(
+                            ContextCompat.getDrawable(context,
+                                R.drawable.ic_launcher_monochrome)!!.toBitmap()
+                                .asImageBitmap(),
+                            modifier = Modifier.size(48.dp),
+                            contentDescription = stringResource(com.afkanerd.lib_smsmms_android.R.string.blocked_folder)
+                        )
+                    },
+                    label = {
+                        Text(
+                            stringResource(R.string.conversations_navigation_view_blocked),
+                            fontSize = 14.sp
+                        )
+                    },
+                    badge = {
+                    },
+                    selected = true,
+                    onClick = { }
+                )
+            },
+            startDestination = if(hasSeenOnboarding) {
+                if(defaultSmsApp) HomeScreenNav() else HomepageScreen
+            } else OnboardingScreen,
         ) {
             composable<OnboardingScreen> {
                 MainOnboarding(navController)

@@ -35,14 +35,10 @@ class LockScreenActivity : AppCompatActivity() {
     }
 
     private fun boot() {
-//        val intent = Intent(this, OnboardingActivity::class.java).apply {
-//            setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//        }
         val intent = Intent(this, MainActivity::class.java).apply {
             setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         startActivity(intent)
-        overridePendingTransition(0, 0)
         finish()
     }
 }
