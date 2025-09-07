@@ -61,6 +61,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LiveData
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import androidx.room.util.TableInfo
 import com.example.sw0b_001.Bridges.Bridges
 import com.example.sw0b_001.Models.Messages.EncryptedContent
@@ -167,7 +170,6 @@ fun RecentViewNoMessages(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun RecentView(
-    _messages: List<EncryptedContent> = emptyList<EncryptedContent>(),
     navController: NavController,
     messagesViewModel: MessagesViewModel,
     platformsViewModel: PlatformsViewModel,
@@ -182,74 +184,73 @@ fun RecentView(
     var isSelectionMode by remember { mutableStateOf(false) }
     val selectedMessages = remember { mutableStateListOf<EncryptedContent>() }
 
-    val messages: List<EncryptedContent> =
-        if(LocalInspectionMode.current) _messages
-        else messagesViewModel.getMessages(context = context).observeAsState(emptyList()).value
+    val messagesPagingSource = messagesViewModel.getMessages(context = context)
+    val messages = messagesPagingSource.collectAsLazyPagingItems()
 
     val platforms: LiveData<List<AvailablePlatforms>> = platformsViewModel.getAvailablePlatforms(context)
     val platformsList by platforms.observeAsState(initial = emptyList())
 
-    val filteredMessages = remember(messages, searchQuery, isSearchDone) {
-        if (searchQuery.isBlank() || !isSearchDone) {
-            messages
-        } else {
-            messages.filter { message ->
-                val text = when (message.type) {
-                    Platforms.ServiceTypes.EMAIL.type -> {
-                        try {
-                            val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
-                            val decomposed = EmailComposeHandler.decomposeMessage(contentBytes)
-                            "${message.fromAccount ?: ""} ${decomposed.subject} ${decomposed.body}"
-                        } catch (e: Exception) {
-                            Log.e("RecentViewFilter", "Failed to decompose V1 email content: ${e.message}")
-                            message.fromAccount ?: ""
-                        }
-                    }
-                    Platforms.ServiceTypes.BRIDGE_INCOMING.type -> {
-                        val decomposed = Bridges.BridgeComposeHandler.decomposeInboxMessage(
-                            message.encryptedContent!!,
-                        )
-                        "${message.fromAccount ?: ""} ${decomposed.subject} ${decomposed.body}"
-                    }
-                    Platforms.ServiceTypes.BRIDGE.type -> {
-                        val decomposed = Bridges.BridgeComposeHandler.decomposeMessage(
-                            message.encryptedContent!!,
-                        )
-                        "${message.fromAccount ?: ""} ${decomposed.subject} ${decomposed.body}"
-                    }
-                    Platforms.ServiceTypes.TEXT.type -> {
-                        try {
-                            val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
-                            val decomposed = TextComposeHandler.decomposeMessage(contentBytes)
-                            "${decomposed.from} ${decomposed.text}"
-                        } catch (e: Exception) {
-                            Log.e("RecentViewFilter", "Failed to decompose V1 text content: ${e.message}")
-                            message.fromAccount ?: message.encryptedContent ?: ""
-                        }
-                    }
-                    Platforms.ServiceTypes.MESSAGE.type -> {
-                        try {
-                            val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
-                            val decomposed = MessageComposeHandler.decomposeMessage(contentBytes)
-                            "${decomposed.to} ${decomposed.message}"
-                        } catch (e: Exception) {
-                            Log.e("RecentViewFilter", "Failed to decompose V1 message content: ${e.message}")
-                            message.fromAccount ?: message.encryptedContent ?: ""
-                        }
-                    }
-                    else -> ""
-                }
-                text.contains(searchQuery, ignoreCase = true)
-            }
-        }
-    }
-
-    // Selection mode callbacks
-    val onSelectAll = {
-        selectedMessages.clear()
-        selectedMessages.addAll(filteredMessages)
-        Unit // Explicitly return Unit to match expected type
-    }
+//    val filteredMessages = remember(messages, searchQuery, isSearchDone) {
+//        if (searchQuery.isBlank() || !isSearchDone) {
+//            messages
+//        } else {
+//            messages.filter { message ->
+//                val text = when (message.type) {
+//                    Platforms.ServiceTypes.EMAIL.type -> {
+//                        try {
+//                            val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
+//                            val decomposed = EmailComposeHandler.decomposeMessage(contentBytes)
+//                            "${message.fromAccount ?: ""} ${decomposed.subject} ${decomposed.body}"
+//                        } catch (e: Exception) {
+//                            Log.e("RecentViewFilter", "Failed to decompose V1 email content: ${e.message}")
+//                            message.fromAccount ?: ""
+//                        }
+//                    }
+//                    Platforms.ServiceTypes.BRIDGE_INCOMING.type -> {
+//                        val decomposed = Bridges.BridgeComposeHandler.decomposeInboxMessage(
+//                            message.encryptedContent!!,
+//                        )
+//                        "${message.fromAccount ?: ""} ${decomposed.subject} ${decomposed.body}"
+//                    }
+//                    Platforms.ServiceTypes.BRIDGE.type -> {
+//                        val decomposed = Bridges.BridgeComposeHandler.decomposeMessage(
+//                            message.encryptedContent!!,
+//                        )
+//                        "${message.fromAccount ?: ""} ${decomposed.subject} ${decomposed.body}"
+//                    }
+//                    Platforms.ServiceTypes.TEXT.type -> {
+//                        try {
+//                            val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
+//                            val decomposed = TextComposeHandler.decomposeMessage(contentBytes)
+//                            "${decomposed.from} ${decomposed.text}"
+//                        } catch (e: Exception) {
+//                            Log.e("RecentViewFilter", "Failed to decompose V1 text content: ${e.message}")
+//                            message.fromAccount ?: message.encryptedContent ?: ""
+//                        }
+//                    }
+//                    Platforms.ServiceTypes.MESSAGE.type -> {
+//                        try {
+//                            val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
+//                            val decomposed = MessageComposeHandler.decomposeMessage(contentBytes)
+//                            "${decomposed.to} ${decomposed.message}"
+//                        } catch (e: Exception) {
+//                            Log.e("RecentViewFilter", "Failed to decompose V1 message content: ${e.message}")
+//                            message.fromAccount ?: message.encryptedContent ?: ""
+//                        }
+//                    }
+//                    else -> ""
+//                }
+//                text.contains(searchQuery, ignoreCase = true)
+//            }
+//        }
+//    }
+//
+//    // Selection mode callbacks
+//    val onSelectAll = {
+//        selectedMessages.clear()
+//        selectedMessages.addAll(filteredMessages)
+//        Unit // Explicitly return Unit to match expected type
+//    }
 
     val onDeleteSelected = {
         if (selectedMessages.isNotEmpty()) {
@@ -268,21 +269,20 @@ fun RecentView(
         Unit // Explicitly return Unit to match expected type
     }
 
-    // Update PlatformsViewModel with selection state
-    LaunchedEffect(isSelectionMode, selectedMessages.size) {
-        platformsViewModel.isSelectionMode = isSelectionMode
-        platformsViewModel.selectedMessagesCount = selectedMessages.size
-        platformsViewModel.onSelectAll = onSelectAll
-        platformsViewModel.onDeleteSelected = onDeleteSelected
-        platformsViewModel.onCancelSelection = onCancelSelection
-    }
+//    // Update PlatformsViewModel with selection state
+//    LaunchedEffect(isSelectionMode, selectedMessages.size) {
+//        platformsViewModel.isSelectionMode = isSelectionMode
+//        platformsViewModel.selectedMessagesCount = selectedMessages.size
+//        platformsViewModel.onSelectAll = onSelectAll
+//        platformsViewModel.onDeleteSelected = onDeleteSelected
+//        platformsViewModel.onCancelSelection = onCancelSelection
+//    }
 
-    Box(
-        Modifier
-            .padding(8.dp)
-            .fillMaxSize()
+    Box(Modifier
+        .padding(8.dp)
+        .fillMaxSize()
     ) {
-        if (filteredMessages.isNotEmpty()) {
+        if (messages.loadState.isIdle && messages.itemCount > 0) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -290,7 +290,12 @@ fun RecentView(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 contentPadding = PaddingValues(vertical = 16.dp)
             ) {
-                items(filteredMessages) { message ->
+                items(
+                    count = messages.itemCount,
+                    key = messages.itemKey { it.id }
+                ) { index ->
+                    val message = messages[index]!!
+
                     val platform = platformsList.find { it.name == message.platformName }
                     val logo =
                         platform?.logo?.let { BitmapFactory.decodeByteArray(it, 0, it.size) }
@@ -346,17 +351,21 @@ fun RecentView(
                     )
                 }
             }
-        } else {
-            if (searchQuery.isNotBlank()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp)
-                        .verticalScroll(rememberScrollState()),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Spacer(modifier = Modifier.weight(1f))
+        }
+        else {
+            GetStartedView(navController = navController)
+        }
+
+        if (searchQuery.isNotBlank()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Spacer(modifier = Modifier.weight(1f))
 
 //                    Image(
 //                        painter = painterResource(id = R.drawable.empty_message),
@@ -366,20 +375,20 @@ fun RecentView(
 //                            .padding(bottom = 16.dp)
 //                    )
 
-                    Text(
-                        text = stringResource(R.string.no_results_found),
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Thin,
-                        textAlign = TextAlign.Center,
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                }
-            } else {
-                RecentViewNoMessages(
-                    saveNewPlatformCallback = { tabRequestedCallback() },
-                    sendNewMessageCallback = { sendNewMessageRequested = true }
+                Text(
+                    text = stringResource(R.string.no_results_found),
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Thin,
+                    textAlign = TextAlign.Center,
                 )
+                Spacer(modifier = Modifier.weight(1f))
             }
+        }
+        else {
+            RecentViewNoMessages(
+                saveNewPlatformCallback = { tabRequestedCallback() },
+                sendNewMessageCallback = { sendNewMessageRequested = true }
+            )
         }
         if (sendNewMessageRequested) {
             ActivePlatformsModal(
@@ -635,13 +644,11 @@ fun RecentScreenMessages_Preview() {
         message.encryptedContent = "+123456789:+237123456789:hello Telegram"
 
         RecentView(
-            _messages = listOf(encryptedContent, text, message),
             navController = rememberNavController(),
-            messagesViewModel = MessagesViewModel(),
-            platformsViewModel = PlatformsViewModel(),
             searchQuery = "",
-            isSearchDone = false
-
+            isSearchDone = false,
+            messagesViewModel = remember { MessagesViewModel() },
+            platformsViewModel = remember { PlatformsViewModel() },
         ) {}
     }
 }

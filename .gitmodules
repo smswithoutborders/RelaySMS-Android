@@ -1,0 +1,3 @@
+[submodule "lib_smsmms_android"]
+	path = lib_smsmms_android
+	url = git@github.com:smswithoutborders/lib_smsmms_android.git

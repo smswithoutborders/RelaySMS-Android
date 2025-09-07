@@ -5,6 +5,8 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization' version '2.2.10'
     id "com.google.protobuf"
     alias(libs.plugins.compose.compiler)
+    id 'kotlin-kapt' // Add this line
+    id 'com.google.devtools.ksp' version '2.2.10-2.0.2'
 }
 
 def versionsPropertiesFile = rootProject.file("version.properties")
@@ -31,6 +33,9 @@ android {
         versionName _versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        ksp {
+            arg('room.schemaLocation', "$projectDir/schemas")
+        }
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments += ["room.schemaLocation":
@@ -141,6 +146,8 @@ configurations {
 
 
 dependencies {
+    implementation project(':lib_smsmms_android:lib_smsmms_android')
+
     implementation libs.androidx.appcompat
     implementation libs.material
     implementation libs.androidx.constraintlayout
@@ -156,6 +163,7 @@ dependencies {
     implementation libs.play.services.auth
     implementation libs.play.services.auth.api.phone
     implementation libs.androidx.ui.text.google.fonts
+    implementation libs.androidx.paging.common
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core
@@ -279,5 +287,32 @@ dependencies {
     implementation(libs.androidx.leanback)
 
     implementation 'com.github.smswithoutborders:lib_smsmms_android:c59a1cb'
+
+    def paging_version = "3.3.6"
+
+    implementation "androidx.paging:paging-runtime:$paging_version"
+
+    // alternatively - without Android dependencies for tests
+    testImplementation "androidx.paging:paging-common:$paging_version"
+
+    // optional - RxJava2 support
+    implementation "androidx.paging:paging-rxjava2:$paging_version"
+
+    // optional - RxJava3 support
+    implementation "androidx.paging:paging-rxjava3:$paging_version"
+
+    // optional - Guava ListenableFuture support
+    implementation "androidx.paging:paging-guava:$paging_version"
+
+    // optional - Jetpack Compose integration
+    implementation "androidx.paging:paging-compose:3.4.0-alpha03"
+
+    def room_version = "2.7.2"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+    ksp "androidx.room:room-compiler:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+    testImplementation "androidx.room:room-testing:$room_version"
+    implementation "androidx.room:room-paging:$room_version"
+
 }
 

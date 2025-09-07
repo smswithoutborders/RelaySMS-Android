@@ -4,11 +4,18 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import com.afkanerd.smswithoutborders_libsmsmms.data.entities.Conversations
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDatabase
 import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.Models.Platforms.Platforms
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -25,19 +32,46 @@ class MessagesViewModel : ViewModel() {
 
     private lateinit var datastore: Datastore
 
-    fun getMessages(context: Context): LiveData<MutableList<EncryptedContent>> {
-        viewModelScope.launch {
-            if (!::messagesList.isInitialized) {
-                _isLoading.value = true
+    var pageSize: Int = 50
+    var prefetchDistance: Int = 3 * pageSize
+    var enablePlaceholder: Boolean = true
+    var initialLoadSize: Int = 2 * pageSize
+    var maxSize: Int = PagingConfig.Companion.MAX_SIZE_UNBOUNDED
 
-                datastore = Datastore.getDatastore(context)
-                messagesList = loadEncryptedContents()
-                delay(50)
-                _isLoading.value = false
-            }
+
+    private var conversationsPager: Flow<PagingData<EncryptedContent>>? = null
+
+    fun getMessages(context: Context): Flow<PagingData<EncryptedContent>> {
+        if(conversationsPager == null) {
+            conversationsPager = Pager(
+                config = PagingConfig(
+                    pageSize,
+                    prefetchDistance,
+                    enablePlaceholder,
+                    initialLoadSize,
+                    maxSize
+                ),
+                pagingSourceFactory = {
+                    Datastore.getDatastore(context).encryptedContentDAO().all()
+                }
+            ).flow.cachedIn(viewModelScope)
         }
-        return messagesList
+        return conversationsPager!!
     }
+
+//    fun getMessages(context: Context): LiveData<MutableList<EncryptedContent>> {
+//        viewModelScope.launch {
+//            if (!::messagesList.isInitialized) {
+//                _isLoading.value = true
+//
+//                datastore = Datastore.getDatastore(context)
+//                messagesList = loadEncryptedContents()
+//                delay(50)
+//                _isLoading.value = false
+//            }
+//        }
+//        return messagesList
+//    }
 
     fun getInboxMessages(context: Context): LiveData<MutableList<EncryptedContent>> {
         viewModelScope.launch {

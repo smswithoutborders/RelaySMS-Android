@@ -41,7 +41,7 @@ import org.jetbrains.annotations.NotNull;
         GatewayClient.class,
         StoredPlatformsEntity.class,
         EncryptedContent.class,},
-        version = 19,
+        version = 20,
         autoMigrations = {
         @AutoMigration( from = 8, to = 9, spec = Datastore.DatastoreMigrations.class),
         @AutoMigration( from = 9, to = 10, spec= Datastore.DatastoreMigrations.class),
@@ -54,6 +54,7 @@ import org.jetbrains.annotations.NotNull;
         @AutoMigration( from = 16, to = 17),
         @AutoMigration( from = 17, to = 18, spec = Datastore.Migrate17To18.class),
         @AutoMigration( from = 18, to = 19),
+        @AutoMigration( from = 19, to = 20),
 })
 
 public abstract class Datastore extends RoomDatabase {

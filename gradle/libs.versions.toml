@@ -58,6 +58,7 @@ uiTestJunit4 = "1.9.0"
 volley = "1.2.1"
 workRuntime = "2.10.3"
 uiTextGoogleFonts = "1.9.0"
+pagingCommon = "3.3.6"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
@@ -142,6 +143,7 @@ smswithoutborders_libsmsmms = { module = "com.afkanerd.oss1:smswithoutborders_li
 ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "uiTestJunit4" }
 volley = { module = "com.android.volley:volley", version.ref = "volley" }
 androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
+androidx-paging-common = { group = "androidx.paging", name = "paging-common", version.ref = "pagingCommon" }
 
 [plugins]
 org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

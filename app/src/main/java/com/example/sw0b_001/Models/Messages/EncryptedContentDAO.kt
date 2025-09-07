@@ -1,6 +1,7 @@
 package com.example.sw0b_001.Models.Messages
 
 import androidx.lifecycle.LiveData
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -12,6 +13,9 @@ import com.example.sw0b_001.Models.Platforms.Platforms
 interface EncryptedContentDAO {
     @Insert
     fun insert(encryptedContent: EncryptedContent): Long
+
+    @Query("SELECT * FROM EncryptedContent ORDER BY date DESC")
+    fun all(): PagingSource<Int, EncryptedContent>
 
     @Query("SELECT * FROM EncryptedContent WHERE type != :type ORDER BY date DESC")
     fun all(type: String): LiveData<MutableList<EncryptedContent>>

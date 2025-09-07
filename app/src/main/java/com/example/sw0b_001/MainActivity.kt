@@ -59,6 +59,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -119,6 +120,9 @@ import com.afkanerd.smswithoutborders_libsmsmms.ui.components.NavHostControllerI
 import com.afkanerd.smswithoutborders_libsmsmms.ui.screens.HomeScreenNav
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.SearchViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ThreadsViewModel
+import com.example.sw0b_001.ui.appbars.BottomNavBar
+import com.example.sw0b_001.ui.views.BottomTabsItems
+import com.example.sw0b_001.ui.views.GetTabViews
 
 
 enum class OnboardingState {
@@ -197,10 +201,7 @@ class MainActivity : ComponentActivity() {
                                     )
                                 }
 
-                                Surface(
-                                    Modifier
-                                        .fillMaxSize()
-                                ) {
+                                Surface( Modifier.fillMaxSize()) {
                                     MainNavigation(navController = navController, newLayoutInfo)
                                 }
                             }
@@ -218,6 +219,7 @@ class MainActivity : ComponentActivity() {
         newLayoutInfo: WindowLayoutInfo,
     ) {
         val context = LocalContext.current
+        val inPreview = LocalInspectionMode.current
         val sharedPreferences = context.getSharedPreferences(PREF_USER_ONBOARDED, MODE_PRIVATE)
 
         var hasSeenOnboarding by remember {
@@ -226,39 +228,38 @@ class MainActivity : ComponentActivity() {
 
         val defaultSmsApp = context.isDefault()
 
+        var isLoggedIn by remember {
+            mutableStateOf(
+                if(inPreview) true else
+                    Vaults.fetchLongLivedToken(context).isNotBlank()
+            )
+        }
+
         NavHostControllerInstance(
             newLayoutInfo,
             navController,
             threadsViewModel,
             searchViewModel,
-            modalNavigationModalItems = { inboxType ->
-                NavigationDrawerItem(
-                    icon = {
-                        Icon(
-                            ContextCompat.getDrawable(context,
-                                R.drawable.ic_launcher_monochrome)!!.toBitmap()
-                                .asImageBitmap(),
-                            modifier = Modifier.size(48.dp),
-                            contentDescription = stringResource(com.afkanerd.lib_smsmms_android.R.string.blocked_folder)
-                        )
-                    },
-                    label = {
-                        Text(
-                            stringResource(R.string.conversations_navigation_view_blocked),
-                            fontSize = 14.sp
-                        )
-                    },
-                    badge = {
-                    },
-                    selected = false,
-                    onClick = {
-                        navController.navigate(HomepageScreen)
-                    }
-                )
-            },
             startDestination = if(hasSeenOnboarding) {
                 if(defaultSmsApp) HomeScreenNav() else HomepageScreen
             } else OnboardingScreen,
+            customBottomBar = {
+                BottomNavBar(
+                    selectedTab = platformsViewModel.bottomTabsItem,
+                    isLoggedIn = isLoggedIn,
+                ) { selectedTab ->
+                    platformsViewModel.bottomTabsItem = selectedTab
+                }
+            },
+            customThreadsView = {
+                GetTabViews(
+                    platformsViewModel.bottomTabsItem,
+                    navController = navController,
+                    messagesViewModel = messagesViewModel,
+                    platformsViewModel = platformsViewModel,
+                    gatewayClientViewModel = gatewayClientViewModel,
+                )
+            }
         ) {
             composable<OnboardingScreen> {
                 MainOnboarding(navController)

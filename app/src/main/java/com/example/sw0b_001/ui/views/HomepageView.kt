@@ -68,6 +68,7 @@ import com.example.sw0b_001.ui.features.FeatureInfo
 import com.example.sw0b_001.ui.features.FeatureManager
 import com.example.sw0b_001.ui.features.NewFeatureModal
 import com.example.sw0b_001.ui.modals.GetStartedModal
+import com.example.sw0b_001.ui.navigation.MessageViewScreen
 
 
 enum class BottomTabsItems {
@@ -81,11 +82,11 @@ enum class BottomTabsItems {
 @Composable
 fun HomepageView(
     _messages: List<EncryptedContent> = emptyList<EncryptedContent>(),
-    isLoggedIn: Boolean = false,
     navController: NavController,
     platformsViewModel : PlatformsViewModel,
     messagesViewModel: MessagesViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
+    isLoggedIn: Boolean = false,
 ) {
     val context = LocalContext.current
     val inspectionMode = LocalInspectionMode.current
@@ -96,9 +97,6 @@ fun HomepageView(
             Vaults.fetchLongLivedToken(context).isNotBlank()
         )
     }
-
-    val messages: List<EncryptedContent> = if(LocalInspectionMode.current) _messages
-    else messagesViewModel.getMessages(context).observeAsState(emptyList()).value
 
     val inboxMessages: List<EncryptedContent> = if(LocalInspectionMode.current) _messages
     else messagesViewModel.getInboxMessages(context).observeAsState(emptyList()).value
@@ -134,7 +132,7 @@ fun HomepageView(
         topBar = {
             when (platformsViewModel.bottomTabsItem) {
                 BottomTabsItems.BottomBarRecentTab -> {
-                    if (isLoggedIn || messages.isNotEmpty()) {
+                    if (isLoggedIn) {
                         RecentAppBar(
                             navController = navController,
                             onSearchQueryChanged = { searchQuery = it },
@@ -185,7 +183,7 @@ fun HomepageView(
         bottomBar = {
             BottomNavBar(
                 selectedTab = platformsViewModel.bottomTabsItem,
-                isLoggedIn = isLoggedIn
+                isLoggedIn = isLoggedIn,
             ) { selectedTab ->
                 platformsViewModel.bottomTabsItem = selectedTab
             }
@@ -193,48 +191,46 @@ fun HomepageView(
         floatingActionButton = {
             when(platformsViewModel.bottomTabsItem) {
                 BottomTabsItems.BottomBarRecentTab -> {
-                    if(messages.isNotEmpty()) {
-                        if(isLoggedIn) {
-                            ExtendedFloatingActionButton(
-                                onClick = {
-                                    sendNewMessageRequested = true
-                                },
-                                containerColor = MaterialTheme.colorScheme.secondary,
-                                icon = {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Default.Message,
-                                        contentDescription = stringResource(R.string.add_account),
-                                        tint = MaterialTheme.colorScheme.onSecondary
-                                    )
-                                },
-                                text = {
-                                    Text(
-                                        text = stringResource(R.string.compose_new),
-                                        color = MaterialTheme.colorScheme.onSecondary
-                                    )
-                                }
-                            )
-                        } else {
-                            ExtendedFloatingActionButton(
-                                onClick = {
-                                    sendNewMessageRequested = true
-                                },
-                                containerColor = MaterialTheme.colorScheme.secondary,
-                                icon = {
-                                    Icon(
-                                        imageVector = Icons.Filled.PersonAdd,
-                                        contentDescription = stringResource(R.string.add_account),
-                                        tint = MaterialTheme.colorScheme.onSecondary
-                                    )
-                                },
-                                text = {
-                                    Text(
-                                        text = stringResource(R.string.add_account_compose_new),
-                                        color = MaterialTheme.colorScheme.onSecondary
-                                    )
-                                }
-                            )
-                        }
+                    if(isLoggedIn) {
+                        ExtendedFloatingActionButton(
+                            onClick = {
+                                sendNewMessageRequested = true
+                            },
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Default.Message,
+                                    contentDescription = stringResource(R.string.add_account),
+                                    tint = MaterialTheme.colorScheme.onSecondary
+                                )
+                            },
+                            text = {
+                                Text(
+                                    text = stringResource(R.string.compose_new),
+                                    color = MaterialTheme.colorScheme.onSecondary
+                                )
+                            }
+                        )
+                    } else {
+                        ExtendedFloatingActionButton(
+                            onClick = {
+                                sendNewMessageRequested = true
+                            },
+                            containerColor = MaterialTheme.colorScheme.secondary,
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Filled.PersonAdd,
+                                    contentDescription = stringResource(R.string.add_account),
+                                    tint = MaterialTheme.colorScheme.onSecondary
+                                )
+                            },
+                            text = {
+                                Text(
+                                    text = stringResource(R.string.add_account_compose_new),
+                                    color = MaterialTheme.colorScheme.onSecondary
+                                )
+                            }
+                        )
                     }
                 }
                 BottomTabsItems.BottomBarPlatformsTab -> {}
@@ -300,42 +296,15 @@ fun HomepageView(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            when(platformsViewModel.bottomTabsItem) {
-                BottomTabsItems.BottomBarRecentTab -> {
-                    if (isLoggedIn || messages.isNotEmpty()) {
-                        RecentView(
-                            _messages = _messages,
-                            navController = navController,
-                            messagesViewModel = messagesViewModel,
-                            platformsViewModel = platformsViewModel,
-                            searchQuery = searchQuery,
-                            isSearchDone = isSearchDone,
-
-                        ) {
-                            platformsViewModel.bottomTabsItem =
-                                BottomTabsItems.BottomBarPlatformsTab
-                        }
-                    } else if(!isLoading){
-                        GetStartedView(navController = navController)
-                    }
-                }
-                BottomTabsItems.BottomBarPlatformsTab -> {
-                    AvailablePlatformsView(
-                        navController = navController,
-                        platformsViewModel = platformsViewModel
-                    )
-                }
-                BottomTabsItems.BottomBarCountriesTab -> {
-                    GatewayClientView( viewModel = gatewayClientViewModel )
-                }
-                BottomTabsItems.BottomBarInboxTab -> {
-                    InboxView(
-                        messagesViewModel = messagesViewModel,
-                        platformsViewModel = platformsViewModel,
-                        navController = navController
-                    )
-                }
-            }
+            GetTabViews(
+                platformsViewModel.bottomTabsItem,
+                navController = navController,
+                messagesViewModel = messagesViewModel,
+                platformsViewModel = platformsViewModel,
+                gatewayClientViewModel = gatewayClientViewModel,
+                searchQuery = searchQuery,
+                isSearchDone = isSearchDone,
+            )
 
             if (sendNewMessageRequested) {
                 if(isLoggedIn) {
@@ -366,6 +335,49 @@ fun HomepageView(
             }
         }
     }
+}
+
+@Composable
+fun GetTabViews(
+    bottomTabsItems: BottomTabsItems,
+    navController: NavController,
+    messagesViewModel: MessagesViewModel,
+    platformsViewModel: PlatformsViewModel,
+    gatewayClientViewModel: GatewayClientViewModel,
+    searchQuery: String = "",
+    isSearchDone: Boolean = false,
+) {
+    when(bottomTabsItems) {
+        BottomTabsItems.BottomBarRecentTab -> {
+            RecentView(
+                navController = navController,
+                messagesViewModel = messagesViewModel,
+                platformsViewModel = platformsViewModel,
+                searchQuery = searchQuery,
+                isSearchDone = isSearchDone
+            ) {
+                platformsViewModel.bottomTabsItem =
+                    BottomTabsItems.BottomBarPlatformsTab
+            }
+        }
+        BottomTabsItems.BottomBarPlatformsTab -> {
+            AvailablePlatformsView(
+                navController = navController,
+                platformsViewModel = platformsViewModel
+            )
+        }
+        BottomTabsItems.BottomBarCountriesTab -> {
+            GatewayClientView( viewModel = gatewayClientViewModel )
+        }
+        BottomTabsItems.BottomBarInboxTab -> {
+            InboxView(
+                messagesViewModel = messagesViewModel,
+                platformsViewModel = platformsViewModel,
+                navController = navController
+            )
+        }
+    }
+
 }
 
 

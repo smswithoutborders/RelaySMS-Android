@@ -8,3 +8,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "sw0b_0.0.1"
 include ':app'
+include ':lib_smsmms_android:lib_smsmms_android'
