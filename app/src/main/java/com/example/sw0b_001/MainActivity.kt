@@ -133,9 +133,6 @@ enum class OnboardingState {
     Complete
 }
 
-val ThreadsViewModel.InboxType.RelayInboxTypes
-    get() = {}
-
 class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
 
@@ -164,7 +161,6 @@ class MainActivity : ComponentActivity() {
                     .collect { newLayoutInfo ->
                         setContent {
                             val composeView = LocalView.current
-
                             DisposableEffect(Unit) {
                                 composeView.filterTouchesWhenObscured = true
                                 onDispose {
@@ -251,15 +247,16 @@ class MainActivity : ComponentActivity() {
                     platformsViewModel.bottomTabsItem = selectedTab
                 }
             },
-            customThreadsView = {
+            customThreadsView = if(defaultSmsApp) {{
                 GetTabViews(
                     platformsViewModel.bottomTabsItem,
                     navController = navController,
                     messagesViewModel = messagesViewModel,
                     platformsViewModel = platformsViewModel,
                     gatewayClientViewModel = gatewayClientViewModel,
+                    isLoggedIn = isLoggedIn
                 )
-            }
+            }} else null
         ) {
             composable<OnboardingScreen> {
                 MainOnboarding(navController)

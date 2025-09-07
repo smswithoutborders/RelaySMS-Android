@@ -173,8 +173,6 @@ fun RecentView(
     navController: NavController,
     messagesViewModel: MessagesViewModel,
     platformsViewModel: PlatformsViewModel,
-    searchQuery: String,
-    isSearchDone: Boolean,
     tabRequestedCallback: () -> Unit
 ) {
     val context = LocalContext.current
@@ -189,94 +187,6 @@ fun RecentView(
 
     val platforms: LiveData<List<AvailablePlatforms>> = platformsViewModel.getAvailablePlatforms(context)
     val platformsList by platforms.observeAsState(initial = emptyList())
-
-//    val filteredMessages = remember(messages, searchQuery, isSearchDone) {
-//        if (searchQuery.isBlank() || !isSearchDone) {
-//            messages
-//        } else {
-//            messages.filter { message ->
-//                val text = when (message.type) {
-//                    Platforms.ServiceTypes.EMAIL.type -> {
-//                        try {
-//                            val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
-//                            val decomposed = EmailComposeHandler.decomposeMessage(contentBytes)
-//                            "${message.fromAccount ?: ""} ${decomposed.subject} ${decomposed.body}"
-//                        } catch (e: Exception) {
-//                            Log.e("RecentViewFilter", "Failed to decompose V1 email content: ${e.message}")
-//                            message.fromAccount ?: ""
-//                        }
-//                    }
-//                    Platforms.ServiceTypes.BRIDGE_INCOMING.type -> {
-//                        val decomposed = Bridges.BridgeComposeHandler.decomposeInboxMessage(
-//                            message.encryptedContent!!,
-//                        )
-//                        "${message.fromAccount ?: ""} ${decomposed.subject} ${decomposed.body}"
-//                    }
-//                    Platforms.ServiceTypes.BRIDGE.type -> {
-//                        val decomposed = Bridges.BridgeComposeHandler.decomposeMessage(
-//                            message.encryptedContent!!,
-//                        )
-//                        "${message.fromAccount ?: ""} ${decomposed.subject} ${decomposed.body}"
-//                    }
-//                    Platforms.ServiceTypes.TEXT.type -> {
-//                        try {
-//                            val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
-//                            val decomposed = TextComposeHandler.decomposeMessage(contentBytes)
-//                            "${decomposed.from} ${decomposed.text}"
-//                        } catch (e: Exception) {
-//                            Log.e("RecentViewFilter", "Failed to decompose V1 text content: ${e.message}")
-//                            message.fromAccount ?: message.encryptedContent ?: ""
-//                        }
-//                    }
-//                    Platforms.ServiceTypes.MESSAGE.type -> {
-//                        try {
-//                            val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
-//                            val decomposed = MessageComposeHandler.decomposeMessage(contentBytes)
-//                            "${decomposed.to} ${decomposed.message}"
-//                        } catch (e: Exception) {
-//                            Log.e("RecentViewFilter", "Failed to decompose V1 message content: ${e.message}")
-//                            message.fromAccount ?: message.encryptedContent ?: ""
-//                        }
-//                    }
-//                    else -> ""
-//                }
-//                text.contains(searchQuery, ignoreCase = true)
-//            }
-//        }
-//    }
-//
-//    // Selection mode callbacks
-//    val onSelectAll = {
-//        selectedMessages.clear()
-//        selectedMessages.addAll(filteredMessages)
-//        Unit // Explicitly return Unit to match expected type
-//    }
-
-    val onDeleteSelected = {
-        if (selectedMessages.isNotEmpty()) {
-            messagesViewModel.deleteMultiple(context, selectedMessages.toList()) {
-                selectedMessages.clear()
-                isSelectionMode = false
-                Toast.makeText(context, context.getString(R.string.messages_deleted), Toast.LENGTH_SHORT).show()
-            }
-        }
-        Unit // Explicitly return Unit to match expected type
-    }
-
-    val onCancelSelection = {
-        selectedMessages.clear()
-        isSelectionMode = false
-        Unit // Explicitly return Unit to match expected type
-    }
-
-//    // Update PlatformsViewModel with selection state
-//    LaunchedEffect(isSelectionMode, selectedMessages.size) {
-//        platformsViewModel.isSelectionMode = isSelectionMode
-//        platformsViewModel.selectedMessagesCount = selectedMessages.size
-//        platformsViewModel.onSelectAll = onSelectAll
-//        platformsViewModel.onDeleteSelected = onDeleteSelected
-//        platformsViewModel.onCancelSelection = onCancelSelection
-//    }
 
     Box(Modifier
         .padding(8.dp)
@@ -353,43 +263,12 @@ fun RecentView(
             }
         }
         else {
-            GetStartedView(navController = navController)
-        }
-
-        if (searchQuery.isNotBlank()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Spacer(modifier = Modifier.weight(1f))
-
-//                    Image(
-//                        painter = painterResource(id = R.drawable.empty_message),
-//                        contentDescription = "No results found",
-//                        modifier = Modifier
-//                            .size(200.dp)
-//                            .padding(bottom = 16.dp)
-//                    )
-
-                Text(
-                    text = stringResource(R.string.no_results_found),
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Thin,
-                    textAlign = TextAlign.Center,
-                )
-                Spacer(modifier = Modifier.weight(1f))
-            }
-        }
-        else {
             RecentViewNoMessages(
                 saveNewPlatformCallback = { tabRequestedCallback() },
                 sendNewMessageCallback = { sendNewMessageRequested = true }
             )
         }
+
         if (sendNewMessageRequested) {
             ActivePlatformsModal(
                 sendNewMessageRequested = sendNewMessageRequested,
@@ -604,9 +483,6 @@ fun RecentScreenPreview() {
             navController = rememberNavController(),
             messagesViewModel = MessagesViewModel(),
             platformsViewModel = PlatformsViewModel(),
-            searchQuery = "",
-            isSearchDone = false
-
         ) {}
     }
 }
@@ -645,8 +521,6 @@ fun RecentScreenMessages_Preview() {
 
         RecentView(
             navController = rememberNavController(),
-            searchQuery = "",
-            isSearchDone = false,
             messagesViewModel = remember { MessagesViewModel() },
             platformsViewModel = remember { PlatformsViewModel() },
         ) {}

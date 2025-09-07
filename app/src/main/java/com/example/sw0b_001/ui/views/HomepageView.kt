@@ -302,8 +302,7 @@ fun HomepageView(
                 messagesViewModel = messagesViewModel,
                 platformsViewModel = platformsViewModel,
                 gatewayClientViewModel = gatewayClientViewModel,
-                searchQuery = searchQuery,
-                isSearchDone = isSearchDone,
+                isLoggedIn = isLoggedIn,
             )
 
             if (sendNewMessageRequested) {
@@ -344,20 +343,22 @@ fun GetTabViews(
     messagesViewModel: MessagesViewModel,
     platformsViewModel: PlatformsViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
-    searchQuery: String = "",
-    isSearchDone: Boolean = false,
+    isLoggedIn: Boolean,
 ) {
     when(bottomTabsItems) {
         BottomTabsItems.BottomBarRecentTab -> {
-            RecentView(
-                navController = navController,
-                messagesViewModel = messagesViewModel,
-                platformsViewModel = platformsViewModel,
-                searchQuery = searchQuery,
-                isSearchDone = isSearchDone
-            ) {
-                platformsViewModel.bottomTabsItem =
-                    BottomTabsItems.BottomBarPlatformsTab
+            if(isLoggedIn) {
+                RecentView(
+                    navController = navController,
+                    messagesViewModel = messagesViewModel,
+                    platformsViewModel = platformsViewModel,
+                ) {
+                    platformsViewModel.bottomTabsItem =
+                        BottomTabsItems.BottomBarPlatformsTab
+                }
+
+            } else {
+                GetStartedView(navController = navController)
             }
         }
         BottomTabsItems.BottomBarPlatformsTab -> {
