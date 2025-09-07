@@ -87,8 +87,10 @@ fun GetStartedView (
     var showCreateAccountBottomSheet by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
+    val previewMode = LocalInspectionMode.current
 
-    var isDefault by remember{ mutableStateOf(context.isDefault()) }
+    var isDefault by remember{
+        mutableStateOf(previewMode || context.isDefault()) }
 
     val getDefaultPermission = getSetDefaultBehaviour(context) {
         isDefault = context.isDefault()

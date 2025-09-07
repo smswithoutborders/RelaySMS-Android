@@ -117,12 +117,16 @@ import com.afkanerd.lib_smsmms_android.R
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDatabase
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.components.NavHostControllerInstance
+import com.afkanerd.smswithoutborders_libsmsmms.ui.requiredReadPhoneStatePermissions
 import com.afkanerd.smswithoutborders_libsmsmms.ui.screens.HomeScreenNav
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.SearchViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ThreadsViewModel
 import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.views.BottomTabsItems
 import com.example.sw0b_001.ui.views.GetTabViews
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 
 
 enum class OnboardingState {
@@ -209,20 +213,27 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @OptIn(ExperimentalPermissionsApi::class)
     @Composable
     fun MainNavigation(
         navController: NavHostController,
         newLayoutInfo: WindowLayoutInfo,
     ) {
+
         val context = LocalContext.current
         val inPreview = LocalInspectionMode.current
+        var defaultSmsApp by remember { mutableStateOf(inPreview || context.isDefault()) }
+
+        val readPhoneStatePermission = rememberPermissionState(requiredReadPhoneStatePermissions)
+        LaunchedEffect(readPhoneStatePermission.status) {
+            defaultSmsApp = context.isDefault()
+        }
+
         val sharedPreferences = context.getSharedPreferences(PREF_USER_ONBOARDED, MODE_PRIVATE)
 
         var hasSeenOnboarding by remember {
             mutableStateOf(sharedPreferences.getBoolean(USER_ONBOARDED, false))
         }
-
-        val defaultSmsApp = context.isDefault()
 
         var isLoggedIn by remember {
             mutableStateOf(
