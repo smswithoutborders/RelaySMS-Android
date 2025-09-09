@@ -242,6 +242,25 @@ class MainActivity : ComponentActivity() {
             )
         }
 
+        var customThreadView: (@Composable () -> Unit)? by remember { mutableStateOf(null)}
+        LaunchedEffect(platformsViewModel.bottomTabsItem) {
+            customThreadView = when(platformsViewModel.bottomTabsItem) {
+                BottomTabsItems.BottomBarSmsMmsTab -> null
+                else -> {
+                    {
+                        GetTabViews(
+                            platformsViewModel.bottomTabsItem,
+                            navController = navController,
+                            messagesViewModel = messagesViewModel,
+                            platformsViewModel = platformsViewModel,
+                            gatewayClientViewModel = gatewayClientViewModel,
+                            isLoggedIn = isLoggedIn
+                        )
+                    }
+                }
+            }
+        }
+
         NavHostControllerInstance(
             newLayoutInfo,
             navController,
@@ -254,20 +273,12 @@ class MainActivity : ComponentActivity() {
                 BottomNavBar(
                     selectedTab = platformsViewModel.bottomTabsItem,
                     isLoggedIn = isLoggedIn,
+                    isDefaultSmsApp = defaultSmsApp
                 ) { selectedTab ->
                     platformsViewModel.bottomTabsItem = selectedTab
                 }
             },
-            customThreadsView = if(defaultSmsApp) {{
-                GetTabViews(
-                    platformsViewModel.bottomTabsItem,
-                    navController = navController,
-                    messagesViewModel = messagesViewModel,
-                    platformsViewModel = platformsViewModel,
-                    gatewayClientViewModel = gatewayClientViewModel,
-                    isLoggedIn = isLoggedIn
-                )
-            }} else null
+            customThreadsView = customThreadView
         ) {
             composable<OnboardingScreen> {
                 MainOnboarding(navController)

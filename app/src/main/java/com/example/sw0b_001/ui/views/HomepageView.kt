@@ -63,6 +63,8 @@ import kotlinx.coroutines.runBlocking
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.setValue
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
+import com.afkanerd.smswithoutborders_libsmsmms.ui.ThreadConversationLayout
+import com.afkanerd.smswithoutborders_libsmsmms.ui.screens.HomeScreenNav
 import com.example.sw0b_001.ui.features.AppFeatures
 import com.example.sw0b_001.ui.features.FeatureInfo
 import com.example.sw0b_001.ui.features.FeatureManager
@@ -72,6 +74,7 @@ import com.example.sw0b_001.ui.navigation.MessageViewScreen
 
 
 enum class BottomTabsItems {
+    BottomBarSmsMmsTab,
     BottomBarRecentTab,
     BottomBarPlatformsTab,
     BottomBarInboxTab,
@@ -156,7 +159,6 @@ fun HomepageView(
                         )
                     }
                 }
-                BottomTabsItems.BottomBarPlatformsTab -> {}
                 BottomTabsItems.BottomBarCountriesTab -> {
                     GatewayClientsAppBar(
                         navController = navController,
@@ -165,7 +167,6 @@ fun HomepageView(
                         }
                     )
                 }
-
                 BottomTabsItems.BottomBarInboxTab -> {
                     TopAppBar(
                         title = {
@@ -178,6 +179,7 @@ fun HomepageView(
                         colors = TopAppBarDefaults.topAppBarColors()
                     )
                 }
+                else -> {}
             }
         },
         bottomBar = {
@@ -233,7 +235,6 @@ fun HomepageView(
                         )
                     }
                 }
-                BottomTabsItems.BottomBarPlatformsTab -> {}
                 BottomTabsItems.BottomBarCountriesTab -> {
                     ExtendedFloatingActionButton(
                         onClick = {
@@ -255,7 +256,6 @@ fun HomepageView(
                         }
                     )
                 }
-
                 BottomTabsItems.BottomBarInboxTab -> {
                     if (inboxMessages.isNotEmpty()) {
                         ExtendedFloatingActionButton(
@@ -279,6 +279,7 @@ fun HomepageView(
                         )
                     }
                 }
+                else -> {}
             }
         }
     ) { innerPadding ->
@@ -377,6 +378,7 @@ fun GetTabViews(
                 navController = navController
             )
         }
+        BottomTabsItems.BottomBarSmsMmsTab -> null
     }
 
 }
