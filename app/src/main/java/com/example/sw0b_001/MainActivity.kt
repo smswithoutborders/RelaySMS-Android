@@ -246,7 +246,7 @@ class MainActivity : ComponentActivity() {
         var showThreadsTopBar by remember { mutableStateOf(true) }
 
         var customThreadView: (@Composable () -> Unit)? by remember { mutableStateOf(null)}
-        LaunchedEffect(platformsViewModel.bottomTabsItem) {
+        LaunchedEffect(platformsViewModel.bottomTabsItem, defaultSmsApp) {
             customThreadView = when(platformsViewModel.bottomTabsItem) {
                 BottomTabsItems.BottomBarSmsMmsTab -> {
                     showThreadsTopBar = true
@@ -254,13 +254,13 @@ class MainActivity : ComponentActivity() {
                 }
                 else -> {
                     {
-                        showThreadsTopBar = false
+                        showThreadsTopBar = !defaultSmsApp
                         HomepageView(
                             navController = navController,
                             platformsViewModel = platformsViewModel,
                             messagesViewModel = messagesViewModel,
                             gatewayClientViewModel = gatewayClientViewModel,
-                            showBottomBar = false,
+                            showBottomBar = !defaultSmsApp,
                         )
                     }
                 }

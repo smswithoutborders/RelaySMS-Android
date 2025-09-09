@@ -221,7 +221,8 @@ fun HomepageView(
                                 )
                             }
                         )
-                    } else if ((LocalInspectionMode.current || messages.loadState.isIdle) &&
+                    }
+                    else if ((LocalInspectionMode.current || messages.loadState.isIdle) &&
                         messages.itemCount > 0
                     ) {
                         ExtendedFloatingActionButton(
