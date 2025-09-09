@@ -62,6 +62,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.setValue
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.ThreadConversationLayout
 import com.afkanerd.smswithoutborders_libsmsmms.ui.screens.HomeScreenNav
@@ -104,6 +105,9 @@ fun HomepageView(
     val inboxMessages: List<EncryptedContent> = if(LocalInspectionMode.current) _messages
     else messagesViewModel.getInboxMessages(context).observeAsState(emptyList()).value
 
+    val messagesPagingSource = messagesViewModel.getMessages(context = context)
+    val messages = messagesPagingSource.collectAsLazyPagingItems()
+
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     var showAddGatewayClientsModal by remember { mutableStateOf(false) }
@@ -135,29 +139,27 @@ fun HomepageView(
         topBar = {
             when (platformsViewModel.bottomTabsItem) {
                 BottomTabsItems.BottomBarRecentTab -> {
-                    if (isLoggedIn) {
-                        RecentAppBar(
-                            navController = navController,
-                            onSearchQueryChanged = { searchQuery = it },
-                            searchQuery = searchQuery,
-                            isSearchActive = isSearchActive,
-                            onToggleSearch = {
-                                isSearchActive = !isSearchActive
-                                if (!isSearchActive) {
-                                    searchQuery = ""
-                                    isSearchDone = false
-                                }
-                            },
-                            onSearchDone = {
-                                isSearchDone = true
-                            },
-                            isSelectionMode = platformsViewModel.isSelectionMode,
-                            selectedCount = platformsViewModel.selectedMessagesCount,
-                            onSelectAll = platformsViewModel.onSelectAll,
-                            onDeleteSelected = platformsViewModel.onDeleteSelected,
-                            onCancelSelection = platformsViewModel.onCancelSelection
-                        )
-                    }
+                    RecentAppBar(
+                        navController = navController,
+                        onSearchQueryChanged = { searchQuery = it },
+                        searchQuery = searchQuery,
+                        isSearchActive = isSearchActive,
+                        onToggleSearch = {
+                            isSearchActive = !isSearchActive
+                            if (!isSearchActive) {
+                                searchQuery = ""
+                                isSearchDone = false
+                            }
+                        },
+                        onSearchDone = {
+                            isSearchDone = true
+                        },
+                        isSelectionMode = platformsViewModel.isSelectionMode,
+                        selectedCount = platformsViewModel.selectedMessagesCount,
+                        onSelectAll = platformsViewModel.onSelectAll,
+                        onDeleteSelected = platformsViewModel.onDeleteSelected,
+                        onCancelSelection = platformsViewModel.onCancelSelection
+                    )
                 }
                 BottomTabsItems.BottomBarCountriesTab -> {
                     GatewayClientsAppBar(
@@ -213,7 +215,9 @@ fun HomepageView(
                                 )
                             }
                         )
-                    } else {
+                    } else if ((LocalInspectionMode.current || messages.loadState.isIdle) &&
+                        messages.itemCount > 0
+                    ) {
                         ExtendedFloatingActionButton(
                             onClick = {
                                 sendNewMessageRequested = true
@@ -348,18 +352,14 @@ fun GetTabViews(
 ) {
     when(bottomTabsItems) {
         BottomTabsItems.BottomBarRecentTab -> {
-            if(isLoggedIn) {
-                RecentView(
-                    navController = navController,
-                    messagesViewModel = messagesViewModel,
-                    platformsViewModel = platformsViewModel,
-                ) {
-                    platformsViewModel.bottomTabsItem =
-                        BottomTabsItems.BottomBarPlatformsTab
-                }
-
-            } else {
-                GetStartedView(navController = navController)
+            RecentView(
+                navController = navController,
+                messagesViewModel = messagesViewModel,
+                platformsViewModel = platformsViewModel,
+                isLoggedIn = isLoggedIn
+            ) {
+                platformsViewModel.bottomTabsItem =
+                    BottomTabsItems.BottomBarPlatformsTab
             }
         }
         BottomTabsItems.BottomBarPlatformsTab -> {
@@ -430,7 +430,7 @@ fun HomepageViewLoggedInMessages_Preview() {
             _messages = listOf(encryptedContent),
             isLoggedIn = true,
             navController = rememberNavController(),
-            platformsViewModel = PlatformsViewModel(),
+            platformsViewModel = remember { PlatformsViewModel() } ,
             messagesViewModel = MessagesViewModel(),
             gatewayClientViewModel = GatewayClientViewModel(),
         )

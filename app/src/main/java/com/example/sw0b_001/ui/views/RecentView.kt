@@ -173,6 +173,7 @@ fun RecentView(
     navController: NavController,
     messagesViewModel: MessagesViewModel,
     platformsViewModel: PlatformsViewModel,
+    isLoggedIn: Boolean = false,
     tabRequestedCallback: () -> Unit
 ) {
     val context = LocalContext.current
@@ -192,7 +193,7 @@ fun RecentView(
         .padding(8.dp)
         .fillMaxSize()
     ) {
-        if (messages.loadState.isIdle && messages.itemCount > 0) {
+        if ((LocalInspectionMode.current || messages.loadState.isIdle) && messages.itemCount > 0) {
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -262,11 +263,13 @@ fun RecentView(
                 }
             }
         }
-        else {
+        else if(((LocalInspectionMode.current || messages.loadState.isIdle) && isLoggedIn)) {
             RecentViewNoMessages(
                 saveNewPlatformCallback = { tabRequestedCallback() },
                 sendNewMessageCallback = { sendNewMessageRequested = true }
             )
+        } else if(messages.loadState.isIdle || LocalInspectionMode.current) {
+            GetStartedView(navController = navController)
         }
 
         if (sendNewMessageRequested) {
@@ -390,10 +393,14 @@ fun RecentMessageCard(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .combinedClickable(
-                    onClick = { onClickCallback(message) },
-                    onLongClick = { onLongClickCallback(message) }
-                ),
+                .apply {
+                    if(!LocalInspectionMode.current) {
+                        this.combinedClickable(
+                            onClick = { onClickCallback(message) },
+                            onLongClick = { onLongClickCallback(message) }
+                        )
+                    }
+                },
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
                 containerColor = if (isSelected) 
@@ -481,8 +488,9 @@ fun RecentScreenPreview() {
         encryptedContent.encryptedContent = "This is an encrypted content"
         RecentView(
             navController = rememberNavController(),
-            messagesViewModel = MessagesViewModel(),
-            platformsViewModel = PlatformsViewModel(),
+            messagesViewModel = remember { MessagesViewModel() },
+            platformsViewModel = remember { PlatformsViewModel() },
+            isLoggedIn = true
         ) {}
     }
 }
