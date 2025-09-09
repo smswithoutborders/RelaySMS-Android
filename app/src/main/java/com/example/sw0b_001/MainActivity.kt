@@ -48,6 +48,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationDrawerItem
@@ -242,19 +243,24 @@ class MainActivity : ComponentActivity() {
             )
         }
 
+        var showThreadsTopBar by remember { mutableStateOf(true) }
+
         var customThreadView: (@Composable () -> Unit)? by remember { mutableStateOf(null)}
         LaunchedEffect(platformsViewModel.bottomTabsItem) {
             customThreadView = when(platformsViewModel.bottomTabsItem) {
-                BottomTabsItems.BottomBarSmsMmsTab -> null
+                BottomTabsItems.BottomBarSmsMmsTab -> {
+                    showThreadsTopBar = true
+                    null
+                }
                 else -> {
                     {
-                        GetTabViews(
-                            platformsViewModel.bottomTabsItem,
+                        showThreadsTopBar = false
+                        HomepageView(
                             navController = navController,
-                            messagesViewModel = messagesViewModel,
                             platformsViewModel = platformsViewModel,
+                            messagesViewModel = messagesViewModel,
                             gatewayClientViewModel = gatewayClientViewModel,
-                            isLoggedIn = isLoggedIn
+                            showBottomBar = false,
                         )
                     }
                 }
@@ -266,6 +272,8 @@ class MainActivity : ComponentActivity() {
             navController,
             threadsViewModel,
             searchViewModel,
+            appName = stringResource(R.string.app_name),
+            showThreadsTopBar = showThreadsTopBar,
             startDestination = if(hasSeenOnboarding) {
                 if(defaultSmsApp) HomeScreenNav() else HomepageScreen
             } else OnboardingScreen,
@@ -278,7 +286,7 @@ class MainActivity : ComponentActivity() {
                     platformsViewModel.bottomTabsItem = selectedTab
                 }
             },
-            customThreadsView = customThreadView
+            customThreadsView = customThreadView,
         ) {
             composable<OnboardingScreen> {
                 MainOnboarding(navController)

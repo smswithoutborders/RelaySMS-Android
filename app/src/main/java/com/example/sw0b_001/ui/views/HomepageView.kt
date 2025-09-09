@@ -91,6 +91,8 @@ fun HomepageView(
     messagesViewModel: MessagesViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
     isLoggedIn: Boolean = false,
+    showBottomBar: Boolean = true,
+    showTopBar: Boolean = true,
 ) {
     val context = LocalContext.current
     val inspectionMode = LocalInspectionMode.current
@@ -137,59 +139,63 @@ fun HomepageView(
     Scaffold (
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            when (platformsViewModel.bottomTabsItem) {
-                BottomTabsItems.BottomBarRecentTab -> {
-                    RecentAppBar(
-                        navController = navController,
-                        onSearchQueryChanged = { searchQuery = it },
-                        searchQuery = searchQuery,
-                        isSearchActive = isSearchActive,
-                        onToggleSearch = {
-                            isSearchActive = !isSearchActive
-                            if (!isSearchActive) {
-                                searchQuery = ""
-                                isSearchDone = false
+            if(showTopBar) {
+                when (platformsViewModel.bottomTabsItem) {
+                    BottomTabsItems.BottomBarRecentTab -> {
+                        RecentAppBar(
+                            navController = navController,
+                            onSearchQueryChanged = { searchQuery = it },
+                            searchQuery = searchQuery,
+                            isSearchActive = isSearchActive,
+                            onToggleSearch = {
+                                isSearchActive = !isSearchActive
+                                if (!isSearchActive) {
+                                    searchQuery = ""
+                                    isSearchDone = false
+                                }
+                            },
+                            onSearchDone = {
+                                isSearchDone = true
+                            },
+                            isSelectionMode = platformsViewModel.isSelectionMode,
+                            selectedCount = platformsViewModel.selectedMessagesCount,
+                            onSelectAll = platformsViewModel.onSelectAll,
+                            onDeleteSelected = platformsViewModel.onDeleteSelected,
+                            onCancelSelection = platformsViewModel.onCancelSelection
+                        )
+                    }
+                    BottomTabsItems.BottomBarCountriesTab -> {
+                        GatewayClientsAppBar(
+                            navController = navController,
+                            onRefreshClicked = {
+                                gatewayClientViewModel.get(context, refreshSuccess)
                             }
-                        },
-                        onSearchDone = {
-                            isSearchDone = true
-                        },
-                        isSelectionMode = platformsViewModel.isSelectionMode,
-                        selectedCount = platformsViewModel.selectedMessagesCount,
-                        onSelectAll = platformsViewModel.onSelectAll,
-                        onDeleteSelected = platformsViewModel.onDeleteSelected,
-                        onCancelSelection = platformsViewModel.onCancelSelection
-                    )
+                        )
+                    }
+                    BottomTabsItems.BottomBarInboxTab -> {
+                        TopAppBar(
+                            title = {
+                                Text(
+                                    text = stringResource(R.string.inbox),
+                                    style = MaterialTheme.typography.headlineLarge,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            },
+                            colors = TopAppBarDefaults.topAppBarColors()
+                        )
+                    }
+                    else -> {}
                 }
-                BottomTabsItems.BottomBarCountriesTab -> {
-                    GatewayClientsAppBar(
-                        navController = navController,
-                        onRefreshClicked = {
-                            gatewayClientViewModel.get(context, refreshSuccess)
-                        }
-                    )
-                }
-                BottomTabsItems.BottomBarInboxTab -> {
-                    TopAppBar(
-                        title = {
-                            Text(
-                                text = stringResource(R.string.inbox),
-                                style = MaterialTheme.typography.headlineLarge,
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
-                        colors = TopAppBarDefaults.topAppBarColors()
-                    )
-                }
-                else -> {}
             }
         },
         bottomBar = {
-            BottomNavBar(
-                selectedTab = platformsViewModel.bottomTabsItem,
-                isLoggedIn = isLoggedIn,
-            ) { selectedTab ->
-                platformsViewModel.bottomTabsItem = selectedTab
+            if(showBottomBar) {
+                BottomNavBar(
+                    selectedTab = platformsViewModel.bottomTabsItem,
+                    isLoggedIn = isLoggedIn,
+                ) { selectedTab ->
+                    platformsViewModel.bottomTabsItem = selectedTab
+                }
             }
         },
         floatingActionButton = {
