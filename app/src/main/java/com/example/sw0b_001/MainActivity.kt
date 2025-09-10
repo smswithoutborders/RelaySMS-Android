@@ -220,7 +220,8 @@ class MainActivity : ComponentActivity() {
                             platformsViewModel = platformsViewModel,
                             messagesViewModel = messagesViewModel,
                             gatewayClientViewModel = gatewayClientViewModel,
-                            showBottomBar = !defaultSmsApp,
+//                            showBottomBar = !defaultSmsApp,
+                            showBottomBar = true,
                         )
                     }
                 }

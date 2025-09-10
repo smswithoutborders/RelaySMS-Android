@@ -235,9 +235,7 @@ fun TextComposeView(
                                 onSuccess = {
                                     loading = false
                                     CoroutineScope(Dispatchers.Main).launch {
-                                        navController.navigate(HomepageScreen) {
-                                            popUpTo(HomepageScreen) { inclusive = true }
-                                        }
+                                        navController.popBackStack()
                                     }
                                 },
                                 subscriptionId = platformsViewModel.subscriptionId

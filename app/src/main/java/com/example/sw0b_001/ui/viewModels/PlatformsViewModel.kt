@@ -49,7 +49,7 @@ class PlatformsViewModel : ViewModel() {
     var loginSignupPhoneNumber by mutableStateOf("")
     var loginSignupPassword by mutableStateOf("")
     var countryCode by mutableStateOf("")
-    var subscriptionId by mutableLongStateOf(-1L)
+    var subscriptionId by mutableLongStateOf(-1L) // This forces to phone to prompt the user
     var otpRequestType = OTPCodeVerificationType.AUTHENTICATE
     var nextAttemptTimestamp: Int? = null
 

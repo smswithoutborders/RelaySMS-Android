@@ -239,9 +239,7 @@ fun MessageComposeView(
                             },
                         ) {
                             CoroutineScope(Dispatchers.Main).launch {
-                                navController.navigate(HomepageScreen) {
-                                    popUpTo(HomepageScreen) { inclusive = true }
-                                }
+                                navController.popBackStack()
                             }
                         }
                     }, enabled = isSendEnabled) {

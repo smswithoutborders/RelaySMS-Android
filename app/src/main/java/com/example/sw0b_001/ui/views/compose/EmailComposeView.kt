@@ -379,9 +379,7 @@ fun EmailComposeView(
                                 },
                                 onCompleteCallback = {
                                     CoroutineScope(Dispatchers.Main).launch {
-                                        navController.navigate(HomepageScreen) {
-                                            popUpTo(HomepageScreen) { inclusive = true }
-                                        }
+                                        navController.popBackStack()
                                     }
                                 },
                                 subscriptionId = platformsViewModel.subscriptionId,

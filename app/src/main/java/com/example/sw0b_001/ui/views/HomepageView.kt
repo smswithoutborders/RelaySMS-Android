@@ -204,8 +204,8 @@ fun HomepageView(
                             }
                         )
                     }
-                    else if ((LocalInspectionMode.current || messages.loadState.isIdle) &&
-                        messages.itemCount > 0
+                    else if (LocalInspectionMode.current ||
+                        (messages.loadState.isIdle && messages.itemCount > 0)
                     ) {
                         ExtendedFloatingActionButton(
                             onClick = {
