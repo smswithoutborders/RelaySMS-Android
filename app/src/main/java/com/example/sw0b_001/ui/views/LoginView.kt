@@ -1,7 +1,6 @@
 package com.example.sw0b_001.ui.views
 
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -60,14 +59,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.example.sw0b_001.BuildConfig
-import com.example.sw0b_001.Models.Messages.EncryptedContent
-import com.example.sw0b_001.Models.Messages.MessagesViewModel
-import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
-import com.example.sw0b_001.Models.Vaults
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
+import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.ForgotPasswordScreen
-import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import io.grpc.StatusRuntimeException

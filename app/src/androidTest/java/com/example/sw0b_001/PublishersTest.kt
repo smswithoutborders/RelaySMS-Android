@@ -1,7 +1,7 @@
 package com.example.sw0b_001
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.sw0b_001.Models.Publishers
+import com.example.sw0b_001.data.Publishers
 import io.grpc.testing.GrpcCleanupRule
 import org.junit.After
 import org.junit.Assert
@@ -12,15 +12,12 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import android.util.Base64
 import android.util.Log
-import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.States
 import com.example.sw0b_001.Database.Datastore
-import com.example.sw0b_001.Models.ComposeHandlers
-import com.example.sw0b_001.Models.MessageComposer
-import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
-import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
-import com.example.sw0b_001.Models.Platforms.StoredPlatformsDao
-import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
-import com.example.sw0b_001.Models.Vaults
+import com.example.sw0b_001.data.ComposeHandlers
+import com.example.sw0b_001.data.Platforms.AvailablePlatforms
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
+import com.example.sw0b_001.data.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.data.Vaults
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -30,8 +27,6 @@ import okhttp3.Response
 import org.json.JSONObject
 import org.junit.Assert.assertTrue
 import java.nio.charset.StandardCharsets
-import java.security.DigestException
-import java.security.MessageDigest
 import java.util.concurrent.TimeUnit
 
 

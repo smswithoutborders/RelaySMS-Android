@@ -1,0 +1,108 @@
+package com.example.sw0b_001.ui.viewModels
+
+import android.content.Context
+import android.util.Base64
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import com.afkanerd.smswithoutborders_libsmsmms.data.data.models.SmsManager
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getThreadId
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
+import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewModel
+import com.example.sw0b_001.Database.Datastore
+import com.example.sw0b_001.R
+import com.example.sw0b_001.data.ComposeHandlers
+import com.example.sw0b_001.data.GatewayClients.GatewayClientsCommunications
+import com.example.sw0b_001.data.Messages.EncryptedContent
+import com.example.sw0b_001.data.Platforms.Platforms
+import com.example.sw0b_001.data.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.data.Publishers
+import com.example.sw0b_001.data.SMSHandler
+import com.example.sw0b_001.ui.views.compose.MessageContent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.charset.StandardCharsets
+import java.util.Locale
+
+class MessagesViewModel : ViewModel() {
+
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading
+
+    private lateinit var messagesList: LiveData<MutableList<EncryptedContent>>
+    private lateinit var inboxMessageList: LiveData<MutableList<EncryptedContent>>
+
+    private lateinit var datastore: Datastore
+
+    var pageSize: Int = 50
+    var prefetchDistance: Int = 3 * pageSize
+    var enablePlaceholder: Boolean = true
+    var initialLoadSize: Int = 2 * pageSize
+    var maxSize: Int = PagingConfig.Companion.MAX_SIZE_UNBOUNDED
+
+
+    private var conversationsPager: Flow<PagingData<EncryptedContent>>? = null
+
+    fun getMessages(context: Context): Flow<PagingData<EncryptedContent>> {
+        if(conversationsPager == null) {
+            conversationsPager = Pager(
+                config = PagingConfig(
+                    pageSize,
+                    prefetchDistance,
+                    enablePlaceholder,
+                    initialLoadSize,
+                    maxSize
+                ),
+                pagingSourceFactory = {
+                    Datastore.getDatastore(context).encryptedContentDAO().all()
+                }
+            ).flow.cachedIn(viewModelScope)
+        }
+        return conversationsPager!!
+    }
+
+    fun getInboxMessages(context: Context): LiveData<MutableList<EncryptedContent>> {
+        viewModelScope.launch {
+            if (!::inboxMessageList.isInitialized) {
+                _isLoading.value = true
+
+                datastore = Datastore.getDatastore(context)
+                inboxMessageList = datastore.encryptedContentDAO()
+                    .inbox(Platforms.ServiceTypes.BRIDGE_INCOMING.type)
+                delay(50)
+                _isLoading.value = false
+            }
+        }
+        return inboxMessageList
+    }
+
+    private fun loadEncryptedContents() : LiveData<MutableList<EncryptedContent>> {
+        return datastore.encryptedContentDAO().all(Platforms.ServiceTypes.BRIDGE_INCOMING.type)
+    }
+
+    fun insert(encryptedContent: EncryptedContent) : Long {
+        return datastore.encryptedContentDAO().insert(encryptedContent)
+    }
+
+    fun delete(context: Context, message: EncryptedContent, onCompleteCallback: () -> Unit) {
+        viewModelScope.launch(Dispatchers.Default) {
+            Datastore.getDatastore(context).encryptedContentDAO().delete(message)
+            launch(Dispatchers.Main) {
+                onCompleteCallback()
+            }
+        }
+    }
+
+}

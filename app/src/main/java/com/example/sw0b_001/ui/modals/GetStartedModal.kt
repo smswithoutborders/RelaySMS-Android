@@ -8,13 +8,10 @@ import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.views.AvailablePlatformsView
 import com.example.sw0b_001.ui.views.GetStartedView
 import kotlinx.coroutines.launch
 

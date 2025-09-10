@@ -7,8 +7,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,7 +21,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -31,24 +28,19 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
@@ -61,16 +53,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LiveData
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
-import androidx.room.util.TableInfo
-import com.example.sw0b_001.Bridges.Bridges
-import com.example.sw0b_001.Models.Messages.EncryptedContent
-import com.example.sw0b_001.Models.Messages.MessagesViewModel
-import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
-import com.example.sw0b_001.Models.Platforms.Platforms
-import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
+import com.example.sw0b_001.data.models.Bridges
+import com.example.sw0b_001.data.Messages.EncryptedContent
+import com.example.sw0b_001.ui.viewModels.MessagesViewModel
+import com.example.sw0b_001.data.Platforms.AvailablePlatforms
+import com.example.sw0b_001.data.Platforms.Platforms
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.Modules.Helpers
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
@@ -82,12 +72,6 @@ import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.views.compose.EmailComposeHandler
 import com.example.sw0b_001.ui.views.compose.MessageComposeHandler
 import com.example.sw0b_001.ui.views.compose.TextComposeHandler
-import com.example.sw0b_001.ui.views.details.EmailDetailsView
-import kotlinx.serialization.json.internal.encodeByWriter
-import kotlin.text.contains
-import kotlin.text.filter
-import kotlin.text.isBlank
-import kotlin.text.isNotBlank
 
 @Composable
 fun RecentViewNoMessages(

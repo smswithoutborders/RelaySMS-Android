@@ -23,15 +23,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
-import com.example.sw0b_001.Models.GatewayClients.GatewayClientViewModel
-import com.example.sw0b_001.Models.Messages.EncryptedContent
-import com.example.sw0b_001.Models.Messages.MessagesViewModel
-import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
-import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.views.HomepageView
 import kotlinx.serialization.Serializable
 import java.util.Locale
 

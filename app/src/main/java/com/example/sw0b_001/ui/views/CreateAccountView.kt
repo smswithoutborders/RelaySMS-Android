@@ -2,7 +2,6 @@ package com.example.sw0b_001.ui.views
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -63,11 +62,8 @@ import androidx.navigation.compose.rememberNavController
 import com.arpitkatiyarprojects.countrypicker.CountryPickerOutlinedTextField
 import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
-import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
-import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
-import com.example.sw0b_001.Models.Vaults
+import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
@@ -75,10 +71,9 @@ import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlin.contracts.contract
 import androidx.core.net.toUri
 import com.example.sw0b_001.BuildConfig
-import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)

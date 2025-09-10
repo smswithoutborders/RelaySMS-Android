@@ -1,7 +1,6 @@
 package com.example.sw0b_001.ui.views.compose
 
 import android.content.Context
-import android.content.Intent
 import android.util.Base64
 import android.util.Log
 import android.widget.Toast
@@ -15,7 +14,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,11 +22,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,52 +32,35 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.preference.PreferenceManager
 import com.example.sw0b_001.Database.Datastore
-import com.example.sw0b_001.Models.ComposeHandlers
-import com.example.sw0b_001.Models.GatewayClients.GatewayClientsCommunications
-import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
-import com.example.sw0b_001.Models.Platforms.AvailablePlatformsDao
-import com.example.sw0b_001.Models.Platforms.Platforms
-import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
-import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
-import com.example.sw0b_001.Models.Publishers
-import com.example.sw0b_001.Models.SMSHandler
-import com.example.sw0b_001.Models.Vaults
+import com.example.sw0b_001.data.ComposeHandlers
+import com.example.sw0b_001.data.GatewayClients.GatewayClientsCommunications
+import com.example.sw0b_001.data.Platforms.AvailablePlatforms
+import com.example.sw0b_001.data.Platforms.Platforms
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
+import com.example.sw0b_001.data.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.data.Publishers
+import com.example.sw0b_001.data.SMSHandler
 import com.example.sw0b_001.Modules.Network
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.components.MissingTokenAccountInfo
-import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationException
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.StandardCharsets
 import java.text.SimpleDateFormat
-import java.time.Instant
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
-import kotlin.text.append
 
 data class TextContent(val from: String, val text: String)
 
@@ -216,26 +194,35 @@ fun TextComposeView(
                         loading = true
                         if (platformsViewModel.platform?.service_type == Platforms.ServiceTypes.TEST.type) {
                             val testStartTime = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).format(Date(System.currentTimeMillis()))
-                            processTest(
+                            platformsViewModel.sendPublishingForTest(
                                 context = context,
                                 startTime = testStartTime,
                                 platform = platformsViewModel.platform!!,
                                 onFailure = { errorMsg ->
                                     loading = false
                                     CoroutineScope(Dispatchers.Main).launch {
-                                        Toast.makeText(context, errorMsg ?: "Test failed", Toast.LENGTH_LONG).show()
+                                        Toast.makeText(
+                                            context,
+                                            errorMsg ?: "Test failed",
+                                            Toast.LENGTH_LONG
+                                        ).show()
                                     }
                                 },
                                 onSuccess = {
                                     loading = false
                                     CoroutineScope(Dispatchers.Main).launch {
-                                        navController.navigate(HomepageScreen) { popUpTo(HomepageScreen) { inclusive = true } }
+                                        navController.navigate(HomepageScreen) {
+                                            popUpTo(
+                                                HomepageScreen
+                                            ) { inclusive = true }
+                                        }
                                     }
-                                }
+                                },
+                                subscriptionId = platformsViewModel.subscriptionId,
                             )
                         }
                         else {
-                            processPost(
+                            platformsViewModel.sendPublishingForPost(
                                 context = context,
                                 text = message,
                                 account = selectedAccount!!,
@@ -252,7 +239,8 @@ fun TextComposeView(
                                             popUpTo(HomepageScreen) { inclusive = true }
                                         }
                                     }
-                                }
+                                },
+                                subscriptionId = platformsViewModel.subscriptionId
                             )
                         }
                     }, enabled = !loading) {
@@ -305,189 +293,13 @@ data class ReliabilityTestResponsePayload(
     val test_start_time: Int,
 )
 
-private fun createTestByteBuffer(testId: String): ByteBuffer {
-    val BYTE_SIZE_LIMIT = 255
-    val testIdBytes = testId.toByteArray(StandardCharsets.UTF_8)
-    val testIdSize = testIdBytes.size
-
-    if (testIdSize > BYTE_SIZE_LIMIT) throw IllegalArgumentException("Test ID exceeds maximum size of $BYTE_SIZE_LIMIT bytes")
-
-    val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 2 + 2 + testIdSize
-    val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
-
-    buffer.put(testIdSize.toByte()) // 1 byte for from field length (test ID)
-    buffer.putShort(0)              // 2 bytes for to length
-    buffer.putShort(0)              // 2 bytes for cc length
-    buffer.putShort(0)              // 2 bytes for bcc length
-    buffer.put(0.toByte())          // 1 byte for subject length
-    buffer.putShort(0)              // 2 bytes for body length
-    buffer.putShort(0)              // 2 bytes for access token length
-    buffer.putShort(0)              // 2 bytes for refresh token length
-
-    buffer.put(testIdBytes)
-    buffer.flip()
-    return buffer
-}
-
-private fun processTest(
-    context: Context,
-    startTime: String,
-    platform: AvailablePlatforms,
-    onFailure: (String?) -> Unit,
-    onSuccess: () -> Unit,
-    smsTransmission: Boolean = true
-) {
-    CoroutineScope(Dispatchers.Default).launch {
-        try {
-            val gatewayClientMSISDN = GatewayClientsCommunications(context).getDefaultGatewayClient()
-                ?: return@launch onFailure("No Gateway Client set for testing.")
-            val url = context.getString(R.string.test_url, gatewayClientMSISDN)
-            val requestPayload = Json.encodeToString(ReliabilityTestRequestPayload(startTime))
-            val response = Network.jsonRequestPost(url, requestPayload)
-            val responsePayload = Json.decodeFromString<ReliabilityTestResponsePayload>(response.result.get())
-            val testId = responsePayload.test_id.toString()
-            val AD = Publishers.fetchPublisherPublicKey(context)
-                ?: return@launch onFailure("Could not fetch publisher key.")
-
-            val contentFormatV2Bytes = createTestByteBuffer(testId).array()
-
-            val languageCode = Locale.getDefault().language.take(2).lowercase()
-            val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
-
-            val v2PayloadBytes = ComposeHandlers.composeV2(
-                context = context,
-                contentFormatV2Bytes = contentFormatV2Bytes,
-                AD = AD,
-                platform = platform,
-                account = null,
-                languageCode = validLanguageCode,
-                smsTransmission = true,
-                isTesting = true
-            )
-
-            if (smsTransmission) {
-                val base64Payload = Base64.encodeToString(v2PayloadBytes, Base64.NO_WRAP)
-                SMSHandler.transferToDefaultSMSApp(context, gatewayClientMSISDN, base64Payload)
-            }
-            onSuccess()
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-            onFailure(e.message)
-        }
-    }
-}
-
-private fun createTextByteBuffer(
-    from: String, body: String,
-    accessToken: String? = null, refreshToken: String? = null
-): ByteBuffer {
-    // Define size constants
-    val BYTE_SIZE_LIMIT = 255
-    val SHORT_SIZE_LIMIT = 65535
-
-    // Convert strings to byte arrays
-    val fromBytes = from.toByteArray(StandardCharsets.UTF_8)
-    val bodyBytes = body.toByteArray(StandardCharsets.UTF_8)
-    val accessTokenBytes = accessToken?.toByteArray(StandardCharsets.UTF_8)
-    val refreshTokenBytes = refreshToken?.toByteArray(StandardCharsets.UTF_8)
-
-    // Get sizes for validation and buffer allocation
-    val fromSize = fromBytes.size
-    val bodySize = bodyBytes.size
-    val accessTokenSize = accessTokenBytes?.size ?: 0
-    val refreshTokenSize = refreshTokenBytes?.size ?: 0
-
-    // Validate field sizes
-    if (fromSize > BYTE_SIZE_LIMIT) throw IllegalArgumentException("From field exceeds maximum size of $BYTE_SIZE_LIMIT bytes")
-    if (bodySize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("Body field exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
-    if (accessTokenSize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("Access token exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
-    if (refreshTokenSize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("Refresh token exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
-
-    val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 2 + 2 +
-            fromSize + bodySize + accessTokenSize + refreshTokenSize
-
-    val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
-
-    // Write field lengths
-    buffer.put(fromSize.toByte())
-    buffer.putShort(0)
-    buffer.putShort(0)
-    buffer.putShort(0)
-    buffer.put(0.toByte())
-    buffer.putShort(bodySize.toShort())
-    buffer.putShort(accessTokenSize.toShort())
-    buffer.putShort(refreshTokenSize.toShort())
-
-    // Write field values
-    buffer.put(fromBytes)
-    buffer.put(bodyBytes)
-    accessTokenBytes?.let { buffer.put(it) }
-    refreshTokenBytes?.let { buffer.put(it) }
-
-    buffer.flip()
-    return buffer
-}
-
-
-private fun processPost(
-    context: Context,
-    text: String,
-    account: StoredPlatformsEntity,
-    onFailure: (String?) -> Unit,
-    onSuccess: () -> Unit,
-    smsTransmission: Boolean = true
-) {
-    CoroutineScope(Dispatchers.Default).launch {
-        try {
-            val AD = Publishers.fetchPublisherPublicKey(context)
-                ?: return@launch onFailure("Could not fetch publisher key.")
-
-            val contentFormatV2Bytes = createTextByteBuffer(
-                from = account.account!!,
-                body = text,
-                accessToken = account.accessToken,
-                refreshToken = account.refreshToken
-            ).array()
-
-            val platform = Datastore.getDatastore(context).availablePlatformsDao().fetch(account.name!!)
-                ?: return@launch onFailure("Could not find platform details for '${account.name}'.")
-
-            val languageCode = Locale.getDefault().language.take(2).lowercase()
-            val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
-
-            val v2PayloadBytes = ComposeHandlers.composeV2(
-                context = context,
-                contentFormatV2Bytes = contentFormatV2Bytes,
-                AD = AD,
-                platform = platform,
-                account = account,
-                languageCode = validLanguageCode,
-                smsTransmission = smsTransmission
-            )
-
-            if (smsTransmission) {
-                val gatewayClientMSISDN = GatewayClientsCommunications(context).getDefaultGatewayClient()
-                    ?: return@launch onFailure("No default gateway client configured.")
-                val base64Payload = Base64.encodeToString(v2PayloadBytes, Base64.NO_WRAP)
-                SMSHandler.transferToDefaultSMSApp(context, gatewayClientMSISDN, base64Payload)
-            }
-            onSuccess()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            onFailure(e.message)
-        }
-    }
-}
-
-
 @Preview(showBackground = true)
 @Composable
 fun TextComposePreview() {
     AppTheme(darkTheme = false) {
         TextComposeView(
             navController = NavController(LocalContext.current),
-            platformsViewModel = PlatformsViewModel()
+            platformsViewModel = remember{ PlatformsViewModel() }
         )
     }
 }

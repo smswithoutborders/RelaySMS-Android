@@ -2,8 +2,6 @@ package com.example.sw0b_001.ui.modals
 
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.result.launch
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,7 +16,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,9 +30,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.sw0b_001.Models.GatewayClients.GatewayClient
-import com.example.sw0b_001.Models.GatewayClients.GatewayClientViewModel
-import com.example.sw0b_001.Models.GatewayClients.GatewayClientsCommunications
+import com.example.sw0b_001.data.GatewayClients.GatewayClient
+import com.example.sw0b_001.data.GatewayClients.GatewayClientViewModel
+import com.example.sw0b_001.data.GatewayClients.GatewayClientsCommunications
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.coroutines.launch

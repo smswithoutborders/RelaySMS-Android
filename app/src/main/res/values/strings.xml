@@ -383,5 +383,12 @@
     <string name="set_as_default_sms_app">Set as default SMS app</string>
     <string name="log_in_or_sign_up_to_save_your_online_accounts">Log in or sign up to save your online accounts.</string>
     <string name="sms_mms">SMS/MMS</string>
+    <string name="could_not_fetch_publisher_key">Could not fetch publisher key.</string>
+    <string name="could_not_find_platform_details_for">Could not find platform details for \'%1$s\'.</string>
+    <string name="no_default_gateway_client_configured">No default gateway client configured.</string>
+    <string name="multiple_ratchet_states_found_in_database_expected_at_most_one">Multiple Ratchet states found in database. Expected at most one.</string>
+    <string name="send_failed">Send failed</string>
+    <string name="account_is_required_for_v1_platform_messages">Account is required for V1 platform messages.</string>
+    <string name="could_not_fetch_publisher_key_cannot_encrypt_message">Could not fetch publisher key. Cannot encrypt message.</string>
 
 </resources>

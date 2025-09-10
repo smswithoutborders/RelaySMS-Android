@@ -8,14 +8,10 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -33,12 +29,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -48,7 +41,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -58,39 +50,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.preference.PreferenceManager
-import com.example.sw0b_001.Bridges.Bridges
+import com.example.sw0b_001.data.models.Bridges
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.Database.Datastore
-import com.example.sw0b_001.Models.ComposeHandlers
-import com.example.sw0b_001.Models.GatewayClients.GatewayClientsCommunications
-import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
-import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
-import com.example.sw0b_001.Models.Publishers
-import com.example.sw0b_001.Models.SMSHandler
-import com.example.sw0b_001.Models.Vaults
-import com.example.sw0b_001.Modules.Helpers
+import com.example.sw0b_001.data.ComposeHandlers
+import com.example.sw0b_001.data.GatewayClients.GatewayClientsCommunications
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
+import com.example.sw0b_001.data.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.data.Publishers
+import com.example.sw0b_001.data.SMSHandler
 import com.example.sw0b_001.Modules.Network
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.components.MissingTokenAccountInfo
-import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
-import com.example.sw0b_001.ui.navigation.GetMeOutScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.views.DeveloperHTTPView
-import com.example.sw0b_001.ui.views.compose.EmailComposeHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationException
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -320,8 +301,7 @@ fun EmailComposeView(
                         developerRequestStatus += "\nending..."
                         developerIsLoading = false
                     } else {
-                        println("Sending for platforms...")
-                        processSend(
+                        platformsViewModel.sendPublishingForEmail(
                             context = context,
                             emailContent = EmailContent(
                                 to = to,
@@ -347,6 +327,7 @@ fun EmailComposeView(
                                 developerIsLoading = false
                             },
                             smsTransmission = false,
+                            subscriptionId = platformsViewModel.subscriptionId,
                         )
                     }
                 }
@@ -382,7 +363,7 @@ fun EmailComposeView(
                     IconButton(
                         enabled = to.isNotEmpty() && body.isNotEmpty(),
                         onClick = {
-                            processSend(
+                            platformsViewModel.sendPublishingForEmail(
                                 context = context,
                                 emailContent = EmailContent(
                                     to = to,
@@ -402,7 +383,8 @@ fun EmailComposeView(
                                             popUpTo(HomepageScreen) { inclusive = true }
                                         }
                                     }
-                                }
+                                },
+                                subscriptionId = platformsViewModel.subscriptionId,
                             )
                         }
                     ) {
@@ -673,200 +655,13 @@ fun EmailComposeView(
 }
 
 
-private fun createEmailByteBuffer(
-    from: String, to: String, cc: String, bcc: String, subject: String, body: String,
-    accessToken: String? = null, refreshToken: String? = null
-): ByteBuffer {
-    val fromBytes = from.toByteArray(StandardCharsets.UTF_8)
-    val toBytes = to.toByteArray(StandardCharsets.UTF_8)
-    val ccBytes = cc.toByteArray(StandardCharsets.UTF_8)
-    val bccBytes = bcc.toByteArray(StandardCharsets.UTF_8)
-    val subjectBytes = subject.toByteArray(StandardCharsets.UTF_8)
-    val bodyBytes = body.toByteArray(StandardCharsets.UTF_8)
-    val accessTokenBytes = accessToken?.toByteArray(StandardCharsets.UTF_8)
-    val refreshTokenBytes = refreshToken?.toByteArray(StandardCharsets.UTF_8)
-
-    // Field size validation
-    if (fromBytes.size > 255) throw IllegalArgumentException("From field exceeds maximum size of 255 bytes")
-    if (toBytes.size > 65535) throw IllegalArgumentException("To field exceeds maximum size of 65,535 bytes")
-    if (ccBytes.size > 65535) throw IllegalArgumentException("CC field exceeds maximum size of 65,535 bytes")
-    if (bccBytes.size > 65535) throw IllegalArgumentException("BCC field exceeds maximum size of 65,535 bytes")
-    if (subjectBytes.size > 255) throw IllegalArgumentException("Subject field exceeds maximum size of 255 bytes")
-    if (bodyBytes.size > 65535) throw IllegalArgumentException("Body field exceeds maximum size of 65,535 bytes")
-    if ((accessTokenBytes?.size ?: 0) > 65535) throw IllegalArgumentException("Access token exceeds maximum size of 65,535 bytes")
-    if ((refreshTokenBytes?.size ?: 0) > 65535) throw IllegalArgumentException("Refresh token exceeds maximum size of 65,535 bytes")
-
-    // Calculate total size for the buffer
-    val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 2 + 2 +
-            fromBytes.size + toBytes.size + ccBytes.size + bccBytes.size +
-            subjectBytes.size + bodyBytes.size +
-            (accessTokenBytes?.size ?: 0) + (refreshTokenBytes?.size ?: 0)
-
-    val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
-
-    // Write field lengths
-    buffer.put(fromBytes.size.toByte())
-    buffer.putShort(toBytes.size.toShort())
-    buffer.putShort(ccBytes.size.toShort())
-    buffer.putShort(bccBytes.size.toShort())
-    buffer.put(subjectBytes.size.toByte())
-    buffer.putShort(bodyBytes.size.toShort())
-    buffer.putShort((accessTokenBytes?.size ?: 0).toShort())
-    buffer.putShort((refreshTokenBytes?.size ?: 0).toShort())
-
-    // Write field values
-    buffer.put(fromBytes)
-    buffer.put(toBytes)
-    buffer.put(ccBytes)
-    buffer.put(bccBytes)
-    buffer.put(subjectBytes)
-    buffer.put(bodyBytes)
-    accessTokenBytes?.let { buffer.put(it) }
-    refreshTokenBytes?.let { buffer.put(it) }
-
-    buffer.flip()
-    return buffer
-}
-
-
-private fun processSend(
-    context: Context,
-    emailContent: EmailContent,
-    account: StoredPlatformsEntity?,
-    isBridge: Boolean,
-    onFailureCallback: (String?) -> Unit,
-    onCompleteCallback: (ByteArray?) -> Unit,
-    smsTransmission: Boolean = true
-) {
-    CoroutineScope(Dispatchers.Default).launch {
-        try {
-            if(isBridge) { // if its a bridge message
-                val txtTransmission = Bridges.compose(
-                    context = context,
-                    to = emailContent.to,
-                    cc = emailContent.cc,
-                    bcc = emailContent.bcc,
-                    subject = emailContent.subject,
-                    body = emailContent.body
-                ) { onCompleteCallback(null) }.first
-
-                val gatewayClientMSISDN = GatewayClientsCommunications(context)
-                    .getDefaultGatewayClient()
-
-                val sentIntent = SMSHandler.transferToDefaultSMSApp(
-                    context,
-                    gatewayClientMSISDN!!,
-                    txtTransmission).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                }
-                context.startActivity(sentIntent)
-            }
-            else {
-                Log.d("processSend", "Processing as V1 PLATFORM message.")
-                if (account == null) {
-                    onFailureCallback("Account is required for V1 platform messages.")
-                    return@launch
-                }
-
-                val AD = Publishers.fetchPublisherPublicKey(context)
-                if (AD == null) {
-                    onFailureCallback("Could not fetch publisher key. Cannot encrypt message.")
-                    return@launch
-                }
-
-                val contentFormatBytes = if (
-                    account.accessToken?.isNotEmpty() == true
-                ) {
-                    createEmailByteBuffer(
-                        from = account.account!!, // 'from' is from the selected account
-                        to = emailContent.to,
-                        cc = emailContent.cc,
-                        bcc = emailContent.bcc,
-                        subject = emailContent.subject,
-                        body = emailContent.body,
-                        accessToken = account.accessToken,
-                        refreshToken = account.refreshToken
-                    ).array()
-                } else {
-                    createEmailByteBuffer(
-                        from = account.account!!,
-                        to = emailContent.to,
-                        cc = emailContent.cc,
-                        bcc = emailContent.bcc,
-                        subject = emailContent.subject,
-                        body = emailContent.body
-                    ).array()
-                }
-
-
-                val contentFormatV2Bytes = createEmailByteBuffer(
-                    from = account.account,
-                    to = emailContent.to,
-                    cc = emailContent.cc,
-                    bcc = emailContent.bcc,
-                    subject = emailContent.subject,
-                    body = emailContent.body,
-                    accessToken = account.accessToken,
-                    refreshToken = account.refreshToken
-                ).array()
-
-                val platform = Datastore.getDatastore(context).availablePlatformsDao().fetch(account.name!!)
-                if (platform == null) {
-                    onFailureCallback("Could not find platform details for '${account.name}'.")
-                    return@launch
-                }
-
-                val languageCode = Locale.getDefault().language.take(2).lowercase(Locale.ROOT)
-                Log.d("processSend", "Language code: $languageCode")
-                val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
-                Log.d("processSend", "Valid language code: $validLanguageCode")
-
-                val v2PayloadBytes = ComposeHandlers.composeV2(
-                    context = context,
-                    contentFormatV2Bytes = contentFormatBytes,
-                    AD = AD,
-                    platform = platform,
-                    account = account,
-                    languageCode = validLanguageCode,
-                    smsTransmission = smsTransmission
-                )
-
-                if (smsTransmission) {
-                    val gatewayClientMSISDN = GatewayClientsCommunications(context)
-                        .getDefaultGatewayClient()
-                    if (gatewayClientMSISDN == null) {
-                        onFailureCallback("No default gateway client configured for SMS.")
-                        return@launch
-                    }
-                    val base64Payload = Base64.encodeToString(v2PayloadBytes, Base64.NO_WRAP)
-                    SMSHandler.transferToDefaultSMSApp(
-                        context,
-                        gatewayClientMSISDN,
-                        base64Payload
-                    ).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    }
-                }
-                onCompleteCallback(v2PayloadBytes)
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            onFailureCallback(e.message)
-            CoroutineScope(Dispatchers.Main).launch {
-                Toast.makeText(context, e.message ?: "An unknown error occurred", Toast.LENGTH_LONG).show()
-            }
-        }
-    }
-}
-
-
 @Preview(showBackground = true)
 @Composable
 fun EmailComposePreview() {
     AppTheme(darkTheme = false) {
         EmailComposeView(
             navController = NavController(LocalContext.current),
-            platformsViewModel = PlatformsViewModel(),
+            platformsViewModel = remember{ PlatformsViewModel() },
             isBridge = true
         )
     }
@@ -885,7 +680,7 @@ fun AccountModalPreview() {
         )
         SelectAccountModal(
             _accounts = listOf(storedPlatform),
-            platformsViewModel = PlatformsViewModel(),
+            platformsViewModel = remember{ PlatformsViewModel() },
             onAccountSelected = {}
         ) {}
     }

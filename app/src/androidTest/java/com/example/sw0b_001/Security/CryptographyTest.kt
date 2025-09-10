@@ -7,7 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.Ratchets
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.States
-import com.example.sw0b_001.Models.MessageComposer
+import com.example.sw0b_001.data.MessageComposer
 import com.example.sw0b_001.Modules.Crypto
 import com.github.kittinunf.fuel.util.encodeBase64
 import org.junit.Assert.assertArrayEquals

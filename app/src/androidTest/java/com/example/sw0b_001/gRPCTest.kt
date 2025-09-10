@@ -1,20 +1,13 @@
 package com.example.sw0b_001
 
-import android.util.Base64
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
-import com.example.sw0b_001.Models.Publishers
-import com.example.sw0b_001.Models.Vaults
-import com.example.sw0b_001.Modules.Network
+import com.example.sw0b_001.data.Publishers
+import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.Security.Cryptography
-import io.grpc.ManagedChannel
 import io.grpc.StatusRuntimeException
-import kotlinx.serialization.json.Json
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import publisher.v1.PublisherGrpc.PublisherBlockingStub
-import vault.v1.EntityGrpc.EntityBlockingStub
 
 /**
  * Flow from https://github.com/smswithoutborders/SMSwithoutborders-BE/blob/feature/grpc_api/docs/grpc.md

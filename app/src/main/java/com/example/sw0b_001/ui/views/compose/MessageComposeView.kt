@@ -2,7 +2,6 @@ package com.example.sw0b_001.ui.views.compose
 
 import android.Manifest
 import android.app.Activity
-import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
@@ -14,8 +13,6 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContract
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -38,9 +35,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,16 +50,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.sw0b_001.Database.Datastore
-import com.example.sw0b_001.Models.ComposeHandlers
-import com.example.sw0b_001.Models.GatewayClients.GatewayClientsCommunications
-import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
-import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
-import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
-import com.example.sw0b_001.Models.Publishers
-import com.example.sw0b_001.Models.SMSHandler
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDefaultSimSubscription
+import com.example.sw0b_001.data.Platforms.AvailablePlatforms
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
+import com.example.sw0b_001.data.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.modals.Account
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
@@ -74,11 +64,9 @@ import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.StandardCharsets
-import java.util.Locale
 
 
 class PickPhoneNumberContract : ActivityResultContract<Unit, Uri?>() {
@@ -155,14 +143,16 @@ object MessageComposeHandler {
 @Composable
 fun MessageComposeView(
     navController: NavController,
-    platformsViewModel: PlatformsViewModel
+    platformsViewModel: PlatformsViewModel,
 ) {
     val inspectMode = LocalInspectionMode.current
     val context = LocalContext.current
+    platformsViewModel.subscriptionId = context.getDefaultSimSubscription() ?: return
 
     val decomposedMessage = if (platformsViewModel.message?.encryptedContent != null) {
         try {
-            val contentBytes = Base64.decode(platformsViewModel.message!!.encryptedContent!!, Base64.DEFAULT)
+            val contentBytes = Base64.decode(
+                platformsViewModel.message!!.encryptedContent!!, Base64.DEFAULT)
             MessageComposeHandler.decomposeMessage(contentBytes)
         } catch (e: Exception) {
             Log.e("MessageComposeView", "Failed to decode/decompose V1 message content.", e)
@@ -225,12 +215,11 @@ fun MessageComposeView(
                     }
                 },
                 actions = {
-
                     val isSendEnabled = recipientAccount.isNotEmpty() && message.isNotEmpty() &&
                             (if (isPnba) verifyPhoneNumberFormat(recipientAccount) else true)
 
                     IconButton(onClick = {
-                        processSend(
+                        platformsViewModel.sendPublishingForMessaging(
                             context = context,
                             messageContent = MessageContent(
                                 from = from,
@@ -238,26 +227,26 @@ fun MessageComposeView(
                                 message = message
                             ),
                             account = selectedAccount!!,
+                            subscriptionId = platformsViewModel.subscriptionId,
                             onFailure = { errorMsg ->
                                 CoroutineScope(Dispatchers.Main).launch {
                                     Toast.makeText(
                                         context,
-                                        errorMsg ?: "Send failed",
+                                        errorMsg ?: context.getString(R.string.send_failed),
                                         Toast.LENGTH_LONG
                                     ).show()
                                 }
                             },
-                            onSuccess = {
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    navController.navigate(HomepageScreen) {
-                                        popUpTo(HomepageScreen) { inclusive = true }
-                                    }
+                        ) {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                navController.navigate(HomepageScreen) {
+                                    popUpTo(HomepageScreen) { inclusive = true }
                                 }
                             }
-                        )
-                    },
-                        enabled = isSendEnabled) {
-                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.send))
+                        }
+                    }, enabled = isSendEnabled) {
+                        Icon(Icons.AutoMirrored.Filled.Send,
+                            stringResource(R.string.send))
                     }
                 },
             )
@@ -357,121 +346,6 @@ fun verifyPhoneNumberFormat(phoneNumber: String): Boolean {
 }
 
 
-private fun createMessageByteBuffer(
-    from: String, to: String, message: String,
-    accessToken: String? = null, refreshToken: String? = null
-): ByteBuffer {
-    val BYTE_SIZE_LIMIT = 255
-    val SHORT_SIZE_LIMIT = 65535
-
-    // Convert strings to byte arrays
-    val fromBytes = from.toByteArray(StandardCharsets.UTF_8)
-    val toBytes = to.toByteArray(StandardCharsets.UTF_8)
-    val bodyBytes = message.toByteArray(StandardCharsets.UTF_8)
-    val accessTokenBytes = accessToken?.toByteArray(StandardCharsets.UTF_8)
-    val refreshTokenBytes = refreshToken?.toByteArray(StandardCharsets.UTF_8)
-
-
-    // Get sizes for validation
-    val fromSize = fromBytes.size
-    val toSize = toBytes.size
-    val bodySize = bodyBytes.size
-    val accessTokenSize = accessTokenBytes?.size ?: 0
-    val refreshTokenSize = refreshTokenBytes?.size ?: 0
-
-    // Validate field sizes
-    if (fromSize > BYTE_SIZE_LIMIT) throw IllegalArgumentException("From field exceeds maximum size of $BYTE_SIZE_LIMIT bytes")
-    if (toSize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("To field exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
-    if (bodySize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("Body field exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
-    if (accessTokenSize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("Access Token exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
-    if (refreshTokenSize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("Refresh Token exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
-
-
-    // Update total size to include tokens
-    val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 2 + 2 +
-            fromSize + toSize + bodySize + accessTokenSize + refreshTokenSize
-
-    // Allocate buffer and set byte order
-    val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
-
-    // Write field lengths according to specification
-    buffer.put(fromSize.toByte())
-    buffer.putShort(toSize.toShort())
-    buffer.putShort(0)
-    buffer.putShort(0)
-    buffer.put(0.toByte())
-    buffer.putShort(bodySize.toShort())
-    buffer.putShort(accessTokenSize.toShort())
-    buffer.putShort(refreshTokenSize.toShort())
-
-    // Write field values
-    buffer.put(fromBytes)
-    buffer.put(toBytes)
-    buffer.put(bodyBytes)
-    accessTokenBytes?.let { buffer.put(it) }
-    refreshTokenBytes?.let { buffer.put(it) }
-
-
-    buffer.flip()
-    return buffer
-}
-
-private fun processSend(
-    context: Context,
-    messageContent: MessageContent,
-    account: StoredPlatformsEntity,
-    onFailure: (String?) -> Unit,
-    onSuccess: () -> Unit,
-    smsTransmission: Boolean = true
-) {
-    CoroutineScope(Dispatchers.Default).launch {
-        try {
-            val AD = Publishers.fetchPublisherPublicKey(context)
-                ?: return@launch onFailure("Could not fetch publisher key.")
-
-            val platform = Datastore.getDatastore(context).availablePlatformsDao().fetch(account.name!!)
-                ?: return@launch onFailure("Could not find platform details for '${account.name}'.")
-
-
-            val accessToken = account.accessToken
-            val refreshToken = account.refreshToken
-            Log.d("MessageComposeView", "Access Token: $accessToken, Refresh Token: $refreshToken")
-
-            val contentFormatV2Bytes = createMessageByteBuffer(
-                from = messageContent.from,
-                to = messageContent.to,
-                message = messageContent.message,
-                accessToken = accessToken,
-                refreshToken = refreshToken
-            ).array()
-
-            val languageCode = Locale.getDefault().language.take(2).lowercase()
-            val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
-
-            val v2PayloadBytes = ComposeHandlers.composeV2(
-                context = context,
-                contentFormatV2Bytes = contentFormatV2Bytes,
-                AD = AD,
-                platform = platform,
-                account = account,
-                languageCode = validLanguageCode,
-                smsTransmission = smsTransmission
-            )
-
-            if (smsTransmission) {
-                val gatewayClientMSISDN = GatewayClientsCommunications(context).getDefaultGatewayClient()
-                    ?: return@launch onFailure("No default gateway client configured.")
-                val base64Payload = Base64.encodeToString(v2PayloadBytes, Base64.NO_WRAP)
-                SMSHandler.transferToDefaultSMSApp(context, gatewayClientMSISDN, base64Payload)
-            }
-            onSuccess()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            onFailure(e.message)
-        }
-    }
-}
-
 private fun getPhoneNumberFromUri(context: Context, uri: Uri): String {
     var phoneNumber: String? = null
     val projection: Array<String> = arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER)
@@ -502,7 +376,7 @@ fun MessageComposePreview() {
     AppTheme(darkTheme = false) {
         MessageComposeView(
             navController = NavController(LocalContext.current),
-            platformsViewModel = PlatformsViewModel()
+            platformsViewModel = remember{ PlatformsViewModel() }
         )
     }
 }

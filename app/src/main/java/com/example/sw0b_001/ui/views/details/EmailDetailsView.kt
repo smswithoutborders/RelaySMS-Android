@@ -29,7 +29,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.sw0b_001.Models.Messages.EncryptedContent
+import com.example.sw0b_001.data.Messages.EncryptedContent
 import com.example.sw0b_001.Modules.Helpers
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.appbars.RelayAppBar
@@ -40,13 +40,12 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
-import com.example.sw0b_001.Bridges.Bridges
-import com.example.sw0b_001.Models.Messages.MessagesViewModel
-import com.example.sw0b_001.Models.Platforms.Platforms
-import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
+import com.example.sw0b_001.data.models.Bridges
+import com.example.sw0b_001.ui.viewModels.MessagesViewModel
+import com.example.sw0b_001.data.Platforms.Platforms
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.ui.navigation.BridgeEmailComposeScreen
 import com.example.sw0b_001.ui.navigation.EmailComposeScreen
-import com.example.sw0b_001.ui.navigation.HomepageScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

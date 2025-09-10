@@ -1,23 +1,13 @@
 package com.example.sw0b_001
 
-import android.util.Base64
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.sw0b_001.Bridges.Bridges
+import com.example.sw0b_001.data.models.Bridges
 import com.example.sw0b_001.Database.Datastore
-import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
-import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
-import com.example.sw0b_001.Models.Publishers
-import com.example.sw0b_001.Models.Vaults
+import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.Modules.Network
-import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertTrue
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.Test
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-import java.nio.charset.Charset
 
 class BridgesTest {
     var context = InstrumentationRegistry.getInstrumentation().targetContext

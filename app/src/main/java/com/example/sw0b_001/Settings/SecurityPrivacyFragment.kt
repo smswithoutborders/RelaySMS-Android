@@ -17,7 +17,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreferenceCompat
 import com.example.sw0b_001.MainActivity
-import com.example.sw0b_001.Models.Vaults
+import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.Modules.Security
 import com.example.sw0b_001.Security.LockScreenFragment
 import com.google.android.material.progressindicator.LinearProgressIndicator
@@ -27,14 +27,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import android.provider.Settings
 import android.util.Log
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.BasicAlertDialog
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.activity
-import com.example.sw0b_001.Database.Datastore
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class SecurityPrivacyFragment : PreferenceFragmentCompat() {
