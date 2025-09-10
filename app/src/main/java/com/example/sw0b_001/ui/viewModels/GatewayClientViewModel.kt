@@ -1,4 +1,4 @@
-package com.example.sw0b_001.data.GatewayClients
+package com.example.sw0b_001.ui.viewModels
 
 import android.content.Context
 import android.util.Log
@@ -7,6 +7,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sw0b_001.Database.Datastore
+import com.example.sw0b_001.data.GatewayClientsCommunications
+import com.example.sw0b_001.data.models.GatewayClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -36,7 +38,7 @@ class GatewayClientViewModel() : ViewModel() {
     fun loadRemote(context: Context, successRunnable: Runnable?, failureRunnable: Runnable?){
         CoroutineScope(Dispatchers.Default).launch{
             try {
-                GatewayClientsCommunications.fetchAndPopulateWithDefault(context)
+                GatewayClientsCommunications.Companion.fetchAndPopulateWithDefault(context)
                 successRunnable?.run()
             } catch (e: Exception) {
                 Log.e(javaClass.name, "Exception fetching Gateway clients", e)
@@ -127,5 +129,3 @@ class GatewayClientViewModel() : ViewModel() {
         }
     }
 }
-
-

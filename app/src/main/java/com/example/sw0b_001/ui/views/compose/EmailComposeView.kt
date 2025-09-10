@@ -1,7 +1,5 @@
 package com.example.sw0b_001.ui.views.compose
 
-import android.content.Context
-import android.content.Intent
 import android.util.Base64
 import android.util.Log
 import android.widget.Toast
@@ -55,17 +53,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.sw0b_001.data.models.Bridges
 import com.example.sw0b_001.BuildConfig
-import com.example.sw0b_001.Database.Datastore
-import com.example.sw0b_001.data.ComposeHandlers
-import com.example.sw0b_001.data.GatewayClients.GatewayClientsCommunications
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Platforms.StoredPlatformsEntity
-import com.example.sw0b_001.data.Publishers
-import com.example.sw0b_001.data.SMSHandler
-import com.example.sw0b_001.Modules.Network
+import com.example.sw0b_001.data.Network
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.SelectAccountModal
-import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.views.DeveloperHTTPView
 import kotlinx.coroutines.CoroutineScope
@@ -76,7 +68,6 @@ import kotlinx.serialization.json.Json
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.StandardCharsets
-import java.util.Locale
 
 data class EmailContent(
     var to: String,

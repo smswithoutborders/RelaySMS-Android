@@ -1,7 +1,7 @@
 package com.example.sw0b_001
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.sw0b_001.Modules.Network
+import com.example.sw0b_001.data.Network
 import com.example.sw0b_001.ui.views.compose.ReliabilityTestRequestPayload
 import com.example.sw0b_001.ui.views.compose.ReliabilityTestResponsePayload
 import junit.framework.TestCase.assertTrue

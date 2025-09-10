@@ -30,9 +30,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.sw0b_001.data.GatewayClients.GatewayClient
-import com.example.sw0b_001.data.GatewayClients.GatewayClientViewModel
+import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.models.GatewayClient
 import com.example.sw0b_001.ui.modals.AddGatewayClientModal
 import com.example.sw0b_001.ui.modals.GatewayClientOptionsModal
 import com.example.sw0b_001.ui.theme.AppTheme

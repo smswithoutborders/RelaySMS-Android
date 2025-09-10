@@ -2,8 +2,6 @@ package com.example.sw0b_001.ui.onboarding
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -11,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -41,7 +38,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -50,8 +46,7 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.components.OnboardingNextButton
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import androidx.core.net.toUri
-import androidx.work.Configuration
-import com.example.sw0b_001.Modules.Helpers
+import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.Settings.SettingsFragment.Companion.changeLanguageLocale
 import com.example.sw0b_001.Settings.SettingsFragment.Companion.getCurrentLocale
 import com.example.sw0b_001.ui.components.LanguageSelectionPopup

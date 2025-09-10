@@ -1,4 +1,4 @@
-package com.example.sw0b_001.Modules
+package com.example.sw0b_001.data
 
 import android.util.Log
 import com.github.kittinunf.fuel.Fuel
@@ -7,7 +7,6 @@ import com.github.kittinunf.fuel.core.Response
 import com.github.kittinunf.fuel.core.extensions.jsonBody
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.result.Result
-import java.net.UnknownHostException
 
 class Network {
     data class NetworkResponseResults(val response: Response,

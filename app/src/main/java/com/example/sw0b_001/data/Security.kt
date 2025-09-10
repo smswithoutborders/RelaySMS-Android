@@ -1,12 +1,8 @@
-package com.example.sw0b_001.Modules
+package com.example.sw0b_001.data
 
 import android.content.Context
-import android.content.Intent
-import android.hardware.biometrics.BiometricManager.Authenticators.DEVICE_CREDENTIAL
-import android.provider.Settings
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
-import androidx.biometric.BiometricPrompt
 
 class Security {
 

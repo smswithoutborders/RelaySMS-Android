@@ -39,7 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.preference.PreferenceManager
-import com.example.sw0b_001.data.GatewayClients.GatewayClientViewModel
+import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.data.Platforms.Platforms
 import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.ui.components.MissingTokenInfoDialog

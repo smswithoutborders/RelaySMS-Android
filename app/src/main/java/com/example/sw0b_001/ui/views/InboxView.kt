@@ -28,10 +28,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.sw0b_001.data.Messages.EncryptedContent
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.ui.navigation.BridgeViewScreen
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.theme.AppTheme
@@ -69,10 +69,9 @@ fun InboxView(
                             platformsViewModel.message = message
                             navController.navigate(BridgeViewScreen)
                         },
-                        logo = TODO(),
-                        isSelected = TODO(),
-                        isSelectionMode = TODO(),
-                        onLongClickCallback = TODO()
+                        onLongClickCallback = { conversation ->
+
+                        }
                     )
                 }
             }

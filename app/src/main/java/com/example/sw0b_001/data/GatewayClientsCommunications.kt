@@ -1,10 +1,10 @@
-package com.example.sw0b_001.data.GatewayClients
+package com.example.sw0b_001.data
 
 import android.content.Context
 import android.content.SharedPreferences
 import com.example.sw0b_001.Database.Datastore
-import com.example.sw0b_001.Modules.Network
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.models.GatewayClient
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -78,7 +78,7 @@ class GatewayClientsCommunications(context: Context) {
                 in 400..500 -> throw Exception("Failed to fetch Gateway clients")
                 in 500..600 -> throw Exception("Error fetching Gateway clients")
                 else -> {
-                    val json = Json {ignoreUnknownKeys = true}
+                    val json = Json { ignoreUnknownKeys = true }
                     return json.decodeFromString<
                             ArrayList<
                                     GatewayClientJsonPayload>>(networkResponseResults.result.get())

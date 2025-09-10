@@ -1,4 +1,4 @@
-package com.example.sw0b_001.data.Messages
+package com.example.sw0b_001.data.dao
 
 import androidx.lifecycle.LiveData
 import androidx.paging.PagingSource
@@ -6,6 +6,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import com.example.sw0b_001.data.models.EncryptedContent
 
 @Dao
 interface EncryptedContentDAO {

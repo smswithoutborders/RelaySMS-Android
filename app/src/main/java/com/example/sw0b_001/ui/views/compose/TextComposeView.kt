@@ -1,6 +1,5 @@
 package com.example.sw0b_001.ui.views.compose
 
-import android.content.Context
 import android.util.Base64
 import android.util.Log
 import android.widget.Toast
@@ -36,16 +35,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.sw0b_001.Database.Datastore
-import com.example.sw0b_001.data.ComposeHandlers
-import com.example.sw0b_001.data.GatewayClients.GatewayClientsCommunications
-import com.example.sw0b_001.data.Platforms.AvailablePlatforms
 import com.example.sw0b_001.data.Platforms.Platforms
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Platforms.StoredPlatformsEntity
-import com.example.sw0b_001.data.Publishers
-import com.example.sw0b_001.data.SMSHandler
-import com.example.sw0b_001.Modules.Network
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.navigation.HomepageScreen
@@ -54,7 +46,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.StandardCharsets

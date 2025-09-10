@@ -16,12 +16,12 @@ import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewM
 import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.ComposeHandlers
-import com.example.sw0b_001.data.GatewayClients.GatewayClientsCommunications
-import com.example.sw0b_001.data.Messages.EncryptedContent
+import com.example.sw0b_001.data.GatewayClientsCommunications
 import com.example.sw0b_001.data.Platforms.Platforms
 import com.example.sw0b_001.data.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.data.Publishers
 import com.example.sw0b_001.data.SMSHandler
+import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.ui.views.compose.MessageContent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

@@ -3,7 +3,6 @@ package com.example.sw0b_001.ui.viewModels
 import android.content.Context
 import android.content.Intent
 import android.util.Base64
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -19,16 +18,16 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getThreadId
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewModel
 import com.example.sw0b_001.Database.Datastore
-import com.example.sw0b_001.Modules.Network
+import com.example.sw0b_001.data.Network
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.ComposeHandlers
-import com.example.sw0b_001.data.GatewayClients.GatewayClientsCommunications
-import com.example.sw0b_001.data.Messages.EncryptedContent
+import com.example.sw0b_001.data.GatewayClientsCommunications
 import com.example.sw0b_001.data.Platforms.AvailablePlatforms
 import com.example.sw0b_001.data.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.data.Publishers
 import com.example.sw0b_001.data.SMSHandler
 import com.example.sw0b_001.data.models.Bridges
+import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.ui.views.BottomTabsItems
 import com.example.sw0b_001.ui.views.OTPCodeVerificationType
 import com.example.sw0b_001.ui.views.compose.EmailContent

@@ -1,9 +1,10 @@
-package com.example.sw0b_001.data.Messages
+package com.example.sw0b_001.data.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
+import com.example.sw0b_001.data.models.RatchetStates
 
 @Dao
 interface RatchetStatesDAO {

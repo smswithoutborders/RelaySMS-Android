@@ -11,12 +11,12 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewModel
 import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.GatewayClients.GatewayClientsCommunications
-import com.example.sw0b_001.data.Messages.EncryptedContent
-import com.example.sw0b_001.data.Messages.RatchetStates
+import com.example.sw0b_001.data.GatewayClientsCommunications
 import com.example.sw0b_001.data.Platforms.AvailablePlatforms
 import com.example.sw0b_001.data.Platforms.Platforms
 import com.example.sw0b_001.data.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.data.models.EncryptedContent
+import com.example.sw0b_001.data.models.RatchetStates
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -52,7 +52,8 @@ object ComposeHandlers {
 
         try {
             val encryptedStatesValue = Publishers.encryptStates(context, state.serializedStates)
-            val ratchetStatesEntry = RatchetStates(id = states.firstOrNull()?.id ?: 0, value = encryptedStatesValue)
+            val ratchetStatesEntry =
+                RatchetStates(id = states.firstOrNull()?.id ?: 0, value = encryptedStatesValue)
             if (states.isNotEmpty()) {
                 Datastore.getDatastore(context).ratchetStatesDAO().update(ratchetStatesEntry)
             } else {

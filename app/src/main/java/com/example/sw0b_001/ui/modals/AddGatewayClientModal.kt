@@ -48,9 +48,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import com.example.sw0b_001.data.GatewayClients.GatewayClient
-import com.example.sw0b_001.data.GatewayClients.GatewayClientViewModel
+import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.models.GatewayClient
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.views.compose.verifyPhoneNumberFormat
 import kotlinx.coroutines.launch
@@ -309,7 +309,7 @@ fun AddGatewayClientModalPreview() {
         AddGatewayClientModal(
             showBottomSheet = true,
             onDismiss = {},
-            viewModel = GatewayClientViewModel(),
+            viewModel = remember{ GatewayClientViewModel() },
         )
     }
 }

@@ -18,7 +18,7 @@ import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreferenceCompat
 import com.example.sw0b_001.MainActivity
 import com.example.sw0b_001.data.Vaults
-import com.example.sw0b_001.Modules.Security
+import com.example.sw0b_001.data.Security
 import com.example.sw0b_001.Security.LockScreenFragment
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import io.grpc.StatusRuntimeException

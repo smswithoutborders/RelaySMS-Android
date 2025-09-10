@@ -34,8 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.sw0b_001.data.GatewayClients.GatewayClientViewModel
-import com.example.sw0b_001.data.Messages.EncryptedContent
+import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Vaults
@@ -49,6 +48,7 @@ import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import androidx.compose.runtime.collectAsState
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.ui.features.AppFeatures
 import com.example.sw0b_001.ui.features.FeatureInfo
 import com.example.sw0b_001.ui.features.FeatureManager

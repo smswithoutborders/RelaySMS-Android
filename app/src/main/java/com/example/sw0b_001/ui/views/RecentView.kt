@@ -56,13 +56,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.example.sw0b_001.data.models.Bridges
-import com.example.sw0b_001.data.Messages.EncryptedContent
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.data.Platforms.AvailablePlatforms
 import com.example.sw0b_001.data.Platforms.Platforms
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
-import com.example.sw0b_001.Modules.Helpers
+import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
 import com.example.sw0b_001.ui.navigation.BridgeViewScreen
 import com.example.sw0b_001.ui.navigation.EmailViewScreen

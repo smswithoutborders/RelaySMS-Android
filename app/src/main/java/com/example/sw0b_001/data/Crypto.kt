@@ -1,4 +1,4 @@
-package com.example.sw0b_001.Modules
+package com.example.sw0b_001.data
 
 import android.util.Base64
 import com.macasaet.fernet.Key
@@ -7,7 +7,6 @@ import com.macasaet.fernet.Token
 import java.io.BufferedInputStream
 import java.io.InputStream
 import java.net.URL
-import java.security.GeneralSecurityException
 import java.security.PublicKey
 import java.security.cert.Certificate
 import javax.crypto.Mac

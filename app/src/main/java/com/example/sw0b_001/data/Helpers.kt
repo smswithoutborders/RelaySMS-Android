@@ -1,4 +1,4 @@
-package com.example.sw0b_001.Modules
+package com.example.sw0b_001.data
 
 import android.content.Context
 import android.content.Intent
