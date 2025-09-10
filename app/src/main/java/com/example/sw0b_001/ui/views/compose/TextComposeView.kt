@@ -129,7 +129,6 @@ fun TextComposeView(
             val contentBytes = Base64.decode(platformsViewModel.message!!.encryptedContent!!, Base64.DEFAULT)
             TextComposeHandler.decomposeMessage(contentBytes)
         } catch (e: Exception) {
-            Log.e("TextComposeView", "Failed to decode/decompose V1 text content.", e)
             null
         }
     } else null
