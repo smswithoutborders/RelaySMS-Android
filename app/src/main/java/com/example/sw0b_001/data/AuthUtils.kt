@@ -1,4 +1,4 @@
-package com.example.sw0b_001.utils
+package com.example.sw0b_001.data
 
 import android.content.Context
 import androidx.core.content.edit

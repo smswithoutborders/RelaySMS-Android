@@ -54,7 +54,7 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.SettingsActivity
 import com.example.sw0b_001.ui.navigation.AboutScreen
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.utils.getPhoneNumberFromPrefs
+import com.example.sw0b_001.data.getPhoneNumberFromPrefs
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
