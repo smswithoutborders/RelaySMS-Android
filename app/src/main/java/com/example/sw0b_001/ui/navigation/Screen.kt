@@ -23,7 +23,7 @@ object EmailComposeScreen
 
 @Serializable
 data class EmailComposeNav(
-    val callback: () -> Unit = {},
+    val callback: (Boolean) -> Unit = {},
 )
 
 @Serializable
