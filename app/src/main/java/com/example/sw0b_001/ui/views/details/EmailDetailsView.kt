@@ -43,7 +43,6 @@ import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.data.Platforms.Platforms
 import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
-import com.example.sw0b_001.ui.navigation.BridgeEmailComposeScreen
 import com.example.sw0b_001.ui.navigation.EmailComposeScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -70,7 +69,7 @@ fun EmailDetailsView(
     if (message?.encryptedContent != null) {
         if (isBridge) {
             when (message.type) {
-                Platforms.ServiceTypes.BRIDGE.type -> {
+                Platforms.ServiceTypes.BRIDGE.name -> {
                     Bridges.BridgeComposeHandler.decomposeMessage(message.encryptedContent!!).apply {
                         from = message.fromAccount ?: "Bridge Message"
                         to = this.to
@@ -81,7 +80,7 @@ fun EmailDetailsView(
                         date = message.date
                     }
                 }
-                Platforms.ServiceTypes.BRIDGE_INCOMING.type -> {
+                Platforms.ServiceTypes.BRIDGE_INCOMING.name -> {
                     Bridges.BridgeComposeHandler.decomposeInboxMessage(message.encryptedContent!!).apply {
                         from = this.sender
                         to = this.alias
@@ -127,9 +126,11 @@ fun EmailDetailsView(
                     platformsViewModel.platform = platform
 
                     CoroutineScope(Dispatchers.Main).launch {
-                        navController.navigate(
-                            if(!isBridge) EmailComposeScreen else BridgeEmailComposeScreen
-                        )
+                        navController.navigate(EmailComposeScreen(
+                            platformName = if(!isBridge) platformsViewModel.message!!
+                                .platformName!! else "",
+                            isBridge = isBridge,
+                        ))
                     }
                 }
             }) {
@@ -241,7 +242,7 @@ fun EmailDetailsPreview() {
         encryptedContent.gatewayClientMSISDN = "+237123456789"
         encryptedContent.encryptedContent = "reply@relaysms.me:cc@relaysms.me:bcc@relaysms.me:subject here:This is an encrypted content"
 
-        val platformsViewModel = PlatformsViewModel()
+        val platformsViewModel = remember{ PlatformsViewModel() }
         platformsViewModel.message = encryptedContent
         EmailDetailsView(
             platformsViewModel=platformsViewModel,

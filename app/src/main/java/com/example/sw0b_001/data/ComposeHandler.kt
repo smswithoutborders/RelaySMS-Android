@@ -78,8 +78,8 @@ object ComposeHandlers {
         val encryptedContent = EncryptedContent()
         encryptedContent.encryptedContent = formattedContent
         encryptedContent.date = System.currentTimeMillis()
-        encryptedContent.type = platform?.service_type ?: Platforms.ServiceTypes.BRIDGE.type
-        encryptedContent.platformName = platform?.name ?: Platforms.ServiceTypes.BRIDGE.type
+        encryptedContent.type = platform?.service_type ?: Platforms.ServiceTypes.BRIDGE.name
+        encryptedContent.platformName = platform?.name ?: Platforms.ServiceTypes.BRIDGE.name
         encryptedContent.fromAccount = account?.account
 
         Datastore.getDatastore(context).encryptedContentDAO().insert(encryptedContent)

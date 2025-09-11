@@ -83,18 +83,23 @@ data class GatewayClientRequest(
 @Composable
 fun EmailComposeView(
     navController: NavController,
-    platformsViewModel: PlatformsViewModel,
+    platformName: String,
+    subscriptionId: Long,
+    encryptedContent: String? = null,
+    fromAccount: String? = null,
     isBridge: Boolean = false,
     onSendCallback: ((Boolean) -> Unit)? = null
 ) {
     val context = LocalContext.current
+    val platformsViewModel = remember { PlatformsViewModel() }
 
-    val decomposedMessage = if (platformsViewModel.message?.encryptedContent != null) {
+    val decomposedMessage = if (encryptedContent != null) {
         if (isBridge) {
-            PlatformsViewModel.EmailComposeHandler.decomposeBridgeMessage(platformsViewModel.message!!.encryptedContent!!)
+            PlatformsViewModel.EmailComposeHandler
+                .decomposeBridgeMessage(encryptedContent)
         } else {
             try {
-                val contentBytes = Base64.decode(platformsViewModel.message!!.encryptedContent!!, Base64.DEFAULT)
+                val contentBytes = Base64.decode(encryptedContent, Base64.DEFAULT)
                 PlatformsViewModel.EmailComposeHandler.decomposeMessage(contentBytes)
             } catch (e: Exception) {
                 Log.e("EmailComposeView", "Error decoding/decomposing V1 message content.", e)
@@ -107,7 +112,7 @@ fun EmailComposeView(
     val density = LocalDensity.current
     val coroutineScope = rememberCoroutineScope()
 
-    var from by remember { mutableStateOf(platformsViewModel.message?.fromAccount ?: "") }
+    var from by remember { mutableStateOf(fromAccount ?: "") }
     var to by remember { mutableStateOf( decomposedMessage?.to ?: "") }
     var cc by remember { mutableStateOf( decomposedMessage?.cc ?: "") }
     var bcc by remember { mutableStateOf( decomposedMessage?.bcc ?: "") }
@@ -124,7 +129,7 @@ fun EmailComposeView(
     val scrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
-        if(BuildConfig.DEBUG && platformsViewModel.message == null) {
+        if(BuildConfig.DEBUG && encryptedContent == null) {
             if(from.isEmpty()) from = if(isBridge) "" else "from@relaysms.me"
             if(to.isEmpty()) to = "to@relaysms.me"
             if(cc.isEmpty()) cc = "cc@relaysms.me"
@@ -206,7 +211,7 @@ fun EmailComposeView(
                                 developerIsLoading = false
                             },
                             smsTransmission = false,
-                            subscriptionId = platformsViewModel.subscriptionId,
+                            subscriptionId = subscriptionId,
                         )
                     }
                 }
@@ -242,10 +247,11 @@ fun EmailComposeView(
             onCompleteCallback = {
                 isSending = false
                 CoroutineScope(Dispatchers.Main).launch {
-                    onSendCallback?.invoke(true) ?: navController.popBackStack()
+                    onSendCallback?.invoke(true)
+                    navController.popBackStack()
                 }
             },
-            subscriptionId = platformsViewModel.subscriptionId,
+            subscriptionId = subscriptionId,
         )
 
     }
@@ -551,7 +557,6 @@ fun EmailComposeView(
             // Conditionally show the SelectAccountModal
             if (showSelectAccountModal && !isBridge) {
                 SelectAccountModal(
-                    platformsViewModel = platformsViewModel,
                     onDismissRequest = {
                         if (selectedAccount == null) {
                             navController.popBackStack()
@@ -563,7 +568,8 @@ fun EmailComposeView(
                         selectedAccount = account
                         from = account.account!!
                         showSelectAccountModal = false
-                    }
+                    },
+                    name = platformName
                 )
             }
 
@@ -583,9 +589,10 @@ fun EmailComposePreview() {
     AppTheme(darkTheme = false) {
         EmailComposeView(
             navController = NavController(LocalContext.current),
-            platformsViewModel = remember{ PlatformsViewModel() },
-            isBridge = true
-        )
+            isBridge = true,
+            platformName = "gmail",
+            subscriptionId = -1L,
+        ) {}
     }
 }
 
@@ -602,7 +609,7 @@ fun AccountModalPreview() {
         )
         SelectAccountModal(
             _accounts = listOf(storedPlatform),
-            platformsViewModel = remember{ PlatformsViewModel() },
+            name = "gmail",
             onAccountSelected = {}
         ) {}
     }

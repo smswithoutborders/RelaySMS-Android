@@ -35,6 +35,7 @@ import com.example.sw0b_001.ui.views.compose.GatewayClientRequest
 import com.example.sw0b_001.ui.views.compose.MessageContent
 import com.example.sw0b_001.ui.views.compose.ReliabilityTestRequestPayload
 import com.example.sw0b_001.ui.views.compose.ReliabilityTestResponsePayload
+import com.example.sw0b_001.ui.views.compose.TextContent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -46,12 +47,6 @@ import java.nio.charset.StandardCharsets
 import java.util.Locale
 
 class PlatformsViewModel : ViewModel() {
-    var loginSignupPhoneNumber by mutableStateOf("")
-    var loginSignupPassword by mutableStateOf("")
-    var countryCode by mutableStateOf("")
-    var subscriptionId by mutableLongStateOf(-1L) // This forces to phone to prompt the user
-    var otpRequestType = OTPCodeVerificationType.AUTHENTICATE
-    var nextAttemptTimestamp: Int? = null
 
     var accountsForMissingDialog by mutableStateOf<Map<String, List<String>>>(emptyMap())
 
@@ -617,6 +612,44 @@ class PlatformsViewModel : ViewModel() {
             } catch (e: Exception) {
                 Log.e("EmailComposeHandler", "Failed to decompose bridge message string", e)
                 EmailContent("", "", "", "", "Error: Could not parse bridge message content.")
+            }
+        }
+
+    }
+
+    object TextComposeHandler {
+
+        fun decomposeMessage(contentBytes: ByteArray): TextContent {
+            return try {
+                val buffer = ByteBuffer.wrap(contentBytes).order(ByteOrder.LITTLE_ENDIAN)
+
+                val fromLen = buffer.get().toInt() and 0xFF
+                val toLen = buffer.getShort().toInt() and 0xFFFF
+                val ccLen = buffer.getShort().toInt() and 0xFFFF
+                val bccLen = buffer.getShort().toInt() and 0xFFFF
+                val subjectLen = buffer.get().toInt() and 0xFF
+                val bodyLen = buffer.getShort().toInt() and 0xFFFF
+                val accessLen = buffer.getShort().toInt() and 0xFFFF
+                val refreshLen = buffer.getShort().toInt() and 0xFFFF
+
+                val from = ByteArray(fromLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+
+                // Skip unused fields
+                if (toLen > 0) buffer.position(buffer.position() + toLen)
+                if (ccLen > 0) buffer.position(buffer.position() + ccLen)
+                if (bccLen > 0) buffer.position(buffer.position() + bccLen)
+                if (subjectLen > 0) buffer.position(buffer.position() + subjectLen)
+
+                val text = ByteArray(bodyLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+
+                // Skip token fields
+                if (accessLen > 0) buffer.position(buffer.position() + accessLen)
+                if (refreshLen > 0) buffer.position(buffer.position() + refreshLen)
+
+                TextContent(from = from, text = text)
+            } catch (e: Exception) {
+                Log.e("TextComposeHandler", "Failed to decompose V2 binary text message", e)
+                TextContent("Unknown", "Error: Could not parse message content.")
             }
         }
     }

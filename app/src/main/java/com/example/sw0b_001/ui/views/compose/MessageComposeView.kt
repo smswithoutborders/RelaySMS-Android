@@ -83,26 +83,12 @@ data class MessageContent(val from: String, val to: String, val message: String)
 data class RecipientFieldInfo(val label: String, val hint: String)
 
 @Composable
-private fun getRecipientFieldInfo(platform: AvailablePlatforms?): RecipientFieldInfo {
-    if (platform?.protocol_type == "pnba") {
-        return RecipientFieldInfo(
-            label = stringResource(R.string.recipient_number),
-            hint = stringResource(R.string.always_add_the_dialing_code_if_absent_e_g_237)
-        )
-    }
+private fun getRecipientFieldInfo(): RecipientFieldInfo {
+    return RecipientFieldInfo(
+        label = stringResource(R.string.recipient_number),
+        hint = stringResource(R.string.always_add_the_dialing_code_if_absent_e_g_237)
+    )
 
-    return when (platform?.name) {
-        "slack" -> RecipientFieldInfo(
-            label = stringResource(R.string.slack_recipient),
-            hint = stringResource(R.string.slack_hint)
-        )
-        // Add other platform-specific cases here
-
-        else -> RecipientFieldInfo(
-            label = stringResource(R.string.recipient_account),
-            hint = stringResource(R.string.recipient_account_format_hint)
-        )
-    }
 }
 
 object MessageComposeHandler {
@@ -143,16 +129,17 @@ object MessageComposeHandler {
 @Composable
 fun MessageComposeView(
     navController: NavController,
-    platformsViewModel: PlatformsViewModel,
+    name: String,
+    subscriptionId: Long,
+    encryptedContent: String? = null,
+    onSendCallback: ((Boolean) -> Unit)? = null,
 ) {
     val inspectMode = LocalInspectionMode.current
     val context = LocalContext.current
-    platformsViewModel.subscriptionId = context.getDefaultSimSubscription() ?: return
 
-    val decomposedMessage = if (platformsViewModel.message?.encryptedContent != null) {
+    val decomposedMessage = if (encryptedContent != null) {
         try {
-            val contentBytes = Base64.decode(
-                platformsViewModel.message!!.encryptedContent!!, Base64.DEFAULT)
+            val contentBytes = Base64.decode(encryptedContent, Base64.DEFAULT)
             MessageComposeHandler.decomposeMessage(contentBytes)
         } catch (e: Exception) {
             Log.e("MessageComposeView", "Failed to decode/decompose V1 message content.", e)
@@ -166,10 +153,8 @@ fun MessageComposeView(
 
     var showSelectAccountModal by remember { mutableStateOf(!inspectMode) }
     var selectedAccount by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
-    val fieldInfo = getRecipientFieldInfo(platform = platformsViewModel.platform)
-    val isPnba = platformsViewModel.platform?.protocol_type == "pnba"
-
-
+    val fieldInfo = getRecipientFieldInfo()
+//    val isPnba = platformsViewModel.platform?.protocol_type == "pnba"
 
     val launcher = rememberLauncherForActivityResult(
         contract = PickPhoneNumberContract()
@@ -183,7 +168,7 @@ fun MessageComposeView(
 
     if (showSelectAccountModal) {
         SelectAccountModal(
-            platformsViewModel = platformsViewModel,
+            name = name ?: "",
             onDismissRequest = {
                 if (selectedAccount == null) {
                     navController.popBackStack()
@@ -203,6 +188,7 @@ fun MessageComposeView(
         navController.popBackStack()
     }
 
+    val platformViewModel = remember{ PlatformsViewModel() }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -215,11 +201,12 @@ fun MessageComposeView(
                     }
                 },
                 actions = {
-                    val isSendEnabled = recipientAccount.isNotEmpty() && message.isNotEmpty() &&
-                            (if (isPnba) verifyPhoneNumberFormat(recipientAccount) else true)
+                    val isSendEnabled = recipientAccount.isNotEmpty() &&
+                            message.isNotEmpty() &&
+                            verifyPhoneNumberFormat(recipientAccount)
 
                     IconButton(onClick = {
-                        platformsViewModel.sendPublishingForMessaging(
+                        platformViewModel.sendPublishingForMessaging(
                             context = context,
                             messageContent = MessageContent(
                                 from = from,
@@ -227,7 +214,7 @@ fun MessageComposeView(
                                 message = message
                             ),
                             account = selectedAccount!!,
-                            subscriptionId = platformsViewModel.subscriptionId,
+                            subscriptionId = subscriptionId,
                             onFailure = { errorMsg ->
                                 CoroutineScope(Dispatchers.Main).launch {
                                     Toast.makeText(
@@ -283,29 +270,27 @@ fun MessageComposeView(
                     onValueChange = { recipientAccount = it },
                     label = { Text(fieldInfo.label, style = MaterialTheme.typography.bodyMedium) },
                     modifier = Modifier.weight(1f),
-                    isError = if (isPnba) recipientAccount.isNotEmpty() && !verifyPhoneNumberFormat(recipientAccount) else false,
+                    isError = recipientAccount.isNotEmpty() && !verifyPhoneNumberFormat(recipientAccount),
                     keyboardOptions = KeyboardOptions(
-                        keyboardType = if (isPnba) KeyboardType.Phone else KeyboardType.Text,
+                        keyboardType = KeyboardType.Phone,
                         imeAction = ImeAction.Next
                     )
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
-                if (isPnba) {
-                    IconButton(onClick = {
-                        if(readContactPermissions.status.isGranted) {
-                            launcher.launch(Unit)
-                        } else {
-                            readContactPermissions.launchPermissionRequest()
-                        }
-
-                    }) {
-                        Icon(
-                            imageVector = Icons.Filled.Contacts,
-                            contentDescription = stringResource(R.string.select_contact),
-                            tint = MaterialTheme.colorScheme.primary,
-                        )
+                IconButton(onClick = {
+                    if(readContactPermissions.status.isGranted) {
+                        launcher.launch(Unit)
+                    } else {
+                        readContactPermissions.launchPermissionRequest()
                     }
+
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.Contacts,
+                        contentDescription = stringResource(R.string.select_contact),
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
                 }
             }
 
@@ -374,7 +359,9 @@ fun MessageComposePreview() {
     AppTheme(darkTheme = false) {
         MessageComposeView(
             navController = NavController(LocalContext.current),
-            platformsViewModel = remember{ PlatformsViewModel() }
+            subscriptionId = -1L,
+            encryptedContent = "",
+            name = "telegram"
         )
     }
 }

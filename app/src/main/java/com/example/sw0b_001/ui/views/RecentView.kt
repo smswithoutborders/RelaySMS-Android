@@ -70,7 +70,6 @@ import com.example.sw0b_001.ui.navigation.MessageViewScreen
 import com.example.sw0b_001.ui.navigation.TextViewScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.views.compose.MessageComposeHandler
-import com.example.sw0b_001.ui.views.compose.TextComposeHandler
 
 @Composable
 fun RecentViewNoMessages(
@@ -217,16 +216,16 @@ fun RecentView(
                                 // Normal navigation
                                 platformsViewModel.message = clickedMessage
                                 when (clickedMessage.type) {
-                                    Platforms.ServiceTypes.EMAIL.type -> {
+                                    Platforms.ServiceTypes.EMAIL.name -> {
                                         navController.navigate(EmailViewScreen)
                                     }
-                                    Platforms.ServiceTypes.BRIDGE.type -> {
+                                    Platforms.ServiceTypes.BRIDGE.name -> {
                                         navController.navigate(BridgeViewScreen)
                                     }
-                                    Platforms.ServiceTypes.TEXT.type -> {
+                                    Platforms.ServiceTypes.TEXT.name -> {
                                         navController.navigate(TextViewScreen)
                                     }
-                                    Platforms.ServiceTypes.MESSAGE.type -> {
+                                    Platforms.ServiceTypes.MESSAGE.name -> {
                                         navController.navigate(MessageViewScreen)
                                     }
                                     else -> {
@@ -307,7 +306,7 @@ fun RecentMessageCard(
     var subHeading by remember { mutableStateOf( "") }
 
     when(message.type) {
-        Platforms.ServiceTypes.EMAIL.type -> {
+        Platforms.ServiceTypes.EMAIL.name -> {
             try {
                 val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
                 val decomposed = PlatformsViewModel.EmailComposeHandler.decomposeMessage(contentBytes)
@@ -321,7 +320,7 @@ fun RecentMessageCard(
                 text = ""
             }
         }
-        Platforms.ServiceTypes.BRIDGE_INCOMING.type -> {
+        Platforms.ServiceTypes.BRIDGE_INCOMING.name -> {
             val decomposed = Bridges.BridgeComposeHandler.decomposeInboxMessage(
                 message.encryptedContent!!,
             )
@@ -329,7 +328,7 @@ fun RecentMessageCard(
             subHeading = decomposed.subject
             text = decomposed.body
         }
-        Platforms.ServiceTypes.BRIDGE.type -> {
+        Platforms.ServiceTypes.BRIDGE.name -> {
             val decomposed = Bridges.BridgeComposeHandler.decomposeMessage(
                 message.encryptedContent!!,
             )
@@ -337,10 +336,12 @@ fun RecentMessageCard(
             subHeading = decomposed.subject
             text = decomposed.body
         }
-        Platforms.ServiceTypes.TEXT.type -> {
+        Platforms.ServiceTypes.TEXT.name -> {
             try {
-                val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
-                val decomposed = TextComposeHandler.decomposeMessage(contentBytes)
+                val contentBytes = Base64.decode(message.encryptedContent!!,
+                    Base64.DEFAULT)
+                val decomposed = PlatformsViewModel.TextComposeHandler
+                    .decomposeMessage(contentBytes)
                 heading = decomposed.from
                 subHeading = ""
                 text = decomposed.text
@@ -351,7 +352,7 @@ fun RecentMessageCard(
                 text = stringResource(R.string.message_content_could_not_be_displayed)
             }
         }
-        Platforms.ServiceTypes.MESSAGE.type -> {
+        Platforms.ServiceTypes.MESSAGE.name -> {
             try {
                 val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
                 val decomposed = MessageComposeHandler.decomposeMessage(contentBytes)
@@ -405,7 +406,7 @@ fun RecentMessageCard(
                     // Heading Text
                     Text(
                         heading,
-                        style = if (message.type == Platforms.ServiceTypes.TEXT.type) {
+                        style = if (message.type == Platforms.ServiceTypes.TEXT.name) {
                             MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
                         } else {
                             MaterialTheme.typography.bodyLarge

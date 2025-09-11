@@ -59,7 +59,6 @@ import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
-import com.example.sw0b_001.ui.navigation.OtpCodeNav
 import com.example.sw0b_001.ui.theme.AppTheme
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
@@ -70,8 +69,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ForgotPasswordView(
     navController: NavController = rememberNavController(),
-    platformsViewModel: PlatformsViewModel,
-    onCompleteCallback: ((Boolean) -> Unit)? = null,
+    isOnboarding: Boolean = false
 ) {
     val context = LocalContext.current
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
@@ -258,16 +256,15 @@ fun ForgotPasswordView(
                             phoneNumber = phoneNumber,
                             password = password,
                             otpRequiredCallback = {
-                                platformsViewModel.loginSignupPassword = password
-                                platformsViewModel.loginSignupPhoneNumber = phoneNumber
-                                platformsViewModel.otpRequestType =
-                                    OTPCodeVerificationType.RECOVER
-                                platformsViewModel.nextAttemptTimestamp = it
-
                                 CoroutineScope(Dispatchers.Main).launch {
-                                    navController.navigate(OtpCodeNav { success ->
-                                        onCompleteCallback?.invoke(success)
-                                    })
+                                    navController.navigate(OTPCodeScreen(
+                                        loginSignupPhoneNumber = phoneNumber,
+                                        loginSignupPassword = password,
+                                        countryCode = selectedCountry!!.countryCode,
+                                        otpRequestType = OTPCodeVerificationType.RECOVER,
+                                        nextAttemptTimestamp = it,
+                                        isOnboarding = isOnboarding
+                                    ))
                                 }
                             },
                             failedCallback = {
@@ -305,14 +302,13 @@ fun ForgotPasswordView(
 
             TextButton(
                 onClick = {
-                    platformsViewModel.loginSignupPassword = password
-                    platformsViewModel.loginSignupPhoneNumber = phoneNumber
-                    platformsViewModel.otpRequestType =
-                        OTPCodeVerificationType.AUTHENTICATE
-
-                    navController.navigate(OtpCodeNav { loggedIn ->
-                        onCompleteCallback?.invoke(loggedIn)
-                    } )
+                    navController.navigate(OTPCodeScreen(
+                        loginSignupPhoneNumber = phoneNumber,
+                        loginSignupPassword = password,
+                        countryCode = selectedCountry!!.countryCode,
+                        otpRequestType = OTPCodeVerificationType.AUTHENTICATE,
+                        isOnboarding = isOnboarding
+                    ))
                 },
                 enabled = (phoneNumber.isNotEmpty()
                         && password.isNotEmpty()
@@ -364,6 +360,6 @@ private fun recoverPassword(
 @Composable
 fun ForgotPasswordPreview() {
     AppTheme(darkTheme = false) {
-        ForgotPasswordView(rememberNavController(), PlatformsViewModel())
+        ForgotPasswordView(rememberNavController(), )
     }
 }

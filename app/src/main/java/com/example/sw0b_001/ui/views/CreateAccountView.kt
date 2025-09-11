@@ -73,8 +73,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
 import com.example.sw0b_001.BuildConfig
-import com.example.sw0b_001.ui.navigation.LoginAccountNav
-import com.example.sw0b_001.ui.navigation.OtpCodeNav
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 
 
@@ -82,8 +80,7 @@ import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 @Composable
 fun CreateAccountView(
     navController: NavController = rememberNavController(),
-    platformsViewModel: PlatformsViewModel,
-    onCompleteCallback: ((Boolean) -> Unit)? = null,
+    isOnboarding: Boolean = false,
 ) {
     val context = LocalContext.current
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
@@ -321,17 +318,14 @@ fun CreateAccountView(
                             countryCode = selectedCountry!!.countryCode,
                             password = password,
                             otpRequiredCallback = {
-                                platformsViewModel.loginSignupPassword = password
-                                platformsViewModel.loginSignupPhoneNumber = phoneNumber
-                                platformsViewModel.countryCode = selectedCountry!!.countryCode
-                                platformsViewModel.nextAttemptTimestamp = it
-                                platformsViewModel.otpRequestType =
-                                    OTPCodeVerificationType.CREATE
-
                                 CoroutineScope(Dispatchers.Main).launch {
-                                    navController.navigate(OtpCodeNav { success ->
-                                        onCompleteCallback?.invoke(success)
-                                    })
+                                    navController.navigate(OTPCodeScreen(
+                                        loginSignupPhoneNumber = phoneNumber,
+                                        loginSignupPassword = password,
+                                        countryCode = selectedCountry!!.countryCode,
+                                        otpRequestType = OTPCodeVerificationType.CREATE,
+                                        nextAttemptTimestamp = it,
+                                    ))
                                 }
                             },
                             failedCallback = {
@@ -375,13 +369,13 @@ fun CreateAccountView(
 
             TextButton(
                 onClick = {
-                    platformsViewModel.loginSignupPassword = password
-                    platformsViewModel.loginSignupPhoneNumber = phoneNumber
-                    platformsViewModel.otpRequestType =
-                        OTPCodeVerificationType.AUTHENTICATE
-                    navController.navigate(OtpCodeNav { loggedIn ->
-                        onCompleteCallback?.invoke(loggedIn)
-                    } )
+                    navController.navigate(OTPCodeScreen(
+                        loginSignupPhoneNumber = phoneNumber,
+                        loginSignupPassword = password,
+                        countryCode = selectedCountry!!.countryCode,
+                        otpRequestType = OTPCodeVerificationType.AUTHENTICATE,
+                        isOnboarding = isOnboarding
+                    ))
                 },
                 enabled = (phoneNumber.isNotEmpty()
                         && password.isNotEmpty()
@@ -408,9 +402,7 @@ fun CreateAccountView(
                 modifier = Modifier
                     .padding(top = 0.dp)
                     .clickable {
-                        navController.navigate(LoginAccountNav { loggedIn ->
-                            onCompleteCallback?.invoke(loggedIn)
-                        })
+                        navController.navigate(LoginScreen(isOnboarding = isOnboarding))
                     },
                 color = MaterialTheme.colorScheme.onBackground
             )
@@ -464,6 +456,6 @@ private fun createAccount(
 @Composable
 fun CreateAccountPreview() {
     AppTheme(darkTheme = false) {
-        CreateAccountView(rememberNavController(), PlatformsViewModel())
+        CreateAccountView(rememberNavController())
     }
 }

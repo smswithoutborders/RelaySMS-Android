@@ -8,7 +8,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.navigation.EmailComposeNav
+import com.example.sw0b_001.ui.navigation.EmailComposeScreen
 import com.example.sw0b_001.ui.onboarding.InteractiveOnboarding
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -63,7 +63,12 @@ class OnboardingViewModel : ViewModel() {
                             ){}
                         }
                     }
-                    navController.navigate(EmailComposeNav)
+                    navController.navigate(EmailComposeScreen(
+                        isBridge = true,
+                        platformName = "",
+                        subscriptionId = -1L,
+                        isOnboarding = true
+                    ))
                 }
             ),
             InteractiveOnboarding(

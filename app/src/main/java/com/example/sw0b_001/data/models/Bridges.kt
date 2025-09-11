@@ -268,8 +268,8 @@ object Bridges {
                                     )
                             }
                             encryptedContent.date = System.currentTimeMillis()
-                            encryptedContent.type = Platforms.ServiceTypes.BRIDGE_INCOMING.type
-                            encryptedContent.platformName = Platforms.ServiceTypes.BRIDGE.type
+                            encryptedContent.type = Platforms.ServiceTypes.BRIDGE_INCOMING.name
+                            encryptedContent.platformName = Platforms.ServiceTypes.BRIDGE.name
                             encryptedContent.fromAccount = it.substring(lenAliasAddress,
                                 lenAliasAddress + lenSender)
 

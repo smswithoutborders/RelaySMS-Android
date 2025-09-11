@@ -44,7 +44,6 @@ import com.example.sw0b_001.data.Platforms.Platforms
 import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.ui.components.MissingTokenInfoDialog
 import com.example.sw0b_001.ui.navigation.AboutScreen
-import com.example.sw0b_001.ui.navigation.BridgeEmailComposeScreen
 import com.example.sw0b_001.ui.navigation.BridgeViewScreen
 import com.example.sw0b_001.ui.navigation.EmailComposeScreen
 import com.example.sw0b_001.ui.navigation.EmailViewScreen
@@ -87,7 +86,6 @@ import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.SearchViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ThreadsViewModel
 import com.example.sw0b_001.extensions.context.settingsGetOnboardedCompletely
 import com.example.sw0b_001.ui.appbars.BottomNavBar
-import com.example.sw0b_001.ui.navigation.EmailComposeNav
 import com.example.sw0b_001.ui.onboarding.OnboardingInteractive
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
 import com.example.sw0b_001.ui.views.BottomTabsItems
@@ -269,65 +267,79 @@ class MainActivity : ComponentActivity() {
                     gatewayClientViewModel = gatewayClientViewModel,
                 )
             }
-            composable<LoginScreen> {
+            composable<LoginScreen> { backEntry ->
+                val loginNav: LoginScreen = backEntry.toRoute()
                 LoginView(
                     navController = navController,
-                    platformsViewModel = platformsViewModel,
+                    isOnboarding = loginNav.isOnboarding,
                 )
             }
-            composable<ForgotPasswordScreen> {
+            composable<ForgotPasswordScreen> { backEntry ->
+                val forgotPasswordNav: ForgotPasswordScreen = backEntry.toRoute()
                 ForgotPasswordView(
                     navController = navController,
-                    platformsViewModel = platformsViewModel,
+                    isOnboarding = forgotPasswordNav.isOnboarding,
                 )
             }
-            composable<CreateAccountScreen> {
+            composable<CreateAccountScreen> { backEntry ->
+                val createAccountNav: ForgotPasswordScreen = backEntry.toRoute()
                 CreateAccountView(
                     navController = navController,
-                    platformsViewModel = platformsViewModel,
+                    isOnboarding = createAccountNav.isOnboarding,
                 )
             }
-            composable<OTPCodeScreen> {
+            composable<OTPCodeScreen> { backEntry ->
+                val otpCodeNav: OTPCodeScreen = backEntry.toRoute()
                 OtpCodeVerificationView(
                     navController = navController,
-                    platformsViewModel = platformsViewModel,
+                    loginSignupPhoneNumber = otpCodeNav.loginSignupPhoneNumber,
+                    loginSignupPassword = otpCodeNav.loginSignupPassword,
+                    countryCode = otpCodeNav.countryCode,
+                    otpRequestType = otpCodeNav.otpRequestType,
+                    nextAttemptTimestamp = otpCodeNav.nextAttemptTimestamp,
+                    platformViewModel = platformsViewModel,
+                    onCompleteCallback = if(otpCodeNav.isOnboarding)
+                        onboardingViewModel.callback else null,
                 )
             }
             composable<AboutScreen> {
                 AboutView(navController = navController)
             }
 
-            composable<BridgeEmailComposeScreen> {
+            composable<EmailComposeScreen> { backEntry ->
+                val emailComposeNav: EmailComposeScreen = backEntry.toRoute()
                 EmailComposeView(
                     navController = navController,
-                    platformsViewModel = platformsViewModel,
-                    isBridge = true
+                    isBridge = emailComposeNav.isBridge,
+                    platformName = emailComposeNav.platformName,
+                    subscriptionId = emailComposeNav.subscriptionId,
+                    encryptedContent = emailComposeNav.encryptedContent,
+                    fromAccount = emailComposeNav.fromAccount,
+                    onSendCallback = if(emailComposeNav.isOnboarding)
+                        onboardingViewModel.callback else null
                 )
             }
-            composable<EmailComposeNav> {
-                EmailComposeView(
-                    navController = navController,
-                    platformsViewModel = platformsViewModel,
-                    isBridge = true,
-                    onSendCallback = onboardingViewModel.callback,
-                )
-            }
-            composable<EmailComposeScreen> {
-                EmailComposeView(
-                    navController = navController,
-                    platformsViewModel = platformsViewModel,
-                )
-            }
-            composable<TextComposeScreen> {
+            composable<TextComposeScreen> { backEntry ->
+                val textComposeNav: TextComposeScreen = backEntry.toRoute()
                 TextComposeView(
                     navController = navController,
-                    platformsViewModel = platformsViewModel,
+                    name = textComposeNav.platformName,
+                    serviceType = textComposeNav.serviceType,
+                    subscriptionId = textComposeNav.subscriptionId,
+                    encryptedContent = textComposeNav.encryptedContent,
+                    onSendCallback = if (textComposeNav.isOnboarding)
+                        onboardingViewModel.callback else null,
                 )
             }
-            composable<MessageComposeScreen> {
+            composable<MessageComposeScreen> { backEntry ->
+                val messageComposeNav: MessageComposeScreen = backEntry.toRoute()
                 MessageComposeView(
                     navController = navController,
-                    platformsViewModel = platformsViewModel,
+                    name = messageComposeNav.platformName,
+                    subscriptionId = messageComposeNav.subscriptionId,
+                    encryptedContent = messageComposeNav.encryptedContent,
+                    onSendCallback = if(messageComposeNav.isOnboarding)
+                        onboardingViewModel.callback else null
                 )
             }
             composable<EmailViewScreen> {

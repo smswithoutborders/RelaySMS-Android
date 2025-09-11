@@ -16,13 +16,13 @@ import java.net.URL
 @Entity(indices = [Index(value = ["name"], unique = true)])
 class Platforms {
 
-    enum class ServiceTypes(val type: String) {
-        EMAIL("email"),
-        TEXT("text"),
-        MESSAGE("message"),
-        BRIDGE("bridge"),
-        BRIDGE_INCOMING("bridge_incoming"),
-        TEST("test"),
+    enum class ServiceTypes {
+        EMAIL,
+        TEXT,
+        MESSAGE,
+        BRIDGE,
+        BRIDGE_INCOMING,
+        TEST,
     }
 
     enum class ProtocolTypes(val type: String) {

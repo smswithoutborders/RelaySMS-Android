@@ -162,7 +162,7 @@ fun PlatformListContent(
         val displayedPlatforms = if (isCompose) {
             platforms.filter { platform ->
                 storedPlatforms.any { it.name == platform.name } ||
-                        platform.service_type == Platforms.ServiceTypes.TEST.type
+                        platform.service_type == Platforms.ServiceTypes.TEST.name
             }
         } else {
             platforms
@@ -175,7 +175,7 @@ fun PlatformListContent(
             maxItemsInEachRow = 2
         ) {
             displayedPlatforms.forEach { platform ->
-                if(platform.service_type == Platforms.ServiceTypes.TEST.type && isCompose) {
+                if(platform.service_type == Platforms.ServiceTypes.TEST.name && isCompose) {
                     PlatformCard(
                         logo =
                             if(platform.logo != null)
@@ -190,7 +190,7 @@ fun PlatformListContent(
                         isActive = true,
                         onClick = onPlatformClick
                     )
-                } else if(platform.service_type != Platforms.ServiceTypes.TEST.type) {
+                } else if(platform.service_type != Platforms.ServiceTypes.TEST.name) {
                     PlatformCard(
                         logo =
                             if(platform.logo != null)
@@ -273,7 +273,7 @@ fun AddPlatformsScreenPreview() {
     AppTheme(darkTheme = false) {
         AvailablePlatformsView(
             navController = NavController(context = LocalContext.current),
-            platformsViewModel = PlatformsViewModel()
+            platformsViewModel = remember{ PlatformsViewModel() }
         )
     }
 }

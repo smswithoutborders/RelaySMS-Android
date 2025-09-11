@@ -62,7 +62,7 @@ class MessagesViewModel : ViewModel() {
 
                 datastore = Datastore.getDatastore(context)
                 inboxMessageList = datastore.encryptedContentDAO()
-                    .inbox(Platforms.ServiceTypes.BRIDGE_INCOMING.type)
+                    .inbox(Platforms.ServiceTypes.BRIDGE_INCOMING.name)
                 delay(50)
                 _isLoading.value = false
             }
@@ -71,7 +71,7 @@ class MessagesViewModel : ViewModel() {
     }
 
     private fun loadEncryptedContents() : LiveData<MutableList<EncryptedContent>> {
-        return datastore.encryptedContentDAO().all(Platforms.ServiceTypes.BRIDGE_INCOMING.type)
+        return datastore.encryptedContentDAO().all(Platforms.ServiceTypes.BRIDGE_INCOMING.name)
     }
 
     fun insert(encryptedContent: EncryptedContent) : Long {

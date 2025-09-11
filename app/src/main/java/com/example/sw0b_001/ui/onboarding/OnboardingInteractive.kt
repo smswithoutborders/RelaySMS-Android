@@ -37,10 +37,9 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.components.OnboardingNextButton
 import com.example.sw0b_001.ui.modals.SignupLoginModal
-import com.example.sw0b_001.ui.navigation.CreateAccountNav
-import com.example.sw0b_001.ui.navigation.EmailComposeNav
+import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.EmailComposeScreen
-import com.example.sw0b_001.ui.navigation.LoginAccountNav
+import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
 
@@ -100,21 +99,20 @@ fun OnboardingInteractive(
                         ){ }
                     )
                 }
+                val callback: ((Boolean) -> Unit) = { success ->
+                    if(success) {
+                        onboardingViewModel.setOnboarding(completedOnboarding)
+                    }
+                }
                 SignupLoginModal(
                     onboardingViewModel.showLoginSignupModal,
                     createAccountCallback = {
-                        navController.navigate(CreateAccountNav { created ->
-                            if(created) {
-                                onboardingViewModel.setOnboarding(completedOnboarding)
-                            }
-                        })
+                        onboardingViewModel.callback = callback
+                        navController.navigate(CreateAccountScreen)
                     },
                     loginAccountCallback = {
-                        navController.navigate(LoginAccountNav { loggedIn ->
-                            if(loggedIn) {
-                                onboardingViewModel.setOnboarding(completedOnboarding)
-                            }
-                        })
+                        onboardingViewModel.callback = callback
+                        navController.navigate(LoginScreen)
                     }
                 ) { onboardingViewModel.showLoginSignupModal = false }
             }

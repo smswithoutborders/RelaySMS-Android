@@ -43,7 +43,6 @@ import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.navigation.TextComposeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.views.compose.TextComposeHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -66,7 +65,8 @@ fun TextDetailsView(
     if (message?.encryptedContent != null) {
         try {
             val contentBytes = Base64.decode(message.encryptedContent, Base64.DEFAULT)
-            val decomposedMessage = TextComposeHandler.decomposeMessage(contentBytes)
+            val decomposedMessage = PlatformsViewModel.TextComposeHandler
+                .decomposeMessage(contentBytes)
 
             from = decomposedMessage.from
             text = decomposedMessage.text
@@ -159,7 +159,7 @@ fun TextDetailsPreview() {
         text.gatewayClientMSISDN = "+237123456789"
         text.encryptedContent = "@relaysms.me:Hello world"
 
-        val platformsViewModel = PlatformsViewModel()
+        val platformsViewModel = remember{ PlatformsViewModel() }
         platformsViewModel.message = text
 
         TextDetailsView(

@@ -55,70 +55,23 @@ import java.util.Locale
 
 data class TextContent(val from: String, val text: String)
 
-//object TextComposeHandler {
-//    fun decomposeMessage(
-//        text: String
-//    ): TextContent {
-//        println(text)
-//        return text.split(":").let {
-//            TextContent(
-//                from=it[0],
-//                text = it.subList(1, it.size).joinToString()
-//            )
-//        }
-//    }
-//}
-
-object TextComposeHandler {
-
-    fun decomposeMessage(contentBytes: ByteArray): TextContent {
-        return try {
-            val buffer = ByteBuffer.wrap(contentBytes).order(ByteOrder.LITTLE_ENDIAN)
-
-            val fromLen = buffer.get().toInt() and 0xFF
-            val toLen = buffer.getShort().toInt() and 0xFFFF
-            val ccLen = buffer.getShort().toInt() and 0xFFFF
-            val bccLen = buffer.getShort().toInt() and 0xFFFF
-            val subjectLen = buffer.get().toInt() and 0xFF
-            val bodyLen = buffer.getShort().toInt() and 0xFFFF
-            val accessLen = buffer.getShort().toInt() and 0xFFFF
-            val refreshLen = buffer.getShort().toInt() and 0xFFFF
-
-            val from = ByteArray(fromLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
-
-            // Skip unused fields
-            if (toLen > 0) buffer.position(buffer.position() + toLen)
-            if (ccLen > 0) buffer.position(buffer.position() + ccLen)
-            if (bccLen > 0) buffer.position(buffer.position() + bccLen)
-            if (subjectLen > 0) buffer.position(buffer.position() + subjectLen)
-
-            val text = ByteArray(bodyLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
-
-            // Skip token fields
-            if (accessLen > 0) buffer.position(buffer.position() + accessLen)
-            if (refreshLen > 0) buffer.position(buffer.position() + refreshLen)
-
-            TextContent(from = from, text = text)
-        } catch (e: Exception) {
-            Log.e("TextComposeHandler", "Failed to decompose V2 binary text message", e)
-            TextContent("Unknown", "Error: Could not parse message content.")
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextComposeView(
     navController: NavController,
-    platformsViewModel: PlatformsViewModel
+    name: String,
+    subscriptionId: Long,
+    encryptedContent: String? = null,
+    serviceType: Platforms.ServiceTypes,
+    onSendCallback: ((Boolean) -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val previewMode = LocalInspectionMode.current
 
-    val decomposedMessage = if (platformsViewModel.message?.encryptedContent != null) {
+    val decomposedMessage = if (encryptedContent != null) {
         try {
-            val contentBytes = Base64.decode(platformsViewModel.message!!.encryptedContent!!, Base64.DEFAULT)
-            TextComposeHandler.decomposeMessage(contentBytes)
+            val contentBytes = Base64.decode(encryptedContent!!, Base64.DEFAULT)
+            PlatformsViewModel.TextComposeHandler.decomposeMessage(contentBytes)
         } catch (e: Exception) {
             null
         }
@@ -127,8 +80,8 @@ fun TextComposeView(
     var from by remember { mutableStateOf( decomposedMessage?.from ?: "") }
     var message by remember { mutableStateOf( decomposedMessage?.text ?: "" ) }
 
-    var showSelectAccountModal by remember { mutableStateOf(
-        !previewMode && platformsViewModel.platform?.service_type != Platforms.ServiceTypes.TEST.type)
+    var showSelectAccountModal by remember { mutableStateOf( !previewMode &&
+            serviceType != Platforms.ServiceTypes.TEST)
     }
     var selectedAccount by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
 
@@ -140,7 +93,7 @@ fun TextComposeView(
 
     if (showSelectAccountModal) {
         SelectAccountModal(
-            platformsViewModel = platformsViewModel,
+            name = name,
             onDismissRequest = {
                 if (selectedAccount == null) {
                     navController.popBackStack()
@@ -159,6 +112,8 @@ fun TextComposeView(
     BackHandler {
         navController.popBackStack()
     }
+
+    val platformViewModel = remember{ PlatformsViewModel() }
 
     Scaffold(
         topBar = {
@@ -182,12 +137,12 @@ fun TextComposeView(
                 actions = {
                     IconButton(onClick = {
                         loading = true
-                        if (platformsViewModel.platform?.service_type == Platforms.ServiceTypes.TEST.type) {
+                        if (serviceType == Platforms.ServiceTypes.TEST) {
                             val testStartTime = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).format(Date(System.currentTimeMillis()))
-                            platformsViewModel.sendPublishingForTest(
+                            platformViewModel.sendPublishingForTest(
                                 context = context,
                                 startTime = testStartTime,
-                                platform = platformsViewModel.platform!!,
+                                platform = platformViewModel.platform!!,
                                 onFailure = { errorMsg ->
                                     loading = false
                                     CoroutineScope(Dispatchers.Main).launch {
@@ -208,18 +163,19 @@ fun TextComposeView(
                                         }
                                     }
                                 },
-                                subscriptionId = platformsViewModel.subscriptionId,
+                                subscriptionId = subscriptionId,
                             )
                         }
                         else {
-                            platformsViewModel.sendPublishingForPost(
+                            platformViewModel.sendPublishingForPost(
                                 context = context,
                                 text = message,
                                 account = selectedAccount!!,
                                 onFailure = { errorMsg ->
                                     loading = false
                                     CoroutineScope(Dispatchers.Main).launch {
-                                        Toast.makeText(context, errorMsg ?: "Unknown error", Toast.LENGTH_LONG).show()
+                                        Toast.makeText(context, errorMsg ?: "Unknown error",
+                                            Toast.LENGTH_LONG).show()
                                     }
                                 },
                                 onSuccess = {
@@ -228,11 +184,12 @@ fun TextComposeView(
                                         navController.popBackStack()
                                     }
                                 },
-                                subscriptionId = platformsViewModel.subscriptionId
+                                subscriptionId = subscriptionId
                             )
                         }
                     }, enabled = !loading) {
-                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.post))
+                        Icon(Icons.AutoMirrored.Filled.Send,
+                            contentDescription = stringResource(R.string.post))
                     }
                 },
             )
@@ -251,8 +208,7 @@ fun TextComposeView(
             // Message Body
             OutlinedTextField(
                 value = message,
-                enabled = platformsViewModel.platform?.service_type !=
-                        Platforms.ServiceTypes.TEST.type,
+                enabled = serviceType != Platforms.ServiceTypes.TEST,
                 onValueChange = { message = it },
                 label = {
                     Text(stringResource(R.string.what_s_happening),
@@ -287,7 +243,10 @@ fun TextComposePreview() {
     AppTheme(darkTheme = false) {
         TextComposeView(
             navController = NavController(LocalContext.current),
-            platformsViewModel = remember{ PlatformsViewModel() }
+            name = "",
+            subscriptionId = 1L,
+            encryptedContent = "",
+            serviceType = Platforms.ServiceTypes.TEXT
         )
     }
 }

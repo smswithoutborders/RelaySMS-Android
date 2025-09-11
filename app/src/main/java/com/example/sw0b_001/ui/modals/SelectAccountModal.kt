@@ -63,7 +63,7 @@ data class Account(
 @Composable
 fun SelectAccountModal(
     _accounts: List<StoredPlatformsEntity> = emptyList<StoredPlatformsEntity>(),
-    platformsViewModel: PlatformsViewModel,
+    name: String,
     onAccountSelected: (StoredPlatformsEntity) -> Unit = {},
     onDismissRequest: () -> Unit
 ) {
@@ -75,8 +75,9 @@ fun SelectAccountModal(
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(true) }
 
+    val platformsViewModel = remember{ PlatformsViewModel() }
     val accounts: List<StoredPlatformsEntity> = if(LocalInspectionMode.current) _accounts
-    else platformsViewModel.getAccounts(context, platformsViewModel.platform?.name!!)
+    else platformsViewModel.getAccounts(context, name)
         .observeAsState(emptyList()).value
 
     if (showBottomSheet) {
@@ -195,7 +196,7 @@ fun SelectAccountModalPreview() {
         )
         SelectAccountModal(
             _accounts = listOf(storedPlatform),
-            platformsViewModel = PlatformsViewModel(),
+            name = "gmail",
             onAccountSelected = {},
             onDismissRequest = {}
         )
