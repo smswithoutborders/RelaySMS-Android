@@ -62,9 +62,12 @@ import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.R
+import com.example.sw0b_001.ui.navigation.CreateAccountNav
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
+import com.example.sw0b_001.ui.navigation.ForgotPasswordNav
 import com.example.sw0b_001.ui.navigation.ForgotPasswordScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
+import com.example.sw0b_001.ui.navigation.OtpCodeNav
 import com.example.sw0b_001.ui.theme.AppTheme
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
@@ -76,6 +79,7 @@ import kotlinx.coroutines.launch
 fun LoginView(
     navController: NavController = rememberNavController(),
     platformsViewModel: PlatformsViewModel,
+    onCompleteCallback: ((Boolean) -> Unit)? = null,
 ) {
     val context = LocalContext.current
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
@@ -263,12 +267,16 @@ fun LoginView(
                                 platformsViewModel.nextAttemptTimestamp = nextAttemptTimestamp
 
                                 CoroutineScope(Dispatchers.Main).launch {
-                                    navController.navigate(OTPCodeScreen)
+                                    navController.navigate(OtpCodeNav { success ->
+                                        onCompleteCallback?.invoke(success)
+                                    })
                                 }
                             },
                             passwordRequiredCallback = {
                                 CoroutineScope(Dispatchers.Main).launch {
-                                    navController.navigate(ForgotPasswordScreen)
+                                    navController.navigate(ForgotPasswordNav { success ->
+                                        onCompleteCallback?.invoke(success)
+                                    })
                                 }
                             },
                             failedCallback = {
@@ -304,7 +312,10 @@ fun LoginView(
                         platformsViewModel.loginSignupPhoneNumber = phoneNumber
                         platformsViewModel.otpRequestType =
                             OTPCodeVerificationType.AUTHENTICATE
-                        navController.navigate(OTPCodeScreen)
+
+                        navController.navigate(OtpCodeNav { loggedIn ->
+                            onCompleteCallback?.invoke(loggedIn)
+                        } )
                     },
                     enabled = (phoneNumber.isNotEmpty() && password.isNotEmpty()) && !isLoading,
                     modifier = Modifier.padding(bottom=16.dp)) {
@@ -329,7 +340,9 @@ fun LoginView(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .clickable {
-                            navController.navigate(CreateAccountScreen)
+                            navController.navigate(CreateAccountNav { created ->
+                                onCompleteCallback?.invoke(created)
+                            })
                         },
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -381,7 +394,8 @@ private fun login(
 @Composable
 fun LoginViewPreview() {
     AppTheme(darkTheme = false) {
-        LoginView(platformsViewModel = PlatformsViewModel())
+        LoginView(rememberNavController(),
+            remember{ PlatformsViewModel() })
     }
 }
 

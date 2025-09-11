@@ -35,7 +35,7 @@ import com.example.sw0b_001.ui.views.GatewayClientView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ComposeChooseGatewayClients(
+fun ComposeChooseGatewayClientsModal(
     showBottomSheet: Boolean,
     onDismiss: () -> Unit,
 ) {
@@ -97,6 +97,6 @@ fun ComposeChooseGatewayClients(
 @Composable
 fun ComposeChooseGatewayClientsPreview() {
     AppTheme {
-        ComposeChooseGatewayClients(true,) { }
+        ComposeChooseGatewayClientsModal(true,) { }
     }
 }

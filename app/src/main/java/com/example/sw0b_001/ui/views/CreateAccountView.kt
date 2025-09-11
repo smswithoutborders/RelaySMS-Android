@@ -73,6 +73,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
 import com.example.sw0b_001.BuildConfig
+import com.example.sw0b_001.ui.navigation.LoginAccountNav
+import com.example.sw0b_001.ui.navigation.OtpCodeNav
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 
 
@@ -80,7 +82,8 @@ import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 @Composable
 fun CreateAccountView(
     navController: NavController = rememberNavController(),
-    platformsViewModel: PlatformsViewModel
+    platformsViewModel: PlatformsViewModel,
+    onCompleteCallback: ((Boolean) -> Unit)? = null,
 ) {
     val context = LocalContext.current
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
@@ -326,7 +329,9 @@ fun CreateAccountView(
                                     OTPCodeVerificationType.CREATE
 
                                 CoroutineScope(Dispatchers.Main).launch {
-                                    navController.navigate(OTPCodeScreen)
+                                    navController.navigate(OtpCodeNav { success ->
+                                        onCompleteCallback?.invoke(success)
+                                    })
                                 }
                             },
                             failedCallback = {
@@ -374,7 +379,9 @@ fun CreateAccountView(
                     platformsViewModel.loginSignupPhoneNumber = phoneNumber
                     platformsViewModel.otpRequestType =
                         OTPCodeVerificationType.AUTHENTICATE
-                    navController.navigate(OTPCodeScreen)
+                    navController.navigate(OtpCodeNav { loggedIn ->
+                        onCompleteCallback?.invoke(loggedIn)
+                    } )
                 },
                 enabled = (phoneNumber.isNotEmpty()
                         && password.isNotEmpty()
@@ -401,7 +408,9 @@ fun CreateAccountView(
                 modifier = Modifier
                     .padding(top = 0.dp)
                     .clickable {
-                        navController.navigate(LoginScreen)
+                        navController.navigate(LoginAccountNav { loggedIn ->
+                            onCompleteCallback?.invoke(loggedIn)
+                        })
                     },
                 color = MaterialTheme.colorScheme.onBackground
             )

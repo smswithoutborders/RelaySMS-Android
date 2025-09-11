@@ -59,6 +59,7 @@ import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
+import com.example.sw0b_001.ui.navigation.OtpCodeNav
 import com.example.sw0b_001.ui.theme.AppTheme
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
@@ -70,6 +71,7 @@ import kotlinx.coroutines.launch
 fun ForgotPasswordView(
     navController: NavController = rememberNavController(),
     platformsViewModel: PlatformsViewModel,
+    onCompleteCallback: ((Boolean) -> Unit)? = null,
 ) {
     val context = LocalContext.current
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
@@ -263,7 +265,9 @@ fun ForgotPasswordView(
                                 platformsViewModel.nextAttemptTimestamp = it
 
                                 CoroutineScope(Dispatchers.Main).launch {
-                                    navController.navigate(OTPCodeScreen)
+                                    navController.navigate(OtpCodeNav { success ->
+                                        onCompleteCallback?.invoke(success)
+                                    })
                                 }
                             },
                             failedCallback = {
@@ -305,7 +309,10 @@ fun ForgotPasswordView(
                     platformsViewModel.loginSignupPhoneNumber = phoneNumber
                     platformsViewModel.otpRequestType =
                         OTPCodeVerificationType.AUTHENTICATE
-                    navController.navigate(OTPCodeScreen)
+
+                    navController.navigate(OtpCodeNav { loggedIn ->
+                        onCompleteCallback?.invoke(loggedIn)
+                    } )
                 },
                 enabled = (phoneNumber.isNotEmpty()
                         && password.isNotEmpty()

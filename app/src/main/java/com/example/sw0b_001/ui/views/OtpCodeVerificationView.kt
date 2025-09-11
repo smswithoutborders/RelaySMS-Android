@@ -56,6 +56,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
@@ -66,6 +67,7 @@ import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.data.savePhoneNumberToPrefs
+import com.example.sw0b_001.ui.theme.AppTheme
 import com.google.android.gms.auth.api.phone.SmsRetriever
 import com.google.android.gms.common.api.CommonStatusCodes
 import com.google.android.gms.common.api.Status
@@ -146,13 +148,12 @@ fun SmsRetrieverHandler(onSmsRetrieved: (String) -> Unit) {
     }
 }
 
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OtpCodeVerificationView(
     navController: NavController = rememberNavController(),
     platformsViewModel: PlatformsViewModel,
+    onCompleteCallback: ((Boolean) -> Unit)? = null
 ) {
     val context = LocalContext.current
     var otpCode by remember { mutableStateOf("") }
@@ -300,7 +301,7 @@ fun OtpCodeVerificationView(
                         onCompleteCallback = {isLoading = false}
                     )  {
                         CoroutineScope(Dispatchers.Main).launch {
-                            navController.navigate(HomepageScreen) {
+                            onCompleteCallback?.invoke(true) ?: navController.navigate(HomepageScreen) {
                                 popUpTo(HomepageScreen) {
                                     inclusive = true
                                 }
@@ -480,3 +481,12 @@ private fun submitOTPCode(
     }
 }
 
+@Preview
+@Composable
+fun OtpCodeVerificationViewPreview() {
+    AppTheme {
+        OtpCodeVerificationView(rememberNavController(),
+            remember{ PlatformsViewModel() }
+        )
+    }
+}

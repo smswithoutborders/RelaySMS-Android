@@ -6,6 +6,7 @@ import androidx.core.content.edit
 private object Settings {
     const val FILENAME: String = "com.afkanerd.smswithoutborders.settings"
     const val SETTINGS_NOT_SHOW_CHOOSE_GATEWAY_CLIENT = "SETTINGS_NOT_SHOW_CHOOSE_GATEWAY_CLIENT"
+    const val SETTINGS_ONBOARDED_COMPLETELY = "SETTINGS_ONBOARDED_COMPLETELY"
 }
 
 val Context.settingsGetNotShowChooseGatewayClient get(): Boolean {
@@ -15,9 +16,23 @@ val Context.settingsGetNotShowChooseGatewayClient get(): Boolean {
         .getBoolean(Settings.SETTINGS_NOT_SHOW_CHOOSE_GATEWAY_CLIENT, false)
 }
 
+val Context.settingsGetOnboardedCompletely get(): Boolean {
+    val sharedPreferences = getSharedPreferences(
+        Settings.FILENAME, Context.MODE_PRIVATE)
+    return sharedPreferences
+        .getBoolean(Settings.SETTINGS_ONBOARDED_COMPLETELY, false)
+}
+
 fun Context.settingsSetNotShowChooseGatewayClient(state: Boolean) {
     getSharedPreferences( Settings.FILENAME, Context.MODE_PRIVATE).edit {
         putBoolean(Settings.SETTINGS_NOT_SHOW_CHOOSE_GATEWAY_CLIENT, state)
+        apply()
+    }
+}
+
+fun Context.settingsSetOnboardedCompletely(state: Boolean) {
+    getSharedPreferences( Settings.FILENAME, Context.MODE_PRIVATE).edit {
+        putBoolean(Settings.SETTINGS_ONBOARDED_COMPLETELY, state)
         apply()
     }
 }

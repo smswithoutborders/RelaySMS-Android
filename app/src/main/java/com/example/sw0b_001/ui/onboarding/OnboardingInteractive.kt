@@ -17,6 +17,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -35,9 +36,13 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.components.OnboardingNextButton
+import com.example.sw0b_001.ui.modals.SignupLoginModal
+import com.example.sw0b_001.ui.navigation.CreateAccountNav
 import com.example.sw0b_001.ui.navigation.EmailComposeNav
 import com.example.sw0b_001.ui.navigation.EmailComposeScreen
+import com.example.sw0b_001.ui.navigation.LoginAccountNav
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
 
 data class InteractiveOnboarding(
     val title: String,
@@ -50,11 +55,11 @@ data class InteractiveOnboarding(
 
 @Composable
 fun OnboardingInteractive(
-    navController: NavController
+    navController: NavController,
+    onboardingViewModel: OnboardingViewModel,
 ) {
     val context = LocalContext.current
-    val previewMode = LocalInspectionMode.current
-    var screenIndex = 0
+    val showingOnboarding by onboardingViewModel.onboardingState.collectAsState()
 
     Scaffold(
 
@@ -65,84 +70,54 @@ fun OnboardingInteractive(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            var showingOnboarding by remember {
-                mutableStateOf<InteractiveOnboarding?>(null) }
-
-            val onboardingScreens = mutableListOf(
-                InteractiveOnboarding(
-                    title = stringResource(R.string.sms_an_email_right_now),
-                    description = stringResource(R.string.you_don_t_need_an_account_we_d_create_one_for_you_email_yourself),
-                    actionButtonText = stringResource(R.string.compose_email),
-                    image = R.drawable.try_sending_message_illus,
-                    onClickCallToAction = {
-                        if(previewMode) {
-                            showingOnboarding = InteractiveOnboarding(
-                                title = "Way to go!!",
-                                description = "You have interacted with how easy it is to send your first message!",
-                                subDescription = "There is more!!",
-                                image = R.drawable.undraw_success_288d,
-                            ){}
-                        }
-                        navController.navigate(EmailComposeNav { sent ->
-                            if(sent) {
-                                showingOnboarding = InteractiveOnboarding(
-                                    title = "Way to go!!",
-                                    description = "You have interacted with how easy it is to send your first message!",
-                                    subDescription = "There is more!!",
-                                    image = R.drawable.undraw_success_288d,
-                                ){}
-                            }
-                        })
-                    }
-                ),
-                InteractiveOnboarding(
-                    title = "Save your accounts!",
-                    description = "You can also use SMS to send messages from your online accounts! Saving them guarantees you can use them without an internet connection.",
-                    actionButtonText = "Give it a try!",
-                    image = R.drawable.vault_illus,
-                    onClickCallToAction = { TODO() }
-                ),
-                InteractiveOnboarding(
-                    title = "Start messaging now!",
-                    description = "You can now send messages from your saved accounts!\nYou can also save more accounts later...",
-                    actionButtonText = "Give it a try!",
-                    image = R.drawable.relay_sms_save_vault,
-                    onClickCallToAction = { TODO() }
-                ),
-                InteractiveOnboarding(
-                    title = "Secure your app!",
-                    description = "From locking with device pin code to other secure ways of making sure you maintain your app's privacy!",
-                    actionButtonText = "Let's lock this down!",
-                    image = R.drawable.undraw_fingerprint_kdwq,
-                    onClickCallToAction = { TODO() }
-                ),
-                InteractiveOnboarding(
-                    title = "Make default SMS app",
-                    description = "You can manage all your SMS messages from a single place.",
-                    subDescription = "This also unlocks features like sending images with SMS (yes not MMS)",
-                    actionButtonText = "Set as default SMS app",
-                    image = R.drawable.try_sending_message_illus,
-                    onClickCallToAction = { TODO() }
-                ),
-            )
-
             Spacer(modifier = Modifier.weight(1f))
 
-            if(showingOnboarding == null) {
-                showingOnboarding = onboardingScreens[screenIndex]
+            showingOnboarding?.let {
+                OnboardingScreen(it)
             }
-            OnboardingScreen(showingOnboarding!!)
 
             Spacer(modifier = Modifier.weight(1f))
 
             OnboardingNextButton("") {
-                if(screenIndex < onboardingScreens.size - 1) {
-                    screenIndex += 1
-                    showingOnboarding = onboardingScreens[screenIndex]
-                }
+                onboardingViewModel.next(context, navController)
             }
 
             Spacer(modifier = Modifier.padding(16.dp))
+
+            if(onboardingViewModel.showLoginSignupModal) {
+                val completedOnboarding = InteractiveOnboarding(
+                    title = context.getString(R.string.way_to_go),
+                    description = stringResource(R.string.now_we_can_save_platforms_in_your_account),
+                    subDescription = stringResource(R.string.it_s_easier_than_you_can_imagine),
+                    actionButtonText = stringResource(R.string.save_platforms_to_your_account),
+                    image = R.drawable.relay_sms_save_vault,
+                ){
+                    onboardingViewModel.setOnboarding(
+                        InteractiveOnboarding(
+                            title = context.getString(R.string.way_to_go),
+                            description = context.getString(R.string.you_can_save_more_accounts_per_platform_at_anytime_from_inside_the_app),
+                            image = R.drawable.undraw_success_288d,
+                        ){ }
+                    )
+                }
+                SignupLoginModal(
+                    onboardingViewModel.showLoginSignupModal,
+                    createAccountCallback = {
+                        navController.navigate(CreateAccountNav { created ->
+                            if(created) {
+                                onboardingViewModel.setOnboarding(completedOnboarding)
+                            }
+                        })
+                    },
+                    loginAccountCallback = {
+                        navController.navigate(LoginAccountNav { loggedIn ->
+                            if(loggedIn) {
+                                onboardingViewModel.setOnboarding(completedOnboarding)
+                            }
+                        })
+                    }
+                ) { onboardingViewModel.showLoginSignupModal = false }
+            }
         }
     }
 }
@@ -230,6 +205,9 @@ fun OnboardingScreenPreview() {
 @Composable
 fun OnboardingInteractivePreview() {
     AppTheme {
-        OnboardingInteractive(rememberNavController())
+        OnboardingInteractive(
+            rememberNavController(),
+            remember{ OnboardingViewModel() }
+        )
     }
 }

@@ -1,5 +1,6 @@
 package com.example.sw0b_001.ui.views.compose
 
+import android.content.Context
 import android.util.Base64
 import android.util.Log
 import android.widget.Toast
@@ -58,10 +59,9 @@ import com.example.sw0b_001.data.models.Bridges
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Platforms.StoredPlatformsEntity
-import com.example.sw0b_001.data.Network
 import com.example.sw0b_001.R
 import com.example.sw0b_001.extensions.context.settingsGetNotShowChooseGatewayClient
-import com.example.sw0b_001.ui.modals.ComposeChooseGatewayClients
+import com.example.sw0b_001.ui.modals.ComposeChooseGatewayClientsModal
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.networkRequest
@@ -70,10 +70,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-import java.nio.charset.StandardCharsets
 
 @Serializable
 data class GatewayClientRequest(
@@ -89,7 +85,7 @@ fun EmailComposeView(
     navController: NavController,
     platformsViewModel: PlatformsViewModel,
     isBridge: Boolean = false,
-    onSendCallback: (() -> Unit)? = null
+    onSendCallback: ((Boolean) -> Unit)? = null
 ) {
     val context = LocalContext.current
 
@@ -224,6 +220,36 @@ fun EmailComposeView(
     var showChooseGatewayClient by remember { mutableStateOf(false) }
     var isSending by remember { mutableStateOf(false) }
 
+    fun send() {
+        platformsViewModel.sendPublishingForEmail(
+            context = context,
+            emailContent = PlatformsViewModel.EmailComposeHandler.EmailContent(
+                to = to,
+                cc = cc,
+                bcc = bcc,
+                subject = subject,
+                body = body
+            ),
+            account = selectedAccount,
+            isBridge = isBridge,
+            onFailureCallback = { errorMsg ->
+                isSending = false
+                CoroutineScope(Dispatchers.Main).launch {
+                    Toast.makeText(context, errorMsg,
+                        Toast.LENGTH_LONG).show()
+                }
+            },
+            onCompleteCallback = {
+                isSending = false
+                CoroutineScope(Dispatchers.Main).launch {
+                    onSendCallback?.invoke(true) ?: navController.popBackStack()
+                }
+            },
+            subscriptionId = platformsViewModel.subscriptionId,
+        )
+
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -250,33 +276,7 @@ fun EmailComposeView(
                         onClick = {
                             isSending = true
                             if(context.settingsGetNotShowChooseGatewayClient) {
-                                platformsViewModel.sendPublishingForEmail(
-                                    context = context,
-                                    emailContent = PlatformsViewModel.EmailComposeHandler.EmailContent(
-                                        to = to,
-                                        cc = cc,
-                                        bcc = bcc,
-                                        subject = subject,
-                                        body = body
-                                    ),
-                                    account = selectedAccount,
-                                    isBridge = isBridge,
-                                    onFailureCallback = { errorMsg ->
-                                        isSending = false
-                                        CoroutineScope(Dispatchers.Main).launch {
-                                            Toast.makeText(context, errorMsg,
-                                                Toast.LENGTH_LONG).show()
-                                        }
-                                    },
-                                    onCompleteCallback = {
-                                        isSending = false
-                                        CoroutineScope(Dispatchers.Main).launch {
-                                            onSendCallback?.invoke() ?: navController.popBackStack()
-                                        }
-                                    },
-                                    subscriptionId = platformsViewModel.subscriptionId,
-                                )
-
+                                send()
                             } else {
                                 showChooseGatewayClient = true
                             }
@@ -568,40 +568,14 @@ fun EmailComposeView(
             }
 
             if(showChooseGatewayClient) {
-                ComposeChooseGatewayClients(showChooseGatewayClient) {
-                    platformsViewModel.sendPublishingForEmail(
-                        context = context,
-                        emailContent = PlatformsViewModel.EmailComposeHandler.EmailContent(
-                            to = to,
-                            cc = cc,
-                            bcc = bcc,
-                            subject = subject,
-                            body = body
-                        ),
-                        account = selectedAccount,
-                        isBridge = isBridge,
-                        onFailureCallback = { errorMsg ->
-                            isSending = false
-                            CoroutineScope(Dispatchers.Main).launch {
-                                Toast.makeText(context, errorMsg,
-                                    Toast.LENGTH_LONG).show()
-                            }
-                        },
-                        onCompleteCallback = {
-                            isSending = false
-                            CoroutineScope(Dispatchers.Main).launch {
-                                onSendCallback?.invoke() ?: navController.popBackStack()
-                            }
-                        },
-                        subscriptionId = platformsViewModel.subscriptionId,
-                    )
-
+                ComposeChooseGatewayClientsModal(showChooseGatewayClient) {
+                    send()
                 }
             }
         }
     }
-}
 
+}
 
 @Preview(showBackground = true)
 @Composable

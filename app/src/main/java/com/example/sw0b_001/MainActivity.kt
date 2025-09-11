@@ -74,6 +74,7 @@ import androidx.core.content.edit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.toRoute
 import androidx.window.layout.WindowInfoTracker
 import androidx.window.layout.WindowLayoutInfo
 import com.afkanerd.lib_smsmms_android.R
@@ -84,7 +85,11 @@ import com.afkanerd.smswithoutborders_libsmsmms.ui.requiredReadPhoneStatePermiss
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.SearchViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ThreadsViewModel
+import com.example.sw0b_001.extensions.context.settingsGetOnboardedCompletely
 import com.example.sw0b_001.ui.appbars.BottomNavBar
+import com.example.sw0b_001.ui.navigation.EmailComposeNav
+import com.example.sw0b_001.ui.onboarding.OnboardingInteractive
+import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
 import com.example.sw0b_001.ui.views.BottomTabsItems
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
@@ -102,6 +107,8 @@ class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
 
     val threadsViewModel: ThreadsViewModel by viewModels()
+    val onboardingViewModel: OnboardingViewModel by viewModels()
+
     private lateinit var searchViewModel: SearchViewModel
 
     val platformsViewModel: PlatformsViewModel by viewModels()
@@ -190,10 +197,8 @@ class MainActivity : ComponentActivity() {
             defaultSmsApp = context.isDefault()
         }
 
-        val sharedPreferences = context.getSharedPreferences(PREF_USER_ONBOARDED, MODE_PRIVATE)
-
         var hasSeenOnboarding by remember {
-            mutableStateOf(sharedPreferences.getBoolean(USER_ONBOARDED, false))
+            mutableStateOf(context.settingsGetOnboardedCompletely)
         }
 
         var isLoggedIn by remember {
@@ -250,7 +255,8 @@ class MainActivity : ComponentActivity() {
             customThreadsView = customThreadView,
         ) {
             composable<OnboardingScreen> {
-                MainOnboarding(navController)
+//                MainOnboarding(navController)
+                OnboardingInteractive(navController, onboardingViewModel)
             }
             composable<GetMeOutScreen> {
                 GetMeOutOfHere(navController)
@@ -296,6 +302,14 @@ class MainActivity : ComponentActivity() {
                     navController = navController,
                     platformsViewModel = platformsViewModel,
                     isBridge = true
+                )
+            }
+            composable<EmailComposeNav> {
+                EmailComposeView(
+                    navController = navController,
+                    platformsViewModel = platformsViewModel,
+                    isBridge = true,
+                    onSendCallback = onboardingViewModel.callback,
                 )
             }
             composable<EmailComposeScreen> {

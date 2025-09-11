@@ -621,11 +621,11 @@ fun PlatformOptionsModalPreview() {
             support_url_scheme = true,
             logo = null
         )
-        val platformsViewModel = PlatformsViewModel()
+        val platformsViewModel = remember { PlatformsViewModel() }
         platformsViewModel.platform = platform
         PlatformOptionsModal(
             showPlatformsModal = false,
-            platformsViewModel = PlatformsViewModel(),
+            platformsViewModel = platformsViewModel,
             isActive = true,
             isCompose = false,
             onDismissRequest = {},

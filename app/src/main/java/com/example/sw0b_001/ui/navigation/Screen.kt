@@ -22,7 +22,25 @@ object AboutScreen
 object EmailComposeScreen
 
 @Serializable
-data class EmailComposeNav(
+object EmailComposeNav
+
+@Serializable
+data class CreateAccountNav(
+    val callback: (Boolean) -> Unit = {},
+)
+
+@Serializable
+data class LoginAccountNav(
+    val callback: (Boolean) -> Unit = {},
+)
+
+@Serializable
+data class ForgotPasswordNav(
+    val callback: (Boolean) -> Unit = {},
+)
+
+@Serializable
+data class OtpCodeNav(
     val callback: (Boolean) -> Unit = {},
 )
 
