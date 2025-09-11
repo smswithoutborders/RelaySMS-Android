@@ -33,7 +33,6 @@ import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.views.compose.EmailComposeHandler
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -97,7 +96,7 @@ fun EmailDetailsView(
         } else {
             try {
                 val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
-                val decomposed = EmailComposeHandler.decomposeMessage(contentBytes)
+                val decomposed = PlatformsViewModel.EmailComposeHandler.decomposeMessage(contentBytes)
 
 
                 from = message.fromAccount ?: "Email Account"

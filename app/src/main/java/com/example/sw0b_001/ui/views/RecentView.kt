@@ -69,7 +69,6 @@ import com.example.sw0b_001.ui.navigation.EmailViewScreen
 import com.example.sw0b_001.ui.navigation.MessageViewScreen
 import com.example.sw0b_001.ui.navigation.TextViewScreen
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.views.compose.EmailComposeHandler
 import com.example.sw0b_001.ui.views.compose.MessageComposeHandler
 import com.example.sw0b_001.ui.views.compose.TextComposeHandler
 
@@ -311,7 +310,7 @@ fun RecentMessageCard(
         Platforms.ServiceTypes.EMAIL.type -> {
             try {
                 val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
-                val decomposed = EmailComposeHandler.decomposeMessage(contentBytes)
+                val decomposed = PlatformsViewModel.EmailComposeHandler.decomposeMessage(contentBytes)
                 heading = message.fromAccount ?: "Email"
                 subHeading = decomposed.subject
                 text = decomposed.body

@@ -7,6 +7,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -15,6 +16,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
@@ -42,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -57,8 +60,11 @@ import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.data.Network
 import com.example.sw0b_001.R
+import com.example.sw0b_001.extensions.context.settingsGetNotShowChooseGatewayClient
+import com.example.sw0b_001.ui.modals.ComposeChooseGatewayClients
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.networkRequest
 import com.example.sw0b_001.ui.views.DeveloperHTTPView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -69,83 +75,6 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.StandardCharsets
 
-data class EmailContent(
-    var to: String,
-    var cc: String,
-    var bcc: String,
-    var subject: String,
-    var body: String
-)
-
-object EmailComposeHandler {
-
-    fun decomposeMessage(contentBytes: ByteArray): EmailContent {
-        try {
-            val buffer = ByteBuffer.wrap(contentBytes).order(ByteOrder.LITTLE_ENDIAN)
-
-            val fromLen = buffer.get().toInt() and 0xFF
-            val toLen = buffer.getShort().toInt() and 0xFFFF
-            val ccLen = buffer.getShort().toInt() and 0xFFFF
-            val bccLen = buffer.getShort().toInt() and 0xFFFF
-            val subjectLen = buffer.get().toInt() and 0xFF
-            val bodyLen = buffer.getShort().toInt() and 0xFFFF
-            val accessLen = buffer.getShort().toInt() and 0xFFFF
-            val refreshLen = buffer.getShort().toInt() and 0xFFFF
-
-            // Skip 'from' field
-            if (fromLen > 0) buffer.position(buffer.position() + fromLen)
-
-            // Read the relevant fields for the EmailContent object
-            val to = ByteArray(toLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
-            val cc = ByteArray(ccLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
-            val bcc = ByteArray(bccLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
-            val subject = ByteArray(subjectLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
-            val body = ByteArray(bodyLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
-
-            // Skip token fields
-            if (accessLen > 0) buffer.position(buffer.position() + accessLen)
-            if (refreshLen > 0) buffer.position(buffer.position() + refreshLen)
-
-            return EmailContent(to, cc, bcc, subject, body)
-        } catch (e: Exception) {
-            Log.e("EmailComposeHandler", "Failed to decompose V2 binary message", e)
-            return EmailContent("", "", "", "", "Error: Could not parse message content.")
-        }
-    }
-
-
-
-    fun decomposeBridgeMessage(message: String): EmailContent {
-        return try {
-            // Bridge messages typically don't include 'from' in their direct content string
-            // Format: to:cc:bcc:subject:body
-            val parts = message.split(":", limit = 5)
-            if (parts.size < 5) {
-                Log.w("EmailComposeHandler", "Bridge message has fewer than 5 parts: '$message'. Parsing as best as possible.")
-                EmailContent(
-                    to = parts.getOrElse(0) { "" },
-                    cc = parts.getOrElse(1) { "" },
-                    bcc = parts.getOrElse(2) { "" },
-                    subject = parts.getOrElse(3) { "" },
-                    body = parts.getOrElse(4) { "" } // If body is missing, this will be empty
-                )
-            } else {
-                EmailContent(
-                    to = parts[0],
-                    cc = parts[1],
-                    bcc = parts[2],
-                    subject = parts[3],
-                    body = parts[4] // The rest of the string is the body
-                )
-            }
-        } catch (e: Exception) {
-            Log.e("EmailComposeHandler", "Failed to decompose bridge message string", e)
-            EmailContent("", "", "", "", "Error: Could not parse bridge message content.")
-        }
-    }
-}
-
-
 @Serializable
 data class GatewayClientRequest(
     val address: String,
@@ -154,40 +83,23 @@ data class GatewayClientRequest(
     val date_sent: String
 )
 
-private fun networkRequest(
-    url: String,
-    payload: GatewayClientRequest,
-) : String? {
-    var payload = Json.encodeToString(payload)
-    println("Publishing: $payload")
-
-    try {
-        var response = Network.jsonRequestPost(url, payload)
-        var text = response.result.get()
-        return text
-    } catch(e: Exception) {
-        println(e.message)
-        return e.message
-    }
-}
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmailComposeView(
     navController: NavController,
     platformsViewModel: PlatformsViewModel,
-    isBridge: Boolean = false
+    isBridge: Boolean = false,
+    onSendCallback: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
 
     val decomposedMessage = if (platformsViewModel.message?.encryptedContent != null) {
         if (isBridge) {
-            EmailComposeHandler.decomposeBridgeMessage(platformsViewModel.message!!.encryptedContent!!)
+            PlatformsViewModel.EmailComposeHandler.decomposeBridgeMessage(platformsViewModel.message!!.encryptedContent!!)
         } else {
             try {
                 val contentBytes = Base64.decode(platformsViewModel.message!!.encryptedContent!!, Base64.DEFAULT)
-                EmailComposeHandler.decomposeMessage(contentBytes)
+                PlatformsViewModel.EmailComposeHandler.decomposeMessage(contentBytes)
             } catch (e: Exception) {
                 Log.e("EmailComposeView", "Error decoding/decomposing V1 message content.", e)
                 null
@@ -234,26 +146,6 @@ fun EmailComposeView(
         navController.popBackStack()
     }
 
-    // Conditionally show the SelectAccountModal
-    if (showSelectAccountModal && !isBridge) {
-        Log.d("EmailComposeView", "Showing SelectAccountModal")
-        SelectAccountModal(
-            platformsViewModel = platformsViewModel,
-            onDismissRequest = {
-                if (selectedAccount == null) {
-                    navController.popBackStack()
-                }
-                Toast.makeText(context,
-                    context.getString(R.string.no_account_selected), Toast.LENGTH_SHORT).show()
-            },
-            onAccountSelected = { account ->
-                selectedAccount = account
-                from = account.account!!
-                showSelectAccountModal = false
-                Log.d("EmailComposeView", "Selected account: $account")
-            }
-        )
-    }
 
     var showDeveloperDialog by remember { mutableStateOf(false) }
 
@@ -294,7 +186,7 @@ fun EmailComposeView(
                     } else {
                         platformsViewModel.sendPublishingForEmail(
                             context = context,
-                            emailContent = EmailContent(
+                            emailContent = PlatformsViewModel.EmailComposeHandler.EmailContent(
                                 to = to,
                                 cc = cc,
                                 bcc = bcc,
@@ -329,6 +221,8 @@ fun EmailComposeView(
     }
 
     var showMoreOptions by remember { mutableStateOf(false) }
+    var showChooseGatewayClient by remember { mutableStateOf(false) }
+    var isSending by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -352,29 +246,40 @@ fun EmailComposeView(
                     }
 
                     IconButton(
-                        enabled = to.isNotEmpty() && body.isNotEmpty(),
+                        enabled = to.isNotEmpty() && body.isNotEmpty() && !isSending,
                         onClick = {
-                            platformsViewModel.sendPublishingForEmail(
-                                context = context,
-                                emailContent = EmailContent(
-                                    to = to,
-                                    cc = cc,
-                                    bcc = bcc,
-                                    subject = subject,
-                                    body = body
-                                ),
-                                account = selectedAccount,
-                                isBridge = isBridge,
-                                onFailureCallback = { errorMsg ->
-                                    Log.e("EmailComposeView", "Send failed: $errorMsg")
-                                },
-                                onCompleteCallback = {
-                                    CoroutineScope(Dispatchers.Main).launch {
-                                        navController.popBackStack()
-                                    }
-                                },
-                                subscriptionId = platformsViewModel.subscriptionId,
-                            )
+                            isSending = true
+                            if(context.settingsGetNotShowChooseGatewayClient) {
+                                platformsViewModel.sendPublishingForEmail(
+                                    context = context,
+                                    emailContent = PlatformsViewModel.EmailComposeHandler.EmailContent(
+                                        to = to,
+                                        cc = cc,
+                                        bcc = bcc,
+                                        subject = subject,
+                                        body = body
+                                    ),
+                                    account = selectedAccount,
+                                    isBridge = isBridge,
+                                    onFailureCallback = { errorMsg ->
+                                        isSending = false
+                                        CoroutineScope(Dispatchers.Main).launch {
+                                            Toast.makeText(context, errorMsg,
+                                                Toast.LENGTH_LONG).show()
+                                        }
+                                    },
+                                    onCompleteCallback = {
+                                        isSending = false
+                                        CoroutineScope(Dispatchers.Main).launch {
+                                            onSendCallback?.invoke() ?: navController.popBackStack()
+                                        }
+                                    },
+                                    subscriptionId = platformsViewModel.subscriptionId,
+                                )
+
+                            } else {
+                                showChooseGatewayClient = true
+                            }
                         }
                     ) {
                         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = stringResource(R.string.send))
@@ -410,176 +315,229 @@ fun EmailComposeView(
                 .fillMaxWidth()
                 .imePadding()
                 .padding(innerPadding)
-                .padding(16.dp)
                 .verticalScroll(scrollState)
         ) {
-            // Sender
-            if(!isBridge) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(R.string.from),
-                        modifier = Modifier.padding(end = 24.dp),
-                        fontWeight = FontWeight.Medium
+            if(isSending || LocalInspectionMode.current) {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                if(!isBridge) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.from),
+                            modifier = Modifier.padding(end = 24.dp),
+                            fontWeight = FontWeight.Medium
 
-                    )
-                    BasicTextField(
-                        value = from,
-                        onValueChange = {},
-                        textStyle = TextStyle.Default.copy(
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontSize = 16.sp
-                        ),
-                        enabled = false,
-                        readOnly = true,
-                        modifier = Modifier.weight(1f),
+                        )
+                        BasicTextField(
+                            value = from,
+                            onValueChange = {},
+                            textStyle = TextStyle.Default.copy(
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontSize = 16.sp
+                            ),
+                            enabled = false,
+                            readOnly = true,
+                            modifier = Modifier.weight(1f),
 
+                            )
+                    }
+                    Divider(
+                        color = MaterialTheme.colorScheme.outline,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                        thickness = 0.5.dp
                     )
+
                 }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+                    Row( verticalAlignment = Alignment.CenterVertically ) {
+                        Text(
+                            text = stringResource(R.string.to),
+                            modifier = Modifier.padding(end = 24.dp),
+                            fontWeight = FontWeight.Medium
+                        )
+                        BasicTextField(
+                            value = to,
+                            onValueChange = {to = it},
+                            textStyle = TextStyle.Default.copy(
+                                color = MaterialTheme.colorScheme.onSurface,
+                                fontSize = 16.sp,
+                            ),
+                            modifier = Modifier.weight(1f),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Email,
+                                imeAction = ImeAction.Next
+                            ),
+                            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
+                        )
+                        IconButton(onClick = {
+                            showCcBcc = !showCcBcc
+                        }) {
+                            Icon(
+                                Icons.Filled.ArrowDropDown,
+                                contentDescription = stringResource(R.string.expand_to)
+                            )
+                        }
+                    }
+
+                    if (showCcBcc) {
+                        Divider(
+                            color = MaterialTheme.colorScheme.outline,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp, bottom = 16.dp),
+                            thickness = 0.5.dp
+                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(R.string.cc),
+                                modifier = Modifier.padding(end = 24.dp),
+                                fontWeight = FontWeight.Medium
+                            )
+                            BasicTextField(
+                                value = cc,
+                                onValueChange = { cc = it },
+                                textStyle = TextStyle.Default.copy(
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    fontSize = 16.sp
+                                ),
+                                modifier = Modifier.fillMaxWidth(),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Email,
+                                    imeAction = ImeAction.Next
+                                ),
+                                cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
+                            )
+                        }
+
+                        Divider(
+                            color = MaterialTheme.colorScheme.outline,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp, bottom = 16.dp),
+                            thickness = 0.5.dp
+                        )
+
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(R.string.bcc),
+                                modifier = Modifier.padding(end = 24.dp),
+                                fontWeight = FontWeight.Medium
+                            )
+                            BasicTextField(
+                                value = bcc,
+                                onValueChange = { bcc = it },
+                                textStyle = TextStyle.Default.copy(
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    fontSize = 16.sp
+                                ),
+                                modifier = Modifier.fillMaxWidth(),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Email,
+                                    imeAction = ImeAction.Next
+                                ),
+                                cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
+                            )
+                        }
+
+                    }
+                }
+
                 Divider(
                     color = MaterialTheme.colorScheme.outline,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp),
+                        .padding(top = 16.dp, bottom = 16.dp),
                     thickness = 0.5.dp
                 )
 
-            }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
                 Row(
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = stringResource(R.string.to),
-                        modifier = Modifier.padding(end = 24.dp),
-                        fontWeight = FontWeight.Medium
-                    )
                     BasicTextField(
-                        value = to,
-                        onValueChange = {to = it},
+                        value = subject,
+                        onValueChange = { subject = it },
                         textStyle = TextStyle.Default.copy(
                             color = MaterialTheme.colorScheme.onSurface,
-                            fontSize = 16.sp,
+                            fontSize = 16.sp
                         ),
-                        modifier = Modifier.weight(1f),
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Email,
-                            imeAction = ImeAction.Next
-                        ),
-                        cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
+                        cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
+                        modifier = Modifier
+                            .weight(1f),
+                        decorationBox = { innerTextField ->
+                            if (subject.isEmpty()) {
+                                Text(
+                                    text = stringResource(R.string.subject),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 16.sp
+                                )
+                            }
+                            innerTextField()
+                        }
                     )
-                    IconButton(onClick = {
-                        showCcBcc = !showCcBcc
-                    }) {
-                        Icon(
-                            Icons.Filled.ArrowDropDown,
-                            contentDescription = stringResource(R.string.expand_to)
-                        )
-                    }
                 }
 
-                if (showCcBcc) {
-                    Divider(
-                        color = MaterialTheme.colorScheme.outline,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp, bottom = 16.dp),
-                        thickness = 0.5.dp
-                    )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(R.string.cc),
-                            modifier = Modifier.padding(end = 24.dp),
-                            fontWeight = FontWeight.Medium
-                        )
-                        BasicTextField(
-                            value = cc,
-                            onValueChange = { cc = it },
-                            textStyle = TextStyle.Default.copy(
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontSize = 16.sp
-                            ),
-                            modifier = Modifier.fillMaxWidth(),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Email,
-                                imeAction = ImeAction.Next
-                            ),
-                            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
-                        )
-                    }
+                Divider(
+                    color = MaterialTheme.colorScheme.outline,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp, bottom = 16.dp),
+                    thickness = 0.5.dp
+                )
 
-                    Divider(
-                        color = MaterialTheme.colorScheme.outline,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp, bottom = 16.dp),
-                        thickness = 0.5.dp
-                    )
-
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(R.string.bcc),
-                            modifier = Modifier.padding(end = 24.dp),
-                            fontWeight = FontWeight.Medium
-                        )
-                        BasicTextField(
-                            value = bcc,
-                            onValueChange = { bcc = it },
-                            textStyle = TextStyle.Default.copy(
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontSize = 16.sp
-                            ),
-                            modifier = Modifier.fillMaxWidth(),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Email,
-                                imeAction = ImeAction.Next
-                            ),
-                            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
-                        )
-                    }
-
-                }
-            }
-
-            Divider(
-                color = MaterialTheme.colorScheme.outline,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp, bottom = 16.dp),
-                thickness = 0.5.dp
-            )
-
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
                 BasicTextField(
-                    value = subject,
-                    onValueChange = { subject = it },
+                    value = body,
+                    onValueChange = { newValue ->
+                        body = newValue
+
+                        val lines = newValue.lines()
+                        val lineCount = lines.size
+
+                        val lineHeight = 20.dp
+                        val maxVisibleLines = 10
+
+                        if (lineCount > maxVisibleLines) {
+                            val scrollOffset = with(density) {
+                                (lineCount - maxVisibleLines) * lineHeight.toPx()
+                            }
+                            coroutineScope.launch {
+                                scrollState.animateScrollTo(scrollOffset.toInt())
+                            }
+                        }
+                    },
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
                     textStyle = TextStyle.Default.copy(
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 16.sp
                     ),
-                    cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
                     modifier = Modifier
-                        .weight(1f),
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
                     decorationBox = { innerTextField ->
-                        if (subject.isEmpty()) {
+                        if (body.isEmpty()) {
                             Text(
-                                text = stringResource(R.string.subject),
+                                text = stringResource(R.string.compose_email),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 16.sp
@@ -588,57 +546,58 @@ fun EmailComposeView(
                         innerTextField()
                     }
                 )
+
+            }
+            // Conditionally show the SelectAccountModal
+            if (showSelectAccountModal && !isBridge) {
+                SelectAccountModal(
+                    platformsViewModel = platformsViewModel,
+                    onDismissRequest = {
+                        if (selectedAccount == null) {
+                            navController.popBackStack()
+                        }
+                        Toast.makeText(context,
+                            context.getString(R.string.no_account_selected), Toast.LENGTH_SHORT).show()
+                    },
+                    onAccountSelected = { account ->
+                        selectedAccount = account
+                        from = account.account!!
+                        showSelectAccountModal = false
+                    }
+                )
             }
 
-            Divider(
-                color = MaterialTheme.colorScheme.outline,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp, bottom = 16.dp),
-                thickness = 0.5.dp
-            )
+            if(showChooseGatewayClient) {
+                ComposeChooseGatewayClients(showChooseGatewayClient) {
+                    platformsViewModel.sendPublishingForEmail(
+                        context = context,
+                        emailContent = PlatformsViewModel.EmailComposeHandler.EmailContent(
+                            to = to,
+                            cc = cc,
+                            bcc = bcc,
+                            subject = subject,
+                            body = body
+                        ),
+                        account = selectedAccount,
+                        isBridge = isBridge,
+                        onFailureCallback = { errorMsg ->
+                            isSending = false
+                            CoroutineScope(Dispatchers.Main).launch {
+                                Toast.makeText(context, errorMsg,
+                                    Toast.LENGTH_LONG).show()
+                            }
+                        },
+                        onCompleteCallback = {
+                            isSending = false
+                            CoroutineScope(Dispatchers.Main).launch {
+                                onSendCallback?.invoke() ?: navController.popBackStack()
+                            }
+                        },
+                        subscriptionId = platformsViewModel.subscriptionId,
+                    )
 
-            BasicTextField(
-                value = body,
-                onValueChange = { newValue ->
-                    body = newValue
-
-                    val lines = newValue.lines()
-                    val lineCount = lines.size
-
-                    val lineHeight = 20.dp
-                    val maxVisibleLines = 10
-
-                    if (lineCount > maxVisibleLines) {
-                        val scrollOffset = with(density) {
-                            (lineCount - maxVisibleLines) * lineHeight.toPx()
-                        }
-                        coroutineScope.launch {
-                            scrollState.animateScrollTo(scrollOffset.toInt())
-                        }
-                    }
-                },
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
-                textStyle = TextStyle.Default.copy(
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontSize = 16.sp
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(),
-                decorationBox = { innerTextField ->
-                    if (body.isEmpty()) {
-                        Text(
-                            text = stringResource(R.string.compose_email),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 16.sp
-                        )
-                    }
-                    innerTextField()
                 }
-            )
-
+            }
         }
     }
 }

@@ -3,6 +3,7 @@ package com.example.sw0b_001.ui.viewModels
 import android.content.Context
 import android.content.Intent
 import android.util.Base64
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -30,7 +31,7 @@ import com.example.sw0b_001.data.models.Bridges
 import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.ui.views.BottomTabsItems
 import com.example.sw0b_001.ui.views.OTPCodeVerificationType
-import com.example.sw0b_001.ui.views.compose.EmailContent
+import com.example.sw0b_001.ui.views.compose.GatewayClientRequest
 import com.example.sw0b_001.ui.views.compose.MessageContent
 import com.example.sw0b_001.ui.views.compose.ReliabilityTestRequestPayload
 import com.example.sw0b_001.ui.views.compose.ReliabilityTestResponsePayload
@@ -187,7 +188,7 @@ class PlatformsViewModel : ViewModel() {
 
     fun sendPublishingForEmail(
         context: Context,
-        emailContent: EmailContent,
+        emailContent: EmailComposeHandler.EmailContent,
         account: StoredPlatformsEntity?,
         isBridge: Boolean,
         subscriptionId: Long,
@@ -545,6 +546,98 @@ class PlatformsViewModel : ViewModel() {
 
         buffer.flip()
         return buffer
+    }
+
+    object EmailComposeHandler {
+        data class EmailContent(
+            var to: String,
+            var cc: String,
+            var bcc: String,
+            var subject: String,
+            var body: String
+        )
+
+        fun decomposeMessage(contentBytes: ByteArray): EmailContent {
+            try {
+                val buffer = ByteBuffer.wrap(contentBytes).order(ByteOrder.LITTLE_ENDIAN)
+
+                val fromLen = buffer.get().toInt() and 0xFF
+                val toLen = buffer.getShort().toInt() and 0xFFFF
+                val ccLen = buffer.getShort().toInt() and 0xFFFF
+                val bccLen = buffer.getShort().toInt() and 0xFFFF
+                val subjectLen = buffer.get().toInt() and 0xFF
+                val bodyLen = buffer.getShort().toInt() and 0xFFFF
+                val accessLen = buffer.getShort().toInt() and 0xFFFF
+                val refreshLen = buffer.getShort().toInt() and 0xFFFF
+
+                // Skip 'from' field
+                if (fromLen > 0) buffer.position(buffer.position() + fromLen)
+
+                // Read the relevant fields for the EmailContent object
+                val to = ByteArray(toLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+                val cc = ByteArray(ccLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+                val bcc = ByteArray(bccLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+                val subject = ByteArray(subjectLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+                val body = ByteArray(bodyLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+
+                // Skip token fields
+                if (accessLen > 0) buffer.position(buffer.position() + accessLen)
+                if (refreshLen > 0) buffer.position(buffer.position() + refreshLen)
+
+                return EmailContent(to, cc, bcc, subject, body)
+            } catch (e: Exception) {
+                Log.e("EmailComposeHandler", "Failed to decompose V2 binary message", e)
+                return EmailContent("", "", "", "", "Error: Could not parse message content.")
+            }
+        }
+
+        fun decomposeBridgeMessage(message: String): EmailContent {
+            return try {
+                // Bridge messages typically don't include 'from' in their direct content string
+                // Format: to:cc:bcc:subject:body
+                val parts = message.split(":", limit = 5)
+                if (parts.size < 5) {
+                    Log.w("EmailComposeHandler", "Bridge message has fewer than 5 parts: '$message'. Parsing as best as possible.")
+                    EmailContent(
+                        to = parts.getOrElse(0) { "" },
+                        cc = parts.getOrElse(1) { "" },
+                        bcc = parts.getOrElse(2) { "" },
+                        subject = parts.getOrElse(3) { "" },
+                        body = parts.getOrElse(4) { "" } // If body is missing, this will be empty
+                    )
+                } else {
+                    EmailContent(
+                        to = parts[0],
+                        cc = parts[1],
+                        bcc = parts[2],
+                        subject = parts[3],
+                        body = parts[4] // The rest of the string is the body
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e("EmailComposeHandler", "Failed to decompose bridge message string", e)
+                EmailContent("", "", "", "", "Error: Could not parse bridge message content.")
+            }
+        }
+    }
+
+    companion object {
+        fun networkRequest(
+            url: String,
+            payload: GatewayClientRequest,
+        ) : String? {
+            var payload = Json.encodeToString(payload)
+            println("Publishing: $payload")
+
+            try {
+                var response = Network.jsonRequestPost(url, payload)
+                var text = response.result.get()
+                return text
+            } catch(e: Exception) {
+                println(e.message)
+                return e.message
+            }
+        }
     }
 
 }

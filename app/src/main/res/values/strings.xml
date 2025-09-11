@@ -390,5 +390,9 @@
     <string name="send_failed">Send failed</string>
     <string name="account_is_required_for_v1_platform_messages">Account is required for V1 platform messages.</string>
     <string name="could_not_fetch_publisher_key_cannot_encrypt_message">Could not fetch publisher key. Cannot encrypt message.</string>
+    <string name="sms_an_email_right_now">SMS an email right now!</string>
+    <string name="you_don_t_need_an_account_we_d_create_one_for_you_email_yourself">You don\'t need an account, we\'d create one for you!\nEmail yourself!</string>
+    <string name="don_t_ask_again">Don\'t ask again</string>
+    <string name="close_this_to_continue_sending">Close this to continue sending...</string>
 
 </resources>

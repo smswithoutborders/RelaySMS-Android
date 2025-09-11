@@ -20,6 +20,12 @@ object AboutScreen
 
 @Serializable
 object EmailComposeScreen
+
+@Serializable
+data class EmailComposeNav(
+    val callback: () -> Unit = {},
+)
+
 @Serializable
 object BridgeEmailComposeScreen
 @Serializable

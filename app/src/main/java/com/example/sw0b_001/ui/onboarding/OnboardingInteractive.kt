@@ -25,11 +25,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.components.OnboardingNextButton
+import com.example.sw0b_001.ui.navigation.EmailComposeNav
+import com.example.sw0b_001.ui.navigation.EmailComposeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 
 data class InteractiveOnboarding(
@@ -42,7 +47,9 @@ data class InteractiveOnboarding(
 )
 
 @Composable
-fun OnboardingInteractive() {
+fun OnboardingInteractive(
+    navController: NavController
+) {
     Scaffold(
 
     ) { innerPadding ->
@@ -53,15 +60,17 @@ fun OnboardingInteractive() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.weight(1f))
-            var screenIndex by remember { mutableIntStateOf(4) }
+            var screenIndex by remember { mutableIntStateOf(3) }
 
             val onboardingScreens = listOf(
                 InteractiveOnboarding(
-                    title = "SMS an email right now!",
-                    description = "You don't need an account, we'd create one for you!\nEmail yourself!",
-                    actionButtonText = "Compose email",
+                    title = stringResource(R.string.sms_an_email_right_now),
+                    description = stringResource(R.string.you_don_t_need_an_account_we_d_create_one_for_you_email_yourself),
+                    actionButtonText = stringResource(R.string.compose_email),
                     image = R.drawable.try_sending_message_illus,
-                    onClickCallToAction = { TODO() }
+                    onClickCallToAction = {
+                        onboardingBridgeAction(navController)
+                    }
                 ),
                 InteractiveOnboarding(
                     title = "Save your accounts!",
@@ -74,14 +83,14 @@ fun OnboardingInteractive() {
                     title = "Start messaging now!",
                     description = "You can now send messages from your saved accounts!\nYou can also save more accounts later...",
                     actionButtonText = "Give it a try!",
-                    image = R.drawable.try_sending_message_illus,
+                    image = R.drawable.relay_sms_save_vault,
                     onClickCallToAction = { TODO() }
                 ),
                 InteractiveOnboarding(
                     title = "Secure your app!",
                     description = "From locking with device pin code to other secure ways of making sure you maintain your app's privacy!",
                     actionButtonText = "Let's lock this down!",
-                    image = R.drawable.try_sending_message_illus,
+                    image = R.drawable.undraw_fingerprint_kdwq,
                     onClickCallToAction = { TODO() }
                 ),
                 InteractiveOnboarding(
@@ -105,6 +114,12 @@ fun OnboardingInteractive() {
             Spacer(modifier = Modifier.padding(16.dp))
         }
     }
+}
+
+fun onboardingBridgeAction(navController: NavController) {
+    navController.navigate(EmailComposeNav {
+        TODO("This step is done in onboarding")
+    })
 }
 
 @Composable
@@ -192,6 +207,6 @@ fun OnboardingScreenPreview() {
 @Composable
 fun OnboardingInteractivePreview() {
     AppTheme {
-        OnboardingInteractive()
+        OnboardingInteractive(rememberNavController())
     }
 }
