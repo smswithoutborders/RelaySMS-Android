@@ -199,7 +199,7 @@ fun OnboardingView(
             verticalArrangement = Arrangement.Center
         ) {
 
-            if (step.showBackButton || step.showSkipButton) {
+            if (LocalInspectionMode.current || (step.showBackButton || step.showSkipButton)) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
