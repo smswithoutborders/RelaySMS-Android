@@ -108,11 +108,11 @@ fun OnboardingInteractive(
                     onboardingViewModel.showLoginSignupModal,
                     createAccountCallback = {
                         onboardingViewModel.callback = callback
-                        navController.navigate(CreateAccountScreen)
+                        navController.navigate(CreateAccountScreen(isOnboarding = true))
                     },
                     loginAccountCallback = {
                         onboardingViewModel.callback = callback
-                        navController.navigate(LoginScreen)
+                        navController.navigate(LoginScreen(isOnboarding = true))
                     }
                 ) { onboardingViewModel.showLoginSignupModal = false }
             }
