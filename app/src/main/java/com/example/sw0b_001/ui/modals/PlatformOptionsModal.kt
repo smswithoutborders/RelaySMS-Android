@@ -51,7 +51,7 @@ import com.example.sw0b_001.ui.theme.AppTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
-import com.example.sw0b_001.Database.Datastore
+import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Platforms.StoredPlatformsEntity
 import com.example.sw0b_001.data.Publishers

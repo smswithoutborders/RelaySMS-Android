@@ -17,7 +17,7 @@ import com.afkanerd.smswithoutborders_libsmsmms.data.data.models.SmsManager
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getThreadId
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewModel
-import com.example.sw0b_001.Database.Datastore
+import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.Network
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.ComposeHandlers

@@ -1,7 +1,6 @@
 package com.example.sw0b_001.ui.viewModels
 
 import android.content.Context
-import android.util.Base64
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,32 +8,15 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.afkanerd.smswithoutborders_libsmsmms.data.data.models.SmsManager
-import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getThreadId
-import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
-import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewModel
-import com.example.sw0b_001.Database.Datastore
-import com.example.sw0b_001.R
-import com.example.sw0b_001.data.ComposeHandlers
-import com.example.sw0b_001.data.GatewayClientsCommunications
+import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.Platforms.Platforms
-import com.example.sw0b_001.data.Platforms.StoredPlatformsEntity
-import com.example.sw0b_001.data.Publishers
-import com.example.sw0b_001.data.SMSHandler
 import com.example.sw0b_001.data.models.EncryptedContent
-import com.example.sw0b_001.ui.views.compose.MessageContent
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-import java.nio.charset.StandardCharsets
-import java.util.Locale
 
 class MessagesViewModel : ViewModel() {
 

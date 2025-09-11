@@ -2,7 +2,6 @@ package com.example.sw0b_001.data
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.example.sw0b_001.Database.Datastore
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.GatewayClient
 import kotlinx.serialization.Serializable

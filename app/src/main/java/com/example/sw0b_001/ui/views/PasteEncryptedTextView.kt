@@ -34,7 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.data.models.Bridges
-import com.example.sw0b_001.Database.Datastore
+import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.R

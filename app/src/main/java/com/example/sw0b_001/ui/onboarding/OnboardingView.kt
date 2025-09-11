@@ -2,6 +2,7 @@ package com.example.sw0b_001.ui.onboarding
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -35,10 +36,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.OnboardingState
@@ -46,10 +49,12 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.components.OnboardingNextButton
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import androidx.core.net.toUri
+import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.Settings.SettingsFragment.Companion.changeLanguageLocale
 import com.example.sw0b_001.Settings.SettingsFragment.Companion.getCurrentLocale
 import com.example.sw0b_001.ui.components.LanguageSelectionPopup
+import com.example.sw0b_001.ui.theme.AppTheme
 
 data class OnboardingStep(
     val title: String,
@@ -72,20 +77,19 @@ fun MainOnboarding(navController: NavController) {
     val context = LocalContext.current
     var currentOnboardingState by remember { mutableStateOf(OnboardingState.Welcome) }
 
-
     val onboardingSteps = listOf(
         OnboardingStep(
-            title = context.getString(R.string.welcome_to_relaysms_),
-            description = context.getString(R.string.use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection),
+            title = stringResource(R.string.welcome_to_relaysms_),
+            description = stringResource(R.string.use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection),
             image = R.drawable.relay_sms_welcome,
             showLanguageButton = true,
             showPrivacyPolicyLink = true,
             isCompleteScreen = false,
-            nextButtonText = context.getString(R.string.learn_how_it_works_),
+            nextButtonText = stringResource(R.string.learn_how_it_works_),
             isWelcomeScreen = true
         ),
         OnboardingStep(
-            title = context.getString(R.string.relaysms_vaults_securely_stores_your_online_accounts_so_that_you_can_access_them_without_an_internet_connection),
+            title = stringResource(R.string.relaysms_vaults_securely_stores_your_online_accounts_so_that_you_can_access_them_without_an_internet_connection),
             description = "",
             image = R.drawable.vault_illus,
             showBackButton = true,
@@ -93,7 +97,7 @@ fun MainOnboarding(navController: NavController) {
             isCompleteScreen = false,
         ),
         OnboardingStep(
-            title = context.getString(R.string.you_can_add_online_accounts_to_your_vault),
+            title = stringResource(R.string.you_can_add_online_accounts_to_your_vault),
             description = "",
             image = R.drawable.relay_sms_save_vault,
             showBackButton = true,
@@ -101,23 +105,24 @@ fun MainOnboarding(navController: NavController) {
             isCompleteScreen = false,
         ),
         OnboardingStep(
-            title = context.getString(R.string.you_can_also_send_out_emails_without_an_account_or_vault),
-            description = context.getString(R.string.this_will_create_a_default_email_your_phonenumber_relaysms_me_using_your_phone_number),
+            title = stringResource(R.string.you_can_also_send_out_emails_without_an_account_or_vault),
+            description = stringResource(R.string.this_will_create_a_default_email_your_phonenumber_relaysms_me_using_your_phone_number),
             image = R.drawable.try_sending_message_illus,
             showBackButton = true,
             showSkipButton = true,
             isCompleteScreen = false,
         ),
         OnboardingStep(
-            title = context.getString(R.string.you_are_ready_to_begin_sending_messages_from_relaysms),
+            title = stringResource(R.string.you_are_ready_to_begin_sending_messages_from_relaysms),
             description = "",
             image = R.drawable.ready_to_begin_illus,
             showBackButton = true,
             showSkipButton = false,
             isCompleteScreen = true,
-            nextButtonText = context.getString(R.string.great),
+            nextButtonText = stringResource(R.string.great),
         ),
     )
+
 
     OnboardingView(
         step = onboardingSteps[currentOnboardingState.ordinal],
@@ -210,7 +215,8 @@ fun OnboardingView(
                     }
                     if (step.showSkipButton) {
                         Row(
-                            modifier = Modifier.clickable(onClick = onSkip),
+                            modifier = if(LocalInspectionMode.current) Modifier else
+                                Modifier.clickable(onClick = onSkip),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
@@ -230,7 +236,6 @@ fun OnboardingView(
                     }
                 }
             }
-
 
             // Illustration
             step.image?.let {
@@ -316,7 +321,8 @@ fun OnboardingView(
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = stringResource(R.string.read_our_privacy_policy),
-                    modifier = Modifier.clickable(onClick = onPrivacyPolicyClicked),
+                    modifier = if(LocalInspectionMode.current) Modifier
+                    else Modifier.clickable(onClick = onPrivacyPolicyClicked),
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.bodySmall
                 )
@@ -333,5 +339,41 @@ fun OnboardingView(
             },
             onDismiss = { showLanguagePopup = false }
         )
+    }
+}
+
+@Composable
+private fun ShowLanguageButton() {
+
+}
+
+@Preview
+@Composable
+fun MainOnboardingPreview() {
+    AppTheme {
+        MainOnboarding(rememberNavController())
+    }
+}
+
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    name = "DefaultPreviewDark"
+)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_NO,
+    name = "DefaultPreviewLight"
+)
+@Composable
+fun OnboardingViewPreview() {
+    AppTheme {
+        val step = OnboardingStep(
+            title = stringResource(R.string.relaysms_vaults_securely_stores_your_online_accounts_so_that_you_can_access_them_without_an_internet_connection),
+            description = "",
+            image = R.drawable.vault_illus,
+            showBackButton = true,
+            showSkipButton = true,
+            isCompleteScreen = false,
+        )
+        OnboardingView(step, {}, {}, {})
     }
 }

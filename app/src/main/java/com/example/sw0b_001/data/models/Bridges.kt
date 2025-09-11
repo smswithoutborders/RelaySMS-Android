@@ -3,7 +3,7 @@ package com.example.sw0b_001.data.models
 import android.content.Context
 import android.util.Base64
 import com.example.sw0b_001.BuildConfig
-import com.example.sw0b_001.Database.Datastore
+import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.R
 import com.example.sw0b_001.Security.Cryptography
 import com.example.sw0b_001.data.ComposeHandlers

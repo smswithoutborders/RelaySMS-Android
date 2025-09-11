@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.sw0b_001.Database.Datastore
+import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.GatewayClientsCommunications
 import com.example.sw0b_001.data.models.GatewayClient
 import kotlinx.coroutines.CoroutineScope

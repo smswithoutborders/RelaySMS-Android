@@ -2,7 +2,7 @@ package com.example.sw0b_001
 
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.sw0b_001.data.models.Bridges
-import com.example.sw0b_001.Database.Datastore
+import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.data.Network
 import kotlinx.serialization.Serializable

@@ -12,7 +12,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import android.util.Base64
 import android.util.Log
-import com.example.sw0b_001.Database.Datastore
+import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.ComposeHandlers
 import com.example.sw0b_001.data.Platforms.AvailablePlatforms
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
