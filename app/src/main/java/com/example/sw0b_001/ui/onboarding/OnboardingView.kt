@@ -39,7 +39,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.googlefonts.Font
+import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -55,6 +58,7 @@ import com.example.sw0b_001.Settings.SettingsFragment.Companion.changeLanguageLo
 import com.example.sw0b_001.Settings.SettingsFragment.Companion.getCurrentLocale
 import com.example.sw0b_001.ui.components.LanguageSelectionPopup
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.theme.provider
 
 data class OnboardingStep(
     val title: String,
@@ -357,11 +361,12 @@ fun MainOnboardingPreview() {
 
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES,
-    name = "DefaultPreviewDark"
+    name = "DefaultPreviewDark",
+    group = "Default"
 )
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_NO,
-    name = "DefaultPreviewLight"
+    name = "DefaultPreviewLight",
 )
 @Composable
 fun OnboardingViewPreview() {
