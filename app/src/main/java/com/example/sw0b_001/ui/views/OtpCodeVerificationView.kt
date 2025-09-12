@@ -305,9 +305,14 @@ fun OtpCodeVerificationView(
                         onCompleteCallback = {isLoading = false}
                     )  {
                         CoroutineScope(Dispatchers.Main).launch {
-                            onCompleteCallback?.invoke(true) ?: navController.navigate(HomepageScreen) {
-                                popUpTo(HomepageScreen) {
-                                    inclusive = true
+                            if(onCompleteCallback != null) {
+                                onCompleteCallback.invoke(true)
+                                navController.popBackStack()
+                            } else {
+                                navController.navigate(HomepageScreen) {
+                                    popUpTo(HomepageScreen) {
+                                        inclusive = true
+                                    }
                                 }
                             }
                         }

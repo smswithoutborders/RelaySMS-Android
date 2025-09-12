@@ -25,7 +25,6 @@ class OauthRedirectActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_open_idoauth_redirect)
-        Helpers.logIntentDetails(intent)
 
         /**
          * Send this to Vault to complete the OAuth process
@@ -99,10 +98,17 @@ class OauthRedirectActivity : AppCompatActivity() {
             } finally {
                 publishers.shutdown()
             }
+
             runOnUiThread {
-                val intent = Intent(applicationContext, MainActivity::class.java).apply {
-                    setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                }
+                val isOnboarding = intent.getBooleanExtra("is_onboarding",
+                    false)
+                val intent = Intent( applicationContext,
+                    MainActivity::class.java)
+                    .apply {
+                        setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        setPackage(packageName)
+                        putExtra("is_onboarding", isOnboarding)
+                    }
                 startActivity(intent)
                 finish()
             }

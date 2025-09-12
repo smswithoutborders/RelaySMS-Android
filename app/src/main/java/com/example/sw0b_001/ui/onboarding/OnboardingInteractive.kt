@@ -141,14 +141,6 @@ fun OnboardingInteractive(
                     actionButtonText = stringResource(R.string.save_platforms_to_your_account),
                     image = R.drawable.relay_sms_save_vault,
                 ){
-//                    onboardingViewModel.setOnboarding(
-//                        InteractiveOnboarding(
-//                            title = context.getString(R.string.way_to_go),
-//                            description = context.getString(R.string.you_can_save_more_accounts_per_platform_at_anytime_from_inside_the_app),
-//                            image = R.drawable.undraw_success_288d,
-//                        ){ }
-//                    )
-
                     // TODO: check if has saved platforms already then skip this step for messaging step
                     onboardingViewModel.showAddPlatformsModal = true
                 }
@@ -187,6 +179,24 @@ fun OnboardingInteractive(
                     onboardingViewModel.showAddPlatformsModal,
                     navController = navController,
                     isCompose = false,
+                    isOnboarding = true,
+                ) { onboardingViewModel.showAddPlatformsModal = false }
+            }
+
+            if(onboardingViewModel.showSendPlatformsModal) {
+                val completedCallback = onboardingViewModel.setOnboarding(
+                    InteractiveOnboarding(
+                        title = stringResource(R.string.you_are_now_ready),
+                        description = stringResource(R.string.you_have_successfully_carried_out_the_essentials_of_messaging_with_relaysms),
+                        image = R.drawable.undraw_success_288d,
+                    ){}
+                )
+
+                onboardingViewModel.showAddPlatformsModal = true
+                OnlineActivePlatformsModal(
+                    onboardingViewModel.showAddPlatformsModal,
+                    navController = navController,
+                    isCompose = true,
                     isOnboarding = true,
                 ) { onboardingViewModel.showAddPlatformsModal = false }
             }

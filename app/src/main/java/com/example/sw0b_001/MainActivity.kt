@@ -51,13 +51,10 @@ import com.example.sw0b_001.ui.navigation.ForgotPasswordScreen
 import com.example.sw0b_001.ui.navigation.GetMeOutScreen
 import com.example.sw0b_001.ui.navigation.MessageComposeScreen
 import com.example.sw0b_001.ui.navigation.MessageViewScreen
-import com.example.sw0b_001.ui.navigation.OnboardingScreen
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.navigation.TextComposeScreen
 import com.example.sw0b_001.ui.navigation.TextViewScreen
-import com.example.sw0b_001.ui.onboarding.MainOnboarding
-import com.example.sw0b_001.ui.onboarding.PREF_USER_ONBOARDED
-import com.example.sw0b_001.ui.onboarding.USER_ONBOARDED
+import com.example.sw0b_001.ui.onboarding.WelcomeMainView
 import com.example.sw0b_001.ui.views.ForgotPasswordView
 import com.example.sw0b_001.ui.views.GetMeOutOfHere
 import com.example.sw0b_001.ui.views.PasteEncryptedTextView
@@ -86,6 +83,8 @@ import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.SearchViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ThreadsViewModel
 import com.example.sw0b_001.extensions.context.settingsGetOnboardedCompletely
 import com.example.sw0b_001.ui.appbars.BottomNavBar
+import com.example.sw0b_001.ui.navigation.OnboardingInteractiveScreen
+import com.example.sw0b_001.ui.navigation.WelcomeScreen
 import com.example.sw0b_001.ui.onboarding.OnboardingInteractive
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
 import com.example.sw0b_001.ui.views.BottomTabsItems
@@ -185,7 +184,6 @@ class MainActivity : ComponentActivity() {
         navController: NavHostController,
         newLayoutInfo: WindowLayoutInfo,
     ) {
-
         val context = LocalContext.current
         val inPreview = LocalInspectionMode.current
         var defaultSmsApp by remember { mutableStateOf(inPreview || context.isDefault()) }
@@ -231,6 +229,9 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        val oathRedirectSuccess: Boolean = intent.getBooleanExtra("oathRedirectSuccess",
+            false)
+
         NavHostControllerInstance(
             newLayoutInfo,
             navController,
@@ -240,7 +241,7 @@ class MainActivity : ComponentActivity() {
             showThreadsTopBar = showThreadsTopBar,
             startDestination = if(hasSeenOnboarding) {
                 if(defaultSmsApp) HomeScreenNav() else HomepageScreen
-            } else OnboardingScreen,
+            } else WelcomeScreen,
             customBottomBar = {
                 BottomNavBar(
                     selectedTab = platformsViewModel.bottomTabsItem,
@@ -252,9 +253,14 @@ class MainActivity : ComponentActivity() {
             },
             customThreadsView = customThreadView,
         ) {
-            composable<OnboardingScreen> {
-//                MainOnboarding(navController)
-                OnboardingInteractive(navController, onboardingViewModel)
+            composable<WelcomeScreen> {
+                WelcomeMainView(navController)
+            }
+            composable<OnboardingInteractiveScreen> {
+                OnboardingInteractive(
+                    navController,
+                    onboardingViewModel,
+                )
             }
             composable<GetMeOutScreen> {
                 GetMeOutOfHere(navController)
@@ -396,7 +402,7 @@ class MainActivity : ComponentActivity() {
         CoroutineScope(Dispatchers.Default).launch {
             try {
                 if(Vaults.isGetMeOut(applicationContext)) {
-                    CoroutineScope(Dispatchers.Main).launch {
+                    runOnUiThread {
                         navController.navigate(GetMeOutScreen) {
                             popUpTo(HomepageScreen) {
                                 inclusive = true
@@ -409,13 +415,12 @@ class MainActivity : ComponentActivity() {
                             val vault = Vaults(applicationContext)
                             try {
                                 vault.refreshStoredTokens(applicationContext, ) {
-                                    if(it.isNotEmpty())
-                                        refreshTokensCallback(it)
+                                    if(it.isNotEmpty()) refreshTokensCallback(it)
                                 }
                             } catch(e: StatusRuntimeException) {
                                 if(e.status.code == Status.UNAUTHENTICATED.code) {
                                     Vaults.setGetMeOut(applicationContext, true)
-                                    CoroutineScope(Dispatchers.Main).launch {
+                                    runOnUiThread {
                                         navController.navigate(GetMeOutScreen) {
                                             popUpTo(HomepageScreen) {
                                                 inclusive = true

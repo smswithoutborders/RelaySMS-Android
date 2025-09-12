@@ -409,5 +409,7 @@
     <string name="start_messaging_now">Start messaging now!</string>
     <string name="you_can_now_send_messages_from_your_saved_accounts_you_can_also_save_more_accounts_later">You can now send messages from your saved accounts!\nYou can also save more accounts later...</string>
     <string name="ready_to_save_platforms">Ready to save platforms!</string>
+    <string name="you_are_now_ready">You are now ready!</string>
+    <string name="you_have_successfully_carried_out_the_essentials_of_messaging_with_relaysms">You have successfully carried out the essentials of messaging with RelaySMS!</string>
 
 </resources>

@@ -65,6 +65,7 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.ForgotPasswordScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
+import com.example.sw0b_001.ui.navigation.OnboardingInteractiveScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
@@ -263,7 +264,14 @@ fun LoginView(
                                         countryCode = selectedCountry!!.countryCode,
                                         otpRequestType = OTPCodeVerificationType.AUTHENTICATE,
                                         nextAttemptTimestamp = nextAttemptTimestamp,
-                                    ))
+                                        isOnboarding = isOnboarding
+                                    )) {
+                                        if(isOnboarding) {
+                                            popUpTo(OnboardingInteractiveScreen) {
+                                                inclusive = false
+                                            }
+                                        }
+                                    }
                                 }
                             },
                             passwordRequiredCallback = {

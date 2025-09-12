@@ -5,7 +5,10 @@ import com.example.sw0b_001.ui.views.OTPCodeVerificationType
 import kotlinx.serialization.Serializable
 
 @Serializable
-object OnboardingScreen
+object WelcomeScreen
+
+@Serializable
+object OnboardingInteractiveScreen
 
 @Serializable
 object GetMeOutScreen

@@ -18,6 +18,7 @@ class OnboardingViewModel : ViewModel() {
 
     var showLoginSignupModal by mutableStateOf(false)
     var showAddPlatformsModal by mutableStateOf(false)
+    var showSendPlatformsModal by mutableStateOf(false)
 
     private val _onboardingState = MutableStateFlow<InteractiveOnboarding?>(null)
     val onboardingState: StateFlow<InteractiveOnboarding?> = _onboardingState.asStateFlow()
@@ -95,7 +96,7 @@ class OnboardingViewModel : ViewModel() {
                 actionButtonText = context.getString(R.string.give_it_a_try),
                 image = R.drawable.try_sending_message_illus,
                 onClickCallToAction = {
-
+                    showSendPlatformsModal = true
                 }
             ),
             InteractiveOnboarding(
