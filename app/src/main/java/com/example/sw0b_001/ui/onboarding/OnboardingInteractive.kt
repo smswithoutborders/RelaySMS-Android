@@ -166,19 +166,28 @@ fun OnboardingInteractive(
                     },
                     loginAccountCallback = {
                         onboardingViewModel.callback = callback
-//                        navController.navigate(LoginScreen(isOnboarding = true))
+                        navController.navigate(LoginScreen(isOnboarding = true))
                         onboardingViewModel.showLoginSignupModal = false
-                        onboardingViewModel.callback?.invoke(true)
                     }
                 ) { onboardingViewModel.showLoginSignupModal = false }
             }
 
             if(onboardingViewModel.showAddPlatformsModal) {
+                val completedCallback = onboardingViewModel.setOnboarding(
+                    InteractiveOnboarding(
+                        title = context.getString(R.string.way_to_go),
+                        description = context.getString(R.string.you_can_save_more_accounts_per_platform_at_anytime_from_inside_the_app),
+                        image = R.drawable.undraw_success_288d,
+                    ){}
+                )
+
+                // TODO: check if has saved platforms already then skip this step for messaging step
+                onboardingViewModel.showAddPlatformsModal = true
                 OnlineActivePlatformsModal(
                     onboardingViewModel.showAddPlatformsModal,
                     navController = navController,
                     isCompose = false,
-                    isOnboarding = true
+                    isOnboarding = true,
                 ) { onboardingViewModel.showAddPlatformsModal = false }
             }
         }
