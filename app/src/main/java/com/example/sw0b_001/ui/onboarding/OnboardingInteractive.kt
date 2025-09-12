@@ -6,12 +6,24 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowRight
+import androidx.compose.material.icons.automirrored.filled.ArrowRightAlt
+import androidx.compose.material.icons.filled.ArrowRight
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.SelectAll
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -29,6 +41,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -36,9 +50,11 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.components.OnboardingNextButton
+import com.example.sw0b_001.ui.modals.OnlineActivePlatformsModal
 import com.example.sw0b_001.ui.modals.SignupLoginModal
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.EmailComposeScreen
+import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
@@ -52,6 +68,7 @@ data class InteractiveOnboarding(
     val onClickCallToAction: () -> Unit
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OnboardingInteractive(
     navController: NavController,
@@ -61,7 +78,37 @@ fun OnboardingInteractive(
     val showingOnboarding by onboardingViewModel.onboardingState.collectAsState()
 
     Scaffold(
-
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {},
+                actions = {
+                    IconButton(onClick = {
+                        navController.navigate(HomepageScreen) {
+                            popUpTo(HomepageScreen) {
+                                inclusive = true
+                            }
+                        }
+                    },
+                        modifier = Modifier.size(50.dp)
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(stringResource(R.string.skip),
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Default.ArrowRight,
+                                contentDescription = stringResource(R.string.skip),
+                            )
+                        }
+                    }
+                },
+                navigationIcon = { },
+            )
+        },
     ) { innerPadding ->
         Column(Modifier
             .fillMaxSize()
@@ -71,6 +118,9 @@ fun OnboardingInteractive(
         ) {
             Spacer(modifier = Modifier.weight(1f))
 
+            if(showingOnboarding == null)
+                onboardingViewModel.first(context, navController)
+
             showingOnboarding?.let {
                 OnboardingScreen(it)
             }
@@ -78,7 +128,7 @@ fun OnboardingInteractive(
             Spacer(modifier = Modifier.weight(1f))
 
             OnboardingNextButton("") {
-                onboardingViewModel.next(context, navController)
+                onboardingViewModel.next()
             }
 
             Spacer(modifier = Modifier.padding(16.dp))
@@ -99,7 +149,8 @@ fun OnboardingInteractive(
 //                        ){ }
 //                    )
 
-                    TODO("Should begin working on adding platforms")
+                    // TODO: check if has saved platforms already then skip this step for messaging step
+                    onboardingViewModel.showAddPlatformsModal = true
                 }
                 val callback: ((Boolean) -> Unit) = { success ->
                     if(success) {
@@ -110,13 +161,25 @@ fun OnboardingInteractive(
                     onboardingViewModel.showLoginSignupModal,
                     createAccountCallback = {
                         onboardingViewModel.callback = callback
+                        onboardingViewModel.showLoginSignupModal = false
                         navController.navigate(CreateAccountScreen(isOnboarding = true))
                     },
                     loginAccountCallback = {
                         onboardingViewModel.callback = callback
-                        navController.navigate(LoginScreen(isOnboarding = true))
+//                        navController.navigate(LoginScreen(isOnboarding = true))
+                        onboardingViewModel.showLoginSignupModal = false
+                        onboardingViewModel.callback?.invoke(true)
                     }
                 ) { onboardingViewModel.showLoginSignupModal = false }
+            }
+
+            if(onboardingViewModel.showAddPlatformsModal) {
+                OnlineActivePlatformsModal(
+                    onboardingViewModel.showAddPlatformsModal,
+                    navController = navController,
+                    isCompose = false,
+                    isOnboarding = true
+                ) { onboardingViewModel.showAddPlatformsModal = false }
             }
         }
     }

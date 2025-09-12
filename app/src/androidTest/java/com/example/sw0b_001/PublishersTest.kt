@@ -14,9 +14,9 @@ import android.util.Base64
 import android.util.Log
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.ComposeHandlers
-import com.example.sw0b_001.data.Platforms.AvailablePlatforms
+import com.example.sw0b_001.data.models.AvailablePlatforms
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
-import com.example.sw0b_001.data.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.data.Vaults
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaType

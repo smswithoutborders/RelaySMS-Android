@@ -7,7 +7,7 @@ import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.R
 import com.example.sw0b_001.Security.Cryptography
 import com.example.sw0b_001.data.ComposeHandlers
-import com.example.sw0b_001.data.Platforms.Platforms
+import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.Publishers
 import com.example.sw0b_001.data.Vaults
 import kotlinx.coroutines.CoroutineScope

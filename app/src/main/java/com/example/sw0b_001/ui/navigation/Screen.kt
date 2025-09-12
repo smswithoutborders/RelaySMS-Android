@@ -1,6 +1,6 @@
 package com.example.sw0b_001.ui.navigation
 
-import com.example.sw0b_001.data.Platforms.Platforms
+import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.ui.views.OTPCodeVerificationType
 import kotlinx.serialization.Serializable
 

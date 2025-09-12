@@ -1,4 +1,4 @@
-package com.example.sw0b_001.data.Platforms
+package com.example.sw0b_001.data.models
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

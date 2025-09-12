@@ -10,9 +10,9 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getThreadId
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewModel
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.Platforms.AvailablePlatforms
-import com.example.sw0b_001.data.Platforms.Platforms
-import com.example.sw0b_001.data.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.data.models.AvailablePlatforms
+import com.example.sw0b_001.data.models.Platforms
+import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.data.models.RatchetStates
 import java.nio.ByteBuffer

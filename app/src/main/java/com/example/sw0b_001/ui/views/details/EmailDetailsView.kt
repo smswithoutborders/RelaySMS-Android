@@ -40,7 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import com.example.sw0b_001.data.models.Bridges
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
-import com.example.sw0b_001.data.Platforms.Platforms
+import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.ui.navigation.EmailComposeScreen

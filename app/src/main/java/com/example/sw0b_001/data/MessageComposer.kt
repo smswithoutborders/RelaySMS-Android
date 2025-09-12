@@ -9,7 +9,7 @@ import androidx.preference.PreferenceManager
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.Headers
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.Ratchets
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.States
-import com.example.sw0b_001.data.Platforms.AvailablePlatforms
+import com.example.sw0b_001.data.models.AvailablePlatforms
 import com.example.sw0b_001.data.Helpers.toBytes
 import java.nio.ByteBuffer
 import java.nio.ByteOrder

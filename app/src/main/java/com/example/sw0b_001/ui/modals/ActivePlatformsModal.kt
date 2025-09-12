@@ -21,9 +21,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun ActivePlatformsModal(
     sendNewMessageRequested: Boolean,
-    platformsViewModel: PlatformsViewModel,
     navController: NavController,
     isCompose: Boolean = false,
+    isOnboarding: Boolean = false,
     onDismiss: () -> Unit,
 ) {
     val sheetState = rememberStandardBottomSheetState(
@@ -44,8 +44,8 @@ fun ActivePlatformsModal(
         ) {
             AvailablePlatformsView(
                 navController = navController,
-                platformsViewModel = platformsViewModel,
-                isCompose = isCompose
+                isCompose = isCompose,
+                isOnboarding = isOnboarding
             ) {
                 onDismiss()
             }
@@ -61,7 +61,6 @@ fun ActivePlatformsModalPreview() {
     AppTheme {
         ActivePlatformsModal(
             sendNewMessageRequested = true,
-            platformsViewModel = remember{ PlatformsViewModel() },
             onDismiss = {},
             navController = NavController(LocalContext.current)
         )

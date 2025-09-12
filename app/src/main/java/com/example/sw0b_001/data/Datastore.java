@@ -23,12 +23,12 @@ import com.example.sw0b_001.data.models.GatewayClient;
 import com.example.sw0b_001.data.models.GatewayServer;
 import com.example.sw0b_001.data.dao.GatewayServersDAO;
 import com.example.sw0b_001.data.dao.RatchetStatesDAO;
-import com.example.sw0b_001.data.Platforms.AvailablePlatforms;
-import com.example.sw0b_001.data.Platforms.AvailablePlatformsDao;
-import com.example.sw0b_001.data.Platforms.Platforms;
-import com.example.sw0b_001.data.Platforms.PlatformDao;
-import com.example.sw0b_001.data.Platforms.StoredPlatformsDao;
-import com.example.sw0b_001.data.Platforms.StoredPlatformsEntity;
+import com.example.sw0b_001.data.models.AvailablePlatforms;
+import com.example.sw0b_001.data.dao.AvailablePlatformsDao;
+import com.example.sw0b_001.data.models.Platforms;
+import com.example.sw0b_001.data.dao.PlatformDao;
+import com.example.sw0b_001.data.dao.StoredPlatformsDao;
+import com.example.sw0b_001.data.models.StoredPlatformsEntity;
 import com.example.sw0b_001.data.models.RatchetStates;
 
 import org.jetbrains.annotations.NotNull;

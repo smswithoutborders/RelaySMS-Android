@@ -1,4 +1,4 @@
-package com.example.sw0b_001.data.Platforms
+package com.example.sw0b_001.data.models
 
 import android.content.Context
 import androidx.room.ColumnInfo
@@ -66,7 +66,7 @@ class Platforms {
         fun refreshAvailablePlatforms(context: Context) {
             CoroutineScope(Dispatchers.Default).launch {
                 try {
-                    Publishers.getAvailablePlatforms(context).let{ json ->
+                    Publishers.Companion.getAvailablePlatforms(context).let{ json ->
                         json.forEach { it->
                             if(it.icon_png?.isNotEmpty() == true) {
                                 val url = URL(it.icon_png)

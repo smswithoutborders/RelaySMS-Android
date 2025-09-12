@@ -58,7 +58,7 @@ import androidx.navigation.NavController
 import com.example.sw0b_001.data.models.Bridges
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
-import com.example.sw0b_001.data.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.R
 import com.example.sw0b_001.extensions.context.settingsGetNotShowChooseGatewayClient
 import com.example.sw0b_001.ui.modals.ComposeChooseGatewayClientsModal

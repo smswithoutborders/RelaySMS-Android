@@ -23,8 +23,8 @@ import com.example.sw0b_001.data.Network
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.ComposeHandlers
 import com.example.sw0b_001.data.GatewayClientsCommunications
-import com.example.sw0b_001.data.Platforms.AvailablePlatforms
-import com.example.sw0b_001.data.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.data.models.AvailablePlatforms
+import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.data.Publishers
 import com.example.sw0b_001.data.SMSHandler
 import com.example.sw0b_001.data.models.Bridges

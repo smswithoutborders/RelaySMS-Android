@@ -9,7 +9,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.sw0b_001.data.Datastore
-import com.example.sw0b_001.data.Platforms.Platforms
+import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.EncryptedContent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 class OnboardingViewModel : ViewModel() {
 
     var showLoginSignupModal by mutableStateOf(false)
+    var showAddPlatformsModal by mutableStateOf(false)
 
     private val _onboardingState = MutableStateFlow<InteractiveOnboarding?>(null)
     val onboardingState: StateFlow<InteractiveOnboarding?> = _onboardingState.asStateFlow()
@@ -29,15 +30,23 @@ class OnboardingViewModel : ViewModel() {
 
     lateinit var screensList: List<InteractiveOnboarding>
 
-    fun next(
+    fun first(
         context: Context,
         navController: NavController
     ) {
         if(!::screensList.isInitialized) {
             screensList = getOnboardingScreens(context, navController)
         }
-        index += 1
+
+        index = 0
         setOnboarding(screensList[index])
+    }
+
+    fun next() {
+        if(index < screensList.size - 1) {
+            index += 1
+            setOnboarding(screensList[index])
+        }
     }
 
     var callback: ((Boolean) -> Unit)? = null

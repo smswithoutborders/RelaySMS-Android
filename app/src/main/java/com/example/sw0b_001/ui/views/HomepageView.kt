@@ -303,7 +303,6 @@ fun HomepageView(
                 if(isLoggedIn) {
                     ActivePlatformsModal(
                         sendNewMessageRequested = sendNewMessageRequested,
-                        platformsViewModel = platformsViewModel,
                         navController = navController,
                         isCompose = true
                     ) {
@@ -354,7 +353,6 @@ fun GetTabViews(
         BottomTabsItems.BottomBarPlatformsTab -> {
             AvailablePlatformsView(
                 navController = navController,
-                platformsViewModel = platformsViewModel
             )
         }
         BottomTabsItems.BottomBarCountriesTab -> {
@@ -379,9 +377,9 @@ fun HomepageView_Preview() {
     AppTheme(darkTheme = false) {
         HomepageView(
             navController = rememberNavController(),
-            platformsViewModel = PlatformsViewModel(),
-            messagesViewModel = MessagesViewModel(),
-            gatewayClientViewModel = GatewayClientViewModel(),
+            platformsViewModel = remember{ PlatformsViewModel() },
+            messagesViewModel = remember{ MessagesViewModel() },
+            gatewayClientViewModel = remember{ GatewayClientViewModel() },
         )
     }
 }
@@ -394,9 +392,9 @@ fun HomepageViewLoggedIn_Preview() {
         HomepageView(
             isLoggedIn = true,
             navController = rememberNavController(),
-            platformsViewModel = PlatformsViewModel(),
-            messagesViewModel = MessagesViewModel(),
-            gatewayClientViewModel = GatewayClientViewModel(),
+            platformsViewModel = remember{ PlatformsViewModel() },
+            messagesViewModel = remember{ MessagesViewModel() },
+            gatewayClientViewModel = remember{ GatewayClientViewModel() },
         )
     }
 }
@@ -419,9 +417,9 @@ fun HomepageViewLoggedInMessages_Preview() {
             _messages = listOf(encryptedContent),
             isLoggedIn = true,
             navController = rememberNavController(),
-            platformsViewModel = remember { PlatformsViewModel() } ,
-            messagesViewModel = MessagesViewModel(),
-            gatewayClientViewModel = GatewayClientViewModel(),
+            platformsViewModel = remember{ PlatformsViewModel() },
+            messagesViewModel = remember{ MessagesViewModel() },
+            gatewayClientViewModel = remember{ GatewayClientViewModel() },
         )
     }
 }

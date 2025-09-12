@@ -57,8 +57,8 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.example.sw0b_001.data.models.Bridges
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
-import com.example.sw0b_001.data.Platforms.AvailablePlatforms
-import com.example.sw0b_001.data.Platforms.Platforms
+import com.example.sw0b_001.data.models.AvailablePlatforms
+import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.R
@@ -257,7 +257,6 @@ fun RecentView(
         if (sendNewMessageRequested) {
             ActivePlatformsModal(
                 sendNewMessageRequested = sendNewMessageRequested,
-                platformsViewModel = platformsViewModel,
                 navController = navController,
                 isCompose = true
             ) {

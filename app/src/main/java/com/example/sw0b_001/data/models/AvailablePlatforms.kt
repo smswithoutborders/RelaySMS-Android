@@ -1,4 +1,4 @@
-package com.example.sw0b_001.data.Platforms
+package com.example.sw0b_001.data.models
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -18,6 +18,6 @@ data class AvailablePlatforms(
     @ColumnInfo(name="support_url_scheme") val support_url_scheme: Boolean?,
 
     @Transient
-    @ColumnInfo(name="logo", typeAffinity = ColumnInfo.BLOB)
+    @ColumnInfo(name="logo", typeAffinity = ColumnInfo.Companion.BLOB)
     var logo: ByteArray? = null
 )

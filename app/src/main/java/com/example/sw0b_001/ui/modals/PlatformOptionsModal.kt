@@ -39,9 +39,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.sw0b_001.data.Platforms.AvailablePlatforms
-import com.example.sw0b_001.data.Platforms.Platforms
-import com.example.sw0b_001.data.Platforms.Platforms.ServiceTypes
+import com.example.sw0b_001.data.models.AvailablePlatforms
+import com.example.sw0b_001.data.models.Platforms
+import com.example.sw0b_001.data.models.Platforms.ServiceTypes
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.EmailComposeScreen
 import com.example.sw0b_001.ui.navigation.MessageComposeScreen
@@ -52,7 +52,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
-import com.example.sw0b_001.data.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.data.Publishers
 import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.ui.views.addAccounts.PNBAPhoneNumberCodeRequestView
@@ -66,10 +66,10 @@ import androidx.core.net.toUri
 @Composable
 fun PlatformOptionsModal(
     showPlatformsModal: Boolean,
-    platformsViewModel: PlatformsViewModel,
     isActive: Boolean,
     isCompose: Boolean,
     navController: NavController,
+    platform: AvailablePlatforms,
     onDismissRequest: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -98,7 +98,7 @@ fun PlatformOptionsModal(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 if(isRevokeLoading) {
-                    RevokeAccountLoading(platformsViewModel.platform!!)
+                    RevokeAccountLoading(platform)
                 }
                 else if(revokeAccountConfirmationRequested) {
                     ConfirmationModal(
@@ -108,7 +108,7 @@ fun PlatformOptionsModal(
                             isRevokeLoading = true
                             triggerAccountRevoke(
                                 context = context,
-                                platform = platformsViewModel.platform!!,
+                                platform = platform,
                                 account = account!!,
                                 onCompletedCallback = {
                                     isRevokeLoading = false
@@ -123,7 +123,7 @@ fun PlatformOptionsModal(
                 }
                 else if(removeAccountRequested) {
                     SelectAccountModal(
-                        name = platformsViewModel.platform?.name ?: "",
+                        name = platform.name,
                         onAccountSelected = { storedAccount ->
                             removeAccountRequested = false
                             revokeAccountConfirmationRequested = true
@@ -136,23 +136,20 @@ fun PlatformOptionsModal(
                 else if(isAddLoading) {
                     AddAccountLoading(
                         context,
-                        platformsViewModel.platform!!
+                        platform
                     ) {
                         onDismissRequest()
                     }
                 } else {
                     Image(
-                        bitmap = if(platformsViewModel.platform != null &&
-                            platformsViewModel.platform!!.logo != null
-                        ) {
+                        bitmap = if(platform.logo != null) {
                             BitmapFactory.decodeByteArray(
-                                platformsViewModel.platform!!.logo,
+                                platform.logo,
                                 0,
-                                platformsViewModel.platform!!.logo!!.count()
+                                platform.logo!!.count()
                             ).asImageBitmap()
                         }
-                        else BitmapFactory.decodeResource(
-                            context.resources,
+                        else BitmapFactory.decodeResource( context.resources,
                             R.drawable.logo
                         ).asImageBitmap(),
                         contentDescription = stringResource(R.string.selected_platform),
@@ -162,28 +159,21 @@ fun PlatformOptionsModal(
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = if (isCompose) {
-                            getServiceBasedComposeDescriptions(
-                                if(platformsViewModel.platform != null)
-                                    platformsViewModel.platform!!.service_type!!
-                                else "",
-                                context
-                            )
+                            getServiceBasedComposeDescriptions( platform.service_type!!,
+                                context)
                         } else {
                             getServiceBasedAvailableDescription(
-                                if(platformsViewModel.platform != null)
-                                    platformsViewModel.platform!!.service_type!!
-                                else "",
-                                context
-                            )
+                                platform.service_type!!,
+                                context)
                         },
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    if (isCompose || platformsViewModel.platform == null) {
+                    if (isCompose) {
                         ComposeMessages(
-                            platform = platformsViewModel.platform,
+                            platform = platform,
                             navController = navController
                         ) {
                             onDismissRequest()
@@ -195,7 +185,7 @@ fun PlatformOptionsModal(
                                 isAddLoading = true
                                 triggerAddPlatformRequest(
                                     context = context,
-                                    platform = platformsViewModel.platform!!
+                                    platform = platform
                                 ) {
                                     isAddLoading = false
                                     onDismissRequest()
@@ -621,13 +611,11 @@ fun PlatformOptionsModalPreview() {
             support_url_scheme = true,
             logo = null
         )
-        val platformsViewModel = remember { PlatformsViewModel() }
-        platformsViewModel.platform = platform
         PlatformOptionsModal(
             showPlatformsModal = true,
-            platformsViewModel = platformsViewModel,
             isActive = true,
             isCompose = false,
+            platform = platform,
             onDismissRequest = {},
             navController = rememberNavController()
         )

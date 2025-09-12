@@ -42,27 +42,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.sw0b_001.data.Platforms.Platforms
+import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.PlatformOptionsModal
 import com.example.sw0b_001.ui.theme.AppTheme
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.stringResource
-import com.example.sw0b_001.data.Platforms.AvailablePlatforms
-import com.example.sw0b_001.data.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.data.models.AvailablePlatforms
+import com.example.sw0b_001.data.models.StoredPlatformsEntity
 
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun AvailablePlatformsView(
     navController: NavController,
-    platformsViewModel: PlatformsViewModel,
     isCompose: Boolean = false,
+    isOnboarding: Boolean = false,
     onDismiss: () -> Unit = {}
 ) {
     val context = LocalContext.current
+    var platform: AvailablePlatforms? by remember{ mutableStateOf(null)}
+
     var showPlatformOptions by remember { mutableStateOf(false) }
+
+    val platformsViewModel = remember{ PlatformsViewModel() }
 
     val platforms: List<AvailablePlatforms> by platformsViewModel
         .getAvailablePlatforms(context).observeAsState(emptyList())
@@ -94,21 +98,21 @@ fun AvailablePlatformsView(
                 isCompose = isCompose,
                 onPlatformClick = {
                     platformsViewModel.reset()
-                    platformsViewModel.platform = it
+                    platform = it
                     showPlatformOptions = true
-                    println("Available platform: ${platformsViewModel.platform?.name}")
-                }
+                },
+                isOnboarding = isOnboarding,
             )
         }
     }
 
-    if (showPlatformOptions) {
+    if (showPlatformOptions && platform != null) {
         PlatformOptionsModal(
             showPlatformsModal = showPlatformOptions,
-            platformsViewModel = platformsViewModel,
-            isActive = isCompose || platformsViewModel.platform == null ||
-                    storedPlatforms.any { it.name == platformsViewModel.platform!!.name },
+            isActive = isCompose || platform == null ||
+                    storedPlatforms.any { it.name == platform!!.name },
             isCompose = isCompose,
+            platform = platform!!,
             navController = navController,
         ) {
             showPlatformOptions = false
@@ -123,6 +127,7 @@ fun PlatformListContent(
     platforms: List<AvailablePlatforms>,
     storedPlatforms: List<StoredPlatformsEntity>,
     isCompose: Boolean = false,
+    isOnboarding: Boolean = false,
     onPlatformClick: (AvailablePlatforms?) -> Unit = {}
 ) {
     Column(
@@ -130,24 +135,26 @@ fun PlatformListContent(
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        Text(
-            text = stringResource(R.string.use_your_relaysms_account),
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onBackground
-        )
+        if(!isOnboarding) {
+            Text(
+                text = stringResource(R.string.use_your_relaysms_account),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        PlatformCard(
-            logo = null,
-            platform = null,
-            modifier = Modifier.width(130.dp),
-            isActive = true,
-            onClick = onPlatformClick
-        )
+            PlatformCard(
+                logo = null,
+                platform = null,
+                modifier = Modifier.width(130.dp),
+                isActive = true,
+                onClick = onPlatformClick
+            )
 
-        Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp))
+        }
 
         Text(
             text = stringResource(R.string.use_your_online_accounts),
@@ -272,7 +279,6 @@ fun AddPlatformsScreenPreview() {
     AppTheme(darkTheme = false) {
         AvailablePlatformsView(
             navController = NavController(context = LocalContext.current),
-            platformsViewModel = remember{ PlatformsViewModel() }
         )
     }
 }
