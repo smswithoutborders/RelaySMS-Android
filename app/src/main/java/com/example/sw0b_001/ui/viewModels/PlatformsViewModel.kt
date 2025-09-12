@@ -5,11 +5,15 @@ import android.content.Intent
 import android.util.Base64
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.ColorInt
+import androidx.browser.customtabs.CustomTabColorSchemeParams
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -18,24 +22,25 @@ import com.afkanerd.smswithoutborders_libsmsmms.data.data.models.SmsManager
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getThreadId
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewModel
-import com.example.sw0b_001.data.Datastore
-import com.example.sw0b_001.data.Network
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.ComposeHandlers
+import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.GatewayClientsCommunications
-import com.example.sw0b_001.data.models.AvailablePlatforms
-import com.example.sw0b_001.data.models.StoredPlatformsEntity
+import com.example.sw0b_001.data.Network
 import com.example.sw0b_001.data.Publishers
 import com.example.sw0b_001.data.SMSHandler
+import com.example.sw0b_001.data.models.AvailablePlatforms
 import com.example.sw0b_001.data.models.Bridges
 import com.example.sw0b_001.data.models.EncryptedContent
+import com.example.sw0b_001.data.models.Platforms
+import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.ui.views.BottomTabsItems
-import com.example.sw0b_001.ui.views.OTPCodeVerificationType
 import com.example.sw0b_001.ui.views.compose.GatewayClientRequest
 import com.example.sw0b_001.ui.views.compose.MessageContent
 import com.example.sw0b_001.ui.views.compose.ReliabilityTestRequestPayload
 import com.example.sw0b_001.ui.views.compose.ReliabilityTestResponsePayload
 import com.example.sw0b_001.ui.views.compose.TextContent
+import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -45,6 +50,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.StandardCharsets
 import java.util.Locale
+
 
 class PlatformsViewModel : ViewModel() {
 
@@ -670,6 +676,73 @@ class PlatformsViewModel : ViewModel() {
                 println(e.message)
                 return e.message
             }
+        }
+
+        fun triggerAddPlatformRequest(
+            context: Context,
+            platform: AvailablePlatforms,
+            onCompletedCallback: () -> Unit
+        ) {
+            CoroutineScope(Dispatchers.Default).launch {
+                when(platform.protocol_type) {
+                    Platforms.ProtocolTypes.OAUTH2.type -> {
+                        val publishers = Publishers(context)
+                        val publicKeyBytes = Publishers.fetchPublisherPublicKey(context)
+                        val requestIdentifier = Base64.encodeToString(publicKeyBytes, Base64.NO_WRAP)
+                        try {
+                            val response = publishers.getOAuthURL(
+                                availablePlatforms = platform,
+                                autogenerateCodeVerifier = true,
+                                supportsUrlScheme = platform.support_url_scheme!!,
+                                requestIdentifier = requestIdentifier
+                            )
+
+                            Publishers.storeOauthRequestCodeVerifier(context, response.codeVerifier)
+
+                            val intentUri = response.authorizationUrl.toUri()
+                            val intent = oAuth2IntentBuilder(context)
+                            intent.launchUrl(context, intentUri)
+                        } catch(e: StatusRuntimeException) {
+                            e.printStackTrace()
+                            CoroutineScope(Dispatchers.Main).launch {
+                                e.status.description?.let {
+                                    Toast.makeText(context, e.status.description,
+                                        Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        } catch(e: Exception) {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                Toast.makeText(context, e.message, Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                        } finally {
+                            publishers.shutdown()
+                            onCompletedCallback()
+                        }
+                    }
+                }
+            }
+        }
+
+        private fun oAuth2IntentBuilder(context: Context): CustomTabsIntent {
+            // get the current toolbar background color (this might work differently in your app)
+            @ColorInt val colorPrimaryLight = ContextCompat.getColor( context,
+                R.color.md_theme_primary)
+
+            return CustomTabsIntent.Builder() // set the default color scheme
+                .setSendToExternalDefaultHandlerEnabled(true)
+                .setDefaultColorSchemeParams(
+                    CustomTabColorSchemeParams.Builder()
+                        .setToolbarColor(colorPrimaryLight)
+                        .build()
+                )
+                .setStartAnimations(context,
+                    android.R.anim.slide_in_left,
+                    android.R.anim.slide_out_right)
+                .setExitAnimations(context,
+                    android.R.anim.slide_in_left,
+                    android.R.anim.slide_out_right)
+                .build()
         }
     }
 

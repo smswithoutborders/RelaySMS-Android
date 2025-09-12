@@ -2,7 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
 //    id 'org.jetbrains.kotlin.jvm' version '1.9.23'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '2.2.10'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '2.2.20'
     id "com.google.protobuf"
     alias(libs.plugins.compose.compiler)
     id 'kotlin-kapt' // Add this line
@@ -14,6 +14,29 @@ def versionProperties = new Properties()
 versionProperties.load(new FileInputStream(versionsPropertiesFile))
 
 android {
+    signingConfigs {
+        def localPropertiesFile = rootProject.file("local.properties")
+        def localProperties = new Properties()
+        localProperties.load(new FileInputStream(localPropertiesFile))
+
+        if (localProperties['storeFile'] && localProperties['keyAlias'] &&
+                localProperties['storePassword'] && localProperties['keyPassword']) {
+
+            debug {
+                keyAlias = localProperties['keyAlias']
+                storeFile = new File(localProperties['storeFile'])
+                storePassword = localProperties['storePassword']
+                keyPassword = localProperties['keyPassword']
+            }
+            release {
+                keyAlias = localProperties['keyAlias']
+                storeFile = new File(localProperties['storeFile'])
+                storePassword = localProperties['storePassword']
+                keyPassword = localProperties['keyPassword']
+            }
+        }
+
+    }
     compileSdk 36
 
     buildFeatures {
@@ -313,6 +336,7 @@ dependencies {
     annotationProcessor "androidx.room:room-compiler:$room_version"
     testImplementation "androidx.room:room-testing:$room_version"
     implementation "androidx.room:room-paging:$room_version"
+    implementation 'androidx.browser:browser:1.9.0'
 
 }
 

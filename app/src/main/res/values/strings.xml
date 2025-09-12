@@ -373,7 +373,7 @@
     <string name="message_">Message</string>
     <string name="message_content_could_not_be_displayed">Message content could not be displayed</string>
     <string name="text_message">Text Message</string>
-    <string name="get_platforms_url" translatable="false">https://publisher.staging.smswithoutborders.com/v1/platforms</string>"
+    <string name="get_platforms_url" translatable="false">https://publisher.smswithoutborders.com/v1/platforms</string>"
     <string name="recipient_account">Recipient account</string>
     <string name="recipient_account_format_hint">Make sure the recipient account is in the right format.</string>
     <string name="slack_recipient">Slack Channel or User</string>

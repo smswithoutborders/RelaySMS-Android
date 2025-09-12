@@ -18,7 +18,6 @@ import androidx.core.content.edit
 
 class Publishers(val context: Context) {
 
-    private var REDIRECT_URL_SCHEME = "relaysms://oauth.afkanerd.com/android/"
     private var channel: ManagedChannel = ManagedChannelBuilder
         .forAddress(context.getString(R.string.publisher_grpc_url),
             context.getString(R.string.publisher_grpc_port).toInt())
@@ -27,7 +26,7 @@ class Publishers(val context: Context) {
 
     private var publisherStub = PublisherGrpc.newBlockingStub(channel)
 
-    private var oAuthRedirectUrl = "https://oauth.afkanerd.com/android/"
+    private var oAuthRedirectUrl = "https://relay.smswithoutborders.com/android"
 
     fun getOAuthURL(availablePlatforms: AvailablePlatforms,
                     autogenerateCodeVerifier: Boolean = true,
@@ -39,7 +38,7 @@ class Publishers(val context: Context) {
                 setPlatform(availablePlatforms.name)
                 setState(Base64.encodeToString("${availablePlatforms.name},$scheme".encodeToByteArray(),
                     Base64.DEFAULT))
-                setRedirectUrl(if (supportsUrlScheme) REDIRECT_URL_SCHEME else oAuthRedirectUrl)
+                setRedirectUrl(oAuthRedirectUrl)
                 setAutogenerateCodeVerifier(autogenerateCodeVerifier)
                 setRequestIdentifier(requestIdentifier)
             }.build()
@@ -82,7 +81,7 @@ class Publishers(val context: Context) {
             setPlatform(platform)
             setAuthorizationCode(code)
             setCodeVerifier(codeVerifier)
-            setRedirectUrl(if (supportsUrlScheme) REDIRECT_URL_SCHEME else oAuthRedirectUrl)
+            setRedirectUrl(oAuthRedirectUrl)
             setStoreOnDevice(storeOnDevice)
             setRequestIdentifier(requestIdentifier)
         }.build()

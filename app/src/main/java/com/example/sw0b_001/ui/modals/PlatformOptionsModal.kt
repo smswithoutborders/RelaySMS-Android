@@ -61,6 +61,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.triggerAddPlatformRequest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -203,55 +204,6 @@ fun PlatformOptionsModal(
     }
 }
 
-private fun triggerAddPlatformRequest(
-    context: Context,
-    platform: AvailablePlatforms,
-    onCompletedCallback: () -> Unit
-) {
-    CoroutineScope(Dispatchers.Default).launch {
-
-        when(platform.protocol_type) {
-            Platforms.ProtocolTypes.OAUTH2.type -> {
-                val publishers = Publishers(context)
-                val publicKeyBytes = Publishers.fetchPublisherPublicKey(context)
-                val requestIdentifier = Base64.encodeToString(publicKeyBytes, Base64.NO_WRAP)
-                println("Request Identifier: $requestIdentifier")
-                try {
-                    val response = publishers.getOAuthURL(
-                        availablePlatforms = platform,
-                        autogenerateCodeVerifier = true,
-                        supportsUrlScheme = platform.support_url_scheme!!,
-                        requestIdentifier = requestIdentifier
-                    )
-
-                    Publishers.storeOauthRequestCodeVerifier(context, response.codeVerifier)
-
-                    CoroutineScope(Dispatchers.Main).launch {
-                        val intentUri = response.authorizationUrl.toUri()
-                        val intent = Intent(Intent.ACTION_VIEW, intentUri)
-                        context.startActivity(intent)
-                    }
-                } catch(e: StatusRuntimeException) {
-                    e.printStackTrace()
-                    CoroutineScope(Dispatchers.Main).launch {
-                        e.status.description?.let {
-                            Toast.makeText(context, e.status.description,
-                                Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                } catch(e: Exception) {
-                    CoroutineScope(Dispatchers.Main).launch {
-                        Toast.makeText(context, e.message, Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                } finally {
-                    publishers.shutdown()
-                    onCompletedCallback()
-                }
-            }
-        }
-    }
-}
 
 
 @Composable
