@@ -83,8 +83,6 @@ fun PlatformOptionsModal(
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Expanded,
         skipHiddenState = false,
-        confirmValueChange = { !isAddLoading ||
-                platformsViewModel.platform?.service_type == Platforms.ProtocolTypes.PNBA.type }
     )
 
     if (showPlatformsModal) {
@@ -626,7 +624,7 @@ fun PlatformOptionsModalPreview() {
         val platformsViewModel = remember { PlatformsViewModel() }
         platformsViewModel.platform = platform
         PlatformOptionsModal(
-            showPlatformsModal = false,
+            showPlatformsModal = true,
             platformsViewModel = platformsViewModel,
             isActive = true,
             isCompose = false,

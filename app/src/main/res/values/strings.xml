@@ -406,5 +406,8 @@
     <string name="save_platforms_to_your_account">Save platforms to your account</string>
     <string name="it_s_easier_than_you_can_imagine">It\'s easier than you can imagine</string>
     <string name="you_can_save_more_accounts_per_platform_at_anytime_from_inside_the_app">You can save more accounts per platform at anytime from inside the app!</string>
+    <string name="start_messaging_now">Start messaging now!</string>
+    <string name="you_can_now_send_messages_from_your_saved_accounts_you_can_also_save_more_accounts_later">You can now send messages from your saved accounts!\nYou can also save more accounts later...</string>
+    <string name="ready_to_save_platforms">Ready to save platforms!</string>
 
 </resources>

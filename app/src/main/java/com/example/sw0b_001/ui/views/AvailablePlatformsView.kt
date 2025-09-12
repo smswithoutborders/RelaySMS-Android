@@ -66,7 +66,6 @@ fun AvailablePlatformsView(
 
     val platforms: List<AvailablePlatforms> by platformsViewModel
         .getAvailablePlatforms(context).observeAsState(emptyList())
-    println("Available platforms: ${platforms.size}")
 
     val storedPlatforms: List<StoredPlatformsEntity> by platformsViewModel
         .getSaved(context).observeAsState(emptyList())
@@ -85,7 +84,7 @@ fun AvailablePlatformsView(
             Text(
                 text = if(isCompose) stringResource(R.string.send_new_message)
                 else stringResource(R.string.available_platforms),
-                style = MaterialTheme.typography.displayMedium,
+                style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(bottom = 16.dp),
             )
 

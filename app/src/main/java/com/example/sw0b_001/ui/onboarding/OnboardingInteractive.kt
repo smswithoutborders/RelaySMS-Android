@@ -85,19 +85,21 @@ fun OnboardingInteractive(
 
             if(onboardingViewModel.showLoginSignupModal) {
                 val completedOnboarding = InteractiveOnboarding(
-                    title = context.getString(R.string.way_to_go),
+                    title = stringResource(R.string.ready_to_save_platforms),
                     description = stringResource(R.string.now_we_can_save_platforms_in_your_account),
                     subDescription = stringResource(R.string.it_s_easier_than_you_can_imagine),
                     actionButtonText = stringResource(R.string.save_platforms_to_your_account),
                     image = R.drawable.relay_sms_save_vault,
                 ){
-                    onboardingViewModel.setOnboarding(
-                        InteractiveOnboarding(
-                            title = context.getString(R.string.way_to_go),
-                            description = context.getString(R.string.you_can_save_more_accounts_per_platform_at_anytime_from_inside_the_app),
-                            image = R.drawable.undraw_success_288d,
-                        ){ }
-                    )
+//                    onboardingViewModel.setOnboarding(
+//                        InteractiveOnboarding(
+//                            title = context.getString(R.string.way_to_go),
+//                            description = context.getString(R.string.you_can_save_more_accounts_per_platform_at_anytime_from_inside_the_app),
+//                            image = R.drawable.undraw_success_288d,
+//                        ){ }
+//                    )
+
+                    TODO("Should begin working on adding platforms")
                 }
                 val callback: ((Boolean) -> Unit) = { success ->
                     if(success) {

@@ -81,11 +81,13 @@ class OnboardingViewModel : ViewModel() {
                 }
             ),
             InteractiveOnboarding(
-                title = "Start messaging now!",
-                description = "You can now send messages from your saved accounts!\nYou can also save more accounts later...",
-                actionButtonText = "Give it a try!",
+                title = context.getString(R.string.start_messaging_now),
+                description = context.getString(R.string.you_can_now_send_messages_from_your_saved_accounts_you_can_also_save_more_accounts_later),
+                actionButtonText = context.getString(R.string.give_it_a_try),
                 image = R.drawable.try_sending_message_illus,
-                onClickCallToAction = { TODO() }
+                onClickCallToAction = {
+
+                }
             ),
             InteractiveOnboarding(
                 title = "Secure your app!",
