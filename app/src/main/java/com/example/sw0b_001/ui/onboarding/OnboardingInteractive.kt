@@ -149,6 +149,7 @@ fun OnboardingInteractive(
                         onboardingViewModel.setOnboarding(completedOnboarding)
                     }
                 }
+
                 SignupLoginModal(
                     onboardingViewModel.showLoginSignupModal,
                     createAccountCallback = {
@@ -184,21 +185,20 @@ fun OnboardingInteractive(
             }
 
             if(onboardingViewModel.showSendPlatformsModal) {
-                val completedCallback = onboardingViewModel.setOnboarding(
-                    InteractiveOnboarding(
-                        title = stringResource(R.string.you_are_now_ready),
-                        description = stringResource(R.string.you_have_successfully_carried_out_the_essentials_of_messaging_with_relaysms),
-                        image = R.drawable.undraw_success_288d,
-                    ){}
-                )
+//                val completedCallback = onboardingViewModel.setOnboarding(
+//                    InteractiveOnboarding(
+//                        title = stringResource(R.string.you_are_now_ready),
+//                        description = stringResource(R.string.you_have_successfully_carried_out_the_essentials_of_messaging_with_relaysms),
+//                        image = R.drawable.undraw_success_288d,
+//                    ){}
+//                )
 
-                onboardingViewModel.showAddPlatformsModal = true
                 OnlineActivePlatformsModal(
-                    onboardingViewModel.showAddPlatformsModal,
+                    onboardingViewModel.showSendPlatformsModal,
                     navController = navController,
                     isCompose = true,
                     isOnboarding = true,
-                ) { onboardingViewModel.showAddPlatformsModal = false }
+                ) { onboardingViewModel.showSendPlatformsModal = false }
             }
         }
     }

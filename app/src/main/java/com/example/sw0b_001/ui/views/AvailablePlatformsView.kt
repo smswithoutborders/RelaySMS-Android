@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,10 +22,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChatBubbleOutline
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -48,7 +55,13 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.PlatformOptionsModal
 import com.example.sw0b_001.ui.theme.AppTheme
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
+import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
+import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.data.models.AvailablePlatforms
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
 
@@ -74,6 +87,23 @@ fun AvailablePlatformsView(
     val storedPlatforms: List<StoredPlatformsEntity> by platformsViewModel
         .getSaved(context).observeAsState(emptyList())
 
+    val inPreviewMode = LocalInspectionMode.current
+
+    var isDefault by remember{
+        mutableStateOf(inPreviewMode || context.isDefault()) }
+
+    val getDefaultPermission = getSetDefaultBehaviour(context) {
+        isDefault = context.isDefault()
+        if(isDefault) {
+            navController.navigate(HomeScreenNav()) {
+                popUpTo(HomeScreenNav()) {
+                    inclusive = true
+                }
+                launchSingleTop = true
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -81,29 +111,63 @@ fun AvailablePlatformsView(
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier
-                .padding(16.dp)
-        ) {
-            Text(
-                text = if(isCompose) stringResource(R.string.send_new_message)
-                else stringResource(R.string.available_platforms),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(bottom = 16.dp),
-            )
+        Text(
+            text = if(isCompose) stringResource(R.string.send_new_message)
+            else stringResource(R.string.available_platforms),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(bottom = 16.dp),
+        )
 
-            PlatformListContent(
-                platforms = platforms,
-                storedPlatforms = storedPlatforms,
-                isCompose = isCompose,
-                onPlatformClick = {
-                    platformsViewModel.reset()
-                    platform = it
-                    showPlatformOptions = true
-                },
-                isOnboarding = isOnboarding,
-            )
+        if(inPreviewMode || (isCompose && !isDefault)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                OutlinedButton(onClick = {
+                    getDefaultPermission.launch(makeDefault(context))
+                }) {
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.ChatBubbleOutline,
+                            contentDescription = stringResource(R.string.compose),
+                        )
+
+                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+
+                        Text(
+                            stringResource(R.string.set_as_default_sms_app),
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    }
+                }
+            }
+
+            HorizontalDivider()
         }
+
+
+        PlatformListContent(
+            platforms = platforms,
+            storedPlatforms = storedPlatforms,
+            isCompose = isCompose,
+            onPlatformClick = {
+                platformsViewModel.reset()
+                platform = it
+                showPlatformOptions = true
+            },
+            isOnboarding = isOnboarding,
+        )
     }
 
     if (showPlatformOptions && platform != null) {
@@ -136,14 +200,7 @@ fun PlatformListContent(
             .padding(16.dp)
     ) {
         if(!isOnboarding) {
-            Text(
-                text = stringResource(R.string.use_your_relaysms_account),
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             PlatformCard(
                 logo = null,
@@ -153,17 +210,28 @@ fun PlatformListContent(
                 onClick = onPlatformClick
             )
 
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = stringResource(R.string.use_your_relaysms_account),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.secondary
+            )
+
             Spacer(modifier = Modifier.height(24.dp))
         }
 
+        HorizontalDivider()
+
+        Spacer(modifier = Modifier.height(24.dp))
+
         Text(
             text = stringResource(R.string.use_your_online_accounts),
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onBackground
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.secondary
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         val displayedPlatforms = if (isCompose) {
             platforms.filter { platform ->
@@ -219,18 +287,26 @@ fun PlatformListContent(
 
 @Composable
 fun PlatformCard(
+    modifier: Modifier = Modifier,
     logo: Bitmap? = null,
     platform: AvailablePlatforms?,
-    modifier: Modifier = Modifier,
     isActive: Boolean,
     onClick: (AvailablePlatforms?) -> Unit = {}
 ) {
     val context = LocalContext.current
+    val inPreviewMode = LocalInspectionMode.current
+
     Card(
         modifier = modifier
             .height(130.dp)
             .width(130.dp)
-            .clickable { onClick(platform) },
+            .then(
+                if(inPreviewMode) {
+                    Modifier
+                } else {
+                    Modifier.clickable { onClick(platform) }
+                }
+            ),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant

@@ -221,16 +221,12 @@ class MainActivity : ComponentActivity() {
                             platformsViewModel = platformsViewModel,
                             messagesViewModel = messagesViewModel,
                             gatewayClientViewModel = gatewayClientViewModel,
-//                            showBottomBar = !defaultSmsApp,
                             showBottomBar = true,
                         )
                     }
                 }
             }
         }
-
-        val oathRedirectSuccess: Boolean = intent.getBooleanExtra("oathRedirectSuccess",
-            false)
 
         NavHostControllerInstance(
             newLayoutInfo,
