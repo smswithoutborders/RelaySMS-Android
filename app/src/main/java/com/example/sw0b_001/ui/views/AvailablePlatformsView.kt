@@ -254,13 +254,14 @@ fun PlatformListContent(
             }
         }
 
-        if (showPlatformOptions && clickedPlatform != null) {
-            val isActive = storedPlatforms.find { it.name == clickedPlatform!!.name } != null
+        if (showPlatformOptions) {
+            val isActive = clickedPlatform == null || storedPlatforms.find {
+                it.name == clickedPlatform!!.name } != null
             PlatformOptionsModal(
                 showPlatformsModal = showPlatformOptions,
                 isActive = isActive,
                 isCompose = isCompose,
-                platform = clickedPlatform!!.apply {
+                platform = clickedPlatform?.apply {
                     this.service_type = this.service_type?.uppercase(Locale.getDefault())
                 },
                 navController = navController,

@@ -1,4 +1,4 @@
-package com.example.sw0b_001.ui.onboarding
+package com.example.sw0b_001.ui.views
 
 import android.content.Intent
 import android.content.res.Configuration

@@ -74,7 +74,7 @@ fun PlatformOptionsModal(
     isActive: Boolean,
     isCompose: Boolean,
     navController: NavController,
-    platform: AvailablePlatforms,
+    platform: AvailablePlatforms?,
     isOnboarding: Boolean = false,
     onCompleteCallback: () -> Unit= {},
     onDismissRequest: () -> Unit,
@@ -105,7 +105,7 @@ fun PlatformOptionsModal(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 if(isRevokeLoading) {
-                    RevokeAccountLoading(platform)
+                    RevokeAccountLoading(platform!!)
                 }
                 else if(revokeAccountConfirmationRequested) {
                     ConfirmationModal(
@@ -115,7 +115,7 @@ fun PlatformOptionsModal(
                             isRevokeLoading = true
                             triggerAccountRevoke(
                                 context = context,
-                                platform = platform,
+                                platform = platform!!,
                                 account = account!!,
                                 onCompletedCallback = {
                                     isRevokeLoading = false
@@ -130,7 +130,7 @@ fun PlatformOptionsModal(
                 }
                 else if(removeAccountRequested) {
                     SelectAccountModal(
-                        name = platform.name,
+                        name = platform!!.name,
                         onAccountSelected = { storedAccount ->
                             removeAccountRequested = false
                             revokeAccountConfirmationRequested = true
@@ -143,14 +143,14 @@ fun PlatformOptionsModal(
                 else if(isAddLoading) {
                     AddAccountLoading(
                         context,
-                        platform
+                        platform!!
                     ) {
                         onDismissRequest()
                     }
                 }
                 else {
                     Image(
-                        bitmap = if(platform.logo != null) {
+                        bitmap = if(platform?.logo != null) {
                             BitmapFactory.decodeByteArray(
                                 platform.logo,
                                 0,
@@ -167,11 +167,12 @@ fun PlatformOptionsModal(
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = if (isCompose) {
-                            getServiceBasedComposeDescriptions( platform.service_type!!,
+                            getServiceBasedComposeDescriptions(
+                                platform?.service_type ?: "",
                                 context)
                         } else {
                             getServiceBasedAvailableDescription(
-                                platform.service_type!!,
+                                platform?.service_type!!,
                                 context)
                         },
                         style = MaterialTheme.typography.bodyMedium,
@@ -195,7 +196,7 @@ fun PlatformOptionsModal(
                                 isAddLoading = true
                                 triggerAddPlatformRequest(
                                     context = context,
-                                    platform = platform
+                                    platform = platform!!
                                 ) {
                                     isAddLoading = false
                                     onDismissRequest()

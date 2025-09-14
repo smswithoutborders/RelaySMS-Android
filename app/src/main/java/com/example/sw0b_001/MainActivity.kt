@@ -54,7 +54,6 @@ import com.example.sw0b_001.ui.navigation.MessageViewScreen
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.navigation.TextComposeScreen
 import com.example.sw0b_001.ui.navigation.TextViewScreen
-import com.example.sw0b_001.ui.onboarding.WelcomeMainView
 import com.example.sw0b_001.ui.views.ForgotPasswordView
 import com.example.sw0b_001.ui.views.GetMeOutOfHere
 import com.example.sw0b_001.ui.views.PasteEncryptedTextView
@@ -86,6 +85,7 @@ import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.navigation.OnboardingInteractiveScreen
 import com.example.sw0b_001.ui.navigation.WelcomeScreen
 import com.example.sw0b_001.ui.onboarding.OnboardingInteractive
+import com.example.sw0b_001.ui.views.WelcomeMainView
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
 import com.example.sw0b_001.ui.views.BottomTabsItems
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
