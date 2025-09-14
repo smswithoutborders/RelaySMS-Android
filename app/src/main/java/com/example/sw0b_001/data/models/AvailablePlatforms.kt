@@ -11,7 +11,7 @@ import kotlinx.serialization.Transient
 data class AvailablePlatforms(
     @PrimaryKey val name: String,
     @ColumnInfo(name="shortcode") val shortcode: String?,
-    @ColumnInfo(name="service_type") val service_type: String?,
+    @ColumnInfo(name="service_type") var service_type: String?,
     @ColumnInfo(name="protocol_type") val protocol_type: String?,
     @ColumnInfo(name="icon_svg") val icon_svg: String?,
     @ColumnInfo(name="icon_png") val icon_png: String?,

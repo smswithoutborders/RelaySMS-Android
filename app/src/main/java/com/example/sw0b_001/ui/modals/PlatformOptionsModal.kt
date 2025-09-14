@@ -49,7 +49,9 @@ import com.example.sw0b_001.ui.navigation.TextComposeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.toUpperCase
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
@@ -62,6 +64,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.triggerAddPlatformRequest
+import java.util.Locale
+import java.util.Locale.getDefault
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,6 +75,8 @@ fun PlatformOptionsModal(
     isCompose: Boolean,
     navController: NavController,
     platform: AvailablePlatforms,
+    isOnboarding: Boolean = false,
+    onCompleteCallback: () -> Unit= {},
     onDismissRequest: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -141,7 +147,8 @@ fun PlatformOptionsModal(
                     ) {
                         onDismissRequest()
                     }
-                } else {
+                }
+                else {
                     Image(
                         bitmap = if(platform.logo != null) {
                             BitmapFactory.decodeByteArray(
@@ -175,13 +182,15 @@ fun PlatformOptionsModal(
                     if (isCompose) {
                         ComposeMessages(
                             platform = platform,
-                            navController = navController
+                            navController = navController,
+                            isOnboarding = isOnboarding,
                         ) {
                             onDismissRequest()
                         }
                     } else {
                         ManageAccounts(
                             isActive,
+                            isOnboarding = isOnboarding,
                             addAccountsCallback = {
                                 isAddLoading = true
                                 triggerAddPlatformRequest(
@@ -190,6 +199,7 @@ fun PlatformOptionsModal(
                                 ) {
                                     isAddLoading = false
                                     onDismissRequest()
+                                    onCompleteCallback()
                                 }
                             },
                             removeAccountsCallback = {
@@ -463,11 +473,14 @@ private fun triggerPNBARequested(
 private fun ComposeMessages(
     platform: AvailablePlatforms?,
     navController: NavController,
+    subscriptionId: Long = -1L,
+    isOnboarding: Boolean = false,
     onDismissRequest: () -> Unit
 ) {
     Button(
         onClick = {
             onDismissRequest()
+
             if(platform == null) {
                 navController.navigate(EmailComposeScreen(
                     isBridge = true,
@@ -477,13 +490,26 @@ private fun ComposeMessages(
             else {
                 when(platform.service_type) {
                     ServiceTypes.EMAIL.name -> {
-                        navController.navigate(EmailComposeScreen)
+                        navController.navigate(EmailComposeScreen(
+                            platformName = platform.name,
+                            subscriptionId = subscriptionId,
+                            isOnboarding = isOnboarding
+                        ))
                     }
                     ServiceTypes.MESSAGE.name -> {
-                        navController.navigate(MessageComposeScreen)
+                        navController.navigate(MessageComposeScreen(
+                            platformName = platform.name,
+                            subscriptionId = subscriptionId,
+                            isOnboarding = isOnboarding
+                        ))
                     }
                     ServiceTypes.TEXT.name, ServiceTypes.TEST.name -> {
-                        navController.navigate(TextComposeScreen)
+                        navController.navigate(TextComposeScreen(
+                            platformName = platform.name,
+                            subscriptionId = subscriptionId,
+                            isOnboarding = isOnboarding,
+                            serviceType = ServiceTypes.valueOf(platform.service_type!!)
+                        ))
                     }
                 }
             }
@@ -497,6 +523,7 @@ private fun ComposeMessages(
 @Composable
 private fun ManageAccounts(
     isActive: Boolean,
+    isOnboarding: Boolean,
     addAccountsCallback: () -> Unit,
     removeAccountsCallback: () -> Unit
 ) {
@@ -507,7 +534,8 @@ private fun ManageAccounts(
         Text(stringResource(R.string.add_account))
     }
     Spacer(modifier = Modifier.height(8.dp))
-    if (isActive) {
+
+    if (LocalInspectionMode.current ||  (isActive && !isOnboarding)) {
         TextButton(
             onClick = {removeAccountsCallback()},
             modifier = Modifier.fillMaxWidth(),

@@ -29,6 +29,7 @@ fun OnlineActivePlatformsModal(
     navController: NavController,
     isCompose: Boolean,
     isOnboarding: Boolean,
+    onCompleteCallback: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     val sheetState = rememberStandardBottomSheetState(
@@ -52,7 +53,8 @@ fun OnlineActivePlatformsModal(
                     navController = navController,
                     isCompose = isCompose,
                     isOnboarding = isOnboarding,
-                    onDismiss = onDismiss
+                    onCompleteCallback = onCompleteCallback,
+                    onDismiss = onDismiss,
                 )
             }
         }
@@ -69,6 +71,7 @@ fun OnlineActivePlatformsModalPreview() {
             navController = rememberNavController(),
             isCompose = false,
             isOnboarding = true,
-        ) {}
+            {},
+        ){}
     }
 }

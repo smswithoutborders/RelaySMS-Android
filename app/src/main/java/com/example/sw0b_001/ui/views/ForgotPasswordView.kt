@@ -1,6 +1,7 @@
 package com.example.sw0b_001.ui.views
 
 import android.content.Context
+import android.telephony.PhoneNumberUtils
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -302,6 +303,7 @@ fun ForgotPasswordView(
 
             TextButton(
                 onClick = {
+                    val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
                     navController.navigate(OTPCodeScreen(
                         loginSignupPhoneNumber = phoneNumber,
                         loginSignupPassword = password,
@@ -310,13 +312,12 @@ fun ForgotPasswordView(
                         isOnboarding = isOnboarding
                     ))
                 },
-                enabled = (phoneNumber.isNotEmpty()
-                        && password.isNotEmpty()
-                        && reenterPassword.isNotEmpty()) && !isLoading,
+                enabled = (
+                        PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
+                                && password.isNotEmpty()) && !isLoading,
                 modifier = Modifier.padding(bottom=16.dp)) {
                 Text(stringResource(R.string.already_got_code))
             }
-
         }
     }
 }

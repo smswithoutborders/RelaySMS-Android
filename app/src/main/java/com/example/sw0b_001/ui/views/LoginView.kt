@@ -1,6 +1,7 @@
 package com.example.sw0b_001.ui.views
 
 import android.content.Context
+import android.telephony.PhoneNumberUtils
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -306,9 +307,10 @@ fun LoginView(
                         Text(stringResource(R.string.log_in))
                     }
                 }
-                
+
                 TextButton(
                     onClick = {
+                        val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
                         navController.navigate(OTPCodeScreen(
                             loginSignupPhoneNumber = phoneNumber,
                             loginSignupPassword = password,
@@ -317,7 +319,9 @@ fun LoginView(
                             isOnboarding = isOnboarding
                         ))
                     },
-                    enabled = (phoneNumber.isNotEmpty() && password.isNotEmpty()) && !isLoading,
+                    enabled = (
+                            PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
+                                    && password.isNotEmpty()) && !isLoading,
                     modifier = Modifier.padding(bottom=16.dp)) {
                     Text(stringResource(R.string.already_got_code))
                 }

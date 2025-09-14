@@ -59,11 +59,14 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.navigation.compose.rememberNavController
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.data.models.AvailablePlatforms
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
+import com.example.sw0b_001.ui.navigation.EmailComposeScreen
+import java.util.Locale
 
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
@@ -72,20 +75,10 @@ fun AvailablePlatformsView(
     navController: NavController,
     isCompose: Boolean = false,
     isOnboarding: Boolean = false,
+    onCompleteCallback: () -> Unit= {},
     onDismiss: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    var platform: AvailablePlatforms? by remember{ mutableStateOf(null)}
-
-    var showPlatformOptions by remember { mutableStateOf(false) }
-
-    val platformsViewModel = remember{ PlatformsViewModel() }
-
-    val platforms: List<AvailablePlatforms> by platformsViewModel
-        .getAvailablePlatforms(context).observeAsState(emptyList())
-
-    val storedPlatforms: List<StoredPlatformsEntity> by platformsViewModel
-        .getSaved(context).observeAsState(emptyList())
 
     val inPreviewMode = LocalInspectionMode.current
 
@@ -120,7 +113,7 @@ fun AvailablePlatformsView(
             modifier = Modifier.padding(bottom = 16.dp),
         )
 
-        if(inPreviewMode || (isCompose && !isDefault)) {
+        if(inPreviewMode || (isCompose && !isDefault && !isOnboarding)) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -156,44 +149,39 @@ fun AvailablePlatformsView(
             HorizontalDivider()
         }
 
-
         PlatformListContent(
-            platforms = platforms,
-            storedPlatforms = storedPlatforms,
             isCompose = isCompose,
-            onPlatformClick = {
-                platformsViewModel.reset()
-                platform = it
-                showPlatformOptions = true
-            },
             isOnboarding = isOnboarding,
+            navController = navController,
+            onDismiss = onDismiss,
+            onCompleteCallback = onCompleteCallback,
         )
     }
 
-    if (showPlatformOptions && platform != null) {
-        PlatformOptionsModal(
-            showPlatformsModal = showPlatformOptions,
-            isActive = isCompose || platform == null ||
-                    storedPlatforms.any { it.name == platform!!.name },
-            isCompose = isCompose,
-            platform = platform!!,
-            navController = navController,
-        ) {
-            showPlatformOptions = false
-            onDismiss()
-        }
-    }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun PlatformListContent(
-    platforms: List<AvailablePlatforms>,
-    storedPlatforms: List<StoredPlatformsEntity>,
+    navController: NavController,
     isCompose: Boolean = false,
     isOnboarding: Boolean = false,
-    onPlatformClick: (AvailablePlatforms?) -> Unit = {}
+    onCompleteCallback: () -> Unit= {},
+    onDismiss: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+
+    val platformsViewModel = remember{ PlatformsViewModel() }
+
+    val platforms: List<AvailablePlatforms> by platformsViewModel
+        .getAvailablePlatforms(context).observeAsState(emptyList())
+
+    val storedPlatforms: List<StoredPlatformsEntity> by platformsViewModel
+        .getSaved(context).observeAsState(emptyList())
+
+    var showPlatformOptions by remember { mutableStateOf(false) }
+    var clickedPlatform: AvailablePlatforms? by remember{ mutableStateOf(null)}
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -207,7 +195,10 @@ fun PlatformListContent(
                 platform = null,
                 modifier = Modifier.width(130.dp),
                 isActive = true,
-                onClick = onPlatformClick
+                onClick = {
+                    clickedPlatform = null
+                    showPlatformOptions = true
+                }
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -233,14 +224,8 @@ fun PlatformListContent(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        val displayedPlatforms = if (isCompose) {
-            platforms.filter { platform ->
-                storedPlatforms.any { it.name == platform.name } ||
-                        platform.service_type == Platforms.ServiceTypes.TEST.name
-            }
-        } else {
-            platforms
-        }
+        val displayPlatforms = if(isCompose) platforms.filter {
+            storedPlatforms.find{ sp -> it.name == sp.name } != null } else platforms
 
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
@@ -248,41 +233,46 @@ fun PlatformListContent(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             maxItemsInEachRow = 2
         ) {
-            displayedPlatforms.forEach { platform ->
-                if(platform.service_type == Platforms.ServiceTypes.TEST.name && isCompose) {
-                    PlatformCard(
-                        logo =
-                            if(platform.logo != null)
-                                BitmapFactory.decodeByteArray(
-                                    platform.logo,
-                                    0,
-                                    platform.logo!!.count()
-                                )
-                            else null,
-                        platform = platform,
-                        modifier = Modifier.width(130.dp),
-                        isActive = true,
-                        onClick = onPlatformClick
-                    )
-                } else if(platform.service_type != Platforms.ServiceTypes.TEST.name) {
-                    PlatformCard(
-                        logo =
-                            if(platform.logo != null)
-                                BitmapFactory.decodeByteArray(
-                                    platform.logo,
-                                    0,
-                                    platform.logo!!.count()
-                                )
-                            else null,
-                        platform = platform,
-                        modifier = Modifier.width(130.dp),
-                        isActive = isCompose || storedPlatforms.any { platform.name == it.name },
-                        onClick = onPlatformClick
-                    )
+            displayPlatforms.forEach { platform ->
+                val isActive = storedPlatforms.find { it.name == platform.name } != null
+                PlatformCard(
+                    logo =
+                        if(platform.logo != null)
+                            BitmapFactory.decodeByteArray(
+                                platform.logo,
+                                0,
+                                platform.logo!!.count()
+                            )
+                        else null,
+                    platform = platform,
+                    modifier = Modifier.width(130.dp),
+                    isActive = isActive,
+                ) {
+                    clickedPlatform = platform
+                    showPlatformOptions = true
                 }
             }
         }
+
+        if (showPlatformOptions && clickedPlatform != null) {
+            val isActive = storedPlatforms.find { it.name == clickedPlatform!!.name } != null
+            PlatformOptionsModal(
+                showPlatformsModal = showPlatformOptions,
+                isActive = isActive,
+                isCompose = isCompose,
+                platform = clickedPlatform!!.apply {
+                    this.service_type = this.service_type?.uppercase(Locale.getDefault())
+                },
+                navController = navController,
+                isOnboarding = isOnboarding,
+                onCompleteCallback = onCompleteCallback,
+            ) {
+                showPlatformOptions = false
+                onDismiss()
+            }
+        }
     }
+
 }
 
 @Composable
@@ -355,36 +345,6 @@ fun AddPlatformsScreenPreview() {
     AppTheme(darkTheme = false) {
         AvailablePlatformsView(
             navController = NavController(context = LocalContext.current),
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AvailablePlatformsCardPreview() {
-    AppTheme(darkTheme = false) {
-        val platform = AvailablePlatforms(
-            name = "gmail",
-            shortcode = "g",
-            service_type = "email",
-            protocol_type = "oauth2",
-            icon_png = "",
-            icon_svg = "",
-            support_url_scheme = true,
-            logo = null
-        )
-
-        val storedPlatform = StoredPlatformsEntity(
-            id= "0",
-            account = "developers@relaysms.me",
-            name = "gmail",
-            accessToken = "",
-            refreshToken = ""
-        )
-
-        PlatformListContent(
-            platforms = listOf(platform),
-            storedPlatforms = listOf(storedPlatform),
-        )
+        ){}
     }
 }

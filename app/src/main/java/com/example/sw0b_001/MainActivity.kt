@@ -114,6 +114,8 @@ class MainActivity : ComponentActivity() {
 
     var showMissingTokenDialog by mutableStateOf(false)
 
+    var loggedInAlready by mutableStateOf(false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -123,6 +125,7 @@ class MainActivity : ComponentActivity() {
             window.isNavigationBarContrastEnforced = false
         }
         searchViewModel = SearchViewModel(getDatabase().threadsDao()!!)
+
         lifecycleScope.launch(Dispatchers.Main) {
             lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 WindowInfoTracker.getOrCreate(this@MainActivity)
@@ -143,6 +146,16 @@ class MainActivity : ComponentActivity() {
                                 LaunchedEffect(true) {
                                     refreshTokensCallback(platformsViewModel
                                         .accountsForMissingDialog)
+                                }
+
+                                LaunchedEffect(loggedInAlready) {
+                                    if(loggedInAlready) {
+                                        navController.navigate(GetMeOutScreen) {
+                                            popUpTo(HomepageScreen) {
+                                                inclusive = true
+                                            }
+                                        }
+                                    }
                                 }
 
                                 if (showMissingTokenDialog) {
@@ -398,13 +411,7 @@ class MainActivity : ComponentActivity() {
         CoroutineScope(Dispatchers.Default).launch {
             try {
                 if(Vaults.isGetMeOut(applicationContext)) {
-                    runOnUiThread {
-                        navController.navigate(GetMeOutScreen) {
-                            popUpTo(HomepageScreen) {
-                                inclusive = true
-                            }
-                        }
-                    }
+                    loggedInAlready = true
                 } else {
                     Vaults.fetchLongLivedToken(applicationContext).let { llt ->
                         if(llt.isNotEmpty()) {
@@ -415,14 +422,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             } catch(e: StatusRuntimeException) {
                                 if(e.status.code == Status.UNAUTHENTICATED.code) {
-                                    Vaults.setGetMeOut(applicationContext, true)
-                                    runOnUiThread {
-                                        navController.navigate(GetMeOutScreen) {
-                                            popUpTo(HomepageScreen) {
-                                                inclusive = true
-                                            }
-                                        }
-                                    }
+                                    loggedInAlready = true
                                 }
                             } finally {
                                 vault.shutdown()

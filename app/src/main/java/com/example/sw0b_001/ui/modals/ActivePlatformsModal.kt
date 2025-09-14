@@ -45,7 +45,7 @@ fun ActivePlatformsModal(
             AvailablePlatformsView(
                 navController = navController,
                 isCompose = isCompose,
-                isOnboarding = isOnboarding
+                isOnboarding = isOnboarding,
             ) {
                 onDismiss()
             }
