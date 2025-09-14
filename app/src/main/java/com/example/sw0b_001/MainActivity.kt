@@ -147,8 +147,6 @@ class MainActivity : ComponentActivity() {
                                         .accountsForMissingDialog)
                                 }
 
-                                val context = LocalContext.current
-
                                 LaunchedEffect(loggedInAlready) {
                                     if(loggedInAlready) {
                                         navController.navigate(GetMeOutScreen) {

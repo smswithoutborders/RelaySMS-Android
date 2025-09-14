@@ -35,6 +35,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
+import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
@@ -181,7 +183,10 @@ fun TextComposeView(
                                 onSuccess = {
                                     loading = false
                                     CoroutineScope(Dispatchers.Main).launch {
-                                        navController.popBackStack()
+                                        navController.navigate(
+                                            if(context.isDefault()) HomeScreenNav()
+                                            else HomepageScreen
+                                        )
                                     }
                                 },
                                 subscriptionId = subscriptionId

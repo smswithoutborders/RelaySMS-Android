@@ -55,6 +55,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
+import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.data.models.Bridges
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
@@ -63,6 +65,7 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.extensions.context.settingsGetNotShowChooseGatewayClient
 import com.example.sw0b_001.ui.modals.ComposeChooseGatewayClientsModal
 import com.example.sw0b_001.ui.modals.SelectAccountModal
+import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.networkRequest
 import com.example.sw0b_001.ui.views.DeveloperHTTPView
@@ -146,7 +149,6 @@ fun EmailComposeView(
     BackHandler {
         navController.popBackStack()
     }
-
 
     var showDeveloperDialog by remember { mutableStateOf(false) }
 
@@ -248,7 +250,8 @@ fun EmailComposeView(
                 isSending = false
                 CoroutineScope(Dispatchers.Main).launch {
                     onSendCallback?.invoke(true)
-                    navController.popBackStack()
+                    navController.navigate(
+                        if(context.isDefault()) HomeScreenNav() else HomepageScreen)
                 }
             },
             subscriptionId = subscriptionId,
