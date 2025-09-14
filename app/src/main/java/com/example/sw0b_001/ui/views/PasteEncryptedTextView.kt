@@ -193,7 +193,7 @@ fun PasteEncryptedTextView(
 @Composable
 fun PasteTextViewPreview() {
     PasteEncryptedTextView(
-        platformsViewModel = PlatformsViewModel(),
+        platformsViewModel = remember{ PlatformsViewModel() },
         navController = NavController(LocalContext.current)
     )
 }

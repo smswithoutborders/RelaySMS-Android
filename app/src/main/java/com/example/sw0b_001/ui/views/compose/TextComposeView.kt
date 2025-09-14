@@ -157,9 +157,9 @@ fun TextComposeView(
                                     loading = false
                                     CoroutineScope(Dispatchers.Main).launch {
                                         navController.navigate(HomepageScreen) {
-                                            popUpTo(
-                                                HomepageScreen
-                                            ) { inclusive = true }
+                                            popUpTo( HomepageScreen ) {
+                                                inclusive = true
+                                            }
                                         }
                                     }
                                 },

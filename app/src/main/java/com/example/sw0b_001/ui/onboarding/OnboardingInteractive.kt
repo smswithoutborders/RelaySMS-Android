@@ -48,7 +48,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.example.sw0b_001.R
+import com.example.sw0b_001.extensions.context.settingsSetOnboardedCompletely
 import com.example.sw0b_001.ui.components.OnboardingNextButton
 import com.example.sw0b_001.ui.modals.OnlineActivePlatformsModal
 import com.example.sw0b_001.ui.modals.SignupLoginModal
@@ -56,6 +58,7 @@ import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.EmailComposeScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.LoginScreen
+import com.example.sw0b_001.ui.navigation.OnboardingSkipScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
 
@@ -83,6 +86,7 @@ fun OnboardingInteractive(
                 title = {},
                 actions = {
                     IconButton(onClick = {
+                        context.settingsSetOnboardedCompletely(true)
                         navController.navigate(HomepageScreen) {
                             popUpTo(HomepageScreen) {
                                 inclusive = true

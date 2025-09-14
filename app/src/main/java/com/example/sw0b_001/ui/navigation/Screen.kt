@@ -1,5 +1,8 @@
 package com.example.sw0b_001.ui.navigation
 
+import android.content.Context
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
+import com.afkanerd.smswithoutborders_libsmsmms.ui.screens.HomeScreenNav
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.ui.views.OTPCodeVerificationType
 import kotlinx.serialization.Serializable
@@ -8,12 +11,19 @@ import kotlinx.serialization.Serializable
 object WelcomeScreen
 
 @Serializable
+object OnboardingSkipScreen
+
+@Serializable
 object OnboardingInteractiveScreen
 
 @Serializable
 object GetMeOutScreen
+
 @Serializable
 object HomepageScreen
+
+@Serializable
+object HomepageScreenRelay
 
 @Serializable
 data class LoginScreen(

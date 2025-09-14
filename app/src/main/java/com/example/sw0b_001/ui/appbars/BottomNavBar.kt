@@ -32,9 +32,11 @@ import com.example.sw0b_001.ui.views.BottomTabsItems
 fun BottomNavBar(
     selectedTab: BottomTabsItems,
     isLoggedIn: Boolean = true,
-    isDefaultSmsApp: Boolean = false,
     onChangeTab: (BottomTabsItems) -> Unit = {}
 ) {
+    val context = LocalContext.current
+    val isDefaultSmsApp = context.isDefault()
+
     NavigationBar {
         if(isDefaultSmsApp || LocalInspectionMode.current) {
             NavigationBarItem(

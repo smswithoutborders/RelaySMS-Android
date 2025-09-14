@@ -21,7 +21,6 @@ import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.ui.views.CreateAccountView
 import com.example.sw0b_001.ui.views.LoginView
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
-import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
 import com.example.sw0b_001.ui.views.AboutView
@@ -31,6 +30,11 @@ import com.example.sw0b_001.ui.views.compose.EmailComposeView
 import com.example.sw0b_001.ui.views.compose.MessageComposeView
 import com.example.sw0b_001.ui.views.compose.TextComposeView
 import androidx.activity.viewModels
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Inbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.sp
 import androidx.preference.PreferenceManager
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.data.models.Platforms
@@ -76,13 +81,16 @@ import com.afkanerd.lib_smsmms_android.R
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDatabase
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.components.NavHostControllerInstance
-import com.afkanerd.smswithoutborders_libsmsmms.ui.requiredReadPhoneStatePermissions
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
+import com.afkanerd.smswithoutborders_libsmsmms.ui.requiredReadPhoneStatePermissions
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.SearchViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ThreadsViewModel
 import com.example.sw0b_001.extensions.context.settingsGetOnboardedCompletely
 import com.example.sw0b_001.ui.appbars.BottomNavBar
+import com.example.sw0b_001.ui.navigation.HomepageScreen
+import com.example.sw0b_001.ui.navigation.HomepageScreenRelay
 import com.example.sw0b_001.ui.navigation.OnboardingInteractiveScreen
+import com.example.sw0b_001.ui.navigation.OnboardingSkipScreen
 import com.example.sw0b_001.ui.navigation.WelcomeScreen
 import com.example.sw0b_001.ui.onboarding.OnboardingInteractive
 import com.example.sw0b_001.ui.views.WelcomeMainView
@@ -90,15 +98,6 @@ import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
 import com.example.sw0b_001.ui.views.BottomTabsItems
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
-
-
-enum class OnboardingState {
-    Welcome,
-    VaultStore,
-    SaveVault,
-    SendMessage,
-    Complete
-}
 
 class MainActivity : ComponentActivity() {
     private lateinit var navController: NavHostController
@@ -147,6 +146,8 @@ class MainActivity : ComponentActivity() {
                                     refreshTokensCallback(platformsViewModel
                                         .accountsForMissingDialog)
                                 }
+
+                                val context = LocalContext.current
 
                                 LaunchedEffect(loggedInAlready) {
                                     if(loggedInAlready) {
@@ -255,7 +256,7 @@ class MainActivity : ComponentActivity() {
                 BottomNavBar(
                     selectedTab = platformsViewModel.bottomTabsItem,
                     isLoggedIn = isLoggedIn,
-                    isDefaultSmsApp = defaultSmsApp
+//                    isDefaultSmsApp = false
                 ) { selectedTab ->
                     platformsViewModel.bottomTabsItem = selectedTab
                 }

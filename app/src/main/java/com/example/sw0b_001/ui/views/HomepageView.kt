@@ -48,6 +48,7 @@ import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import androidx.compose.runtime.collectAsState
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.ui.features.AppFeatures
 import com.example.sw0b_001.ui.features.FeatureInfo

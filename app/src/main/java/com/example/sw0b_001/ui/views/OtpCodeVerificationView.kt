@@ -65,8 +65,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Vaults
-import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.data.savePhoneNumberToPrefs
+import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.google.android.gms.auth.api.phone.SmsRetriever
 import com.google.android.gms.common.api.CommonStatusCodes
