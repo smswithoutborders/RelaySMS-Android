@@ -31,6 +31,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -163,10 +164,6 @@ fun RecentView(
     val context = LocalContext.current
     var sendNewMessageRequested by remember { mutableStateOf(false) }
 
-    // Selection mode state
-    var isSelectionMode by remember { mutableStateOf(false) }
-    val selectedMessages = remember { mutableStateListOf<EncryptedContent>() }
-
     val messagesPagingSource = messagesViewModel.getMessages(context = context)
     val messages = messagesPagingSource.collectAsLazyPagingItems()
 
@@ -181,9 +178,9 @@ fun RecentView(
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(vertical = 16.dp)
+                    .padding(horizontal = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(vertical = 8.dp)
             ) {
                 items(
                     count = messages.itemCount,
@@ -342,14 +339,13 @@ fun RecentMessageCard(
     }
 
     Column {
-        Card(
+        OutlinedCard(
+            onClick = {
+                onClickCallback(message)
+            },
             modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onClickCallback(message) },
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                MaterialTheme.colorScheme.surfaceVariant
-            )
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp),
         ) {
             Row(
                 modifier = Modifier

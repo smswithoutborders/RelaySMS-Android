@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.BubbleChart
 import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -189,18 +190,15 @@ fun HomepageView(
                             onClick = {
                                 sendNewMessageRequested = true
                             },
-                            containerColor = MaterialTheme.colorScheme.secondary,
                             icon = {
                                 Icon(
-                                    imageVector = Icons.AutoMirrored.Default.Message,
-                                    contentDescription = stringResource(R.string.add_account),
-                                    tint = MaterialTheme.colorScheme.onSecondary
+                                    imageVector = Icons.Default.BubbleChart,
+                                    contentDescription = stringResource(R.string.compose_new),
                                 )
                             },
                             text = {
                                 Text(
                                     text = stringResource(R.string.compose_new),
-                                    color = MaterialTheme.colorScheme.onSecondary
                                 )
                             }
                         )
@@ -209,21 +207,16 @@ fun HomepageView(
                         (messages.loadState.isIdle && messages.itemCount > 0)
                     ) {
                         ExtendedFloatingActionButton(
-                            onClick = {
-                                sendNewMessageRequested = true
-                            },
-                            containerColor = MaterialTheme.colorScheme.secondary,
+                            onClick = { sendNewMessageRequested = true },
                             icon = {
                                 Icon(
                                     imageVector = Icons.Filled.PersonAdd,
                                     contentDescription = stringResource(R.string.add_account),
-                                    tint = MaterialTheme.colorScheme.onSecondary
                                 )
                             },
                             text = {
                                 Text(
                                     text = stringResource(R.string.add_account_compose_new),
-                                    color = MaterialTheme.colorScheme.onSecondary
                                 )
                             }
                         )
