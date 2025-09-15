@@ -382,16 +382,16 @@
     <string name="your_account">Your Account</string>
     <string name="set_as_default_sms_app">Set as default SMS app</string>
     <string name="log_in_or_sign_up_to_save_your_online_accounts">Log in or sign up to save your online accounts.</string>
-    <string name="sms_mms">SMS/MMS</string>
+    <string name="sms_mms" translatable="false">SMS/MMS</string>
     <string name="could_not_fetch_publisher_key">Could not fetch publisher key.</string>
     <string name="could_not_find_platform_details_for">Could not find platform details for \'%1$s\'.</string>
     <string name="no_default_gateway_client_configured">No default gateway client configured.</string>
-    <string name="multiple_ratchet_states_found_in_database_expected_at_most_one">Multiple Ratchet states found in database. Expected at most one.</string>
+    <string name="multiple_ratchet_states_found_in_database_expected_at_most_one">Could not fetch publisher key. Cannot encrypt message.</string>
     <string name="send_failed">Send failed</string>
     <string name="account_is_required_for_v1_platform_messages">Account is required for V1 platform messages.</string>
     <string name="could_not_fetch_publisher_key_cannot_encrypt_message">Could not fetch publisher key. Cannot encrypt message.</string>
     <string name="sms_an_email_right_now">SMS an email right now!</string>
-    <string name="you_don_t_need_an_account_we_d_create_one_for_you_email_yourself">You don\'t need an account, we\'d create one for you!\nEmail yourself!</string>
+    <string name="you_don_t_need_an_account_we_d_create_one_for_you_email_yourself">You don\'t need an account, we\'d create one for you! Email yourself!</string>
     <string name="don_t_ask_again">Don\'t ask again</string>
     <string name="close_this_to_continue_sending">Close this to continue sending...</string>
     <string name="way_to_go">Way to go!!</string>
@@ -407,7 +407,7 @@
     <string name="it_s_easier_than_you_can_imagine">It\'s easier than you can imagine</string>
     <string name="you_can_save_more_accounts_per_platform_at_anytime_from_inside_the_app">You can save more accounts per platform at anytime from inside the app!</string>
     <string name="start_messaging_now">Start messaging now!</string>
-    <string name="you_can_now_send_messages_from_your_saved_accounts_you_can_also_save_more_accounts_later">You can now send messages from your saved accounts!\nYou can also save more accounts later...</string>
+    <string name="you_can_now_send_messages_from_your_saved_accounts_you_can_also_save_more_accounts_later">You can now send messages from your saved accounts! You can also save more accounts later...</string>
     <string name="ready_to_save_platforms">Ready to save platforms!</string>
     <string name="you_are_now_ready">You are now ready!</string>
     <string name="you_have_successfully_carried_out_the_essentials_of_messaging_with_relaysms">You have successfully carried out the essentials of messaging with RelaySMS!</string>
