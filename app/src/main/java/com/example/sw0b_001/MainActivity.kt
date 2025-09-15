@@ -1,5 +1,6 @@
 package com.example.sw0b_001
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -74,13 +75,17 @@ import androidx.core.content.edit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavController
 import androidx.navigation.toRoute
 import androidx.window.layout.WindowInfoTracker
 import androidx.window.layout.WindowLayoutInfo
 import com.afkanerd.lib_smsmms_android.R
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.NEW_NOTIFICATION_ACTION
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDatabase
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.makeE16PhoneNumber
 import com.afkanerd.smswithoutborders_libsmsmms.ui.components.NavHostControllerInstance
+import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.ConversationsScreenNav
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.afkanerd.smswithoutborders_libsmsmms.ui.requiredReadPhoneStatePermissions
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.SearchViewModel
@@ -179,6 +184,10 @@ class MainActivity : ComponentActivity() {
                                 }
 
                                 Surface( Modifier.fillMaxSize()) {
+                                    if(LocalContext.current.isDefault()) {
+                                        platformsViewModel.bottomTabsItem =
+                                            BottomTabsItems.BottomBarSmsMmsTab
+                                    }
                                     MainNavigation(navController = navController, newLayoutInfo)
                                 }
                             }
@@ -217,8 +226,8 @@ class MainActivity : ComponentActivity() {
         }
 
         var showThreadsTopBar by remember { mutableStateOf(true) }
-
         var customThreadView: (@Composable () -> Unit)? by remember { mutableStateOf(null)}
+
         LaunchedEffect(platformsViewModel.bottomTabsItem, defaultSmsApp) {
             customThreadView = when(platformsViewModel.bottomTabsItem) {
                 BottomTabsItems.BottomBarSmsMmsTab -> {
@@ -388,6 +397,8 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
+
+        processIntent(navController)
     }
 
     private fun refreshTokensCallback(accountsInfo: Map<String, List<String>> ){
@@ -436,5 +447,44 @@ class MainActivity : ComponentActivity() {
         }
 
         Platforms.refreshAvailablePlatforms(applicationContext)
+    }
+
+    private fun processIntent(navController: NavController, newIntent: Intent? = null) {
+        val intent = newIntent ?: intent
+        when(intent.action) {
+            intent.NEW_NOTIFICATION_ACTION -> {
+                val address = intent.getStringExtra("address")
+                address?.let {
+                    intent.removeExtra("address")
+                    navController.navigate(ConversationsScreenNav(address))
+                }
+            }
+            Intent.ACTION_SEND -> {
+
+            }
+            Intent.ACTION_SENDTO -> {
+                intent.data?.let { uri ->
+                    val address = makeE16PhoneNumber(uri.toString())
+
+                    val text = intent.getStringExtra("sms_body")
+                        ?: intent.getStringExtra(Intent.EXTRA_TEXT)
+
+                    intent.removeExtra("sms_body")
+                    intent.removeExtra(Intent.EXTRA_TEXT)
+                    intent.data = null
+
+                    navController.navigate(ConversationsScreenNav(
+                        address = address,
+                        text = text,
+                    ))
+                }
+            }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if(::navController.isInitialized)
+            processIntent(navController, intent)
     }
 }

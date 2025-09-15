@@ -59,10 +59,9 @@ class PlatformsViewModel : ViewModel() {
     private var availableLiveData: LiveData<List<AvailablePlatforms>> = MutableLiveData()
     private var storedLiveData: LiveData<List<StoredPlatformsEntity>> = MutableLiveData()
 
-
     var platform by mutableStateOf<AvailablePlatforms?>(null)
     var message by mutableStateOf<EncryptedContent?>(null)
-    var bottomTabsItem by mutableStateOf<BottomTabsItems>(BottomTabsItems.BottomBarRecentTab)
+    var bottomTabsItem by mutableStateOf(BottomTabsItems.BottomBarRecentTab)
 
     // Selection mode properties
     var isSelectionMode by mutableStateOf(false)

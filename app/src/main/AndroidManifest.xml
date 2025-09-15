@@ -173,6 +173,16 @@
             </intent-filter>
         </service>
 
+        <!-- Custom receiver for notifications from lib -->
+        <receiver
+            android:name=".receivers.SmsMmsNotificationReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.afkanerd.deku.SMS_SENT_BROADCAST_INTENT_LIB" />
+                <action android:name="com.afkanerd.deku.NOTIFICATION_REPLY_ACTION_INTENT_ACTION_REPLAY" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>
