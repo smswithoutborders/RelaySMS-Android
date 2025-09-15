@@ -76,15 +76,6 @@ fun RecentAppBar(
     var showMenu by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val isDarkTheme = isSystemInDarkTheme()
-    val logo by remember {
-        mutableIntStateOf(
-            if (isDarkTheme) {
-                R.drawable.relaysms_dark_theme
-            } else {
-                R.drawable.relaysms_default_shape_
-            }
-        )
-    }
 
     val phoneNumber = remember { getPhoneNumberFromPrefs(context) }
 
@@ -132,12 +123,12 @@ fun RecentAppBar(
                 },
                 actions = {
                     if (!isSearchActive) {
-                        IconButton(onClick = onToggleSearch) {
-                            Icon(
-                                imageVector = Icons.Filled.Search,
-                                contentDescription = stringResource(R.string.search)
-                            )
-                        }
+//                        IconButton(onClick = onToggleSearch) {
+//                            Icon(
+//                                imageVector = Icons.Filled.Search,
+//                                contentDescription = stringResource(R.string.search)
+//                            )
+//                        }
                     }
 
                     IconButton(onClick = { showMenu = !showMenu }) {
