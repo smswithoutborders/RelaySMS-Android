@@ -69,9 +69,6 @@ fun InboxView(
                             platformsViewModel.message = message
                             navController.navigate(BridgeViewScreen)
                         },
-                        onLongClickCallback = { conversation ->
-
-                        }
                     )
                 }
             }

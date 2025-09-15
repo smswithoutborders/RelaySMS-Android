@@ -7,6 +7,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -70,6 +71,7 @@ import com.example.sw0b_001.ui.navigation.MessageViewScreen
 import com.example.sw0b_001.ui.navigation.TextViewScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.views.compose.MessageComposeHandler
+import java.util.Locale
 
 @Composable
 fun RecentViewNoMessages(
@@ -193,54 +195,31 @@ fun RecentView(
                     val logo =
                         platform?.logo?.let { BitmapFactory.decodeByteArray(it, 0, it.size) }
 
-                    val isSelected = selectedMessages.contains(message)
-
                     RecentMessageCard(
                         message = message, 
                         logo = logo,
-                        isSelected = isSelected,
-                        isSelectionMode = isSelectionMode,
                         onClickCallback = { clickedMessage ->
-                            if (isSelectionMode) {
-                                // Toggle selection
-                                if (isSelected) {
-                                    selectedMessages.remove(clickedMessage)
-                                    // Exit selection mode if no messages are selected
-                                    if (selectedMessages.isEmpty()) {
-                                        isSelectionMode = false
-                                    }
-                                } else {
-                                    selectedMessages.add(clickedMessage)
+                            platformsViewModel.message = clickedMessage
+                            when (clickedMessage.type?.uppercase()) {
+                                Platforms.ServiceTypes.EMAIL.name -> {
+                                    navController.navigate(EmailViewScreen)
                                 }
-                            } else {
-                                // Normal navigation
-                                platformsViewModel.message = clickedMessage
-                                when (clickedMessage.type) {
-                                    Platforms.ServiceTypes.EMAIL.name -> {
-                                        navController.navigate(EmailViewScreen)
-                                    }
-                                    Platforms.ServiceTypes.BRIDGE.name -> {
-                                        navController.navigate(BridgeViewScreen)
-                                    }
-                                    Platforms.ServiceTypes.TEXT.name -> {
-                                        navController.navigate(TextViewScreen)
-                                    }
-                                    Platforms.ServiceTypes.MESSAGE.name -> {
-                                        navController.navigate(MessageViewScreen)
-                                    }
-                                    else -> {
-                                        Toast.makeText(context,
-                                            context.getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show()
-                                    }
+                                Platforms.ServiceTypes.BRIDGE.name -> {
+                                    navController.navigate(BridgeViewScreen)
+                                }
+                                Platforms.ServiceTypes.TEXT.name -> {
+                                    navController.navigate(TextViewScreen)
+                                }
+                                Platforms.ServiceTypes.MESSAGE.name -> {
+                                    navController.navigate(MessageViewScreen)
+                                }
+                                else -> {
+                                    Toast.makeText(context,
+                                        context.getString(R.string.something_went_wrong),
+                                        Toast.LENGTH_SHORT).show()
                                 }
                             }
                         },
-                        onLongClickCallback = { longClickedMessage ->
-                            if (!isSelectionMode) {
-                                isSelectionMode = true
-                                selectedMessages.add(longClickedMessage)
-                            }
-                        }
                     )
                 }
             }
@@ -295,29 +274,19 @@ fun GetMessageAvatar(logo: Bitmap? = null) {
 fun RecentMessageCard(
     message: EncryptedContent,
     logo: Bitmap? = null,
-    isSelected: Boolean = false,
-    isSelectionMode: Boolean = false,
     onClickCallback: (EncryptedContent) -> Unit,
-    onLongClickCallback: (EncryptedContent) -> Unit
 ) {
     var text by remember { mutableStateOf("" ) }
     var heading by remember { mutableStateOf( "") }
     var subHeading by remember { mutableStateOf( "") }
 
-    when(message.type) {
+    when(message.type?.uppercase(Locale.getDefault())) {
         Platforms.ServiceTypes.EMAIL.name -> {
-            try {
-                val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
-                val decomposed = PlatformsViewModel.EmailComposeHandler.decomposeMessage(contentBytes)
-                heading = message.fromAccount ?: "Email"
-                subHeading = decomposed.subject
-                text = decomposed.body
-            } catch (e: Exception) {
-                Log.e("RecentMessageCard", "Failed to decompose V1 email content: ${e.message}")
-                heading = message.fromAccount ?: "Email"
-                subHeading = stringResource(R.string.message_content_could_not_be_displayed)
-                text = ""
-            }
+            val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
+            val decomposed = PlatformsViewModel.EmailComposeHandler.decomposeMessage(contentBytes)
+            heading = message.fromAccount ?: "Email"
+            subHeading = decomposed.subject
+            text = decomposed.body
         }
         Platforms.ServiceTypes.BRIDGE_INCOMING.name -> {
             val decomposed = Bridges.BridgeComposeHandler.decomposeInboxMessage(
@@ -376,20 +345,10 @@ fun RecentMessageCard(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .apply {
-                    if(!LocalInspectionMode.current) {
-                        this.combinedClickable(
-                            onClick = { onClickCallback(message) },
-                            onLongClick = { onLongClickCallback(message) }
-                        )
-                    }
-                },
+                .clickable { onClickCallback(message) },
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
-                containerColor = if (isSelected) 
-                    MaterialTheme.colorScheme.primaryContainer 
-                else 
-                    MaterialTheme.colorScheme.surfaceVariant
+                MaterialTheme.colorScheme.surfaceVariant
             )
         ) {
             Row(
@@ -410,10 +369,7 @@ fun RecentMessageCard(
                         } else {
                             MaterialTheme.typography.bodyLarge
                         },
-                        color = if (isSelected) 
-                            MaterialTheme.colorScheme.onPrimaryContainer 
-                        else 
-                            MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -422,10 +378,7 @@ fun RecentMessageCard(
                         Text(
                             subHeading,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = if (isSelected) 
-                                MaterialTheme.colorScheme.onPrimaryContainer 
-                            else 
-                                MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -436,10 +389,7 @@ fun RecentMessageCard(
                         style = MaterialTheme.typography.bodySmall,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        color = if (isSelected) 
-                            MaterialTheme.colorScheme.onPrimaryContainer 
-                        else 
-                            MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
 
@@ -447,10 +397,7 @@ fun RecentMessageCard(
                 Text(
                     text = Helpers.formatDate(LocalContext.current, message.date),
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (isSelected) 
-                        MaterialTheme.colorScheme.onPrimaryContainer 
-                    else 
-                        MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -533,7 +480,6 @@ fun RecentsCardPreview() {
         RecentMessageCard(
             message = encryptedContent,
             onClickCallback = {},
-            onLongClickCallback = {}
         )
     }
 }
