@@ -58,26 +58,15 @@
         tools:replace="android:label">
 
         <activity
-            android:name=".Security.LockScreenActivity"
-            android:exported="true"
-            android:windowSoftInputMode="adjustResize">
+            android:name=".MainActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:launchMode="singleInstance"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <activity
-            android:name=".MainActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:launchMode="singleInstance"
-            android:exported="true">
-            <!--            <intent-filter>-->
-            <!--                <action android:name="android.intent.action.MAIN" />-->
-
-            <!--                <category android:name="android.intent.category.LAUNCHER" />-->
-            <!--            </intent-filter>-->
 
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />

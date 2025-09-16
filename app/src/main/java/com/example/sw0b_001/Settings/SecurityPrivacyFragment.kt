@@ -19,7 +19,6 @@ import androidx.preference.SwitchPreferenceCompat
 import com.example.sw0b_001.MainActivity
 import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.data.Security
-import com.example.sw0b_001.Security.LockScreenFragment
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
@@ -157,21 +156,7 @@ class SecurityPrivacyFragment : PreferenceFragmentCompat() {
                 }
                 return@OnPreferenceChangeListener true
             } else {
-                val fragmentTransaction = activity?.supportFragmentManager?.beginTransaction()
-                val lockScreenFragment = LockScreenFragment(
-                    successRunnable = {
-                        val sharedPreferences = PreferenceManager
-                            .getDefaultSharedPreferences(requireContext())
-                        sharedPreferences.edit().putBoolean(lockScreenAlwaysOnSettingsKey, false)
-                            .apply()
-                        findPreference<SwitchPreferenceCompat>("lock_screen_always_on")
-                            ?.isChecked = false
-                    },
-                    failedRunnable = null,
-                    errorRunnable = null)
-                fragmentTransaction?.add(lockScreenFragment, "lock_screen_frag_tag")
-                fragmentTransaction?.show(lockScreenFragment)
-                fragmentTransaction?.commitNow()
+                TODO()
             }
             false
         }

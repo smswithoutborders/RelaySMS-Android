@@ -1,18 +1,25 @@
 package com.example.sw0b_001.ui.viewModels
 
 import android.content.Context
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
+import com.example.sw0b_001.extensions.context.promptBiometrics
+import com.example.sw0b_001.extensions.context.settingsSetLockDownApp
 import com.example.sw0b_001.ui.navigation.EmailComposeScreen
 import com.example.sw0b_001.ui.onboarding.InteractiveOnboarding
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class OnboardingViewModel : ViewModel() {
 
@@ -33,27 +40,31 @@ class OnboardingViewModel : ViewModel() {
 
     fun first(
         context: Context,
+        activity: AppCompatActivity,
         navController: NavController
     ) {
         if(!::screensList.isInitialized) {
-            screensList = getOnboardingScreens(context, navController)
+            screensList = getOnboardingScreens(context, activity, navController)
         }
 
         index = 0
         setOnboarding(screensList[index])
     }
 
-    fun next() {
+    fun next(): Boolean {
         if(index < screensList.size - 1) {
             index += 1
             setOnboarding(screensList[index])
+            return false
         }
+        return true
     }
 
     var callback: ((Boolean) -> Unit)? = null
 
     private fun getOnboardingScreens(
         context: Context,
+        activity: AppCompatActivity,
         navController: NavController,
     ) : List<InteractiveOnboarding>{
         return mutableListOf(
@@ -100,19 +111,33 @@ class OnboardingViewModel : ViewModel() {
                 }
             ),
             InteractiveOnboarding(
-                title = "Secure your app!",
-                description = "From locking with device pin code to other secure ways of making sure you maintain your app's privacy!",
-                actionButtonText = "Let's lock this down!",
+                title = context.getString(R.string.secure_your_app),
+                description = context.getString(R.string.from_locking_with_device_pin_code_to_other_secure_ways_of_making_sure_you_maintain_your_app_s_privacy),
+                actionButtonText = context.getString(R.string.let_s_lock_this_down),
                 image = R.drawable.undraw_fingerprint_kdwq,
-                onClickCallToAction = { TODO() }
+                onClickCallToAction = {
+                    context.promptBiometrics(activity) {
+                        if(it) {
+                            context.settingsSetLockDownApp(true)
+                            next()
+                        }
+                        else {
+                            viewModelScope.launch(Dispatchers.Main) { 
+                                Toast.makeText(context,
+                                    context.getString(R.string.failed_to_set_biometric_authentication), 
+                                    Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    }
+                }
             ),
             InteractiveOnboarding(
-                title = "Make default SMS app",
-                description = "You can manage all your SMS messages from a single place.",
-                subDescription = "This also unlocks features like sending images with SMS (yes not MMS)",
-                actionButtonText = "Set as default SMS app",
+                title = context.getString(R.string.make_default_sms_app),
+                description = context.getString(R.string.you_can_manage_all_your_sms_messages_from_a_single_place),
+                subDescription = context.getString(R.string.this_also_unlocks_features_like_sending_images_with_sms_yes_not_mms),
+                actionButtonText = context.getString(R.string.set_as_default_sms_app),
                 image = R.drawable.try_sending_message_illus,
-                onClickCallToAction = { TODO() }
+                onClickCallToAction = {  }
             ),
         )
     }

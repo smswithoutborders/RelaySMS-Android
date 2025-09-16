@@ -411,5 +411,12 @@
     <string name="ready_to_save_platforms">Ready to save platforms!</string>
     <string name="you_are_now_ready">You are now ready!</string>
     <string name="you_have_successfully_carried_out_the_essentials_of_messaging_with_relaysms">You have successfully carried out the essentials of messaging with RelaySMS!</string>
+    <string name="secure_your_app">Secure your app!</string>
+    <string name="let_s_lock_this_down">Let\'s lock this down!</string>
+    <string name="from_locking_with_device_pin_code_to_other_secure_ways_of_making_sure_you_maintain_your_app_s_privacy">From locking with device pin code to other secure ways of making sure you maintain your app\'s privacy!</string>
+    <string name="failed_to_set_biometric_authentication">Failed to set biometric authentication</string>
+    <string name="make_default_sms_app">Make default SMS app</string>
+    <string name="you_can_manage_all_your_sms_messages_from_a_single_place">You can manage all your SMS messages from a single place.</string>
+    <string name="this_also_unlocks_features_like_sending_images_with_sms_yes_not_mms">This also unlocks features like sending images with SMS (yes not MMS)</string>
 
 </resources>

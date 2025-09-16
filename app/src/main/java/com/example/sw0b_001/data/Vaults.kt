@@ -10,7 +10,7 @@ import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityRSA
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.R
-import com.example.sw0b_001.Security.Cryptography
+import com.example.sw0b_001.data.Cryptography
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
 import kotlinx.coroutines.CoroutineScope

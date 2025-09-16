@@ -1,8 +1,11 @@
 package com.example.sw0b_001
 
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -31,6 +34,11 @@ import com.example.sw0b_001.ui.views.compose.EmailComposeView
 import com.example.sw0b_001.ui.views.compose.MessageComposeView
 import com.example.sw0b_001.ui.views.compose.TextComposeView
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
+import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
+import androidx.biometric.BiometricPrompt
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material3.Icon
@@ -44,6 +52,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.data.models.Platforms
@@ -90,6 +99,8 @@ import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.afkanerd.smswithoutborders_libsmsmms.ui.requiredReadPhoneStatePermissions
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.SearchViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ThreadsViewModel
+import com.example.sw0b_001.extensions.context.promptBiometrics
+import com.example.sw0b_001.extensions.context.settingsGetLockDownApp
 import com.example.sw0b_001.extensions.context.settingsGetOnboardedCompletely
 import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.navigation.HomepageScreen
@@ -103,8 +114,10 @@ import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
 import com.example.sw0b_001.ui.views.BottomTabsItems
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
+import java.util.concurrent.Executor
+import kotlin.system.exitProcess
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavHostController
 
     val threadsViewModel: ThreadsViewModel by viewModels()
@@ -128,74 +141,93 @@ class MainActivity : ComponentActivity() {
             // TODO: https://issuetracker.google.com/issues/298296168
             window.isNavigationBarContrastEnforced = false
         }
+
         searchViewModel = SearchViewModel(getDatabase().threadsDao()!!)
 
-        lifecycleScope.launch(Dispatchers.Main) {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                WindowInfoTracker.getOrCreate(this@MainActivity)
-                    .windowLayoutInfo(this@MainActivity)
-                    .collect { newLayoutInfo ->
-                        setContent {
-                            val composeView = LocalView.current
-                            DisposableEffect(Unit) {
-                                composeView.filterTouchesWhenObscured = true
-                                onDispose {
-                                    composeView.filterTouchesWhenObscured = false
-                                }
-                            }
-
-                            AppTheme {
-                                navController = rememberNavController()
-
-                                LaunchedEffect(true) {
-                                    refreshTokensCallback(platformsViewModel
-                                        .accountsForMissingDialog)
-                                }
-
-                                LaunchedEffect(loggedInAlready) {
-                                    if(loggedInAlready) {
-                                        navController.navigate(GetMeOutScreen) {
-                                            popUpTo(HomepageScreen) {
-                                                inclusive = true
-                                            }
-                                        }
+        fun beginAppLifecycle() {
+            lifecycleScope.launch(Dispatchers.Main) {
+                lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    WindowInfoTracker.getOrCreate(this@MainActivity)
+                        .windowLayoutInfo(this@MainActivity)
+                        .collect { newLayoutInfo ->
+                            setContent {
+                                val composeView = LocalView.current
+                                DisposableEffect(Unit) {
+                                    composeView.filterTouchesWhenObscured = true
+                                    onDispose {
+                                        composeView.filterTouchesWhenObscured = false
                                     }
                                 }
 
-                                if (showMissingTokenDialog) {
-                                    MissingTokenInfoDialog(
-                                        groupedAccounts = platformsViewModel.accountsForMissingDialog,
-                                        onDismiss = { showMissingTokenDialog = false },
-                                        onConfirm = { doNotShowAgain ->
-                                            showMissingTokenDialog = false
-                                            if (doNotShowAgain) {
-                                                PreferenceManager
-                                                    .getDefaultSharedPreferences(applicationContext)
-                                                    .edit {
-                                                        putBoolean(
-                                                            Vaults.Companion.PrefKeys
-                                                                .KEY_DO_NOT_SHOW_MISSING_TOKEN_DIALOG,
-                                                            true
-                                                        )
-                                                    }
+                                AppTheme {
+                                    navController = rememberNavController()
+
+                                    LaunchedEffect(true) {
+                                        refreshTokensCallback(platformsViewModel
+                                            .accountsForMissingDialog)
+                                    }
+
+                                    LaunchedEffect(loggedInAlready) {
+                                        if(loggedInAlready) {
+                                            navController.navigate(GetMeOutScreen) {
+                                                popUpTo(HomepageScreen) {
+                                                    inclusive = true
+                                                }
                                             }
                                         }
-                                    )
-                                }
-
-                                Surface( Modifier.fillMaxSize()) {
-                                    if(LocalContext.current.isDefault()) {
-                                        platformsViewModel.bottomTabsItem =
-                                            BottomTabsItems.BottomBarSmsMmsTab
                                     }
-                                    MainNavigation(navController = navController, newLayoutInfo)
-                                }
-                            }
 
+                                    if (showMissingTokenDialog) {
+                                        MissingTokenInfoDialog(
+                                            groupedAccounts = platformsViewModel.accountsForMissingDialog,
+                                            onDismiss = { showMissingTokenDialog = false },
+                                            onConfirm = { doNotShowAgain ->
+                                                showMissingTokenDialog = false
+                                                if (doNotShowAgain) {
+                                                    PreferenceManager
+                                                        .getDefaultSharedPreferences(applicationContext)
+                                                        .edit {
+                                                            putBoolean(
+                                                                Vaults.Companion.PrefKeys
+                                                                    .KEY_DO_NOT_SHOW_MISSING_TOKEN_DIALOG,
+                                                                true
+                                                            )
+                                                        }
+                                                }
+                                            }
+                                        )
+                                    }
+
+                                    Surface( Modifier.fillMaxSize()) {
+                                        if(LocalContext.current.isDefault()) {
+                                            platformsViewModel.bottomTabsItem =
+                                                BottomTabsItems.BottomBarSmsMmsTab
+                                        }
+                                        MainNavigation(navController = navController, newLayoutInfo)
+                                    }
+                                }
+
+                            }
                         }
-                    }
+                }
             }
+        }
 
+        securityChecks {
+            beginAppLifecycle()
+        }
+    }
+
+    private fun securityChecks(callback: () -> Unit) {
+        if(settingsGetLockDownApp) {
+            promptBiometrics(this) {
+                if(!it) {
+                    finish()
+                    exitProcess(0)
+                } else {
+                    callback()
+                }
+            }
         }
     }
 

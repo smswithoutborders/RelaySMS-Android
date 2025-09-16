@@ -2,6 +2,8 @@ package com.example.sw0b_001.ui.onboarding
 
 import android.accessibilityservice.GestureDescription
 import android.content.res.Configuration
+import androidx.activity.compose.LocalActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -50,6 +52,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.example.sw0b_001.R
+import com.example.sw0b_001.extensions.context.settingsGetOnboardedCompletely
 import com.example.sw0b_001.extensions.context.settingsSetOnboardedCompletely
 import com.example.sw0b_001.ui.components.OnboardingNextButton
 import com.example.sw0b_001.ui.modals.OnlineActivePlatformsModal
@@ -78,6 +81,7 @@ fun OnboardingInteractive(
     onboardingViewModel: OnboardingViewModel,
 ) {
     val context = LocalContext.current
+    val activity = LocalActivity.current as AppCompatActivity
     val showingOnboarding by onboardingViewModel.onboardingState.collectAsState()
 
     Scaffold(
@@ -123,7 +127,7 @@ fun OnboardingInteractive(
             Spacer(modifier = Modifier.weight(1f))
 
             if(showingOnboarding == null)
-                onboardingViewModel.first(context, navController)
+                onboardingViewModel.first(context, activity, navController)
 
             showingOnboarding?.let {
                 OnboardingScreen(it)
@@ -132,7 +136,14 @@ fun OnboardingInteractive(
             Spacer(modifier = Modifier.weight(1f))
 
             OnboardingNextButton("") {
-                onboardingViewModel.next()
+                if(onboardingViewModel.next()) {
+                    context.settingsSetOnboardedCompletely(true)
+                    navController.navigate(HomepageScreen) {
+                        popUpTo(HomepageScreen) {
+                            inclusive = true
+                        }
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.padding(16.dp))

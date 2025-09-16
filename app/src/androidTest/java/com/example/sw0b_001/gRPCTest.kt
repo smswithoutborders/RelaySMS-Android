@@ -3,7 +3,7 @@ package com.example.sw0b_001
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.sw0b_001.data.Publishers
 import com.example.sw0b_001.data.Vaults
-import com.example.sw0b_001.Security.Cryptography
+import com.example.sw0b_001.data.Cryptography
 import io.grpc.StatusRuntimeException
 import org.junit.Assert.assertTrue
 import org.junit.Before

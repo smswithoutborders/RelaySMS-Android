@@ -1,12 +1,11 @@
-package com.example.sw0b_001.Security
+package com.example.sw0b_001.data
 
 import android.content.Context
 import android.util.Base64
-import com.afkanerd.smswithoutborders.libsignal_doubleratchet.CryptoHelpers
+import androidx.core.content.edit
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.KeystoreHelpers
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityCurve25519
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityRSA
-import androidx.core.content.edit
 
 object Cryptography {
     val HYBRID_KEYS_FILE = "com.afkanerd.relaysms.HYBRID_KEYS_FILE"
