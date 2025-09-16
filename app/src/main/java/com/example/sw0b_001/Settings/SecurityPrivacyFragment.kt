@@ -2,6 +2,7 @@ package com.example.sw0b_001.Settings
 
 import com.example.sw0b_001.R
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.hardware.biometrics.BiometricManager
 import android.hardware.biometrics.BiometricManager.Authenticators.BIOMETRIC_STRONG
@@ -18,7 +19,6 @@ import androidx.preference.PreferenceManager
 import androidx.preference.SwitchPreferenceCompat
 import com.example.sw0b_001.MainActivity
 import com.example.sw0b_001.data.Vaults
-import com.example.sw0b_001.data.Security
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
@@ -38,16 +38,16 @@ class SecurityPrivacyFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.security_privacy_preferences, rootKey)
 
-        val lockScreenAlwaysOn = findPreference<SwitchPreferenceCompat>(lockScreenAlwaysOnSettingsKey)
-        when(Security.isBiometricLockAvailable(requireContext())) {
-            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE,
-            BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
-                lockScreenAlwaysOn?.isEnabled = false
-                lockScreenAlwaysOn?.summary =
-                    getString(R.string.settings_security_biometric_user_cannot_add_this_functionality_at_this_time)
-            }
-        }
-        lockScreenAlwaysOn?.onPreferenceChangeListener = switchSecurityPreferences()
+//        val lockScreenAlwaysOn = findPreference<SwitchPreferenceCompat>(lockScreenAlwaysOnSettingsKey)
+//        when(Context.isBiometricLockAvailable()) {
+//            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE,
+//            BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
+//                lockScreenAlwaysOn?.isEnabled = false
+//                lockScreenAlwaysOn?.summary =
+//                    getString(R.string.settings_security_biometric_user_cannot_add_this_functionality_at_this_time)
+//            }
+//        }
+//        lockScreenAlwaysOn?.onPreferenceChangeListener = switchSecurityPreferences()
 
         storeTokensOnDevice =
             findPreference<SwitchPreferenceCompat>(storeTokensOnDeviceKey)!!
@@ -138,29 +138,29 @@ class SecurityPrivacyFragment : PreferenceFragmentCompat() {
         startActivity(intent)
     }
 
-    private fun switchSecurityPreferences(): OnPreferenceChangeListener {
-        return OnPreferenceChangeListener {_, newValue ->
-            if(newValue as Boolean) {
-                when (Security.isBiometricLockAvailable(requireContext())) {
-                    BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
-                        val enrollIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                            Intent(Settings.ACTION_BIOMETRIC_ENROLL).apply {
-                                putExtra(Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED,
-                                    BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
-                            }
-                        } else {
-                            Intent(Settings.ACTION_SECURITY_SETTINGS)
-                        }
-                        registerActivityResult.launch(enrollIntent)
-                    }
-                }
-                return@OnPreferenceChangeListener true
-            } else {
-                TODO()
-            }
-            false
-        }
-    }
+//    private fun switchSecurityPreferences(): OnPreferenceChangeListener {
+//        return OnPreferenceChangeListener {_, newValue ->
+//            if(newValue as Boolean) {
+//                when (Security.isBiometricLockAvailable(requireContext())) {
+//                    BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
+//                        val enrollIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//                            Intent(Settings.ACTION_BIOMETRIC_ENROLL).apply {
+//                                putExtra(Settings.EXTRA_BIOMETRIC_AUTHENTICATORS_ALLOWED,
+//                                    BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
+//                            }
+//                        } else {
+//                            Intent(Settings.ACTION_SECURITY_SETTINGS)
+//                        }
+//                        registerActivityResult.launch(enrollIntent)
+//                    }
+//                }
+//                return@OnPreferenceChangeListener true
+//            } else {
+//                TODO()
+//            }
+//            false
+//        }
+//    }
 
     private fun storeTokensOnDevicePreferenceChangeListener(): OnPreferenceChangeListener {
         Log.d("SecurityPrivacyFragment", "storeTokensOnDevicePreferenceChangeListener invoked")

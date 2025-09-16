@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.filled.ChatBubbleOutline
@@ -64,7 +66,8 @@ import com.example.sw0b_001.ui.theme.AppTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GetStartedView (
-    navController: NavController
+    navController: NavController,
+    loggedIn: Boolean,
 ) {
     var showLoginBottomSheet by remember { mutableStateOf(false) }
     var showCreateAccountBottomSheet by remember { mutableStateOf(false) }
@@ -87,8 +90,10 @@ fun GetStartedView (
         }
     }
 
+
     Column(
         modifier = Modifier
+            .verticalScroll(rememberScrollState())
             .fillMaxSize()
             .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -113,88 +118,90 @@ fun GetStartedView (
 //            )
 //        }
 
-        Card(
-            elevation = CardDefaults.cardElevation(8.dp),
-            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.background),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-        ) {
-            Column(
+        if(!loggedIn) {
+            Card(
+                elevation = CardDefaults.cardElevation(8.dp),
+                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.background),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                    .padding(8.dp),
             ) {
-                Text(
-                    stringResource(R.string.your_account),
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(top=16.dp)
-                )
-
-                Text(
-                    stringResource(R.string.log_in_or_sign_up_to_save_your_online_accounts),
-                    style = MaterialTheme.typography.labelMedium,
-                    modifier = Modifier.padding(16.dp)
-                )
-
-                Button(
-                    onClick = { showCreateAccountBottomSheet = true },
-                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(8.dp)
+                    Text(
+                        stringResource(R.string.your_account),
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(top=16.dp)
+                    )
+
+                    Text(
+                        stringResource(R.string.log_in_or_sign_up_to_save_your_online_accounts),
+                        style = MaterialTheme.typography.labelMedium,
+                        modifier = Modifier.padding(16.dp)
+                    )
+
+                    Button(
+                        onClick = { showCreateAccountBottomSheet = true },
+                        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
+                        modifier = Modifier
+                            .fillMaxWidth()
                     ) {
-                        Icon(
-                            imageVector = Icons.Filled.PersonAdd,
-                            contentDescription = stringResource(R.string.create_account),
-                        )
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.PersonAdd,
+                                contentDescription = stringResource(R.string.create_account),
+                            )
 
-                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
 
-                        Text(
-                            stringResource(R.string.create_account),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontWeight = FontWeight.SemiBold
-                        )
+                            Text(
+                                stringResource(R.string.create_account),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
                     }
-                }
-                Spacer(modifier = Modifier.padding(8.dp))
+                    Spacer(modifier = Modifier.padding(8.dp))
 
-                Button(
-                    onClick = { showLoginBottomSheet = true },
-                    colors = ButtonDefaults
-                        .buttonColors(MaterialTheme.colorScheme.secondary),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(8.dp)
+                    Button(
+                        onClick = { showLoginBottomSheet = true },
+                        colors = ButtonDefaults
+                            .buttonColors(MaterialTheme.colorScheme.secondary),
+                        modifier = Modifier
+                            .fillMaxWidth()
                     ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Login,
-                            contentDescription = stringResource(R.string.login),
-                        )
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Login,
+                                contentDescription = stringResource(R.string.login),
+                            )
 
-                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
 
-                        Text(
-                            stringResource(R.string.login),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            fontWeight = FontWeight.SemiBold
-                        )
+                            Text(
+                                stringResource(R.string.login),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
                     }
                 }
             }
         }
-        
+
         Spacer(Modifier.padding(8.dp))
 
         Card(
@@ -202,7 +209,6 @@ fun GetStartedView (
             colors = CardDefaults.cardColors(MaterialTheme.colorScheme.background),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
         ) {
             Column(
                 modifier = Modifier
@@ -308,7 +314,7 @@ fun GetStartedView (
                 },
                 title = stringResource(R.string.login)
             ) {
-                navController.navigate(LoginScreen)
+                navController.navigate(LoginScreen(false))
                 showLoginBottomSheet = false
             }
         }
@@ -321,7 +327,7 @@ fun GetStartedView (
                 },
                 title = stringResource(R.string.create_account)
             ) {
-                navController.navigate(CreateAccountScreen)
+                navController.navigate(CreateAccountScreen(false))
                 showCreateAccountBottomSheet = false
             }
         }
@@ -416,7 +422,19 @@ fun makeDefault(context: Context): Intent {
 fun GetStartedPreview() {
     AppTheme (darkTheme = false) {
         GetStartedView(
-            navController = NavController(LocalContext.current)
+            navController = NavController(LocalContext.current),
+            false
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GetStartedPreviewLoggedIn() {
+    AppTheme (darkTheme = false) {
+        GetStartedView(
+            navController = NavController(LocalContext.current),
+            true
         )
     }
 }

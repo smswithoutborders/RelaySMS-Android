@@ -303,7 +303,11 @@ fun HomepageView(
                         sendNewMessageRequested = false
                     }
                 } else {
-                    GetStartedModal(sendNewMessageRequested, navController) {
+                    GetStartedModal(
+                        sendNewMessageRequested,
+                        navController = navController,
+                        isLoggedIn = isLoggedIn,
+                    ) {
                         sendNewMessageRequested = false
                     }
                 }

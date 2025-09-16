@@ -221,13 +221,11 @@ fun RecentView(
                 }
             }
         }
-        else if(((LocalInspectionMode.current || messages.loadState.isIdle) && isLoggedIn)) {
-            RecentViewNoMessages(
-                saveNewPlatformCallback = { tabRequestedCallback() },
-                sendNewMessageCallback = { sendNewMessageRequested = true }
+        else if(messages.loadState.isIdle || LocalInspectionMode.current) {
+            GetStartedView(
+                navController = navController,
+                loggedIn = isLoggedIn
             )
-        } else if(messages.loadState.isIdle || LocalInspectionMode.current) {
-            GetStartedView(navController = navController)
         }
 
         if (sendNewMessageRequested) {

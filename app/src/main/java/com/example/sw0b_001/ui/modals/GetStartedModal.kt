@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
 fun GetStartedModal(
     getStartedRequested: Boolean,
     navController: NavController,
+    isLoggedIn: Boolean,
     onDismiss: () -> Unit,
 ) {
     val sheetState = rememberStandardBottomSheetState(
@@ -38,11 +39,24 @@ fun GetStartedModal(
             sheetState = sheetState,
             modifier = Modifier.fillMaxWidth()
         ) {
-            GetStartedView(navController)
+            GetStartedView(navController, isLoggedIn)
         }
 
     }
 
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GetStartedModalPreviewNotLoggedIn() {
+    AppTheme {
+        GetStartedModal (
+            getStartedRequested = true,
+            navController = rememberNavController(),
+            false,
+            onDismiss = {},
+        )
+    }
 }
 
 @Preview(showBackground = true)
@@ -52,6 +66,7 @@ fun GetStartedModalPreview() {
         GetStartedModal (
             getStartedRequested = true,
             navController = rememberNavController(),
+            true,
             onDismiss = {},
         )
     }
