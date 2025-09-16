@@ -213,7 +213,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        securityChecks {
+        if(!settingsGetOnboardedCompletely) {
+            beginAppLifecycle()
+        }
+        else securityChecks {
             beginAppLifecycle()
         }
     }
@@ -228,6 +231,8 @@ class MainActivity : AppCompatActivity() {
                     callback()
                 }
             }
+        } else {
+            callback()
         }
     }
 
