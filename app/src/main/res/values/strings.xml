@@ -418,5 +418,6 @@
     <string name="make_default_sms_app">Make default SMS app</string>
     <string name="you_can_manage_all_your_sms_messages_from_a_single_place">You can manage all your SMS messages from a single place.</string>
     <string name="this_also_unlocks_features_like_sending_images_with_sms_yes_not_mms">This also unlocks features like sending images with SMS (yes not MMS)</string>
+    <string name="you_can_only_save_these_platforms_after_you_log_in">You can only save these platforms after you log in</string>
 
 </resources>

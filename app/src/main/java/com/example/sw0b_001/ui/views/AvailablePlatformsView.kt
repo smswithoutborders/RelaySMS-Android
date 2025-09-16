@@ -63,6 +63,7 @@ import androidx.navigation.compose.rememberNavController
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
+import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.data.models.AvailablePlatforms
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.ui.navigation.EmailComposeScreen
@@ -95,6 +96,12 @@ fun AvailablePlatformsView(
                 launchSingleTop = true
             }
         }
+    }
+
+    var isLoggedIn by remember {
+        mutableStateOf(
+            inPreviewMode || Vaults.fetchLongLivedToken(context).isNotBlank()
+        )
     }
 
     Column(
@@ -155,6 +162,7 @@ fun AvailablePlatformsView(
             navController = navController,
             onDismiss = onDismiss,
             onCompleteCallback = onCompleteCallback,
+            isLoggedIn = isLoggedIn,
         )
     }
 
@@ -164,6 +172,7 @@ fun AvailablePlatformsView(
 @Composable
 fun PlatformListContent(
     navController: NavController,
+    isLoggedIn: Boolean,
     isCompose: Boolean = false,
     isOnboarding: Boolean = false,
     onCompleteCallback: () -> Unit= {},
@@ -195,6 +204,7 @@ fun PlatformListContent(
                 platform = null,
                 modifier = Modifier.width(130.dp),
                 isActive = true,
+                isEnabled = true,
                 onClick = {
                     clickedPlatform = null
                     showPlatformOptions = true
@@ -222,6 +232,16 @@ fun PlatformListContent(
             color = MaterialTheme.colorScheme.secondary
         )
 
+        Spacer(modifier = Modifier.padding(8.dp))
+
+        if(LocalInspectionMode.current || !isLoggedIn) {
+            Text(
+                text = stringResource(R.string.you_can_only_save_these_platforms_after_you_log_in),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.error
+            )
+        }
+
         Spacer(modifier = Modifier.height(8.dp))
 
         val displayPlatforms = if(isCompose) platforms.filter {
@@ -229,8 +249,8 @@ fun PlatformListContent(
 
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.Center,
             maxItemsInEachRow = 2
         ) {
             displayPlatforms.forEach { platform ->
@@ -245,8 +265,11 @@ fun PlatformListContent(
                             )
                         else null,
                     platform = platform,
-                    modifier = Modifier.width(130.dp),
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .width(130.dp),
                     isActive = isActive,
+                    isEnabled = isLoggedIn,
                 ) {
                     clickedPlatform = platform
                     showPlatformOptions = true
@@ -282,22 +305,18 @@ fun PlatformCard(
     logo: Bitmap? = null,
     platform: AvailablePlatforms?,
     isActive: Boolean,
+    isEnabled: Boolean,
     onClick: (AvailablePlatforms?) -> Unit = {}
 ) {
     val context = LocalContext.current
     val inPreviewMode = LocalInspectionMode.current
 
     Card(
+        onClick = { onClick(platform) },
+        enabled = isEnabled,
         modifier = modifier
             .height(130.dp)
-            .width(130.dp)
-            .then(
-                if(inPreviewMode) {
-                    Modifier
-                } else {
-                    Modifier.clickable { onClick(platform) }
-                }
-            ),
+            .width(130.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
