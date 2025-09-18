@@ -77,7 +77,7 @@ fun ComposerInterface(
         navController.popBackStack()
     }
 
-    var from = remember { mutableStateOf(when(type) {
+    val from = remember { mutableStateOf(when(type) {
         Platforms.ServiceTypes.EMAIL,
         Platforms.ServiceTypes.BRIDGE,
         Platforms.ServiceTypes.BRIDGE_INCOMING ->  emailNav?.fromAccount

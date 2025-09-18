@@ -97,7 +97,7 @@ fun MessageDetailsView(
                                 messageNav = Json.encodeToString(MessageComposeNav(
                                     platformName = platform!!.name,
                                     subscriptionId = -1L,
-                                    encryptedContent = messageBody,
+                                    encryptedContent = message?.encryptedContent,
                                     fromAccount = fromDisplay,
                                 )),
                                 isOnboarding = isOnboarding

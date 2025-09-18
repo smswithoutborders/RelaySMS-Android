@@ -97,12 +97,6 @@ fun EmailComposeView(
 
     val scrollState = rememberScrollState()
 
-//    var to by remember{ mutableStateOf("") }
-//    var subject by remember{ mutableStateOf("") }
-//    var cc by remember{ mutableStateOf("") }
-//    var bcc by remember{ mutableStateOf("") }
-//    var body by remember{ mutableStateOf("") }
-
     Column(
         modifier = Modifier
             .fillMaxWidth()

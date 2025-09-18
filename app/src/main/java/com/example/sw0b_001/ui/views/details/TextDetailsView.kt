@@ -76,7 +76,6 @@ fun TextDetailsView(
             text = decomposedMessage.text.value
             date = message.date
         } catch (e: Exception) {
-            Log.e("TextDetailsView", "Failed to decompose V1 text content: ${e.message}")
             from = message.fromAccount ?: "Unknown Sender"
             text = "This message's content could not be displayed."
             date = message.date
@@ -102,7 +101,7 @@ fun TextDetailsView(
                                         TextComposeNav(
                                             platformName = platform!!.name,
                                             subscriptionId = -1L,
-                                            encryptedContent = text,
+                                            encryptedContent = message?.encryptedContent,
                                             fromAccount = from,
                                             serviceType = Platforms.ServiceTypes.TEXT,
                                         )

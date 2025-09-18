@@ -43,10 +43,12 @@ import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.ui.navigation.ComposeScreen
+import com.example.sw0b_001.ui.navigation.EmailComposeNav
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,7 +94,8 @@ fun EmailDetailsView(
                     }
                 }
             }
-        } else {
+        }
+        else {
             try {
                 val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
                 val decomposed = PlatformsViewModel.EmailComposeHandler.decomposeMessage(contentBytes)
@@ -115,7 +118,6 @@ fun EmailDetailsView(
         }
     }
 
-
     Scaffold(
         topBar = {
             RelayAppBar(navController = navController, {
@@ -130,6 +132,14 @@ fun EmailDetailsView(
                                 type = if(platform != null)
                                     Platforms.ServiceTypes.valueOf(platform.service_type!!)
                                 else Platforms.ServiceTypes.BRIDGE,
+                                emailNav = Json.encodeToString<EmailComposeNav>(
+                                    EmailComposeNav(
+                                        platformName = platform?.name ?: "",
+                                        encryptedContent = message?.encryptedContent,
+                                        fromAccount = from,
+                                        isBridge = isBridge,
+                                    )
+                                )
                             )
                         )
                     }
