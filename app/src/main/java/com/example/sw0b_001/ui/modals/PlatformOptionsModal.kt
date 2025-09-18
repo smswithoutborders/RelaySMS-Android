@@ -43,9 +43,6 @@ import com.example.sw0b_001.data.models.AvailablePlatforms
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.Platforms.ServiceTypes
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.navigation.EmailComposeScreen
-import com.example.sw0b_001.ui.navigation.MessageComposeScreen
-import com.example.sw0b_001.ui.navigation.TextComposeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -63,9 +60,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
+import com.example.sw0b_001.ui.navigation.ComposeScreen
+import com.example.sw0b_001.ui.navigation.EmailComposeNav
+import com.example.sw0b_001.ui.navigation.MessageComposeNav
+import com.example.sw0b_001.ui.navigation.TextComposeNav
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.triggerAddPlatformRequest
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.EmailComposeHandler.EmailContent
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
 import java.util.Locale
 import java.util.Locale.getDefault
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -481,39 +486,30 @@ private fun ComposeMessages(
     Button(
         onClick = {
             onDismissRequest()
-
-            if(platform == null) {
-                navController.navigate(EmailComposeScreen(
-                    isBridge = true,
-                    platformName = ""
-                ))
-            }
-            else {
-                when(platform.service_type) {
-                    ServiceTypes.EMAIL.name -> {
-                        navController.navigate(EmailComposeScreen(
-                            platformName = platform.name,
-                            subscriptionId = subscriptionId,
-                            isOnboarding = isOnboarding
-                        ))
-                    }
-                    ServiceTypes.MESSAGE.name -> {
-                        navController.navigate(MessageComposeScreen(
-                            platformName = platform.name,
-                            subscriptionId = subscriptionId,
-                            isOnboarding = isOnboarding
-                        ))
-                    }
-                    ServiceTypes.TEXT.name, ServiceTypes.TEST.name -> {
-                        navController.navigate(TextComposeScreen(
-                            platformName = platform.name,
-                            subscriptionId = subscriptionId,
-                            isOnboarding = isOnboarding,
-                            serviceType = ServiceTypes.valueOf(platform.service_type!!)
-                        ))
-                    }
-                }
-            }
+            navController.navigate(ComposeScreen(
+                type = if(platform != null) ServiceTypes.valueOf(platform.service_type!!)
+                    else ServiceTypes.BRIDGE,
+                emailNav = if(platform?.service_type == ServiceTypes.EMAIL.name)
+                    Json.encodeToString<EmailComposeNav>(EmailComposeNav(
+                        platformName = platform.name,
+                        subscriptionId = subscriptionId,
+                    ))
+                else null,
+                textNav = if(platform?.service_type == ServiceTypes.TEXT.name)
+                    Json.encodeToString<TextComposeNav>(TextComposeNav(
+                        platformName = platform.name,
+                        subscriptionId = subscriptionId,
+                        serviceType = ServiceTypes.valueOf(platform.service_type!!),
+                    ))
+                else null,
+                messageNav = if(platform?.service_type == ServiceTypes.MESSAGE.name)
+                    Json.encodeToString<MessageComposeNav>(MessageComposeNav(
+                        platformName = platform.name,
+                        subscriptionId = subscriptionId,
+                    ))
+                else null,
+                isOnboarding = isOnboarding
+            ))
         },
         modifier = Modifier.fillMaxWidth()
     ) {

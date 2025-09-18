@@ -30,9 +30,6 @@ import com.example.sw0b_001.ui.navigation.OTPCodeScreen
 import com.example.sw0b_001.ui.views.AboutView
 import com.example.sw0b_001.ui.views.HomepageView
 import com.example.sw0b_001.ui.views.OtpCodeVerificationView
-import com.example.sw0b_001.ui.views.compose.EmailComposeView
-import com.example.sw0b_001.ui.views.compose.MessageComposeView
-import com.example.sw0b_001.ui.views.compose.TextComposeView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
@@ -60,14 +57,11 @@ import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.ui.components.MissingTokenInfoDialog
 import com.example.sw0b_001.ui.navigation.AboutScreen
 import com.example.sw0b_001.ui.navigation.BridgeViewScreen
-import com.example.sw0b_001.ui.navigation.EmailComposeScreen
 import com.example.sw0b_001.ui.navigation.EmailViewScreen
 import com.example.sw0b_001.ui.navigation.ForgotPasswordScreen
 import com.example.sw0b_001.ui.navigation.GetMeOutScreen
-import com.example.sw0b_001.ui.navigation.MessageComposeScreen
 import com.example.sw0b_001.ui.navigation.MessageViewScreen
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
-import com.example.sw0b_001.ui.navigation.TextComposeScreen
 import com.example.sw0b_001.ui.navigation.TextViewScreen
 import com.example.sw0b_001.ui.views.ForgotPasswordView
 import com.example.sw0b_001.ui.views.GetMeOutOfHere
@@ -88,7 +82,6 @@ import androidx.navigation.NavController
 import androidx.navigation.toRoute
 import androidx.window.layout.WindowInfoTracker
 import androidx.window.layout.WindowLayoutInfo
-import com.afkanerd.lib_smsmms_android.R
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.NEW_NOTIFICATION_ACTION
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDatabase
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
@@ -103,17 +96,23 @@ import com.example.sw0b_001.extensions.context.promptBiometrics
 import com.example.sw0b_001.extensions.context.settingsGetLockDownApp
 import com.example.sw0b_001.extensions.context.settingsGetOnboardedCompletely
 import com.example.sw0b_001.ui.appbars.BottomNavBar
+import com.example.sw0b_001.ui.navigation.ComposeScreen
+import com.example.sw0b_001.ui.navigation.EmailComposeNav
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreenRelay
+import com.example.sw0b_001.ui.navigation.MessageComposeNav
 import com.example.sw0b_001.ui.navigation.OnboardingInteractiveScreen
 import com.example.sw0b_001.ui.navigation.OnboardingSkipScreen
+import com.example.sw0b_001.ui.navigation.TextComposeNav
 import com.example.sw0b_001.ui.navigation.WelcomeScreen
 import com.example.sw0b_001.ui.onboarding.OnboardingInteractive
 import com.example.sw0b_001.ui.views.WelcomeMainView
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
 import com.example.sw0b_001.ui.views.BottomTabsItems
+import com.example.sw0b_001.ui.views.compose.ComposerInterface
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
+import kotlinx.serialization.json.Json
 import java.util.concurrent.Executor
 import kotlin.system.exitProcess
 
@@ -366,39 +365,21 @@ class MainActivity : AppCompatActivity() {
                 AboutView(navController = navController)
             }
 
-            composable<EmailComposeScreen> { backEntry ->
-                val emailComposeNav: EmailComposeScreen = backEntry.toRoute()
-                EmailComposeView(
+            composable<ComposeScreen> { backEntry ->
+                val composeScreenNav: ComposeScreen = backEntry.toRoute()
+                ComposerInterface(
                     navController = navController,
-                    isBridge = emailComposeNav.isBridge,
-                    platformName = emailComposeNav.platformName,
-                    subscriptionId = emailComposeNav.subscriptionId,
-                    encryptedContent = emailComposeNav.encryptedContent,
-                    fromAccount = emailComposeNav.fromAccount,
-                    onSendCallback = if(emailComposeNav.isOnboarding)
-                        onboardingViewModel.callback else null
-                )
-            }
-            composable<TextComposeScreen> { backEntry ->
-                val textComposeNav: TextComposeScreen = backEntry.toRoute()
-                TextComposeView(
-                    navController = navController,
-                    name = textComposeNav.platformName,
-                    serviceType = textComposeNav.serviceType,
-                    subscriptionId = textComposeNav.subscriptionId,
-                    encryptedContent = textComposeNav.encryptedContent,
-                    onSendCallback = if (textComposeNav.isOnboarding)
-                        onboardingViewModel.callback else null,
-                )
-            }
-            composable<MessageComposeScreen> { backEntry ->
-                val messageComposeNav: MessageComposeScreen = backEntry.toRoute()
-                MessageComposeView(
-                    navController = navController,
-                    name = messageComposeNav.platformName,
-                    subscriptionId = messageComposeNav.subscriptionId,
-                    encryptedContent = messageComposeNav.encryptedContent,
-                    onSendCallback = if(messageComposeNav.isOnboarding)
+                    type = composeScreenNav.type,
+                    emailNav = if(!composeScreenNav.emailNav.isNullOrEmpty())
+                        Json.decodeFromString<EmailComposeNav>(composeScreenNav.emailNav)
+                    else null,
+                    textNav = if(!composeScreenNav.textNav.isNullOrEmpty())
+                        Json.decodeFromString<TextComposeNav>(composeScreenNav.textNav)
+                    else null,
+                    messageNav = if(!composeScreenNav.messageNav.isNullOrEmpty())
+                        Json.decodeFromString<MessageComposeNav>(composeScreenNav.messageNav)
+                    else null,
+                    onSendCallback = if(composeScreenNav.isOnboarding)
                         onboardingViewModel.callback else null
                 )
             }

@@ -20,8 +20,6 @@ class MessageComposer(
     val state: States,
     val AD: ByteArray?
 ) {
-//    private val AD = Publishers.fetchPublisherPublicKey(context)
-
     init {
         if(state.DHs == null) {
             val SK = Publishers.fetchPublisherSharedKey(context)

@@ -40,18 +40,22 @@ import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.data.models.EncryptedContent
+import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.ui.appbars.RelayAppBar
-import com.example.sw0b_001.ui.navigation.TextComposeScreen
+import com.example.sw0b_001.ui.navigation.ComposeScreen
+import com.example.sw0b_001.ui.navigation.TextComposeNav
 import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextDetailsView(
     platformsViewModel: PlatformsViewModel,
     navController: NavController,
+    isOnboarding: Boolean = false,
 ) {
     val context = LocalContext.current
 
@@ -68,7 +72,7 @@ fun TextDetailsView(
             val decomposedMessage = PlatformsViewModel.TextComposeHandler
                 .decomposeMessage(contentBytes)
 
-            from = decomposedMessage.from
+            from = decomposedMessage.from!!
             text = decomposedMessage.text
             date = message.date
         } catch (e: Exception) {
@@ -91,7 +95,21 @@ fun TextDetailsView(
                         platformsViewModel.platform = platform
 
                         CoroutineScope(Dispatchers.Main).launch {
-                            navController.navigate(TextComposeScreen)
+                            navController.navigate(
+                                ComposeScreen(
+                                    type = Platforms.ServiceTypes.MESSAGE,
+                                    messageNav = Json.encodeToString(
+                                        TextComposeNav(
+                                            platformName = platform!!.name,
+                                            subscriptionId = -1L,
+                                            encryptedContent = text,
+                                            fromAccount = from,
+                                            serviceType = Platforms.ServiceTypes.TEXT,
+                                        )
+                                    ),
+                                    isOnboarding = isOnboarding
+                                )
+                            )
                         }
                     }
                 }

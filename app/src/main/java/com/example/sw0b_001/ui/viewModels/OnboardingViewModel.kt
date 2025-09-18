@@ -11,9 +11,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.extensions.context.promptBiometrics
 import com.example.sw0b_001.extensions.context.settingsSetLockDownApp
-import com.example.sw0b_001.ui.navigation.EmailComposeScreen
+import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.onboarding.InteractiveOnboarding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -84,12 +85,12 @@ class OnboardingViewModel : ViewModel() {
                             ){}
                         }
                     }
-                    navController.navigate(EmailComposeScreen(
-                        isBridge = true,
-                        platformName = "",
-                        subscriptionId = -1L,
-                        isOnboarding = true
-                    ))
+                    navController.navigate(
+                        ComposeScreen(
+                            type = Platforms.ServiceTypes.BRIDGE,
+                            isOnboarding = true
+                        )
+                    )
                 }
             ),
             InteractiveOnboarding(

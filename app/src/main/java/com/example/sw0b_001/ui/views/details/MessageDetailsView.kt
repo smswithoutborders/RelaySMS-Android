@@ -38,19 +38,22 @@ import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.EncryptedContent
+import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.ui.appbars.RelayAppBar
-import com.example.sw0b_001.ui.navigation.MessageComposeScreen
+import com.example.sw0b_001.ui.navigation.ComposeScreen
+import com.example.sw0b_001.ui.navigation.MessageComposeNav
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.views.compose.MessageComposeHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageDetailsView(
     platformsViewModel: PlatformsViewModel,
-    navController: NavController
+    navController: NavController,
+    isOnboarding: Boolean = false
 ) {
     val context = LocalContext.current
     var fromDisplay by remember { mutableStateOf("") }
@@ -62,15 +65,15 @@ fun MessageDetailsView(
     if (message?.encryptedContent != null) {
         try {
             val contentBytes = Base64.decode(message.encryptedContent, Base64.DEFAULT)
-            val decomposed = MessageComposeHandler.decomposeMessage(contentBytes)
+            val decomposed = PlatformsViewModel.MessageComposeHandler.decomposeMessage(contentBytes)
 
-            fromDisplay = decomposed.from
+            fromDisplay = decomposed.from!!
             toDisplay = decomposed.to
             messageBody = decomposed.message
             date = message.date
 
         } catch (e: Exception) {
-            Log.e("MessageDetailsView", "Failed to decompose V1 message content: ${e.message}")
+            e.printStackTrace()
             fromDisplay = message.fromAccount ?: stringResource(R.string.unknown)
             toDisplay = stringResource(R.string.unknown)
             messageBody = stringResource(R.string.this_message_s_content_could_not_be_displayed)
@@ -88,7 +91,18 @@ fun MessageDetailsView(
                     platformsViewModel.platform = platform
 
                     CoroutineScope(Dispatchers.Main).launch {
-                        navController.navigate(MessageComposeScreen)
+                        navController.navigate(
+                            ComposeScreen(
+                                type = Platforms.ServiceTypes.MESSAGE,
+                                messageNav = Json.encodeToString(MessageComposeNav(
+                                    platformName = platform!!.name,
+                                    subscriptionId = -1L,
+                                    encryptedContent = messageBody,
+                                    fromAccount = fromDisplay,
+                                )),
+                                isOnboarding = isOnboarding
+                            )
+                        )
                     }
                 }
             }) {
@@ -161,7 +175,7 @@ fun MessageDetailsPreview() {
         message.gatewayClientMSISDN = "+237123456789"
         message.encryptedContent = "+123456789:+237123456789:hello Telegram"
 
-        val platformsViewModel = PlatformsViewModel()
+        val platformsViewModel = remember{ PlatformsViewModel() }
         platformsViewModel.message = message
 
         MessageDetailsView(

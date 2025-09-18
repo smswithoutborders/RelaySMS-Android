@@ -71,7 +71,6 @@ import com.example.sw0b_001.ui.navigation.EmailViewScreen
 import com.example.sw0b_001.ui.navigation.MessageViewScreen
 import com.example.sw0b_001.ui.navigation.TextViewScreen
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.views.compose.MessageComposeHandler
 import java.util.Locale
 
 @Composable
@@ -305,11 +304,11 @@ fun RecentMessageCard(
                     Base64.DEFAULT)
                 val decomposed = PlatformsViewModel.TextComposeHandler
                     .decomposeMessage(contentBytes)
-                heading = decomposed.from
+                heading = decomposed.from ?: "RelaySMS"
                 subHeading = ""
                 text = decomposed.text
             } catch (e: Exception) {
-                Log.e("RecentMessageCard", "Failed to decompose V1 text content: ${e.message}")
+                e.printStackTrace()
                 heading = message.fromAccount ?: stringResource(R.string.text_message)
                 subHeading = ""
                 text = stringResource(R.string.message_content_could_not_be_displayed)
@@ -317,18 +316,20 @@ fun RecentMessageCard(
         }
         Platforms.ServiceTypes.MESSAGE.name -> {
             try {
-                val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
-                val decomposed = MessageComposeHandler.decomposeMessage(contentBytes)
+                val contentBytes = Base64.decode(message.encryptedContent!!,
+                    Base64.DEFAULT)
+                val decomposed = PlatformsViewModel.MessageComposeHandler
+                    .decomposeMessage(contentBytes)
 
                 if (message.fromAccount == decomposed.from) {
                     heading = decomposed.to
                 } else {
-                    heading = decomposed.from
+                    heading = decomposed.from ?: "RelaySMS"
                 }
                 subHeading = ""
                 text = decomposed.message
             } catch (e: Exception) {
-                Log.e("RecentMessageCard", "Failed to decompose V1 message content: ${e.message}")
+                e.printStackTrace()
                 heading = message.fromAccount ?: stringResource(R.string.message_)
                 subHeading = ""
                 text = stringResource(R.string.message_content_could_not_be_displayed)

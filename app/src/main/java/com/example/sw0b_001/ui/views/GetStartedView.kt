@@ -58,8 +58,9 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.models.Platforms
+import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
-import com.example.sw0b_001.ui.navigation.EmailComposeScreen
 import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 
@@ -218,10 +219,13 @@ fun GetStartedView (
                 verticalArrangement = Arrangement.Center
             ) {
                 Button(
-                    onClick = { navController.navigate(EmailComposeScreen(
-                        platformName = "",
-                        isBridge = true
-                    )) },
+                    onClick = {
+                        navController.navigate(
+                            ComposeScreen(
+                                type = Platforms.ServiceTypes.BRIDGE,
+                                isOnboarding = true
+                            )
+                        )},
                     colors = ButtonDefaults
                         .buttonColors(MaterialTheme.colorScheme.primary),
                     modifier = Modifier.fillMaxWidth(),

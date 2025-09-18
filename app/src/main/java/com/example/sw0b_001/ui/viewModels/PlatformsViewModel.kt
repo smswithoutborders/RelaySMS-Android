@@ -2,6 +2,9 @@ package com.example.sw0b_001.ui.viewModels
 
 import android.content.Context
 import android.content.Intent
+import android.database.Cursor
+import android.net.Uri
+import android.provider.ContactsContract
 import android.util.Base64
 import android.util.Log
 import android.widget.Toast
@@ -36,10 +39,8 @@ import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.ui.views.BottomTabsItems
 import com.example.sw0b_001.ui.views.compose.GatewayClientRequest
-import com.example.sw0b_001.ui.views.compose.MessageContent
 import com.example.sw0b_001.ui.views.compose.ReliabilityTestRequestPayload
 import com.example.sw0b_001.ui.views.compose.ReliabilityTestResponsePayload
-import com.example.sw0b_001.ui.views.compose.TextContent
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -104,7 +105,7 @@ class PlatformsViewModel : ViewModel() {
 
     fun sendPublishingForMessaging(
         context: Context,
-        messageContent: MessageContent,
+        messageContent: MessageComposeHandler.MessageContent,
         account: StoredPlatformsEntity,
         subscriptionId: Long,
         smsTransmission: Boolean = true,
@@ -115,7 +116,7 @@ class PlatformsViewModel : ViewModel() {
             withContext(Dispatchers.IO) {
                 try {
                     val contentFormatV2Bytes = createMessageByteBuffer(
-                        from = messageContent.from,
+                        from = messageContent.from!!,
                         to = messageContent.to,
                         message = messageContent.message,
                     )
@@ -550,11 +551,11 @@ class PlatformsViewModel : ViewModel() {
 
     object EmailComposeHandler {
         data class EmailContent(
-            var to: String,
-            var cc: String,
-            var bcc: String,
-            var subject: String,
-            var body: String
+            var to: String = "",
+            var cc: String = "",
+            var bcc: String = "",
+            var subject: String = "",
+            var body: String = ""
         )
 
         fun decomposeMessage(contentBytes: ByteArray): EmailContent {
@@ -623,6 +624,10 @@ class PlatformsViewModel : ViewModel() {
     }
 
     object TextComposeHandler {
+        data class TextContent(
+            val from: String?,
+            var text: String = ""
+        )
 
         fun decomposeMessage(contentBytes: ByteArray): TextContent {
             return try {
@@ -659,7 +664,77 @@ class PlatformsViewModel : ViewModel() {
         }
     }
 
+    object MessageComposeHandler {
+        data class MessageContent(
+            val from: String?,
+            var to: String = "",
+            var message: String = ""
+        )
+
+        fun decomposeMessage(contentBytes: ByteArray): MessageContent {
+            return try {
+                val buffer = ByteBuffer.wrap(contentBytes).order(ByteOrder.LITTLE_ENDIAN)
+
+                val fromLen = buffer.get().toInt() and 0xFF
+                val toLen = buffer.getShort().toInt() and 0xFFFF
+                val ccLen = buffer.getShort().toInt() and 0xFFFF
+                val bccLen = buffer.getShort().toInt() and 0xFFFF
+                val subjectLen = buffer.get().toInt() and 0xFF
+                val bodyLen = buffer.getShort().toInt() and 0xFFFF
+                val accessLen = buffer.getShort().toInt() and 0xFFFF
+                val refreshLen = buffer.getShort().toInt() and 0xFFFF
+
+                val from = ByteArray(fromLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+                val to = ByteArray(toLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+
+                if (ccLen > 0) buffer.position(buffer.position() + ccLen)
+                if (bccLen > 0) buffer.position(buffer.position() + bccLen)
+                if (subjectLen > 0) buffer.position(buffer.position() + subjectLen)
+
+                val message = ByteArray(bodyLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
+
+                if (accessLen > 0) buffer.position(buffer.position() + accessLen)
+                if (refreshLen > 0) buffer.position(buffer.position() + refreshLen)
+
+                MessageContent(from = from, to = to, message = message)
+            } catch (e: Exception) {
+                Log.e("MessageComposeHandler", "Failed to decompose V2 binary message content", e)
+                MessageContent("Unknown", "Unknown", "Error: Could not parse message content.")
+            }
+        }
+    }
+
+
     companion object {
+        fun verifyPhoneNumberFormat(phoneNumber: String): Boolean {
+            val newPhoneNumber = phoneNumber
+                .replace("[\\s-]".toRegex(), "")
+            return newPhoneNumber.matches("^\\+[1-9]\\d{1,14}$".toRegex())
+        }
+
+
+        fun getPhoneNumberFromUri(context: Context, uri: Uri): String {
+            var phoneNumber: String? = null
+            val projection: Array<String> = arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER)
+
+            try {
+                val cursor: Cursor? = context.contentResolver.query(uri, projection, null, null, null)
+                cursor?.use {
+                    if (it.moveToFirst()) {
+                        val numberIndex = it.getColumnIndex(ContactsContract.Contacts.CONTENT_URI.toString())
+                        if (numberIndex >= 0) {
+                            phoneNumber = it.getString(numberIndex)
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Log.e("getPhoneNumberFromUri", "Failed to get phone number from URI", e)
+            }
+
+            return phoneNumber ?: ""
+        }
+
         fun networkRequest(
             url: String,
             payload: GatewayClientRequest,

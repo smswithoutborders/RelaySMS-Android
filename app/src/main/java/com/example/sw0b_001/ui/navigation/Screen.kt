@@ -48,7 +48,7 @@ data class OTPCodeScreen(
 object AboutScreen
 
 @Serializable
-data class EmailComposeScreen(
+data class EmailComposeNav(
     val platformName: String,
     val subscriptionId: Long = -1L,
     val encryptedContent: String? = null,
@@ -58,7 +58,7 @@ data class EmailComposeScreen(
 )
 
 @Serializable
-data class TextComposeScreen(
+data class TextComposeNav(
     val platformName: String,
     val serviceType: Platforms.ServiceTypes,
     val subscriptionId: Long = -1L,
@@ -69,7 +69,7 @@ data class TextComposeScreen(
 )
 
 @Serializable
-data class MessageComposeScreen(
+data class MessageComposeNav(
     val platformName: String,
     val subscriptionId: Long = -1L,
     val encryptedContent: String? = null,
@@ -94,3 +94,13 @@ object PasteEncryptedTextScreen
 data class ForgotPasswordScreen(
     val isOnboarding: Boolean = false
 )
+
+@Serializable
+data class ComposeScreen(
+    val type: Platforms.ServiceTypes,
+    val emailNav: String? = null,
+    val textNav: String? = null,
+    val messageNav: String? = null,
+    val isOnboarding: Boolean = false
+)
+

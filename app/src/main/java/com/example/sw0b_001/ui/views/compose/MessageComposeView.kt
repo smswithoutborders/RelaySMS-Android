@@ -60,6 +60,8 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.verifyPhoneNumberFormat
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.MessageComposeHandler.MessageContent
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -80,8 +82,6 @@ class PickPhoneNumberContract : ActivityResultContract<Unit, Uri?>() {
     }
 }
 
-data class MessageContent(val from: String, val to: String, val message: String)
-
 data class RecipientFieldInfo(val label: String, val hint: String)
 
 @Composable
@@ -93,267 +93,109 @@ private fun getRecipientFieldInfo(): RecipientFieldInfo {
 
 }
 
-object MessageComposeHandler {
-    fun decomposeMessage(contentBytes: ByteArray): MessageContent {
-        return try {
-            val buffer = ByteBuffer.wrap(contentBytes).order(ByteOrder.LITTLE_ENDIAN)
-
-            val fromLen = buffer.get().toInt() and 0xFF
-            val toLen = buffer.getShort().toInt() and 0xFFFF
-            val ccLen = buffer.getShort().toInt() and 0xFFFF
-            val bccLen = buffer.getShort().toInt() and 0xFFFF
-            val subjectLen = buffer.get().toInt() and 0xFF
-            val bodyLen = buffer.getShort().toInt() and 0xFFFF
-            val accessLen = buffer.getShort().toInt() and 0xFFFF
-            val refreshLen = buffer.getShort().toInt() and 0xFFFF
-
-            val from = ByteArray(fromLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
-            val to = ByteArray(toLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
-
-            if (ccLen > 0) buffer.position(buffer.position() + ccLen)
-            if (bccLen > 0) buffer.position(buffer.position() + bccLen)
-            if (subjectLen > 0) buffer.position(buffer.position() + subjectLen)
-
-            val message = ByteArray(bodyLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
-
-            if (accessLen > 0) buffer.position(buffer.position() + accessLen)
-            if (refreshLen > 0) buffer.position(buffer.position() + refreshLen)
-
-            MessageContent(from = from, to = to, message = message)
-        } catch (e: Exception) {
-            Log.e("MessageComposeHandler", "Failed to decompose V2 binary message content", e)
-            MessageContent("Unknown", "Unknown", "Error: Could not parse message content.")
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun MessageComposeView(
-    navController: NavController,
-    name: String,
-    subscriptionId: Long,
-    encryptedContent: String? = null,
-    onSendCallback: ((Boolean) -> Unit)? = null,
+    messageContent: PlatformsViewModel.MessageComposeHandler.MessageContent,
+    from: String,
 ) {
-    val inspectMode = LocalInspectionMode.current
     val context = LocalContext.current
-
-    val decomposedMessage = if (encryptedContent != null) {
-        try {
-            val contentBytes = Base64.decode(encryptedContent, Base64.DEFAULT)
-            MessageComposeHandler.decomposeMessage(contentBytes)
-        } catch (e: Exception) {
-            Log.e("MessageComposeView", "Failed to decode/decompose V1 message content.", e)
-            null
-        }
-    } else null
-
-    var recipientAccount by remember { mutableStateOf(decomposedMessage?.to ?: "") }
-    var message by remember { mutableStateOf( decomposedMessage?.message ?: "") }
-    var from by remember { mutableStateOf( decomposedMessage?.from ?: "") }
-
-    var showSelectAccountModal by remember { mutableStateOf(!inspectMode) }
-    var selectedAccount by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
     val fieldInfo = getRecipientFieldInfo()
-//    val isPnba = platformsViewModel.platform?.protocol_type == "pnba"
 
     val launcher = rememberLauncherForActivityResult(
         contract = PickPhoneNumberContract()
     ) { uri ->
         uri?.let {
-            recipientAccount = getPhoneNumberFromUri(context, it)
+            messageContent.to = PlatformsViewModel.getPhoneNumberFromUri(context, it)
         }
     }
 
     val readContactPermissions = rememberPermissionState(Manifest.permission.READ_CONTACTS)
 
-    if (showSelectAccountModal) {
-        SelectAccountModal(
-            name = name ?: "",
-            onDismissRequest = {
-                if (selectedAccount == null) {
-                    navController.popBackStack()
-                }
-                Toast.makeText(context,
-                    context.getString(R.string.no_account_selected), Toast.LENGTH_SHORT).show()
-            },
-            onAccountSelected = { account ->
-                selectedAccount = account
-                from = account.account!!
-                showSelectAccountModal = false
-            }
-        )
-    }
-
-    BackHandler {
-        navController.popBackStack()
-    }
-
-    val platformViewModel = remember{ PlatformsViewModel() }
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.new_message)) },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        navController.popBackStack()
-                    }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
-                    }
-                },
-                actions = {
-                    val isSendEnabled = recipientAccount.isNotEmpty() &&
-                            message.isNotEmpty() &&
-                            verifyPhoneNumberFormat(recipientAccount)
-
-                    IconButton(onClick = {
-                        platformViewModel.sendPublishingForMessaging(
-                            context = context,
-                            messageContent = MessageContent(
-                                from = from,
-                                to = recipientAccount,
-                                message = message
-                            ),
-                            account = selectedAccount!!,
-                            subscriptionId = subscriptionId,
-                            onFailure = { errorMsg ->
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    Toast.makeText(
-                                        context,
-                                        errorMsg ?: context.getString(R.string.send_failed),
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                }
-                            },
-                        ) {
-                            CoroutineScope(Dispatchers.Main).launch {
-                                navController.navigate(
-                                    if(context.isDefault()) HomeScreenNav() else HomepageScreen
-                                )
-                            }
-                        }
-                    }, enabled = isSendEnabled) {
-                        Icon(Icons.AutoMirrored.Filled.Send,
-                            stringResource(R.string.send))
-                    }
-                },
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        OutlinedTextField(
+            value = from,
+            onValueChange = { },
+            label = { Text(stringResource(R.string.sender)) },
+            enabled = false,
+            modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                disabledBorderColor = MaterialTheme.colorScheme.outline,
+                disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
             )
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(16.dp)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+        // Recipient Number
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(
-                value = from,
-                onValueChange = { },
-                label = { Text(stringResource(R.string.sender)) },
-                enabled = false,
-                modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                    disabledBorderColor = MaterialTheme.colorScheme.outline,
-                    disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-            // Recipient Number
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                OutlinedTextField(
-                    value = recipientAccount,
-                    onValueChange = { recipientAccount = it },
-                    label = { Text(fieldInfo.label, style = MaterialTheme.typography.bodyMedium) },
-                    modifier = Modifier.weight(1f),
-                    isError = recipientAccount.isNotEmpty() && !verifyPhoneNumberFormat(recipientAccount),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Phone,
-                        imeAction = ImeAction.Next
-                    )
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-                IconButton(onClick = {
-                    if(readContactPermissions.status.isGranted) {
-                        launcher.launch(Unit)
-                    } else {
-                        readContactPermissions.launchPermissionRequest()
-                    }
-
-                }) {
-                    Icon(
-                        imageVector = Icons.Filled.Contacts,
-                        contentDescription = stringResource(R.string.select_contact),
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = fieldInfo.hint,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Message Body
-            OutlinedTextField(
-                value = message,
-                onValueChange = { message = it },
-                label = { Text(stringResource(R.string.message), style = MaterialTheme.typography.bodyMedium) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
+                value = messageContent.to,
+                onValueChange = { messageContent.to = it },
+                label = { Text(fieldInfo.label, style = MaterialTheme.typography.bodyMedium) },
+                modifier = Modifier.weight(1f),
+                isError = messageContent.to.isNotEmpty() &&
+                        !verifyPhoneNumberFormat(messageContent.to),
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done
+                    keyboardType = KeyboardType.Phone,
+                    imeAction = ImeAction.Next
                 )
             )
-        }
-    }
-}
 
-fun verifyPhoneNumberFormat(phoneNumber: String): Boolean {
-    val newPhoneNumber = phoneNumber
-        .replace("[\\s-]".toRegex(), "")
-    return newPhoneNumber.matches("^\\+[1-9]\\d{1,14}$".toRegex())
-}
-
-
-private fun getPhoneNumberFromUri(context: Context, uri: Uri): String {
-    var phoneNumber: String? = null
-    val projection: Array<String> = arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER)
-
-    try {
-        val cursor: Cursor? = context.contentResolver.query(uri, projection, null, null, null)
-        cursor?.use {
-            if (it.moveToFirst()) {
-                val numberIndex = it.getColumnIndex(ContactsContract.Contacts.CONTENT_URI.toString())
-                if (numberIndex >= 0) {
-                    phoneNumber = it.getString(numberIndex)
+            Spacer(modifier = Modifier.width(8.dp))
+            IconButton(onClick = {
+                if(readContactPermissions.status.isGranted) {
+                    launcher.launch(Unit)
+                } else {
+                    readContactPermissions.launchPermissionRequest()
                 }
+
+            }) {
+                Icon(
+                    imageVector = Icons.Filled.Contacts,
+                    contentDescription = stringResource(R.string.select_contact),
+                    tint = MaterialTheme.colorScheme.primary,
+                )
             }
         }
-    } catch (e: Exception) {
-        e.printStackTrace()
-        Log.e("getPhoneNumberFromUri", "Failed to get phone number from URI", e)
-    }
 
-    return phoneNumber ?: ""
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(
+            text = fieldInfo.hint,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Message Body
+        OutlinedTextField(
+            value = messageContent.message,
+            onValueChange = { messageContent.message = it },
+            label = { Text(stringResource(R.string.message), style = MaterialTheme.typography.bodyMedium) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Done
+            )
+        )
+    }
 }
+
 
 
 
@@ -361,11 +203,17 @@ private fun getPhoneNumberFromUri(context: Context, uri: Uri): String {
 @Composable
 fun MessageComposePreview() {
     AppTheme(darkTheme = false) {
+
+        val messageContent by remember{ mutableStateOf(
+            MessageContent(
+                from = "",
+                to = "",
+                message = "",
+            ))
+        }
         MessageComposeView(
-            navController = NavController(LocalContext.current),
-            subscriptionId = -1L,
-            encryptedContent = "",
-            name = "telegram"
+            messageContent = messageContent,
+            from = ""
         )
     }
 }

@@ -42,8 +42,8 @@ import com.example.sw0b_001.data.models.Bridges
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.EncryptedContent
+import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
-import com.example.sw0b_001.ui.navigation.EmailComposeScreen
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -126,11 +126,13 @@ fun EmailDetailsView(
                     platformsViewModel.platform = platform
 
                     CoroutineScope(Dispatchers.Main).launch {
-                        navController.navigate(EmailComposeScreen(
-                            platformName = if(!isBridge) platformsViewModel.message!!
-                                .platformName!! else "",
-                            isBridge = isBridge,
-                        ))
+                        navController.navigate(
+                            ComposeScreen(
+                                type = if(platform != null)
+                                    Platforms.ServiceTypes.valueOf(platform.service_type!!)
+                                else Platforms.ServiceTypes.BRIDGE,
+                            )
+                        )
                     }
                 }
             }) {
