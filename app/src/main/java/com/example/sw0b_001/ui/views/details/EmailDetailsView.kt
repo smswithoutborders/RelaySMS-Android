@@ -97,17 +97,16 @@ fun EmailDetailsView(
                 val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
                 val decomposed = PlatformsViewModel.EmailComposeHandler.decomposeMessage(contentBytes)
 
-
                 from = message.fromAccount ?: "Email Account"
-                to = decomposed.to
-                cc = decomposed.cc
-                bcc = decomposed.bcc
-                subject = decomposed.subject
-                body = decomposed.body
+                to = decomposed.to.value
+                cc = decomposed.cc.value
+                bcc = decomposed.bcc.value
+                subject = decomposed.subject.value
+                body = decomposed.body.value
                 date = message.date
 
             } catch (e: Exception) {
-                Log.e("EmailDetailsView", "Failed to decompose V1 email content: ${e.message}")
+                e.printStackTrace()
                 from = message.fromAccount ?: "Email Account"
                 subject = "Error"
                 body = "This message's content could not be displayed."

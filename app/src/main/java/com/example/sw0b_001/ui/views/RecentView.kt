@@ -279,8 +279,8 @@ fun RecentMessageCard(
             val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
             val decomposed = PlatformsViewModel.EmailComposeHandler.decomposeMessage(contentBytes)
             heading = message.fromAccount ?: "Email"
-            subHeading = decomposed.subject
-            text = decomposed.body
+            subHeading = decomposed.subject.value
+            text = decomposed.body.value
         }
         Platforms.ServiceTypes.BRIDGE_INCOMING.name -> {
             val decomposed = Bridges.BridgeComposeHandler.decomposeInboxMessage(

@@ -102,7 +102,7 @@ fun ComposerInterface(
 
     val context = LocalContext.current
 
-    val decomposedEmailMessage by remember{ mutableStateOf(
+    val decomposedEmailMessage = remember(emailNav){
         if(emailNav?.encryptedContent != null) {
             if (emailNav.isBridge) {
                 PlatformsViewModel.EmailComposeHandler
@@ -117,55 +117,64 @@ fun ComposerInterface(
                     null
                 }
             }
-        }
-        else PlatformsViewModel.EmailComposeHandler.EmailContent()
-    )}
+        } else PlatformsViewModel.EmailComposeHandler.EmailContent()
+    }
 
-    val decomposedMessageMessage: MessageContent? by remember{ mutableStateOf(
-        if (messageNav?.encryptedContent != null) {
-            try {
-                val contentBytes = Base64.decode(messageNav.encryptedContent,
-                    Base64.DEFAULT)
-                PlatformsViewModel.MessageComposeHandler.decomposeMessage(contentBytes)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
+    val decomposedMessageMessage: MessageContent? = if (messageNav?.encryptedContent != null) {
+        try {
+            val contentBytes = Base64.decode(messageNav.encryptedContent,
+                Base64.DEFAULT)
+            PlatformsViewModel.MessageComposeHandler.decomposeMessage(contentBytes)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+    else MessageContent(from = from)
+
+    val decomposedTextMessage = if (textNav?.encryptedContent != null) {
+        try {
+            val contentBytes = Base64.decode(textNav.encryptedContent, Base64.DEFAULT)
+            PlatformsViewModel.TextComposeHandler.decomposeMessage(contentBytes)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+    else PlatformsViewModel.TextComposeHandler.TextContent(from = from)
+
+    val isSendingEnabled by remember(
+        type,
+        isSending,
+        decomposedEmailMessage?.to?.value,
+        decomposedEmailMessage?.body?.value,
+        decomposedTextMessage?.text,
+        decomposedMessageMessage?.to,
+        decomposedMessageMessage?.message
+    ) {
+        mutableStateOf(
+            when (type) {
+                Platforms.ServiceTypes.EMAIL,
+                Platforms.ServiceTypes.BRIDGE,
+                Platforms.ServiceTypes.BRIDGE_INCOMING -> {
+                    !isSending &&
+                            decomposedEmailMessage?.to?.value?.isNotEmpty() == true &&
+                            decomposedEmailMessage?.body?.value?.isNotEmpty() == true
+                }
+                Platforms.ServiceTypes.TEXT -> {
+                    !isSending &&
+                            decomposedTextMessage?.text?.isNotEmpty() == true
+                }
+                Platforms.ServiceTypes.MESSAGE -> {
+                    !isSending &&
+                            decomposedMessageMessage?.to?.isNotEmpty() == true &&
+                            decomposedMessageMessage?.message?.isNotEmpty() == true &&
+                            verifyPhoneNumberFormat(decomposedMessageMessage.to)
+                }
+                else -> false
             }
-        }
-        else MessageContent(from = from)
-    )}
-
-    val decomposedTextMessage by remember { mutableStateOf(
-        if (textNav?.encryptedContent != null) {
-            try {
-                val contentBytes = Base64.decode(textNav.encryptedContent, Base64.DEFAULT)
-                PlatformsViewModel.TextComposeHandler.decomposeMessage(contentBytes)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-        }
-        else PlatformsViewModel.TextComposeHandler.TextContent(from = from)
-    )}
-
-    var sendingEnabled by remember { mutableStateOf(when(type) {
-        Platforms.ServiceTypes.EMAIL,
-        Platforms.ServiceTypes.BRIDGE,
-        Platforms.ServiceTypes.BRIDGE_INCOMING -> {
-            !isSending && decomposedEmailMessage?.to!!.isNotEmpty() &&
-                    decomposedEmailMessage?.body!!.isNotEmpty()
-        }
-        Platforms.ServiceTypes.TEXT -> {
-            !isSending && decomposedTextMessage?.text!!.isNotEmpty()
-        }
-        Platforms.ServiceTypes.MESSAGE -> {
-            !isSending && decomposedMessageMessage?.to!!.isNotEmpty() &&
-                    decomposedMessageMessage?.message!!.isNotEmpty() &&
-                     verifyPhoneNumberFormat(decomposedMessageMessage?.to!!)
-        }
-        else -> false
-    }) }
-
+        )
+    }
 
     val platformsViewModel = remember{ PlatformsViewModel() }
 
@@ -268,7 +277,7 @@ fun ComposerInterface(
                 },
                 actions = {
                     IconButton(
-                        enabled = sendingEnabled,
+                        enabled = isSendingEnabled,
                         onClick = {
                             isSending = true
                             if(context.settingsGetNotShowChooseGatewayClient) {
@@ -329,7 +338,8 @@ fun ComposerInterface(
                             navController.popBackStack()
                         }
                         Toast.makeText(context,
-                            context.getString(R.string.no_account_selected), Toast.LENGTH_SHORT).show()
+                            context.getString(R.string.no_account_selected),
+                            Toast.LENGTH_SHORT).show()
                     },
                     onAccountSelected = { account ->
                         selectedAccount = account

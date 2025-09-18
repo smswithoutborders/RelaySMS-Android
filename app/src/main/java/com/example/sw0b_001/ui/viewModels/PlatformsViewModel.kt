@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -203,11 +204,11 @@ class PlatformsViewModel : ViewModel() {
                     if(isBridge) { // if its a bridge message
                         val txtTransmission = Bridges.compose(
                             context = context,
-                            to = emailContent.to,
-                            cc = emailContent.cc,
-                            bcc = emailContent.bcc,
-                            subject = emailContent.subject,
-                            body = emailContent.body
+                            to = emailContent.to.value,
+                            cc = emailContent.cc.value,
+                            bcc = emailContent.bcc.value,
+                            subject = emailContent.subject.value,
+                            body = emailContent.body.value,
                         ) { onCompleteCallback(null) }.first
 
                         val gatewayClientMSISDN = GatewayClientsCommunications(context)
@@ -254,32 +255,32 @@ class PlatformsViewModel : ViewModel() {
                         ) {
                             createEmailByteBuffer(
                                 from = account.account!!, // 'from' is from the selected account
-                                to = emailContent.to,
-                                cc = emailContent.cc,
-                                bcc = emailContent.bcc,
-                                subject = emailContent.subject,
-                                body = emailContent.body,
+                                to = emailContent.to.value,
+                                cc = emailContent.cc.value,
+                                bcc = emailContent.bcc.value,
+                                subject = emailContent.subject.value,
+                                body = emailContent.body.value,
                                 accessToken = account.accessToken,
                                 refreshToken = account.refreshToken
                             )
                         } else {
                             createEmailByteBuffer(
                                 from = account.account!!,
-                                to = emailContent.to,
-                                cc = emailContent.cc,
-                                bcc = emailContent.bcc,
-                                subject = emailContent.subject,
-                                body = emailContent.body
+                                to = emailContent.to.value,
+                                cc = emailContent.cc.value,
+                                bcc = emailContent.bcc.value,
+                                subject = emailContent.subject.value,
+                                body = emailContent.body.value,
                             )
                         }
 
                         createEmailByteBuffer(
                             from = account.account,
-                            to = emailContent.to,
-                            cc = emailContent.cc,
-                            bcc = emailContent.bcc,
-                            subject = emailContent.subject,
-                            body = emailContent.body,
+                            to = emailContent.to.value,
+                            cc = emailContent.cc.value,
+                            bcc = emailContent.bcc.value,
+                            subject = emailContent.subject.value,
+                            body = emailContent.body.value,
                             accessToken = account.accessToken,
                             refreshToken = account.refreshToken
                         )
@@ -551,11 +552,11 @@ class PlatformsViewModel : ViewModel() {
 
     object EmailComposeHandler {
         data class EmailContent(
-            var to: String = "",
-            var cc: String = "",
-            var bcc: String = "",
-            var subject: String = "",
-            var body: String = ""
+            var to: MutableState<String> = mutableStateOf(""),
+            var cc: MutableState<String> = mutableStateOf(""),
+            var bcc: MutableState<String> = mutableStateOf(""),
+            var subject: MutableState<String> = mutableStateOf(""),
+            var body: MutableState<String> = mutableStateOf("")
         )
 
         fun decomposeMessage(contentBytes: ByteArray): EmailContent {
@@ -585,10 +586,16 @@ class PlatformsViewModel : ViewModel() {
                 if (accessLen > 0) buffer.position(buffer.position() + accessLen)
                 if (refreshLen > 0) buffer.position(buffer.position() + refreshLen)
 
-                return EmailContent(to, cc, bcc, subject, body)
+                return EmailContent(
+                    mutableStateOf(to),
+                    mutableStateOf(cc),
+                    mutableStateOf(bcc),
+                    mutableStateOf(subject),
+                    mutableStateOf(body),
+                )
             } catch (e: Exception) {
-                Log.e("EmailComposeHandler", "Failed to decompose V2 binary message", e)
-                return EmailContent("", "", "", "", "Error: Could not parse message content.")
+                e.printStackTrace()
+                return EmailContent()
             }
         }
 
@@ -598,26 +605,25 @@ class PlatformsViewModel : ViewModel() {
                 // Format: to:cc:bcc:subject:body
                 val parts = message.split(":", limit = 5)
                 if (parts.size < 5) {
-                    Log.w("EmailComposeHandler", "Bridge message has fewer than 5 parts: '$message'. Parsing as best as possible.")
                     EmailContent(
-                        to = parts.getOrElse(0) { "" },
-                        cc = parts.getOrElse(1) { "" },
-                        bcc = parts.getOrElse(2) { "" },
-                        subject = parts.getOrElse(3) { "" },
-                        body = parts.getOrElse(4) { "" } // If body is missing, this will be empty
+                        to = mutableStateOf(parts.getOrElse(0) { "" }),
+                        cc = mutableStateOf(parts.getOrElse(1) { "" }),
+                        bcc = mutableStateOf(parts.getOrElse(2) { "" }),
+                        subject = mutableStateOf(parts.getOrElse(3) { "" }),
+                        body = mutableStateOf(parts.getOrElse(4) { "" }),
                     )
                 } else {
                     EmailContent(
-                        to = parts[0],
-                        cc = parts[1],
-                        bcc = parts[2],
-                        subject = parts[3],
-                        body = parts[4] // The rest of the string is the body
+                        to = mutableStateOf(parts[0]),
+                        cc = mutableStateOf(parts[1]),
+                        bcc = mutableStateOf(parts[2]),
+                        subject = mutableStateOf(parts[3]),
+                        body = mutableStateOf(parts[4]),
                     )
                 }
             } catch (e: Exception) {
-                Log.e("EmailComposeHandler", "Failed to decompose bridge message string", e)
-                EmailContent("", "", "", "", "Error: Could not parse bridge message content.")
+                e.printStackTrace()
+                EmailContent()
             }
         }
 
