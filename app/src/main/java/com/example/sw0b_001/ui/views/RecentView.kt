@@ -304,9 +304,9 @@ fun RecentMessageCard(
                     Base64.DEFAULT)
                 val decomposed = PlatformsViewModel.TextComposeHandler
                     .decomposeMessage(contentBytes)
-                heading = decomposed.from ?: "RelaySMS"
+                heading = decomposed.from.value ?: ""
                 subHeading = ""
-                text = decomposed.text
+                text = decomposed.text.value
             } catch (e: Exception) {
                 e.printStackTrace()
                 heading = message.fromAccount ?: stringResource(R.string.text_message)
@@ -321,13 +321,13 @@ fun RecentMessageCard(
                 val decomposed = PlatformsViewModel.MessageComposeHandler
                     .decomposeMessage(contentBytes)
 
-                if (message.fromAccount == decomposed.from) {
-                    heading = decomposed.to
+                if (message.fromAccount == decomposed.from.value) {
+                    heading = decomposed.to.value
                 } else {
-                    heading = decomposed.from ?: "RelaySMS"
+                    heading = decomposed.from.value ?: "RelaySMS"
                 }
                 subHeading = ""
-                text = decomposed.message
+                text = decomposed.message.value
             } catch (e: Exception) {
                 e.printStackTrace()
                 heading = message.fromAccount ?: stringResource(R.string.message_)

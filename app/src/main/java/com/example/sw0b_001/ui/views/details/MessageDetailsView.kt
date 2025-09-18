@@ -67,9 +67,9 @@ fun MessageDetailsView(
             val contentBytes = Base64.decode(message.encryptedContent, Base64.DEFAULT)
             val decomposed = PlatformsViewModel.MessageComposeHandler.decomposeMessage(contentBytes)
 
-            fromDisplay = decomposed.from!!
-            toDisplay = decomposed.to
-            messageBody = decomposed.message
+            fromDisplay = decomposed.from.value!!
+            toDisplay = decomposed.to.value
+            messageBody = decomposed.message.value
             date = message.date
 
         } catch (e: Exception) {

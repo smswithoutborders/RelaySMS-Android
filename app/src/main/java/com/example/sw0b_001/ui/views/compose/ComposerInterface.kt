@@ -77,7 +77,7 @@ fun ComposerInterface(
         navController.popBackStack()
     }
 
-    var from by remember { mutableStateOf(when(type) {
+    var from = remember { mutableStateOf(when(type) {
         Platforms.ServiceTypes.EMAIL,
         Platforms.ServiceTypes.BRIDGE,
         Platforms.ServiceTypes.BRIDGE_INCOMING ->  emailNav?.fromAccount
@@ -141,7 +141,7 @@ fun ComposerInterface(
             null
         }
     }
-    else PlatformsViewModel.TextComposeHandler.TextContent(from = from)
+    else PlatformsViewModel.TextComposeHandler.TextContent(from)
 
     val isSendingEnabled by remember(
         type,
@@ -163,13 +163,13 @@ fun ComposerInterface(
                 }
                 Platforms.ServiceTypes.TEXT -> {
                     !isSending &&
-                            decomposedTextMessage?.text?.isNotEmpty() == true
+                            decomposedTextMessage?.text?.value?.isNotEmpty() == true
                 }
                 Platforms.ServiceTypes.MESSAGE -> {
                     !isSending &&
-                            decomposedMessageMessage?.to?.isNotEmpty() == true &&
-                            decomposedMessageMessage?.message?.isNotEmpty() == true &&
-                            verifyPhoneNumberFormat(decomposedMessageMessage.to)
+                            decomposedMessageMessage?.to?.value?.isNotEmpty() == true &&
+                            decomposedMessageMessage?.message?.value?.isNotEmpty() == true &&
+                            verifyPhoneNumberFormat(decomposedMessageMessage.to.value)
                 }
                 else -> false
             }
@@ -201,7 +201,7 @@ fun ComposerInterface(
             Platforms.ServiceTypes.TEXT -> {
                 platformsViewModel.sendPublishingForPost(
                     context = context,
-                    text = decomposedTextMessage?.text ?: "",
+                    text = decomposedTextMessage?.text?.value ?: "",
                     account = selectedAccount!!,
                     onFailure = { errorMsg ->
                         isSending = false
@@ -308,7 +308,7 @@ fun ComposerInterface(
                     EmailComposeView(
                         isBridge = isBridge,
                         emailContent = decomposedEmailMessage!!,
-                        from = from
+                        from = from.value
                     )
                 }
                 Platforms.ServiceTypes.TEXT, Platforms.ServiceTypes.TEST -> {
@@ -320,7 +320,7 @@ fun ComposerInterface(
                 Platforms.ServiceTypes.MESSAGE -> {
                     MessageComposeView(
                         messageContent = decomposedMessageMessage!!,
-                        from = from!!
+                        from = from.value
                     )
                 }
             }
@@ -343,7 +343,7 @@ fun ComposerInterface(
                     },
                     onAccountSelected = { account ->
                         selectedAccount = account
-                        from = account.account!!
+                        from.value = account.account!!
                         showSelectAccountModal = false
                     },
                     name = platformName

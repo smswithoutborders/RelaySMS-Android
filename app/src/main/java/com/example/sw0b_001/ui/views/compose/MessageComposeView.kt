@@ -96,9 +96,10 @@ private fun getRecipientFieldInfo(): RecipientFieldInfo {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun MessageComposeView(
-    messageContent: PlatformsViewModel.MessageComposeHandler.MessageContent,
-    from: String,
+    messageContent: MessageContent,
+    from: String?= null
 ) {
+
     val context = LocalContext.current
     val fieldInfo = getRecipientFieldInfo()
 
@@ -106,7 +107,7 @@ fun MessageComposeView(
         contract = PickPhoneNumberContract()
     ) { uri ->
         uri?.let {
-            messageContent.to = PlatformsViewModel.getPhoneNumberFromUri(context, it)
+            messageContent.to.value = PlatformsViewModel.getPhoneNumberFromUri(context, it)
         }
     }
 
@@ -118,7 +119,7 @@ fun MessageComposeView(
             .padding(16.dp)
     ) {
         OutlinedTextField(
-            value = from,
+            value = from ?: "",
             onValueChange = { },
             label = { Text(stringResource(R.string.sender)) },
             enabled = false,
@@ -140,12 +141,12 @@ fun MessageComposeView(
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(
-                value = messageContent.to,
-                onValueChange = { messageContent.to = it },
+                value = messageContent.to.value,
+                onValueChange = { messageContent.to.value = it },
                 label = { Text(fieldInfo.label, style = MaterialTheme.typography.bodyMedium) },
                 modifier = Modifier.weight(1f),
-                isError = messageContent.to.isNotEmpty() &&
-                        !verifyPhoneNumberFormat(messageContent.to),
+                isError = messageContent.to.value.isNotEmpty() &&
+                        !verifyPhoneNumberFormat(messageContent.to.value),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Phone,
                     imeAction = ImeAction.Next
@@ -182,9 +183,11 @@ fun MessageComposeView(
 
         // Message Body
         OutlinedTextField(
-            value = messageContent.message,
-            onValueChange = { messageContent.message = it },
-            label = { Text(stringResource(R.string.message), style = MaterialTheme.typography.bodyMedium) },
+            value = messageContent.message.value,
+            onValueChange = { messageContent.message.value = it },
+            label = { Text(
+                stringResource(R.string.message),
+                style = MaterialTheme.typography.bodyMedium) },
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
@@ -205,11 +208,7 @@ fun MessageComposePreview() {
     AppTheme(darkTheme = false) {
 
         val messageContent by remember{ mutableStateOf(
-            MessageContent(
-                from = "",
-                to = "",
-                message = "",
-            ))
+            MessageContent( ))
         }
         MessageComposeView(
             messageContent = messageContent,

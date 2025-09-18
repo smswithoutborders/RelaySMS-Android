@@ -68,9 +68,9 @@ fun TextComposeView(
             .padding(16.dp)
     ) {
         OutlinedTextField(
-            value = textContent.text,
+            value = textContent.text.value,
             enabled = serviceType != Platforms.ServiceTypes.TEST,
-            onValueChange = { textContent.text = it },
+            onValueChange = { textContent.text.value = it },
             label = {
                 Text(stringResource(R.string.what_s_happening),
                     style = MaterialTheme.typography.bodyMedium)
@@ -102,7 +102,7 @@ data class ReliabilityTestResponsePayload(
 fun TextComposePreview() {
     AppTheme(darkTheme = false) {
         TextComposeView(
-            textContent = PlatformsViewModel.TextComposeHandler.TextContent(""),
+            textContent = PlatformsViewModel.TextComposeHandler.TextContent(),
             serviceType = Platforms.ServiceTypes.TEXT
         )
     }

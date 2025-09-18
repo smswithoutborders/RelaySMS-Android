@@ -62,7 +62,7 @@ data class Account(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectAccountModal(
-    _accounts: List<StoredPlatformsEntity> = emptyList<StoredPlatformsEntity>(),
+    _accounts: List<StoredPlatformsEntity> = emptyList(),
     name: String,
     onAccountSelected: (StoredPlatformsEntity) -> Unit = {},
     onDismissRequest: () -> Unit

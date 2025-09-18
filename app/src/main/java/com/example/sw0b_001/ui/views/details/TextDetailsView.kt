@@ -72,8 +72,8 @@ fun TextDetailsView(
             val decomposedMessage = PlatformsViewModel.TextComposeHandler
                 .decomposeMessage(contentBytes)
 
-            from = decomposedMessage.from!!
-            text = decomposedMessage.text
+            from = decomposedMessage.from.value!!
+            text = decomposedMessage.text.value
             date = message.date
         } catch (e: Exception) {
             Log.e("TextDetailsView", "Failed to decompose V1 text content: ${e.message}")

@@ -117,9 +117,9 @@ class PlatformsViewModel : ViewModel() {
             withContext(Dispatchers.IO) {
                 try {
                     val contentFormatV2Bytes = createMessageByteBuffer(
-                        from = messageContent.from!!,
-                        to = messageContent.to,
-                        message = messageContent.message,
+                        from = messageContent.from.value!!,
+                        to = messageContent.to.value,
+                        message = messageContent.message.value!!,
                     )
 
                     val languageCode = Locale.getDefault().language.take(2).lowercase()
@@ -626,13 +626,12 @@ class PlatformsViewModel : ViewModel() {
                 EmailContent()
             }
         }
-
     }
 
     object TextComposeHandler {
         data class TextContent(
-            val from: String?,
-            var text: String = ""
+            val from: MutableState<String?> = mutableStateOf(null),
+            val text: MutableState<String> = mutableStateOf(""),
         )
 
         fun decomposeMessage(contentBytes: ByteArray): TextContent {
@@ -662,19 +661,21 @@ class PlatformsViewModel : ViewModel() {
                 if (accessLen > 0) buffer.position(buffer.position() + accessLen)
                 if (refreshLen > 0) buffer.position(buffer.position() + refreshLen)
 
-                TextContent(from = from, text = text)
+                TextContent(
+                    from = mutableStateOf(from),
+                    text = mutableStateOf(text)
+                )
             } catch (e: Exception) {
-                Log.e("TextComposeHandler", "Failed to decompose V2 binary text message", e)
-                TextContent("Unknown", "Error: Could not parse message content.")
+                TextContent()
             }
         }
     }
 
     object MessageComposeHandler {
         data class MessageContent(
-            val from: String?,
-            var to: String = "",
-            var message: String = ""
+            val from: MutableState<String?> = mutableStateOf(null),
+            val to: MutableState<String> = mutableStateOf(""),
+            val message: MutableState<String> = mutableStateOf(""),
         )
 
         fun decomposeMessage(contentBytes: ByteArray): MessageContent {
@@ -702,10 +703,14 @@ class PlatformsViewModel : ViewModel() {
                 if (accessLen > 0) buffer.position(buffer.position() + accessLen)
                 if (refreshLen > 0) buffer.position(buffer.position() + refreshLen)
 
-                MessageContent(from = from, to = to, message = message)
+                MessageContent(
+                    from = mutableStateOf(from),
+                    to = mutableStateOf(to),
+                    message = mutableStateOf(message)
+                )
             } catch (e: Exception) {
-                Log.e("MessageComposeHandler", "Failed to decompose V2 binary message content", e)
-                MessageContent("Unknown", "Unknown", "Error: Could not parse message content.")
+                e.printStackTrace()
+                MessageContent()
             }
         }
     }
