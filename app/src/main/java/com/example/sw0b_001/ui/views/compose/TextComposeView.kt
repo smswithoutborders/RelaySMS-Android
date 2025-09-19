@@ -69,7 +69,6 @@ fun TextComposeView(
     ) {
         OutlinedTextField(
             value = textContent.text.value,
-            enabled = serviceType != Platforms.ServiceTypes.TEST,
             onValueChange = { textContent.text.value = it },
             label = {
                 Text(stringResource(R.string.what_s_happening),
@@ -78,10 +77,10 @@ fun TextComposeView(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-//                    imeAction = ImeAction.Done
-            )
+//            keyboardOptions = KeyboardOptions(
+//                keyboardType = KeyboardType.Text,
+////                    imeAction = ImeAction.Done
+//            )
         )
     }
 }

@@ -225,7 +225,6 @@ object ComposeHandlers {
         smsTransmission: Boolean = true,
         onSuccessRunnable: () -> Unit? = {}
     ): ByteArray {
-
         val states = Datastore.getDatastore(context).ratchetStatesDAO().fetch()
         if (states.size > 1) {
             throw IllegalStateException(context.getString(R.string.multiple_ratchet_states_found_in_database_expected_at_most_one))

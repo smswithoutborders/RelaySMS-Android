@@ -96,8 +96,8 @@ fun TextDetailsView(
                         CoroutineScope(Dispatchers.Main).launch {
                             navController.navigate(
                                 ComposeScreen(
-                                    type = Platforms.ServiceTypes.MESSAGE,
-                                    messageNav = Json.encodeToString(
+                                    type = Platforms.ServiceTypes.TEXT,
+                                    textNav = Json.encodeToString(
                                         TextComposeNav(
                                             platformName = platform!!.name,
                                             subscriptionId = -1L,

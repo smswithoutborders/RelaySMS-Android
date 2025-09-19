@@ -161,37 +161,41 @@ fun ComposerInterface(
         } else PlatformsViewModel.EmailComposeHandler.EmailContent()
     }
 
-    val decomposedMessageMessage: MessageContent? = if (messageNav?.encryptedContent != null) {
-        try {
-            val contentBytes = Base64.decode(messageNav.encryptedContent,
-                Base64.DEFAULT)
-            PlatformsViewModel.MessageComposeHandler.decomposeMessage(contentBytes)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
+    val decomposedMessageMessage = remember(messageNav) {
+        if (messageNav?.encryptedContent != null) {
+            try {
+                val contentBytes = Base64.decode(messageNav.encryptedContent,
+                    Base64.DEFAULT)
+                PlatformsViewModel.MessageComposeHandler.decomposeMessage(contentBytes)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
         }
+        else MessageContent(from = from)
     }
-    else MessageContent(from = from)
 
-    val decomposedTextMessage = if (textNav?.encryptedContent != null) {
-        try {
-            val contentBytes = Base64.decode(textNav.encryptedContent, Base64.DEFAULT)
-            PlatformsViewModel.TextComposeHandler.decomposeMessage(contentBytes)
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
+    val decomposedTextMessage = remember(textNav) {
+        if (textNav?.encryptedContent != null) {
+            try {
+                val contentBytes = Base64.decode(textNav.encryptedContent, Base64.DEFAULT)
+                PlatformsViewModel.TextComposeHandler.decomposeMessage(contentBytes)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
         }
+        else PlatformsViewModel.TextComposeHandler.TextContent(from)
     }
-    else PlatformsViewModel.TextComposeHandler.TextContent(from)
 
     val isSendingEnabled by remember(
         type,
         isSending,
         decomposedEmailMessage?.to?.value,
         decomposedEmailMessage?.body?.value,
-        decomposedTextMessage?.text,
-        decomposedMessageMessage?.to,
-        decomposedMessageMessage?.message
+        decomposedTextMessage?.text?.value,
+        decomposedMessageMessage?.to?.value,
+        decomposedMessageMessage?.message?.value
     ) {
         mutableStateOf(
             when (type) {

@@ -119,8 +119,8 @@ fun MessageComposeView(
             .padding(16.dp)
     ) {
         OutlinedTextField(
-            value = from ?: "",
-            onValueChange = { },
+            value = messageContent.from.value ?: "",
+            onValueChange = { messageContent.from.value = it },
             label = { Text(stringResource(R.string.sender)) },
             enabled = false,
             modifier = Modifier.fillMaxWidth(),

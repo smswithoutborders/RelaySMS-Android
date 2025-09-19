@@ -107,7 +107,6 @@ class MessageComposer(
         platformShortcodeByte: Byte,
         languageCodeString: String
     ): String {
-        Log.d("MessageComposer", "state platforms V2: $state")
         val (drHeader, drEncryptedBody) = Ratchets.ratchetEncrypt(state, contentFormatV2Bytes, AD)
 
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)

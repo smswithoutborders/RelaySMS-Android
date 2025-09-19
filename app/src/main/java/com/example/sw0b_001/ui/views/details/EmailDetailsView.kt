@@ -130,7 +130,7 @@ fun EmailDetailsView(
                         navController.navigate(
                             ComposeScreen(
                                 type = if(platform != null)
-                                    Platforms.ServiceTypes.valueOf(platform.service_type!!)
+                                    Platforms.ServiceTypes.EMAIL
                                 else Platforms.ServiceTypes.BRIDGE,
                                 emailNav = Json.encodeToString<EmailComposeNav>(
                                     EmailComposeNav(

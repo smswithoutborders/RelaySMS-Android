@@ -168,7 +168,7 @@ class PlatformsViewModel : ViewModel() {
         val bodyBytes = message.toByteArray(StandardCharsets.UTF_8)
 
         val buffer = ByteBuffer.allocate(14 +
-                fromBytes.size + toBytes.size + bodyBytes.size)
+                fromBytes.size + toBytes.size + bodyBytes.size).order(ByteOrder.LITTLE_ENDIAN)
 
         // Write field lengths according to specification
         buffer.put(fromBytes.size.toByte())
