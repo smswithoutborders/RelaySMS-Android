@@ -338,5 +338,7 @@ dependencies {
     implementation "androidx.room:room-paging:$room_version"
     implementation 'androidx.browser:browser:1.9.0'
 
+    implementation("io.coil-kt.coil3:coil-compose:3.3.0")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.3.0")
 }
 

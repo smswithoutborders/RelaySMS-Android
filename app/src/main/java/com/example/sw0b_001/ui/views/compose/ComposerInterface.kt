@@ -9,19 +9,27 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AddToPhotos
 import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.DeveloperMode
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,13 +45,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getUriForDrawable
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.components.mmsImagePicker
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
@@ -127,6 +142,7 @@ fun ComposerInterface(
 
     val context = LocalContext.current
 
+
     val decomposedEmailMessage = remember(emailNav){
         if(emailNav?.encryptedContent != null) {
             if (emailNav.isBridge) {
@@ -201,10 +217,20 @@ fun ComposerInterface(
         )
     }
 
+    val inPreviewMode = LocalInspectionMode.current
+    var imageUri: Uri? by remember{ mutableStateOf(
+        if(inPreviewMode) {
+            context
+                .getUriForDrawable(com.afkanerd.lib_smsmms_android
+                    .R.drawable.github_mark)!!
+        }
+        else null
+    ) }
+
     val imagePicker = mmsImagePicker { uri ->
         val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
         context.contentResolver.takePersistableUriPermission(uri, flag)
-        TODO("Implement some picture functinality here")
+        imageUri = uri
     }
 
     val platformsViewModel = remember{ PlatformsViewModel() }
@@ -364,13 +390,53 @@ fun ComposerInterface(
                 }
             }
 
+            imageUri?.let { absoluteImageUri ->
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(Modifier.weight(1f))
+                    Box {
+                        Card(
+                            onClick = {},
+                            elevation = CardDefaults.cardElevation(8.dp)
+                        ) {
+                            AsyncImage(
+                                model = ImageRequest.Builder(context)
+                                    .data(imageUri)
+                                    .build(),
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .size(250.dp)
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .size(28.dp)
+                                .align(Alignment.BottomEnd)
+                        ) {
+                            IconButton(
+                                onClick = { imageUri = null }
+                            ) {
+                                Icon(Icons.Filled.Cancel, "Cancel")
+                            }
+                        }
+                    }
+                    Spacer(Modifier.padding(8.dp))
+                }
+            }
+
             if(showChooseGatewayClient) {
                 ComposeChooseGatewayClientsModal(showChooseGatewayClient) {
                     send()
                 }
             }
 
-            if (showSelectAccountModal) {
+            if (showSelectAccountModal && !LocalInspectionMode.current) {
                 SelectAccountModal(
                     onDismissRequest = {
                         if (selectedAccount == null) {

@@ -5,6 +5,7 @@ import android.util.Base64
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -342,7 +343,6 @@ fun EmailComposeView(
                     innerTextField()
                 }
             )
-
         }
     }
 
