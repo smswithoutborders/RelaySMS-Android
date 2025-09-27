@@ -1,9 +1,14 @@
 package com.example.sw0b_001.ui.views.compose
 
+import android.content.Intent
+import android.net.Uri
 import android.util.Base64
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +18,8 @@ import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.AddToPhotos
+import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.DeveloperMode
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
@@ -36,7 +43,9 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
+import com.afkanerd.smswithoutborders_libsmsmms.ui.components.mmsImagePicker
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.R
@@ -61,6 +70,22 @@ import java.util.Date
 import java.util.Locale
 import kotlin.text.isNotEmpty
 
+
+@Composable
+fun mmsImagePicker(
+    callback: (Uri) -> Unit
+): ManagedActivityResultLauncher<Array<String>, Uri?> {
+    // Registers a photo picker activity launcher in single-select mode.
+    return rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        // Callback is invoked after the user selects a media item or closes the
+        // photo picker.
+        if (uri != null) {
+            callback(uri)
+        } else {
+            Log.d("PhotoPicker", "No media selected")
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -176,6 +201,12 @@ fun ComposerInterface(
         )
     }
 
+    val imagePicker = mmsImagePicker { uri ->
+        val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        context.contentResolver.takePersistableUriPermission(uri, flag)
+        TODO("Implement some picture functinality here")
+    }
+
     val platformsViewModel = remember{ PlatformsViewModel() }
 
     fun send() {
@@ -277,6 +308,14 @@ fun ComposerInterface(
                 },
                 actions = {
                     IconButton(
+                        onClick = { imagePicker.launch(arrayOf("*/*")) }
+                    ) {
+                        Icon(Icons.Default.AttachFile,
+                            stringResource(R.string.add_photos)
+                        )
+                    }
+
+                    IconButton(
                         enabled = isSendingEnabled,
                         onClick = {
                             isSending = true
@@ -350,6 +389,20 @@ fun ComposerInterface(
                 )
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ComposerInterfacePreview() {
+    AppTheme {
+        ComposerInterface(
+            rememberNavController(),
+            Platforms.ServiceTypes.EMAIL,
+            EmailComposeNav(
+                platformName = "gmail",
+            )
+        )
     }
 }
 
