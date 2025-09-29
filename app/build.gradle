@@ -170,6 +170,7 @@ configurations {
 
 dependencies {
     implementation project(':lib_smsmms_android:lib_smsmms_android')
+    implementation project(':lib_image_android:app')
 //    implementation 'com.github.smswithoutborders:lib_smsmms_android:63241a9'
 
     implementation libs.androidx.appcompat

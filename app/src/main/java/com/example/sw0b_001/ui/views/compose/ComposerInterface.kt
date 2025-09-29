@@ -338,7 +338,9 @@ fun ComposerInterface(
                 },
                 actions = {
                     IconButton(
-                        onClick = { imagePicker.launch(arrayOf("*/*")) }
+                        onClick = { imagePicker
+                            .launch(arrayOf("image/png", "image/jpg", "image/jpeg"))
+                        }
                     ) {
                         Icon(Icons.Default.AttachFile,
                             stringResource(R.string.add_photos)
