@@ -169,7 +169,8 @@ configurations {
 
 
 dependencies {
-//    implementation project(':lib_smsmms_android:lib_smsmms_android')
+    implementation project(':lib_smsmms_android:lib_smsmms_android')
+//    implementation 'com.github.smswithoutborders:lib_smsmms_android:63241a9'
 
     implementation libs.androidx.appcompat
     implementation libs.material
@@ -308,8 +309,6 @@ dependencies {
     implementation libs.accompanist.permissions
 
     implementation(libs.androidx.leanback)
-
-    implementation 'com.github.smswithoutborders:lib_smsmms_android:63241a9'
 
     def paging_version = "3.3.6"
 

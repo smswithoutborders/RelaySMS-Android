@@ -7,29 +7,37 @@ import kotlin.math.ceil
 
 @Serializable
 data class ImageTransmissionProtocol(
-    val sessionId: Short,
-    val segNumber: Byte,
-    val numberSegments: Byte? = null,
+    val sessionId: Byte,
+    val segNumber: Int, // nibble
+    val numberSegments: Int, // nibble
     val imageLength: Short,
-    val image: ByteArray
+    val textLength: Short,
+    val image: ByteArray,
+    val text: ByteArray
 ) {
 
     private fun serialize(): ByteArray {
-        val buffer = ByteBuffer.allocate(2 + 1 + 1 + 2 + imageLength)
-        buffer.putShort(sessionId)
-        buffer.put(segNumber)
-        numberSegments?.let {
-            buffer.put(it)
-        }
+        val buffer = ByteBuffer.allocate(1 + 2 + 1 + 1 + 2 + imageLength + textLength)
+        val hi = (segNumber and 0x0F) shl 4
+        val low = (numberSegments and 0x0F)
+        buffer.put(sessionId)
+        buffer.put((hi or low).toByte())
         buffer.putShort(imageLength)
+        buffer.putShort(textLength)
         buffer.put(image)
+        buffer.put(text)
 
         return buffer.array()
     }
 
+    @Throws
     fun compose(): List<ByteArray> {
         val composedPayload = mutableListOf<ByteArray>()
         val dividedSegments = divideImagePayload()
+        if(dividedSegments.size > (256/2)) {
+            throw Exception("Payload too large: ${dividedSegments.size}")
+        }
+
         dividedSegments.forEach {
             composedPayload.add(serialize() + it)
         }
