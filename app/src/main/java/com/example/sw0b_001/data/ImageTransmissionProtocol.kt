@@ -13,7 +13,7 @@ data class ImageTransmissionProtocol(
     val imageLength: Short,
     val textLength: Short,
     val image: ByteArray,
-    val text: ByteArray
+    val text: ByteArray // follows std platform formatting
 ) {
 
     private fun serialize(): ByteArray {
@@ -31,7 +31,7 @@ data class ImageTransmissionProtocol(
     }
 
     @Throws
-    fun compose(): List<ByteArray> {
+    fun compose(isBridge: Boolean): List<ByteArray> {
         val composedPayload = mutableListOf<ByteArray>()
         val dividedSegments = divideImagePayload()
         if(dividedSegments.size > (256/2)) {
@@ -44,24 +44,4 @@ data class ImageTransmissionProtocol(
         return composedPayload
     }
 
-    private fun divideImagePayload(): MutableList<ByteArray> {
-        val standardSegmentSize = 150f
-        val firstSegmentSize = 7
-        val secondarySegmentSize = 5
-        val dividedImage = mutableListOf<ByteArray>()
-        val numSegments = ceil(image.size / standardSegmentSize) +
-                (firstSegmentSize + secondarySegmentSize)
-
-        for(i in 0..numSegments.toInt()) {
-            val segment = if(i == 0) {
-                // 7 bytes = header size
-                image.take(standardSegmentSize.toInt() - firstSegmentSize)
-            } else {
-                // 5 bytes = header size
-                image.take(standardSegmentSize.toInt() - secondarySegmentSize)
-            }
-            dividedImage.add(segment.toByteArray())
-        }
-        return dividedImage
-    }
 }

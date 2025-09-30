@@ -82,6 +82,9 @@ import androidx.navigation.NavController
 import androidx.navigation.toRoute
 import androidx.window.layout.WindowInfoTracker
 import androidx.window.layout.WindowLayoutInfo
+import com.afkanerd.lib_image_android.ui.components.ImageRender
+import com.afkanerd.lib_image_android.ui.navigation.ImageRenderNav
+import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.NEW_NOTIFICATION_ACTION
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDatabase
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
@@ -127,6 +130,7 @@ class MainActivity : AppCompatActivity() {
     val platformsViewModel: PlatformsViewModel by viewModels()
     val messagesViewModel: MessagesViewModel by viewModels()
     val gatewayClientViewModel: GatewayClientViewModel by viewModels()
+    val imageViewModel: ImageViewModel by viewModels()
 
     var showMissingTokenDialog by mutableStateOf(false)
 
@@ -370,6 +374,7 @@ class MainActivity : AppCompatActivity() {
                 ComposerInterface(
                     navController = navController,
                     type = composeScreenNav.type,
+                    imageViewModel = imageViewModel,
                     emailNav = if(!composeScreenNav.emailNav.isNullOrEmpty())
                         Json.decodeFromString<EmailComposeNav>(composeScreenNav.emailNav)
                     else null,
@@ -412,6 +417,15 @@ class MainActivity : AppCompatActivity() {
                 PasteEncryptedTextView(
                     platformsViewModel = platformsViewModel,
                     navController = navController,
+                )
+            }
+
+            composable<ImageRenderNav>{ backStackEntry ->
+                val imageRenderNav: ImageRenderNav = backStackEntry.toRoute()
+                ImageRender(
+                    navController = navController,
+                    imageViewModel = imageViewModel,
+                    initialize = imageRenderNav.initialize
                 )
             }
         }

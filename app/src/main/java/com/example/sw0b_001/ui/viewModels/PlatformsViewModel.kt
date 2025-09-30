@@ -365,7 +365,6 @@ class PlatformsViewModel : ViewModel() {
         return buffer.array()
     }
 
-
     fun sendPublishingForTest(
         context: Context,
         startTime: String,
@@ -442,7 +441,6 @@ class PlatformsViewModel : ViewModel() {
         buffer.flip()
         return buffer
     }
-
 
     fun sendPublishingForPost(
         context: Context,
@@ -715,7 +713,6 @@ class PlatformsViewModel : ViewModel() {
         }
     }
 
-
     companion object {
         fun verifyPhoneNumberFormat(phoneNumber: String): Boolean {
             val newPhoneNumber = phoneNumber
@@ -830,5 +827,6 @@ class PlatformsViewModel : ViewModel() {
                 .build()
         }
     }
+
 
 }

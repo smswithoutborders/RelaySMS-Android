@@ -1,7 +1,12 @@
 package com.example.sw0b_001.ui.views.compose
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.ImageDecoder
 import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import android.util.Base64
 import android.util.Log
 import android.widget.Toast
@@ -9,6 +14,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -49,6 +55,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
@@ -58,6 +65,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
+import com.afkanerd.lib_image_android.ui.navigation.ImageRenderNav
+import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getUriForDrawable
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.components.mmsImagePicker
@@ -85,28 +94,12 @@ import java.util.Date
 import java.util.Locale
 import kotlin.text.isNotEmpty
 
-
-@Composable
-fun mmsImagePicker(
-    callback: (Uri) -> Unit
-): ManagedActivityResultLauncher<Array<String>, Uri?> {
-    // Registers a photo picker activity launcher in single-select mode.
-    return rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        // Callback is invoked after the user selects a media item or closes the
-        // photo picker.
-        if (uri != null) {
-            callback(uri)
-        } else {
-            Log.d("PhotoPicker", "No media selected")
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ComposerInterface(
     navController: NavController,
     type: Platforms.ServiceTypes,
+    imageViewModel: ImageViewModel,
     emailNav: EmailComposeNav? = null,
     textNav: TextComposeNav? = null,
     messageNav: MessageComposeNav? = null,
@@ -222,89 +215,98 @@ fun ComposerInterface(
     }
 
     val inPreviewMode = LocalInspectionMode.current
-    var imageUri: Uri? by remember{ mutableStateOf(
+    var imageBitmap: Bitmap? by remember{ mutableStateOf(
         if(inPreviewMode) {
-            context
-                .getUriForDrawable(com.afkanerd.lib_smsmms_android
-                    .R.drawable.github_mark)!!
+            BitmapFactory.decodeResource(context.resources,
+                com.afkanerd.lib_image_android.R.drawable._0241226_124819)
         }
-        else null
+        else imageViewModel.processedImage.value?.image ?: imageViewModel.originalBitmap
     ) }
 
     val imagePicker = mmsImagePicker { uri ->
         val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
         context.contentResolver.takePersistableUriPermission(uri, flag)
-        imageUri = uri
+        imageViewModel.originalBitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            ImageDecoder.decodeBitmap(ImageDecoder
+                .createSource(context.contentResolver, uri))
+        } else {
+            MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+        }
+        navController.navigate(ImageRenderNav(true))
     }
 
     val platformsViewModel = remember{ PlatformsViewModel() }
 
     fun send() {
-        when(type) {
-            Platforms.ServiceTypes.EMAIL,
-            Platforms.ServiceTypes.BRIDGE,
-            Platforms.ServiceTypes.BRIDGE_INCOMING -> {
-                platformsViewModel.sendPublishingForEmail(
-                    context = context,
-                    emailContent = decomposedEmailMessage!!,
-                    account = selectedAccount,
-                    isBridge = isBridge,
-                    subscriptionId = emailNav?.subscriptionId ?: -1L,
-                    onFailureCallback = { isSending = false },
-                ){
-                    isSending = false
-                    CoroutineScope(Dispatchers.Main).launch {
-                        onSendCallback?.invoke(true)
-                        navController.popBackStack()
-                    }
-                }
-            }
-            Platforms.ServiceTypes.TEXT -> {
-                platformsViewModel.sendPublishingForPost(
-                    context = context,
-                    text = decomposedTextMessage?.text?.value ?: "",
-                    account = selectedAccount!!,
-                    onFailure = { errorMsg ->
-                        isSending = false
-                        CoroutineScope(Dispatchers.Main).launch {
-                            Toast.makeText(context, errorMsg ?:
-                            context.getString(R.string.unknown_error),
-                                Toast.LENGTH_LONG).show()
-                        }
-                    },
-                    onSuccess = {
+        if(imageBitmap != null) {
+            TODO("Break down the messages and send")
+        }
+        else {
+            when(type) {
+                Platforms.ServiceTypes.EMAIL,
+                Platforms.ServiceTypes.BRIDGE,
+                Platforms.ServiceTypes.BRIDGE_INCOMING -> {
+                    platformsViewModel.sendPublishingForEmail(
+                        context = context,
+                        emailContent = decomposedEmailMessage!!,
+                        account = selectedAccount,
+                        isBridge = isBridge,
+                        subscriptionId = emailNav?.subscriptionId ?: -1L,
+                        onFailureCallback = { isSending = false },
+                    ){
                         isSending = false
                         CoroutineScope(Dispatchers.Main).launch {
                             onSendCallback?.invoke(true)
                             navController.popBackStack()
                         }
-                    },
-                    subscriptionId = textNav?.subscriptionId ?: -1L
-                )
-            }
-            Platforms.ServiceTypes.MESSAGE -> {
-                platformsViewModel.sendPublishingForMessaging(
-                    context = context,
-                    messageContent = decomposedMessageMessage!!,
-                    account = selectedAccount!!,
-                    subscriptionId = messageNav?.subscriptionId ?: -1L,
-                    onFailure = { errorMsg ->
-                        CoroutineScope(Dispatchers.Main).launch {
-                            Toast.makeText(
-                                context,
-                                errorMsg ?: context.getString(R.string.send_failed),
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                    },
-                ) {
-                    CoroutineScope(Dispatchers.Main).launch {
-                        onSendCallback?.invoke(true)
-                        navController.popBackStack()
                     }
                 }
-            }
-            Platforms.ServiceTypes.TEST -> {
+                Platforms.ServiceTypes.TEXT -> {
+                    platformsViewModel.sendPublishingForPost(
+                        context = context,
+                        text = decomposedTextMessage?.text?.value ?: "",
+                        account = selectedAccount!!,
+                        onFailure = { errorMsg ->
+                            isSending = false
+                            CoroutineScope(Dispatchers.Main).launch {
+                                Toast.makeText(context, errorMsg ?:
+                                context.getString(R.string.unknown_error),
+                                    Toast.LENGTH_LONG).show()
+                            }
+                        },
+                        onSuccess = {
+                            isSending = false
+                            CoroutineScope(Dispatchers.Main).launch {
+                                onSendCallback?.invoke(true)
+                                navController.popBackStack()
+                            }
+                        },
+                        subscriptionId = textNav?.subscriptionId ?: -1L
+                    )
+                }
+                Platforms.ServiceTypes.MESSAGE -> {
+                    platformsViewModel.sendPublishingForMessaging(
+                        context = context,
+                        messageContent = decomposedMessageMessage!!,
+                        account = selectedAccount!!,
+                        subscriptionId = messageNav?.subscriptionId ?: -1L,
+                        onFailure = { errorMsg ->
+                            CoroutineScope(Dispatchers.Main).launch {
+                                Toast.makeText(
+                                    context,
+                                    errorMsg ?: context.getString(R.string.send_failed),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        },
+                    ) {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            onSendCallback?.invoke(true)
+                            navController.popBackStack()
+                        }
+                    }
+                }
+                Platforms.ServiceTypes.TEST -> {}
             }
         }
     }
@@ -396,7 +398,7 @@ fun ComposerInterface(
                 }
             }
 
-            imageUri?.let { absoluteImageUri ->
+            imageBitmap?.let {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.Center,
@@ -405,14 +407,14 @@ fun ComposerInterface(
                     Spacer(Modifier.weight(1f))
                     Box {
                         Card(
-                            onClick = {},
+                            onClick = {
+                                navController.navigate(ImageRenderNav(false))
+                            },
                             elevation = CardDefaults.cardElevation(8.dp)
                         ) {
-                            AsyncImage(
-                                model = ImageRequest.Builder(context)
-                                    .data(imageUri)
-                                    .build(),
-                                contentDescription = "",
+                            Image(
+                                bitmap = imageBitmap!!.asImageBitmap(),
+                                "",
                                 modifier = Modifier
                                     .padding(16.dp)
                                     .size(250.dp)
@@ -422,11 +424,11 @@ fun ComposerInterface(
                         Box(
                             modifier = Modifier
                                 .padding(8.dp)
-                                .size(28.dp)
+                                .size(35.dp)
                                 .align(Alignment.BottomEnd)
                         ) {
                             IconButton(
-                                onClick = { imageUri = null }
+                                onClick = { imageBitmap = null }
                             ) {
                                 Icon(Icons.Filled.Cancel, "Cancel")
                             }
@@ -471,6 +473,7 @@ fun ComposerInterfacePreview() {
         ComposerInterface(
             rememberNavController(),
             Platforms.ServiceTypes.EMAIL,
+            remember{ ImageViewModel() },
             EmailComposeNav(
                 platformName = "gmail",
             )
