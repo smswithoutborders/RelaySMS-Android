@@ -14,6 +14,8 @@ import com.afkanerd.smswithoutborders_libsmsmms.receivers.SmsTextReceivedReceive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.takeWhile
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import kotlin.math.ceil
 
 class SmsWorkManager(
@@ -26,10 +28,22 @@ class SmsWorkManager(
     val workValue = MutableStateFlow<Result?>(null)
 
     override suspend fun doWork(): Result {
-        val messagePayload = inputData.getString(SMS_WORK_MANAGER_PAYLOAD)
+        val formattedPayload = inputData.getByteArray(FORMATTED_SMS_PAYLOAD)
+            ?: return Result.failure()
 
-        // TODO: send the sms payload
-        // TODO: wait for the incoming broadcast to inform if the message has been sent or failed
+        val itp = inputData.getString(ITP_PAYLOAD).let {
+            if(it == null) return Result.failure()
+            Json.decodeFromString<ImageTransmissionProtocol>(it)
+        }
+
+        val dividedPayload = try {
+            divideImagePayload(
+                formattedPayload,
+                itp
+            )
+        } catch(e: Exception) {
+            e.printStackTrace()
+        }
 
         handleBroadcast()
 
@@ -59,8 +73,52 @@ class SmsWorkManager(
         )
     }
 
+    private val segmentSize: Int = 3
+
+    @Throws
+    private fun divideImagePayload(
+        payload: ByteArray,
+        imageTransmissionProtocol: ImageTransmissionProtocol,
+    ): MutableList<ByteArray> {
+        var encodedPayload = payload
+        val standardSegmentSize = 150 * segmentSize
+        val dividedImage = mutableListOf<ByteArray>()
+
+        var segmentNumber = 0
+        do {
+            var metaData = byteArrayOf(
+                imageTransmissionProtocol.version,
+                imageTransmissionProtocol.sessionId,
+                imageTransmissionProtocol.getSegNumberNumberSegment(segmentNumber),
+            )
+            if(segmentNumber == 0) {
+                metaData +=
+                    imageTransmissionProtocol.imageLength.toByteArray() +
+                            imageTransmissionProtocol.textLength.toByteArray()
+            }
+
+            val size = (standardSegmentSize - metaData.size)
+                .coerceAtMost(encodedPayload.size)
+            val buffer = metaData +  encodedPayload.take(size).toByteArray()
+            if(buffer.size > standardSegmentSize) {
+                throw Exception("Buffer size > $standardSegmentSize")
+            }
+            encodedPayload = encodedPayload.drop(buffer.size).toByteArray()
+
+            segmentNumber += 1
+            if(segmentNumber >= 256 / 2) {
+                throw Exception("Segment number > ${256 /2 }")
+            }
+
+            dividedImage.add(buffer)
+        } while(encodedPayload.isNotEmpty())
+
+        return dividedImage
+    }
+
     companion object {
-        const val SMS_WORK_MANAGER_PAYLOAD = "SMS_WORK_MANAGER_PAYLOAD"
+        const val ITP_PAYLOAD = "ITP_PAYLOAD"
+        const val FORMATTED_SMS_PAYLOAD = "FORMATTED_SMS_PAYLOAD"
     }
 
 }

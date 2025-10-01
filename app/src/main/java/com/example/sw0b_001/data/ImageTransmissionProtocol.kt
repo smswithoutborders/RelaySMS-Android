@@ -22,6 +22,12 @@ data class ImageTransmissionProtocol(
     val image: ByteArray,
     val text: ByteArray // follows std platform formatting
 ) {
+    fun getSegNumberNumberSegment(segmentNumber: Int): Byte {
+        val hi = (segmentNumber and 0x0F) shl 4
+        val low = (numberSegments and 0x0F)
+        return (hi or low).toByte()
+    }
+
     @Throws
     fun compose(
         context: Context,
@@ -31,8 +37,8 @@ data class ImageTransmissionProtocol(
         account: StoredPlatformsEntity? = null,
         languageCode: String? = null,
         subscriptionId: Long = -1,
-    ): List<ByteArray> {
-        val payload : ByteArray = if(isBridge) {
+    ): ByteArray {
+        return if(isBridge) {
             val content = Bridges.encryptContent(
                 context,
                 image + text,
@@ -58,45 +64,6 @@ data class ImageTransmissionProtocol(
             )
             Base64.encode(content, Base64.DEFAULT)
         }
-
-        val dividedPayload = divideImagePayload(payload = payload)
-    }
-
-    private val segmentSize: Int = 3
-
-    private fun divideImagePayload(payload: ByteArray): MutableList<ByteArray> {
-        var encodedPayload = payload
-        val standardSegmentSize = 150 * segmentSize
-        val dividedImage = mutableListOf<ByteArray>()
-
-        var segmentNumber = 0
-        val low = (numberSegments and 0x0F)
-        do {
-            val hi = (segmentNumber and 0x0F) shl 4
-            val segNumberNumberSegments = (hi or low).toByte()
-
-            var metaData = byteArrayOf(
-                version,
-                sessionId,
-                segNumberNumberSegments,
-            )
-            if(segmentNumber == 0) {
-                metaData += imageLength.toByteArray() + textLength.toByteArray()
-            }
-
-            val size = (standardSegmentSize - metaData.size)
-                .coerceAtMost(encodedPayload.size)
-            val buffer = metaData +  encodedPayload.take(size).toByteArray()
-            if(buffer.size > standardSegmentSize) {
-                throw Exception("Buffer size > $standardSegmentSize")
-            }
-            encodedPayload = encodedPayload.drop(buffer.size).toByteArray()
-
-            segmentNumber += 1
-            dividedImage.add(buffer)
-        } while(encodedPayload.isNotEmpty())
-
-        return dividedImage
     }
 }
 
