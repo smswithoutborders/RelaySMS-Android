@@ -274,17 +274,6 @@ class PlatformsViewModel : ViewModel() {
                             )
                         }
 
-                        createEmailByteBuffer(
-                            from = account.account,
-                            to = emailContent.to.value,
-                            cc = emailContent.cc.value,
-                            bcc = emailContent.bcc.value,
-                            subject = emailContent.subject.value,
-                            body = emailContent.body.value,
-                            accessToken = account.accessToken,
-                            refreshToken = account.refreshToken
-                        )
-
                         val platform = Datastore.getDatastore(context).availablePlatformsDao()
                             .fetch(account.name!!)
 

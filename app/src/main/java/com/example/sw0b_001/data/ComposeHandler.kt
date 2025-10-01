@@ -19,13 +19,13 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
 object ComposeHandlers {
+    @Throws
     fun compose(
         context: Context,
-        formattedContent: String,
+        formattedContent: ByteArray,
         AD: ByteArray,
         platform: AvailablePlatforms? = null,
         account: StoredPlatformsEntity? = null,
-        isTesting: Boolean = false,
         smsTransmission: Boolean = true,
         onSuccessRunnable: (ByteArray?) -> Unit? = {}
     ) : ByteArray {
@@ -40,12 +40,9 @@ object ComposeHandlers {
             States()
         }
 
-//        val state = if(states.isNotEmpty() && (account != null || isTesting))
-//            States(String(Publishers.getEncryptedStates(context, states[0].value),
-//                Charsets.UTF_8)) else States()
         val messageComposer = MessageComposer(context, state, AD)
-        var encryptedContentBase64 = if(platform != null)
-            messageComposer.compose( platform, formattedContent)
+        val encryptedContentBase64 = if(platform != null)
+            messageComposer.encryptContent( platform, formattedContent)
         else messageComposer.composeBridge(formattedContent)
 
         try {
@@ -59,7 +56,8 @@ object ComposeHandlers {
                 Datastore.getDatastore(context).ratchetStatesDAO().insert(RatchetStates(value = encryptedStatesValue))
             }
         } catch (e: Exception) {
-            System.err.println("Failed to update Ratchet states: ${e.message}")
+            e.printStackTrace()
+            throw e
         }
 
         val gatewayClientMSISDN = GatewayClientsCommunications(context)
@@ -76,7 +74,7 @@ object ComposeHandlers {
         }
 
         val encryptedContent = EncryptedContent()
-        encryptedContent.encryptedContent = formattedContent
+        encryptedContent.encryptedContent = String(formattedContent)
         encryptedContent.date = System.currentTimeMillis()
         encryptedContent.type = platform?.service_type ?: Platforms.ServiceTypes.BRIDGE.name
         encryptedContent.platformName = platform?.name ?: Platforms.ServiceTypes.BRIDGE.name
@@ -90,85 +88,6 @@ object ComposeHandlers {
     }
 
     // New V1 compose method
-    fun composeV1(
-        context: Context,
-        contentFormatV1Bytes: ByteArray,
-        AD: ByteArray,
-        platform: AvailablePlatforms,
-        account: StoredPlatformsEntity? = null,
-        languageCode: String,
-        isTesting: Boolean = false,
-        smsTransmission: Boolean = true,
-        onSuccessRunnable: () -> Unit? = {}
-    ): ByteArray {
-
-        val states = Datastore.getDatastore(context).ratchetStatesDAO().fetch()
-        if (states.size > 1) {
-            throw IllegalStateException("Multiple Ratchet states found in database. Expected at most one.")
-        }
-
-        val state = if (states.isNotEmpty()) {
-            States(String(Publishers.getEncryptedStates(context, states[0].value)))
-        } else {
-            States()
-        }
-
-        val messageComposer = MessageComposer(context, state, AD)
-
-        val platformShortcodeByte = platform.shortcode?.firstOrNull()?.code?.toByte()
-            ?: throw IllegalArgumentException("Platform shortcode is missing or invalid for platform: ${platform.name}")
-
-        val encryptedPayloadV1Base64 = messageComposer.composeV1(
-            contentFormatV1Bytes = contentFormatV1Bytes,
-            platformShortcodeByte = platformShortcodeByte,
-            languageCodeString = languageCode
-        )
-
-        try {
-            val encryptedStatesValue = Publishers.encryptStates(context, state.serializedStates)
-            val ratchetStatesEntry = RatchetStates(id = states.firstOrNull()?.id ?: 0, value = encryptedStatesValue)
-            if (states.isNotEmpty()) {
-                Datastore.getDatastore(context).ratchetStatesDAO().update(ratchetStatesEntry)
-            } else {
-                Datastore.getDatastore(context).ratchetStatesDAO().deleteAll()
-                Datastore.getDatastore(context).ratchetStatesDAO().insert(RatchetStates(value = encryptedStatesValue))
-            }
-        } catch (e: Exception) {
-            System.err.println("Failed to update Ratchet states: ${e.message}")
-        }
-
-        if (smsTransmission) {
-            val gatewayClientMSISDN = GatewayClientsCommunications(context).getDefaultGatewayClient()
-            gatewayClientMSISDN?.let {
-                val sentIntent = SMSHandler.transferToDefaultSMSApp(
-                    context,
-                    it,
-                    encryptedPayloadV1Base64
-                ).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                }
-                context.startActivity(sentIntent)
-            } ?: run {
-                System.err.println("ComposeHandlers V1: Default Gateway Client MSISDN not found. SMS not sent.")
-            }
-        }
-
-
-        val encryptedContentEntry = EncryptedContent()
-        encryptedContentEntry.encryptedContent = Base64.encodeToString(contentFormatV1Bytes, Base64.DEFAULT)
-
-        encryptedContentEntry.date = System.currentTimeMillis()
-        encryptedContentEntry.type = platform.service_type
-        encryptedContentEntry.platformName = platform.name
-        encryptedContentEntry.fromAccount = account?.account
-
-        Datastore.getDatastore(context).encryptedContentDAO().insert(encryptedContentEntry)
-        onSuccessRunnable()
-
-        return Base64.decode(encryptedPayloadV1Base64, Base64.DEFAULT)
-    }
-
-
     fun decompose(
         context: Context,
         cipherText: ByteArray,
@@ -296,7 +215,6 @@ object ComposeHandlers {
                 }
             }
         }
-
 
         val encryptedContentEntry = EncryptedContent()
         encryptedContentEntry.encryptedContent = Base64.encodeToString(contentFormatV2Bytes, Base64.DEFAULT)

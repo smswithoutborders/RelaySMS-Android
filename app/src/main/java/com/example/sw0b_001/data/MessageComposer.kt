@@ -36,12 +36,9 @@ class MessageComposer(
     }
 
     fun composeBridge(
-        content: String,
+        content: ByteArray,
     ): String {
-        Log.d("MessageComposer", "state bridge: $state")
-        val (header, cipherMk) = Ratchets.ratchetEncrypt(state, content.encodeToByteArray(), AD)
-
-        Log.d("MessageComposer", "state bridge again: $state")
+        val (header, cipherMk) = Ratchets.ratchetEncrypt(state, content, AD)
 
         return formatTransmissionBridge(
             header,
@@ -49,11 +46,11 @@ class MessageComposer(
         )
     }
 
-    fun compose(
+    fun encryptContent(
         availablePlatforms: AvailablePlatforms,
-        content: String,
+        content: ByteArray,
     ): String {
-        val (header, cipherMk) = Ratchets.ratchetEncrypt(state, content.encodeToByteArray(), AD)
+        val (header, cipherMk) = Ratchets.ratchetEncrypt(state, content, AD)
 
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
         val usePhoneNumber = sharedPreferences.getBoolean("use_phone_number_switch", false)
@@ -64,41 +61,6 @@ class MessageComposer(
             cipherMk,
             availablePlatforms.shortcode!!.encodeToByteArray()[0],
             deviceID
-        )
-    }
-
-    // New V1 compose method
-    fun composeV1(
-        contentFormatV1Bytes: ByteArray,
-        platformShortcodeByte: Byte,
-        languageCodeString: String
-    ): String {
-        Log.d("MessageComposer", "state platforms: $state")
-
-        val (drHeader, drEncryptedBody) = Ratchets.ratchetEncrypt(state, contentFormatV1Bytes, AD)
-
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        val usePhoneNumber = sharedPreferences.getBoolean("use_phone_number_switch", false)
-        val deviceIDBytes = if (!usePhoneNumber) {
-            Vaults.fetchDeviceId(context) ?: ByteArray(0)
-        } else {
-            ByteArray(0)
-        }
-
-        val languageCodeBytes = languageCodeString.toByteArray(StandardCharsets.US_ASCII)
-        if (languageCodeBytes.size != 2) {
-            throw IllegalArgumentException(
-                "Language code '$languageCodeString' must be 2 ASCII characters to form 2 bytes."
-            )
-        }
-        Log.d("MessageComposer", "state platforms again: $state")
-
-        return formatTransmissionV1(
-            headers = drHeader,
-            encryptedDrBody = drEncryptedBody,
-            platformShortcode = platformShortcodeByte,
-            deviceID = deviceIDBytes,
-            languageCode = languageCodeBytes
         )
     }
 
@@ -163,26 +125,24 @@ class MessageComposer(
             return Base64.encodeToString(data, Base64.DEFAULT)
         }
 
-        // New V1 Payload Formatter
-        fun formatTransmissionV1(
+        fun formatTransmissionV2(
             headers: Headers,
             encryptedDrBody: ByteArray,
             platformShortcode: Byte,
             deviceID: ByteArray,
             languageCode: ByteArray
         ): String {
-
-            val versionMarker = 0x01.toByte()
-
+            val versionMarker = 0x02.toByte()
             val serializedDrHeader = headers.serialized
             val drHeaderLengthBytes = serializedDrHeader.size.toBytes()
+            val v2PayloadCiphertextBlock = drHeaderLengthBytes + serializedDrHeader + encryptedDrBody
 
-            val v1PayloadCiphertextBlock = drHeaderLengthBytes + serializedDrHeader + encryptedDrBody
-
-            if (v1PayloadCiphertextBlock.size > 65535) {
-                throw IllegalArgumentException("V1 Ciphertext block is too long (max 65535 bytes).")
+            if (v2PayloadCiphertextBlock.size > 65535) {
+                throw IllegalArgumentException("V2 Ciphertext block is too long (max 65535 bytes).")
             }
-            val v1OverallCiphertextLengthBytes = v1PayloadCiphertextBlock.size.toShort().toLittleEndianBytes()
+
+            val v2OverallCiphertextLengthBytes = v2PayloadCiphertextBlock.size
+                .toShort().toLittleEndianBytes()
 
             if (deviceID.size > 255) {
                 throw IllegalArgumentException("Device ID is too long (max 255 bytes).")
@@ -193,11 +153,11 @@ class MessageComposer(
                 throw IllegalArgumentException("Language code must be 2 bytes.")
             }
 
-            val payloadData = byteArrayOf(versionMarker) +      // 1 byte: Version Marker
-                    v1OverallCiphertextLengthBytes + // 2 bytes: Ciphertext Length (Little Endian)
+            val payloadData = byteArrayOf(versionMarker) +      // 1 byte: Version Marker (0x02)
+                    v2OverallCiphertextLengthBytes + // 2 bytes: Ciphertext Length (Little Endian)
                     deviceIdLengthByte +             // 1 byte:  Device ID Length
                     platformShortcode +              // 1 byte:  Platform shortcode
-                    v1PayloadCiphertextBlock +       // Variable: Ciphertext (with its Little Endian header length)
+                    v2PayloadCiphertextBlock +       // Variable: Ciphertext
                     deviceID +                       // Variable: Device ID
                     languageCode                     // 2 bytes: Language Code
 
@@ -205,62 +165,10 @@ class MessageComposer(
         }
 
         private fun Short.toLittleEndianBytes(): ByteArray {
-            return ByteBuffer.allocate(2).order(ByteOrder.LITTLE_ENDIAN).putShort(this).array()
+            return ByteBuffer.allocate(2)
+                .order(ByteOrder.LITTLE_ENDIAN).putShort(this).array()
         }
-
-        private fun Int.toOneByteValue(): Byte {
-            if (this < 0 || this > 255) throw IllegalArgumentException("Value '$this' is out of unsigned byte range (0-255)")
-            return this.toByte()
-        }
-
     }
-
-    fun formatTransmissionV2(
-        headers: Headers,
-        encryptedDrBody: ByteArray,
-        platformShortcode: Byte,
-        deviceID: ByteArray,
-        languageCode: ByteArray
-    ): String {
-
-        val versionMarker = 0x02.toByte()
-
-        val serializedDrHeader = headers.serialized
-
-        val drHeaderLengthBytes = serializedDrHeader.size.toBytes()
-
-        val v2PayloadCiphertextBlock = drHeaderLengthBytes + serializedDrHeader + encryptedDrBody
-
-        if (v2PayloadCiphertextBlock.size > 65535) {
-            throw IllegalArgumentException("V2 Ciphertext block is too long (max 65535 bytes).")
-        }
-        val v2OverallCiphertextLengthBytes = v2PayloadCiphertextBlock.size.toShort().toLittleEndianBytes()
-
-        if (deviceID.size > 255) {
-            throw IllegalArgumentException("Device ID is too long (max 255 bytes).")
-        }
-        val deviceIdLengthByte = deviceID.size.toByte()
-
-        if (languageCode.size != 2) {
-            throw IllegalArgumentException("Language code must be 2 bytes.")
-        }
-
-        val payloadData = byteArrayOf(versionMarker) +      // 1 byte: Version Marker (0x02)
-                v2OverallCiphertextLengthBytes + // 2 bytes: Ciphertext Length (Little Endian)
-                deviceIdLengthByte +             // 1 byte:  Device ID Length
-                platformShortcode +              // 1 byte:  Platform shortcode
-                v2PayloadCiphertextBlock +       // Variable: Ciphertext
-                deviceID +                       // Variable: Device ID
-                languageCode                     // 2 bytes: Language Code
-
-        return Base64.encodeToString(payloadData, Base64.DEFAULT)
-    }
-
-    private fun Short.toLittleEndianBytes(): ByteArray {
-        return ByteBuffer.allocate(2).order(ByteOrder.LITTLE_ENDIAN).putShort(this).array()
-    }
-
-
 }
 
 

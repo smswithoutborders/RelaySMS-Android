@@ -61,28 +61,6 @@ class SmsWorkManager(
 
     companion object {
         const val SMS_WORK_MANAGER_PAYLOAD = "SMS_WORK_MANAGER_PAYLOAD"
-
-
     }
 
-    private fun divideImagePayload(isBridge: Boolean): MutableList<ByteArray> {
-        val standardSegmentSize = 150f
-        val firstSegmentSize = 7
-        val secondarySegmentSize = 5
-        val dividedImage = mutableListOf<ByteArray>()
-        val numSegments = ceil(image.size / standardSegmentSize) +
-                (firstSegmentSize + secondarySegmentSize)
-
-        for(i in 0..numSegments.toInt()) {
-            val segment = if(i == 0) {
-                // 7 bytes = header size
-                image.take(standardSegmentSize.toInt() - firstSegmentSize)
-            } else {
-                // 5 bytes = header size
-                image.take(standardSegmentSize.toInt() - secondarySegmentSize)
-            }
-            dividedImage.add(segment.toByteArray())
-        }
-        return dividedImage
-    }
 }

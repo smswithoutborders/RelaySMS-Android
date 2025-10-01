@@ -79,7 +79,10 @@ object Bridges {
         }
     }
 
-    private fun getStaticKeys(context: Context, kid: Int? = null) : List<StaticKeys>? {
+    private fun getStaticKeys(
+        context: Context,
+        kid: Int? = null
+    ) : List<StaticKeys>? {
         try {
             val filename = if(BuildConfig.DEBUG) "staging-static-x25519.json" else "static-x25519.json"
             val inputStream = context.assets.open(filename)
@@ -96,6 +99,39 @@ object Bridges {
         }
     }
 
+    fun getKeypairForTransmission(
+        context: Context
+    ) : ByteArray {
+        return Cryptography.generateKey(context,
+            Publishers.PUBLISHER_ID_KEYSTORE_ALIAS).also { clientPublicKey ->
+            getStaticKeys(context)?.get(0)?.keypair?.let { serverPublicKey ->
+                Publishers.storeArtifacts(
+                    context,
+                    serverPublicKey,
+                    Base64.encodeToString(
+                        clientPublicKey,
+                        Base64.DEFAULT
+                    )
+                )
+            }
+        }
+    }
+
+    fun encryptContent(
+        context: Context,
+        formattedContent: ByteArray,
+        smsTransmission: Boolean,
+        onSuccessCallback: () -> Unit = {},
+    ): ByteArray {
+        val ad = Publishers.fetchPublisherPublicKey(context)
+        return ComposeHandlers.compose(
+            context = context,
+            formattedContent = formattedContent,
+            AD = ad!!,
+            smsTransmission = smsTransmission,
+        ) { onSuccessCallback() }
+    }
+
     fun compose(
         context: Context,
         to: String,
@@ -106,46 +142,31 @@ object Bridges {
         smsTransmission: Boolean = false,
         onSuccessCallback: () -> Unit?
     ) : Pair<String?, ByteArray?> {
-
         val isLoggedIn = Vaults.Companion.fetchLongLivedToken(context).isNotEmpty()
-        var clientPublicKey: ByteArray? = Publishers.Companion.fetchClientPublisherPublicKey(context)
+        var clientPublicKey: ByteArray? = Publishers.fetchClientPublisherPublicKey(context)
 
-        if(!isLoggedIn) {
-            clientPublicKey = Cryptography.generateKey(context,
-                Publishers.Companion.PUBLISHER_ID_KEYSTORE_ALIAS)
+        if(!isLoggedIn) { clientPublicKey = getKeypairForTransmission(context) }
 
-            val serverPublicKey = getStaticKeys(context)?.get(0)?.keypair
-            serverPublicKey?.let {
-                Publishers.Companion.storeArtifacts(context, it,
-                    Base64.encodeToString(
-                        clientPublicKey,
-                        Base64.DEFAULT)
-                )
-            }
+        val formattedString = "$to:$cc:$bcc:$subject:$body"
+        val encryptedContent = encryptContent(
+            context = context,
+            formattedContent = formattedString.encodeToByteArray(),
+            smsTransmission = smsTransmission,
+        ) { onSuccessCallback() }
+
+        val payload: String = if(!isLoggedIn) {
+            val content = authRequestAndPayload(clientPublicKey!!,
+                encryptedContent)
+            Base64.encodeToString(content, Base64.DEFAULT)
+        } else {
+            val content = payloadOnly(encryptedContent)
+            Base64.encodeToString(content, Base64.DEFAULT)
         }
 
-        val AD = Publishers.Companion.fetchPublisherPublicKey(context)
-        val formattedString = "$to:$cc:$bcc:$subject:$body".run {
-            val messageComposer = ComposeHandlers.compose(
-                context = context,
-                formattedContent = this,
-                AD = AD!!,
-                smsTransmission = smsTransmission,
-            ) { onSuccessCallback() }
-            if(!isLoggedIn) {
-                clientPublicKey?.let {
-                    authRequestAndPayload(it, messageComposer)
-                }
-            } else {
-                payloadOnly(messageComposer)
-            }
-        }
-        println(formattedString)
-
-        return Pair(formattedString, clientPublicKey)
+        return Pair(payload, clientPublicKey)
     }
 
-    private fun payloadOnly(cipherText: ByteArray) : String {
+    fun payloadOnly(cipherText: ByteArray) : ByteArray {
         val mode: ByteArray = ByteArray(1).apply { this[0] = 0x00 }
         val versionMarker: ByteArray = ByteArray(1).apply { this[0] = 0x0A }
         val switchValue: ByteArray = ByteArray(1).apply { this[0] = 0x01 }
@@ -156,21 +177,19 @@ object Bridges {
 
         val bridgeLetter: Byte = "e".encodeToByteArray()[0]
 
-        val payload = mode +
+        return mode +
                 versionMarker +
                 switchValue +
                 cipherTextLength +
                 bridgeLetter +
                 cipherText
-
-        return Base64.encodeToString(payload, Base64.DEFAULT)
     }
 
-    private fun authRequestAndPayload(
+    fun authRequestAndPayload(
         clientPublicKey: ByteArray,
         cipherText: ByteArray,
         serverKID: Byte = 0x00
-    ) : String {
+    ) : ByteArray {
         val mode: ByteArray = ByteArray(1).apply { this[0] = 0x00 }
         val versionMarker: ByteArray = ByteArray(1).apply { this[0] = 0x0A }
         val switchValue: ByteArray = ByteArray(1).apply { this[0] = 0x00 }
@@ -185,7 +204,7 @@ object Bridges {
 
         val bridgeLetter: Byte = "e".encodeToByteArray()[0]
 
-        val payload = mode +
+        return mode +
                 versionMarker +
                 switchValue +
                 clientPublicKeyLen +
@@ -194,10 +213,7 @@ object Bridges {
                 serverKID +
                 clientPublicKey +
                 cipherText
-
-        return Base64.encodeToString(payload, Base64.DEFAULT)
     }
-
 
     fun decryptIncomingMessages(
         context: Context,
