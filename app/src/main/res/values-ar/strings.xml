@@ -326,5 +326,36 @@
     <string name="slack_hint">للقنوات: استخدم #الاسم أو مُعرّف (مثال: #عام أو C123ABC). للرسائل الخاصة: استخدم @اسم_المستخدم، أو بريد إلكتروني، أو مُعرّف مستخدم (مثال: @jane أو @user@gmail.com أو U456DEF).</string>
     <string name="view_account_menu">يمكنك الآن رؤية الحساب الذي سجلت دخولك به حاليًا بالنقر على أيقونة القائمة في شريط التنقل</string>
     <string name="your_account">حسابك</string>
+    <string name="set_as_default_sms_app">تعيين كتطبيق SMS الافتراضي</string>
+    <string name="log_in_or_sign_up_to_save_your_online_accounts">قم بتسجيل الدخول أو التسجيل لحفظ حساباتك على الإنترنت.</string>
+    <string name="sms_mms">الرسائل القصيرة/الرسائل المتعددة الوسائط</string>
+    <string name="could_not_fetch_publisher_key">لم يتم العثور على مفتاح الناشر.</string>
+    <string name="could_not_find_platform_details_for">لم يتم العثور على تفاصيل المنصة لـ \'%1$s\'.</string>
+    <string name="no_default_gateway_client_configured">لم يتم تكوين عميل البوابة الافتراضية.</string>
+    <string name="multiple_ratchet_states_found_in_database_expected_at_most_one">وُجدت عدة حالات راتشيت في قاعدة البيانات. من المتوقع وجود حالة واحدة على الأكثر.</string>
+    <string name="send_failed">فشل الإرسال</string>
+    <string name="account_is_required_for_v1_platform_messages">يجب إنشاء حساب لرسائل منصة V1.</string>
+    <string name="could_not_fetch_publisher_key_cannot_encrypt_message">يتطلب رسالة للرسائل على منصة V1.</string>
+    <string name="sms_an_email_right_now">أرسل رسالة نصية قصيرة بالبريد الإلكتروني الآن!</string>
+    <string name="you_don_t_need_an_account_we_d_create_one_for_you_email_yourself">لا تحتاج إلى حساب، سننشئ لك واحدًا! راسل نفسك!</string>
+    <string name="don_t_ask_again">لا تسأل مرة أخرى</string>
+    <string name="close_this_to_continue_sending">أغلق هذا لمواصلة الإرسال...</string>
+    <string name="way_to_go">طريقة جيدة للذهاب!!</string>
+    <string name="there_is_more">هناك المزيد!!</string>
+    <string name="you_have_interacted_with_how_easy_it_is_to_send_your_first_message">لقد تفاعلت مع مدى سهولة إرسال رسالتك الأولى!</string>
+    <string name="save_your_accounts">احفظ حساباتك!</string>
+    <string name="you_can_also_use_sms_to_send_messages_from_your_online_accounts_saving_them_guarantees_you_can_use_them_without_an_internet_connection">يمكنك أيضًا استخدام الرسائل النصية القصيرة لإرسال رسائل من حساباتك الإلكترونية! حفظها يضمن لك استخدامها دون الحاجة للاتصال بالإنترنت.</string>
+    <string name="give_it_a_try">جربها!</string>
+    <string name="your_platforms_and_security_keys_are_saved_in_your_account_create_one_or_login_if_you_have_created_already">منصاتك ومفاتيح الأمان محفوظة في حسابك! أنشئ حسابًا أو سجّل الدخول إذا كنت قد أنشأته مسبقًا.</string>
+    <string name="let_s_get_you_started">دعنا نبدأ معك!</string>
+    <string name="now_we_can_save_platforms_in_your_account">الآن يمكننا حفظ المنصات في حسابك!</string>
+    <string name="save_platforms_to_your_account">حفظ المنصات في حسابك</string>
+    <string name="it_s_easier_than_you_can_imagine">إنه أسهل مما تتخيل</string>
+    <string name="you_can_save_more_accounts_per_platform_at_anytime_from_inside_the_app">يمكنك حفظ المزيد من الحسابات لكل منصة في أي وقت من داخل التطبيق!</string>
+    <string name="start_messaging_now">ابدأ بالمراسلة الآن!</string>
+    <string name="you_can_now_send_messages_from_your_saved_accounts_you_can_also_save_more_accounts_later">يمكنك الآن إرسال رسائل من حساباتك المحفوظة!  يمكنك أيضًا حفظ المزيد من الحسابات لاحقًا...</string>
+    <string name="ready_to_save_platforms">جاهز لحفظ المنصات!</string>
+    <string name="you_are_now_ready">أنت الآن جاهز!</string>
+    <string name="you_have_successfully_carried_out_the_essentials_of_messaging_with_relaysms">لقد قمت بتنفيذ أساسيات المراسلة بنجاح باستخدام RelaySMS!</string>
 
 </resources>

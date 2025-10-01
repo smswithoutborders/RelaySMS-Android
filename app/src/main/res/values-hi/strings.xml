@@ -330,5 +330,36 @@
     <string name="slack_hint">चैनलों के लिए: #नाम या एक आईडी का उपयोग करें (जैसे, #general या C123ABC)। डीएम के लिए: @उपयोगकर्ता नाम, एक ईमेल, या एक उपयोगकर्ता आईडी का उपयोग करें (जैसे, @jane या @user@gmail.com या U456DEF)।</string>
     <string name="view_account_menu">अब आप नेविगेशन बार पर मेनू आइकन पर क्लिक करके वह खाता देख सकते हैं जिसमें आपने वर्तमान में लॉग इन किया है</string>
     <string name="your_account">आपका खाता</string>
+    <string name="now_we_can_save_platforms_in_your_account">अब हम आपके खाते में प्लेटफ़ॉर्म सहेज सकते हैं!</string>
+    <string name="save_platforms_to_your_account">प्लेटफ़ॉर्म को अपने खाते में सहेजें</string>
+    <string name="it_s_easier_than_you_can_imagine">यह आपकी कल्पना से भी अधिक आसान है</string>
+    <string name="you_can_save_more_accounts_per_platform_at_anytime_from_inside_the_app">आप ऐप के अंदर से किसी भी समय प्रति प्लेटफ़ॉर्म अधिक खाते सहेज सकते हैं!</string>
+    <string name="start_messaging_now">अभी संदेश भेजना शुरू करें!</string>
+    <string name="you_can_now_send_messages_from_your_saved_accounts_you_can_also_save_more_accounts_later">अब आप अपने सहेजे गए खातों से संदेश भेज सकते हैं! आप बाद में और भी खाते सहेज सकते हैं...</string>
+    <string name="ready_to_save_platforms">प्लेटफॉर्म बचाने के लिए तैयार!</string>
+    <string name="you_are_now_ready">अब आप तैयार हैं!</string>
+    <string name="you_have_successfully_carried_out_the_essentials_of_messaging_with_relaysms">आपने RelaySMS के साथ संदेश भेजने के अनिवार्य कार्यों को सफलतापूर्वक पूरा कर लिया है!</string>
+    <string name="sms_mms">एसएमएस/एमएमएस</string>
+    <string name="could_not_fetch_publisher_key">प्रकाशक कुंजी प्राप्त नहीं की जा सकी.</string>
+    <string name="could_not_find_platform_details_for">\'%1$s\' के लिए प्लेटफ़ॉर्म विवरण नहीं मिल सका.</string>
+    <string name="no_default_gateway_client_configured">कोई डिफ़ॉल्ट गेटवे क्लाइंट कॉन्फ़िगर नहीं किया गया.</string>
+    <string name="multiple_ratchet_states_found_in_database_expected_at_most_one">डेटाबेस में एकाधिक रैचेट स्थितियाँ पाई गईं। अधिकतम एक अपेक्षित है।</string>
+    <string name="send_failed">भेजना विफल</string>
+    <string name="account_is_required_for_v1_platform_messages">V1 प्लेटफ़ॉर्म संदेशों के लिए खाता आवश्यक है.</string>
+    <string name="could_not_fetch_publisher_key_cannot_encrypt_message">V1 प्लेटफ़ॉर्म पर संदेशों के लिए एक संदेश की आवश्यकता होती है।</string>
+    <string name="sms_an_email_right_now">अभी एसएमएस से ईमेल भेजें!</string>
+    <string name="you_don_t_need_an_account_we_d_create_one_for_you_email_yourself">आपको अकाउंट की ज़रूरत नहीं है, हम आपके लिए एक अकाउंट बना देंगे! खुद को ईमेल करें!</string>
+    <string name="don_t_ask_again">दोबारा मत पूछो</string>
+    <string name="close_this_to_continue_sending">भेजना जारी रखने के लिए इसे बंद करें...</string>
+    <string name="way_to_go">जाने के लिए रास्ता!!</string>
+    <string name="there_is_more">वहां और अधिक है!!</string>
+    <string name="you_have_interacted_with_how_easy_it_is_to_send_your_first_message">आपने देखा होगा कि अपना पहला संदेश भेजना कितना आसान है!</string>
+    <string name="save_your_accounts">अपने खाते बचाओ!</string>
+    <string name="you_can_also_use_sms_to_send_messages_from_your_online_accounts_saving_them_guarantees_you_can_use_them_without_an_internet_connection">आप अपने ऑनलाइन खातों से संदेश भेजने के लिए SMS का भी इस्तेमाल कर सकते हैं! इन्हें सेव करने से यह सुनिश्चित होता है कि आप बिना इंटरनेट कनेक्शन के भी इनका इस्तेमाल कर सकते हैं।</string>
+    <string name="give_it_a_try">इसे आज़माइए!</string>
+    <string name="your_platforms_and_security_keys_are_saved_in_your_account_create_one_or_login_if_you_have_created_already">आपके प्लेटफ़ॉर्म और सुरक्षा कुंजियाँ आपके खाते में सहेजी जाती हैं! एक बनाएँ या अगर आपने पहले से बना ली है तो लॉगिन करें</string>
+    <string name="let_s_get_you_started">चलिए शुरू करते हैं!</string>
+    <string name="set_as_default_sms_app">डिफ़ॉल्ट SMS ऐप के रूप में सेट करें</string>
+    <string name="log_in_or_sign_up_to_save_your_online_accounts">अपने ऑनलाइन खातों को सहेजने के लिए लॉग इन करें या साइन अप करें।</string>
 
 </resources>
