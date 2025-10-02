@@ -50,7 +50,14 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializer
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -124,6 +131,10 @@ class PlatformsViewModel : ViewModel() {
             if(isBridge) {
                 var encryptedContent: EncryptedContent? = null
 
+                val clientPublicKey: ByteArray? = if(isLoggedIn)
+                    Publishers.fetchClientPublisherPublicKey(context) else
+                    Bridges.getKeypairForTransmission(context)
+
                 val content = Bridges.encryptContent(
                     context,
                     imageViewModel.processedImage.value!!.rawBytes!! +
@@ -135,8 +146,8 @@ class PlatformsViewModel : ViewModel() {
 
                 val payload = if(isLoggedIn) { Bridges.payloadOnly(content) }
                 else {
-                    val clientPublicKey = Bridges.getKeypairForTransmission(context)
-                    Bridges.authRequestAndPayload(clientPublicKey, content)
+                    Bridges.authRequestAndPayload(clientPublicKey!!,
+                        content)
                 }
 
                 encryptedContent!!.encryptedContent = Base64
@@ -188,9 +199,7 @@ class PlatformsViewModel : ViewModel() {
         imageViewModel.startWorkManager(
             context = context,
             intent = Intent(context, MainActivity::class.java).apply {
-                putExtra(SmsWorkManager.ITP_PAYLOAD,
-                    Json.encodeToString(encryptedContent))
-                putExtra(SmsWorkManager.ITP_PAYLOAD_BASE64, isBridge)
+                putExtra(SmsWorkManager.ITP_PAYLOAD, encryptedContent.encryptedContent)
             },
             logo = R.drawable.logo,
         )
@@ -632,10 +641,15 @@ class PlatformsViewModel : ViewModel() {
     object EmailComposeHandler {
         @Serializable
         data class EmailContent(
+            @Serializable(with = MutableStateSerializer::class)
             var to: MutableState<String> = mutableStateOf(""),
+            @Serializable(with = MutableStateSerializer::class)
             var cc: MutableState<String> = mutableStateOf(""),
+            @Serializable(with = MutableStateSerializer::class)
             var bcc: MutableState<String> = mutableStateOf(""),
+            @Serializable(with = MutableStateSerializer::class)
             var subject: MutableState<String> = mutableStateOf(""),
+            @Serializable(with = MutableStateSerializer::class)
             var body: MutableState<String> = mutableStateOf("")
         )
 
@@ -711,7 +725,9 @@ class PlatformsViewModel : ViewModel() {
     object TextComposeHandler {
         @Serializable
         data class TextContent(
+            @Serializable(with = MutableStateSerializer::class)
             val from: MutableState<String?> = mutableStateOf(null),
+            @Serializable(with = MutableStateSerializer::class)
             val text: MutableState<String> = mutableStateOf(""),
         )
 
@@ -755,8 +771,11 @@ class PlatformsViewModel : ViewModel() {
     object MessageComposeHandler {
         @Serializable
         data class MessageContent(
+            @Serializable(with = MutableStateSerializer::class)
             val from: MutableState<String?> = mutableStateOf(null),
+            @Serializable(with = MutableStateSerializer::class)
             val to: MutableState<String> = mutableStateOf(""),
+            @Serializable(with = MutableStateSerializer::class)
             val message: MutableState<String> = mutableStateOf(""),
         )
 
@@ -803,7 +822,6 @@ class PlatformsViewModel : ViewModel() {
                 .replace("[\\s-]".toRegex(), "")
             return newPhoneNumber.matches("^\\+[1-9]\\d{1,14}$".toRegex())
         }
-
 
         fun getPhoneNumberFromUri(context: Context, uri: Uri): String {
             var phoneNumber: String? = null
@@ -910,7 +928,21 @@ class PlatformsViewModel : ViewModel() {
                     android.R.anim.slide_out_right)
                 .build()
         }
+
+        class MutableStateSerializer<T>(
+            private val valueSerializer: KSerializer<T>
+        ) : KSerializer<MutableState<T>> {
+
+            override val descriptor: SerialDescriptor =
+                valueSerializer.descriptor
+
+            override fun serialize(encoder: Encoder, value: MutableState<T>) {
+                valueSerializer.serialize(encoder, value.value)
+            }
+
+            override fun deserialize(decoder: Decoder): MutableState<T> {
+                return mutableStateOf(valueSerializer.deserialize(decoder))
+            }
+        }
     }
-
-
 }

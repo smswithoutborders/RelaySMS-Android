@@ -222,8 +222,6 @@ class Publishers(val context: Context) {
 
         fun fetchPublisherSharedKey(context: Context, publicKey: ByteArray? = null) : ByteArray {
             val pubKey = publicKey ?: fetchPublisherPublicKey(context)
-            println("Public key: $pubKey")
-            println("Public key: ${Base64.encodeToString(pubKey, Base64.DEFAULT)}")
             return Cryptography.calculateSharedSecret(context, PUBLISHER_ID_KEYSTORE_ALIAS,
                 pubKey!!)
         }
