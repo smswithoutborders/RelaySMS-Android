@@ -121,7 +121,7 @@ object Bridges {
         context: Context,
         formattedContent: ByteArray,
         smsTransmission: Boolean,
-        onSuccessCallback: () -> Unit = {},
+        onSuccessCallback: (EncryptedContent) -> Unit = {},
     ): ByteArray {
         val ad = Publishers.fetchPublisherPublicKey(context)
         return ComposeHandlers.compose(
@@ -129,7 +129,7 @@ object Bridges {
             formattedContent = formattedContent,
             AD = ad!!,
             smsTransmission = smsTransmission,
-        ) { onSuccessCallback() }
+        ) { onSuccessCallback(it) }
     }
 
     fun compose(

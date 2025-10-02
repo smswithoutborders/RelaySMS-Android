@@ -3,8 +3,11 @@ package com.example.sw0b_001.data.models
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
+import java.io.Serial
 
 @Entity
+@Serializable
 class EncryptedContent {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0

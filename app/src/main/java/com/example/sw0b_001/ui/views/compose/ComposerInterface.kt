@@ -72,6 +72,7 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.components.mmsImagePicker
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.BuildConfig
+import com.example.sw0b_001.MainActivity
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
@@ -89,6 +90,8 @@ import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.verifyPho
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -238,8 +241,36 @@ fun ComposerInterface(
     val platformsViewModel = remember{ PlatformsViewModel() }
 
     fun send() {
+        fun sendingCallback() {
+            isSending = false
+            CoroutineScope(Dispatchers.Main).launch {
+                onSendCallback?.invoke(true)
+                navController.popBackStack()
+            }
+        }
         if(imageBitmap != null) {
-            TODO("Break down the messages and send")
+            platformsViewModel.sendPublishingForImage(
+                context = context,
+                imageViewModel = imageViewModel,
+                account = selectedAccount,
+                text = when(type) {
+                    Platforms.ServiceTypes.BRIDGE,
+                    Platforms.ServiceTypes.BRIDGE_INCOMING,
+                    Platforms.ServiceTypes.EMAIL -> {
+                        Json.encodeToString(decomposedEmailMessage)
+                    }
+                    Platforms.ServiceTypes.TEXT -> {
+                        Json.encodeToString(decomposedTextMessage)
+                    }
+                    Platforms.ServiceTypes.MESSAGE -> {
+                        Json.encodeToString(decomposedMessageMessage)
+                    }
+                    else -> ""
+                },
+                isBridge = isBridge,
+                isLoggedIn = !isBridge,
+                onFailure = { isSending = false },
+            ) { sendingCallback() }
         }
         else {
             when(type) {
@@ -253,13 +284,7 @@ fun ComposerInterface(
                         isBridge = isBridge,
                         subscriptionId = emailNav?.subscriptionId ?: -1L,
                         onFailureCallback = { isSending = false },
-                    ){
-                        isSending = false
-                        CoroutineScope(Dispatchers.Main).launch {
-                            onSendCallback?.invoke(true)
-                            navController.popBackStack()
-                        }
-                    }
+                    ) { sendingCallback() }
                 }
                 Platforms.ServiceTypes.TEXT -> {
                     platformsViewModel.sendPublishingForPost(
@@ -274,13 +299,7 @@ fun ComposerInterface(
                                     Toast.LENGTH_LONG).show()
                             }
                         },
-                        onSuccess = {
-                            isSending = false
-                            CoroutineScope(Dispatchers.Main).launch {
-                                onSendCallback?.invoke(true)
-                                navController.popBackStack()
-                            }
-                        },
+                        onSuccess = { sendingCallback() },
                         subscriptionId = textNav?.subscriptionId ?: -1L
                     )
                 }
@@ -299,12 +318,7 @@ fun ComposerInterface(
                                 ).show()
                             }
                         },
-                    ) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            onSendCallback?.invoke(true)
-                            navController.popBackStack()
-                        }
-                    }
+                    ) { sendingCallback() }
                 }
                 Platforms.ServiceTypes.TEST -> {}
             }

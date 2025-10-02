@@ -27,7 +27,7 @@ object ComposeHandlers {
         platform: AvailablePlatforms? = null,
         account: StoredPlatformsEntity? = null,
         smsTransmission: Boolean = true,
-        onSuccessRunnable: (ByteArray?) -> Unit? = {}
+        onSuccessRunnable: (EncryptedContent) -> Unit? = {}
     ) : ByteArray {
         val states = Datastore.getDatastore(context).ratchetStatesDAO().fetch()
         if(states.size > 1) {
@@ -73,18 +73,16 @@ object ComposeHandlers {
             context.startActivity(sentIntent)
         }
 
-        val encryptedContent = EncryptedContent()
-        encryptedContent.encryptedContent = String(formattedContent)
-        encryptedContent.date = System.currentTimeMillis()
-        encryptedContent.type = platform?.service_type ?: Platforms.ServiceTypes.BRIDGE.name
-        encryptedContent.platformName = platform?.name ?: Platforms.ServiceTypes.BRIDGE.name
-        encryptedContent.fromAccount = account?.account
-
-        Datastore.getDatastore(context).encryptedContentDAO().insert(encryptedContent)
-        val decoded =  Base64.decode(encryptedContentBase64, Base64.DEFAULT)
-
-        onSuccessRunnable(decoded)
-        return decoded
+        val encryptedContent = EncryptedContent().apply {
+            encryptedContent = String(formattedContent)
+            date = System.currentTimeMillis()
+            type = platform?.service_type ?: Platforms.ServiceTypes.BRIDGE.name
+            platformName = platform?.name ?: Platforms.ServiceTypes.BRIDGE.name
+            fromAccount = account?.account
+            Datastore.getDatastore(context).encryptedContentDAO().insert(this)
+        }
+        onSuccessRunnable(encryptedContent)
+        return Base64.decode(encryptedContentBase64, Base64.DEFAULT)
     }
 
     // New V1 compose method
@@ -142,7 +140,7 @@ object ComposeHandlers {
         languageCode: String,
         subscriptionId: Long,
         smsTransmission: Boolean = true,
-        onSuccessRunnable: () -> Unit? = {}
+        onSuccessRunnable: (EncryptedContent) -> Unit? = {}
     ): ByteArray {
         val states = Datastore.getDatastore(context).ratchetStatesDAO().fetch()
         if (states.size > 1) {
@@ -187,6 +185,16 @@ object ComposeHandlers {
             throw e
         }
 
+        val encryptedContentEntry = EncryptedContent().apply {
+            encryptedContent = Base64
+                .encodeToString(contentFormatV2Bytes, Base64.DEFAULT)
+            date = System.currentTimeMillis()
+            type = platform.service_type
+            platformName = platform.name
+            fromAccount = account?.account
+            Datastore.getDatastore(context).encryptedContentDAO().insert(this)
+        }
+
         if (smsTransmission) {
             val gatewayClientMSISDN = GatewayClientsCommunications(context)
                 .getDefaultGatewayClient()
@@ -200,7 +208,7 @@ object ComposeHandlers {
                         address = gatewayClientMSISDN,
                         subscriptionId = subscriptionId,
                         threadId = context.getThreadId(gatewayClientMSISDN),
-                        callback = { conversation -> onSuccessRunnable() }
+                        callback = { conversation -> onSuccessRunnable(encryptedContentEntry) }
                     )
                 }
                 else {
@@ -216,15 +224,7 @@ object ComposeHandlers {
             }
         }
 
-        val encryptedContentEntry = EncryptedContent()
-        encryptedContentEntry.encryptedContent = Base64.encodeToString(contentFormatV2Bytes, Base64.DEFAULT)
-        encryptedContentEntry.date = System.currentTimeMillis()
-        encryptedContentEntry.type = platform.service_type
-        encryptedContentEntry.platformName = platform.name
-        encryptedContentEntry.fromAccount = account?.account
-        Datastore.getDatastore(context).encryptedContentDAO().insert(encryptedContentEntry)
-
-        onSuccessRunnable()
+        onSuccessRunnable(encryptedContentEntry)
         return Base64.decode(encryptedPayloadV2Base64, Base64.DEFAULT)
     }
 
