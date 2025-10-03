@@ -179,7 +179,6 @@ fun OtpCodeVerificationView(
 
     SmsRetrieverHandler {
         otpCode = it
-        println("Code came in: $otpCode")
     }
     configureVerificationListener(context)
 

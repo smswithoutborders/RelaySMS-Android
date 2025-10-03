@@ -42,7 +42,6 @@ class Publishers(val context: Context) {
                 setAutogenerateCodeVerifier(autogenerateCodeVerifier)
                 setRequestIdentifier(requestIdentifier)
             }.build()
-        Log.d("getOAuthURL", request.toString())
 
         return publisherStub.getOAuth2AuthorizationUrl(request)
     }
@@ -172,7 +171,8 @@ class Publishers(val context: Context) {
                     PUBLISHER_ATTRIBUTE_FILES, Context.MODE_PRIVATE)
 
             val encryptedSecretKey = Base64.decode(sharedPreferences
-                .getString(PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS, ""), Base64.DEFAULT)
+                .getString(PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS, ""),
+                Base64.DEFAULT)
             val secretKey = SecurityRSA.decrypt(KeystoreHelpers
                 .getKeyPairFromKeystore(PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS).private,
                 encryptedSecretKey)
@@ -182,7 +182,6 @@ class Publishers(val context: Context) {
 
         fun getAvailablePlatforms(context: Context): ArrayList<AvailablePlatforms> {
             val response = Network.requestGet(context.getString(R.string.get_platforms_url))
-            Log.d("getAvailablePlatforms", response.result.toString())
             return Json.decodeFromString<ArrayList<AvailablePlatforms>>(response.result.get())
         }
 

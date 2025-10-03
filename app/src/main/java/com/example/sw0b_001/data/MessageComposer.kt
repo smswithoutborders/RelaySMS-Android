@@ -85,7 +85,6 @@ class MessageComposer(
                 "Language code '$languageCodeString' must be 2 ASCII characters to form 2 bytes."
             )
         }
-        Log.d("MessageComposer", "state platforms V2 again: $state")
 
         return formatTransmissionV2(
             headers = drHeader,

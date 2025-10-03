@@ -138,7 +138,6 @@ class Vaults(val context: Context) {
             DEVICE_ID_KEYSTORE_ALIAS,
             Base64.decode(deviceIdPubKey, Base64.DEFAULT),
         )
-        println("DeviceID sk: ${Base64.encodeToString(deviceIdSharedKey, Base64.DEFAULT)}")
 
         val llt = Crypto.decryptFernet(deviceIdSharedKey,
             String(Base64.decode(encodedLlt, Base64.DEFAULT), Charsets.UTF_8))
@@ -148,8 +147,6 @@ class Vaults(val context: Context) {
             phoneNumber,
             clientDeviceIDPubKey
         )
-        println("DeviceID: ${Base64.encodeToString(deviceId, Base64.DEFAULT)}")
-        println("Device msisdn: $phoneNumber")
 
         storeArtifacts(context, llt, deviceId, clientDeviceIDPubKey)
         Publishers.storeArtifacts(context, publisherPubKey,
@@ -312,7 +309,6 @@ class Vaults(val context: Context) {
 
             Datastore.getDatastore(context).storedPlatformsDao().fetchAllList().forEach { platform ->
                 availablePlatforms.filter { it.name == platform.name }.forEach {
-                    Log.d("deleteEntity", "platform: ${it.protocol_type}")
                     when(it.protocol_type) {
                         Platforms.ProtocolTypes.OAUTH2.type -> {
                             publishers.revokeOAuthPlatforms(
@@ -472,11 +468,7 @@ class Vaults(val context: Context) {
 
         fun getDeviceID(derivedKey: ByteArray, phoneNumber: String, publicKey: ByteArray) : ByteArray {
             val combinedData = phoneNumber.encodeToByteArray() + publicKey
-            println("PK size: ${publicKey.size}")
             assert(publicKey.size == 32)
-            println("Combined: ${Base64.encodeToString(combinedData, Base64.DEFAULT)} = " +
-                    "${combinedData.size}")
-            println("pk: ${Base64.encodeToString(publicKey, Base64.DEFAULT)}")
             return Crypto.HMAC(derivedKey, combinedData)
         }
 

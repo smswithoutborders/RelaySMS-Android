@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.ContactsContract
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -238,20 +237,12 @@ fun AddGatewayClientModal(
                         scope.launch {
                             try {
                                 val successRunnable = Runnable {
-                                    Log.i(
-                                        "AddGatewayClientModal",
-                                        if (gatewayClient == null) "Gateway client added successfully" else "Gateway client edited successfully"
-                                    )
                                     isSaving = false
                                     onGatewayClientSaved()
                                     onDismiss()
                                 }
 
                                 val failureRunnable = Runnable {
-                                    Log.e(
-                                        "AddGatewayClientModal",
-                                        if (gatewayClient == null) "Failed to add gateway client" else "Failed to edit gateway client"
-                                    )
                                     isSaving = false
                                     isError = true
                                 }
@@ -278,7 +269,6 @@ fun AddGatewayClientModal(
                                     )
                                 }
                             } catch (e: Exception) {
-                                Log.e("AddGatewayClientModal", "Error saving gateway client", e)
                                 isSaving = false
                                 isError = true
                             }

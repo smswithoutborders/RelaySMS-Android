@@ -23,6 +23,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.afkanerd.lib_image_android.data.SmsWorkManager
+import com.afkanerd.lib_image_android.data.getItpSession
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.data.data.models.SmsManager
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getThreadId
@@ -33,6 +34,7 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.data.ComposeHandlers
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.GatewayClientsCommunications
+import com.example.sw0b_001.data.Helpers.toBytes
 import com.example.sw0b_001.data.Network
 import com.example.sw0b_001.data.Publishers
 import com.example.sw0b_001.data.SMSHandler
@@ -64,7 +66,6 @@ import java.nio.ByteOrder
 import java.nio.charset.StandardCharsets
 import java.util.Locale
 
-
 class PlatformsViewModel : ViewModel() {
 
     var accountsForMissingDialog by mutableStateOf<Map<String, List<String>>>(emptyMap())
@@ -82,7 +83,6 @@ class PlatformsViewModel : ViewModel() {
     var onSelectAll: (() -> Unit)? = null
     var onDeleteSelected: (() -> Unit)? = null
     var onCancelSelection: (() -> Unit)? = null
-
 
     fun reset() {
         platform = null
@@ -128,81 +128,65 @@ class PlatformsViewModel : ViewModel() {
         onSuccess: () -> Unit,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            if(isBridge) {
-                var encryptedContent: EncryptedContent? = null
+            lateinit var payload: ByteArray
 
-                val clientPublicKey: ByteArray? = if(isLoggedIn)
-                    Publishers.fetchClientPublisherPublicKey(context) else
-                    Bridges.getKeypairForTransmission(context)
+            try {
+                if(isBridge) {
+                    val clientPublicKey: ByteArray? = if(isLoggedIn)
+                        Publishers.fetchClientPublisherPublicKey(context) else
+                        Bridges.getKeypairForTransmission(context)
 
-                val content = Bridges.encryptContent(
-                    context,
-                    imageViewModel.processedImage.value!!.rawBytes!! +
-                            text.encodeToByteArray(),
-                    false,
-                ) {
-                    encryptedContent = it
-                }
-
-                val payload = if(isLoggedIn) { Bridges.payloadOnly(content) }
-                else {
-                    Bridges.authRequestAndPayload(clientPublicKey!!,
-                        content)
-                }
-
-                encryptedContent!!.encryptedContent = Base64
-                    .encodeToString(payload, Base64.DEFAULT)
-
-                publishWithWorker(
-                    context,
-                    true,
-                    encryptedContent,
-                    imageViewModel
-                )
-            } else {
-                val platform = Datastore.getDatastore(context).availablePlatformsDao()
-                    .fetch(account!!.name!!)
-                    ?: return@launch onFailure(
-                        context.getString(
-                            R.string.could_not_find_platform_details_for,
-                            account.name
-                        ))
-
-                val ad = Publishers.fetchPublisherPublicKey(context)
-                ComposeHandlers.composeV2(
-                    context = context,
-                    contentFormatV2Bytes = imageViewModel.processedImage.value!!.rawBytes!! +
-                            text.encodeToByteArray(),
-                    AD = ad!!,
-                    platform = platform,
-                    account = account,
-                    languageCode = languageCode,
-                    subscriptionId = subscriptionId,
-                ) {
-                    publishWithWorker(
+                    val content = Bridges.encryptContent(
                         context,
+                        imageViewModel.processedImage.value!!.rawBytes!! +
+                                text.encodeToByteArray(),
                         false,
-                        it,
-                        imageViewModel
+                    )
+
+                    payload = if(isLoggedIn) { Bridges.payloadOnly(content) }
+                    else {
+                        Bridges.authRequestAndPayload(clientPublicKey!!,
+                            content)
+                    }
+                }
+                else {
+                    val platform = Datastore.getDatastore(context).availablePlatformsDao()
+                        .fetch(account!!.name!!)
+                        ?: return@launch onFailure(
+                            context.getString(
+                                R.string.could_not_find_platform_details_for,
+                                account.name
+                            ))
+
+                    val ad = Publishers.fetchPublisherPublicKey(context)
+                    payload = ComposeHandlers.composeV2(
+                        context = context,
+                        contentFormatV2Bytes = imageViewModel.processedImage.value!!.rawBytes!! +
+                                text.encodeToByteArray(),
+                        AD = ad!!,
+                        platform = platform,
+                        account = account,
+                        languageCode = languageCode,
+                        subscriptionId = subscriptionId,
                     )
                 }
-            }
-        }
-    }
 
-    private fun publishWithWorker(
-        context: Context,
-        isBridge: Boolean,
-        encryptedContent: EncryptedContent,
-        imageViewModel: ImageViewModel
-    ) {
-        imageViewModel.startWorkManager(
-            context = context,
-            intent = Intent(context, MainActivity::class.java).apply {
-                putExtra(SmsWorkManager.ITP_PAYLOAD, encryptedContent.encryptedContent)
-            },
-            logo = R.drawable.logo,
-        )
+                imageViewModel.startWorkManager(
+                    context = context,
+                    formattedPayload = payload,
+                    logo = R.drawable.logo,
+                    version = ITP_VERSION_VALUE,
+                    sessionId = context.getItpSession().toByte(),
+                    imageLength = imageViewModel.processedImage.value!!.rawBytes!!.size.toBytes(),
+                    textLength = text.length.toBytes(),
+                )
+                onSuccess()
+            } catch(e: Exception) {
+                e.printStackTrace()
+                onFailure(e.message)
+            }
+
+        }
     }
 
     fun sendPublishingForMessaging(
@@ -817,6 +801,8 @@ class PlatformsViewModel : ViewModel() {
     }
 
     companion object {
+        const val ITP_VERSION_VALUE: Byte = 0x04
+
         fun verifyPhoneNumberFormat(phoneNumber: String): Boolean {
             val newPhoneNumber = phoneNumber
                 .replace("[\\s-]".toRegex(), "")
@@ -839,7 +825,7 @@ class PlatformsViewModel : ViewModel() {
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                Log.e("getPhoneNumberFromUri", "Failed to get phone number from URI", e)
+                throw e
             }
 
             return phoneNumber ?: ""
@@ -850,14 +836,12 @@ class PlatformsViewModel : ViewModel() {
             payload: GatewayClientRequest,
         ) : String? {
             var payload = Json.encodeToString(payload)
-            println("Publishing: $payload")
 
             try {
                 var response = Network.jsonRequestPost(url, payload)
                 var text = response.result.get()
                 return text
             } catch(e: Exception) {
-                println(e.message)
                 return e.message
             }
         }

@@ -74,7 +74,6 @@ class Platforms {
                             }
                         }
                         Datastore.getDatastore(context).availablePlatformsDao().clear()
-                        println("Storing: $json")
                         Datastore.getDatastore(context).availablePlatformsDao().insertAll(json)
                     }
                 } catch(e: Exception) {

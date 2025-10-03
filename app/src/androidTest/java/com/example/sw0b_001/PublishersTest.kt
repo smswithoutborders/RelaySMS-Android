@@ -72,7 +72,6 @@ class PublishersTest {
 
     @Before
     fun init() {
-
         publishers = Publishers(context)
         vault = Vaults(context)
         datastore = Datastore.getDatastore(context)
@@ -80,14 +79,10 @@ class PublishersTest {
         platformsViewModel = PlatformsViewModel()
 
         // Authenticate the user
-        Log.d("PublishersTest", "Authenticating...")
         val res = vault.authenticateEntity(context, globalPhoneNumber, globalPassword)
         assertTrue(res.requiresOwnershipProof)
         val res1 = vault.authenticateEntity(context, globalPhoneNumber, globalPassword, "123456")
-        Log.d("PublishersTest", "Auth response: $res1")
         longLivedToken = Vaults.fetchLongLivedToken(context)
-        Log.d("PublishersTest", "Got LLT.")
-
     }
 
     @After

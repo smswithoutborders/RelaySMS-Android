@@ -84,19 +84,10 @@ fun GatewayClientOptionsModal(
                     onClick = {
                         scope.launch {
                             val successRunnable = Runnable {
-                                Log.i(
-                                    "GatewayClientOptionsModal",
-                                    "Default gateway client updated successfully"
-                                )
                                 onDismiss()
                             }
 
-                            val failureRunnable = Runnable {
-                                Log.e(
-                                    "GatewayClientOptionsModal",
-                                    "Failed to update default gateway client"
-                                )
-                            }
+                            val failureRunnable = Runnable {}
                             GatewayClientsCommunications(context).updateDefaultGatewayClient(gatewayClient.mSISDN!!)
                             viewModel.loadRemote(context, successRunnable, failureRunnable)
                             onMakeDefaultClicked(gatewayClient)
@@ -114,7 +105,6 @@ fun GatewayClientOptionsModal(
                 if (!isDefault) {
                     Button(
                         onClick = {
-                            Log.d("GatewayClientOptionsModal", "Edit button clicked for: ${gatewayClient.mSISDN}")
                             onEditClicked(gatewayClient)
                         },
                         modifier = Modifier.fillMaxWidth(),

@@ -47,7 +47,6 @@ fun GatewayClientView(
 
     var isLoading by remember { mutableStateOf(true) }
     val successRunnable = Runnable {
-        println("Gateway clients loaded successfully!")
         isLoading = false
     }
     val gatewayClients by viewModel.get(context, successRunnable).observeAsState(initial = emptyList())

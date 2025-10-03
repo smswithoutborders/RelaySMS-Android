@@ -101,7 +101,6 @@ fun HomepageView(
     val refreshSuccess = Runnable {
         Toast.makeText(context,
             context.getString(R.string.gateway_clients_refreshed_successfully), Toast.LENGTH_SHORT).show()
-        Log.d("GatewayClients", "Gateway clients refreshed successfully!")
     }
 
     var sendNewMessageRequested by remember { mutableStateOf(false)}

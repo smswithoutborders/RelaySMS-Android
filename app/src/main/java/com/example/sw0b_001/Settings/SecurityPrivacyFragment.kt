@@ -163,7 +163,6 @@ class SecurityPrivacyFragment : PreferenceFragmentCompat() {
 //    }
 
     private fun storeTokensOnDevicePreferenceChangeListener(): OnPreferenceChangeListener {
-        Log.d("SecurityPrivacyFragment", "storeTokensOnDevicePreferenceChangeListener invoked")
         return OnPreferenceChangeListener { preference, newValue ->
             val isBeingEnabled = newValue as Boolean
             val switchPreference = preference as SwitchPreferenceCompat
@@ -183,27 +182,19 @@ class SecurityPrivacyFragment : PreferenceFragmentCompat() {
                 .setTitle(dialogTitle)
                 .setMessage(dialogMessage)
                 .setNegativeButton(getString(R.string.cancel)) { dialog, _ ->
-                    Log.d("SecurityPrivacyFragment", "Token storage change cancelled by user.")
                     dialog.dismiss()
                 }
                 .setPositiveButton(getString(R.string.ok)) { dialog, _ ->
-                    Log.d("SecurityPrivacyFragment", "Token storage change confirmed by user. New state: $isBeingEnabled")
-
                     val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext())
                     sharedPreferences.edit().putBoolean(storeTokensOnDeviceKey, isBeingEnabled).apply()
-                    Log.d("SecurityPrivacyFragment", "SharedPreferences updated.")
-
                     switchPreference.isChecked = isBeingEnabled
-                    Log.d("SecurityPrivacyFragment", "Switch UI state updated.")
 
                     if (isBeingEnabled) {
-                        Log.d("SecurityPrivacyFragment", "Launching token refresh coroutine...")
                         lifecycleScope.launch(Dispatchers.IO) {
                             try {
                                 val vaults = Vaults(requireContext().applicationContext)
                                 vaults.refreshStoredTokens(requireContext().applicationContext)
                                 vaults.shutdown()
-                                Log.i("SecurityPrivacyFragment", "Token refresh successful.")
                                 launch(Dispatchers.Main) {
                                     Toast.makeText(
                                         activity,
@@ -212,7 +203,6 @@ class SecurityPrivacyFragment : PreferenceFragmentCompat() {
                                     ).show()
                                 }
                             } catch (e: Exception) {
-                                Log.e("SecurityPrivacyFragment", "Error refreshing tokens", e)
                                 launch(Dispatchers.Main) {
                                     Toast.makeText(
                                         activity,
@@ -223,8 +213,6 @@ class SecurityPrivacyFragment : PreferenceFragmentCompat() {
                             }
                         }
                     } else {
-
-                        Log.d("SecurityPrivacyFragment", "Token storage disabled. ")
                         lifecycleScope.launch(Dispatchers.IO) {
                             try {
 //                                Datastore.getDatastore(requireContext().applicationContext)
@@ -239,7 +227,6 @@ class SecurityPrivacyFragment : PreferenceFragmentCompat() {
                                     ).show()
                                 }
                             } catch (e: Exception) {
-                                Log.e("SecurityPrivacyFragment", "An error occurred while storing local tokens", e)
                                 launch(Dispatchers.Main) {
                                     Toast.makeText(activity, getString(R.string.an_unexpected_error_occurred, e.message), Toast.LENGTH_LONG).show()
                                 }

@@ -32,7 +32,6 @@ class OauthRedirectActivity : AppCompatActivity() {
 
         val intentUrl = intent.dataString
         if(intentUrl.isNullOrEmpty()) {
-            Log.e(javaClass.name, "Intent has no URL")
             finish()
         }
 
@@ -57,10 +56,8 @@ class OauthRedirectActivity : AppCompatActivity() {
 
                 val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
                 val storeTokensOnDevice = sharedPreferences.getBoolean("store_tokens_on_device", false)
-                Log.d("Oauth redirect", "Store on device is $storeTokensOnDevice")
 
                 if (storeTokensOnDevice) {
-                    Log.d("Oauth redirect", "Store on device is true")
                     publishers.sendOAuthAuthorizationCode(
                         llt,
                         platform,
