@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -118,6 +120,8 @@ fun EmailDetailsView(
         }
     }
 
+    val scrollState = rememberScrollState() // Remember the scroll state
+
     Scaffold(
         topBar = {
             RelayAppBar(navController = navController, {
@@ -154,6 +158,7 @@ fun EmailDetailsView(
     ) { innerPadding ->
         Column(
             modifier = Modifier
+                .verticalScroll(scrollState)
                 .fillMaxSize()
                 .padding(innerPadding)
                 .padding(16.dp)
