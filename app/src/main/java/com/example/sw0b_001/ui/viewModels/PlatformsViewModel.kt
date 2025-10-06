@@ -6,7 +6,6 @@ import android.database.Cursor
 import android.net.Uri
 import android.provider.ContactsContract
 import android.util.Base64
-import android.util.Log
 import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.browser.customtabs.CustomTabColorSchemeParams
@@ -22,14 +21,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.afkanerd.lib_image_android.data.SmsWorkManager
-import com.afkanerd.lib_image_android.data.getItpSession
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
+import com.afkanerd.smswithoutborders_libsmsmms.data.ImageTransmissionProtocol
 import com.afkanerd.smswithoutborders_libsmsmms.data.data.models.SmsManager
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getThreadId
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewModel
-import com.example.sw0b_001.MainActivity
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.ComposeHandlers
 import com.example.sw0b_001.data.Datastore
@@ -54,9 +51,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Serializer
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -171,14 +165,19 @@ class PlatformsViewModel : ViewModel() {
                     )
                 }
 
-                imageViewModel.startWorkManager(
+                val gatewayClientMSISDN = GatewayClientsCommunications(context)
+                    .getDefaultGatewayClient() ?: return@launch
+
+                ImageTransmissionProtocol.startWorkManager(
                     context = context,
                     formattedPayload = payload,
                     logo = R.drawable.logo,
                     version = ITP_VERSION_VALUE,
-                    sessionId = context.getItpSession().toByte(),
+                    sessionId = ImageTransmissionProtocol.getItpSession(context).toByte(),
                     imageLength = imageViewModel.processedImage.value!!.rawBytes!!.size.toBytes(),
                     textLength = text.length.toBytes(),
+                    address = gatewayClientMSISDN,
+                    subscriptionId = subscriptionId,
                 )
                 onSuccess()
             } catch(e: Exception) {
@@ -204,7 +203,7 @@ class PlatformsViewModel : ViewModel() {
                     val contentFormatV2Bytes = createMessageByteBuffer(
                         from = messageContent.from.value!!,
                         to = messageContent.to.value,
-                        message = messageContent.message.value!!,
+                        message = messageContent.message.value,
                     )
 
                     val languageCode = Locale.getDefault().language.take(2).lowercase()
