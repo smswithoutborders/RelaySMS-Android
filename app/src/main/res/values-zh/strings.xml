@@ -361,4 +361,14 @@
     <string name="ready_to_save_platforms">准备保存平台！</string>
     <string name="you_are_now_ready">您现在已准备好！</string>
     <string name="you_have_successfully_carried_out_the_essentials_of_messaging_with_relaysms">您已成功使用 RelaySMS 执行消息传递的基本操作！</string>
+    <string name="secure_your_app">保护您的应用程序！</string>
+    <string name="let_s_lock_this_down">让我们锁定它！</string>
+    <string name="from_locking_with_device_pin_code_to_other_secure_ways_of_making_sure_you_maintain_your_app_s_privacy">从使用设备密码锁定到其他安全方式确保您维护应用程序的隐私！</string>
+    <string name="failed_to_set_biometric_authentication">无法设置生物特征认证</string>
+    <string name="make_default_sms_app">设为默认短信应用</string>
+    <string name="you_can_manage_all_your_sms_messages_from_a_single_place">您可以从一个地方管理所有短信。</string>
+    <string name="this_also_unlocks_features_like_sending_images_with_sms_yes_not_mms">这还可以解锁通过短信（不是彩信）发送图像等功能</string>
+    <string name="you_can_only_save_these_platforms_after_you_log_in">您只有登录后才能保存这些平台</string>
+    <string name="unknown_error">未知错误</string>
+    <string name="add_photos">添加照片</string>
 </resources>

@@ -356,5 +356,15 @@
     <string name="ready_to_save_platforms">¡Listo para salvar plataformas!</string>
     <string name="you_are_now_ready">¡Ya estás listo!</string>
     <string name="you_have_successfully_carried_out_the_essentials_of_messaging_with_relaysms">¡Has realizado con éxito las funciones esenciales de mensajería con RelaySMS!</string>
+    <string name="secure_your_app">¡Asegure su aplicación!</string>
+    <string name="let_s_lock_this_down">¡Vamos a bloquear esto!</string>
+    <string name="from_locking_with_device_pin_code_to_other_secure_ways_of_making_sure_you_maintain_your_app_s_privacy">¡Desde el bloqueo con código PIN del dispositivo hasta otras formas seguras de garantizar la privacidad de su aplicación!</string>
+    <string name="failed_to_set_biometric_authentication">No se pudo establecer la autenticación biométrica</string>
+    <string name="make_default_sms_app">Establecer como aplicación de SMS predeterminada</string>
+    <string name="you_can_manage_all_your_sms_messages_from_a_single_place">Podrás gestionar todos tus mensajes SMS desde un único lugar.</string>
+    <string name="this_also_unlocks_features_like_sending_images_with_sms_yes_not_mms">Esto también desbloquea funciones como enviar imágenes con SMS (sí, no MMS).</string>
+    <string name="you_can_only_save_these_platforms_after_you_log_in">Solo puedes guardar estas plataformas después de iniciar sesión</string>
+    <string name="unknown_error">Error desconocido</string>
+    <string name="add_photos">Añadir fotos</string>
 
 </resources>

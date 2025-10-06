@@ -356,5 +356,15 @@
     <string name="ready_to_save_platforms">آماده برای نجات پلتفرم‌ها!</string>
     <string name="you_are_now_ready">شما اکنون آماده هستید!</string>
     <string name="you_have_successfully_carried_out_the_essentials_of_messaging_with_relaysms">شما با موفقیت اصول اولیه پیام‌رسانی با RelaySMS را انجام داده‌اید!</string>
+    <string name="secure_your_app">برنامه خود را ایمن کنید!</string>
+    <string name="let_s_lock_this_down">بیا اینجا رو قفل کنیم!</string>
+    <string name="from_locking_with_device_pin_code_to_other_secure_ways_of_making_sure_you_maintain_your_app_s_privacy">از قفل کردن با پین کد دستگاه گرفته تا سایر روش‌های امن برای اطمینان از حفظ حریم خصوصی برنامه‌تان!</string>
+    <string name="failed_to_set_biometric_authentication">تنظیم احراز هویت بیومتریک ناموفق بود</string>
+    <string name="make_default_sms_app">برنامه پیامک پیش‌فرض را تنظیم کنید</string>
+    <string name="you_can_manage_all_your_sms_messages_from_a_single_place">شما می‌توانید تمام پیامک‌های خود را از یک مکان مدیریت کنید.</string>
+    <string name="this_also_unlocks_features_like_sending_images_with_sms_yes_not_mms">این همچنین ویژگی‌هایی مانند ارسال تصاویر با پیامک (بله، نه MMS) را باز می‌کند.</string>
+    <string name="you_can_only_save_these_platforms_after_you_log_in">شما فقط می‌توانید این پلتفرم‌ها را پس از ورود به سیستم ذخیره کنید</string>
+    <string name="unknown_error">خطای ناشناخته</string>
+    <string name="add_photos">اضافه کردن عکس</string>
 
 </resources>

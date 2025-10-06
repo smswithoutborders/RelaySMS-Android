@@ -357,5 +357,15 @@
     <string name="ready_to_save_platforms">جاهز لحفظ المنصات!</string>
     <string name="you_are_now_ready">أنت الآن جاهز!</string>
     <string name="you_have_successfully_carried_out_the_essentials_of_messaging_with_relaysms">لقد قمت بتنفيذ أساسيات المراسلة بنجاح باستخدام RelaySMS!</string>
+    <string name="secure_your_app">تأمين التطبيق الخاص بك!</string>
+    <string name="let_s_lock_this_down">دعونا نغلق هذا!</string>
+    <string name="from_locking_with_device_pin_code_to_other_secure_ways_of_making_sure_you_maintain_your_app_s_privacy">من القفل باستخدام رمز PIN الخاص بالجهاز إلى طرق آمنة أخرى للتأكد من الحفاظ على خصوصية تطبيقك!</string>
+    <string name="failed_to_set_biometric_authentication">فشل في ضبط المصادقة البيومترية</string>
+    <string name="make_default_sms_app">جعل تطبيق الرسائل القصيرة افتراضيًا</string>
+    <string name="you_can_manage_all_your_sms_messages_from_a_single_place">يمكنك إدارة جميع رسائلك النصية القصيرة من مكان واحد.</string>
+    <string name="this_also_unlocks_features_like_sending_images_with_sms_yes_not_mms">يؤدي هذا أيضًا إلى فتح ميزات مثل إرسال الصور عبر الرسائل القصيرة (نعم، وليس رسائل الوسائط المتعددة)</string>
+    <string name="you_can_only_save_these_platforms_after_you_log_in">لا يمكنك حفظ هذه المنصات إلا بعد تسجيل الدخول</string>
+    <string name="unknown_error">خطأ غير معروف</string>
+    <string name="add_photos">أضف الصور</string>
 
 </resources>

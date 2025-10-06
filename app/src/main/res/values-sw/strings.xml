@@ -356,5 +356,15 @@
     <string name="ready_to_save_platforms">Tayari kuhifadhi majukwaa!</string>
     <string name="you_are_now_ready">Sasa uko tayari!</string>
     <string name="you_have_successfully_carried_out_the_essentials_of_messaging_with_relaysms">Umefaulu kutekeleza mambo muhimu ya kutuma ujumbe kwa RelaySMS!</string>
+    <string name="secure_your_app">Linda programu yako!</string>
+    <string name="let_s_lock_this_down">Hebu tufungie hii!</string>
+    <string name="from_locking_with_device_pin_code_to_other_secure_ways_of_making_sure_you_maintain_your_app_s_privacy">Kuanzia kufunga kwa kutumia msimbo wa siri wa kifaa hadi njia zingine salama za kuhakikisha kuwa unadumisha faragha ya programu yako!</string>
+    <string name="failed_to_set_biometric_authentication">Imeshindwa kuweka uthibitishaji wa kibayometriki</string>
+    <string name="make_default_sms_app">Fanya programu chaguomsingi ya SMS</string>
+    <string name="you_can_manage_all_your_sms_messages_from_a_single_place">Unaweza kudhibiti jumbe zako zote za SMS kutoka sehemu moja.</string>
+    <string name="this_also_unlocks_features_like_sending_images_with_sms_yes_not_mms">Hii pia hufungua vipengele kama vile kutuma picha kwa SMS (ndiyo si MMS)</string>
+    <string name="you_can_only_save_these_platforms_after_you_log_in">Unaweza tu kuhifadhi mifumo hii baada ya kuingia</string>
+    <string name="unknown_error">Hitilafu isiyojulikana</string>
+    <string name="add_photos">Ongeza picha</string>
 
 </resources>

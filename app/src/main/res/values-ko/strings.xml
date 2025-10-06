@@ -360,5 +360,15 @@
     <string name="ready_to_save_platforms">플랫폼을 저장할 준비가 되었습니다!</string>
     <string name="you_are_now_ready">이제 준비가 되었습니다!</string>
     <string name="you_have_successfully_carried_out_the_essentials_of_messaging_with_relaysms">RelaySMS를 사용하여 메시징의 필수 사항을 성공적으로 수행했습니다!</string>
+    <string name="secure_your_app">앱을 보호하세요!</string>
+    <string name="let_s_lock_this_down">이걸 꼭 마무리하자!</string>
+    <string name="from_locking_with_device_pin_code_to_other_secure_ways_of_making_sure_you_maintain_your_app_s_privacy">기기 핀 코드를 이용한 잠금부터 앱의 개인 정보를 보호하는 다른 안전한 방법까지!</string>
+    <string name="failed_to_set_biometric_authentication">생체인증 설정에 실패했습니다.</string>
+    <string name="make_default_sms_app">기본 SMS 앱으로 만들기</string>
+    <string name="you_can_manage_all_your_sms_messages_from_a_single_place">모든 SMS 메시지를 한곳에서 관리할 수 있습니다.</string>
+    <string name="this_also_unlocks_features_like_sending_images_with_sms_yes_not_mms">이렇게 하면 SMS(예: MMS 아님)로 이미지를 보내는 것과 같은 기능도 잠금 해제됩니다.</string>
+    <string name="you_can_only_save_these_platforms_after_you_log_in">로그인 후에만 이 플랫폼을 저장할 수 있습니다.</string>
+    <string name="unknown_error">알 수 없는 오류</string>
+    <string name="add_photos">사진 추가</string>
 
 </resources>

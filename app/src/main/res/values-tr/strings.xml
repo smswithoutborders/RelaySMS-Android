@@ -358,5 +358,15 @@
     <string name="ready_to_save_platforms">Platformları kurtarmaya hazır olun!</string>
     <string name="you_are_now_ready">Artık hazırsınız!</string>
     <string name="you_have_successfully_carried_out_the_essentials_of_messaging_with_relaysms">RelaySMS ile mesajlaşmanın temel unsurlarını başarıyla gerçekleştirdiniz!</string>
+    <string name="secure_your_app">Uygulamanızı güvence altına alın!</string>
+    <string name="let_s_lock_this_down">Hadi bunu kilitleyelim!</string>
+    <string name="from_locking_with_device_pin_code_to_other_secure_ways_of_making_sure_you_maintain_your_app_s_privacy">Cihaz pin koduyla kilitlemekten, uygulamanızın gizliliğini korumanın diğer güvenli yollarına kadar!</string>
+    <string name="failed_to_set_biometric_authentication">Biyometrik kimlik doğrulaması ayarlanamadı</string>
+    <string name="make_default_sms_app">Varsayılan SMS uygulamasını yap</string>
+    <string name="you_can_manage_all_your_sms_messages_from_a_single_place">Tüm SMS mesajlarınızı tek bir yerden yönetebilirsiniz.</string>
+    <string name="this_also_unlocks_features_like_sending_images_with_sms_yes_not_mms">Bu aynı zamanda SMS ile resim gönderme (evet, MMS değil) gibi özelliklerin de kilidini açar</string>
+    <string name="you_can_only_save_these_platforms_after_you_log_in">Bu platformları yalnızca oturum açtıktan sonra kaydedebilirsiniz</string>
+    <string name="unknown_error">Bilinmeyen hata</string>
+    <string name="add_photos">Fotoğraf ekle</string>
 
 </resources>
