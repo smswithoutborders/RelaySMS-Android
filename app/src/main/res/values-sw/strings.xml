@@ -325,5 +325,36 @@
     <string name="slack_hint">Kwa chaneli: tumia #jina au kitambulisho (k.m., #general au C123ABC). Kwa DM: tumia @jinalamtumiaji, barua pepe, au kitambulisho cha mtumiaji (k.m., @jane au @user@gmail.com au U456DEF).</string>
     <string name="view_account_menu">Sasa unaweza kuona akaunti uliyoingia kwayo kwa kubofya aikoni ya menyu kwenye upau wa kusogeza</string>
     <string name="your_account">Akaunti Yako</string>
+    <string name="it_s_easier_than_you_can_imagine">Ni rahisi kuliko unavyoweza kufikiria</string>
+    <string name="you_can_save_more_accounts_per_platform_at_anytime_from_inside_the_app">Unaweza kuhifadhi akaunti zaidi kwa kila jukwaa wakati wowote kutoka ndani ya programu!</string>
+    <string name="start_messaging_now">Anza kutuma ujumbe sasa!</string>
+    <string name="you_can_now_send_messages_from_your_saved_accounts_you_can_also_save_more_accounts_later">Sasa unaweza kutuma ujumbe kutoka kwa akaunti ulizohifadhi! Unaweza pia kuhifadhi akaunti zaidi baadaye...</string>
+    <string name="ready_to_save_platforms">Tayari kuhifadhi majukwaa!</string>
+    <string name="you_are_now_ready">Sasa uko tayari!</string>
+    <string name="you_have_successfully_carried_out_the_essentials_of_messaging_with_relaysms">Umefaulu kutekeleza mambo muhimu ya kutuma ujumbe kwa RelaySMS!</string>
+    <string name="set_as_default_sms_app">Weka kama programu chaguomsingi ya SMS</string>
+    <string name="log_in_or_sign_up_to_save_your_online_accounts">Ingia au ujiandikishe ili kuhifadhi akaunti zako za mtandaoni.</string>
+    <string name="sms_mms">SMS/MMS</string>
+    <string name="could_not_fetch_publisher_key">Haikuweza kuleta ufunguo wa mchapishaji.</string>
+    <string name="could_not_find_platform_details_for">Haikuweza kupata maelezo ya mfumo wa \'%1$s\'.</string>
+    <string name="no_default_gateway_client_configured">Hakuna kiteja chaguo-msingi cha lango kilichosanidiwa.</string>
+    <string name="multiple_ratchet_states_found_in_database_expected_at_most_one">Majimbo mengi ya Ratchet yamepatikana kwenye hifadhidata. Inatarajiwa angalau moja.</string>
+    <string name="send_failed">Imeshindwa kutuma</string>
+    <string name="account_is_required_for_v1_platform_messages">Akaunti inahitajika kwa jumbe za mfumo wa V1.</string>
+    <string name="could_not_fetch_publisher_key_cannot_encrypt_message">Haikuweza kuleta ufunguo wa mchapishaji. Haiwezi kusimba ujumbe kwa njia fiche.</string>
+    <string name="sms_an_email_right_now">Tuma barua pepe sasa hivi!</string>
+    <string name="you_don_t_need_an_account_we_d_create_one_for_you_email_yourself">Huhitaji akaunti, tutakuundia moja! Jitumie barua pepe!</string>
+    <string name="don_t_ask_again">Usiulize tena</string>
+    <string name="close_this_to_continue_sending">Funga hii ili kuendelea kutuma...</string>
+    <string name="way_to_go">Njia ya kwenda!!</string>
+    <string name="there_is_more">Kuna zaidi!!</string>
+    <string name="you_have_interacted_with_how_easy_it_is_to_send_your_first_message">Umeingiliana na jinsi ilivyo rahisi kutuma ujumbe wako wa kwanza!</string>
+    <string name="save_your_accounts">Hifadhi akaunti zako!</string>
+    <string name="you_can_also_use_sms_to_send_messages_from_your_online_accounts_saving_them_guarantees_you_can_use_them_without_an_internet_connection">Unaweza pia kutumia SMS kutuma ujumbe kutoka kwa akaunti zako za mtandaoni! Kuzihifadhi kunakuhakikishia unaweza kuzitumia bila muunganisho wa intaneti.</string>
+    <string name="give_it_a_try">Jaribu!</string>
+    <string name="your_platforms_and_security_keys_are_saved_in_your_account_create_one_or_login_if_you_have_created_already">Mifumo na funguo zako za usalama huhifadhiwa katika akaunti yako! Unda moja au ingia ikiwa umeunda tayari</string>
+    <string name="let_s_get_you_started">Hebu tuanze!</string>
+    <string name="now_we_can_save_platforms_in_your_account">Sasa tunaweza kuhifadhi mifumo katika akaunti yako!</string>
+    <string name="save_platforms_to_your_account">Hifadhi mifumo kwenye akaunti yako</string>
 
 </resources>

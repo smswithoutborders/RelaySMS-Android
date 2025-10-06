@@ -324,5 +324,36 @@
     <string name="slack_hint">Für Kanäle: Verwenden Sie #Name oder eine ID (z.B. #general oder C123ABC). Für DMs: Verwenden Sie @Benutzername, eine E-Mail-Adresse oder eine Benutzer-ID (z.B. @jane oder @user@gmail.com oder U456DEF).</string>
     <string name="view_account_menu">Sie können Ihr aktuell angemeldetes Konto jetzt sehen, indem Sie auf das Menü-Symbol in der Navigationsleiste klicken</string>
     <string name="your_account">Ihr Konto</string>
+    <string name="set_as_default_sms_app">Als Standard-SMS-App festlegen</string>
+    <string name="log_in_or_sign_up_to_save_your_online_accounts">Melden Sie sich an oder registrieren Sie sich, um Ihre Online-Konten zu speichern.</string>
+    <string name="sms_mms">SMS/MMS</string>
+    <string name="could_not_fetch_publisher_key">Der Herausgeberschlüssel konnte nicht abgerufen werden.</string>
+    <string name="could_not_find_platform_details_for">Plattformdetails für „%1$s“ konnten nicht gefunden werden.</string>
+    <string name="no_default_gateway_client_configured">Kein Standard-Gateway-Client konfiguriert.</string>
+    <string name="multiple_ratchet_states_found_in_database_expected_at_most_one">In der Datenbank wurden mehrere Ratchet-Zustände gefunden. Es wird höchstens einer erwartet.</string>
+    <string name="send_failed">Senden fehlgeschlagen</string>
+    <string name="account_is_required_for_v1_platform_messages">Für V1-Plattformnachrichten ist ein Konto erforderlich.</string>
+    <string name="could_not_fetch_publisher_key_cannot_encrypt_message">Der Herausgeberschlüssel konnte nicht abgerufen werden. Die Nachricht kann nicht verschlüsselt werden.</string>
+    <string name="sms_an_email_right_now">Senden Sie jetzt eine SMS oder E-Mail!</string>
+    <string name="you_don_t_need_an_account_we_d_create_one_for_you_email_yourself">Sie benötigen kein Konto, wir erstellen eines für Sie! Senden Sie sich selbst eine E-Mail!</string>
+    <string name="don_t_ask_again">Nicht nochmal fragen</string>
+    <string name="close_this_to_continue_sending">Schließen Sie dies, um mit dem Senden fortzufahren ...</string>
+    <string name="way_to_go">So gehts!!</string>
+    <string name="there_is_more">Es gibt noch mehr!!</string>
+    <string name="you_have_interacted_with_how_easy_it_is_to_send_your_first_message">Sie haben erfahren, wie einfach es ist, Ihre erste Nachricht zu senden!</string>
+    <string name="save_your_accounts">Speichern Sie Ihre Konten!</string>
+    <string name="you_can_also_use_sms_to_send_messages_from_your_online_accounts_saving_them_guarantees_you_can_use_them_without_an_internet_connection">Sie können SMS auch verwenden, um Nachrichten von Ihren Online-Konten zu senden! Das Speichern garantiert, dass Sie sie auch ohne Internetverbindung nutzen können.</string>
+    <string name="give_it_a_try">Probieren Sie es aus!</string>
+    <string name="your_platforms_and_security_keys_are_saved_in_your_account_create_one_or_login_if_you_have_created_already">Ihre Plattformen und Sicherheitsschlüssel sind in Ihrem Konto gespeichert! Erstellen Sie ein Konto oder melden Sie sich an, wenn Sie bereits eines erstellt haben</string>
+    <string name="let_s_get_you_started">Lassen Sie uns loslegen!</string>
+    <string name="now_we_can_save_platforms_in_your_account">Jetzt können wir Plattformen in Ihrem Konto speichern!</string>
+    <string name="save_platforms_to_your_account">Speichern Sie Plattformen in Ihrem Konto</string>
+    <string name="it_s_easier_than_you_can_imagine">Es ist einfacher als Sie sich vorstellen können</string>
+    <string name="you_can_save_more_accounts_per_platform_at_anytime_from_inside_the_app">Sie können jederzeit innerhalb der App weitere Konten pro Plattform speichern!</string>
+    <string name="start_messaging_now">Beginnen Sie jetzt mit dem Versenden von Nachrichten!</string>
+    <string name="you_can_now_send_messages_from_your_saved_accounts_you_can_also_save_more_accounts_later">Sie können jetzt Nachrichten von Ihren gespeicherten Konten senden! Sie können später auch weitere Konten speichern ...</string>
+    <string name="ready_to_save_platforms">Bereit, Plattformen zu speichern!</string>
+    <string name="you_are_now_ready">Sie sind jetzt bereit!</string>
+    <string name="you_have_successfully_carried_out_the_essentials_of_messaging_with_relaysms">Sie haben die Grundlagen des Messaging mit RelaySMS erfolgreich umgesetzt!</string>
 
 </resources>

@@ -327,5 +327,36 @@
     <string name="slack_hint">Kanallar için: #isim veya bir ID kullanın (ör. #general veya C123ABC). DM\'ler için: @kullanıcıadı, bir e-posta veya bir kullanıcı ID\'si kullanın (ör. @jane veya @user@gmail.com veya U456DEF).</string>
     <string name="view_account_menu">Artık navigasyon çubuğundaki menü simgesine tıklayarak şu anda oturum açtığınız hesabı görebilirsiniz</string>
     <string name="your_account">Hesabınız</string>
+    <string name="it_s_easier_than_you_can_imagine">Hayal edebileceğinizden daha kolay</string>
+    <string name="you_can_save_more_accounts_per_platform_at_anytime_from_inside_the_app">Uygulamanın içinden dilediğiniz zaman platform başına daha fazla hesap kaydedebilirsiniz!</string>
+    <string name="start_messaging_now">Hemen mesajlaşmaya başlayın!</string>
+    <string name="you_can_now_send_messages_from_your_saved_accounts_you_can_also_save_more_accounts_later">Artık kayıtlı hesaplarınızdan mesaj gönderebilirsiniz! Daha sonra başka hesaplar da kaydedebilirsiniz...</string>
+    <string name="ready_to_save_platforms">Platformları kurtarmaya hazır olun!</string>
+    <string name="you_are_now_ready">Artık hazırsınız!</string>
+    <string name="you_have_successfully_carried_out_the_essentials_of_messaging_with_relaysms">RelaySMS ile mesajlaşmanın temel unsurlarını başarıyla gerçekleştirdiniz!</string>
+    <string name="set_as_default_sms_app">Varsayılan SMS uygulaması olarak ayarla</string>
+    <string name="log_in_or_sign_up_to_save_your_online_accounts">Çevrimiçi hesaplarınızı kaydetmek için giriş yapın veya kaydolun.</string>
+    <string name="sms_mms">SMS/MMS</string>
+    <string name="could_not_fetch_publisher_key">Yayımcı anahtarı alınamadı.</string>
+    <string name="could_not_find_platform_details_for">\'%1$s\' için platform ayrıntıları bulunamadı.</string>
+    <string name="no_default_gateway_client_configured">Varsayılan ağ geçidi istemcisi yapılandırılmadı.</string>
+    <string name="multiple_ratchet_states_found_in_database_expected_at_most_one">Veritabanında birden fazla Ratchet durumu bulundu. En fazla bir tane bekleniyor.</string>
+    <string name="send_failed">Gönderim başarısız oldu</string>
+    <string name="account_is_required_for_v1_platform_messages">V1 platform mesajları için hesap gereklidir.</string>
+    <string name="could_not_fetch_publisher_key_cannot_encrypt_message">Yayımcı anahtarı alınamadı. Mesaj şifrelenemiyor.</string>
+    <string name="sms_an_email_right_now">Hemen bir e-posta gönderin!</string>
+    <string name="you_don_t_need_an_account_we_d_create_one_for_you_email_yourself">Hesabınıza ihtiyacınız yok, biz sizin için bir hesap oluşturalım! Kendinize e-posta gönderin!</string>
+    <string name="don_t_ask_again">Bir daha sorma</string>
+    <string name="close_this_to_continue_sending">Göndermeye devam etmek için bunu kapatın...</string>
+    <string name="way_to_go">Harika!!</string>
+    <string name="there_is_more">Daha fazlası var!!</string>
+    <string name="you_have_interacted_with_how_easy_it_is_to_send_your_first_message">İlk mesajınızı göndermenin ne kadar kolay olduğunu deneyimlediniz!</string>
+    <string name="save_your_accounts">Hesaplarınızı kaydedin!</string>
+    <string name="you_can_also_use_sms_to_send_messages_from_your_online_accounts_saving_them_guarantees_you_can_use_them_without_an_internet_connection">SMS\'i çevrimiçi hesaplarınızdan mesaj göndermek için de kullanabilirsiniz! Kaydettiğiniz mesajları internet bağlantısı olmadan da kullanabilirsiniz.</string>
+    <string name="give_it_a_try">Deneyin!</string>
+    <string name="your_platforms_and_security_keys_are_saved_in_your_account_create_one_or_login_if_you_have_created_already">Platformlarınız ve güvenlik anahtarlarınız hesabınızda kayıtlı! Bir tane oluşturun veya daha önce oluşturduysanız giriş yapın.</string>
+    <string name="let_s_get_you_started">Hadi başlayalım!</string>
+    <string name="now_we_can_save_platforms_in_your_account">Artık platformları hesabınıza kaydedebiliriz!</string>
+    <string name="save_platforms_to_your_account">Platformları hesabınıza kaydedin</string>
 
 </resources>

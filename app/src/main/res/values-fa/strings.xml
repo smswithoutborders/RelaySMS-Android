@@ -325,5 +325,36 @@
     <string name="slack_hint">برای کانال‌ها: از #نام یا یک شناسه (مثلا #general یا C123ABC) استفاده کنید. برای پیام‌های مستقیم: از @نام‌کاربری، یک ایمیل یا شناسه کاربری (مثلا @jane یا @user@gmail.com یا U456DEF) استفاده کنید.</string>
     <string name="view_account_menu">اکنون می‌توانید حسابی که با آن وارد شده‌اید را با کلیک بر روی آیکون منو در نوار پیمایش مشاهده کنید</string>
     <string name="your_account">حساب شما</string>
+    <string name="it_s_easier_than_you_can_imagine">آسان‌تر از آن چیزی است که تصور می‌کنید</string>
+    <string name="you_can_save_more_accounts_per_platform_at_anytime_from_inside_the_app">شما می‌توانید در هر زمان از داخل برنامه، حساب‌های بیشتری را برای هر پلتفرم ذخیره کنید!</string>
+    <string name="start_messaging_now">همین حالا پیام‌رسانی را شروع کنید!</string>
+    <string name="you_can_now_send_messages_from_your_saved_accounts_you_can_also_save_more_accounts_later">اکنون می‌توانید از حساب‌های ذخیره‌شده‌تان پیام ارسال کنید! همچنین می‌توانید بعداً حساب‌های بیشتری را ذخیره کنید...</string>
+    <string name="ready_to_save_platforms">آماده برای نجات پلتفرم‌ها!</string>
+    <string name="you_are_now_ready">شما اکنون آماده هستید!</string>
+    <string name="you_have_successfully_carried_out_the_essentials_of_messaging_with_relaysms">شما با موفقیت اصول اولیه پیام‌رسانی با RelaySMS را انجام داده‌اید!</string>
+    <string name="set_as_default_sms_app">تنظیم به عنوان برنامه پیامک پیش‌فرض</string>
+    <string name="log_in_or_sign_up_to_save_your_online_accounts">برای ذخیره حساب‌های آنلاین خود، وارد شوید یا ثبت‌نام کنید.</string>
+    <string name="sms_mms">پیامک/MMS</string>
+    <string name="could_not_fetch_publisher_key">کلید ناشر دریافت نشد.</string>
+    <string name="could_not_find_platform_details_for">جزئیات پلتفرم «%1$s» پیدا نشد.</string>
+    <string name="no_default_gateway_client_configured">هیچ کلاینت دروازه پیش‌فرضی پیکربندی نشده است.</string>
+    <string name="multiple_ratchet_states_found_in_database_expected_at_most_one">چندین حالت Ratchet در پایگاه داده یافت شد. حداکثر یکی مورد انتظار است.</string>
+    <string name="send_failed">ارسال ناموفق بود</string>
+    <string name="account_is_required_for_v1_platform_messages">برای پیام‌های پلتفرم V1، حساب کاربری لازم است.</string>
+    <string name="could_not_fetch_publisher_key_cannot_encrypt_message">کلید ناشر دریافت نشد. پیام رمزگذاری نشد.</string>
+    <string name="sms_an_email_right_now">همین الان یه ایمیل بهم پیامک کن!</string>
+    <string name="you_don_t_need_an_account_we_d_create_one_for_you_email_yourself">نیازی به حساب کاربری ندارید، ما برایتان یکی می‌سازیم! به خودتان ایمیل بزنید!</string>
+    <string name="don_t_ask_again">دوباره نپرس.</string>
+    <string name="close_this_to_continue_sending">برای ادامه ارسال، این را ببندید...</string>
+    <string name="way_to_go">موفق باشی!!</string>
+    <string name="there_is_more">بیشتر هم هست!!</string>
+    <string name="you_have_interacted_with_how_easy_it_is_to_send_your_first_message">شما با این موضوع که ارسال اولین پیامتان چقدر آسان است، تعامل برقرار کرده‌اید!</string>
+    <string name="save_your_accounts">حساب‌های کاربری خود را ذخیره کنید!</string>
+    <string name="you_can_also_use_sms_to_send_messages_from_your_online_accounts_saving_them_guarantees_you_can_use_them_without_an_internet_connection">همچنین می‌توانید از طریق حساب‌های آنلاین خود از طریق پیامک پیام ارسال کنید! ذخیره کردن آنها تضمین می‌کند که می‌توانید بدون اتصال به اینترنت از آنها استفاده کنید.</string>
+    <string name="give_it_a_try">امتحانش کن!</string>
+    <string name="your_platforms_and_security_keys_are_saved_in_your_account_create_one_or_login_if_you_have_created_already">پلتفرم‌ها و کلیدهای امنیتی شما در حساب کاربری‌تان ذخیره می‌شوند! اگر قبلاً یکی ساخته‌اید، یکی ایجاد کنید یا وارد شوید.</string>
+    <string name="let_s_get_you_started">بیایید شروع کنیم!</string>
+    <string name="now_we_can_save_platforms_in_your_account">حالا می‌توانیم پلتفرم‌ها را در حساب شما ذخیره کنیم!</string>
+    <string name="save_platforms_to_your_account">پلتفرم‌ها را در حساب خود ذخیره کنید</string>
 
 </resources>

@@ -329,5 +329,36 @@
     <string name="slack_hint">채널: #이름 또는 ID(예: #general 또는 C123ABC)를 사용하세요. DM: @사용자이름, 이메일 또는 사용자 ID(예: @jane 또는 @user@gmail.com 또는 U456DEF)를 사용하세요.</string>
     <string name="view_account_menu">이제 탐색 메뉴 아이콘을 클릭하여 현재 로그인된 계정을 볼 수 있습니다</string>
     <string name="your_account">내 계정</string>
+    <string name="it_s_easier_than_you_can_imagine">당신이 상상하는 것보다 쉽습니다</string>
+    <string name="you_can_save_more_accounts_per_platform_at_anytime_from_inside_the_app">앱 내에서 언제든지 플랫폼별로 더 많은 계정을 저장할 수 있습니다!</string>
+    <string name="start_messaging_now">지금 바로 메시지를 보내세요!</string>
+    <string name="you_can_now_send_messages_from_your_saved_accounts_you_can_also_save_more_accounts_later">이제 저장된 계정에서 메시지를 보낼 수 있습니다! 나중에 더 많은 계정을 저장할 수도 있습니다...</string>
+    <string name="ready_to_save_platforms">플랫폼을 저장할 준비가 되었습니다!</string>
+    <string name="you_are_now_ready">이제 준비가 되었습니다!</string>
+    <string name="you_have_successfully_carried_out_the_essentials_of_messaging_with_relaysms">RelaySMS를 사용하여 메시징의 필수 사항을 성공적으로 수행했습니다!</string>
+    <string name="set_as_default_sms_app">기본 SMS 앱으로 설정</string>
+    <string name="log_in_or_sign_up_to_save_your_online_accounts">로그인하거나 가입하여 온라인 계정을 저장하세요.</string>
+    <string name="sms_mms">SMS/MMS</string>
+    <string name="could_not_fetch_publisher_key">게시자 키를 가져올 수 없습니다.</string>
+    <string name="could_not_find_platform_details_for">\'%1$s\'에 대한 플랫폼 세부 정보를 찾을 수 없습니다.</string>
+    <string name="no_default_gateway_client_configured">기본 게이트웨이 클라이언트가 구성되지 않았습니다.</string>
+    <string name="multiple_ratchet_states_found_in_database_expected_at_most_one">데이터베이스에서 여러 개의 래칫 상태가 발견되었습니다. 최대 1개까지 가능합니다.</string>
+    <string name="send_failed">보내기 실패</string>
+    <string name="account_is_required_for_v1_platform_messages">V1 플랫폼 메시지를 사용하려면 계정이 필요합니다.</string>
+    <string name="could_not_fetch_publisher_key_cannot_encrypt_message">게시자 키를 가져올 수 없습니다. 메시지를 암호화할 수 없습니다.</string>
+    <string name="sms_an_email_right_now">지금 당장 SMS로 이메일을 보내세요!</string>
+    <string name="you_don_t_need_an_account_we_d_create_one_for_you_email_yourself">계정이 필요 없습니다. 저희가 만들어 드리겠습니다! 이메일로 문의하세요!</string>
+    <string name="don_t_ask_again">다시 묻지 마세요</string>
+    <string name="close_this_to_continue_sending">계속 보내려면 이 항목을 닫으세요...</string>
+    <string name="way_to_go">잘했어요!!</string>
+    <string name="there_is_more">더 많은 것이 있습니다!!</string>
+    <string name="you_have_interacted_with_how_easy_it_is_to_send_your_first_message">첫 번째 메시지를 보내는 것이 얼마나 쉬운지 직접 경험해 보셨죠!</string>
+    <string name="save_your_accounts">계정을 저장하세요!</string>
+    <string name="you_can_also_use_sms_to_send_messages_from_your_online_accounts_saving_them_guarantees_you_can_use_them_without_an_internet_connection">온라인 계정에서 SMS를 사용하여 메시지를 보낼 수도 있습니다! SMS를 저장해 두면 인터넷에 연결되지 않아도 사용할 수 있습니다.</string>
+    <string name="give_it_a_try">한번 시도해 보세요!</string>
+    <string name="your_platforms_and_security_keys_are_saved_in_your_account_create_one_or_login_if_you_have_created_already">플랫폼과 보안 키가 계정에 저장됩니다! 계정을 만들거나 이미 만들었다면 로그인하세요.</string>
+    <string name="let_s_get_you_started">시작해 볼까요!</string>
+    <string name="now_we_can_save_platforms_in_your_account">이제 귀하의 계정에 플랫폼을 저장할 수 있습니다!</string>
+    <string name="save_platforms_to_your_account">귀하의 계정에 플랫폼을 저장하세요</string>
 
 </resources>
