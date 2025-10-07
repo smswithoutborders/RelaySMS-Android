@@ -170,7 +170,7 @@ class PlatformsViewModel : ViewModel() {
 
                 ImageTransmissionProtocol.startWorkManager(
                     context = context,
-                    formattedPayload = payload,
+                    formattedPayload = Base64.encode(payload, Base64.DEFAULT),
                     logo = R.drawable.logo,
                     version = ITP_VERSION_VALUE,
                     sessionId = ImageTransmissionProtocol.getItpSession(context).toByte(),
