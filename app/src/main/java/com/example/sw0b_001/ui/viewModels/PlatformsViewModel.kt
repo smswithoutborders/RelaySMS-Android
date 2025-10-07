@@ -24,6 +24,7 @@ import androidx.lifecycle.viewModelScope
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.data.ImageTransmissionProtocol
 import com.afkanerd.smswithoutborders_libsmsmms.data.data.models.SmsManager
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDefaultSimSubscription
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getThreadId
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewModel
@@ -117,13 +118,12 @@ class PlatformsViewModel : ViewModel() {
         isBridge: Boolean,
         isLoggedIn: Boolean,
         languageCode: String = "en",
-        subscriptionId: Long = -1,
         onFailure: (String?) -> Unit,
         onSuccess: () -> Unit,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             lateinit var payload: ByteArray
-
+            val subscriptionId = context.getDefaultSimSubscription()!!
             try {
                 if(isBridge) {
                     val clientPublicKey: ByteArray? = if(isLoggedIn)
