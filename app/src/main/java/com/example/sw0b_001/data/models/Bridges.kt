@@ -49,7 +49,6 @@ object Bridges {
         fun decomposeMessage(
             message: String,
         ): BridgeEmailContent {
-            println(message)
             return message.split(":").let {
                 BridgeEmailContent(
                     to = it[0],
