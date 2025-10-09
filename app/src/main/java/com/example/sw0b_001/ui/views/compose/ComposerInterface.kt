@@ -148,7 +148,8 @@ fun ComposerInterface(
                 try {
                     val contentBytes = Base64.decode(emailNav.encryptedContent,
                         Base64.DEFAULT)
-                    PlatformsViewModel.EmailComposeHandler.decomposeMessage(contentBytes)
+                    PlatformsViewModel.EmailComposeHandler
+                        .decomposeMessage(contentBytes, 0, 0)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     null
@@ -257,7 +258,12 @@ fun ComposerInterface(
                     Platforms.ServiceTypes.BRIDGE,
                     Platforms.ServiceTypes.BRIDGE_INCOMING,
                     Platforms.ServiceTypes.EMAIL -> {
-                        Json.encodeToString(decomposedEmailMessage)
+//                        Json.encodeToString(decomposedEmailMessage)
+                        "${decomposedEmailMessage!!.to.value}:${
+                            decomposedEmailMessage.cc.value}:${
+                                decomposedEmailMessage.bcc.value}:${
+                                    decomposedEmailMessage.subject.value}:${
+                                        decomposedEmailMessage.body.value}"
                     }
                     Platforms.ServiceTypes.TEXT -> {
                         Json.encodeToString(decomposedTextMessage)

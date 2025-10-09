@@ -74,15 +74,20 @@ fun EmailDetailsView(
         if (isBridge) {
             when (message.type) {
                 Platforms.ServiceTypes.BRIDGE.name -> {
-                    Bridges.BridgeComposeHandler.decomposeMessage(message.encryptedContent!!).apply {
-                        from = message.fromAccount ?: "Bridge Message"
-                        to = this.to
-                        cc = this.cc
-                        bcc = this.bcc
-                        subject = this.subject
-                        body = this.body
-                        date = message.date
-                    }
+                    Bridges.BridgeComposeHandler
+                        .decomposeMessage(
+                            message.encryptedContent!!,
+                            message.imageLength,
+                            message.textLength
+                        ).apply {
+                            from = message.fromAccount ?: "Bridge Message"
+                            to = this.to
+                            cc = this.cc
+                            bcc = this.bcc
+                            subject = this.subject
+                            body = this.body
+                            date = message.date
+                        }
                 }
                 Platforms.ServiceTypes.BRIDGE_INCOMING.name -> {
                     Bridges.BridgeComposeHandler.decomposeInboxMessage(message.encryptedContent!!).apply {
@@ -100,7 +105,12 @@ fun EmailDetailsView(
         else {
             try {
                 val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
-                val decomposed = PlatformsViewModel.EmailComposeHandler.decomposeMessage(contentBytes)
+                val decomposed = PlatformsViewModel.EmailComposeHandler
+                    .decomposeMessage(
+                        contentBytes,
+                        message.imageLength,
+                        message.textLength
+                    )
 
                 from = message.fromAccount ?: "Email Account"
                 to = decomposed.to.value

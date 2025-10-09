@@ -24,4 +24,9 @@ class EncryptedContent {
     var gatewayClientMSISDN: String? = null
 
     var encryptedContent: String? = null
+
+    @ColumnInfo(defaultValue = "0")
+    var imageLength: Int = 0
+    @ColumnInfo(defaultValue = "0")
+    var textLength: Int = 0
 }

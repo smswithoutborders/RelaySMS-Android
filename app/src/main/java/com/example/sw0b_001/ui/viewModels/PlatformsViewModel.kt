@@ -135,6 +135,8 @@ class PlatformsViewModel : ViewModel() {
                         imageViewModel.processedImage.value!!.rawBytes!! +
                                 text.encodeToByteArray(),
                         false,
+                        imageLength = imageViewModel.processedImage.value!!.rawBytes!!.size,
+                        textLength = text.encodeToByteArray().size
                     )
 
                     payload = if(isLoggedIn) { Bridges.payloadOnly(content) }
@@ -293,6 +295,8 @@ class PlatformsViewModel : ViewModel() {
                             bcc = emailContent.bcc.value,
                             subject = emailContent.subject.value,
                             body = emailContent.body.value,
+                            imageLength = 0,
+                            textLength = 0
                         ) { onCompleteCallback(null) }.first
 
                         val gatewayClientMSISDN = GatewayClientsCommunications(context)
@@ -633,13 +637,28 @@ class PlatformsViewModel : ViewModel() {
             @Serializable(with = MutableStateSerializer::class)
             var subject: MutableState<String> = mutableStateOf(""),
             @Serializable(with = MutableStateSerializer::class)
-            var body: MutableState<String> = mutableStateOf("")
+            var body: MutableState<String> = mutableStateOf(""),
+            @Serializable(with = MutableStateSerializer::class)
+            var imageUri: MutableState<String> = mutableStateOf(""),
         )
 
-        fun decomposeMessage(contentBytes: ByteArray): EmailContent {
+        fun decomposeMessage(
+            contentBytes: ByteArray,
+            imageLength: Int,
+            textLength: Int,
+        ): EmailContent {
+            var contentBytes = contentBytes
             try {
+                if(imageLength > 0) {
+                    parseLocalImageContent(
+                        contentBytes,
+                        imageLength,
+                        textLength
+                    ).let {
+                        contentBytes = it.second
+                    }
+                }
                 val buffer = ByteBuffer.wrap(contentBytes).order(ByteOrder.LITTLE_ENDIAN)
-
                 val fromLen = buffer.get().toInt() and 0xFF
                 val toLen = buffer.getShort().toInt() and 0xFFFF
                 val ccLen = buffer.getShort().toInt() and 0xFFFF
@@ -801,6 +820,19 @@ class PlatformsViewModel : ViewModel() {
 
     companion object {
         const val ITP_VERSION_VALUE: Byte = 0x04
+
+        fun parseLocalImageContent(
+            content: ByteArray,
+            imageLength: Int,
+            textLength: Int,
+        ) : Pair<ByteArray, ByteArray> {
+            var content = Base64.decode(content, Base64.DEFAULT)
+            val image = content.take(imageLength).toByteArray().also {
+                content = content.drop(imageLength).toByteArray() }
+            val text = content.take(textLength).toByteArray()
+
+            return Pair(image, text)
+        }
 
         fun verifyPhoneNumberFormat(phoneNumber: String): Boolean {
             val newPhoneNumber = phoneNumber

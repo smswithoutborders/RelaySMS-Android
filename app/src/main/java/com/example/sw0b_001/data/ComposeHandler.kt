@@ -27,6 +27,8 @@ object ComposeHandlers {
         platform: AvailablePlatforms? = null,
         account: StoredPlatformsEntity? = null,
         smsTransmission: Boolean = true,
+        imageLength: Int = 0,
+        textLength: Int = 0,
         onSuccessRunnable: (EncryptedContent) -> Unit? = {}
     ) : ByteArray {
         val states = Datastore.getDatastore(context).ratchetStatesDAO().fetch()
@@ -73,12 +75,17 @@ object ComposeHandlers {
             context.startActivity(sentIntent)
         }
 
+        val formattedContent = if(imageLength > 0) Base64
+            .encode(formattedContent, Base64.DEFAULT) else formattedContent
+
         val encryptedContent = EncryptedContent().apply {
             encryptedContent = String(formattedContent)
             date = System.currentTimeMillis()
             type = platform?.service_type ?: Platforms.ServiceTypes.BRIDGE.name
             platformName = platform?.name ?: Platforms.ServiceTypes.BRIDGE.name
             fromAccount = account?.account
+            this.imageLength = imageLength
+            this.textLength = textLength
             Datastore.getDatastore(context).encryptedContentDAO().insert(this)
         }
         onSuccessRunnable(encryptedContent)

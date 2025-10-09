@@ -189,7 +189,8 @@ fun RecentView(
 
                     val platform = platformsList.find { it.name == message.platformName }
                     val logo =
-                        platform?.logo?.let { BitmapFactory.decodeByteArray(it, 0, it.size) }
+                        platform?.logo?.let { BitmapFactory
+                            .decodeByteArray(it, 0, it.size) }
 
                     RecentMessageCard(
                         message = message, 
@@ -277,7 +278,12 @@ fun RecentMessageCard(
     when(message.type?.uppercase(Locale.getDefault())) {
         Platforms.ServiceTypes.EMAIL.name -> {
             val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
-            val decomposed = PlatformsViewModel.EmailComposeHandler.decomposeMessage(contentBytes)
+            val decomposed = PlatformsViewModel.EmailComposeHandler
+                .decomposeMessage(
+                    contentBytes,
+                    imageLength = message.imageLength,
+                    textLength = message.textLength
+                )
             heading = message.fromAccount ?: "Email"
             subHeading = decomposed.subject.value
             text = decomposed.body.value
@@ -293,6 +299,8 @@ fun RecentMessageCard(
         Platforms.ServiceTypes.BRIDGE.name -> {
             val decomposed = Bridges.BridgeComposeHandler.decomposeMessage(
                 message.encryptedContent!!,
+                message.imageLength,
+                message.textLength
             )
             heading = message.fromAccount ?: "RelaySMS"
             subHeading = decomposed.subject

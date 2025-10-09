@@ -10,6 +10,7 @@ import com.example.sw0b_001.data.ComposeHandlers
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.Publishers
 import com.example.sw0b_001.data.Vaults
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.parseLocalImageContent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -48,7 +49,19 @@ object Bridges {
     object BridgeComposeHandler {
         fun decomposeMessage(
             message: String,
+            imageLength: Int,
+            textLength: Int,
         ): BridgeEmailContent {
+            var message = message
+            if(imageLength > 0) {
+                parseLocalImageContent(
+                    message.encodeToByteArray(),
+                    imageLength,
+                    textLength
+                ).let {
+                    message = String(it.second)
+                }
+            }
             return message.split(":").let {
                 BridgeEmailContent(
                     to = it[0],
@@ -120,6 +133,8 @@ object Bridges {
         context: Context,
         formattedContent: ByteArray,
         smsTransmission: Boolean,
+        imageLength: Int,
+        textLength: Int,
         onSuccessCallback: (EncryptedContent) -> Unit = {},
     ): ByteArray {
         val ad = Publishers.fetchPublisherPublicKey(context)
@@ -128,6 +143,8 @@ object Bridges {
             formattedContent = formattedContent,
             AD = ad!!,
             smsTransmission = smsTransmission,
+            imageLength = imageLength,
+            textLength = textLength
         ) { onSuccessCallback(it) }
     }
 
@@ -139,6 +156,8 @@ object Bridges {
         subject: String,
         body: String,
         smsTransmission: Boolean = false,
+        imageLength: Int,
+        textLength: Int,
         onSuccessCallback: () -> Unit?
     ) : Pair<String?, ByteArray?> {
         val isLoggedIn = Vaults.Companion.fetchLongLivedToken(context).isNotEmpty()
@@ -151,6 +170,8 @@ object Bridges {
             context = context,
             formattedContent = formattedString.encodeToByteArray(),
             smsTransmission = smsTransmission,
+            imageLength = imageLength,
+            textLength = textLength
         ) { onSuccessCallback() }
 
         val payload: String = if(!isLoggedIn) {
