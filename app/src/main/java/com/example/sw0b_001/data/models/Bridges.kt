@@ -2,6 +2,7 @@ package com.example.sw0b_001.data.models
 
 import android.content.Context
 import android.util.Base64
+import coil3.Uri
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.R
@@ -51,18 +52,21 @@ object Bridges {
             message: String,
             imageLength: Int,
             textLength: Int,
-        ): BridgeEmailContent {
+        ): Pair<BridgeEmailContent, ByteArray?> {
             var message = message
+            var imageUri: ByteArray? = null
+
             if(imageLength > 0) {
                 parseLocalImageContent(
                     message.encodeToByteArray(),
                     imageLength,
                     textLength
                 ).let {
+                    imageUri = it.first
                     message = String(it.second)
                 }
             }
-            return message.split(":").let {
+            return Pair(message.split(":").let {
                 BridgeEmailContent(
                     to = it[0],
                     cc = it[1],
@@ -70,7 +74,7 @@ object Bridges {
                     subject = it[3],
                     body = it.subList(4, it.size).joinToString()
                 )
-            }
+            }, imageUri)
         }
 
         fun decomposeInboxMessage(

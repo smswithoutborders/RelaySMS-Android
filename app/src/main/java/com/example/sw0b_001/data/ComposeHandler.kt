@@ -37,7 +37,8 @@ object ComposeHandlers {
         }
 
         val state = if (states.isNotEmpty()) {
-            States(String(Publishers.getEncryptedStates(context, states[0].value)))
+            States(String(Publishers
+                .getEncryptedStates(context, states[0].value)))
         } else {
             States()
         }
@@ -52,10 +53,12 @@ object ComposeHandlers {
             val ratchetStatesEntry =
                 RatchetStates(id = states.firstOrNull()?.id ?: 0, value = encryptedStatesValue)
             if (states.isNotEmpty()) {
-                Datastore.getDatastore(context).ratchetStatesDAO().update(ratchetStatesEntry)
+                Datastore.getDatastore(context).ratchetStatesDAO()
+                    .update(ratchetStatesEntry)
             } else {
                 Datastore.getDatastore(context).ratchetStatesDAO().deleteAll()
-                Datastore.getDatastore(context).ratchetStatesDAO().insert(RatchetStates(value = encryptedStatesValue))
+                Datastore.getDatastore(context).ratchetStatesDAO()
+                    .insert(RatchetStates(value = encryptedStatesValue))
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -156,7 +159,8 @@ object ComposeHandlers {
 
         // The state loading logic is the same.
         val state = if (states.isNotEmpty()) {
-            States(String(Publishers.getEncryptedStates(context, states[0].value)))
+            States(String(Publishers
+                .getEncryptedStates(context, states[0].value)))
         } else {
             States()
         }
@@ -164,7 +168,8 @@ object ComposeHandlers {
         val messageComposer = MessageComposer(context, state, AD)
 
         val platformShortcodeByte = platform.shortcode?.firstOrNull()?.code?.toByte()
-            ?: throw IllegalArgumentException("Platform shortcode is missing or invalid for platform: ${platform.name}")
+            ?: throw IllegalArgumentException("Platform shortcode is missing or " +
+                    "invalid for platform: ${platform.name}")
 
         // Call the new composeV2 method
         val encryptedPayloadV2Base64 = messageComposer.composeV2(

@@ -1,12 +1,17 @@
 package com.example.sw0b_001.ui.views.details
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Base64
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -14,8 +19,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -39,7 +50,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.stringResource
+import coil3.Uri
+import com.afkanerd.lib_image_android.ui.navigation.ImageRenderNav
 import com.example.sw0b_001.data.models.Bridges
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.data.models.Platforms
@@ -68,6 +82,7 @@ fun EmailDetailsView(
     var subject by remember{ mutableStateOf("") }
     var body by remember{ mutableStateOf("") }
     var date by remember{ mutableLongStateOf(0L) }
+    var imageBitmap by remember{ mutableStateOf<Bitmap?>(null) }
 
     val message = platformsViewModel.message
     if (message?.encryptedContent != null) {
@@ -81,12 +96,20 @@ fun EmailDetailsView(
                             message.textLength
                         ).apply {
                             from = message.fromAccount ?: "Bridge Message"
-                            to = this.to
-                            cc = this.cc
-                            bcc = this.bcc
-                            subject = this.subject
-                            body = this.body
+                            to = this.first.to
+                            cc = this.first.cc
+                            bcc = this.first.bcc
+                            subject = this.first.subject
+                            body = this.first.body
                             date = message.date
+
+                            this.second?.let { byteArray ->
+                                imageBitmap = BitmapFactory.decodeByteArray(
+                                    byteArray,
+                                    0,
+                                    byteArray.size
+                                )
+                            }
                         }
                 }
                 Platforms.ServiceTypes.BRIDGE_INCOMING.name -> {
@@ -129,6 +152,7 @@ fun EmailDetailsView(
             }
         }
     }
+
 
     val scrollState = rememberScrollState() // Remember the scroll state
 
@@ -174,13 +198,16 @@ fun EmailDetailsView(
                 .padding(16.dp)
         ) {
             // Subject
-            Text(
-                text = subject,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+            if(subject.isNotEmpty()) {
+                Text(
+                    text = subject,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+            }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
                 // Sender Avatar
@@ -231,6 +258,46 @@ fun EmailDetailsView(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onBackground
             )
+
+            imageBitmap?.let {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(Modifier.weight(1f))
+                    Box {
+                        Card(
+                            onClick = {
+                                navController.navigate(ImageRenderNav(false))
+                            },
+                            elevation = CardDefaults.cardElevation(8.dp)
+                        ) {
+                            Image(
+                                bitmap = imageBitmap!!.asImageBitmap(),
+                                "",
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .size(250.dp)
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .size(35.dp)
+                                .align(Alignment.BottomEnd)
+                        ) {
+                            IconButton(
+                                onClick = { imageBitmap = null }
+                            ) {
+                                Icon(Icons.Filled.Cancel, "Cancel")
+                            }
+                        }
+                    }
+                    Spacer(Modifier.padding(8.dp))
+                }
+            }
         }
     }
 }

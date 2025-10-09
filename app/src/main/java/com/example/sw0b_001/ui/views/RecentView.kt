@@ -303,8 +303,8 @@ fun RecentMessageCard(
                 message.textLength
             )
             heading = message.fromAccount ?: "RelaySMS"
-            subHeading = decomposed.subject
-            text = decomposed.body
+            subHeading = decomposed.first.subject
+            text = decomposed.first.body
         }
         Platforms.ServiceTypes.TEXT.name -> {
             try {
