@@ -374,16 +374,9 @@ class MainActivity : AppCompatActivity() {
                 ComposerInterface(
                     navController = navController,
                     type = composeScreenNav.type,
+                    messageId = composeScreenNav.messageId,
                     imageViewModel = imageViewModel,
-                    emailNav = if(!composeScreenNav.emailNav.isNullOrEmpty())
-                        Json.decodeFromString<EmailComposeNav>(composeScreenNav.emailNav)
-                    else null,
-                    textNav = if(!composeScreenNav.textNav.isNullOrEmpty())
-                        Json.decodeFromString<TextComposeNav>(composeScreenNav.textNav)
-                    else null,
-                    messageNav = if(!composeScreenNav.messageNav.isNullOrEmpty())
-                        Json.decodeFromString<MessageComposeNav>(composeScreenNav.messageNav)
-                    else null,
+                    messagesViewModel = messagesViewModel,
                     onSendCallback = if(composeScreenNav.isOnboarding)
                         onboardingViewModel.callback else null
                 )

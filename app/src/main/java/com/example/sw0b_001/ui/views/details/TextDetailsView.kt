@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.sw0b_001.data.Composers
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Helpers
@@ -69,7 +70,7 @@ fun TextDetailsView(
     if (message?.encryptedContent != null) {
         try {
             val contentBytes = Base64.decode(message.encryptedContent, Base64.DEFAULT)
-            val decomposedMessage = PlatformsViewModel.TextComposeHandler
+            val decomposedMessage = Composers.TextComposeHandler
                 .decomposeMessage(contentBytes)
 
             from = decomposedMessage.from.value!!
@@ -97,15 +98,7 @@ fun TextDetailsView(
                             navController.navigate(
                                 ComposeScreen(
                                     type = Platforms.ServiceTypes.TEXT,
-                                    textNav = Json.encodeToString(
-                                        TextComposeNav(
-                                            platformName = platform!!.name,
-                                            subscriptionId = -1L,
-                                            encryptedContent = message?.encryptedContent,
-                                            fromAccount = from,
-                                            serviceType = Platforms.ServiceTypes.TEXT,
-                                        )
-                                    ),
+                                    messageId = message?.id,
                                     isOnboarding = isOnboarding
                                 )
                             )

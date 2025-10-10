@@ -64,6 +64,7 @@ import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.Composers
 import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
 import com.example.sw0b_001.ui.navigation.BridgeViewScreen
@@ -278,39 +279,40 @@ fun RecentMessageCard(
     when(message.type?.uppercase(Locale.getDefault())) {
         Platforms.ServiceTypes.EMAIL.name -> {
             val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
-            val decomposed = PlatformsViewModel.EmailComposeHandler
+            val decomposed = Composers.EmailComposeHandler
                 .decomposeMessage(
                     contentBytes,
                     imageLength = message.imageLength,
-                    textLength = message.textLength
+                    textLength = message.textLength,
+                    isBridge = message.type == Platforms.ServiceTypes.BRIDGE.name
                 )
             heading = message.fromAccount ?: "Email"
             subHeading = decomposed.subject.value
             text = decomposed.body.value
         }
         Platforms.ServiceTypes.BRIDGE_INCOMING.name -> {
-            val decomposed = Bridges.BridgeComposeHandler.decomposeInboxMessage(
-                message.encryptedContent!!,
-            )
-            heading = message.fromAccount ?: "RelaySMS"
-            subHeading = decomposed.subject
-            text = decomposed.body
+            TODO()
+//            val decomposed = TODO()
+//            heading = message.fromAccount ?: "RelaySMS"
+//            subHeading = decomposed.subject
+//            text = decomposed.body
         }
         Platforms.ServiceTypes.BRIDGE.name -> {
-            val decomposed = Bridges.BridgeComposeHandler.decomposeMessage(
-                message.encryptedContent!!,
+            val decomposed = Composers.EmailComposeHandler.decomposeMessage(
+                Base64.decode(message.encryptedContent, Base64.DEFAULT),
                 message.imageLength,
-                message.textLength
+                message.textLength,
+                true
             )
             heading = message.fromAccount ?: "RelaySMS"
-            subHeading = decomposed.first.subject
-            text = decomposed.first.body
+            subHeading = decomposed.subject.value
+            text = decomposed.body.value
         }
         Platforms.ServiceTypes.TEXT.name -> {
             try {
                 val contentBytes = Base64.decode(message.encryptedContent!!,
                     Base64.DEFAULT)
-                val decomposed = PlatformsViewModel.TextComposeHandler
+                val decomposed = Composers.TextComposeHandler
                     .decomposeMessage(contentBytes)
                 heading = decomposed.from.value ?: ""
                 subHeading = ""
@@ -326,7 +328,7 @@ fun RecentMessageCard(
             try {
                 val contentBytes = Base64.decode(message.encryptedContent!!,
                     Base64.DEFAULT)
-                val decomposed = PlatformsViewModel.MessageComposeHandler
+                val decomposed = Composers.MessageComposeHandler
                     .decomposeMessage(contentBytes)
 
                 if (message.fromAccount == decomposed.from.value) {

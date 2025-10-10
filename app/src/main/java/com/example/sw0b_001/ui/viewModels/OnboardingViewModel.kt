@@ -88,7 +88,8 @@ class OnboardingViewModel : ViewModel() {
                     navController.navigate(
                         ComposeScreen(
                             type = Platforms.ServiceTypes.BRIDGE,
-                            isOnboarding = true
+                            isOnboarding = true,
+                            messageId = null
                         )
                     )
                 }

@@ -67,6 +67,7 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import com.afkanerd.lib_image_android.ui.navigation.ImageRenderNav
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDefaultSimSubscription
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getUriForDrawable
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.components.mmsImagePicker
@@ -74,6 +75,8 @@ import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.MainActivity
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.Composers
+import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.extensions.context.settingsGetNotShowChooseGatewayClient
@@ -84,8 +87,8 @@ import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.MessageComposeNav
 import com.example.sw0b_001.ui.navigation.TextComposeNav
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.MessageComposeHandler.MessageContent
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.verifyPhoneNumberFormat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -101,88 +104,94 @@ import kotlin.text.isNotEmpty
 @Composable
 fun ComposerInterface(
     navController: NavController,
+    messageId: Long? = null,
     type: Platforms.ServiceTypes,
     imageViewModel: ImageViewModel,
-    emailNav: EmailComposeNav? = null,
-    textNav: TextComposeNav? = null,
-    messageNav: MessageComposeNav? = null,
+    messagesViewModel: MessagesViewModel,
     onSendCallback: ((Boolean) -> Unit)? = null,
 ) {
-
+    val context = LocalContext.current
+    val subscriptionId by remember{ mutableStateOf(
+        if(context.isDefault()) context.getDefaultSimSubscription() ?: -1L else -1L)}
     BackHandler {
         navController.popBackStack()
+    }
+
+    var message by remember{ mutableStateOf<EncryptedContent?>(null) }
+    var isBridge by remember{ mutableStateOf(type == Platforms.ServiceTypes.BRIDGE) }
+    messageId?.let {
+        messagesViewModel.getMessage(context, messageId) {
+            message = it
+        }
     }
 
     val from = remember { mutableStateOf(when(type) {
         Platforms.ServiceTypes.EMAIL,
         Platforms.ServiceTypes.BRIDGE,
-        Platforms.ServiceTypes.BRIDGE_INCOMING ->  emailNav?.fromAccount
-        Platforms.ServiceTypes.TEXT -> textNav?.fromAccount
-        Platforms.ServiceTypes.MESSAGE -> messageNav?.fromAccount
+        Platforms.ServiceTypes.BRIDGE_INCOMING -> message?.fromAccount
+        Platforms.ServiceTypes.TEXT -> message?.fromAccount
+        Platforms.ServiceTypes.MESSAGE -> message?.fromAccount
         else -> null
     }) }
 
     val platformName = when(type) {
-        Platforms.ServiceTypes.EMAIL -> emailNav!!.platformName
-        Platforms.ServiceTypes.TEXT -> textNav!!.platformName
-        Platforms.ServiceTypes.MESSAGE -> messageNav!!.platformName
+        Platforms.ServiceTypes.EMAIL -> message!!.platformName!!
+        Platforms.ServiceTypes.TEXT -> message!!.platformName!!
+        Platforms.ServiceTypes.MESSAGE -> message!!.platformName!!
         else -> ""
     }
 
-    val isBridge = emailNav?.isBridge ?: true
     var showChooseGatewayClient by remember { mutableStateOf(false) }
     var isSending by remember { mutableStateOf(false) }
     var showSelectAccountModal by remember { mutableStateOf(
         type != Platforms.ServiceTypes.BRIDGE) }
     var selectedAccount: StoredPlatformsEntity? by remember { mutableStateOf(null) }
 
-    val context = LocalContext.current
 
-
-    val decomposedEmailMessage = remember(emailNav){
-        if(emailNav?.encryptedContent != null) {
-            if (emailNav.isBridge) {
-                PlatformsViewModel.EmailComposeHandler
-                    .decomposeBridgeMessage(emailNav.encryptedContent)
-            } else {
-                try {
-                    val contentBytes = Base64.decode(emailNav.encryptedContent,
-                        Base64.DEFAULT)
-                    PlatformsViewModel.EmailComposeHandler
-                        .decomposeMessage(contentBytes, 0, 0)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    null
-                }
+    val decomposedEmailMessage = remember(message){
+        if(message?.encryptedContent != null) {
+            try {
+                Composers.EmailComposeHandler
+                    .decomposeMessage(
+                        Base64.decode(message!!.encryptedContent,
+                            Base64.DEFAULT),
+                        0,
+                        0,
+                        type == Platforms.ServiceTypes.BRIDGE
+                    )
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
             }
-        } else PlatformsViewModel.EmailComposeHandler.EmailContent()
+        } else Composers.EmailComposeHandler.EmailContent()
     }
 
-    val decomposedMessageMessage = remember(messageNav) {
-        if (messageNav?.encryptedContent != null) {
+    val decomposedMessageMessage = remember(message) {
+        if (message?.encryptedContent != null) {
             try {
-                val contentBytes = Base64.decode(messageNav.encryptedContent,
+                val contentBytes = Base64.decode(message!!.encryptedContent,
                     Base64.DEFAULT)
-                PlatformsViewModel.MessageComposeHandler.decomposeMessage(contentBytes)
+                Composers.MessageComposeHandler.decomposeMessage(contentBytes)
             } catch (e: Exception) {
                 e.printStackTrace()
                 null
             }
         }
-        else MessageContent(from = from)
+        else Composers.MessageComposeHandler.MessageContent(from = from)
     }
 
-    val decomposedTextMessage = remember(textNav) {
-        if (textNav?.encryptedContent != null) {
+    val decomposedTextMessage = remember(message) {
+        if (message?.encryptedContent != null) {
             try {
-                val contentBytes = Base64.decode(textNav.encryptedContent, Base64.DEFAULT)
-                PlatformsViewModel.TextComposeHandler.decomposeMessage(contentBytes)
+                val contentBytes = Base64.decode(message?.encryptedContent,
+                    Base64.DEFAULT)
+                Composers.TextComposeHandler.decomposeMessage(contentBytes)
             } catch (e: Exception) {
                 e.printStackTrace()
                 null
             }
         }
-        else PlatformsViewModel.TextComposeHandler.TextContent(from)
+        else Composers.TextComposeHandler.TextContent(from)
     }
 
     val isSendingEnabled by remember(
@@ -244,11 +253,23 @@ fun ComposerInterface(
     fun send() {
         fun sendingCallback() {
             isSending = false
+            showChooseGatewayClient = false
             CoroutineScope(Dispatchers.Main).launch {
                 onSendCallback?.invoke(true)
                 navController.popBackStack()
             }
         }
+
+        fun onFailureCallback(msg: String?) {
+            isSending = false
+            showChooseGatewayClient = false
+            CoroutineScope(Dispatchers.Main).launch {
+                Toast.makeText(context, msg ?:
+                context.getString(R.string.unknown_error),
+                    Toast.LENGTH_LONG).show()
+            }
+        }
+
         if(imageBitmap != null) {
             platformsViewModel.sendPublishingForImage(
                 context = context,
@@ -258,24 +279,33 @@ fun ComposerInterface(
                     Platforms.ServiceTypes.BRIDGE,
                     Platforms.ServiceTypes.BRIDGE_INCOMING,
                     Platforms.ServiceTypes.EMAIL -> {
-//                        Json.encodeToString(decomposedEmailMessage)
-                        "${decomposedEmailMessage!!.to.value}:${
-                            decomposedEmailMessage.cc.value}:${
-                                decomposedEmailMessage.bcc.value}:${
-                                    decomposedEmailMessage.subject.value}:${
-                                        decomposedEmailMessage.body.value}"
+                        Composers.EmailComposeHandler.createEmailByteBuffer(
+                            from = null,
+                            to = decomposedEmailMessage?.to!!.value,
+                            cc = decomposedEmailMessage.cc.value,
+                            bcc = decomposedEmailMessage.bcc.value,
+                            subject = decomposedEmailMessage.subject.value,
+                            body = decomposedEmailMessage.body.value,
+                        )
                     }
                     Platforms.ServiceTypes.TEXT -> {
-                        Json.encodeToString(decomposedTextMessage)
+                        Composers.TextComposeHandler.createTextByteBuffer(
+                            from = from.value!!,
+                            body = decomposedEmailMessage?.body!!.value,
+                        )
                     }
                     Platforms.ServiceTypes.MESSAGE -> {
-                        Json.encodeToString(decomposedMessageMessage)
+                        Composers.MessageComposeHandler.createMessageByteBuffer(
+                            from = from.value!!,
+                            to = decomposedMessageMessage?.to!!.value,
+                            message = decomposedEmailMessage?.body!!.value,
+                        )
                     }
-                    else -> ""
+                    else -> byteArrayOf()
                 },
                 isBridge = isBridge,
                 isLoggedIn = !isBridge,
-                onFailure = { isSending = false },
+                onFailure = { onFailureCallback(it) },
             ) { sendingCallback() }
         }
         else {
@@ -288,8 +318,8 @@ fun ComposerInterface(
                         emailContent = decomposedEmailMessage!!,
                         account = selectedAccount,
                         isBridge = isBridge,
-                        subscriptionId = emailNav?.subscriptionId ?: -1L,
-                        onFailureCallback = { isSending = false },
+                        subscriptionId = subscriptionId,
+                        onFailureCallback = { onFailureCallback(it) },
                     ) { sendingCallback() }
                 }
                 Platforms.ServiceTypes.TEXT -> {
@@ -297,16 +327,9 @@ fun ComposerInterface(
                         context = context,
                         text = decomposedTextMessage?.text?.value ?: "",
                         account = selectedAccount!!,
-                        onFailure = { errorMsg ->
-                            isSending = false
-                            CoroutineScope(Dispatchers.Main).launch {
-                                Toast.makeText(context, errorMsg ?:
-                                context.getString(R.string.unknown_error),
-                                    Toast.LENGTH_LONG).show()
-                            }
-                        },
+                        onFailure = { onFailureCallback(it) },
                         onSuccess = { sendingCallback() },
-                        subscriptionId = textNav?.subscriptionId ?: -1L
+                        subscriptionId = subscriptionId
                     )
                 }
                 Platforms.ServiceTypes.MESSAGE -> {
@@ -314,16 +337,8 @@ fun ComposerInterface(
                         context = context,
                         messageContent = decomposedMessageMessage!!,
                         account = selectedAccount!!,
-                        subscriptionId = messageNav?.subscriptionId ?: -1L,
-                        onFailure = { errorMsg ->
-                            CoroutineScope(Dispatchers.Main).launch {
-                                Toast.makeText(
-                                    context,
-                                    errorMsg ?: context.getString(R.string.send_failed),
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        },
+                        subscriptionId = subscriptionId,
+                        onFailure = { onFailureCallback(it) },
                     ) { sendingCallback() }
                 }
                 Platforms.ServiceTypes.TEST -> {}
@@ -360,9 +375,10 @@ fun ComposerInterface(
                 },
                 actions = {
                     IconButton(
-                        onClick = { imagePicker
-                            .launch(arrayOf("image/png", "image/jpg", "image/jpeg"))
-                        }
+                        onClick = { if(!context.isDefault()) TODO("Show toast") else {
+                            imagePicker.launch(
+                                arrayOf( "image/png", "image/jpg", "image/jpeg"))
+                        }}
                     ) {
                         Icon(Icons.Default.AttachFile,
                             stringResource(R.string.add_photos)
@@ -491,13 +507,12 @@ fun ComposerInterface(
 fun ComposerInterfacePreview() {
     AppTheme {
         ComposerInterface(
-            rememberNavController(),
-            Platforms.ServiceTypes.EMAIL,
-            remember{ ImageViewModel() },
-            EmailComposeNav(
-                platformName = "gmail",
-            )
-        )
+            navController = rememberNavController(),
+            messageId = -1,
+            type = Platforms.ServiceTypes.BRIDGE,
+            imageViewModel = remember{ ImageViewModel() },
+            messagesViewModel = remember{ MessagesViewModel() },
+        ){}
     }
 }
 

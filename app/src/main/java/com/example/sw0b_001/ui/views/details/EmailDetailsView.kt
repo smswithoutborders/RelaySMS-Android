@@ -51,9 +51,11 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import coil3.Uri
 import com.afkanerd.lib_image_android.ui.navigation.ImageRenderNav
+import com.example.sw0b_001.data.Composers
 import com.example.sw0b_001.data.models.Bridges
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.data.models.Platforms
@@ -89,21 +91,23 @@ fun EmailDetailsView(
         if (isBridge) {
             when (message.type) {
                 Platforms.ServiceTypes.BRIDGE.name -> {
-                    Bridges.BridgeComposeHandler
+                    Composers.EmailComposeHandler
                         .decomposeMessage(
-                            message.encryptedContent!!,
+                            Base64.decode(message.encryptedContent!!,
+                                Base64.DEFAULT),
                             message.imageLength,
-                            message.textLength
+                            message.textLength,
+                            true
                         ).apply {
                             from = message.fromAccount ?: "Bridge Message"
-                            to = this.first.to
-                            cc = this.first.cc
-                            bcc = this.first.bcc
-                            subject = this.first.subject
-                            body = this.first.body
+                            to = this.to.value
+                            cc = this.cc.value
+                            bcc = this.bcc.value
+                            subject = this.subject.value
+                            body = this.body.value
                             date = message.date
 
-                            this.second?.let { byteArray ->
+                            this.image.value?.let { byteArray ->
                                 imageBitmap = BitmapFactory.decodeByteArray(
                                     byteArray,
                                     0,
@@ -113,22 +117,14 @@ fun EmailDetailsView(
                         }
                 }
                 Platforms.ServiceTypes.BRIDGE_INCOMING.name -> {
-                    Bridges.BridgeComposeHandler.decomposeInboxMessage(message.encryptedContent!!).apply {
-                        from = this.sender
-                        to = this.alias
-                        cc = this.cc
-                        bcc = this.bcc
-                        subject = this.subject
-                        body = this.body
-                        date = this.date
-                    }
+                    TODO()
                 }
             }
         }
         else {
             try {
                 val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
-                val decomposed = PlatformsViewModel.EmailComposeHandler
+                val decomposed = Composers.EmailComposeHandler
                     .decomposeMessage(
                         contentBytes,
                         message.imageLength,
@@ -153,7 +149,6 @@ fun EmailDetailsView(
         }
     }
 
-
     val scrollState = rememberScrollState() // Remember the scroll state
 
     Scaffold(
@@ -170,14 +165,7 @@ fun EmailDetailsView(
                                 type = if(platform != null)
                                     Platforms.ServiceTypes.EMAIL
                                 else Platforms.ServiceTypes.BRIDGE,
-                                emailNav = Json.encodeToString<EmailComposeNav>(
-                                    EmailComposeNav(
-                                        platformName = platform?.name ?: "",
-                                        encryptedContent = message?.encryptedContent,
-                                        fromAccount = from,
-                                        isBridge = isBridge,
-                                    )
-                                )
+                                messageId = message?.id
                             )
                         )
                     }
@@ -222,7 +210,7 @@ fun EmailDetailsView(
                 Column {
                     // Sender Email
                     Text(
-                        text = from,
+                        text = if(LocalInspectionMode.current) "RelaySMS" else from,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onBackground
                     )
@@ -269,7 +257,7 @@ fun EmailDetailsView(
                     Box {
                         Card(
                             onClick = {
-                                navController.navigate(ImageRenderNav(false))
+                                TODO("Implement view image")
                             },
                             elevation = CardDefaults.cardElevation(8.dp)
                         ) {

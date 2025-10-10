@@ -7,7 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.Ratchets
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.States
-import com.example.sw0b_001.data.MessageComposer
+import com.example.sw0b_001.data.RatchetComposerFormatter
 import com.example.sw0b_001.data.Crypto
 import com.example.sw0b_001.data.Cryptography
 import com.github.kittinunf.fuel.util.encodeBase64
@@ -51,7 +51,7 @@ class CryptographyTest {
             peerPubkey)
         println("Header: ${String(header.serialized.encodeBase64(), Charsets.UTF_8)}")
 
-        val transmit = MessageComposer.formatTransmission(header, cipherText, "g".encodeToByteArray()[0])
+        val transmit = RatchetComposerFormatter.formatTransmission(header, cipherText, "g".encodeToByteArray()[0])
         println("Final transmission $transmit")
     }
 

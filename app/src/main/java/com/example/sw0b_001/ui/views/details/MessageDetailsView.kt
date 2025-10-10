@@ -37,6 +37,7 @@ import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.Composers
 import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.ui.appbars.RelayAppBar
@@ -65,7 +66,7 @@ fun MessageDetailsView(
     if (message?.encryptedContent != null) {
         try {
             val contentBytes = Base64.decode(message.encryptedContent, Base64.DEFAULT)
-            val decomposed = PlatformsViewModel.MessageComposeHandler.decomposeMessage(contentBytes)
+            val decomposed = Composers.MessageComposeHandler.decomposeMessage(contentBytes)
 
             fromDisplay = decomposed.from.value!!
             toDisplay = decomposed.to.value
@@ -94,12 +95,7 @@ fun MessageDetailsView(
                         navController.navigate(
                             ComposeScreen(
                                 type = Platforms.ServiceTypes.MESSAGE,
-                                messageNav = Json.encodeToString(MessageComposeNav(
-                                    platformName = platform!!.name,
-                                    subscriptionId = -1L,
-                                    encryptedContent = message?.encryptedContent,
-                                    fromAccount = fromDisplay,
-                                )),
+                                messageId = message?.id,
                                 isOnboarding = isOnboarding
                             )
                         )

@@ -13,7 +13,7 @@ import java.nio.ByteOrder
 import android.util.Base64
 import android.util.Log
 import com.example.sw0b_001.data.Datastore
-import com.example.sw0b_001.data.ComposeHandlers
+import com.example.sw0b_001.data.PayloadEncryptionComposeDecomposeInit
 import com.example.sw0b_001.data.models.AvailablePlatforms
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
@@ -246,7 +246,7 @@ class PublishersTest {
             val languageCode = "en"
 
             Log.d("PublishersTest_V1", "Composing V1 payload...")
-            val base64DecodedV1Payload = ComposeHandlers.composeV1(
+            val base64DecodedV1Payload = PayloadEncryptionComposeDecomposeInit.composeV1(
                 context = context,
                 contentFormatV1Bytes = contentFormatV1Bytes,
                 AD = AD!!,

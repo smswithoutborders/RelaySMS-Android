@@ -29,7 +29,8 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getThreadId
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewModel
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.ComposeHandlers
+import com.example.sw0b_001.data.Composers
+import com.example.sw0b_001.data.PayloadEncryptionComposeDecomposeInit
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.GatewayClientsCommunications
 import com.example.sw0b_001.data.Helpers.toBytes
@@ -41,6 +42,7 @@ import com.example.sw0b_001.data.models.Bridges
 import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
+import com.example.sw0b_001.extensions.context.settingsGetDefaultGatewayClient
 import com.example.sw0b_001.ui.views.BottomTabsItems
 import com.example.sw0b_001.ui.views.compose.GatewayClientRequest
 import com.example.sw0b_001.ui.views.compose.ReliabilityTestRequestPayload
@@ -106,15 +108,11 @@ class PlatformsViewModel : ViewModel() {
         return Datastore.getDatastore(context).availablePlatformsDao().fetch(name)
     }
 
-    fun getAccount(context: Context, accountIdentifier: String): StoredPlatformsEntity? {
-        return Datastore.getDatastore(context).storedPlatformsDao().fetchAccount(accountIdentifier)
-    }
-
     fun sendPublishingForImage(
         context: Context,
         imageViewModel: ImageViewModel,
         account: StoredPlatformsEntity? = null,
-        text: String,
+        text: ByteArray,
         isBridge: Boolean,
         isLoggedIn: Boolean,
         languageCode: String = "en",
@@ -132,11 +130,11 @@ class PlatformsViewModel : ViewModel() {
 
                     val content = Bridges.encryptContent(
                         context,
-                        imageViewModel.processedImage.value!!.rawBytes!! +
-                                text.encodeToByteArray(),
+                        imageViewModel.processedImage.value!!.rawBytes!! + text,
                         false,
                         imageLength = imageViewModel.processedImage.value!!.rawBytes!!.size,
-                        textLength = text.encodeToByteArray().size
+                        textLength = text.size,
+                        subscriptionId = subscriptionId,
                     )
 
                     payload = if(isLoggedIn) { Bridges.payloadOnly(content) }
@@ -155,11 +153,10 @@ class PlatformsViewModel : ViewModel() {
                             ))
 
                     val ad = Publishers.fetchPublisherPublicKey(context)
-                    payload = ComposeHandlers.composeV2(
+                    payload = PayloadEncryptionComposeDecomposeInit.compose(
                         context = context,
-                        contentFormatV2Bytes = imageViewModel.processedImage.value!!.rawBytes!! +
-                                text.encodeToByteArray(),
-                        AD = ad!!,
+                        content = imageViewModel.processedImage.value!!.rawBytes!! + text,
+                        ad = ad!!,
                         platform = platform,
                         account = account,
                         languageCode = languageCode,
@@ -167,8 +164,10 @@ class PlatformsViewModel : ViewModel() {
                     )
                 }
 
-                val gatewayClientMSISDN = GatewayClientsCommunications(context)
-                    .getDefaultGatewayClient() ?: return@launch
+                val address = context.settingsGetDefaultGatewayClient
+                if(address == null) {
+                    throw Exception("No default Gateway client")
+                }
 
                 ImageTransmissionProtocol.startWorkManager(
                     context = context,
@@ -177,8 +176,8 @@ class PlatformsViewModel : ViewModel() {
                     version = ITP_VERSION_VALUE,
                     sessionId = ImageTransmissionProtocol.getItpSession(context).toByte(),
                     imageLength = imageViewModel.processedImage.value!!.rawBytes!!.size.toBytes(),
-                    textLength = text.length.toBytes(),
-                    address = gatewayClientMSISDN,
+                    textLength = text.size.toBytes(),
+                    address = address,
                     subscriptionId = subscriptionId,
                 )
                 onSuccess()
@@ -192,7 +191,7 @@ class PlatformsViewModel : ViewModel() {
 
     fun sendPublishingForMessaging(
         context: Context,
-        messageContent: MessageComposeHandler.MessageContent,
+        messageContent: Composers.MessageComposeHandler.MessageContent,
         account: StoredPlatformsEntity,
         subscriptionId: Long,
         smsTransmission: Boolean = true,
@@ -202,11 +201,12 @@ class PlatformsViewModel : ViewModel() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
-                    val contentFormatV2Bytes = createMessageByteBuffer(
-                        from = messageContent.from.value!!,
-                        to = messageContent.to.value,
-                        message = messageContent.message.value,
-                    )
+                    val contentFormatV2Bytes = Composers.MessageComposeHandler
+                        .createMessageByteBuffer(
+                            from = messageContent.from.value!!,
+                            to = messageContent.to.value,
+                            message = messageContent.message.value,
+                        )
 
                     val languageCode = Locale.getDefault().language.take(2).lowercase()
                     val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
@@ -223,10 +223,10 @@ class PlatformsViewModel : ViewModel() {
                                 account.name
                             ))
 
-                    ComposeHandlers.composeV2(
+                    PayloadEncryptionComposeDecomposeInit.compose(
                         context = context,
-                        contentFormatV2Bytes = contentFormatV2Bytes,
-                        AD = ad,
+                        content = contentFormatV2Bytes,
+                        ad = ad,
                         platform = platform,
                         account = account,
                         languageCode = validLanguageCode,
@@ -242,41 +242,9 @@ class PlatformsViewModel : ViewModel() {
         }
     }
 
-    private fun createMessageByteBuffer(
-        from: String,
-        to: String,
-        message: String
-    ): ByteArray {
-
-        // Convert strings to byte arrays
-        val fromBytes = from.toByteArray(StandardCharsets.UTF_8)
-        val toBytes = to.toByteArray(StandardCharsets.UTF_8)
-        val bodyBytes = message.toByteArray(StandardCharsets.UTF_8)
-
-        val buffer = ByteBuffer.allocate(14 +
-                fromBytes.size + toBytes.size + bodyBytes.size).order(ByteOrder.LITTLE_ENDIAN)
-
-        // Write field lengths according to specification
-        buffer.put(fromBytes.size.toByte())
-        buffer.putShort(toBytes.size.toShort())
-        buffer.putShort(0)
-        buffer.putShort(0)
-        buffer.put(0.toByte())
-        buffer.putShort(bodyBytes.size.toShort())
-        buffer.putShort(0.toShort()) // access token
-        buffer.putShort(0.toShort()) // refresh token
-
-        // Write field values
-        buffer.put(fromBytes)
-        buffer.put(toBytes)
-        buffer.put(bodyBytes)
-
-        return buffer.array()
-    }
-
     fun sendPublishingForEmail(
         context: Context,
-        emailContent: EmailComposeHandler.EmailContent,
+        emailContent: Composers.EmailComposeHandler.EmailContent,
         account: StoredPlatformsEntity?,
         isBridge: Boolean,
         subscriptionId: Long,
@@ -296,34 +264,37 @@ class PlatformsViewModel : ViewModel() {
                             subject = emailContent.subject.value,
                             body = emailContent.body.value,
                             imageLength = 0,
-                            textLength = 0
-                        ) { onCompleteCallback(null) }.first
+                            textLength = 0,
+                            smsTransmission = smsTransmission,
+                            subscriptionId = subscriptionId
+                        ).first
 
-                        val gatewayClientMSISDN = GatewayClientsCommunications(context)
-                            .getDefaultGatewayClient()
+                        val address = context.settingsGetDefaultGatewayClient
+                        if(address == null) {
+                            onFailureCallback("No default Gateway Client...")
+                            return@withContext
+                        }
 
-                        gatewayClientMSISDN?.let {
-                            if(context.isDefault()) {
-                                val smsManager = SmsManager(ConversationsViewModel())
-                                smsManager.sendSms(
-                                    context = context,
-                                    text = txtTransmission!!,
-                                    address = gatewayClientMSISDN,
-                                    subscriptionId = subscriptionId,
-                                    threadId = context.getThreadId(gatewayClientMSISDN),
-                                    callback = { conversation -> onCompleteCallback(null) }
-                                )
+                        if(context.isDefault()) {
+                            val smsManager = SmsManager(ConversationsViewModel())
+                            smsManager.sendSms(
+                                context = context,
+                                text = txtTransmission!!,
+                                address = address,
+                                subscriptionId = subscriptionId,
+                                threadId = context.getThreadId(address),
+                                callback = { conversation -> onCompleteCallback(null) }
+                            )
+                        }
+                        else {
+                            val intent = SMSHandler.transferToDefaultSMSApp(
+                                context,
+                                address,
+                                txtTransmission
+                            ).apply {
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK
                             }
-                            else {
-                                val intent = SMSHandler.transferToDefaultSMSApp(
-                                    context,
-                                    gatewayClientMSISDN,
-                                    txtTransmission
-                                ).apply {
-                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                }
-                                context.startActivity(intent)
-                            }
+                            context.startActivity(intent)
                         }
                     }
                     else {
@@ -341,8 +312,8 @@ class PlatformsViewModel : ViewModel() {
                         val contentFormatBytes = if (
                             account.accessToken?.isNotEmpty() == true
                         ) {
-                            createEmailByteBuffer(
-                                from = account.account!!, // 'from' is from the selected account
+                            Composers.EmailComposeHandler.createEmailByteBuffer(
+                                from= account.account!!, // 'from' is from the selected account
                                 to = emailContent.to.value,
                                 cc = emailContent.cc.value,
                                 bcc = emailContent.bcc.value,
@@ -352,7 +323,7 @@ class PlatformsViewModel : ViewModel() {
                                 refreshToken = account.refreshToken
                             )
                         } else {
-                            createEmailByteBuffer(
+                            Composers.EmailComposeHandler.createEmailByteBuffer(
                                 from = account.account!!,
                                 to = emailContent.to.value,
                                 cc = emailContent.cc.value,
@@ -374,10 +345,10 @@ class PlatformsViewModel : ViewModel() {
                         val languageCode = Locale.getDefault().language.take(2).lowercase(Locale.ROOT)
                         val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
 
-                        val payload = ComposeHandlers.composeV2(
+                        val payload = PayloadEncryptionComposeDecomposeInit.compose(
                             context = context,
-                            contentFormatV2Bytes = contentFormatBytes,
-                            AD = ad,
+                            content = contentFormatBytes,
+                            ad = ad,
                             platform = platform,
                             account = account,
                             languageCode = validLanguageCode,
@@ -396,50 +367,6 @@ class PlatformsViewModel : ViewModel() {
                 }
             }
         }
-    }
-
-    private fun createEmailByteBuffer(
-        from: String, to: String, cc: String, bcc: String, subject: String, body: String,
-        accessToken: String? = null, refreshToken: String? = null
-    ): ByteArray {
-        val fromBytes = from.toByteArray(StandardCharsets.UTF_8)
-        val toBytes = to.toByteArray(StandardCharsets.UTF_8)
-        val ccBytes = cc.toByteArray(StandardCharsets.UTF_8)
-        val bccBytes = bcc.toByteArray(StandardCharsets.UTF_8)
-        val subjectBytes = subject.toByteArray(StandardCharsets.UTF_8)
-        val bodyBytes = body.toByteArray(StandardCharsets.UTF_8)
-        val accessTokenBytes = accessToken?.toByteArray(StandardCharsets.UTF_8)
-        val refreshTokenBytes = refreshToken?.toByteArray(StandardCharsets.UTF_8)
-
-        // Calculate total size for the buffer
-        val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 2 + 2 +
-                fromBytes.size + toBytes.size + ccBytes.size + bccBytes.size +
-                subjectBytes.size + bodyBytes.size +
-                (accessTokenBytes?.size ?: 0) + (refreshTokenBytes?.size ?: 0)
-
-        val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
-
-        // Write field lengths
-        buffer.put(fromBytes.size.toByte())
-        buffer.putShort(toBytes.size.toShort())
-        buffer.putShort(ccBytes.size.toShort())
-        buffer.putShort(bccBytes.size.toShort())
-        buffer.put(subjectBytes.size.toByte())
-        buffer.putShort(bodyBytes.size.toShort())
-        buffer.putShort((accessTokenBytes?.size ?: 0).toShort())
-        buffer.putShort((refreshTokenBytes?.size ?: 0).toShort())
-
-        // Write field values
-        buffer.put(fromBytes)
-        buffer.put(toBytes)
-        buffer.put(ccBytes)
-        buffer.put(bccBytes)
-        buffer.put(subjectBytes)
-        buffer.put(bodyBytes)
-        accessTokenBytes?.let { buffer.put(it) }
-        refreshTokenBytes?.let { buffer.put(it) }
-
-        return buffer.array()
     }
 
     fun sendPublishingForTest(
@@ -469,16 +396,16 @@ class PlatformsViewModel : ViewModel() {
                     val languageCode = Locale.getDefault().language.take(2).lowercase()
                     val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
 
-                    val v2PayloadBytes = ComposeHandlers.composeV2(
+                    val v2PayloadBytes = PayloadEncryptionComposeDecomposeInit.compose(
                         context = context,
-                        contentFormatV2Bytes = contentFormatV2Bytes,
-                        AD = AD,
+                        content = contentFormatV2Bytes,
+                        ad = AD,
                         platform = platform,
                         account = null,
                         languageCode = validLanguageCode,
                         smsTransmission = true,
                         subscriptionId = subscriptionId
-                    ){}
+                    )
 
                     if (smsTransmission) {
                         val base64Payload = Base64.encodeToString(v2PayloadBytes, Base64.NO_WRAP)
@@ -534,12 +461,12 @@ class PlatformsViewModel : ViewModel() {
                     val AD = Publishers.fetchPublisherPublicKey(context)
                         ?: return@withContext onFailure("Could not fetch publisher key.")
 
-                    val contentFormatV2Bytes = createTextByteBuffer(
+                    val contentFormatV2Bytes = Composers.TextComposeHandler.createTextByteBuffer(
                         from = account.account!!,
                         body = text,
                         accessToken = account.accessToken,
                         refreshToken = account.refreshToken
-                    ).array()
+                    )
 
                     val platform = Datastore.getDatastore(context).availablePlatformsDao().fetch(account.name!!)
                         ?: return@withContext onFailure("Could not find platform details for '${account.name}'.")
@@ -547,10 +474,10 @@ class PlatformsViewModel : ViewModel() {
                     val languageCode = Locale.getDefault().language.take(2).lowercase()
                     val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
 
-                    val v2PayloadBytes = ComposeHandlers.composeV2(
+                    val v2PayloadBytes = PayloadEncryptionComposeDecomposeInit.compose(
                         context = context,
-                        contentFormatV2Bytes = contentFormatV2Bytes,
-                        AD = AD,
+                        content = contentFormatV2Bytes,
+                        ad = AD,
                         platform = platform,
                         account = account,
                         languageCode = validLanguageCode,
@@ -574,250 +501,6 @@ class PlatformsViewModel : ViewModel() {
         }
     }
 
-    private fun createTextByteBuffer(
-        from: String, body: String,
-        accessToken: String? = null, refreshToken: String? = null
-    ): ByteBuffer {
-        // Define size constants
-        val BYTE_SIZE_LIMIT = 255
-        val SHORT_SIZE_LIMIT = 65535
-
-        // Convert strings to byte arrays
-        val fromBytes = from.toByteArray(StandardCharsets.UTF_8)
-        val bodyBytes = body.toByteArray(StandardCharsets.UTF_8)
-        val accessTokenBytes = accessToken?.toByteArray(StandardCharsets.UTF_8)
-        val refreshTokenBytes = refreshToken?.toByteArray(StandardCharsets.UTF_8)
-
-        // Get sizes for validation and buffer allocation
-        val fromSize = fromBytes.size
-        val bodySize = bodyBytes.size
-        val accessTokenSize = accessTokenBytes?.size ?: 0
-        val refreshTokenSize = refreshTokenBytes?.size ?: 0
-
-        // Validate field sizes
-        if (fromSize > BYTE_SIZE_LIMIT) throw IllegalArgumentException("From field exceeds maximum size of $BYTE_SIZE_LIMIT bytes")
-        if (bodySize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("Body field exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
-        if (accessTokenSize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("Access token exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
-        if (refreshTokenSize > SHORT_SIZE_LIMIT) throw IllegalArgumentException("Refresh token exceeds maximum size of $SHORT_SIZE_LIMIT bytes")
-
-        val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 2 + 2 +
-                fromSize + bodySize + accessTokenSize + refreshTokenSize
-
-        val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
-
-        // Write field lengths
-        buffer.put(fromSize.toByte())
-        buffer.putShort(0)
-        buffer.putShort(0)
-        buffer.putShort(0)
-        buffer.put(0.toByte())
-        buffer.putShort(bodySize.toShort())
-        buffer.putShort(accessTokenSize.toShort())
-        buffer.putShort(refreshTokenSize.toShort())
-
-        // Write field values
-        buffer.put(fromBytes)
-        buffer.put(bodyBytes)
-        accessTokenBytes?.let { buffer.put(it) }
-        refreshTokenBytes?.let { buffer.put(it) }
-
-        buffer.flip()
-        return buffer
-    }
-
-    object EmailComposeHandler {
-        @Serializable
-        data class EmailContent(
-            @Serializable(with = MutableStateSerializer::class)
-            var to: MutableState<String> = mutableStateOf(""),
-            @Serializable(with = MutableStateSerializer::class)
-            var cc: MutableState<String> = mutableStateOf(""),
-            @Serializable(with = MutableStateSerializer::class)
-            var bcc: MutableState<String> = mutableStateOf(""),
-            @Serializable(with = MutableStateSerializer::class)
-            var subject: MutableState<String> = mutableStateOf(""),
-            @Serializable(with = MutableStateSerializer::class)
-            var body: MutableState<String> = mutableStateOf(""),
-            @Serializable(with = MutableStateSerializer::class)
-            var imageUri: MutableState<String> = mutableStateOf(""),
-        )
-
-        fun decomposeMessage(
-            contentBytes: ByteArray,
-            imageLength: Int,
-            textLength: Int,
-        ): EmailContent {
-            var contentBytes = contentBytes
-            try {
-                if(imageLength > 0) {
-                    parseLocalImageContent(
-                        contentBytes,
-                        imageLength,
-                        textLength
-                    ).let {
-                        contentBytes = it.second
-                    }
-                }
-                val buffer = ByteBuffer.wrap(contentBytes).order(ByteOrder.LITTLE_ENDIAN)
-                val fromLen = buffer.get().toInt() and 0xFF
-                val toLen = buffer.getShort().toInt() and 0xFFFF
-                val ccLen = buffer.getShort().toInt() and 0xFFFF
-                val bccLen = buffer.getShort().toInt() and 0xFFFF
-                val subjectLen = buffer.get().toInt() and 0xFF
-                val bodyLen = buffer.getShort().toInt() and 0xFFFF
-                val accessLen = buffer.getShort().toInt() and 0xFFFF
-                val refreshLen = buffer.getShort().toInt() and 0xFFFF
-
-                // Skip 'from' field
-                if (fromLen > 0) buffer.position(buffer.position() + fromLen)
-
-                // Read the relevant fields for the EmailContent object
-                val to = ByteArray(toLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
-                val cc = ByteArray(ccLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
-                val bcc = ByteArray(bccLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
-                val subject = ByteArray(subjectLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
-                val body = ByteArray(bodyLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
-
-                // Skip token fields
-                if (accessLen > 0) buffer.position(buffer.position() + accessLen)
-                if (refreshLen > 0) buffer.position(buffer.position() + refreshLen)
-
-                return EmailContent(
-                    mutableStateOf(to),
-                    mutableStateOf(cc),
-                    mutableStateOf(bcc),
-                    mutableStateOf(subject),
-                    mutableStateOf(body),
-                )
-            } catch (e: Exception) {
-                e.printStackTrace()
-                return EmailContent()
-            }
-        }
-
-        fun decomposeBridgeMessage(message: String): EmailContent {
-            return try {
-                // Bridge messages typically don't include 'from' in their direct content string
-                // Format: to:cc:bcc:subject:body
-                val parts = message.split(":", limit = 5)
-                if (parts.size < 5) {
-                    EmailContent(
-                        to = mutableStateOf(parts.getOrElse(0) { "" }),
-                        cc = mutableStateOf(parts.getOrElse(1) { "" }),
-                        bcc = mutableStateOf(parts.getOrElse(2) { "" }),
-                        subject = mutableStateOf(parts.getOrElse(3) { "" }),
-                        body = mutableStateOf(parts.getOrElse(4) { "" }),
-                    )
-                } else {
-                    EmailContent(
-                        to = mutableStateOf(parts[0]),
-                        cc = mutableStateOf(parts[1]),
-                        bcc = mutableStateOf(parts[2]),
-                        subject = mutableStateOf(parts[3]),
-                        body = mutableStateOf(parts[4]),
-                    )
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                EmailContent()
-            }
-        }
-    }
-
-    object TextComposeHandler {
-        @Serializable
-        data class TextContent(
-            @Serializable(with = MutableStateSerializer::class)
-            val from: MutableState<String?> = mutableStateOf(null),
-            @Serializable(with = MutableStateSerializer::class)
-            val text: MutableState<String> = mutableStateOf(""),
-        )
-
-        fun decomposeMessage(contentBytes: ByteArray): TextContent {
-            return try {
-                val buffer = ByteBuffer.wrap(contentBytes).order(ByteOrder.LITTLE_ENDIAN)
-
-                val fromLen = buffer.get().toInt() and 0xFF
-                val toLen = buffer.getShort().toInt() and 0xFFFF
-                val ccLen = buffer.getShort().toInt() and 0xFFFF
-                val bccLen = buffer.getShort().toInt() and 0xFFFF
-                val subjectLen = buffer.get().toInt() and 0xFF
-                val bodyLen = buffer.getShort().toInt() and 0xFFFF
-                val accessLen = buffer.getShort().toInt() and 0xFFFF
-                val refreshLen = buffer.getShort().toInt() and 0xFFFF
-
-                val from = ByteArray(fromLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
-
-                // Skip unused fields
-                if (toLen > 0) buffer.position(buffer.position() + toLen)
-                if (ccLen > 0) buffer.position(buffer.position() + ccLen)
-                if (bccLen > 0) buffer.position(buffer.position() + bccLen)
-                if (subjectLen > 0) buffer.position(buffer.position() + subjectLen)
-
-                val text = ByteArray(bodyLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
-
-                // Skip token fields
-                if (accessLen > 0) buffer.position(buffer.position() + accessLen)
-                if (refreshLen > 0) buffer.position(buffer.position() + refreshLen)
-
-                TextContent(
-                    from = mutableStateOf(from),
-                    text = mutableStateOf(text)
-                )
-            } catch (e: Exception) {
-                TextContent()
-            }
-        }
-    }
-
-    object MessageComposeHandler {
-        @Serializable
-        data class MessageContent(
-            @Serializable(with = MutableStateSerializer::class)
-            val from: MutableState<String?> = mutableStateOf(null),
-            @Serializable(with = MutableStateSerializer::class)
-            val to: MutableState<String> = mutableStateOf(""),
-            @Serializable(with = MutableStateSerializer::class)
-            val message: MutableState<String> = mutableStateOf(""),
-        )
-
-        fun decomposeMessage(contentBytes: ByteArray): MessageContent {
-            return try {
-                val buffer = ByteBuffer.wrap(contentBytes).order(ByteOrder.LITTLE_ENDIAN)
-
-                val fromLen = buffer.get().toInt() and 0xFF
-                val toLen = buffer.getShort().toInt() and 0xFFFF
-                val ccLen = buffer.getShort().toInt() and 0xFFFF
-                val bccLen = buffer.getShort().toInt() and 0xFFFF
-                val subjectLen = buffer.get().toInt() and 0xFF
-                val bodyLen = buffer.getShort().toInt() and 0xFFFF
-                val accessLen = buffer.getShort().toInt() and 0xFFFF
-                val refreshLen = buffer.getShort().toInt() and 0xFFFF
-
-                val from = ByteArray(fromLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
-                val to = ByteArray(toLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
-
-                if (ccLen > 0) buffer.position(buffer.position() + ccLen)
-                if (bccLen > 0) buffer.position(buffer.position() + bccLen)
-                if (subjectLen > 0) buffer.position(buffer.position() + subjectLen)
-
-                val message = ByteArray(bodyLen).also { buffer.get(it) }.toString(StandardCharsets.UTF_8)
-
-                if (accessLen > 0) buffer.position(buffer.position() + accessLen)
-                if (refreshLen > 0) buffer.position(buffer.position() + refreshLen)
-
-                MessageContent(
-                    from = mutableStateOf(from),
-                    to = mutableStateOf(to),
-                    message = mutableStateOf(message)
-                )
-            } catch (e: Exception) {
-                e.printStackTrace()
-                MessageContent()
-            }
-        }
-    }
-
     companion object {
         const val ITP_VERSION_VALUE: Byte = 0x04
 
@@ -826,7 +509,8 @@ class PlatformsViewModel : ViewModel() {
             imageLength: Int,
             textLength: Int,
         ) : Pair<ByteArray, ByteArray> {
-            var content = Base64.decode(content, Base64.DEFAULT)
+//            var content = Base64.decode(content, Base64.DEFAULT)
+            var content = content
             val image = content.take(imageLength).toByteArray().also {
                 content = content.drop(imageLength).toByteArray() }
             val text = content.take(textLength).toByteArray()

@@ -65,7 +65,6 @@ import com.example.sw0b_001.ui.navigation.EmailComposeNav
 import com.example.sw0b_001.ui.navigation.MessageComposeNav
 import com.example.sw0b_001.ui.navigation.TextComposeNav
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.triggerAddPlatformRequest
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.EmailComposeHandler.EmailContent
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
 import java.util.Locale
@@ -489,25 +488,7 @@ private fun ComposeMessages(
             navController.navigate(ComposeScreen(
                 type = if(platform != null) ServiceTypes.valueOf(platform.service_type!!)
                     else ServiceTypes.BRIDGE,
-                emailNav = if(platform?.service_type == ServiceTypes.EMAIL.name)
-                    Json.encodeToString<EmailComposeNav>(EmailComposeNav(
-                        platformName = platform.name,
-                        subscriptionId = subscriptionId,
-                    ))
-                else null,
-                textNav = if(platform?.service_type == ServiceTypes.TEXT.name)
-                    Json.encodeToString<TextComposeNav>(TextComposeNav(
-                        platformName = platform.name,
-                        subscriptionId = subscriptionId,
-                        serviceType = ServiceTypes.valueOf(platform.service_type!!),
-                    ))
-                else null,
-                messageNav = if(platform?.service_type == ServiceTypes.MESSAGE.name)
-                    Json.encodeToString<MessageComposeNav>(MessageComposeNav(
-                        platformName = platform.name,
-                        subscriptionId = subscriptionId,
-                    ))
-                else null,
+                messageId = null,
                 isOnboarding = isOnboarding
             ))
         },

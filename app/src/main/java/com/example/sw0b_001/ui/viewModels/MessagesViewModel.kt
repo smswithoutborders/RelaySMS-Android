@@ -37,6 +37,18 @@ class MessagesViewModel : ViewModel() {
 
     private var conversationsPager: Flow<PagingData<EncryptedContent>>? = null
 
+    fun getMessage(
+        context: Context,
+        messageId: Long,
+        callback: (EncryptedContent) -> Unit,
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val encryptedContent = Datastore.getDatastore(context)
+                .encryptedContentDAO().get(messageId)
+            callback(encryptedContent)
+        }
+    }
+
     fun getMessages(context: Context): Flow<PagingData<EncryptedContent>> {
         if(conversationsPager == null) {
             conversationsPager = Pager(
@@ -68,10 +80,6 @@ class MessagesViewModel : ViewModel() {
             }
         }
         return inboxMessageList
-    }
-
-    private fun loadEncryptedContents() : LiveData<MutableList<EncryptedContent>> {
-        return datastore.encryptedContentDAO().all(Platforms.ServiceTypes.BRIDGE_INCOMING.name)
     }
 
     fun insert(encryptedContent: EncryptedContent) : Long {
