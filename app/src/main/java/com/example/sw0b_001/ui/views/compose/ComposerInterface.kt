@@ -48,6 +48,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -111,17 +112,39 @@ fun ComposerInterface(
     onSendCallback: ((Boolean) -> Unit)? = null,
 ) {
     val context = LocalContext.current
-    val subscriptionId by remember{ mutableStateOf(
-        if(context.isDefault()) context.getDefaultSimSubscription() ?: -1L else -1L)}
+    val subscriptionId by remember{
+        mutableLongStateOf(
+            if(context.isDefault()) context.getDefaultSimSubscription() ?: -1L else -1L)
+    }
     BackHandler {
         navController.popBackStack()
     }
 
     var message by remember{ mutableStateOf<EncryptedContent?>(null) }
     var isBridge by remember{ mutableStateOf(type == Platforms.ServiceTypes.BRIDGE) }
+
+    val decomposedEmailMessage = remember {
+        mutableStateOf<Composers.EmailComposeHandler.EmailContent?>(null)}
     messageId?.let {
         messagesViewModel.getMessage(context, messageId) {
             message = it
+            if((type == Platforms.ServiceTypes.BRIDGE || type == Platforms.ServiceTypes.EMAIL) &&
+                message?.encryptedContent != null
+            ) {
+                decomposedEmailMessage.value = try {
+                    Composers.EmailComposeHandler
+                        .decomposeMessage(
+                            Base64.decode(message?.encryptedContent,
+                                Base64.DEFAULT),
+                            0,
+                            0,
+                            type == Platforms.ServiceTypes.BRIDGE
+                        )
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    null
+                }
+            } else Composers.EmailComposeHandler.EmailContent()
         }
     }
 
@@ -147,27 +170,28 @@ fun ComposerInterface(
         type != Platforms.ServiceTypes.BRIDGE) }
     var selectedAccount: StoredPlatformsEntity? by remember { mutableStateOf(null) }
 
-
-    val decomposedEmailMessage = remember(message){
-        if(message?.encryptedContent != null) {
-            try {
-                Composers.EmailComposeHandler
-                    .decomposeMessage(
-                        Base64.decode(message!!.encryptedContent,
-                            Base64.DEFAULT),
-                        0,
-                        0,
-                        type == Platforms.ServiceTypes.BRIDGE
-                    )
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-        } else Composers.EmailComposeHandler.EmailContent()
-    }
+//    val decomposedEmailMessage = remember {
+//        if((type == Platforms.ServiceTypes.BRIDGE || type == Platforms.ServiceTypes.EMAIL) &&
+//            message?.encryptedContent != null
+//        ) {
+//            try {
+//                Composers.EmailComposeHandler
+//                    .decomposeMessage(
+//                        Base64.decode(message?.encryptedContent,
+//                            Base64.DEFAULT),
+//                        0,
+//                        0,
+//                        type == Platforms.ServiceTypes.BRIDGE
+//                    )
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//                null
+//            }
+//        } else Composers.EmailComposeHandler.EmailContent()
+//    }
 
     val decomposedMessageMessage = remember(message) {
-        if (message?.encryptedContent != null) {
+        if (type == Platforms.ServiceTypes.MESSAGE && message?.encryptedContent != null) {
             try {
                 val contentBytes = Base64.decode(message!!.encryptedContent,
                     Base64.DEFAULT)
@@ -181,7 +205,7 @@ fun ComposerInterface(
     }
 
     val decomposedTextMessage = remember(message) {
-        if (message?.encryptedContent != null) {
+        if (type == Platforms.ServiceTypes.TEXT && message?.encryptedContent != null) {
             try {
                 val contentBytes = Base64.decode(message?.encryptedContent,
                     Base64.DEFAULT)
@@ -197,8 +221,8 @@ fun ComposerInterface(
     val isSendingEnabled by remember(
         type,
         isSending,
-        decomposedEmailMessage?.to?.value,
-        decomposedEmailMessage?.body?.value,
+        decomposedEmailMessage.value?.to,
+        decomposedEmailMessage.value?.body,
         decomposedTextMessage?.text?.value,
         decomposedMessageMessage?.to?.value,
         decomposedMessageMessage?.message?.value
@@ -209,8 +233,8 @@ fun ComposerInterface(
                 Platforms.ServiceTypes.BRIDGE,
                 Platforms.ServiceTypes.BRIDGE_INCOMING -> {
                     !isSending &&
-                            decomposedEmailMessage?.to?.value?.isNotEmpty() == true &&
-                            decomposedEmailMessage?.body?.value?.isNotEmpty() == true
+                            decomposedEmailMessage.value?.to?.value?.isNotEmpty() == true &&
+                            decomposedEmailMessage.value?.body?.value?.isNotEmpty() == true
                 }
                 Platforms.ServiceTypes.TEXT -> {
                     !isSending &&
@@ -281,24 +305,24 @@ fun ComposerInterface(
                     Platforms.ServiceTypes.EMAIL -> {
                         Composers.EmailComposeHandler.createEmailByteBuffer(
                             from = null,
-                            to = decomposedEmailMessage?.to!!.value,
-                            cc = decomposedEmailMessage.cc.value,
-                            bcc = decomposedEmailMessage.bcc.value,
-                            subject = decomposedEmailMessage.subject.value,
-                            body = decomposedEmailMessage.body.value,
+                            to = decomposedEmailMessage.value?.to!!.value,
+                            cc = decomposedEmailMessage.value?.cc!!.value,
+                            bcc = decomposedEmailMessage.value?.bcc!!.value,
+                            subject = decomposedEmailMessage.value?.subject!!.value,
+                            body = decomposedEmailMessage.value?.body!!.value,
                         )
                     }
                     Platforms.ServiceTypes.TEXT -> {
                         Composers.TextComposeHandler.createTextByteBuffer(
                             from = from.value!!,
-                            body = decomposedEmailMessage?.body!!.value,
+                            body = decomposedEmailMessage.value?.body!!.value,
                         )
                     }
                     Platforms.ServiceTypes.MESSAGE -> {
                         Composers.MessageComposeHandler.createMessageByteBuffer(
                             from = from.value!!,
                             to = decomposedMessageMessage?.to!!.value,
-                            message = decomposedEmailMessage?.body!!.value,
+                            message = decomposedEmailMessage.value?.body!!.value,
                         )
                     }
                     else -> byteArrayOf()
@@ -315,7 +339,7 @@ fun ComposerInterface(
                 Platforms.ServiceTypes.BRIDGE_INCOMING -> {
                     platformsViewModel.sendPublishingForEmail(
                         context = context,
-                        emailContent = decomposedEmailMessage!!,
+                        emailContent = decomposedEmailMessage!!.value!!,
                         account = selectedAccount,
                         isBridge = isBridge,
                         subscriptionId = subscriptionId,
@@ -416,7 +440,7 @@ fun ComposerInterface(
                 Platforms.ServiceTypes.BRIDGE_INCOMING -> {
                     EmailComposeView(
                         isBridge = isBridge,
-                        emailContent = decomposedEmailMessage!!,
+                        emailContent = decomposedEmailMessage.value!!,
                         from = from.value
                     )
                 }

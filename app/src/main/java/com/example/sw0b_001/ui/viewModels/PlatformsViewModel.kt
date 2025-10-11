@@ -529,7 +529,13 @@ class PlatformsViewModel : ViewModel() {
             val projection: Array<String> = arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER)
 
             try {
-                val cursor: Cursor? = context.contentResolver.query(uri, projection, null, null, null)
+                val cursor: Cursor? = context.contentResolver.query(
+                    uri,
+                    projection,
+                    null,
+                    null,
+                    null
+                )
                 cursor?.use {
                     if (it.moveToFirst()) {
                         val numberIndex = it.getColumnIndex(ContactsContract.Contacts.CONTENT_URI.toString())
