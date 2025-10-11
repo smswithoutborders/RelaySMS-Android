@@ -62,6 +62,7 @@ import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.navigation.EmailComposeNav
+import com.example.sw0b_001.ui.navigation.MessageViewScreen
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -72,12 +73,13 @@ import kotlinx.serialization.json.Json
 @Composable
 fun EmailDetailsView(
     platformsViewModel: PlatformsViewModel,
+    messagesViewModel: MessagesViewModel,
     navController: NavController,
     isBridge: Boolean = false
 ) {
     val context = LocalContext.current
     var from by remember{ mutableStateOf(
-        platformsViewModel.message?.fromAccount ?: "RelaySMS account") }
+        messagesViewModel.message?.fromAccount ?: "RelaySMS account") }
     var to by remember{ mutableStateOf("") }
     var cc by remember{ mutableStateOf("") }
     var bcc by remember{ mutableStateOf("") }
@@ -86,7 +88,7 @@ fun EmailDetailsView(
     var date by remember{ mutableLongStateOf(0L) }
     var imageBitmap by remember{ mutableStateOf<Bitmap?>(null) }
 
-    val message = platformsViewModel.message
+    val message = messagesViewModel.message
     if (message?.encryptedContent != null) {
         if (isBridge) {
             when (message.type) {
@@ -156,7 +158,7 @@ fun EmailDetailsView(
             RelayAppBar(navController = navController, {
                 CoroutineScope(Dispatchers.Default).launch {
                     val platform = if(!isBridge) platformsViewModel.getAvailablePlatforms(context,
-                        platformsViewModel.message!!.platformName!!) else null
+                        messagesViewModel.message!!.platformName!!) else null
                     platformsViewModel.platform = platform
 
                     CoroutineScope(Dispatchers.Main).launch {
@@ -165,14 +167,13 @@ fun EmailDetailsView(
                                 type = if(platform != null)
                                     Platforms.ServiceTypes.EMAIL
                                 else Platforms.ServiceTypes.BRIDGE,
-                                messageId = message?.id
                             )
                         )
                     }
                 }
             }) {
                 val messagesViewModel = MessagesViewModel()
-                messagesViewModel.delete(context, platformsViewModel.message!!) {
+                messagesViewModel.delete(context, messagesViewModel.message!!) {
                     navController.popBackStack()
                 }
             }
@@ -324,9 +325,11 @@ fun EmailDetailsPreview() {
         encryptedContent.encryptedContent = "reply@relaysms.me:cc@relaysms.me:bcc@relaysms.me:subject here:This is an encrypted content"
 
         val platformsViewModel = remember{ PlatformsViewModel() }
-        platformsViewModel.message = encryptedContent
+        val messagesViewModel = remember{ MessagesViewModel() }
+        messagesViewModel.message = encryptedContent
         EmailDetailsView(
             platformsViewModel=platformsViewModel,
+            messagesViewModel= messagesViewModel,
             navController = rememberNavController()
         )
     }

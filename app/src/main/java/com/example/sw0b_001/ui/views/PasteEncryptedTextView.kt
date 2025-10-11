@@ -40,6 +40,7 @@ import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.BridgeViewScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
+import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -48,6 +49,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun PasteEncryptedTextView(
     platformsViewModel: PlatformsViewModel,
+    messagesViewModel: MessagesViewModel,
     navController: NavController
 ) {
     val context = LocalContext.current
@@ -164,7 +166,7 @@ fun PasteEncryptedTextView(
                             onSuccessCallback = {
                                 val scope = CoroutineScope(Dispatchers.Main).launch {
 //                            navController.popBackStack()
-                                    platformsViewModel.message = it
+                                    messagesViewModel.message = it
                                     navController.navigate(BridgeViewScreen)
                                 }
                             }
@@ -194,6 +196,7 @@ fun PasteEncryptedTextView(
 fun PasteTextViewPreview() {
     PasteEncryptedTextView(
         platformsViewModel = remember{ PlatformsViewModel() },
+        messagesViewModel = remember{ MessagesViewModel() },
         navController = NavController(LocalContext.current)
     )
 }

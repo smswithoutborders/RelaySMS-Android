@@ -374,7 +374,6 @@ class MainActivity : AppCompatActivity() {
                 ComposerInterface(
                     navController = navController,
                     type = composeScreenNav.type,
-                    messageId = composeScreenNav.messageId,
                     imageViewModel = imageViewModel,
                     messagesViewModel = messagesViewModel,
                     onSendCallback = if(composeScreenNav.isOnboarding)
@@ -385,30 +384,35 @@ class MainActivity : AppCompatActivity() {
                 EmailDetailsView(
                     navController = navController,
                     platformsViewModel = platformsViewModel,
+                    messagesViewModel = messagesViewModel,
                 )
             }
             composable<BridgeViewScreen> {
                 EmailDetailsView(
                     navController = navController,
                     platformsViewModel = platformsViewModel,
+                    messagesViewModel = messagesViewModel,
                     isBridge = true
                 )
             }
             composable<TextViewScreen> {
                 TextDetailsView(
                     navController = navController,
+                    messagesViewModel = messagesViewModel,
                     platformsViewModel = platformsViewModel,
                 )
             }
             composable<MessageViewScreen> {
                 MessageDetailsView(
                     navController = navController,
+                    messagesViewModel = messagesViewModel,
                     platformsViewModel = platformsViewModel,
                 )
             }
             composable<PasteEncryptedTextScreen> {
                 PasteEncryptedTextView(
                     platformsViewModel = platformsViewModel,
+                    messagesViewModel = messagesViewModel,
                     navController = navController,
                 )
             }

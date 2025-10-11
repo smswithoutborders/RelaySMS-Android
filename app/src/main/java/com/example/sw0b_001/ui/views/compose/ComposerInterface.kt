@@ -47,6 +47,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableLongStateOf
@@ -82,6 +83,7 @@ import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.extensions.context.settingsGetNotShowChooseGatewayClient
+import com.example.sw0b_001.ui.components.AttachImageView
 import com.example.sw0b_001.ui.modals.ComposeChooseGatewayClientsModal
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.navigation.EmailComposeNav
@@ -106,7 +108,6 @@ import kotlin.text.isNotEmpty
 @Composable
 fun ComposerInterface(
     navController: NavController,
-    messageId: Long? = null,
     type: Platforms.ServiceTypes,
     imageViewModel: ImageViewModel,
     messagesViewModel: MessagesViewModel,
@@ -115,27 +116,28 @@ fun ComposerInterface(
     val context = LocalContext.current
     val inPreviewMode = LocalInspectionMode.current
 
+    val message by remember{ mutableStateOf(messagesViewModel.message)}
+
     val subscriptionId by remember{
         mutableLongStateOf(
+            if(inPreviewMode) -1 else
             if(context.isDefault()) context.getDefaultSimSubscription() ?: -1L else -1L)
     }
     BackHandler {
+        imageViewModel.reset()
         navController.popBackStack()
     }
 
-    var message by remember{ mutableStateOf<EncryptedContent?>(null) }
     var isBridge by remember{ mutableStateOf(type == Platforms.ServiceTypes.BRIDGE) }
 
-    var imageBitmap: Bitmap? by remember{ mutableStateOf(
+    val processedImage by imageViewModel.processedImage.collectAsState()
+
+    var imageBitmap: Bitmap? = remember(processedImage){
         if(inPreviewMode) {
             BitmapFactory.decodeResource(context.resources,
                 com.afkanerd.lib_image_android.R.drawable._0241226_124819)
         }
-        else imageViewModel.processedImage.value?.image ?: imageViewModel.originalBitmap
-    ) }
-
-    messageId?.let {
-        message = messagesViewModel.getMessage(context, messageId).observeAsState().value
+        else processedImage?.image ?: imageViewModel.originalBitmap
     }
 
     val from = remember { mutableStateOf(when(type) {
@@ -160,7 +162,7 @@ fun ComposerInterface(
         type != Platforms.ServiceTypes.BRIDGE) }
     var selectedAccount: StoredPlatformsEntity? by remember { mutableStateOf(null) }
 
-    val decomposedEmailMessage = remember(message) {
+    val decomposedEmailMessage = remember() {
         if((type == Platforms.ServiceTypes.BRIDGE || type == Platforms.ServiceTypes.EMAIL) &&
             message?.encryptedContent != null
         ) {
@@ -174,9 +176,12 @@ fun ComposerInterface(
                         type == Platforms.ServiceTypes.BRIDGE
                     ).apply {
                         if(message?.imageLength!! > 0) {
-                            imageBitmap = BitmapFactory
-                                .decodeByteArray(this.image.value, 0,
-                                    this.image.value!!.size)
+                            imageViewModel.setImage(
+                                bitmap = BitmapFactory.decodeByteArray(
+                                    this.image.value, 0,
+                                        this.image.value!!.size),
+                                rawBytes = this.image.value!!
+                            )
                         }
                     }
             } catch (e: Exception) {
@@ -355,6 +360,7 @@ fun ComposerInterface(
                 Platforms.ServiceTypes.TEST -> {}
             }
         }
+
     }
 
     Scaffold(
@@ -378,6 +384,7 @@ fun ComposerInterface(
                 },
                 navigationIcon = {
                     IconButton(onClick = {
+                        imageViewModel.reset()
                         navController.popBackStack()
                     }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack,
@@ -418,73 +425,55 @@ fun ComposerInterface(
             .fillMaxWidth()
             .padding(innerPadding)
         ) {
-            if(isSending || LocalInspectionMode.current) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            }
-            when(type) {
-                Platforms.ServiceTypes.EMAIL,
-                Platforms.ServiceTypes.BRIDGE,
-                Platforms.ServiceTypes.BRIDGE_INCOMING -> {
-                    EmailComposeView(
-                        isBridge = isBridge,
-                        emailContent = decomposedEmailMessage!!,
-                        from = from.value
-                    )
+            Column {
+                if(isSending || LocalInspectionMode.current) {
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                 }
-                Platforms.ServiceTypes.TEXT, Platforms.ServiceTypes.TEST -> {
-                    TextComposeView(
-                        textContent = decomposedTextMessage!!,
-                        serviceType = type
-                    )
-                }
-                Platforms.ServiceTypes.MESSAGE -> {
-                    MessageComposeView(
-                        messageContent = decomposedMessageMessage!!,
-                        from = from.value
-                    )
-                }
-            }
-
-            imageBitmap?.let {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Spacer(Modifier.weight(1f))
-                    Box {
-                        Card(
-                            onClick = {
-                                navController.navigate(ImageRenderNav(false))
-                            },
-                            elevation = CardDefaults.cardElevation(8.dp)
-                        ) {
-                            Image(
-                                bitmap = imageBitmap!!.asImageBitmap(),
-                                "",
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .size(250.dp)
+                Column {
+                    when(type) {
+                        Platforms.ServiceTypes.EMAIL,
+                        Platforms.ServiceTypes.BRIDGE,
+                        Platforms.ServiceTypes.BRIDGE_INCOMING -> {
+                            EmailComposeView(
+                                isBridge = isBridge,
+                                emailContent = decomposedEmailMessage!!,
+                                from = from.value
                             )
                         }
-
-                        Box(
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .size(35.dp)
-                                .align(Alignment.BottomEnd)
-                        ) {
-                            IconButton(
-                                onClick = { imageBitmap = null }
-                            ) {
-                                Icon(Icons.Filled.Cancel, "Cancel")
-                            }
+                        Platforms.ServiceTypes.TEXT, Platforms.ServiceTypes.TEST -> {
+                            TextComposeView(
+                                textContent = decomposedTextMessage!!,
+                                serviceType = type
+                            )
+                        }
+                        Platforms.ServiceTypes.MESSAGE -> {
+                            MessageComposeView(
+                                messageContent = decomposedMessageMessage!!,
+                                from = from.value
+                            )
                         }
                     }
-                    Spacer(Modifier.padding(8.dp))
+
+                }
+
+                imageBitmap?.let {
+                    Spacer(Modifier.padding(24.dp))
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        AttachImageView(
+                            it,
+                            onCancelCallback = {
+                                imageViewModel.reset()
+                                imageBitmap = null
+                            }
+                        ) {
+                            navController.navigate(ImageRenderNav(false))
+                        }
+                    }
                 }
             }
-
             if(showChooseGatewayClient) {
                 ComposeChooseGatewayClientsModal(showChooseGatewayClient) {
                     send()
@@ -509,6 +498,7 @@ fun ComposerInterface(
                     name = platformName
                 )
             }
+
         }
     }
 }
@@ -519,7 +509,6 @@ fun ComposerInterfacePreview() {
     AppTheme {
         ComposerInterface(
             navController = rememberNavController(),
-            messageId = -1,
             type = Platforms.ServiceTypes.BRIDGE,
             imageViewModel = remember{ ImageViewModel() },
             messagesViewModel = remember{ MessagesViewModel() },

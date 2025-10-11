@@ -197,7 +197,7 @@ fun RecentView(
                         message = message, 
                         logo = logo,
                         onClickCallback = { clickedMessage ->
-                            platformsViewModel.message = clickedMessage
+                            messagesViewModel.message = clickedMessage
                             when (clickedMessage.type?.uppercase()) {
                                 Platforms.ServiceTypes.EMAIL.name -> {
                                     navController.navigate(EmailViewScreen)

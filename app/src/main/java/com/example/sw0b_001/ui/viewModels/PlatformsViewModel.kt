@@ -71,7 +71,6 @@ class PlatformsViewModel : ViewModel() {
     private var storedLiveData: LiveData<List<StoredPlatformsEntity>> = MutableLiveData()
 
     var platform by mutableStateOf<AvailablePlatforms?>(null)
-    var message by mutableStateOf<EncryptedContent?>(null)
     var bottomTabsItem by mutableStateOf(BottomTabsItems.BottomBarRecentTab)
 
     // Selection mode properties
@@ -80,11 +79,6 @@ class PlatformsViewModel : ViewModel() {
     var onSelectAll: (() -> Unit)? = null
     var onDeleteSelected: (() -> Unit)? = null
     var onCancelSelection: (() -> Unit)? = null
-
-    fun reset() {
-        platform = null
-        message = null
-    }
 
     fun getAccounts(context: Context, name: String): LiveData<List<StoredPlatformsEntity>> {
         return Datastore.getDatastore(context).storedPlatformsDao().fetchPlatform(name)

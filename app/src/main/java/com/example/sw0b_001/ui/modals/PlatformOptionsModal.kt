@@ -488,7 +488,6 @@ private fun ComposeMessages(
             navController.navigate(ComposeScreen(
                 type = if(platform != null) ServiceTypes.valueOf(platform.service_type!!)
                     else ServiceTypes.BRIDGE,
-                messageId = null,
                 isOnboarding = isOnboarding
             ))
         },

@@ -1,6 +1,9 @@
 package com.example.sw0b_001.ui.viewModels
 
 import android.content.Context
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,7 +22,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class MessagesViewModel : ViewModel() {
-
+//    var message by mutableStateOf<EncryptedContent?>(null)
+    var message: EncryptedContent? = null
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
 
@@ -37,7 +41,8 @@ class MessagesViewModel : ViewModel() {
 
     private var conversationsPager: Flow<PagingData<EncryptedContent>>? = null
 
-    fun getMessage( context: Context, messageId: Long ): LiveData<EncryptedContent> {
+    fun getMessage( context: Context, messageId: Long?): LiveData<EncryptedContent>? {
+        if(messageId == null) return null
         return Datastore.getDatastore(context).encryptedContentDAO()
             .getLiveData(messageId)
     }

@@ -224,7 +224,6 @@ fun GetStartedView (
                             ComposeScreen(
                                 type = Platforms.ServiceTypes.BRIDGE,
                                 isOnboarding = true,
-                                messageId = null
                             )
                         )},
                     colors = ButtonDefaults

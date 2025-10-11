@@ -89,7 +89,6 @@ class OnboardingViewModel : ViewModel() {
                         ComposeScreen(
                             type = Platforms.ServiceTypes.BRIDGE,
                             isOnboarding = true,
-                            messageId = null
                         )
                     )
                 }

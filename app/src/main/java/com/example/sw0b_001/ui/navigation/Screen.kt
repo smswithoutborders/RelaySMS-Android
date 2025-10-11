@@ -98,7 +98,6 @@ data class ForgotPasswordScreen(
 @Serializable
 data class ComposeScreen(
     val type: Platforms.ServiceTypes,
-    val messageId: Long?,
     val isOnboarding: Boolean = false,
 )
 

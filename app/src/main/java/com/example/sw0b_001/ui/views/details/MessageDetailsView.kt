@@ -53,6 +53,7 @@ import kotlinx.serialization.json.Json
 @Composable
 fun MessageDetailsView(
     platformsViewModel: PlatformsViewModel,
+    messagesViewModel: MessagesViewModel,
     navController: NavController,
     isOnboarding: Boolean = false
 ) {
@@ -62,7 +63,7 @@ fun MessageDetailsView(
     var messageBody by remember { mutableStateOf("") }
     var date by remember { mutableLongStateOf(0L) }
 
-    val message = platformsViewModel.message
+    val message = messagesViewModel.message
     if (message?.encryptedContent != null) {
         try {
             val contentBytes = Base64.decode(message.encryptedContent, Base64.DEFAULT)
@@ -88,14 +89,14 @@ fun MessageDetailsView(
             RelayAppBar(navController = navController, {
                 CoroutineScope(Dispatchers.Default).launch {
                     val platform = platformsViewModel.getAvailablePlatforms(context,
-                        platformsViewModel.message!!.platformName!!)
+                        messagesViewModel.message!!.platformName!!)
                     platformsViewModel.platform = platform
+                    messagesViewModel.message = message
 
                     CoroutineScope(Dispatchers.Main).launch {
                         navController.navigate(
                             ComposeScreen(
                                 type = Platforms.ServiceTypes.MESSAGE,
-                                messageId = message?.id,
                                 isOnboarding = isOnboarding
                             )
                         )
@@ -103,7 +104,7 @@ fun MessageDetailsView(
                 }
             }) {
                 val messagesViewModel = MessagesViewModel()
-                messagesViewModel.delete(context, platformsViewModel.message!!) {
+                messagesViewModel.delete(context, messagesViewModel.message!!) {
                     navController.popBackStack()
                 }
             }
@@ -172,10 +173,12 @@ fun MessageDetailsPreview() {
         message.encryptedContent = "+123456789:+237123456789:hello Telegram"
 
         val platformsViewModel = remember{ PlatformsViewModel() }
-        platformsViewModel.message = message
+        val messagesViewModel = remember{ MessagesViewModel() }
+        messagesViewModel.message = message
 
         MessageDetailsView(
             platformsViewModel = platformsViewModel,
+            messagesViewModel = messagesViewModel,
             navController = NavController(LocalContext.current)
         )
     }

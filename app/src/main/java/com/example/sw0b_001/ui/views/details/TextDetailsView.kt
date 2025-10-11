@@ -55,6 +55,7 @@ import kotlinx.serialization.json.Json
 @Composable
 fun TextDetailsView(
     platformsViewModel: PlatformsViewModel,
+    messagesViewModel: MessagesViewModel,
     navController: NavController,
     isOnboarding: Boolean = false,
 ) {
@@ -66,7 +67,7 @@ fun TextDetailsView(
     var date by remember { mutableLongStateOf(0L) }
 
     // Decompose the message content when the view is composed
-    val message = platformsViewModel.message
+    val message = messagesViewModel.message
     if (message?.encryptedContent != null) {
         try {
             val contentBytes = Base64.decode(message.encryptedContent, Base64.DEFAULT)
@@ -91,14 +92,14 @@ fun TextDetailsView(
                 editCallback = {
                     CoroutineScope(Dispatchers.Default).launch {
                         val platform = platformsViewModel.getAvailablePlatforms(context,
-                            platformsViewModel.message!!.platformName!!)
+                            messagesViewModel.message!!.platformName!!)
                         platformsViewModel.platform = platform
+                        messagesViewModel.message = message
 
                         CoroutineScope(Dispatchers.Main).launch {
                             navController.navigate(
                                 ComposeScreen(
                                     type = Platforms.ServiceTypes.TEXT,
-                                    messageId = message?.id,
                                     isOnboarding = isOnboarding
                                 )
                             )
@@ -107,7 +108,7 @@ fun TextDetailsView(
                 }
             ) {
                 val messagesViewModel = MessagesViewModel()
-                messagesViewModel.delete(context, platformsViewModel.message!!) {
+                messagesViewModel.delete(context, messagesViewModel.message!!) {
                     navController.popBackStack()
                 }
             }
@@ -170,10 +171,13 @@ fun TextDetailsPreview() {
         text.encryptedContent = "@relaysms.me:Hello world"
 
         val platformsViewModel = remember{ PlatformsViewModel() }
-        platformsViewModel.message = text
+        val messagesViewModel = remember{ MessagesViewModel() }
+
+        messagesViewModel.message = text
 
         TextDetailsView(
             platformsViewModel = platformsViewModel,
+            messagesViewModel = messagesViewModel,
             navController = rememberNavController()
         )
     }

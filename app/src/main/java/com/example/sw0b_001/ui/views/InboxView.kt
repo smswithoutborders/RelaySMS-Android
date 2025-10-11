@@ -66,7 +66,7 @@ fun InboxView(
                     RecentMessageCard(
                         message,
                         onClickCallback = {
-                            platformsViewModel.message = message
+                            messagesViewModel.message = message
                             navController.navigate(BridgeViewScreen)
                         },
                     )
