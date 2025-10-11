@@ -466,7 +466,7 @@ fun ComposerInterface(
                             it,
                             onCancelCallback = {
                                 imageViewModel.reset()
-                                imageBitmap = null
+//                                imageBitmap = null
                             }
                         ) {
                             navController.navigate(ImageRenderNav(false))

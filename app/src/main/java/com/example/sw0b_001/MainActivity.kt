@@ -385,6 +385,7 @@ class MainActivity : AppCompatActivity() {
                     navController = navController,
                     platformsViewModel = platformsViewModel,
                     messagesViewModel = messagesViewModel,
+                    imageViewModel = imageViewModel,
                 )
             }
             composable<BridgeViewScreen> {
@@ -392,6 +393,7 @@ class MainActivity : AppCompatActivity() {
                     navController = navController,
                     platformsViewModel = platformsViewModel,
                     messagesViewModel = messagesViewModel,
+                    imageViewModel = imageViewModel,
                     isBridge = true
                 )
             }

@@ -34,6 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -74,84 +75,6 @@ import com.example.sw0b_001.ui.navigation.TextViewScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import java.util.Locale
 
-@Composable
-fun RecentViewNoMessages(
-    saveNewPlatformCallback: () -> Unit,
-    sendNewMessageCallback: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Spacer(modifier = Modifier.weight(1f))
-
-        Image(
-            painter = painterResource(id = R.drawable.empty_message),
-            contentDescription = stringResource(R.string.get_started_illustration),
-            modifier = Modifier
-                .size(200.dp)
-                .padding(bottom = 16.dp)
-        )
-
-        Text(
-            text = stringResource(R.string.send_your_first_message),
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Thin,
-            textAlign = TextAlign.Center,
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-
-            Button(
-                onClick = { sendNewMessageCallback() },
-                modifier = Modifier
-                    .padding(bottom = 16.dp)
-                    .height(50.dp)
-                    .fillMaxWidth(),
-            ) {
-                Text(
-                    text = stringResource(R.string.send_new_message),
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-
-            Button(
-                onClick = { saveNewPlatformCallback() },
-                modifier = Modifier
-                    .height(50.dp)
-                    .fillMaxWidth(),
-                colors = ButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                    disabledContentColor = MaterialTheme.colorScheme.onSurface
-                )
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.save_platforms_),
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(64.dp))
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun RecentView(
@@ -162,6 +85,11 @@ fun RecentView(
     tabRequestedCallback: () -> Unit
 ) {
     val context = LocalContext.current
+    
+    LaunchedEffect(true) { 
+        messagesViewModel.message = null
+    }
+
     var sendNewMessageRequested by remember { mutableStateOf(false) }
 
     val messagesPagingSource = messagesViewModel.getMessages(context = context)

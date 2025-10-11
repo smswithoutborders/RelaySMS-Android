@@ -54,12 +54,15 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import coil3.Uri
+import com.afkanerd.lib_image_android.ui.ImageMainView
 import com.afkanerd.lib_image_android.ui.navigation.ImageRenderNav
+import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.example.sw0b_001.data.Composers
 import com.example.sw0b_001.data.models.Bridges
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.EncryptedContent
+import com.example.sw0b_001.ui.components.AttachImageView
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.navigation.EmailComposeNav
 import com.example.sw0b_001.ui.navigation.MessageViewScreen
@@ -74,6 +77,7 @@ import kotlinx.serialization.json.Json
 fun EmailDetailsView(
     platformsViewModel: PlatformsViewModel,
     messagesViewModel: MessagesViewModel,
+    imageViewModel: ImageViewModel,
     navController: NavController,
     isBridge: Boolean = false
 ) {
@@ -249,42 +253,17 @@ fun EmailDetailsView(
             )
 
             imageBitmap?.let {
+                Spacer(Modifier.padding(24.dp))
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    modifier = Modifier.padding(16.dp),
+                    horizontalAlignment = Alignment.Start
                 ) {
-                    Spacer(Modifier.weight(1f))
-                    Box {
-                        Card(
-                            onClick = {
-                                TODO("Implement view image")
-                            },
-                            elevation = CardDefaults.cardElevation(8.dp)
-                        ) {
-                            Image(
-                                bitmap = imageBitmap!!.asImageBitmap(),
-                                "",
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .size(250.dp)
-                            )
-                        }
-
-                        Box(
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .size(35.dp)
-                                .align(Alignment.BottomEnd)
-                        ) {
-                            IconButton(
-                                onClick = { imageBitmap = null }
-                            ) {
-                                Icon(Icons.Filled.Cancel, "Cancel")
-                            }
-                        }
+                    AttachImageView(
+                        it,
+                        onCancelCallback = {}
+                    ) {
+                        TODO()
                     }
-                    Spacer(Modifier.padding(8.dp))
                 }
             }
         }
@@ -330,6 +309,7 @@ fun EmailDetailsPreview() {
         EmailDetailsView(
             platformsViewModel=platformsViewModel,
             messagesViewModel= messagesViewModel,
+            imageViewModel = remember{ ImageViewModel() },
             navController = rememberNavController()
         )
     }
