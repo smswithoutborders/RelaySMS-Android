@@ -35,7 +35,7 @@ fun BottomNavBar(
     onChangeTab: (BottomTabsItems) -> Unit = {}
 ) {
     val context = LocalContext.current
-    val isDefaultSmsApp = context.isDefault()
+    val isDefaultSmsApp = if(LocalInspectionMode.current) true else context.isDefault()
 
     NavigationBar {
         if(isDefaultSmsApp || LocalInspectionMode.current) {
@@ -55,13 +55,6 @@ fun BottomNavBar(
                 onClick = {
                     onChangeTab(BottomTabsItems.BottomBarSmsMmsTab)
                 },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.onSurface,
-                    selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    indicatorColor = MaterialTheme.colorScheme.primaryContainer
-                )
             )
         }
 
@@ -82,13 +75,6 @@ fun BottomNavBar(
             onClick = {
                 onChangeTab(BottomTabsItems.BottomBarRecentTab)
             },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = MaterialTheme.colorScheme.onSurface,
-                selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                indicatorColor = MaterialTheme.colorScheme.primaryContainer
-            )
         )
 
         NavigationBarItem(
@@ -105,13 +91,6 @@ fun BottomNavBar(
             onClick = {
                 onChangeTab(BottomTabsItems.BottomBarPlatformsTab,)
             },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = MaterialTheme.colorScheme.onSurface,
-                selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                indicatorColor = MaterialTheme.colorScheme.primaryContainer
-            )
         )
 
         if(!isDefaultSmsApp || LocalInspectionMode.current) {
@@ -129,13 +108,6 @@ fun BottomNavBar(
                 onClick = {
                     onChangeTab(BottomTabsItems.BottomBarInboxTab,)
                 },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.onSurface,
-                    selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    indicatorColor = MaterialTheme.colorScheme.primaryContainer
-                )
             )
         }
 
@@ -153,13 +125,6 @@ fun BottomNavBar(
             onClick = {
                 onChangeTab(BottomTabsItems.BottomBarCountriesTab,)
             },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = MaterialTheme.colorScheme.onSurface,
-                selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                indicatorColor = MaterialTheme.colorScheme.primaryContainer
-            )
         )
 
     }
