@@ -37,16 +37,9 @@ class MessagesViewModel : ViewModel() {
 
     private var conversationsPager: Flow<PagingData<EncryptedContent>>? = null
 
-    fun getMessage(
-        context: Context,
-        messageId: Long,
-        callback: (EncryptedContent) -> Unit,
-    ) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val encryptedContent = Datastore.getDatastore(context)
-                .encryptedContentDAO().get(messageId)
-            callback(encryptedContent)
-        }
+    fun getMessage( context: Context, messageId: Long ): LiveData<EncryptedContent> {
+        return Datastore.getDatastore(context).encryptedContentDAO()
+            .getLiveData(messageId)
     }
 
     fun getMessages(context: Context): Flow<PagingData<EncryptedContent>> {

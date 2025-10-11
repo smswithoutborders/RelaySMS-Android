@@ -48,6 +48,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -112,6 +113,8 @@ fun ComposerInterface(
     onSendCallback: ((Boolean) -> Unit)? = null,
 ) {
     val context = LocalContext.current
+    val inPreviewMode = LocalInspectionMode.current
+
     val subscriptionId by remember{
         mutableLongStateOf(
             if(context.isDefault()) context.getDefaultSimSubscription() ?: -1L else -1L)
@@ -123,29 +126,16 @@ fun ComposerInterface(
     var message by remember{ mutableStateOf<EncryptedContent?>(null) }
     var isBridge by remember{ mutableStateOf(type == Platforms.ServiceTypes.BRIDGE) }
 
-    val decomposedEmailMessage = remember {
-        mutableStateOf<Composers.EmailComposeHandler.EmailContent?>(null)}
-    messageId?.let {
-        messagesViewModel.getMessage(context, messageId) {
-            message = it
-            if((type == Platforms.ServiceTypes.BRIDGE || type == Platforms.ServiceTypes.EMAIL) &&
-                message?.encryptedContent != null
-            ) {
-                decomposedEmailMessage.value = try {
-                    Composers.EmailComposeHandler
-                        .decomposeMessage(
-                            Base64.decode(message?.encryptedContent,
-                                Base64.DEFAULT),
-                            0,
-                            0,
-                            type == Platforms.ServiceTypes.BRIDGE
-                        )
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    null
-                }
-            } else Composers.EmailComposeHandler.EmailContent()
+    var imageBitmap: Bitmap? by remember{ mutableStateOf(
+        if(inPreviewMode) {
+            BitmapFactory.decodeResource(context.resources,
+                com.afkanerd.lib_image_android.R.drawable._0241226_124819)
         }
+        else imageViewModel.processedImage.value?.image ?: imageViewModel.originalBitmap
+    ) }
+
+    messageId?.let {
+        message = messagesViewModel.getMessage(context, messageId).observeAsState().value
     }
 
     val from = remember { mutableStateOf(when(type) {
@@ -170,25 +160,31 @@ fun ComposerInterface(
         type != Platforms.ServiceTypes.BRIDGE) }
     var selectedAccount: StoredPlatformsEntity? by remember { mutableStateOf(null) }
 
-//    val decomposedEmailMessage = remember {
-//        if((type == Platforms.ServiceTypes.BRIDGE || type == Platforms.ServiceTypes.EMAIL) &&
-//            message?.encryptedContent != null
-//        ) {
-//            try {
-//                Composers.EmailComposeHandler
-//                    .decomposeMessage(
-//                        Base64.decode(message?.encryptedContent,
-//                            Base64.DEFAULT),
-//                        0,
-//                        0,
-//                        type == Platforms.ServiceTypes.BRIDGE
-//                    )
-//            } catch (e: Exception) {
-//                e.printStackTrace()
-//                null
-//            }
-//        } else Composers.EmailComposeHandler.EmailContent()
-//    }
+    val decomposedEmailMessage = remember(message) {
+        if((type == Platforms.ServiceTypes.BRIDGE || type == Platforms.ServiceTypes.EMAIL) &&
+            message?.encryptedContent != null
+        ) {
+            try {
+                Composers.EmailComposeHandler
+                    .decomposeMessage(
+                        Base64.decode(message?.encryptedContent,
+                            Base64.DEFAULT),
+                        message?.imageLength!!,
+                        message?.textLength!!,
+                        type == Platforms.ServiceTypes.BRIDGE
+                    ).apply {
+                        if(message?.imageLength!! > 0) {
+                            imageBitmap = BitmapFactory
+                                .decodeByteArray(this.image.value, 0,
+                                    this.image.value!!.size)
+                        }
+                    }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        } else Composers.EmailComposeHandler.EmailContent()
+    }
 
     val decomposedMessageMessage = remember(message) {
         if (type == Platforms.ServiceTypes.MESSAGE && message?.encryptedContent != null) {
@@ -221,8 +217,8 @@ fun ComposerInterface(
     val isSendingEnabled by remember(
         type,
         isSending,
-        decomposedEmailMessage.value?.to,
-        decomposedEmailMessage.value?.body,
+        decomposedEmailMessage?.to?.value,
+        decomposedEmailMessage?.body?.value,
         decomposedTextMessage?.text?.value,
         decomposedMessageMessage?.to?.value,
         decomposedMessageMessage?.message?.value
@@ -233,8 +229,8 @@ fun ComposerInterface(
                 Platforms.ServiceTypes.BRIDGE,
                 Platforms.ServiceTypes.BRIDGE_INCOMING -> {
                     !isSending &&
-                            decomposedEmailMessage.value?.to?.value?.isNotEmpty() == true &&
-                            decomposedEmailMessage.value?.body?.value?.isNotEmpty() == true
+                            decomposedEmailMessage?.to?.value?.isNotEmpty() == true &&
+                            decomposedEmailMessage.body.value.isNotEmpty()
                 }
                 Platforms.ServiceTypes.TEXT -> {
                     !isSending &&
@@ -243,22 +239,13 @@ fun ComposerInterface(
                 Platforms.ServiceTypes.MESSAGE -> {
                     !isSending &&
                             decomposedMessageMessage?.to?.value?.isNotEmpty() == true &&
-                            decomposedMessageMessage?.message?.value?.isNotEmpty() == true &&
+                            decomposedMessageMessage.message.value.isNotEmpty() &&
                             verifyPhoneNumberFormat(decomposedMessageMessage.to.value)
                 }
                 else -> false
             }
         )
     }
-
-    val inPreviewMode = LocalInspectionMode.current
-    var imageBitmap: Bitmap? by remember{ mutableStateOf(
-        if(inPreviewMode) {
-            BitmapFactory.decodeResource(context.resources,
-                com.afkanerd.lib_image_android.R.drawable._0241226_124819)
-        }
-        else imageViewModel.processedImage.value?.image ?: imageViewModel.originalBitmap
-    ) }
 
     val imagePicker = mmsImagePicker { uri ->
         val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
@@ -305,24 +292,24 @@ fun ComposerInterface(
                     Platforms.ServiceTypes.EMAIL -> {
                         Composers.EmailComposeHandler.createEmailByteBuffer(
                             from = null,
-                            to = decomposedEmailMessage.value?.to!!.value,
-                            cc = decomposedEmailMessage.value?.cc!!.value,
-                            bcc = decomposedEmailMessage.value?.bcc!!.value,
-                            subject = decomposedEmailMessage.value?.subject!!.value,
-                            body = decomposedEmailMessage.value?.body!!.value,
+                            to = decomposedEmailMessage?.to!!.value,
+                            cc = decomposedEmailMessage.cc.value,
+                            bcc = decomposedEmailMessage.bcc.value,
+                            subject = decomposedEmailMessage.subject.value,
+                            body = decomposedEmailMessage.body.value,
                         )
                     }
                     Platforms.ServiceTypes.TEXT -> {
                         Composers.TextComposeHandler.createTextByteBuffer(
                             from = from.value!!,
-                            body = decomposedEmailMessage.value?.body!!.value,
+                            body = decomposedEmailMessage?.body!!.value,
                         )
                     }
                     Platforms.ServiceTypes.MESSAGE -> {
                         Composers.MessageComposeHandler.createMessageByteBuffer(
                             from = from.value!!,
                             to = decomposedMessageMessage?.to!!.value,
-                            message = decomposedEmailMessage.value?.body!!.value,
+                            message = decomposedEmailMessage?.body!!.value,
                         )
                     }
                     else -> byteArrayOf()
@@ -339,7 +326,7 @@ fun ComposerInterface(
                 Platforms.ServiceTypes.BRIDGE_INCOMING -> {
                     platformsViewModel.sendPublishingForEmail(
                         context = context,
-                        emailContent = decomposedEmailMessage!!.value!!,
+                        emailContent = decomposedEmailMessage!!,
                         account = selectedAccount,
                         isBridge = isBridge,
                         subscriptionId = subscriptionId,
@@ -440,7 +427,7 @@ fun ComposerInterface(
                 Platforms.ServiceTypes.BRIDGE_INCOMING -> {
                     EmailComposeView(
                         isBridge = isBridge,
-                        emailContent = decomposedEmailMessage.value!!,
+                        emailContent = decomposedEmailMessage!!,
                         from = from.value
                     )
                 }
