@@ -36,6 +36,7 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import androidx.biometric.BiometricPrompt
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material3.DrawerState
@@ -52,6 +53,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
@@ -80,6 +82,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.core.content.edit
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Observer
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
@@ -272,12 +276,23 @@ class MainActivity : AppCompatActivity() {
         var navDrawItemSelected by remember{ mutableStateOf(false) }
         var drawerCallback by remember { mutableStateOf<(() -> Unit)?>(null) }
 
+        val lifeCycleOwner = LocalLifecycleOwner.current
+        DisposableEffect(lifeCycleOwner) {
+            val observer = Observer<ThreadsViewModel.InboxType> { newInboxType ->
+                navDrawItemSelected = newInboxType == ThreadsViewModel.InboxType.CUSTOM
+            }
+            threadsViewModel.selectedInbox.observe(lifeCycleOwner, observer)
+
+            onDispose {
+                threadsViewModel.selectedInbox.removeObserver(observer)
+            }
+        }
+
         LaunchedEffect(navDrawItemSelected) {
             customThreadView = when {
                 navDrawItemSelected -> {
                     {
                         showThreadsTopBar = false
-//                        showThreadsTopBar = !defaultSmsApp
                         HomepageView(
                             navController = navController,
                             platformsViewModel = platformsViewModel,
@@ -310,7 +325,8 @@ class MainActivity : AppCompatActivity() {
                     icon = {
                         Icon(
                             painter = painterResource(R.drawable.logo),
-                            contentDescription = "RelaySMS"
+                            contentDescription = "RelaySMS",
+                            modifier = Modifier.size(20.dp)
                         )
                     },
                     label = {
@@ -321,9 +337,8 @@ class MainActivity : AppCompatActivity() {
                     },
                     selected = navDrawItemSelected,
                     onClick = {
-                        threadsViewModel.setInboxType(ThreadsViewModel.InboxType.CUSTOM)
                         drawerCallback = callback.invoke(ThreadsViewModel.InboxType.CUSTOM)
-                        navDrawItemSelected = true
+                        threadsViewModel.setInboxType(ThreadsViewModel.InboxType.CUSTOM)
                     }
                 )
             }
