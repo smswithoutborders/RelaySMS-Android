@@ -132,7 +132,7 @@ fun ComposerInterface(
 
     val processedImage by imageViewModel.processedImage.collectAsState()
 
-    var imageBitmap: Bitmap? = remember(processedImage){
+    val imageBitmap: Bitmap? = remember(processedImage){
         if(inPreviewMode) {
             BitmapFactory.decodeResource(context.resources,
                 com.afkanerd.lib_image_android.R.drawable._0241226_124819)
@@ -149,10 +149,10 @@ fun ComposerInterface(
         else -> null
     }) }
 
-    val platformName = when(type) {
-        Platforms.ServiceTypes.EMAIL -> message!!.platformName!!
-        Platforms.ServiceTypes.TEXT -> message!!.platformName!!
-        Platforms.ServiceTypes.MESSAGE -> message!!.platformName!!
+    val platformName =  when(type) {
+        Platforms.ServiceTypes.EMAIL -> message?.platformName!!
+        Platforms.ServiceTypes.TEXT -> message?.platformName!!
+        Platforms.ServiceTypes.MESSAGE -> message?.platformName!!
         else -> ""
     }
 
@@ -191,7 +191,7 @@ fun ComposerInterface(
         } else Composers.EmailComposeHandler.EmailContent()
     }
 
-    val decomposedMessageMessage = remember(message) {
+    val decomposedMessageMessage = remember {
         if (type == Platforms.ServiceTypes.MESSAGE && message?.encryptedContent != null) {
             try {
                 val contentBytes = Base64.decode(message!!.encryptedContent,
@@ -205,7 +205,7 @@ fun ComposerInterface(
         else Composers.MessageComposeHandler.MessageContent(from = from)
     }
 
-    val decomposedTextMessage = remember(message) {
+    val decomposedTextMessage = remember {
         if (type == Platforms.ServiceTypes.TEXT && message?.encryptedContent != null) {
             try {
                 val contentBytes = Base64.decode(message?.encryptedContent,
