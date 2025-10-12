@@ -89,7 +89,7 @@ fun GatewayClientOptionsModal(
 
                             val failureRunnable = Runnable {}
                             GatewayClientsCommunications(context).updateDefaultGatewayClient(gatewayClient.mSISDN!!)
-                            viewModel.loadRemote(context, successRunnable, failureRunnable)
+//                            viewModel.loadRemote(context, successRunnable, failureRunnable)
                             onMakeDefaultClicked(gatewayClient)
                         }
                     },
