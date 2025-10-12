@@ -38,15 +38,19 @@ import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import androidx.biometric.BiometricPrompt
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Inbox
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
@@ -202,10 +206,6 @@ class MainActivity : AppCompatActivity() {
                                     }
 
                                     Surface( Modifier.fillMaxSize()) {
-                                        if(LocalContext.current.isDefault()) {
-                                            platformsViewModel.bottomTabsItem =
-                                                BottomTabsItems.BottomBarSmsMmsTab
-                                        }
                                         MainNavigation(navController = navController, newLayoutInfo)
                                     }
                                 }
@@ -268,23 +268,28 @@ class MainActivity : AppCompatActivity() {
         var showThreadsTopBar by remember { mutableStateOf(true) }
         var customThreadView: (@Composable () -> Unit)? by remember { mutableStateOf(null)}
 
-        LaunchedEffect(platformsViewModel.bottomTabsItem, defaultSmsApp) {
-            customThreadView = when(platformsViewModel.bottomTabsItem) {
-                BottomTabsItems.BottomBarSmsMmsTab -> {
-                    showThreadsTopBar = true
-                    null
-                }
-                else -> {
+
+        var navDrawItemSelected by remember{ mutableStateOf(false) }
+        var drawerCallback by remember { mutableStateOf<(() -> Unit)?>(null) }
+
+        LaunchedEffect(navDrawItemSelected) {
+            customThreadView = when {
+                navDrawItemSelected -> {
                     {
-                        showThreadsTopBar = !defaultSmsApp
+                        showThreadsTopBar = false
+//                        showThreadsTopBar = !defaultSmsApp
                         HomepageView(
                             navController = navController,
                             platformsViewModel = platformsViewModel,
                             messagesViewModel = messagesViewModel,
                             gatewayClientViewModel = gatewayClientViewModel,
-                            showBottomBar = true,
+                            drawerCallback = drawerCallback
                         )
                     }
+                }
+                else -> {
+                    showThreadsTopBar = true
+                    null
                 }
             }
         }
@@ -299,16 +304,29 @@ class MainActivity : AppCompatActivity() {
             startDestination = if(hasSeenOnboarding) {
                 if(defaultSmsApp) HomeScreenNav() else HomepageScreen
             } else WelcomeScreen,
-            customBottomBar = {
-                BottomNavBar(
-                    selectedTab = platformsViewModel.bottomTabsItem,
-                    isLoggedIn = isLoggedIn,
-//                    isDefaultSmsApp = false
-                ) { selectedTab ->
-                    platformsViewModel.bottomTabsItem = selectedTab
-                }
-            },
             customThreadsView = customThreadView,
+            modalNavigationModalItems = { callback ->
+                NavigationDrawerItem(
+                    icon = {
+                        Icon(
+                            painter = painterResource(R.drawable.logo),
+                            contentDescription = "RelaySMS"
+                        )
+                    },
+                    label = {
+                        Text(
+                            stringResource(R.string.relaysms_inbox),
+                            fontSize = 14.sp
+                        )
+                    },
+                    selected = navDrawItemSelected,
+                    onClick = {
+                        threadsViewModel.setInboxType(ThreadsViewModel.InboxType.CUSTOM)
+                        drawerCallback = callback.invoke(ThreadsViewModel.InboxType.CUSTOM)
+                        navDrawItemSelected = true
+                    }
+                )
+            }
         ) {
             composable<WelcomeScreen> {
                 WelcomeMainView(navController)

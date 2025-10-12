@@ -421,5 +421,7 @@
     <string name="you_can_only_save_these_platforms_after_you_log_in">You can only save these platforms after you log in</string>
     <string name="unknown_error">Unknown error</string>
     <string name="add_photos">Add photos</string>
+    <string name="relaysms_inbox">RelaySMS inbox</string>
+    <string name="open_menu">Open menu</string>
 
 </resources>

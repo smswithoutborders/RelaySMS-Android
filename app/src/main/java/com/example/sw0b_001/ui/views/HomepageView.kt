@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BubbleChart
 import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -48,6 +49,7 @@ import com.example.sw0b_001.ui.modals.AddGatewayClientModal
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.example.sw0b_001.data.models.EncryptedContent
@@ -56,10 +58,10 @@ import com.example.sw0b_001.ui.features.FeatureInfo
 import com.example.sw0b_001.ui.features.FeatureManager
 import com.example.sw0b_001.ui.features.NewFeatureModal
 import com.example.sw0b_001.ui.modals.GetStartedModal
+import kotlinx.coroutines.launch
 
 
 enum class BottomTabsItems {
-    BottomBarSmsMmsTab,
     BottomBarRecentTab,
     BottomBarPlatformsTab,
     BottomBarInboxTab,
@@ -77,6 +79,7 @@ fun HomepageView(
     isLoggedIn: Boolean = false,
     showBottomBar: Boolean = true,
     showTopBar: Boolean = true,
+    drawerCallback: (() -> Unit)? = {},
 ) {
     val context = LocalContext.current
     val inspectionMode = LocalInspectionMode.current
@@ -105,19 +108,9 @@ fun HomepageView(
 
     var sendNewMessageRequested by remember { mutableStateOf(false)}
 
-    val isLoading by messagesViewModel.isLoading.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
-    var isSearchDone by remember { mutableStateOf(false) }
-
-    var featureToShow by remember { mutableStateOf<FeatureInfo?>(null) }
-
-    LaunchedEffect(Unit) {
-        val nextFeature = AppFeatures.ALL_FEATURES.firstOrNull {
-            !FeatureManager.hasFeatureBeenShown(context, it.id)
-        }
-        featureToShow = nextFeature
-    }
+    val scope = rememberCoroutineScope()
 
     Scaffold (
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -130,16 +123,8 @@ fun HomepageView(
                             onSearchQueryChanged = { searchQuery = it },
                             searchQuery = searchQuery,
                             isSearchActive = isSearchActive,
-                            onToggleSearch = {
-                                isSearchActive = !isSearchActive
-                                if (!isSearchActive) {
-                                    searchQuery = ""
-                                    isSearchDone = false
-                                }
-                            },
-                            onSearchDone = {
-                                isSearchDone = true
-                            },
+                            onToggleSearch = {},
+                            onSearchDone = {},
                             isSelectionMode = platformsViewModel.isSelectionMode,
                             selectedCount = platformsViewModel.selectedMessagesCount,
                             onSelectAll = platformsViewModel.onSelectAll,
@@ -176,6 +161,9 @@ fun HomepageView(
                 BottomNavBar(
                     selectedTab = platformsViewModel.bottomTabsItem,
                     isLoggedIn = isLoggedIn,
+                    onMenuChangedCallback = {
+                        drawerCallback?.invoke()
+                    }
                 ) { selectedTab ->
                     platformsViewModel.bottomTabsItem = selectedTab
                 }
@@ -269,15 +257,6 @@ fun HomepageView(
             }
         }
     ) { innerPadding ->
-        featureToShow?.let { currentFeature ->
-            NewFeatureModal(
-                featureInfo = currentFeature,
-                onDismiss = {
-                    FeatureManager.markFeatureAsShown(context, currentFeature.id)
-                    featureToShow = null
-                }
-            )
-        }
         Box(
             Modifier
                 .fillMaxSize()
@@ -362,7 +341,6 @@ fun GetTabViews(
                 navController = navController
             )
         }
-        BottomTabsItems.BottomBarSmsMmsTab -> null
     }
 
 }
