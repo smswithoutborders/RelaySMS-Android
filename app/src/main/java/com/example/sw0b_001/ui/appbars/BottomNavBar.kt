@@ -33,31 +33,12 @@ import com.example.sw0b_001.ui.views.BottomTabsItems
 fun BottomNavBar(
     selectedTab: BottomTabsItems,
     isLoggedIn: Boolean = true,
-    onMenuChangedCallback: () -> Unit = {},
     onChangeTab: (BottomTabsItems) -> Unit = {},
 ) {
     val context = LocalContext.current
     val isDefaultSmsApp = if(LocalInspectionMode.current) true else context.isDefault()
 
     NavigationBar {
-        if(isDefaultSmsApp) {
-            NavigationBarItem(
-                icon = { Icon(
-                    Icons.Filled.Menu,
-                    contentDescription = stringResource(R.string.open_menu),
-                    modifier = Modifier.size(20.dp)
-                ) },
-                label = {
-                    Text(
-                        text = "Menu",
-                        style = MaterialTheme.typography.labelSmall
-                    )
-                },
-                selected = false,
-                onClick = onMenuChangedCallback,
-            )
-        }
-
         NavigationBarItem(
             icon = { Icon(
                 Icons.Filled.Home,

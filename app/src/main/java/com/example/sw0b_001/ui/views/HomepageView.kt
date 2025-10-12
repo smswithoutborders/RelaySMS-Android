@@ -77,7 +77,6 @@ fun HomepageView(
     messagesViewModel: MessagesViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
     isLoggedIn: Boolean = false,
-    showBottomBar: Boolean = true,
     showTopBar: Boolean = true,
     drawerCallback: (() -> Unit)? = {},
 ) {
@@ -110,7 +109,6 @@ fun HomepageView(
 
     var searchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
 
     Scaffold (
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -129,7 +127,8 @@ fun HomepageView(
                             selectedCount = platformsViewModel.selectedMessagesCount,
                             onSelectAll = platformsViewModel.onSelectAll,
                             onDeleteSelected = platformsViewModel.onDeleteSelected,
-                            onCancelSelection = platformsViewModel.onCancelSelection
+                            onCancelSelection = platformsViewModel.onCancelSelection,
+                            onMenuClickCallback = drawerCallback
                         )
                     }
                     BottomTabsItems.BottomBarCountriesTab -> {
@@ -157,16 +156,11 @@ fun HomepageView(
             }
         },
         bottomBar = {
-            if(showBottomBar) {
-                BottomNavBar(
-                    selectedTab = platformsViewModel.bottomTabsItem,
-                    isLoggedIn = isLoggedIn,
-                    onMenuChangedCallback = {
-                        drawerCallback?.invoke()
-                    }
-                ) { selectedTab ->
-                    platformsViewModel.bottomTabsItem = selectedTab
-                }
+            BottomNavBar(
+                selectedTab = platformsViewModel.bottomTabsItem,
+                isLoggedIn = isLoggedIn,
+            ) { selectedTab ->
+                platformsViewModel.bottomTabsItem = selectedTab
             }
         },
         floatingActionButton = {
