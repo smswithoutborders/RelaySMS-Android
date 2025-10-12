@@ -272,6 +272,13 @@ fun RecentMessageCard(
 
     Column {
         ListItem(
+            modifier = Modifier
+                .combinedClickable(
+                    hapticFeedbackEnabled = true,
+                    onLongClick = {},
+                    onClick = { onClickCallback(message) }
+                )
+                .fillMaxWidth(),
             headlineContent = {
                 Text(
                     subHeading,
@@ -281,7 +288,6 @@ fun RecentMessageCard(
                     overflow = TextOverflow.Ellipsis
                 )
             },
-            modifier = Modifier.fillMaxWidth(),
             overlineContent = {
                 Text(
                     heading,
