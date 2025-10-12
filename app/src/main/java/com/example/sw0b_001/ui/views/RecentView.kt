@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -30,6 +31,7 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
@@ -98,17 +100,13 @@ fun RecentView(
     val platforms: LiveData<List<AvailablePlatforms>> = platformsViewModel.getAvailablePlatforms(context)
     val platformsList by platforms.observeAsState(initial = emptyList())
 
-    Box(Modifier
-        .padding(8.dp)
-        .fillMaxSize()
+    val listState = rememberLazyListState()
+    Box(Modifier.fillMaxSize()
     ) {
         if ((LocalInspectionMode.current || messages.loadState.isIdle) && messages.itemCount > 0) {
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(vertical = 8.dp)
+                modifier = Modifier.fillMaxSize(),
+                state = listState
             ) {
                 items(
                     count = messages.itemCount,
@@ -172,22 +170,19 @@ fun RecentView(
 @Composable
 fun GetMessageAvatar(logo: Bitmap? = null) {
     val context = LocalContext.current
-    if(LocalInspectionMode.current) {
+    val imageSize = 38.dp
+    if(LocalInspectionMode.current || logo == null) {
         Image(
             painterResource(R.drawable.relaysms_icon_default_shape),
             contentDescription = stringResource(R.string.avatar_image),
-            modifier = Modifier.size(48.dp)
+            modifier = Modifier.size(imageSize)
         )
     }
     else {
         Image(
-            bitmap = logo?.asImageBitmap()
-                ?: BitmapFactory.decodeResource(
-                    context.resources,
-                    R.drawable.logo
-                ).asImageBitmap(),
+            bitmap = logo.asImageBitmap(),
             contentDescription = stringResource(R.string.avatar_image),
-            modifier = Modifier.size(48.dp)
+            modifier = Modifier.size(imageSize)
         )
     }
 }
@@ -276,64 +271,109 @@ fun RecentMessageCard(
     }
 
     Column {
-        OutlinedCard(
-            onClick = {
-                onClickCallback(message)
+        ListItem(
+            headlineContent = {
+                Text(
+                    subHeading,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
             },
-            modifier = Modifier
-                .fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp),
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            modifier = Modifier.fillMaxWidth(),
+            overlineContent = {
+                Text(
+                    heading,
+                    style = if (message.type == Platforms.ServiceTypes.TEXT.name) {
+                        MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                    } else {
+                        MaterialTheme.typography.bodyLarge
+                    },
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            },
+            supportingContent = {
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            },
+            leadingContent = {
                 GetMessageAvatar(logo)
-
-                Spacer(modifier = Modifier.width(16.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    // Heading Text
-                    Text(
-                        heading,
-                        style = if (message.type == Platforms.ServiceTypes.TEXT.name) {
-                            MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-                        } else {
-                            MaterialTheme.typography.bodyLarge
-                        },
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    // Subheading Text
-                    if (message.encryptedContent != null) {
-                        Text(
-                            subHeading,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                    // Message Preview
-                    Text(
-                        text = text,
-                        style = MaterialTheme.typography.bodySmall,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-
-                // Date
+            },
+            trailingContent = {
                 Text(
                     text = Helpers.formatDate(LocalContext.current, message.date),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-            }
-        }
+            },
+        )
+        
+//        OutlinedCard(
+//            onClick = {
+//                onClickCallback(message)
+//            },
+//            modifier = Modifier
+//                .fillMaxWidth(),
+//            shape = RoundedCornerShape(8.dp),
+//        ) {
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(16.dp),
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                GetMessageAvatar(logo)
+//
+//                Spacer(modifier = Modifier.width(16.dp))
+//                Column(modifier = Modifier.weight(1f)) {
+//                    // Heading Text
+//                    Text(
+//                        heading,
+//                        style = if (message.type == Platforms.ServiceTypes.TEXT.name) {
+//                            MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+//                        } else {
+//                            MaterialTheme.typography.bodyLarge
+//                        },
+//                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+//                        maxLines = 1,
+//                        overflow = TextOverflow.Ellipsis
+//                    )
+//                    // Subheading Text
+//                    if (message.encryptedContent != null) {
+//                        Text(
+//                            subHeading,
+//                            style = MaterialTheme.typography.bodyMedium,
+//                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+//                            maxLines = 1,
+//                            overflow = TextOverflow.Ellipsis
+//                        )
+//                    }
+//                    // Message Preview
+//                    Text(
+//                        text = text,
+//                        style = MaterialTheme.typography.bodySmall,
+//                        maxLines = 2,
+//                        overflow = TextOverflow.Ellipsis,
+//                        color = MaterialTheme.colorScheme.onSurfaceVariant
+//                    )
+//                }
+//
+//                // Date
+//                Text(
+//                    text = Helpers.formatDate(LocalContext.current, message.date),
+//                    style = MaterialTheme.typography.labelSmall,
+//                    color = MaterialTheme.colorScheme.onSurfaceVariant
+//                )
+//            }
+//        }
     }
 }
 
