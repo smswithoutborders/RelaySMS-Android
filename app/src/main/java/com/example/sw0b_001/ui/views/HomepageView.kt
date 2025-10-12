@@ -270,7 +270,8 @@ fun HomepageView(
                     ActivePlatformsModal(
                         sendNewMessageRequested = sendNewMessageRequested,
                         navController = navController,
-                        isCompose = true
+                        isCompose = true,
+                        isLoggedIn = true
                     ) {
                         sendNewMessageRequested = false
                     }

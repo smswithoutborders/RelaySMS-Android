@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetValue
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -22,13 +23,15 @@ import kotlinx.coroutines.launch
 fun ActivePlatformsModal(
     sendNewMessageRequested: Boolean,
     navController: NavController,
+    isLoggedIn: Boolean = false,
     isCompose: Boolean = false,
     isOnboarding: Boolean = false,
     onDismiss: () -> Unit,
 ) {
-    val sheetState = rememberStandardBottomSheetState(
-        initialValue = SheetValue.Expanded,
-        skipHiddenState = false
+    val sheetState = rememberModalBottomSheetState(
+//        initialValue = SheetValue.Expanded,
+//        skipHiddenState = false,
+        skipPartiallyExpanded = isLoggedIn
     )
     val scope = rememberCoroutineScope()
 
