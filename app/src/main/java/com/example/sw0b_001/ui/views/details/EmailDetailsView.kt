@@ -171,6 +171,7 @@ fun EmailDetailsView(
                                 type = if(platform != null)
                                     Platforms.ServiceTypes.EMAIL
                                 else Platforms.ServiceTypes.BRIDGE,
+                                platformName = null
                             )
                         )
                     }

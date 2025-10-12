@@ -97,7 +97,8 @@ fun MessageDetailsView(
                         navController.navigate(
                             ComposeScreen(
                                 type = Platforms.ServiceTypes.MESSAGE,
-                                isOnboarding = isOnboarding
+                                isOnboarding = isOnboarding,
+                                platformName = message?.platformName
                             )
                         )
                     }

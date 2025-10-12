@@ -410,7 +410,8 @@ class MainActivity : AppCompatActivity() {
                     imageViewModel = imageViewModel,
                     messagesViewModel = messagesViewModel,
                     onSendCallback = if(composeScreenNav.isOnboarding)
-                        onboardingViewModel.callback else null
+                        onboardingViewModel.callback else null,
+                    platformName = composeScreenNav.platformName,
                 )
             }
             composable<EmailViewScreen> {

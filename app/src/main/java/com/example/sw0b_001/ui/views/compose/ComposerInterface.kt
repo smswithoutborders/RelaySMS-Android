@@ -111,6 +111,7 @@ fun ComposerInterface(
     type: Platforms.ServiceTypes,
     imageViewModel: ImageViewModel,
     messagesViewModel: MessagesViewModel,
+    platformName: String?,
     onSendCallback: ((Boolean) -> Unit)? = null,
 ) {
     val context = LocalContext.current
@@ -148,13 +149,6 @@ fun ComposerInterface(
         Platforms.ServiceTypes.MESSAGE -> message?.fromAccount
         else -> null
     }) }
-
-    val platformName =  when(type) {
-        Platforms.ServiceTypes.EMAIL -> message?.platformName!!
-        Platforms.ServiceTypes.TEXT -> message?.platformName!!
-        Platforms.ServiceTypes.MESSAGE -> message?.platformName!!
-        else -> ""
-    }
 
     var showChooseGatewayClient by remember { mutableStateOf(false) }
     var isSending by remember { mutableStateOf(false) }
@@ -495,7 +489,7 @@ fun ComposerInterface(
                         from.value = account.account!!
                         showSelectAccountModal = false
                     },
-                    name = platformName
+                    name = platformName!!
                 )
             }
 
@@ -512,6 +506,7 @@ fun ComposerInterfacePreview() {
             type = Platforms.ServiceTypes.BRIDGE,
             imageViewModel = remember{ ImageViewModel() },
             messagesViewModel = remember{ MessagesViewModel() },
+            platformName = "BRIDGE"
         ){}
     }
 }

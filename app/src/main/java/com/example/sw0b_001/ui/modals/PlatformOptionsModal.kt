@@ -488,7 +488,8 @@ private fun ComposeMessages(
             navController.navigate(ComposeScreen(
                 type = if(platform != null) ServiceTypes.valueOf(platform.service_type!!)
                     else ServiceTypes.BRIDGE,
-                isOnboarding = isOnboarding
+                isOnboarding = isOnboarding,
+                platformName = platform?.name!!
             ))
         },
         modifier = Modifier.fillMaxWidth()

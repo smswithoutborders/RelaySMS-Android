@@ -100,7 +100,8 @@ fun TextDetailsView(
                             navController.navigate(
                                 ComposeScreen(
                                     type = Platforms.ServiceTypes.TEXT,
-                                    isOnboarding = isOnboarding
+                                    isOnboarding = isOnboarding,
+                                    platformName = message?.platformName
                                 )
                             )
                         }
