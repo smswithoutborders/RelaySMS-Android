@@ -111,7 +111,7 @@ class PlatformsViewModel : ViewModel() {
         isLoggedIn: Boolean,
         languageCode: String = "en",
         onFailure: (String?) -> Unit,
-        onSuccess: () -> Unit,
+        onSuccess: (ByteArray?) -> Unit,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             lateinit var payload: ByteArray
@@ -174,7 +174,7 @@ class PlatformsViewModel : ViewModel() {
                     address = address,
                     subscriptionId = subscriptionId,
                 )
-                onSuccess()
+                onSuccess(payload)
             } catch(e: Exception) {
                 e.printStackTrace()
                 onFailure(e.message)
@@ -190,7 +190,7 @@ class PlatformsViewModel : ViewModel() {
         subscriptionId: Long,
         smsTransmission: Boolean = true,
         onFailure: (String?) -> Unit,
-        onSuccess: (EncryptedContent) -> Unit,
+        onSuccess: (ByteArray?) -> Unit,
     ) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -217,7 +217,7 @@ class PlatformsViewModel : ViewModel() {
                                 account.name
                             ))
 
-                    PayloadEncryptionComposeDecomposeInit.compose(
+                    val payload = PayloadEncryptionComposeDecomposeInit.compose(
                         context = context,
                         content = contentFormatV2Bytes,
                         ad = ad,
@@ -226,8 +226,8 @@ class PlatformsViewModel : ViewModel() {
                         languageCode = validLanguageCode,
                         subscriptionId = subscriptionId,
                         smsTransmission = smsTransmission,
-                        onSuccessRunnable = onSuccess,
-                    )
+                    ) {}
+                    onSuccess(payload)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     onFailure(e.message)
@@ -446,7 +446,7 @@ class PlatformsViewModel : ViewModel() {
         account: StoredPlatformsEntity,
         subscriptionId: Long,
         onFailure: (String?) -> Unit,
-        onSuccess: () -> Unit,
+        onSuccess: (ByteArray?) -> Unit,
         smsTransmission: Boolean = true
     ) {
         viewModelScope.launch {
@@ -485,7 +485,7 @@ class PlatformsViewModel : ViewModel() {
                         val base64Payload = Base64.encodeToString(v2PayloadBytes, Base64.NO_WRAP)
                         SMSHandler.transferToDefaultSMSApp(context, gatewayClientMSISDN, base64Payload)
                     }
-                    onSuccess()
+                    onSuccess(v2PayloadBytes)
                 } catch (e: Exception) {
                     e.printStackTrace()
                     onFailure(e.message)

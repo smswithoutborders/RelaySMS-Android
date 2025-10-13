@@ -8,97 +8,21 @@ import com.github.kittinunf.fuel.core.extensions.jsonBody
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.result.Result
 
-class Network {
-    data class NetworkResponseResults(val response: Response,
-                                      val result: Result<String, java.lang.Exception>)
-    companion object {
-        fun requestGet(url: String, headers: Headers? = null) : NetworkResponseResults{
-            try {
-                val (_, response, result) = if(headers.isNullOrEmpty())
-                    url.httpGet()
-                        .responseString()
-                else
-                    url.httpGet()
-                        .header(Headers.COOKIE to headers["Set-Cookie"].first())
-                        .responseString()
+data class NetworkResponseResults(
+    val response: Response,
+    val result: Result<String, java.lang.Exception>
+)
 
-                return when(result) {
-                    is Result.Failure -> {
-                        NetworkResponseResults(response, Result.Failure(result.error))
-                    }
-
-                    is Result.Success -> {
-                        NetworkResponseResults(response, Result.Success(result.get()))
-                    }
-                }
-            } catch(e: Exception) {
-                throw Throwable(e)
-            }
-        }
-
-        fun jsonRequestDelete(url: String, payload: String, headers: Headers? = null) :
-                NetworkResponseResults {
-            println("url: $url")
+object Network {
+    fun requestGet(url: String, headers: Headers? = null) : NetworkResponseResults{
+        try {
             val (_, response, result) = if(headers.isNullOrEmpty())
-                Fuel.delete(url)
-                        .jsonBody(payload)
-                        .responseString()
+                url.httpGet()
+                    .responseString()
             else
-                Fuel.delete(url)
-                        .jsonBody(payload)
-                        .header(headers)
-                        .header( Headers.COOKIE to headers["Set-Cookie"].first())
-                        .responseString()
-
-            return when(result) {
-                is Result.Failure -> {
-                    Log.w(javaClass.name, "Response text - ${String(response.data)}")
-                    NetworkResponseResults(response, Result.Failure(result.error))
-                }
-
-                is Result.Success -> {
-                    NetworkResponseResults(response, Result.Success(result.get()))
-                }
-            }
-        }
-        fun jsonRequestPut(url: String, payload: String, headers: Headers? = null) :
-                NetworkResponseResults {
-            println("url: $url")
-            val (_, response, result) = if(headers.isNullOrEmpty())
-                Fuel.put(url)
-                        .jsonBody(payload)
-                        .responseString()
-            else
-                Fuel.put(url)
-                        .jsonBody(payload)
-                        .header(headers)
-                        .header( Headers.COOKIE to headers["Set-Cookie"].first())
-                        .responseString()
-
-            return when(result) {
-                is Result.Failure -> {
-                    Log.w(javaClass.name, "Response text - ${String(response.data)}")
-                    NetworkResponseResults(response, Result.Failure(result.error))
-                }
-
-                is Result.Success -> {
-                    NetworkResponseResults(response, Result.Success(result.get()))
-                }
-            }
-        }
-
-        fun jsonRequestPost(url: String, payload: String, headers: Headers? = null) : NetworkResponseResults {
-            val (_, response, result) = if(headers.isNullOrEmpty())
-                Fuel.post(url)
-                        .jsonBody(payload)
-                        .responseString()
-            else
-                Fuel.post(url)
-                        .jsonBody(payload)
-                        .header(headers)
-                        .header( Headers.COOKIE to headers["Set-Cookie"].first())
-                        .responseString()
-
+                url.httpGet()
+                    .header(Headers.COOKIE to headers["Set-Cookie"].first())
+                    .responseString()
 
             return when(result) {
                 is Result.Failure -> {
@@ -108,7 +32,89 @@ class Network {
                 is Result.Success -> {
                     NetworkResponseResults(response, Result.Success(result.get()))
                 }
+            }
+        } catch(e: Exception) {
+            throw Throwable(e)
+        }
+    }
+
+    fun jsonRequestDelete(url: String, payload: String, headers: Headers? = null) :
+            NetworkResponseResults {
+        println("url: $url")
+        val (_, response, result) = if(headers.isNullOrEmpty())
+            Fuel.delete(url)
+                .jsonBody(payload)
+                .responseString()
+        else
+            Fuel.delete(url)
+                .jsonBody(payload)
+                .header(headers)
+                .header( Headers.COOKIE to headers["Set-Cookie"].first())
+                .responseString()
+
+        return when(result) {
+            is Result.Failure -> {
+                Log.w(javaClass.name, "Response text - ${String(response.data)}")
+                NetworkResponseResults(response, Result.Failure(result.error))
+            }
+
+            is Result.Success -> {
+                NetworkResponseResults(response, Result.Success(result.get()))
+            }
+        }
+    }
+    fun jsonRequestPut(url: String, payload: String, headers: Headers? = null) :
+            NetworkResponseResults {
+        println("url: $url")
+        val (_, response, result) = if(headers.isNullOrEmpty())
+            Fuel.put(url)
+                .jsonBody(payload)
+                .responseString()
+        else
+            Fuel.put(url)
+                .jsonBody(payload)
+                .header(headers)
+                .header( Headers.COOKIE to headers["Set-Cookie"].first())
+                .responseString()
+
+        return when(result) {
+            is Result.Failure -> {
+                Log.w(javaClass.name, "Response text - ${String(response.data)}")
+                NetworkResponseResults(response, Result.Failure(result.error))
+            }
+
+            is Result.Success -> {
+                NetworkResponseResults(response, Result.Success(result.get()))
+            }
+        }
+    }
+
+    fun jsonRequestPost(
+        url: String,
+        payload: String,
+        headers: Headers? = null
+    ) : NetworkResponseResults {
+        val (_, response, result) = if(headers.isNullOrEmpty())
+            Fuel.post(url)
+                .jsonBody(payload)
+                .responseString()
+        else
+            Fuel.post(url)
+                .jsonBody(payload)
+                .header(headers)
+                .header( Headers.COOKIE to headers["Set-Cookie"].first())
+                .responseString()
+
+
+        return when(result) {
+            is Result.Failure -> {
+                NetworkResponseResults(response, Result.Failure(result.error))
+            }
+
+            is Result.Success -> {
+                NetworkResponseResults(response, Result.Success(result.get()))
             }
         }
     }
 }
+

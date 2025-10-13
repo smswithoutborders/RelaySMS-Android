@@ -10,12 +10,24 @@ import kotlinx.serialization.json.Json
 class GatewayClientsCommunications(context: Context) {
 
     @Serializable
-    data class GatewayClientJsonPayload(val msisdn: String,
-                                        val country: String,
-                                        val operator: String,
-                                        val operator_code: String,
-                                        val protocols: ArrayList<String>,
-                                        val last_published_date: Int)
+    data class GatewayClientRequestPayload(
+        val address: String,
+        val text: String,
+        val date: Long = System.currentTimeMillis(),
+        val date_sent: Long = System.currentTimeMillis(),
+    )
+
+    @Serializable
+    data class GatewayClientJsonPayload(
+        val msisdn: String,
+        val country: String,
+        val operator: String,
+        val operator_code: String,
+        val protocols: ArrayList<String>,
+        val last_published_date: Int,
+        val date: Long = System.currentTimeMillis(),
+        val date_sent: Long = System.currentTimeMillis(),
+    )
 
     private val filename = "gateway_client_prefs"
     private val defaultKey = "DEFAULT_KEY"

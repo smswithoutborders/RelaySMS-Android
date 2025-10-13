@@ -79,6 +79,7 @@ import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.MainActivity
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Composers
+import com.example.sw0b_001.data.GatewayClientsCommunications
 import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
@@ -94,6 +95,7 @@ import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.verifyPhoneNumberFormat
+import com.example.sw0b_001.ui.views.DeveloperHTTPView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -155,6 +157,10 @@ fun ComposerInterface(
     var showSelectAccountModal by remember { mutableStateOf(
         type != Platforms.ServiceTypes.BRIDGE) }
     var selectedAccount: StoredPlatformsEntity? by remember { mutableStateOf(null) }
+
+    var showDeveloperDialog by remember{ mutableStateOf(false) }
+
+    var sendRequestPayload by remember{ mutableStateOf<ByteArray?>(null) }
 
     val decomposedEmailMessage = remember() {
         if((type == Platforms.ServiceTypes.BRIDGE || type == Platforms.ServiceTypes.EMAIL) &&
@@ -260,13 +266,20 @@ fun ComposerInterface(
 
     val platformsViewModel = remember{ PlatformsViewModel() }
 
-    fun send() {
-        fun sendingCallback() {
+    fun send(
+        smsTransmission: Boolean = true,
+        onCompleteCallback: ((ByteArray) -> Unit)? = null
+    ) {
+        fun sendingCallback(payload: ByteArray?) {
             isSending = false
             showChooseGatewayClient = false
-            CoroutineScope(Dispatchers.Main).launch {
-                onSendCallback?.invoke(true)
-                navController.popBackStack()
+            if(onCompleteCallback != null && payload != null) {
+                onCompleteCallback.invoke(payload)
+            } else {
+                CoroutineScope(Dispatchers.Main).launch {
+                    onSendCallback?.invoke(true)
+                    navController.popBackStack()
+                }
             }
         }
 
@@ -316,7 +329,7 @@ fun ComposerInterface(
                 isBridge = isBridge,
                 isLoggedIn = !isBridge,
                 onFailure = { onFailureCallback(it) },
-            ) { sendingCallback() }
+            ) { sendingCallback(it) }
         }
         else {
             when(type) {
@@ -329,8 +342,9 @@ fun ComposerInterface(
                         account = selectedAccount,
                         isBridge = isBridge,
                         subscriptionId = subscriptionId,
+                        smsTransmission = smsTransmission,
                         onFailureCallback = { onFailureCallback(it) },
-                    ) { sendingCallback() }
+                    ) { sendingCallback(it) }
                 }
                 Platforms.ServiceTypes.TEXT -> {
                     platformsViewModel.sendPublishingForPost(
@@ -338,7 +352,7 @@ fun ComposerInterface(
                         text = decomposedTextMessage?.text?.value ?: "",
                         account = selectedAccount!!,
                         onFailure = { onFailureCallback(it) },
-                        onSuccess = { sendingCallback() },
+                        onSuccess = { sendingCallback(it) },
                         subscriptionId = subscriptionId
                     )
                 }
@@ -349,12 +363,11 @@ fun ComposerInterface(
                         account = selectedAccount!!,
                         subscriptionId = subscriptionId,
                         onFailure = { onFailureCallback(it) },
-                    ) { sendingCallback() }
+                    ) { sendingCallback(it) }
                 }
                 Platforms.ServiceTypes.TEST -> {}
             }
         }
-
     }
 
     Scaffold(
@@ -386,15 +399,31 @@ fun ComposerInterface(
                     }
                 },
                 actions = {
-                    IconButton(
-                        onClick = { if(!context.isDefault()) TODO("Show toast") else {
-                            imagePicker.launch(
-                                arrayOf( "image/png", "image/jpg", "image/jpeg"))
-                        }}
-                    ) {
-                        Icon(Icons.Default.AttachFile,
-                            stringResource(R.string.add_photos)
-                        )
+                    if(BuildConfig.DEBUG || inPreviewMode) {
+                        IconButton(
+                            enabled = isSendingEnabled,
+                            onClick = {
+                                send(false) {
+                                    sendRequestPayload = it
+                                    showDeveloperDialog = true
+                                }
+                            }
+                        ) {
+                            Icon(Icons.Default.DeveloperMode, "" )
+                        }
+                    }
+
+                    if(context.isDefault() || inPreviewMode) {
+                        IconButton(
+                            onClick = { if(!context.isDefault()) TODO("Show toast") else {
+                                imagePicker.launch(
+                                    arrayOf( "image/png", "image/jpg", "image/jpeg"))
+                            }}
+                        ) {
+                            Icon(Icons.Default.AttachFile,
+                                stringResource(R.string.add_photos)
+                            )
+                        }
                     }
 
                     IconButton(
@@ -493,6 +522,13 @@ fun ComposerInterface(
                 )
             }
 
+            if(showDeveloperDialog) {
+                DeveloperHTTPView(
+                    payload = sendRequestPayload!!,
+                ) {
+                    showDeveloperDialog = false
+                }
+            }
         }
     }
 }

@@ -1,25 +1,22 @@
 package com.example.sw0b_001.ui.views
 
-import androidx.compose.foundation.background
+import android.util.Base64
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DeveloperMode
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -27,14 +24,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,18 +40,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.GatewayClientsCommunications
+import com.example.sw0b_001.data.Network
 import com.example.sw0b_001.ui.theme.AppTheme
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 
 @Composable
 fun DeveloperHTTPView(
-    dialingUrl: String,
-    requestStatus: String,
-    isLoading: Boolean = false,
-    httpRequestCallback: (String?, String) -> Unit?,
+    payload: ByteArray,
     onDismissRequest: () -> Unit
 ) {
-    var customDialingUrl by remember{ mutableStateOf( dialingUrl ) }
+    var url by remember{ mutableStateOf("") }
+    var requestStatus by remember{ mutableStateOf("") }
+    var statusCode by remember{ mutableIntStateOf(-1) }
+    var isLoading by remember{ mutableStateOf(false) }
 
     Dialog(
         onDismissRequest = { onDismissRequest() }
@@ -82,8 +84,8 @@ fun DeveloperHTTPView(
                 }
 
                 OutlinedTextField(
-                    value = customDialingUrl,
-                    onValueChange = { customDialingUrl = it },
+                    value = url,
+                    onValueChange = { url = it },
                     label = {
                         Text(
                             stringResource(R.string.gateway_server_url),
@@ -109,16 +111,27 @@ fun DeveloperHTTPView(
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp)
+                        .size(200.dp)
+                        .padding(16.dp)
                 ) {
-                    Text(
-                        requestStatus,
-                        color = MaterialTheme.colorScheme.background,
-                        modifier = Modifier
-                            .verticalScroll(rememberScrollState())
-                            .padding(8.dp),
-                        style = MaterialTheme.typography.bodySmall
-                    )
+                    Column {
+                        Text(
+                            statusCode.toString(),
+                            color = MaterialTheme.colorScheme.background,
+                            modifier = Modifier.padding(8.dp),
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+
+                        Text(
+                            requestStatus,
+                            color = MaterialTheme.colorScheme.background,
+                            modifier = Modifier
+                                .verticalScroll(rememberScrollState())
+                                .padding(8.dp),
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.padding(8.dp))
@@ -126,7 +139,17 @@ fun DeveloperHTTPView(
                 Button(
                     enabled = !isLoading,
                     onClick = {
-                        httpRequestCallback(requestStatus, customDialingUrl)
+                        val gatewayClientPayload = GatewayClientsCommunications
+                            .GatewayClientRequestPayload(
+                                address = "+237123456789",
+                                text = Base64.encodeToString(payload, Base64.DEFAULT),
+                            )
+                        val response = Network.jsonRequestPost(
+                            url = url,
+                            payload = Json.encodeToString(gatewayClientPayload),
+                        )
+                        statusCode = response.response.statusCode
+                        requestStatus = response.result.get()
                     }
                 ) {
                     Text(stringResource(R.string.http_request))
@@ -149,6 +172,6 @@ fun DeveloperHTTPView(
 @Composable
 fun DeveloperHTTPView_Preview() {
     AppTheme {
-        DeveloperHTTPView("https://example.com", "", true, {_,_->}) {}
+        DeveloperHTTPView(byteArrayOf()) {}
     }
 }
