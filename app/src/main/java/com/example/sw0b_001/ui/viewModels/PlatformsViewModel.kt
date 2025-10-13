@@ -42,7 +42,7 @@ import com.example.sw0b_001.data.models.Bridges
 import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
-import com.example.sw0b_001.extensions.context.settingsGetDefaultGatewayClient
+import com.example.sw0b_001.extensions.context.settingsGetDefaultGatewayClients
 import com.example.sw0b_001.ui.views.BottomTabsItems
 import com.example.sw0b_001.ui.views.compose.GatewayClientRequest
 import com.example.sw0b_001.ui.views.compose.ReliabilityTestRequestPayload
@@ -158,8 +158,8 @@ class PlatformsViewModel : ViewModel() {
                     )
                 }
 
-                val address = context.settingsGetDefaultGatewayClient
-                if(address == null) {
+                val gatewayClients = context.settingsGetDefaultGatewayClients
+                if(gatewayClients == null) {
                     throw Exception("No default Gateway client")
                 }
 
@@ -171,7 +171,7 @@ class PlatformsViewModel : ViewModel() {
                     sessionId = ImageTransmissionProtocol.getItpSession(context).toByte(),
                     imageLength = imageViewModel.processedImage.value!!.rawBytes!!.size.toBytes(),
                     textLength = text.size.toBytes(),
-                    address = address,
+                    address = gatewayClients.msisdn,
                     subscriptionId = subscriptionId,
                 )
                 onSuccess(payload)
@@ -263,8 +263,8 @@ class PlatformsViewModel : ViewModel() {
                             subscriptionId = subscriptionId
                         ).first
 
-                        val address = context.settingsGetDefaultGatewayClient
-                        if(address == null) {
+                        val gatewayClient = context.settingsGetDefaultGatewayClients
+                        if(gatewayClient == null) {
                             onFailureCallback("No default Gateway Client...")
                             return@withContext
                         }
@@ -274,16 +274,16 @@ class PlatformsViewModel : ViewModel() {
                             smsManager.sendSms(
                                 context = context,
                                 text = txtTransmission!!,
-                                address = address,
+                                address = gatewayClient.msisdn,
                                 subscriptionId = subscriptionId,
-                                threadId = context.getThreadId(address),
+                                threadId = context.getThreadId(gatewayClient.msisdn),
                                 callback = { conversation -> onCompleteCallback(null) }
                             )
                         }
                         else {
                             val intent = SMSHandler.transferToDefaultSMSApp(
                                 context,
-                                address,
+                                gatewayClient.msisdn,
                                 txtTransmission
                             ).apply {
                                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -375,9 +375,10 @@ class PlatformsViewModel : ViewModel() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
-                    val gatewayClientMSISDN = GatewayClientsCommunications(context).getDefaultGatewayClient()
+                    val gatewayClient = context.settingsGetDefaultGatewayClients
                         ?: return@withContext onFailure("No Gateway Client set for testing.")
-                    val url = context.getString(R.string.test_url, gatewayClientMSISDN)
+                    val url = context.getString(R.string.test_url,
+                        gatewayClient.msisdn)
                     val requestPayload = Json.encodeToString(ReliabilityTestRequestPayload(startTime))
                     val response = Network.jsonRequestPost(url, requestPayload)
                     val responsePayload = Json.decodeFromString<ReliabilityTestResponsePayload>(response.result.get())
@@ -403,7 +404,11 @@ class PlatformsViewModel : ViewModel() {
 
                     if (smsTransmission) {
                         val base64Payload = Base64.encodeToString(v2PayloadBytes, Base64.NO_WRAP)
-                        SMSHandler.transferToDefaultSMSApp(context, gatewayClientMSISDN, base64Payload)
+                        SMSHandler.transferToDefaultSMSApp(
+                            context,
+                            gatewayClient.msisdn,
+                            base64Payload
+                        )
                     }
                     onSuccess()
 
@@ -480,10 +485,14 @@ class PlatformsViewModel : ViewModel() {
                     )
 
                     if (smsTransmission) {
-                        val gatewayClientMSISDN = GatewayClientsCommunications(context).getDefaultGatewayClient()
-                            ?: return@withContext onFailure("No default gateway client configured.")
+                        val gatewayClient = context.settingsGetDefaultGatewayClients
+                            ?: return@withContext onFailure("No Gateway Client set.")
                         val base64Payload = Base64.encodeToString(v2PayloadBytes, Base64.NO_WRAP)
-                        SMSHandler.transferToDefaultSMSApp(context, gatewayClientMSISDN, base64Payload)
+                        SMSHandler.transferToDefaultSMSApp(
+                            context,
+                            gatewayClient.msisdn,
+                            base64Payload
+                        )
                     }
                     onSuccess(v2PayloadBytes)
                 } catch (e: Exception) {

@@ -8,8 +8,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class StartupActivity : Initializer<GatewayClientsCommunications>{
-    override fun create(context: Context): GatewayClientsCommunications {
+class StartupActivity : Initializer<Context>{
+    override fun create(context: Context): Context {
         context.setDatabaseName("smswithoutborders.RelaySms")
         CoroutineScope(Dispatchers.Default).launch {
             try {
@@ -18,7 +18,7 @@ class StartupActivity : Initializer<GatewayClientsCommunications>{
                 e.printStackTrace()
             }
         }
-        return GatewayClientsCommunications(context)
+        return context
     }
 
     override fun dependencies(): List<Class<out Initializer<*>?>?> {

@@ -423,5 +423,8 @@
     <string name="add_photos">Add photos</string>
     <string name="relaysms_inbox">RelaySMS inbox</string>
     <string name="open_menu">Open menu</string>
+    <string name="default_sms_receiver">Default SMS receiver</string>
+    <string name="set_as_default">Set as default</string>
+    <string name="delete_gateway_client">Delete gateway client</string>
 
 </resources>

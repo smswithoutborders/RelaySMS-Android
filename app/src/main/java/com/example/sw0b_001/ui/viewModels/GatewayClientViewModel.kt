@@ -8,37 +8,29 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.GatewayClientsCommunications
-import com.example.sw0b_001.data.models.GatewayClient
+import com.example.sw0b_001.data.models.GatewayClients
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class GatewayClientViewModel() : ViewModel() {
-    private var liveData: LiveData<List<GatewayClient>> = MutableLiveData()
-    private val _selectedGatewayClient = MutableLiveData<GatewayClient?>()
-    val selectedGatewayClient: LiveData<GatewayClient?> = _selectedGatewayClient
+    private var liveData: LiveData<List<GatewayClients>> = MutableLiveData()
+    private val _selectedGatewayClients = MutableLiveData<GatewayClients?>()
+    val selectedGatewayClients: LiveData<GatewayClients?> = _selectedGatewayClients
 
-    fun getDefaultGatewayClient(context: Context, successRunnable: (GatewayClient) -> Unit) {
-        val msisdn = GatewayClientsCommunications(context).getDefaultGatewayClient()
-        viewModelScope.launch(Dispatchers.Default) {
-            val defaultGatewayClient = getGatewayClientByMsisdn(context, msisdn!!)!!
-            successRunnable(defaultGatewayClient)
-        }
-    }
-
-    fun get(context: Context, successRunnable: Runnable?): LiveData<List<GatewayClient>> {
+    fun get(context: Context, successRunnable: Runnable?): LiveData<List<GatewayClients>> {
         if(liveData.value.isNullOrEmpty()) {
             liveData = Datastore.getDatastore(context).gatewayClientsDao().all
-            loadRemote(context, successRunnable, successRunnable)
+//            loadRemote(context, successRunnable, successRunnable)
         }
         return liveData
     }
 
     fun loadRemote(context: Context, successRunnable: Runnable?, failureRunnable: Runnable?){
-        CoroutineScope(Dispatchers.Default).launch{
+        viewModelScope.launch(Dispatchers.Default){
             try {
-                GatewayClientsCommunications.Companion.fetchAndPopulateWithDefault(context)
+                GatewayClientsCommunications.fetchRemote(context)
                 successRunnable?.run()
             } catch (e: Exception) {
                 Log.e(javaClass.name, "Exception fetching Gateway clients", e)
@@ -47,30 +39,14 @@ class GatewayClientViewModel() : ViewModel() {
         }
     }
 
-    fun getGatewayClientByMsisdn(context: Context, msisdn: String): GatewayClient? {
-        return Datastore.getDatastore(context).gatewayClientsDao().getByMsisdn(msisdn)
+    fun selectGatewayClient(gatewayClients: GatewayClients) {
+        _selectedGatewayClients.value = gatewayClients
     }
 
-    fun selectGatewayClient(gatewayClient: GatewayClient) {
-        _selectedGatewayClient.value = gatewayClient
-    }
-
-    private fun loadDefaultGatewayClient(context: Context) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val defaultMsisdn = GatewayClientsCommunications(context).getDefaultGatewayClient()
-            if (!defaultMsisdn.isNullOrEmpty()) {
-                val defaultGatewayClient = getGatewayClientByMsisdn(context, defaultMsisdn)
-                withContext(Dispatchers.Main) {
-                    _selectedGatewayClient.value = defaultGatewayClient!!
-                }
-            }
-        }
-    }
-
-    fun delete(context: Context, gatewayClient: GatewayClient) {
+    fun delete(context: Context, gatewayClients: GatewayClients) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                Datastore.getDatastore(context).gatewayClientsDao().delete(gatewayClient)
+                Datastore.getDatastore(context).gatewayClientsDao().delete(gatewayClients)
             } catch (e: Exception) {
                 e.printStackTrace()
                 throw e
@@ -78,14 +54,20 @@ class GatewayClientViewModel() : ViewModel() {
         }
     }
 
-    fun deleteGatewayClient(context: Context, gatewayClient: GatewayClient, successRunnable: Runnable, failureRunnable: Runnable) {
-        CoroutineScope(Dispatchers.IO).launch {
+    fun deleteGatewayClient(
+        context: Context,
+        gatewayClients: GatewayClients,
+        successRunnable: Runnable,
+        failureRunnable: Runnable
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
-                Datastore.getDatastore(context).gatewayClientsDao().delete(gatewayClient)
+                Datastore.getDatastore(context).gatewayClientsDao().delete(gatewayClients)
                 withContext(Dispatchers.Main) {
                     successRunnable.run()
                 }
             } catch (e: Exception) {
+                e.printStackTrace()
                 withContext(Dispatchers.Main) {
                     failureRunnable.run()
                 }
@@ -93,14 +75,20 @@ class GatewayClientViewModel() : ViewModel() {
         }
     }
 
-    fun insertGatewayClient(context: Context, gatewayClient: GatewayClient, successRunnable: Runnable, failureRunnable: Runnable) {
-        CoroutineScope(Dispatchers.IO).launch {
+    fun insertGatewayClient(
+        context: Context,
+        gatewayClients: GatewayClients,
+        successRunnable: Runnable,
+        failureRunnable: Runnable
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
-                Datastore.getDatastore(context).gatewayClientsDao().insert(gatewayClient)
+                Datastore.getDatastore(context).gatewayClientsDao().insert(gatewayClients)
                 withContext(Dispatchers.Main) {
                     successRunnable.run()
                 }
             } catch (e: Exception) {
+                e.printStackTrace()
                 withContext(Dispatchers.Main) {
                     failureRunnable.run()
                 }
@@ -108,14 +96,20 @@ class GatewayClientViewModel() : ViewModel() {
         }
     }
 
-    fun updateGatewayClient(context: Context, gatewayClient: GatewayClient, successRunnable: Runnable, failureRunnable: Runnable) {
-        CoroutineScope(Dispatchers.IO).launch {
+    fun updateGatewayClient(
+        context: Context,
+        gatewayClients: GatewayClients,
+        successRunnable: Runnable,
+        failureRunnable: Runnable
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
-                Datastore.getDatastore(context).gatewayClientsDao().update(gatewayClient)
+                Datastore.getDatastore(context).gatewayClientsDao().update(gatewayClients)
                 withContext(Dispatchers.Main) {
                     successRunnable.run()
                 }
             } catch (e: Exception) {
+                e.printStackTrace()
                 withContext(Dispatchers.Main) {
                     failureRunnable.run()
                 }

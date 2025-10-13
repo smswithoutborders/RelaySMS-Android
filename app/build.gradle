@@ -189,6 +189,9 @@ dependencies {
     implementation libs.play.services.auth.api.phone
     implementation libs.androidx.ui.text.google.fonts
     implementation libs.androidx.paging.common
+//    implementation libs.androidx.datastore.core.jvm
+    implementation libs.androidx.datastore.preferences.core
+    implementation libs.androidx.datastore.preferences
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core
@@ -313,22 +316,22 @@ dependencies {
 
     def paging_version = "3.3.6"
 
-    implementation "androidx.paging:paging-runtime:$paging_version"
+    implementation libs.androidx.paging.runtime
 
     // alternatively - without Android dependencies for tests
     testImplementation "androidx.paging:paging-common:$paging_version"
 
     // optional - RxJava2 support
-    implementation "androidx.paging:paging-rxjava2:$paging_version"
+    implementation libs.androidx.paging.rxjava2
 
     // optional - RxJava3 support
-    implementation "androidx.paging:paging-rxjava3:$paging_version"
+    implementation libs.androidx.paging.rxjava3
 
     // optional - Guava ListenableFuture support
-    implementation "androidx.paging:paging-guava:$paging_version"
+    implementation libs.androidx.paging.guava
 
     // optional - Jetpack Compose integration
-    implementation "androidx.paging:paging-compose:3.4.0-alpha03"
+    implementation libs.androidx.paging.compose
 
     def room_version = "2.7.2"
     annotationProcessor "androidx.room:room-compiler:$room_version"
@@ -336,9 +339,9 @@ dependencies {
     annotationProcessor "androidx.room:room-compiler:$room_version"
     testImplementation "androidx.room:room-testing:$room_version"
     implementation "androidx.room:room-paging:$room_version"
-    implementation 'androidx.browser:browser:1.9.0'
+    implementation libs.androidx.browser
 
-    implementation("io.coil-kt.coil3:coil-compose:3.3.0")
-    implementation("io.coil-kt.coil3:coil-network-okhttp:3.3.0")
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 }
 

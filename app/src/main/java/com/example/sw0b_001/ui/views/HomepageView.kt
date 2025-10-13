@@ -134,6 +134,9 @@ fun HomepageView(
                     BottomTabsItems.BottomBarCountriesTab -> {
                         GatewayClientsAppBar(
                             navController = navController,
+                            onAddClicked = {
+                                showAddGatewayClientsModal = true
+                            },
                             onRefreshClicked = {
                                 gatewayClientViewModel.get(context, refreshSuccess)
                             }
@@ -202,27 +205,6 @@ fun HomepageView(
                             }
                         )
                     }
-                }
-                BottomTabsItems.BottomBarCountriesTab -> {
-                    ExtendedFloatingActionButton(
-                        onClick = {
-                            showAddGatewayClientsModal = true
-                        },
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Filled.Add,
-                                contentDescription = stringResource(R.string.add_new_gateway_clients),
-                                tint = MaterialTheme.colorScheme.onSecondary
-                            )
-                        },
-                        text = {
-                            Text(
-                                text = stringResource(R.string.add_number),
-                                color = MaterialTheme.colorScheme.onSecondary
-                            )
-                        }
-                    )
                 }
                 BottomTabsItems.BottomBarInboxTab -> {
                     if (inboxMessages.isNotEmpty()) {

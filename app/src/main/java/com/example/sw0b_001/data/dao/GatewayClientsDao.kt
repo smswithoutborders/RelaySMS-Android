@@ -8,54 +8,38 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.example.sw0b_001.data.models.GatewayClient
+import com.example.sw0b_001.data.models.GatewayClients
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface GatewayClientsDao {
-    @get:Query("SELECT * FROM GatewayClient ORDER BY date DESC")
-    val all: LiveData<List<GatewayClient>>
+    @get:Query("SELECT * FROM GatewayClients ORDER BY date DESC")
+    val all: LiveData<List<GatewayClients>>
 
-    @Query("SELECT * FROM GatewayClient WHERE operator_id=:operator_id")
-    fun findForOperaetorId(operator_id: String?): MutableList<GatewayClient>?
+    @Query("SELECT * FROM GatewayClients WHERE operatorCode = :operatorCode")
+    fun findForOperatorCode(operatorCode: String?): MutableList<GatewayClients>?
+
+    @Insert(onConflict = OnConflictStrategy.Companion.IGNORE)
+    fun insertAll(gatewayClients: MutableList<GatewayClients>)
 
     @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
-    fun insertAll(gatewayClients: MutableList<GatewayClient>)
-
-    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
-    fun insert(GatewayClient: GatewayClient): Long
+    fun insert(gatewayClients: GatewayClients): Long
 
     @Delete
-    fun delete(GatewayClient: GatewayClient)
+    fun delete(gatewayClients: GatewayClients)
 
-    @Query(
-        "DELETE FROM GatewayClient WHERE type IS NOT 'custom' AND type is NOT 'default' AND NOT " +
-                "EXISTS (SELECT * FROM GatewayClient WHERE mSISDN IN (:gatewayClients))"
-    )
-    fun clear(gatewayClients: MutableList<String>)
-
-    @Query("UPDATE GatewayClient SET `default` = :setDefault WHERE id=:id")
+    @Query("UPDATE GatewayClients SET isDefault = :setDefault WHERE id=:id")
     fun updateDefault(setDefault: Boolean, id: Long)
 
     @Update
-    fun update(gatewayClient: GatewayClient)
+    fun update(gatewayClients: GatewayClients)
 
-    @Query("UPDATE GatewayClient SET `default`=0")
+    @Query("UPDATE GatewayClients SET isDefault =0")
     fun resetAllDefaults()
 
-    @Query("SELECT * FROM GatewayClient WHERE id = :id")
-    fun fetch(id: Long): GatewayClient?
+    @Query("SELECT * FROM GatewayClients WHERE id = :id")
+    fun fetch(id: Long): GatewayClients?
 
-    @Transaction
-    fun refresh(gatewayClients: MutableList<GatewayClient>) {
-        val msisdns: MutableList<String> = ArrayList<String>()
-        for (gatewayClient in gatewayClients) {
-            if(gatewayClient.mSISDN != null)
-                msisdns.add(gatewayClient.mSISDN!!)
-        }
-        clear(msisdns)
-        insertAll(gatewayClients)
-    }
-
-    @Query("SELECT * FROM GatewayClient WHERE MSISDN = :msisdn")
-    fun getByMsisdn(msisdn: String): GatewayClient?
+    @Query("SELECT * FROM GatewayClients WHERE MSISDN = :msisdn")
+    fun getByAddress(msisdn: String): Flow<GatewayClients>
 }

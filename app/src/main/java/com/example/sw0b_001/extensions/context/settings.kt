@@ -2,6 +2,24 @@ package com.example.sw0b_001.extensions.context
 
 import android.content.Context
 import androidx.core.content.edit
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import com.example.sw0b_001.data.Datastore
+import com.example.sw0b_001.data.models.GatewayClients
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
+
+val Context.relaySmsDatastore: DataStore<Preferences> by preferencesDataStore(name = "relaysms_settings")
 
 private object Settings {
     const val FILENAME: String = "com.afkanerd.smswithoutborders.settings"
@@ -12,11 +30,10 @@ private object Settings {
     const val SETTINGS_DEFAULT_GATEWAY_CLIENT = "SETTINGS_DEFAULT_GATEWAY_CLIENT"
 }
 
-val Context.settingsGetDefaultGatewayClient get(): String? {
-    val sharedPreferences = getSharedPreferences(
-        Settings.FILENAME, Context.MODE_PRIVATE)
-    return sharedPreferences
-        .getString(Settings.SETTINGS_DEFAULT_GATEWAY_CLIENT, null)
+val Context.settingsGetDefaultGatewayClients get(): GatewayClients? = runBlocking{
+    val gatewayClient = relaySmsDatastore.data.firstOrNull()
+        ?.get(settingsDefaultGatewayClientKey) ?: return@runBlocking null
+    Json.decodeFromString<GatewayClients>(gatewayClient)
 }
 
 val Context.settingsGetUseDeviceId get(): Boolean {
@@ -47,10 +64,11 @@ val Context.settingsGetOnboardedCompletely get(): Boolean {
         .getBoolean(Settings.SETTINGS_ONBOARDED_COMPLETELY, false)
 }
 
-fun Context.settingsSetDefaultGatewayClient(address: String) {
-    getSharedPreferences( Settings.FILENAME, Context.MODE_PRIVATE).edit {
-        putString(Settings.SETTINGS_DEFAULT_GATEWAY_CLIENT, address)
-        apply()
+
+val settingsDefaultGatewayClientKey = stringPreferencesKey("default_gateway_client")
+suspend fun Context.settingsSetDefaultGatewayClient(gatewayClients: String) {
+    relaySmsDatastore.edit { setting ->
+        setting[settingsDefaultGatewayClientKey] = gatewayClients
     }
 }
 

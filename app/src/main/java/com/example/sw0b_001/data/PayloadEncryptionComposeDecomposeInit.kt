@@ -20,8 +20,11 @@ import com.example.sw0b_001.data.models.AvailablePlatforms
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.data.models.RatchetStates
-import com.example.sw0b_001.extensions.context.settingsGetDefaultGatewayClient
+import com.example.sw0b_001.extensions.context.relaySmsDatastore
+import com.example.sw0b_001.extensions.context.settingsDefaultGatewayClientKey
+import com.example.sw0b_001.extensions.context.settingsGetDefaultGatewayClients
 import com.example.sw0b_001.extensions.context.settingsGetUseDeviceId
+import kotlinx.coroutines.flow.firstOrNull
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.StandardCharsets
@@ -138,10 +141,9 @@ object PayloadEncryptionComposeDecomposeInit {
         encryptedContent: EncryptedContent,
         onSuccessRunnable: (EncryptedContent) -> Unit
     ) {
-        val gatewayClientMSISDN = GatewayClientsCommunications(context)
-            .getDefaultGatewayClient()
+        val gatewayClient = context.settingsGetDefaultGatewayClients
 
-        gatewayClientMSISDN?.let {
+        gatewayClient?.let {
             if(context.isDefault()) {
                 val smsManager = SmsManager(ConversationsViewModel())
                 smsManager.sendSms(
@@ -149,14 +151,14 @@ object PayloadEncryptionComposeDecomposeInit {
                     text = payload,
                     address = address,
                     subscriptionId = subscriptionId,
-                    threadId = context.getThreadId(gatewayClientMSISDN),
+                    threadId = context.getThreadId(gatewayClient.msisdn),
                     callback = { conversation -> onSuccessRunnable(encryptedContent) }
                 )
             }
             else {
                 val intent = SMSHandler.transferToDefaultSMSApp(
                     context,
-                    gatewayClientMSISDN,
+                    gatewayClient.msisdn,
                     payload
                 ).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -218,8 +220,8 @@ object PayloadEncryptionComposeDecomposeInit {
             languageCode = languageCode.encodeToByteArray(),
         )
 
-        val address = context.settingsGetDefaultGatewayClient
-        if(address == null) {
+        val gatewayClient = context.settingsGetDefaultGatewayClients
+        if(gatewayClient == null) {
             throw Exception("No default Gateway client")
         }
 
@@ -227,7 +229,7 @@ object PayloadEncryptionComposeDecomposeInit {
             sendSms(
                 context = context,
                 payload = payload,
-                address = address,
+                address = gatewayClient.msisdn,
                 subscriptionId = subscriptionId,
                 encryptedContent = message,
             ) {}

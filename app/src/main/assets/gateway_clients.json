@@ -1,0 +1,56 @@
+[
+  {
+    "country": "USA",
+    "last_published_date": 1748379763,
+    "msisdn": "+15024439537",
+    "operator": "Twilio",
+    "operator_code": "N/A",
+    "protocols": [
+      "https"
+    ],
+    "reliability": "0",
+    "isDefault": true
+  },
+  {
+    "country": "Nigeria",
+    "last_published_date": 1748379524,
+    "msisdn": "+2348131498393",
+    "operator": "MTN",
+    "operator_code": "62130",
+    "protocols": [
+      "https",
+      "smtp",
+      "ftp"
+    ],
+    "reliability": "0",
+    "isDefault": false
+  },
+  {
+    "country": "Cameroon",
+    "last_published_date": 1748379558,
+    "msisdn": "+237679466332",
+    "operator": "MTN Cameroon",
+    "operator_code": "62401",
+    "protocols": [
+      "https",
+      "smtp",
+      "ftp"
+    ],
+    "reliability": "36",
+    "isDefault": false
+  },
+  {
+    "country": "Cameroon",
+    "last_published_date": 1748379585,
+    "msisdn": "+237690826242",
+    "operator": "Orange",
+    "operator_code": "62402",
+    "protocols": [
+      "https",
+      "smtp",
+      "ftp"
+    ],
+    "reliability": "0",
+    "isDefault": false
+  }
+]

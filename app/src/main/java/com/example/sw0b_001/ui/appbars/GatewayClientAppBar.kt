@@ -2,6 +2,7 @@ package com.example.sw0b_001.ui.appbars
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -32,10 +33,9 @@ import com.example.sw0b_001.ui.theme.AppTheme
 @Composable
 fun GatewayClientsAppBar(
     navController: NavController,
+    onAddClicked: () -> Unit = {},
     onRefreshClicked: () -> Unit = {}
 ) {
-    var showMenu by remember { mutableStateOf(false) }
-
     TopAppBar(
         title = {
             Text(
@@ -45,6 +45,15 @@ fun GatewayClientsAppBar(
             )
         },
         actions = {
+            IconButton(onClick = {
+                onAddClicked()
+            }) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = stringResource(R.string.add)
+                )
+            }
+            
             IconButton(onClick = {
                 onRefreshClicked()
             }) {
