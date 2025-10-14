@@ -43,6 +43,9 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.data.GatewayClientsCommunications
 import com.example.sw0b_001.data.Network
 import com.example.sw0b_001.ui.theme.AppTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -52,7 +55,7 @@ fun DeveloperHTTPView(
     payload: ByteArray,
     onDismissRequest: () -> Unit
 ) {
-    var url by remember{ mutableStateOf("") }
+    var url by remember{ mutableStateOf("https://gatewayserver.smswithoutborders.com/v3/publish") }
     var requestStatus by remember{ mutableStateOf("") }
     var statusCode by remember{ mutableIntStateOf(-1) }
     var isLoading by remember{ mutableStateOf(false) }
@@ -111,7 +114,7 @@ fun DeveloperHTTPView(
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .size(200.dp)
+                        .size(170.dp)
                         .padding(16.dp)
                 ) {
                     Column {
@@ -144,12 +147,18 @@ fun DeveloperHTTPView(
                                 address = "+237123456789",
                                 text = Base64.encodeToString(payload, Base64.DEFAULT),
                             )
-                        val response = Network.jsonRequestPost(
-                            url = url,
-                            payload = Json.encodeToString(gatewayClientPayload),
-                        )
-                        statusCode = response.response.statusCode
-                        requestStatus = response.result.get()
+                        CoroutineScope(Dispatchers.Default).launch {
+                            try {
+                                val response = Network.jsonRequestPost(
+                                    url = url,
+                                    payload = Json.encodeToString(gatewayClientPayload),
+                                )
+                                statusCode = response.response.statusCode
+                                requestStatus = response.result.get()
+                            } catch(e: Exception) {
+                                e.printStackTrace()
+                            }
+                        }
                     }
                 ) {
                     Text(stringResource(R.string.http_request))

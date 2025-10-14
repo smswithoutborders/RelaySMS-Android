@@ -277,7 +277,10 @@ class PlatformsViewModel : ViewModel() {
                                 address = gatewayClient.msisdn,
                                 subscriptionId = subscriptionId,
                                 threadId = context.getThreadId(gatewayClient.msisdn),
-                                callback = { conversation -> onCompleteCallback(null) }
+                                callback = { conversation ->
+                                    onCompleteCallback(
+                                        Base64.decode(txtTransmission, Base64.DEFAULT))
+                                }
                             )
                         }
                         else {

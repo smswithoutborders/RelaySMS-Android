@@ -413,7 +413,7 @@ fun ComposerInterface(
                         }
                     }
 
-                    if(context.isDefault() || inPreviewMode) {
+                    if(inPreviewMode || context.isDefault()) {
                         IconButton(
                             onClick = { if(!context.isDefault()) TODO("Show toast") else {
                                 imagePicker.launch(
