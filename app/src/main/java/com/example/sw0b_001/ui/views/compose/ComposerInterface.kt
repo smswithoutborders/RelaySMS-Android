@@ -162,7 +162,7 @@ fun ComposerInterface(
 
     var sendRequestPayload by remember{ mutableStateOf<ByteArray?>(null) }
 
-    val decomposedEmailMessage = remember() {
+    val decomposedEmailMessage = remember {
         if((type == Platforms.ServiceTypes.BRIDGE || type == Platforms.ServiceTypes.EMAIL) &&
             message?.encryptedContent != null
         ) {

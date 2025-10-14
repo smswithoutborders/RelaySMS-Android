@@ -489,7 +489,7 @@ private fun ComposeMessages(
                 type = if(platform != null) ServiceTypes.valueOf(platform.service_type!!)
                     else ServiceTypes.BRIDGE,
                 isOnboarding = isOnboarding,
-                platformName = platform?.name!!
+                platformName = platform?.name ?: ServiceTypes.BRIDGE.name
             ))
         },
         modifier = Modifier.fillMaxWidth()

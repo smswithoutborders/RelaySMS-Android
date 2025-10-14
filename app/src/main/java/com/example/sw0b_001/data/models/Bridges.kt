@@ -30,23 +30,6 @@ object Bridges {
         val version: String
     )
 
-    data class BridgeEmailContent(
-        var to: String,
-        var cc: String,
-        var bcc: String,
-        var subject: String,
-        var body: String
-    )
-    data class BridgeIncomingEmailContent(
-        var alias: String,
-        var sender: String,
-        var cc: String,
-        var bcc: String,
-        var subject: String,
-        var date: Long,
-        var body: String
-    )
-
     private fun getStaticKeys(
         context: Context,
         kid: Int? = null
@@ -164,7 +147,7 @@ object Bridges {
 
     fun payloadOnly(cipherText: ByteArray) : ByteArray {
         val mode: ByteArray = ByteArray(1).apply { this[0] = 0x00 }
-        val versionMarker: ByteArray = ByteArray(1).apply { this[0] = 0x0A }
+        val versionMarker: ByteArray = ByteArray(1).apply { this[0] = 0x02 }
         val switchValue: ByteArray = ByteArray(1).apply { this[0] = 0x01 }
 
         val cipherTextLength = ByteArray(2)
@@ -187,7 +170,7 @@ object Bridges {
         serverKID: Byte = 0x00
     ) : ByteArray {
         val mode: ByteArray = ByteArray(1).apply { this[0] = 0x00 }
-        val versionMarker: ByteArray = ByteArray(1).apply { this[0] = 0x0A }
+        val versionMarker: ByteArray = ByteArray(1).apply { this[0] = 0x02 }
         val switchValue: ByteArray = ByteArray(1).apply { this[0] = 0x00 }
 
         val clientPublicKeyLen = ByteArray(1).run {
