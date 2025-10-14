@@ -129,6 +129,7 @@ class PlatformsViewModel : ViewModel() {
                         imageLength = imageViewModel.processedImage.value!!.rawBytes!!.size,
                         textLength = text.size,
                         subscriptionId = subscriptionId,
+                        resetStates = false
                     )
 
                     payload = if(isLoggedIn) { Bridges.payloadOnly(content) }

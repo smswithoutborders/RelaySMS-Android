@@ -75,6 +75,7 @@ object Bridges {
         imageLength: Int,
         textLength: Int,
         subscriptionId: Long,
+        resetStates: Boolean,
     ): ByteArray {
         val ad = Publishers.fetchPublisherPublicKey(context)
         return PayloadEncryptionComposeDecomposeInit.compose(
@@ -94,7 +95,8 @@ object Bridges {
             textLength = textLength,
             account = null,
             subscriptionId = subscriptionId,
-            smsTransmission = smsTransmission
+            smsTransmission = smsTransmission,
+            resetStates = resetStates,
         )
     }
 
@@ -130,7 +132,8 @@ object Bridges {
             smsTransmission = smsTransmission,
             imageLength = imageLength,
             textLength = textLength,
-            subscriptionId = subscriptionId
+            subscriptionId = subscriptionId,
+            resetStates = isLoggedIn
         )
 
         val payload: String = if(!isLoggedIn) {
@@ -191,7 +194,8 @@ object Bridges {
                 bridgeLetter +
                 serverKID +
                 clientPublicKey +
-                cipherText
+                cipherText +
+                "en".encodeToByteArray()
     }
 
     fun decryptIncomingMessages(
