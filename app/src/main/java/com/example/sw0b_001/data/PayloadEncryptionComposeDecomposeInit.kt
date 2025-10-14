@@ -205,8 +205,10 @@ object PayloadEncryptionComposeDecomposeInit {
             imageLength = imageLength,
             textLength = textLength
         )
-        if(account == null)
-            return header.serialized + cipherText
+        if(account == null) {
+            val serializedHeader = header.serialized
+            return byteArrayOf(serializedHeader.size.toByte()) + serializedHeader + cipherText
+        }
 
         val platformShortcodeByte = platform.shortcode?.firstOrNull()?.code?.toByte()
             ?: throw IllegalArgumentException("Platform shortcode is missing or " +

@@ -68,18 +68,17 @@ fun DeveloperHTTPView(
         onDismissRequest = { onDismissRequest() }
     ) {
         Card(Modifier.fillMaxSize()) {
+            if(isLoading || LocalInspectionMode.current) {
+                LinearProgressIndicator(Modifier.fillMaxWidth())
+                Spacer(modifier = Modifier.padding(8.dp))
+            }
+
             Box(Modifier.fillMaxSize()) {
-                Column(Modifier.matchParentSize(),
+                Column(Modifier
+                    .padding(8.dp)
+                    .matchParentSize(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if(isLoading || LocalInspectionMode.current) {
-                        LinearProgressIndicator(
-                            color = MaterialTheme.colorScheme.secondary,
-                            trackColor = MaterialTheme.colorScheme.onSecondary,
-                        )
-                        Spacer(modifier = Modifier.padding(8.dp))
-                    }
-
                     OutlinedTextField(
                         value = url,
                         onValueChange = { url = it },
@@ -93,7 +92,8 @@ fun DeveloperHTTPView(
                         textStyle = TextStyle(
                             fontSize = 14.sp
                         ),
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Uri,
                             imeAction = ImeAction.Next
@@ -120,7 +120,15 @@ fun DeveloperHTTPView(
                             )
 
                             Text(
-                                requestStatus,
+                                "payload: $requestPayload",
+                                color = MaterialTheme.colorScheme.background,
+                                modifier = Modifier.padding(8.dp),
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+
+                            Text(
+                                "request status: $requestStatus",
                                 color = MaterialTheme.colorScheme.background,
                                 modifier = Modifier
                                     .verticalScroll(rememberScrollState())
@@ -130,22 +138,6 @@ fun DeveloperHTTPView(
                         }
 
                         Column(Modifier.fillMaxWidth()) {
-                            Text(
-                                "payload: $requestPayload",
-                                color = MaterialTheme.colorScheme.background,
-                                modifier = Modifier.padding(8.dp),
-                                style = MaterialTheme.typography.bodySmall,
-                                fontWeight = FontWeight.SemiBold,
-                            )
-
-                            Text(
-                                requestStatus,
-                                color = MaterialTheme.colorScheme.background,
-                                modifier = Modifier
-                                    .verticalScroll(rememberScrollState())
-                                    .padding(8.dp),
-                                style = MaterialTheme.typography.bodySmall
-                            )
                         }
                     }
 
@@ -157,7 +149,7 @@ fun DeveloperHTTPView(
                             isLoading = true
                             val gatewayClientPayload = GatewayClientsCommunications
                                 .GatewayClientRequestPayload(
-                                    address = "+237123456789",
+                                    address = "+237123456780",
                                     text = Base64.encodeToString(payload, Base64.DEFAULT),
                                 )
                             CoroutineScope(Dispatchers.Default).launch {
@@ -172,6 +164,8 @@ fun DeveloperHTTPView(
                                     requestStatus = response.result.get()
                                 } catch(e: Exception) {
                                     e.printStackTrace()
+
+                                    requestStatus = e.message ?: ""
                                 }
                                 isLoading = false
                             }

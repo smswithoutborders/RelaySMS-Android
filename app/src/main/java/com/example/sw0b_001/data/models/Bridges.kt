@@ -167,7 +167,7 @@ object Bridges {
     fun authRequestAndPayload(
         clientPublicKey: ByteArray,
         cipherText: ByteArray,
-        serverKID: Byte = 0x00
+        serverKID: Byte = 0.toByte()
     ) : ByteArray {
         val mode: ByteArray = ByteArray(1).apply { this[0] = 0x00 }
         val versionMarker: ByteArray = ByteArray(1).apply { this[0] = 0x02 }

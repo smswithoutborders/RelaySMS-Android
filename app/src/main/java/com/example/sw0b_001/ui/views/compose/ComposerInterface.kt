@@ -403,9 +403,11 @@ fun ComposerInterface(
                         IconButton(
                             enabled = isSendingEnabled,
                             onClick = {
+                                isSending = true
                                 send(false) {
                                     sendRequestPayload = it
                                     showDeveloperDialog = true
+                                    isSending = false
                                 }
                             }
                         ) {
