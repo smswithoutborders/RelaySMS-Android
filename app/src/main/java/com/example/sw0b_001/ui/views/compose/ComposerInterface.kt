@@ -309,6 +309,7 @@ fun ComposerInterface(
                             bcc = decomposedEmailMessage.bcc.value,
                             subject = decomposedEmailMessage.subject.value,
                             body = decomposedEmailMessage.body.value,
+                            isBridge = type == Platforms.ServiceTypes.BRIDGE
                         )
                     }
                     Platforms.ServiceTypes.TEXT -> {

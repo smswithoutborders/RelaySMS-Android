@@ -118,10 +118,6 @@ class PlatformsViewModel : ViewModel() {
             val subscriptionId = context.getDefaultSimSubscription()!!
             try {
                 if(isBridge) {
-                    val clientPublicKey: ByteArray? = if(isLoggedIn)
-                        Publishers.fetchClientPublisherPublicKey(context) else
-                        Bridges.getKeypairForTransmission(context)
-
                     val content = Bridges.encryptContent(
                         context,
                         imageViewModel.processedImage.value!!.rawBytes!! + text,
@@ -129,13 +125,11 @@ class PlatformsViewModel : ViewModel() {
                         imageLength = imageViewModel.processedImage.value!!.rawBytes!!.size,
                         textLength = text.size,
                         subscriptionId = subscriptionId,
-                        resetStates = false
                     )
 
                     payload = if(isLoggedIn) { Bridges.payloadOnly(content) }
                     else {
-                        Bridges.authRequestAndPayload(clientPublicKey!!,
-                            content)
+                        Bridges.authRequestAndPayload(context, content)
                     }
                 }
                 else {
@@ -262,7 +256,7 @@ class PlatformsViewModel : ViewModel() {
                             textLength = 0,
                             smsTransmission = smsTransmission,
                             subscriptionId = subscriptionId
-                        ).first
+                        )
 
                         val gatewayClient = context.settingsGetDefaultGatewayClients
                         if(gatewayClient == null) {
@@ -270,29 +264,34 @@ class PlatformsViewModel : ViewModel() {
                             return@withContext
                         }
 
-                        if(context.isDefault()) {
-                            val smsManager = SmsManager(ConversationsViewModel())
-                            smsManager.sendSms(
-                                context = context,
-                                text = txtTransmission!!,
-                                address = gatewayClient.msisdn,
-                                subscriptionId = subscriptionId,
-                                threadId = context.getThreadId(gatewayClient.msisdn),
-                                callback = { conversation ->
-                                    onCompleteCallback(
-                                        Base64.decode(txtTransmission, Base64.DEFAULT))
-                                }
-                            )
-                        }
-                        else {
-                            val intent = SMSHandler.transferToDefaultSMSApp(
-                                context,
-                                gatewayClient.msisdn,
-                                txtTransmission
-                            ).apply {
-                                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        if(!smsTransmission) {
+                            onCompleteCallback(Base64
+                                .decode(txtTransmission, Base64.DEFAULT))
+                        } else {
+                            if(context.isDefault()) {
+                                val smsManager = SmsManager(ConversationsViewModel())
+                                smsManager.sendSms(
+                                    context = context,
+                                    text = txtTransmission!!,
+                                    address = gatewayClient.msisdn,
+                                    subscriptionId = subscriptionId,
+                                    threadId = context.getThreadId(gatewayClient.msisdn),
+                                    callback = { conversation ->
+                                        onCompleteCallback(
+                                            Base64.decode(txtTransmission, Base64.DEFAULT))
+                                    }
+                                )
                             }
-                            context.startActivity(intent)
+                            else {
+                                val intent = SMSHandler.transferToDefaultSMSApp(
+                                    context,
+                                    gatewayClient.msisdn,
+                                    txtTransmission
+                                ).apply {
+                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                                }
+                                context.startActivity(intent)
+                            }
                         }
                     }
                     else {
@@ -318,7 +317,8 @@ class PlatformsViewModel : ViewModel() {
                                 subject = emailContent.subject.value,
                                 body = emailContent.body.value,
                                 accessToken = account.accessToken,
-                                refreshToken = account.refreshToken
+                                refreshToken = account.refreshToken,
+                                isBridge = false
                             )
                         } else {
                             Composers.EmailComposeHandler.createEmailByteBuffer(
@@ -328,6 +328,7 @@ class PlatformsViewModel : ViewModel() {
                                 bcc = emailContent.bcc.value,
                                 subject = emailContent.subject.value,
                                 body = emailContent.body.value,
+                                isBridge = false
                             )
                         }
 

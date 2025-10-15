@@ -35,6 +35,7 @@ object Composers {
             bcc: String,
             subject: String,
             body: String,
+            isBridge: Boolean,
             accessToken: String? = null,
             refreshToken: String? = null
         ): ByteArray {
@@ -48,15 +49,13 @@ object Composers {
             val refreshTokenBytes = refreshToken?.toByteArray(StandardCharsets.UTF_8)
 
             // Calculate total size for the buffer
-            val totalSize =
+            var totalSize =
                 if(from != null) 1 else 0 +  // from
                         2 +  // to
                         2 +  // cc
                         2 + // bcc
                         1 +  //subject
                         2 + //body
-                        2 +  // accessToken
-                        2 +  //refresh token
                         (fromBytes?.size ?: 0) +
                         toBytes.size +
                         ccBytes.size +
@@ -64,6 +63,7 @@ object Composers {
                         subjectBytes.size +
                         bodyBytes.size +
                         (accessTokenBytes?.size ?: 0) + (refreshTokenBytes?.size ?: 0)
+            if(!isBridge) totalSize += 4
 
             val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
 
@@ -74,8 +74,11 @@ object Composers {
             buffer.putShort(bccBytes.size.toShort())
             buffer.put(subjectBytes.size.toByte())
             buffer.putShort(bodyBytes.size.toShort())
-            buffer.putShort((accessTokenBytes?.size ?: 0).toShort())
-            buffer.putShort((refreshTokenBytes?.size ?: 0).toShort())
+
+            if(!isBridge) {
+                buffer.putShort((accessTokenBytes?.size ?: 0).toShort())
+                buffer.putShort((refreshTokenBytes?.size ?: 0).toShort())
+            }
 
             // Write field values
             if(fromBytes != null) buffer.put(fromBytes)
@@ -84,8 +87,11 @@ object Composers {
             buffer.put(bccBytes)
             buffer.put(subjectBytes)
             buffer.put(bodyBytes)
-            accessTokenBytes?.let { buffer.put(it) }
-            refreshTokenBytes?.let { buffer.put(it) }
+
+            if(!isBridge) {
+                accessTokenBytes?.let { buffer.put(it) }
+                refreshTokenBytes?.let { buffer.put(it) }
+            }
 
             return buffer.array()
         }

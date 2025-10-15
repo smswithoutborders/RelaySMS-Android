@@ -75,7 +75,6 @@ object Bridges {
         imageLength: Int,
         textLength: Int,
         subscriptionId: Long,
-        resetStates: Boolean,
     ): ByteArray {
         val ad = Publishers.fetchPublisherPublicKey(context)
         return PayloadEncryptionComposeDecomposeInit.compose(
@@ -96,7 +95,6 @@ object Bridges {
             account = null,
             subscriptionId = subscriptionId,
             smsTransmission = smsTransmission,
-            resetStates = resetStates,
         )
     }
 
@@ -111,11 +109,8 @@ object Bridges {
         imageLength: Int,
         textLength: Int,
         subscriptionId: Long,
-    ) : Pair<String?, ByteArray?> {
+    ) : String? {
         val isLoggedIn = Vaults.Companion.fetchLongLivedToken(context).isNotEmpty()
-        var clientPublicKey: ByteArray? = Publishers.fetchClientPublisherPublicKey(context)
-
-        if(!isLoggedIn) { clientPublicKey = getKeypairForTransmission(context) }
 
         val content = Composers.EmailComposeHandler.createEmailByteBuffer(
             from = null,
@@ -124,7 +119,10 @@ object Bridges {
             bcc = bcc,
             subject = subject,
             body = body,
+            isBridge = true
         )
+
+        if(!isLoggedIn) getKeypairForTransmission(context)
 
         val encryptedContent = encryptContent(
             context = context,
@@ -133,19 +131,15 @@ object Bridges {
             imageLength = imageLength,
             textLength = textLength,
             subscriptionId = subscriptionId,
-            resetStates = isLoggedIn
         )
 
-        val payload: String = if(!isLoggedIn) {
-            val content = authRequestAndPayload(clientPublicKey!!,
-                encryptedContent)
-            Base64.encodeToString(content, Base64.DEFAULT)
+        val payload = if(!isLoggedIn) {
+            authRequestAndPayload( context, encryptedContent, )
         } else {
-            val content = payloadOnly(encryptedContent)
-            Base64.encodeToString(content, Base64.DEFAULT)
+            payloadOnly(encryptedContent)
         }
 
-        return Pair(payload, clientPublicKey)
+        return Base64.encodeToString(payload, Base64.DEFAULT)
     }
 
     fun payloadOnly(cipherText: ByteArray) : ByteArray {
@@ -168,7 +162,7 @@ object Bridges {
     }
 
     fun authRequestAndPayload(
-        clientPublicKey: ByteArray,
+        context: Context,
         cipherText: ByteArray,
         serverKID: Byte = 0.toByte()
     ) : ByteArray {
@@ -176,10 +170,9 @@ object Bridges {
         val versionMarker: ByteArray = ByteArray(1).apply { this[0] = 0x02 }
         val switchValue: ByteArray = ByteArray(1).apply { this[0] = 0x00 }
 
-        val clientPublicKeyLen = ByteArray(1).run {
-            clientPublicKey.size.toByte()
-        }
+        val clientPublicKey = Publishers.fetchClientPublisherPublicKey(context)
 
+        val clientPublicKeyLen = ByteArray(1).run { clientPublicKey!!.size.toByte() }
         val cipherTextLength = ByteArray(2)
         ByteBuffer.wrap(cipherTextLength).order(ByteOrder.LITTLE_ENDIAN)
             .putShort(cipherText.size.toShort())
@@ -193,7 +186,7 @@ object Bridges {
                 cipherTextLength +
                 bridgeLetter +
                 serverKID +
-                clientPublicKey +
+                clientPublicKey!! +
                 cipherText +
                 "en".encodeToByteArray()
     }

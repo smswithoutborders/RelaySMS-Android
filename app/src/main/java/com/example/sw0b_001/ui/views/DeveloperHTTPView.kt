@@ -149,7 +149,7 @@ fun DeveloperHTTPView(
                             isLoading = true
                             val gatewayClientPayload = GatewayClientsCommunications
                                 .GatewayClientRequestPayload(
-                                    address = "+237123456780",
+                                    address = "+237123456782",
                                     text = Base64.encodeToString(payload, Base64.DEFAULT),
                                 )
                             CoroutineScope(Dispatchers.Default).launch {
@@ -161,7 +161,11 @@ fun DeveloperHTTPView(
                                         payload = requestPayload,
                                     )
                                     statusCode = response.response.statusCode
-                                    requestStatus = response.result.get()
+                                    requestStatus = if(statusCode in 200..300) {
+                                        response.result.get()
+                                    } else {
+                                        String(response.response.data)
+                                    }
                                 } catch(e: Exception) {
                                     e.printStackTrace()
 

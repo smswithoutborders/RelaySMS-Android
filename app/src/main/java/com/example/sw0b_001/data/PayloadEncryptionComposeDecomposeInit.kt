@@ -180,16 +180,14 @@ object PayloadEncryptionComposeDecomposeInit {
         subscriptionId: Long = -1,
         languageCode: String = "en",
         smsTransmission: Boolean = true,
-        resetStates: Boolean = true,
         onSuccessRunnable: (EncryptedContent) -> Unit? = {}
     ): ByteArray {
-        val states = if(resetStates) Datastore.getDatastore(context).ratchetStatesDAO().fetch() else
-            listOf()
+        val states = Datastore.getDatastore(context).ratchetStatesDAO().fetch()
         if (states.size > 1) {
             throw IllegalStateException(context.getString(R.string.multiple_ratchet_states_found_in_database_expected_at_most_one))
         }
 
-        val state = if (states.isNotEmpty()) {
+        val state = if (account != null && states.isNotEmpty()) {
             States(String(Publishers
                 .getEncryptedStates(context, states[0].value)))
         } else {
@@ -209,7 +207,10 @@ object PayloadEncryptionComposeDecomposeInit {
         )
         if(account == null) {
             val serializedHeader = header.serialized
-            return byteArrayOf(serializedHeader.size.toByte()) + serializedHeader + cipherText
+            val headerSize = ByteArray(4).apply {
+                this[0] = serializedHeader.size.toByte()
+            }
+            return headerSize + serializedHeader + cipherText
         }
 
         val platformShortcodeByte = platform.shortcode?.firstOrNull()?.code?.toByte()
