@@ -67,7 +67,7 @@ fun GatewayClientView(
 ) {
     val context = LocalContext.current
 
-    var isLoading by remember { mutableStateOf(true) }
+    var isLoading by remember { mutableStateOf(false) }
     val successRunnable = Runnable {
         isLoading = false
     }
@@ -114,7 +114,7 @@ fun GatewayClientView(
                     GatewayClientCard(
                         gatewayClients = defaultGatewayClients.value!!,
                         gatewayClientViewModel = viewModel,
-                        editCallback = {}
+                        editCallback = null
                     ) {
                     }
                 } else {
@@ -181,7 +181,7 @@ fun GatewayClientView(
 fun GatewayClientCard(
     gatewayClients: GatewayClients,
     gatewayClientViewModel: GatewayClientViewModel,
-    editCallback: () -> Unit,
+    editCallback: (() -> Unit)?,
     onDismissCallback: () -> Unit,
 ) {
     var isClicked by remember{ mutableStateOf(false) }
@@ -212,7 +212,7 @@ fun GatewayClientCard(
             },
         )
 
-        if(isClicked || LocalInspectionMode.current) {
+        if((editCallback != null && isClicked) || LocalInspectionMode.current) {
             Row(Modifier.padding(16.dp)) {
                 Button(onClick = {
                     CoroutineScope(Dispatchers.Default).launch {
@@ -228,7 +228,7 @@ fun GatewayClientCard(
 
                 Spacer(Modifier.weight(1f))
 
-                IconButton(onClick = editCallback ) {
+                IconButton(onClick = editCallback!! ) {
                     Icon(Icons.Default.ModeEdit,
                         stringResource(R.string.edit_gateway_client)
                     )

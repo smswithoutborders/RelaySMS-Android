@@ -176,7 +176,7 @@ fun PlatformOptionsModal(
                                 context)
                         } else {
                             getServiceBasedAvailableDescription(
-                                platform?.service_type!!,
+                                platform?.service_type ?: "",
                                 context)
                         },
                         style = MaterialTheme.typography.bodyMedium,
@@ -184,7 +184,7 @@ fun PlatformOptionsModal(
                     )
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    if (isCompose) {
+                    if (isCompose || platform == null) {
                         ComposeMessages(
                             platform = platform,
                             navController = navController,
@@ -200,7 +200,7 @@ fun PlatformOptionsModal(
                                 isAddLoading = true
                                 triggerAddPlatformRequest(
                                     context = context,
-                                    platform = platform!!
+                                    platform = platform
                                 ) {
                                     isAddLoading = false
                                     onDismissRequest()

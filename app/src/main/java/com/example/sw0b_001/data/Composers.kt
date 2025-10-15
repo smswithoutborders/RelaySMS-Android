@@ -123,8 +123,8 @@ object Composers {
                 val bccLen = buffer.getShort().toInt() and 0xFFFF
                 val subjectLen = buffer.get().toInt() and 0xFF
                 val bodyLen = buffer.getShort().toInt() and 0xFFFF
-                val accessLen = buffer.getShort().toInt() and 0xFFFF
-                val refreshLen = buffer.getShort().toInt() and 0xFFFF
+                val accessLen = if(isBridge) 0 else buffer.getShort().toInt() and 0xFFFF
+                val refreshLen = if(isBridge) 0 else buffer.getShort().toInt() and 0xFFFF
 
                 // Skip 'from' field
                 if (fromLen > 0) buffer.position(buffer.position() + fromLen)
