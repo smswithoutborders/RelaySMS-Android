@@ -252,12 +252,9 @@ object PayloadEncryptionComposeDecomposeInit {
         languageCode: ByteArray,
     ): String {
         val deviceIDBytes = if (!context.settingsGetUseDeviceId) {
-            Vaults.fetchDeviceId(context) ?: ByteArray(0)
+            Vaults.fetchDeviceId(context) ?: byteArrayOf()
         } else {
-            ByteArray(0)
-        }
-        if(deviceIDBytes.size > 1) {
-            throw Exception("Device ID > 1 byte")
+            byteArrayOf()
         }
 
         val versionMarker = 0x02.toByte()
