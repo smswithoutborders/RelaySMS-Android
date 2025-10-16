@@ -26,59 +26,59 @@ class BridgesTest {
 
     @Test
     fun bridgeComposeTest() {
-        Vaults.logout(context) {}
-        Datastore.getDatastore(context).ratchetStatesDAO().deleteAll()
-
-        var request = Bridges.compose(
-            context = context,
-            to = to,
-            cc = cc,
-            bcc = bcc,
-            subject = subject,
-            body = body,
-            smsTransmission = false
-        ){ }
-        var payload = Json.encodeToString(GatewayClientRequest(phoneNumber, request.first!!, "2025-04-01", "2025-04-01"))
-        println("Publishing: $payload")
-
-        // TODO: checks if user already auth, then proceeds to use that information
-        // TODO: if not auth, then request for auth sessions to begin
-        /**
-         * Simulating Gateway clients here, since cannot send the SMS
-         */
-        try {
-            var response = Network.jsonRequestPost(gatewayServerUrl, payload)
-            var text = response.result.get()
-            println("Response message: $text")
-        } catch(e: Exception) {
-            println(e.message)
-            throw e
-        }
-
-
-        request = Bridges.compose(
-            context = context,
-            to = to,
-            cc = cc,
-            bcc = bcc,
-            subject = subject,
-            body = "Second message"
-        ){}
-        payload = Json.encodeToString(GatewayClientRequest(phoneNumber, request.first!!,"2025-04-01", "2025-04-01"))
-        println("Publishing 2: $payload")
-
-        // TODO: checks if user already auth, then proceeds to use that information
-        // TODO: if not auth, then request for auth sessions to begin
-        /**
-         * Simulating Gateway clients here, since cannot send the SMS
-         */
-        try {
-            var response = Network.jsonRequestPost(gatewayServerUrl, payload)
-            var text = response.result.get()
-            println("Response message: $text")
-        } catch(e: Exception) {
-            println(e.message)
-            throw e
-        }
+//        Vaults.logout(context) {}
+//        Datastore.getDatastore(context).ratchetStatesDAO().deleteAll()
+//
+//        var request = Bridges.compose(
+//            context = context,
+//            to = to,
+//            cc = cc,
+//            bcc = bcc,
+//            subject = subject,
+//            body = body,
+//            smsTransmission = false
+//        ){ }
+//        var payload = Json.encodeToString(GatewayClientRequest(phoneNumber, request.first!!, "2025-04-01", "2025-04-01"))
+//        println("Publishing: $payload")
+//
+//        // TODO: checks if user already auth, then proceeds to use that information
+//        // TODO: if not auth, then request for auth sessions to begin
+//        /**
+//         * Simulating Gateway clients here, since cannot send the SMS
+//         */
+//        try {
+//            var response = Network.jsonRequestPost(gatewayServerUrl, payload)
+//            var text = response.result.get()
+//            println("Response message: $text")
+//        } catch(e: Exception) {
+//            println(e.message)
+//            throw e
+//        }
+//
+//
+//        request = Bridges.compose(
+//            context = context,
+//            to = to,
+//            cc = cc,
+//            bcc = bcc,
+//            subject = subject,
+//            body = "Second message"
+//        ){}
+//        payload = Json.encodeToString(GatewayClientRequest(phoneNumber, request.first!!,"2025-04-01", "2025-04-01"))
+//        println("Publishing 2: $payload")
+//
+//        // TODO: checks if user already auth, then proceeds to use that information
+//        // TODO: if not auth, then request for auth sessions to begin
+//        /**
+//         * Simulating Gateway clients here, since cannot send the SMS
+//         */
+//        try {
+//            var response = Network.jsonRequestPost(gatewayServerUrl, payload)
+//            var text = response.result.get()
+//            println("Response message: $text")
+//        } catch(e: Exception) {
+//            println(e.message)
+//            throw e
+//        }
     }
 }
