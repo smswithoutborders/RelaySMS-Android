@@ -38,6 +38,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -63,6 +64,8 @@ fun DeveloperHTTPView(
     var requestPayload by remember{ mutableStateOf("") }
     var statusCode by remember{ mutableIntStateOf(-1) }
     var isLoading by remember{ mutableStateOf(false) }
+
+    val address by remember { mutableStateOf("+2371123579") }
 
     Dialog(
         onDismissRequest = { onDismissRequest() }
@@ -98,6 +101,14 @@ fun DeveloperHTTPView(
                             keyboardType = KeyboardType.Uri,
                             imeAction = ImeAction.Next
                         )
+                    )
+
+                    Text(
+                        "Address: $address",
+                        textAlign = TextAlign.Start,
+                        fontSize = 12.sp,
+                        modifier = Modifier
+                            .fillMaxWidth()
                     )
 
                     Spacer(Modifier.padding(8.dp))
@@ -149,7 +160,7 @@ fun DeveloperHTTPView(
                             isLoading = true
                             val gatewayClientPayload = GatewayClientsCommunications
                                 .GatewayClientRequestPayload(
-                                    address = "+2371123579",
+                                    address = address,
                                     text = Base64.encodeToString(payload, Base64.DEFAULT),
                                 )
                             CoroutineScope(Dispatchers.Default).launch {
