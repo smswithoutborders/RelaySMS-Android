@@ -139,7 +139,7 @@ object Bridges {
             payloadOnly(encryptedContent)
         }
 
-        return Base64.encodeToString(payload, Base64.DEFAULT)
+        return Base64.encodeToString(payload, Base64.NO_WRAP)
     }
 
     fun payloadOnly(cipherText: ByteArray) : ByteArray {

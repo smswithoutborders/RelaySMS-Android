@@ -39,6 +39,7 @@ import com.example.sw0b_001.data.Publishers
 import com.example.sw0b_001.data.SMSHandler
 import com.example.sw0b_001.data.models.AvailablePlatforms
 import com.example.sw0b_001.data.models.Bridges
+import com.example.sw0b_001.data.models.Bridges.getKeypairForTransmission
 import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
@@ -118,6 +119,7 @@ class PlatformsViewModel : ViewModel() {
             val subscriptionId = context.getDefaultSimSubscription()!!
             try {
                 if(isBridge) {
+                    if(!isLoggedIn) getKeypairForTransmission(context)
                     val content = Bridges.encryptContent(
                         context,
                         imageViewModel.processedImage.value!!.rawBytes!! + text,
@@ -164,8 +166,8 @@ class PlatformsViewModel : ViewModel() {
                     logo = R.drawable.logo,
                     version = ITP_VERSION_VALUE,
                     sessionId = ImageTransmissionProtocol.getItpSession(context).toByte(),
-                    imageLength = imageViewModel.processedImage.value!!.rawBytes!!.size.toBytes(),
-                    textLength = text.size.toBytes(),
+                    imageLength = imageViewModel.processedImage.value!!.rawBytes!!.size.toShort(),
+                    textLength = text.size.toShort(),
                     address = gatewayClients.msisdn,
                     subscriptionId = subscriptionId,
                 )
