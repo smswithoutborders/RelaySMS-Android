@@ -149,7 +149,7 @@ fun DeveloperHTTPView(
                             isLoading = true
                             val gatewayClientPayload = GatewayClientsCommunications
                                 .GatewayClientRequestPayload(
-                                    address = "+237123456782",
+                                    address = "+2371123579",
                                     text = Base64.encodeToString(payload, Base64.DEFAULT),
                                 )
                             CoroutineScope(Dispatchers.Default).launch {

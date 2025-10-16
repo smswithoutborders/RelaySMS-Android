@@ -303,7 +303,7 @@ fun ComposerInterface(
                     Platforms.ServiceTypes.BRIDGE_INCOMING,
                     Platforms.ServiceTypes.EMAIL -> {
                         Composers.EmailComposeHandler.createEmailByteBuffer(
-                            from = null,
+                            from = from.value,
                             to = decomposedEmailMessage?.to!!.value,
                             cc = decomposedEmailMessage.cc.value,
                             bcc = decomposedEmailMessage.bcc.value,

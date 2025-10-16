@@ -180,6 +180,7 @@ object PayloadEncryptionComposeDecomposeInit {
         subscriptionId: Long = -1,
         languageCode: String = "en",
         smsTransmission: Boolean = true,
+        isLoggedIn: Boolean = true,
         onSuccessRunnable: (EncryptedContent) -> Unit? = {}
     ): ByteArray {
         val states = Datastore.getDatastore(context).ratchetStatesDAO().fetch()
@@ -187,7 +188,7 @@ object PayloadEncryptionComposeDecomposeInit {
             throw IllegalStateException(context.getString(R.string.multiple_ratchet_states_found_in_database_expected_at_most_one))
         }
 
-        val state = if (account != null && states.isNotEmpty()) {
+        val state = if(isLoggedIn && states.isNotEmpty()) {
             States(String(Publishers
                 .getEncryptedStates(context, states[0].value)))
         } else {

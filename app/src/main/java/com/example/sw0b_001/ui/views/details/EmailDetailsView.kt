@@ -171,7 +171,7 @@ fun EmailDetailsView(
                                 type = if(platform != null)
                                     Platforms.ServiceTypes.EMAIL
                                 else Platforms.ServiceTypes.BRIDGE,
-                                platformName = null
+                                platformName = platform?.name
                             )
                         )
                     }
@@ -192,7 +192,7 @@ fun EmailDetailsView(
                 .padding(16.dp)
         ) {
             // Subject
-            if(subject.isNotEmpty()) {
+            if(subject.isNotEmpty() || LocalInspectionMode.current) {
                 Text(
                     text = subject,
                     style = MaterialTheme.typography.titleMedium,

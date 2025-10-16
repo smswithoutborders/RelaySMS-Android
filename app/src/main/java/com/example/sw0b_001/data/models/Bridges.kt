@@ -75,6 +75,7 @@ object Bridges {
         imageLength: Int,
         textLength: Int,
         subscriptionId: Long,
+        isLoggedIn: Boolean,
     ): ByteArray {
         val ad = Publishers.fetchPublisherPublicKey(context)
         return PayloadEncryptionComposeDecomposeInit.compose(
@@ -95,6 +96,7 @@ object Bridges {
             account = null,
             subscriptionId = subscriptionId,
             smsTransmission = smsTransmission,
+            isLoggedIn = isLoggedIn
         )
     }
 
@@ -110,7 +112,7 @@ object Bridges {
         textLength: Int,
         subscriptionId: Long,
     ) : String? {
-        val isLoggedIn = Vaults.Companion.fetchLongLivedToken(context).isNotEmpty()
+        val isLoggedIn = Vaults.fetchLongLivedToken(context).isNotEmpty()
 
         val content = Composers.EmailComposeHandler.createEmailByteBuffer(
             from = null,
@@ -131,6 +133,7 @@ object Bridges {
             imageLength = imageLength,
             textLength = textLength,
             subscriptionId = subscriptionId,
+            isLoggedIn = isLoggedIn
         )
 
         val payload = if(!isLoggedIn) {
@@ -158,7 +161,8 @@ object Bridges {
                 switchValue +
                 cipherTextLength +
                 bridgeLetter +
-                cipherText
+                cipherText +
+                "en".encodeToByteArray()
     }
 
     fun authRequestAndPayload(

@@ -39,24 +39,25 @@ object Composers {
             accessToken: String? = null,
             refreshToken: String? = null
         ): ByteArray {
-            val fromBytes = from?.toByteArray(StandardCharsets.UTF_8)
-            val toBytes = to.toByteArray(StandardCharsets.UTF_8)
-            val ccBytes = cc.toByteArray(StandardCharsets.UTF_8)
-            val bccBytes = bcc.toByteArray(StandardCharsets.UTF_8)
-            val subjectBytes = subject.toByteArray(StandardCharsets.UTF_8)
-            val bodyBytes = body.toByteArray(StandardCharsets.UTF_8)
-            val accessTokenBytes = accessToken?.toByteArray(StandardCharsets.UTF_8)
-            val refreshTokenBytes = refreshToken?.toByteArray(StandardCharsets.UTF_8)
+            val fromBytes = from?.encodeToByteArray() ?: byteArrayOf()
+            val toBytes = to.encodeToByteArray()
+            val ccBytes = cc.encodeToByteArray()
+            val bccBytes = bcc.encodeToByteArray()
+            val subjectBytes = subject.encodeToByteArray()
+            val bodyBytes = body.encodeToByteArray()
+            val accessTokenBytes = accessToken?.encodeToByteArray()
+            val refreshTokenBytes = refreshToken?.encodeToByteArray()
+
 
             // Calculate total size for the buffer
             var totalSize =
-                if(from != null) 1 else 0 +  // from
+                (if(from != null) 1 else 0) +  // from
                         2 +  // to
                         2 +  // cc
                         2 + // bcc
                         1 +  //subject
                         2 + //body
-                        (fromBytes?.size ?: 0) +
+                        fromBytes.size +
                         toBytes.size +
                         ccBytes.size +
                         bccBytes.size +
@@ -68,7 +69,7 @@ object Composers {
             val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
 
             // Write field lengths
-            if(fromBytes != null) buffer.put(fromBytes.size.toByte())
+            if(fromBytes.isNotEmpty()) buffer.put(fromBytes.size.toByte())
             buffer.putShort(toBytes.size.toShort())
             buffer.putShort(ccBytes.size.toShort())
             buffer.putShort(bccBytes.size.toShort())
@@ -81,7 +82,7 @@ object Composers {
             }
 
             // Write field values
-            if(fromBytes != null) buffer.put(fromBytes)
+            if(fromBytes.isNotEmpty()) buffer.put(fromBytes)
             buffer.put(toBytes)
             buffer.put(ccBytes)
             buffer.put(bccBytes)

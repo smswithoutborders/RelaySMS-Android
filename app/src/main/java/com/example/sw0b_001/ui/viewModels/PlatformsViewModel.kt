@@ -127,6 +127,7 @@ class PlatformsViewModel : ViewModel() {
                         imageLength = imageViewModel.processedImage.value!!.rawBytes!!.size,
                         textLength = text.size,
                         subscriptionId = subscriptionId,
+                        isLoggedIn = isLoggedIn
                     )
 
                     payload = if(isLoggedIn) { Bridges.payloadOnly(content) }
@@ -308,31 +309,19 @@ class PlatformsViewModel : ViewModel() {
                             return@withContext
                         }
 
-                        val contentFormatBytes = if (
-                            account.accessToken?.isNotEmpty() == true
-                        ) {
-                            Composers.EmailComposeHandler.createEmailByteBuffer(
-                                from= account.account!!, // 'from' is from the selected account
-                                to = emailContent.to.value,
-                                cc = emailContent.cc.value,
-                                bcc = emailContent.bcc.value,
-                                subject = emailContent.subject.value,
-                                body = emailContent.body.value,
-                                accessToken = account.accessToken,
-                                refreshToken = account.refreshToken,
-                                isBridge = false
-                            )
-                        } else {
-                            Composers.EmailComposeHandler.createEmailByteBuffer(
-                                from = account.account!!,
-                                to = emailContent.to.value,
-                                cc = emailContent.cc.value,
-                                bcc = emailContent.bcc.value,
-                                subject = emailContent.subject.value,
-                                body = emailContent.body.value,
-                                isBridge = false
-                            )
-                        }
+                        val contentFormatBytes = Composers.EmailComposeHandler.createEmailByteBuffer(
+                            from= account.account!!, // 'from' is from the selected account
+                            to = emailContent.to.value,
+                            cc = emailContent.cc.value,
+                            bcc = emailContent.bcc.value,
+                            subject = emailContent.subject.value,
+                            body = emailContent.body.value,
+                            accessToken = if(account.accessToken?.isNotEmpty() == true)
+                                account.accessToken else null,
+                            refreshToken =if(account.refreshToken?.isNotEmpty() == true)
+                                account.refreshToken else null,
+                            isBridge = false
+                        )
 
                         val platform = Datastore.getDatastore(context).availablePlatformsDao()
                             .fetch(account.name!!)
