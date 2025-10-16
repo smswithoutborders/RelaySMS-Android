@@ -426,5 +426,16 @@
     <string name="default_sms_receiver">Default SMS receiver</string>
     <string name="set_as_default">Set as default</string>
     <string name="delete_gateway_client">Delete gateway client</string>
+    <string name="english1">English</string>
+    <string name="system">System</string>
+    <string name="publishing">Publishing</string>
+    <string name="send_messages_with_device_id">Send messages with device ID</string>
+    <string name="device_id_lets_you_send_messages_without_using_your_actual_phone_number_for_authentication_this_works_well_for_dual_sim_phones">Device ID lets you send messages without using your actual phone number for authentication. This works well for dual sim phones.</string>
+    <string name="lock_app">Lock app</string>
+    <string name="this_will_lock_the_app_using_your_phone_s_biometric_security_configurations_you_will_need_to_globally_set_for_the_device">This will lock the app using your phone\'s biometric security configurations. You will need to globally set for the device</string>
+    <string name="log_out">Log out</string>
+    <string name="this_would_log_you_out_of_your_vault_account_on_this_device_you_can_log_back_in_at_anytime_with_an_internet_connection">This would log you out of your Vault account on this device. You can log back in at anytime (with an internet connection)</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer">This would revoke all your stored tokens, security keys and every data you have stored on device and Vault. You can still use bridges whenever you prefer</string>
 
 </resources>

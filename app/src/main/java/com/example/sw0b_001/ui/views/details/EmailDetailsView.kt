@@ -64,7 +64,6 @@ import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.ui.components.AttachImageView
 import com.example.sw0b_001.ui.navigation.ComposeScreen
-import com.example.sw0b_001.ui.navigation.EmailComposeNav
 import com.example.sw0b_001.ui.navigation.MessageViewScreen
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import kotlinx.coroutines.CoroutineScope

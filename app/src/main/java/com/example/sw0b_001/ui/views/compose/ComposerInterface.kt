@@ -87,10 +87,7 @@ import com.example.sw0b_001.extensions.context.settingsGetNotShowChooseGatewayCl
 import com.example.sw0b_001.ui.components.AttachImageView
 import com.example.sw0b_001.ui.modals.ComposeChooseGatewayClientsModal
 import com.example.sw0b_001.ui.modals.SelectAccountModal
-import com.example.sw0b_001.ui.navigation.EmailComposeNav
 import com.example.sw0b_001.ui.navigation.HomepageScreen
-import com.example.sw0b_001.ui.navigation.MessageComposeNav
-import com.example.sw0b_001.ui.navigation.TextComposeNav
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel

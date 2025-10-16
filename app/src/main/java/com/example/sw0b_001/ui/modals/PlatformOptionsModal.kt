@@ -61,9 +61,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
 import com.example.sw0b_001.ui.navigation.ComposeScreen
-import com.example.sw0b_001.ui.navigation.EmailComposeNav
-import com.example.sw0b_001.ui.navigation.MessageComposeNav
-import com.example.sw0b_001.ui.navigation.TextComposeNav
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.triggerAddPlatformRequest
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement

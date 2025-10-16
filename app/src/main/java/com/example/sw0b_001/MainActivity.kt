@@ -106,18 +106,17 @@ import com.example.sw0b_001.extensions.context.settingsGetLockDownApp
 import com.example.sw0b_001.extensions.context.settingsGetOnboardedCompletely
 import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.navigation.ComposeScreen
-import com.example.sw0b_001.ui.navigation.EmailComposeNav
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreenRelay
-import com.example.sw0b_001.ui.navigation.MessageComposeNav
 import com.example.sw0b_001.ui.navigation.OnboardingInteractiveScreen
 import com.example.sw0b_001.ui.navigation.OnboardingSkipScreen
-import com.example.sw0b_001.ui.navigation.TextComposeNav
+import com.example.sw0b_001.ui.navigation.SettingsScreen
 import com.example.sw0b_001.ui.navigation.WelcomeScreen
 import com.example.sw0b_001.ui.onboarding.OnboardingInteractive
 import com.example.sw0b_001.ui.views.WelcomeMainView
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
 import com.example.sw0b_001.ui.views.BottomTabsItems
+import com.example.sw0b_001.ui.views.SettingsView
 import com.example.sw0b_001.ui.views.compose.ComposerInterface
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
@@ -457,6 +456,13 @@ class MainActivity : AppCompatActivity() {
                     navController = navController,
                     imageViewModel = imageViewModel,
                     initialize = imageRenderNav.initialize
+                )
+            }
+
+            composable<SettingsScreen> {
+                SettingsView(
+                    navController = navController,
+                    activity = this@MainActivity
                 )
             }
         }

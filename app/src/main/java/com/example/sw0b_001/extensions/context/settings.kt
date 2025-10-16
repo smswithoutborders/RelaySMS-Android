@@ -27,7 +27,6 @@ private object Settings {
     const val SETTINGS_ONBOARDED_COMPLETELY = "SETTINGS_ONBOARDED_COMPLETELY"
     const val SETTINGS_LOCK_DOWN_APP = "SETTINGS_LOCK_DOWN_APP"
     const val SETTINGS_USE_DEVICE_ID = "SETTINGS_USE_DEVICE_ID"
-    const val SETTINGS_DEFAULT_GATEWAY_CLIENT = "SETTINGS_DEFAULT_GATEWAY_CLIENT"
 }
 
 val Context.settingsGetDefaultGatewayClients get(): GatewayClients? = runBlocking{

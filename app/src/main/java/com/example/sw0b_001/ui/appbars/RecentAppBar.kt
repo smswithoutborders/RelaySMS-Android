@@ -58,6 +58,7 @@ import com.example.sw0b_001.SettingsActivity
 import com.example.sw0b_001.ui.navigation.AboutScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.data.getPhoneNumberFromPrefs
+import com.example.sw0b_001.ui.navigation.SettingsScreen
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -190,13 +191,8 @@ fun RecentAppBar(
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.settings)) },
                             onClick = {
-                                context.startActivity(
-                                    Intent(context, SettingsActivity::class.java).apply {
-                                        flags =
-                                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_TASK_ON_HOME
-                                    }
-                                )
                                 showMenu = false
+                                navController.navigate(SettingsScreen)
                             }
                         )
                         DropdownMenuItem(
