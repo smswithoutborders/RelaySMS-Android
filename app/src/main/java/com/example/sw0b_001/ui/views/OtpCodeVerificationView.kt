@@ -155,7 +155,6 @@ fun OtpCodeVerificationView(
     loginSignupPhoneNumber: String,
     loginSignupPassword: String,
     countryCode: String,
-    platformViewModel: PlatformsViewModel?,
     otpRequestType: OTPCodeVerificationType,
     nextAttemptTimestamp: Int? = null,
     onCompleteCallback: ((Boolean) -> Unit)? = null
@@ -298,7 +297,6 @@ fun OtpCodeVerificationView(
                         password = loginSignupPassword,
                         countryCode = countryCode,
                         code = otpCode,
-                        platformsViewModel = platformViewModel,
                         type = otpRequestType,
                         onFailedCallback = {isLoading = false},
                         onCompleteCallback = {isLoading = false}
@@ -434,7 +432,6 @@ private fun submitOTPCode(
     countryCode: String = "",
     code: String,
     type: OTPCodeVerificationType,
-    platformsViewModel: PlatformsViewModel?,
     onFailedCallback: (String?) -> Unit,
     onCompleteCallback: () -> Unit,
     onSuccessCallback: () -> Unit,
@@ -444,7 +441,7 @@ private fun submitOTPCode(
         try {
             when(type) {
                 OTPCodeVerificationType.CREATE -> {
-                    val response = vault.createEntity(
+                    vault.createEntity(
                         context,
                         phoneNumber,
                         countryCode,
@@ -453,7 +450,7 @@ private fun submitOTPCode(
                     )
                 }
                 OTPCodeVerificationType.AUTHENTICATE -> {
-                    val response = vault.authenticateEntity(
+                    vault.authenticateEntity(
                         context,
                         phoneNumber,
                         password,
@@ -461,7 +458,7 @@ private fun submitOTPCode(
                     )
                 }
                 OTPCodeVerificationType.RECOVER -> {
-                    val response = vault.recoverEntityPassword(
+                    vault.recoverEntityPassword(
                         context,
                         phoneNumber,
                         password,
@@ -471,10 +468,6 @@ private fun submitOTPCode(
             }
 
             savePhoneNumberToPrefs(context, phoneNumber)
-
-            vault.refreshStoredTokens(context) {
-                platformsViewModel?.accountsForMissingDialog = it
-            }
             onSuccessCallback()
         } catch(e: StatusRuntimeException) {
             e.printStackTrace()
@@ -498,7 +491,6 @@ fun OtpCodeVerificationViewPreview() {
             "",
             loginSignupPassword = "",
             countryCode = "",
-            platformViewModel = remember { PlatformsViewModel() },
             otpRequestType = OTPCodeVerificationType.CREATE,
         ) {}
     }

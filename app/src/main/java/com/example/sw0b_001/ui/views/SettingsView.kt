@@ -71,8 +71,6 @@ import com.example.sw0b_001.extensions.context.settingsSetLockDownApp
 import com.example.sw0b_001.extensions.context.settingsSetStoreTokensOnDevice
 import com.example.sw0b_001.extensions.context.settingsSetUseDeviceId
 import com.example.sw0b_001.ui.appbars.RelayAppBar
-import com.example.sw0b_001.ui.components.LanguageOption
-import com.example.sw0b_001.ui.components.LanguageSelectionPopup
 import com.example.sw0b_001.ui.theme.AppTheme
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
@@ -249,24 +247,27 @@ fun SettingsView(
                 enabled = !isLoading,
             ) { checked ->
                 isLoading = true
-                scope.launch(Dispatchers.Default) {
-                    try {
-                        Vaults(context).refreshStoredTokens(
-                            context = context,
-                            migrateToDevice = checked ?: true
-                        ) { }
-                    } catch(e: Exception) {
-                        e.printStackTrace()
-                        scope.launch(Dispatchers.Main) {
-                            Toast.makeText(context, e.message, Toast.LENGTH_LONG)
-                                .show()
+                context.settingsSetStoreTokensOnDevice(checked ?: true)
+                storeTokensOnDevice = checked ?: true
+
+                if(checked == true && !Vaults(context).isStoredOnDevice()) {
+                    scope.launch(Dispatchers.Default) {
+                        try {
+                            Vaults(context).refreshStoredTokens(
+                                context = context,
+                                migrateToDevice = true
+                            )
+                        } catch(e: Exception) {
+                            e.printStackTrace()
+                            scope.launch(Dispatchers.Main) {
+                                Toast.makeText(context, e.message, Toast.LENGTH_LONG)
+                                    .show()
+                            }
+                        } finally {
+                            isLoading = false
                         }
-                    } finally {
-                        isLoading = false
-                        storeTokensOnDevice = checked ?: true
-                        context.settingsSetStoreTokensOnDevice(checked ?: true)
                     }
-                }
+                } else { isLoading = false }
             }
 
             Text(

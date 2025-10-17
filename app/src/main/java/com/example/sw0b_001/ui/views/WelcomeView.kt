@@ -48,32 +48,14 @@ import androidx.navigation.compose.rememberNavController
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getCurrentLocale
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.setLocale
 import com.example.sw0b_001.data.Helpers
-import com.example.sw0b_001.ui.components.LanguageSelectionPopup
 import com.example.sw0b_001.ui.navigation.OnboardingInteractiveScreen
 import com.example.sw0b_001.ui.theme.AppTheme
-
-data class OnboardingStep(
-    val title: String,
-    val description: String,
-    val image: Int? = null,
-    val showBackButton: Boolean = false,
-    val showSkipButton: Boolean = false,
-    val showLanguageButton: Boolean = false,
-    val showPrivacyPolicyLink: Boolean = false,
-    val isCompleteScreen: Boolean = false,
-    val nextButtonText: String = "",
-    val isWelcomeScreen: Boolean = false
-)
-
-const val PREF_USER_ONBOARDED = "PREF_USER_ONBOARDED"
-const val USER_ONBOARDED = "USER_ONBOARDED"
 
 @Composable
 fun WelcomeMainView(
     navController: NavController
 ) {
     val context = LocalContext.current
-    var showLanguagePopup by remember { mutableStateOf(false) }
 
     var localeExpanded by remember { mutableStateOf(false) }
     val localeArraysValues = stringArrayResource(R.array.language_values)

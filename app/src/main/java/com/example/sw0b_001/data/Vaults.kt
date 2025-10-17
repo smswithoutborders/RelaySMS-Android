@@ -49,10 +49,23 @@ class Vaults(val context: Context) {
         }
     }
 
+    @Throws
+    fun isStoredOnDevice(): Boolean {
+        try {
+            val llt = fetchLongLivedToken(context)
+
+            val response = getStoredAccountTokens(llt, false)
+
+            return !response.storedTokensList.any { !it.isStoredOnDevice }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw e
+        }
+    }
+
     fun refreshStoredTokens(
         context: Context,
         migrateToDevice: Boolean = false,
-        missingCallback: (Map<String, List<String>>) -> Unit = {}
     ) {
         try {
             val llt = fetchLongLivedToken(context)
@@ -60,17 +73,14 @@ class Vaults(val context: Context) {
             val response = getStoredAccountTokens(llt, migrateToDevice)
 
             val datastore = Datastore.getDatastore(context)
-            val platformsToSave = ArrayList<StoredPlatformsEntity>()
-            val storedPlatforms = datastore.storedPlatformsDao().fetchAllList()
+            val platformsToSave = mutableListOf<StoredPlatformsEntity>()
 
-            val accountsMissingTokens = mutableMapOf<String, MutableList<String>>()
             response.storedTokensList.forEach { accountTokens ->
                 val uuid = Base64.encodeToString(
                     buildPlatformsUUID(accountTokens.platform, accountTokens.accountIdentifier),
                     Base64.DEFAULT
                 )
 
-                val isStoredOnDevice = accountTokens.isStoredOnDevice
                 val accessToken = if(accountTokens.accountTokensMap.containsKey("access_token")) {
                     accountTokens.accountTokensMap["access_token"]
                 } else ""
@@ -78,45 +88,17 @@ class Vaults(val context: Context) {
                     accountTokens.accountTokensMap["refresh_token"]
                 } else ""
 
-                if (isStoredOnDevice &&
-                    accessToken.isNullOrEmpty() &&
-                    storedPlatforms.find { it.id == uuid &&
-                            !it.accessToken.isNullOrEmpty() } == null) {
-                    accountsMissingTokens[accountTokens.platform].let { accountsIds ->
-                        if (accountsIds.isNullOrEmpty())
-                            accountsMissingTokens[accountTokens.platform] =
-                                mutableListOf(accountTokens.accountIdentifier)
-                        else
-                            accountsMissingTokens[accountTokens.platform]
-                                ?.add(accountTokens.accountIdentifier)
-                    }
-                }
-                else {
-                    platformsToSave.add(
-                        if(storedPlatforms.find { it.id == uuid } != null) {
-                            storedPlatforms.first { it.id == uuid }.apply {
-                                if (this.accessToken.isNullOrEmpty()) {
-                                    this.accessToken = accessToken
-                                }
-                                if (this.refreshToken.isNullOrEmpty()) {
-                                    this.refreshToken = refreshToken
-                                }
-                            }
-                        }
-                        else {
-                            StoredPlatformsEntity(
-                                id = uuid,
-                                account = accountTokens.accountIdentifier,
-                                name = accountTokens.platform,
-                                accessToken = accessToken,
-                                refreshToken = refreshToken
-                            )
-                        }
+                platformsToSave.add(
+                    StoredPlatformsEntity(
+                        id = uuid,
+                        account = accountTokens.accountIdentifier,
+                        name = accountTokens.platform,
+                        accessToken = accessToken,
+                        refreshToken = refreshToken
                     )
-                }
+                )
             }
             datastore.storedPlatformsDao().insert(platformsToSave)
-            missingCallback(accountsMissingTokens)
         } catch (e: Exception) {
             e.printStackTrace()
             throw e

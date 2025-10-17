@@ -58,7 +58,6 @@ import androidx.preference.PreferenceManager
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.Vaults
-import com.example.sw0b_001.ui.components.MissingTokenInfoDialog
 import com.example.sw0b_001.ui.navigation.AboutScreen
 import com.example.sw0b_001.ui.navigation.BridgeViewScreen
 import com.example.sw0b_001.ui.navigation.EmailViewScreen
@@ -126,18 +125,15 @@ import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavHostController
+    private lateinit var searchViewModel: SearchViewModel
 
     val threadsViewModel: ThreadsViewModel by viewModels()
     val onboardingViewModel: OnboardingViewModel by viewModels()
-
-    private lateinit var searchViewModel: SearchViewModel
 
     val platformsViewModel: PlatformsViewModel by viewModels()
     val messagesViewModel: MessagesViewModel by viewModels()
     val gatewayClientViewModel: GatewayClientViewModel by viewModels()
     val imageViewModel: ImageViewModel by viewModels()
-
-    var showMissingTokenDialog by mutableStateOf(false)
 
     var loggedInAlready by mutableStateOf(false)
 
@@ -170,11 +166,6 @@ class MainActivity : AppCompatActivity() {
                                 AppTheme {
                                     navController = rememberNavController()
 
-                                    LaunchedEffect(true) {
-                                        refreshTokensCallback(platformsViewModel
-                                            .accountsForMissingDialog)
-                                    }
-
                                     LaunchedEffect(loggedInAlready) {
                                         if(loggedInAlready) {
                                             navController.navigate(GetMeOutScreen) {
@@ -183,27 +174,6 @@ class MainActivity : AppCompatActivity() {
                                                 }
                                             }
                                         }
-                                    }
-
-                                    if (showMissingTokenDialog) {
-                                        MissingTokenInfoDialog(
-                                            groupedAccounts = platformsViewModel.accountsForMissingDialog,
-                                            onDismiss = { showMissingTokenDialog = false },
-                                            onConfirm = { doNotShowAgain ->
-                                                showMissingTokenDialog = false
-                                                if (doNotShowAgain) {
-                                                    PreferenceManager
-                                                        .getDefaultSharedPreferences(applicationContext)
-                                                        .edit {
-                                                            putBoolean(
-                                                                Vaults.Companion.PrefKeys
-                                                                    .KEY_DO_NOT_SHOW_MISSING_TOKEN_DIALOG,
-                                                                true
-                                                            )
-                                                        }
-                                                }
-                                            }
-                                        )
                                     }
 
                                     Surface( Modifier.fillMaxSize()) {
@@ -390,7 +360,6 @@ class MainActivity : AppCompatActivity() {
                     countryCode = otpCodeNav.countryCode,
                     otpRequestType = otpCodeNav.otpRequestType,
                     nextAttemptTimestamp = otpCodeNav.nextAttemptTimestamp,
-                    platformViewModel = platformsViewModel,
                     onCompleteCallback = if(otpCodeNav.isOnboarding)
                         onboardingViewModel.callback else null,
                 )
@@ -470,20 +439,6 @@ class MainActivity : AppCompatActivity() {
         processIntent(navController)
     }
 
-    private fun refreshTokensCallback(accountsInfo: Map<String, List<String>> ){
-        val sharedPreferences = PreferenceManager
-            .getDefaultSharedPreferences(applicationContext)
-        val doNotShowDialog = sharedPreferences
-            .getBoolean(Vaults.Companion.PrefKeys
-                .KEY_DO_NOT_SHOW_MISSING_TOKEN_DIALOG, false)
-
-        if (!doNotShowDialog && accountsInfo.isNotEmpty()) {
-            showMissingTokenDialog = true
-            platformsViewModel.accountsForMissingDialog = accountsInfo
-        }
-
-    }
-
     override fun onResume() {
         super.onResume()
 
@@ -496,9 +451,7 @@ class MainActivity : AppCompatActivity() {
                         if(llt.isNotEmpty()) {
                             val vault = Vaults(applicationContext)
                             try {
-                                vault.refreshStoredTokens(applicationContext, ) {
-                                    if(it.isNotEmpty()) refreshTokensCallback(it)
-                                }
+                                vault.refreshStoredTokens(applicationContext, )
                             } catch(e: StatusRuntimeException) {
                                 if(e.status.code == Status.UNAUTHENTICATED.code) {
                                     loggedInAlready = true
@@ -514,8 +467,6 @@ class MainActivity : AppCompatActivity() {
                 e.printStackTrace()
             }
         }
-
-        Platforms.refreshAvailablePlatforms(applicationContext)
     }
 
     private fun processIntent(navController: NavController, newIntent: Intent? = null) {
