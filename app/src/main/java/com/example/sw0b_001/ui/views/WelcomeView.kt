@@ -19,6 +19,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -34,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,9 +45,9 @@ import androidx.navigation.NavController
 import com.example.sw0b_001.R
 import androidx.core.net.toUri
 import androidx.navigation.compose.rememberNavController
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getCurrentLocale
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.setLocale
 import com.example.sw0b_001.data.Helpers
-import com.example.sw0b_001.Settings.SettingsFragment.Companion.changeLanguageLocale
-import com.example.sw0b_001.Settings.SettingsFragment.Companion.getCurrentLocale
 import com.example.sw0b_001.ui.components.LanguageSelectionPopup
 import com.example.sw0b_001.ui.navigation.OnboardingInteractiveScreen
 import com.example.sw0b_001.ui.theme.AppTheme
@@ -71,11 +74,10 @@ fun WelcomeMainView(
 ) {
     val context = LocalContext.current
     var showLanguagePopup by remember { mutableStateOf(false) }
-    var currentLanguageCode by remember { mutableStateOf(getCurrentLocale(context)) }
 
-    LaunchedEffect(currentLanguageCode) {
-        changeLanguageLocale(context, currentLanguageCode)
-    }
+    var localeExpanded by remember { mutableStateOf(false) }
+    val localeArraysValues = stringArrayResource(R.array.language_values)
+    val localeArraysOptions= stringArrayResource(R.array.language_options)
 
     Scaffold { innerPadding ->
         Column(
@@ -94,13 +96,15 @@ fun WelcomeMainView(
             )
             Spacer(modifier = Modifier.height(32.dp))
 
-            Row(
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
                 Button(
-                    onClick = { showLanguagePopup = true },
+                    onClick = {
+                        localeExpanded = true
+                    },
                     shape = RoundedCornerShape(24.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
@@ -116,11 +120,34 @@ fun WelcomeMainView(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = Helpers.getLanguageNameFromCode(context, currentLanguageCode),
+                        text = context.getCurrentLocale()?.displayName ?:
+                        stringResource(R.string.english1),
                         color = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 8.dp)
+                ) {
+                    DropdownMenu(
+                        expanded = localeExpanded,
+                        onDismissRequest = { localeExpanded = false }
+                    ) {
+                        localeArraysOptions.forEachIndexed { i, item ->
+                            DropdownMenuItem(
+                                text = { Text(item) },
+                                onClick = {
+                                    context.setLocale(localeArraysValues[i])
+                                    localeExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
             }
+
 
             Spacer(modifier = Modifier.height(64.dp))
 
@@ -168,16 +195,6 @@ fun WelcomeMainView(
             )
             Spacer(modifier = Modifier.height(64.dp))
         }
-    }
-
-    if (showLanguagePopup) {
-        LanguageSelectionPopup(
-            currentLanguageCode = currentLanguageCode,
-            onLanguageSelected = { selectedLanguage ->
-                currentLanguageCode = selectedLanguage.code
-            },
-            onDismiss = { showLanguagePopup = false }
-        )
     }
 }
 

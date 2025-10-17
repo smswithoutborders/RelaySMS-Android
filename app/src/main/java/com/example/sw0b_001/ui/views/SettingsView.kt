@@ -60,6 +60,7 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getCurrentLoc
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.setLocale
 import com.afkanerd.smswithoutborders_libsmsmms.ui.SettingsItem
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.extensions.context.promptBiometrics
 import com.example.sw0b_001.extensions.context.settingsGetLockDownApp
 import com.example.sw0b_001.extensions.context.settingsGetUseDeviceId
@@ -81,12 +82,15 @@ fun SettingsView(
     val inPreviewMode = LocalInspectionMode.current
     val scrollState = rememberScrollState()
 
-    var localeExpanded by remember { mutableStateOf(context.settingsGetUseDeviceId) }
+    var localeExpanded by remember { mutableStateOf(inPreviewMode) }
     var setLockDownApp by remember { mutableStateOf( context.settingsGetLockDownApp) }
     var useDeviceId by remember { mutableStateOf( context.settingsGetUseDeviceId) }
 
     val currentNightMode = LocalConfiguration.current.uiMode and Configuration.UI_MODE_NIGHT_MASK
     var themeExpanded by remember { mutableStateOf(false) }
+
+    val isLoggedIn by remember{ mutableStateOf(
+        inPreviewMode || Vaults.fetchLongLivedToken(context).isNotEmpty()) }
 
     val localeArraysValues = stringArrayResource(R.array.language_values)
     val localeArraysOptions= stringArrayResource(R.array.language_options)
@@ -245,19 +249,23 @@ fun SettingsView(
                 }
             }
 
-            SettingsItem(
-                itemTitle = stringResource(R.string.log_out),
-                itemDescription = stringResource(R.string.this_would_log_you_out_of_your_vault_account_on_this_device_you_can_log_back_in_at_anytime_with_an_internet_connection),
-            ) {
-                TODO()
-            }
+            if(isLoggedIn) {
+                SettingsItem(
+                    itemTitle = stringResource(R.string.log_out),
+                    itemDescription = stringResource(R.string.this_would_log_you_out_of_your_vault_account_on_this_device_you_can_log_back_in_at_anytime_with_an_internet_connection),
+                ) {
+                    Vaults.logout(context) {
+                        navController.popBackStack()
+                    }
+                }
 
-            SettingsItem(
-                itemTitle = stringResource(R.string.delete_account),
-                itemDescription = stringResource(R.string.this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer),
-                isWarning = true
-            ) {
-                TODO()
+                SettingsItem(
+                    itemTitle = stringResource(R.string.delete_account),
+                    itemDescription = stringResource(R.string.this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer),
+                    isWarning = true
+                ) {
+                    TODO()
+                }
             }
         }
     }
