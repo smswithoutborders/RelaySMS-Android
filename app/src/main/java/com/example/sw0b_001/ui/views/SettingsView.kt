@@ -258,7 +258,8 @@ fun SettingsView(
                     } catch(e: Exception) {
                         e.printStackTrace()
                         scope.launch(Dispatchers.Main) {
-                            Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, e.message, Toast.LENGTH_LONG)
+                                .show()
                         }
                     } finally {
                         isLoading = false
@@ -288,9 +289,11 @@ fun SettingsView(
                         setLockDownApp = true
                     }
                     else {
-                        Toast.makeText(context,
-                            context.getString(R.string.failed_to_set_biometric_authentication),
-                            Toast.LENGTH_LONG).show()
+                        scope.launch(Dispatchers.Default) {
+                            Toast.makeText(context,
+                                context.getString(R.string.failed_to_set_biometric_authentication),
+                                Toast.LENGTH_LONG).show()
+                        }
                     }
                 }
             }
