@@ -51,15 +51,13 @@ class Vaults(val context: Context) {
 
     fun refreshStoredTokens(
         context: Context,
+        migrateToDevice: Boolean = false,
         missingCallback: (Map<String, List<String>>) -> Unit = {}
     ) {
         try {
             val llt = fetchLongLivedToken(context)
 
-            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-            val storeTokensOnDevice = sharedPreferences.getBoolean("store_tokens_on_device", false)
-
-            val response = getStoredAccountTokens(llt, storeTokensOnDevice)
+            val response = getStoredAccountTokens(llt, migrateToDevice)
 
             val datastore = Datastore.getDatastore(context)
             val platformsToSave = ArrayList<StoredPlatformsEntity>()
@@ -80,7 +78,6 @@ class Vaults(val context: Context) {
                     accountTokens.accountTokensMap["refresh_token"]
                 } else ""
 
-                // TODO: add storing in case there's something to store
                 if (isStoredOnDevice &&
                     accessToken.isNullOrEmpty() &&
                     storedPlatforms.find { it.id == uuid &&
@@ -370,12 +367,10 @@ class Vaults(val context: Context) {
             KeystoreHelpers.removeFromKeystore(context, DEVICE_ID_PUB_KEY)
             KeystoreHelpers.removeFromKeystore(context, LONG_LIVED_TOKEN_KEYSTORE_ALIAS)
 
-            CoroutineScope(Dispatchers.Default).launch {
-                Datastore.getDatastore(context).storedPlatformsDao().deleteAll()
-                Datastore.getDatastore(context).encryptedContentDAO().deleteAll()
-                Datastore.getDatastore(context).ratchetStatesDAO().deleteAll()
-                successRunnable.run()
-            }
+            Datastore.getDatastore(context).storedPlatformsDao().deleteAll()
+            Datastore.getDatastore(context).encryptedContentDAO().deleteAll()
+            Datastore.getDatastore(context).ratchetStatesDAO().deleteAll()
+            successRunnable.run()
         }
 
         fun storeArtifacts(context: Context,
