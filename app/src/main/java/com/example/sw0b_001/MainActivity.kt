@@ -323,6 +323,7 @@ class MainActivity : AppCompatActivity() {
                 GetMeOutOfHere(navController)
             }
             composable<HomepageScreen> {
+                imageViewModel.reset()
                 HomepageView(
                     navController = navController,
                     platformsViewModel = platformsViewModel,
