@@ -283,11 +283,11 @@ fun SettingsView(
                 itemDescription = stringResource(R.string.this_will_lock_the_app_using_your_phone_s_biometric_security_configurations_you_will_need_to_globally_set_for_the_device),
                 checked = setLockDownApp,
                 enabled = !isLoading,
-            ) {
+            ) { checked ->
                 context.promptBiometrics(activity) {
                     if(it) {
-                        context.settingsSetLockDownApp(true)
-                        setLockDownApp = true
+                        context.settingsSetLockDownApp(checked!!)
+                        setLockDownApp = checked
                     }
                     else {
                         scope.launch(Dispatchers.Default) {
