@@ -321,65 +321,6 @@ fun RecentMessageCard(
                 )
             },
         )
-        
-//        OutlinedCard(
-//            onClick = {
-//                onClickCallback(message)
-//            },
-//            modifier = Modifier
-//                .fillMaxWidth(),
-//            shape = RoundedCornerShape(8.dp),
-//        ) {
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(16.dp),
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                GetMessageAvatar(logo)
-//
-//                Spacer(modifier = Modifier.width(16.dp))
-//                Column(modifier = Modifier.weight(1f)) {
-//                    // Heading Text
-//                    Text(
-//                        heading,
-//                        style = if (message.type == Platforms.ServiceTypes.TEXT.name) {
-//                            MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-//                        } else {
-//                            MaterialTheme.typography.bodyLarge
-//                        },
-//                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-//                        maxLines = 1,
-//                        overflow = TextOverflow.Ellipsis
-//                    )
-//                    // Subheading Text
-//                    if (message.encryptedContent != null) {
-//                        Text(
-//                            subHeading,
-//                            style = MaterialTheme.typography.bodyMedium,
-//                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-//                            maxLines = 1,
-//                            overflow = TextOverflow.Ellipsis
-//                        )
-//                    }
-//                    // Message Preview
-//                    Text(
-//                        text = text,
-//                        style = MaterialTheme.typography.bodySmall,
-//                        maxLines = 2,
-//                        overflow = TextOverflow.Ellipsis,
-//                        color = MaterialTheme.colorScheme.onSurfaceVariant
-//                    )
-//                }
-//
-//                // Date
-//                Text(
-//                    text = Helpers.formatDate(LocalContext.current, message.date),
-//                    style = MaterialTheme.typography.labelSmall,
-//                    color = MaterialTheme.colorScheme.onSurfaceVariant
-//                )
-//            }
-//        }
     }
 }
 

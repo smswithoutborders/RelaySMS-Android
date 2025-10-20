@@ -74,23 +74,21 @@ fun BottomNavBar(
             },
         )
 
-        if(!isDefaultSmsApp || LocalInspectionMode.current) {
-            NavigationBarItem(
-                icon = { Icon(
-                    Icons.Filled.Inbox,
-                    contentDescription = stringResource(R.string.inbox),
-                    modifier = Modifier.size(20.dp)
-                ) },
-                label = { Text(
-                    text = stringResource(R.string.inbox),
-                    style = MaterialTheme.typography.labelSmall
-                ) },
-                selected = selectedTab == BottomTabsItems.BottomBarInboxTab,
-                onClick = {
-                    onChangeTab(BottomTabsItems.BottomBarInboxTab,)
-                },
-            )
-        }
+        NavigationBarItem(
+            icon = { Icon(
+                Icons.Filled.Inbox,
+                contentDescription = stringResource(R.string.inbox),
+                modifier = Modifier.size(20.dp)
+            ) },
+            label = { Text(
+                text = stringResource(R.string.inbox),
+                style = MaterialTheme.typography.labelSmall
+            ) },
+            selected = selectedTab == BottomTabsItems.BottomBarInboxTab,
+            onClick = {
+                onChangeTab(BottomTabsItems.BottomBarInboxTab,)
+            },
+        )
 
         NavigationBarItem(
             icon = { Icon(
