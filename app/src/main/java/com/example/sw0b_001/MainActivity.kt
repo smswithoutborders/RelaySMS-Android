@@ -169,8 +169,10 @@ class MainActivity : AppCompatActivity() {
 
                                     LaunchedEffect(loggedInAlready) {
                                         if(loggedInAlready) {
+                                            val route = if(isDefault()) HomeScreenNav()
+                                            else HomepageScreen
                                             navController.navigate(GetMeOutScreen) {
-                                                popUpTo(HomepageScreen) {
+                                                popUpTo(route) {
                                                     inclusive = true
                                                 }
                                             }

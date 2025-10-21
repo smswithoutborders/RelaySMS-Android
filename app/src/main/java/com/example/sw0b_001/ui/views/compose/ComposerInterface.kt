@@ -276,7 +276,13 @@ fun ComposerInterface(
                 CoroutineScope(Dispatchers.Main).launch {
                     onSendCallback?.invoke(true)
                     imageViewModel.reset()
-                    navController.popBackStack()
+                    val route = if(context.isDefault()) HomeScreenNav()
+                    else HomepageScreen
+                    navController.navigate(route) {
+                        popUpTo(route) {
+                            inclusive = true
+                        }
+                    }
                 }
             }
         }
