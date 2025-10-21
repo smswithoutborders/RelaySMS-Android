@@ -250,14 +250,14 @@ private fun triggerAccountRevoke(
         val publishers = Publishers(context)
         try {
             when(platform.protocol_type) {
-                Platforms.ProtocolTypes.OAUTH2.type -> {
+                Platforms.ProtocolTypes.oauth2.name -> {
                     publishers.revokeOAuthPlatforms(
                         llt,
                         account.name!!,
                         account.account!!,
                     )
                 }
-                Platforms.ProtocolTypes.PNBA.type -> {
+                Platforms.ProtocolTypes.pnba.name -> {
                     publishers.revokePNBAPlatforms(
                         llt,
                         account.name!!,
@@ -311,13 +311,13 @@ private fun AddAccountLoading(
         )
 
         when(platform.protocol_type) {
-            Platforms.ProtocolTypes.OAUTH2.type -> {
+            Platforms.ProtocolTypes.oauth2.name -> {
                 CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.secondary,
                     trackColor = MaterialTheme.colorScheme.surfaceVariant,
                 )
             }
-            Platforms.ProtocolTypes.PNBA.type -> {
+            Platforms.ProtocolTypes.pnba.name -> {
                 PNBAPhoneNumberCodeRequestView(
                     isLoading = isLoading,
                     platform = platform,

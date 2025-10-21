@@ -289,14 +289,14 @@ class Vaults(val context: Context) {
             Datastore.getDatastore(context).storedPlatformsDao().fetchAllList().forEach { platform ->
                 availablePlatforms.filter { it.name == platform.name }.forEach {
                     when(it.protocol_type) {
-                        Platforms.ProtocolTypes.OAUTH2.type -> {
+                        Platforms.ProtocolTypes.oauth2.name -> {
                             publishers.revokeOAuthPlatforms(
                                 llt,
                                 platform.name!!,
                                 platform.account!!,
                             )
                         }
-                        Platforms.ProtocolTypes.PNBA.type -> {
+                        Platforms.ProtocolTypes.pnba.name -> {
                             publishers.revokePNBAPlatforms(
                                 llt,
                                 platform.name!!,

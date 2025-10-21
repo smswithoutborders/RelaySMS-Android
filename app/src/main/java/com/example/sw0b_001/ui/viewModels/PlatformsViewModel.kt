@@ -59,6 +59,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
+import java.net.URL
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.StandardCharsets
@@ -573,7 +574,7 @@ class PlatformsViewModel : ViewModel() {
         ) {
             CoroutineScope(Dispatchers.Default).launch {
                 when(platform.protocol_type) {
-                    Platforms.ProtocolTypes.OAUTH2.type -> {
+                    Platforms.ProtocolTypes.oauth2.name -> {
                         val publishers = Publishers(context)
                         val publicKeyBytes = Publishers.fetchPublisherPublicKey(context)
                         val requestIdentifier = Base64.encodeToString(publicKeyBytes, Base64.NO_WRAP)
@@ -610,6 +611,7 @@ class PlatformsViewModel : ViewModel() {
                     }
                 }
             }
+
         }
 
         private fun oAuth2IntentBuilder(context: Context): CustomTabsIntent {
