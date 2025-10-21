@@ -51,6 +51,7 @@ import com.example.sw0b_001.ui.theme.AppTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.ui.features.AppFeatures
@@ -76,6 +77,7 @@ fun HomepageView(
     platformsViewModel : PlatformsViewModel,
     messagesViewModel: MessagesViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
+    imageViewModel: ImageViewModel,
     isLoggedIn: Boolean = false,
     showTopBar: Boolean = true,
     drawerCallback: (() -> Unit)? = {},
@@ -244,6 +246,7 @@ fun HomepageView(
                 messagesViewModel = messagesViewModel,
                 platformsViewModel = platformsViewModel,
                 gatewayClientViewModel = gatewayClientViewModel,
+                imageViewModel = imageViewModel,
                 isLoggedIn = isLoggedIn,
             )
 
@@ -289,6 +292,7 @@ fun GetTabViews(
     messagesViewModel: MessagesViewModel,
     platformsViewModel: PlatformsViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
+    imageViewModel: ImageViewModel,
     isLoggedIn: Boolean,
 ) {
     when(bottomTabsItems) {
@@ -297,6 +301,7 @@ fun GetTabViews(
                 navController = navController,
                 messagesViewModel = messagesViewModel,
                 platformsViewModel = platformsViewModel,
+                imageViewModel = imageViewModel,
                 isLoggedIn = isLoggedIn
             ) {
                 platformsViewModel.bottomTabsItem =
@@ -332,6 +337,7 @@ fun HomepageView_Preview() {
             platformsViewModel = remember{ PlatformsViewModel() },
             messagesViewModel = remember{ MessagesViewModel() },
             gatewayClientViewModel = remember{ GatewayClientViewModel() },
+            imageViewModel = remember{ ImageViewModel() },
         )
     }
 }
@@ -347,6 +353,7 @@ fun HomepageViewLoggedIn_Preview() {
             platformsViewModel = remember{ PlatformsViewModel() },
             messagesViewModel = remember{ MessagesViewModel() },
             gatewayClientViewModel = remember{ GatewayClientViewModel() },
+            imageViewModel = remember{ ImageViewModel() },
         )
     }
 }
@@ -372,6 +379,7 @@ fun HomepageViewLoggedInMessages_Preview() {
             platformsViewModel = remember{ PlatformsViewModel() },
             messagesViewModel = remember{ MessagesViewModel() },
             gatewayClientViewModel = remember{ GatewayClientViewModel() },
+            imageViewModel = remember{ ImageViewModel() },
         )
     }
 }

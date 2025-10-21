@@ -60,6 +60,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
+import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.example.sw0b_001.data.models.Bridges
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.data.models.AvailablePlatforms
@@ -83,6 +84,7 @@ fun RecentView(
     navController: NavController,
     messagesViewModel: MessagesViewModel,
     platformsViewModel: PlatformsViewModel,
+    imageViewModel: ImageViewModel,
     isLoggedIn: Boolean = false,
     tabRequestedCallback: () -> Unit
 ) {
@@ -90,6 +92,7 @@ fun RecentView(
     
     LaunchedEffect(true) { 
         messagesViewModel.message = null
+        imageViewModel.reset()
     }
 
     var sendNewMessageRequested by remember { mutableStateOf(false) }
@@ -340,6 +343,7 @@ fun RecentScreenPreview() {
             navController = rememberNavController(),
             messagesViewModel = remember { MessagesViewModel() },
             platformsViewModel = remember { PlatformsViewModel() },
+            imageViewModel = remember { ImageViewModel() },
             isLoggedIn = true
         ) {}
     }
@@ -381,6 +385,7 @@ fun RecentScreenMessages_Preview() {
             navController = rememberNavController(),
             messagesViewModel = remember { MessagesViewModel() },
             platformsViewModel = remember { PlatformsViewModel() },
+            imageViewModel = remember { ImageViewModel() },
         ) {}
     }
 }

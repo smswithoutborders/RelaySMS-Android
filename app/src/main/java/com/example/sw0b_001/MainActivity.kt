@@ -266,6 +266,7 @@ class MainActivity : AppCompatActivity() {
                             platformsViewModel = platformsViewModel,
                             messagesViewModel = messagesViewModel,
                             gatewayClientViewModel = gatewayClientViewModel,
+                            imageViewModel = imageViewModel,
                             drawerCallback = drawerCallback
                         )
                     }
@@ -330,6 +331,7 @@ class MainActivity : AppCompatActivity() {
                     platformsViewModel = platformsViewModel,
                     messagesViewModel = messagesViewModel,
                     gatewayClientViewModel = gatewayClientViewModel,
+                    imageViewModel = imageViewModel,
                 )
             }
             composable<LoginScreen> { backEntry ->
