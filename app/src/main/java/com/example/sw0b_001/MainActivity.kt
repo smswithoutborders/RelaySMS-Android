@@ -103,6 +103,7 @@ import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ThreadsViewModel
 import com.example.sw0b_001.extensions.context.promptBiometrics
 import com.example.sw0b_001.extensions.context.settingsGetLockDownApp
 import com.example.sw0b_001.extensions.context.settingsGetOnboardedCompletely
+import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
 import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
@@ -452,7 +453,9 @@ class MainActivity : AppCompatActivity() {
                         if(llt.isNotEmpty()) {
                             val vault = Vaults(applicationContext)
                             try {
-                                vault.refreshStoredTokens(applicationContext, )
+                                vault.refreshStoredTokens(
+                                    applicationContext,
+                                    settingsGetStoreTokensOnDevice)
                             } catch(e: StatusRuntimeException) {
                                 if(e.status.code == Status.UNAUTHENTICATED.code) {
                                     loggedInAlready = true

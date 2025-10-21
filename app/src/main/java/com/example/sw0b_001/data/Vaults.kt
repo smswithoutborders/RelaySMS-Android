@@ -77,26 +77,29 @@ class Vaults(val context: Context) {
 
             response.storedTokensList.forEach { accountTokens ->
                 val uuid = Base64.encodeToString(
-                    buildPlatformsUUID(accountTokens.platform, accountTokens.accountIdentifier),
-                    Base64.DEFAULT
-                )
+                    buildPlatformsUUID(
+                        accountTokens.platform,
+                        accountTokens.accountIdentifier
+                    ), Base64.DEFAULT)
 
-                val accessToken = if(accountTokens.accountTokensMap.containsKey("access_token")) {
-                    accountTokens.accountTokensMap["access_token"]
-                } else ""
-                val refreshToken = if(accountTokens.accountTokensMap.containsKey("refresh_token")) {
-                    accountTokens.accountTokensMap["refresh_token"]
-                } else ""
+                if(!accountTokens.isStoredOnDevice) {
+                    val accessToken = if(accountTokens.accountTokensMap.containsKey("access_token")) {
+                        accountTokens.accountTokensMap["access_token"]
+                    } else ""
+                    val refreshToken = if(accountTokens.accountTokensMap.containsKey("refresh_token")) {
+                        accountTokens.accountTokensMap["refresh_token"]
+                    } else ""
 
-                platformsToSave.add(
-                    StoredPlatformsEntity(
-                        id = uuid,
-                        account = accountTokens.accountIdentifier,
-                        name = accountTokens.platform,
-                        accessToken = accessToken,
-                        refreshToken = refreshToken
+                    platformsToSave.add(
+                        StoredPlatformsEntity(
+                            id = uuid,
+                            account = accountTokens.accountIdentifier,
+                            name = accountTokens.platform,
+                            accessToken = accessToken,
+                            refreshToken = refreshToken
+                        )
                     )
-                )
+                }
             }
             datastore.storedPlatformsDao().insert(platformsToSave)
         } catch (e: Exception) {

@@ -60,6 +60,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
+import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.triggerAddPlatformRequest
 import kotlinx.serialization.json.Json
@@ -349,7 +350,9 @@ private fun AddAccountLoading(
                                 if(authCodeRequested) {
                                     try {
                                         val vault = Vaults(context)
-                                        vault.refreshStoredTokens(context)
+                                        vault.refreshStoredTokens(
+                                            context,
+                                            context.settingsGetStoreTokensOnDevice)
                                         onCompletedCallback()
                                     } catch(e: Exception) {
                                         e.printStackTrace()
@@ -375,7 +378,9 @@ private fun AddAccountLoading(
                             onSuccessCallback = {_, _ ->
                                 try {
                                     val vault = Vaults(context)
-                                    vault.refreshStoredTokens(context)
+                                    vault.refreshStoredTokens(
+                                        context,
+                                        context.settingsGetStoreTokensOnDevice)
                                     onCompletedCallback()
                                 } catch(e: Exception) {
                                     e.printStackTrace()

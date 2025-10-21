@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 
 import java.net.URLDecoder
 import android.net.Uri
+import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
 
 
 class OauthRedirectActivity : AppCompatActivity() {
@@ -79,7 +80,9 @@ class OauthRedirectActivity : AppCompatActivity() {
                 }
 
                 val vaults = Vaults(applicationContext)
-                vaults.refreshStoredTokens(applicationContext)
+                vaults.refreshStoredTokens(
+                    applicationContext,
+                    settingsGetStoreTokensOnDevice)
                 vaults.shutdown()
             } catch(e: StatusRuntimeException) {
                 e.printStackTrace()
