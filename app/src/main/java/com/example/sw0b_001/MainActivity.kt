@@ -261,6 +261,7 @@ class MainActivity : AppCompatActivity() {
                 navDrawItemSelected -> {
                     {
                         showThreadsTopBar = false
+                        imageViewModel.resetComplete()
                         HomepageView(
                             navController = navController,
                             platformsViewModel = platformsViewModel,
@@ -325,7 +326,7 @@ class MainActivity : AppCompatActivity() {
                 GetMeOutOfHere(navController)
             }
             composable<HomepageScreen> {
-                imageViewModel.reset()
+                imageViewModel.resetComplete()
                 HomepageView(
                     navController = navController,
                     platformsViewModel = platformsViewModel,

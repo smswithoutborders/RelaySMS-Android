@@ -37,6 +37,7 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -84,15 +85,13 @@ fun RecentView(
     navController: NavController,
     messagesViewModel: MessagesViewModel,
     platformsViewModel: PlatformsViewModel,
-    imageViewModel: ImageViewModel,
     isLoggedIn: Boolean = false,
     tabRequestedCallback: () -> Unit
 ) {
     val context = LocalContext.current
-    
-    LaunchedEffect(true) { 
+
+    SideEffect{
         messagesViewModel.message = null
-        imageViewModel.reset()
     }
 
     var sendNewMessageRequested by remember { mutableStateOf(false) }
@@ -343,7 +342,6 @@ fun RecentScreenPreview() {
             navController = rememberNavController(),
             messagesViewModel = remember { MessagesViewModel() },
             platformsViewModel = remember { PlatformsViewModel() },
-            imageViewModel = remember { ImageViewModel() },
             isLoggedIn = true
         ) {}
     }
@@ -385,7 +383,6 @@ fun RecentScreenMessages_Preview() {
             navController = rememberNavController(),
             messagesViewModel = remember { MessagesViewModel() },
             platformsViewModel = remember { PlatformsViewModel() },
-            imageViewModel = remember { ImageViewModel() },
         ) {}
     }
 }

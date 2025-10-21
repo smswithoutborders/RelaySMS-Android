@@ -275,6 +275,7 @@ fun ComposerInterface(
             } else {
                 CoroutineScope(Dispatchers.Main).launch {
                     onSendCallback?.invoke(true)
+                    imageViewModel.reset()
                     navController.popBackStack()
                 }
             }

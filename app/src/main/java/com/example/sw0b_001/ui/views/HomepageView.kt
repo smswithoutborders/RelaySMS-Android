@@ -246,7 +246,6 @@ fun HomepageView(
                 messagesViewModel = messagesViewModel,
                 platformsViewModel = platformsViewModel,
                 gatewayClientViewModel = gatewayClientViewModel,
-                imageViewModel = imageViewModel,
                 isLoggedIn = isLoggedIn,
             )
 
@@ -292,7 +291,6 @@ fun GetTabViews(
     messagesViewModel: MessagesViewModel,
     platformsViewModel: PlatformsViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
-    imageViewModel: ImageViewModel,
     isLoggedIn: Boolean,
 ) {
     when(bottomTabsItems) {
@@ -301,7 +299,6 @@ fun GetTabViews(
                 navController = navController,
                 messagesViewModel = messagesViewModel,
                 platformsViewModel = platformsViewModel,
-                imageViewModel = imageViewModel,
                 isLoggedIn = isLoggedIn
             ) {
                 platformsViewModel.bottomTabsItem =
