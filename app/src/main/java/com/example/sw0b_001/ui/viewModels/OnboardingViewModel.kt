@@ -1,12 +1,17 @@
 package com.example.sw0b_001.ui.viewModels
 
+import android.app.role.RoleManager
 import android.content.Context
+import android.content.Intent
+import android.os.Build
+import android.provider.Telephony
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -16,6 +21,7 @@ import com.example.sw0b_001.extensions.context.promptBiometrics
 import com.example.sw0b_001.extensions.context.settingsSetLockDownApp
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.onboarding.InteractiveOnboarding
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,6 +33,7 @@ class OnboardingViewModel : ViewModel() {
     var showLoginSignupModal by mutableStateOf(false)
     var showAddPlatformsModal by mutableStateOf(false)
     var showSendPlatformsModal by mutableStateOf(false)
+    var showMakeDefaultRequest by mutableStateOf(false)
 
     private val _onboardingState = MutableStateFlow<InteractiveOnboarding?>(null)
     val onboardingState: StateFlow<InteractiveOnboarding?> = _onboardingState.asStateFlow()
@@ -139,7 +146,21 @@ class OnboardingViewModel : ViewModel() {
                 subDescription = context.getString(R.string.this_also_unlocks_features_like_sending_images_with_sms_yes_not_mms),
                 actionButtonText = context.getString(R.string.set_as_default_sms_app),
                 image = R.drawable.try_sending_message_illus,
-                onClickCallToAction = {  }
+                onClickCallToAction = {
+//                    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+//                        val roleManager = context
+//                            .getSystemService(RoleManager::class.java)
+//                        val roleRequestIntent = roleManager
+//                            .createRequestRoleIntent(RoleManager.ROLE_SMS)
+//                        activity.startActivityForResult(roleRequestIntent, 12)
+//                    } else {
+//                        val intent = Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT)
+//                        intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME,
+//                            context.packageName)
+//                        context.startActivity(intent)
+//                    }
+                    showMakeDefaultRequest = true
+                }
             ),
         )
     }
