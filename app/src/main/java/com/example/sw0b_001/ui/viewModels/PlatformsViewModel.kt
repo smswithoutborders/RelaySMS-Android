@@ -67,8 +67,6 @@ import java.util.Locale
 
 class PlatformsViewModel : ViewModel() {
 
-    var accountsForMissingDialog by mutableStateOf<Map<String, List<String>>>(emptyMap())
-
     private var availableLiveData: LiveData<List<AvailablePlatforms>> = MutableLiveData()
     private var storedLiveData: LiveData<List<StoredPlatformsEntity>> = MutableLiveData()
 

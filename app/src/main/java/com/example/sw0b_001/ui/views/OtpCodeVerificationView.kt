@@ -62,6 +62,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
+import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Vaults
@@ -307,8 +309,10 @@ fun OtpCodeVerificationView(
                                 onCompleteCallback.invoke(true)
                                 navController.popBackStack()
                             } else {
-                                navController.navigate(HomepageScreen) {
-                                    popUpTo(HomepageScreen) {
+                                val route = if(context.isDefault()) HomeScreenNav()
+                                else HomepageScreen
+                                navController.navigate(route) {
+                                    popUpTo(route) {
                                         inclusive = true
                                     }
                                 }
