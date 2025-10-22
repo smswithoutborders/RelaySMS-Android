@@ -510,7 +510,8 @@ fun ComposerInterface(
                                 imageBitmap = null
                             }
                         ) {
-                            imageRenderSubModule()
+                            if(imageUri != null)
+                                imageRenderSubModule()
                         }
                     }
                 }
