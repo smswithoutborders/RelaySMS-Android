@@ -3,9 +3,7 @@ package com.example.sw0b_001.ui.modals
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
-import android.net.Uri
 import android.util.Base64
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -41,40 +39,46 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
-import com.example.sw0b_001.Models.Platforms.Platforms
-import com.example.sw0b_001.Models.Platforms.Platforms.ServiceTypes
+import com.example.sw0b_001.data.models.AvailablePlatforms
+import com.example.sw0b_001.data.models.Platforms
+import com.example.sw0b_001.data.models.Platforms.ServiceTypes
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.navigation.BridgeEmailComposeScreen
-import com.example.sw0b_001.ui.navigation.EmailComposeScreen
-import com.example.sw0b_001.ui.navigation.MessageComposeScreen
-import com.example.sw0b_001.ui.navigation.TextComposeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
-import com.example.sw0b_001.Database.Datastore
-import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
-import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
-import com.example.sw0b_001.Models.Publishers
-import com.example.sw0b_001.Models.Vaults
-import com.example.sw0b_001.ui.navigation.BridgeViewScreen
-import com.example.sw0b_001.ui.navigation.HomepageScreen
+import androidx.compose.ui.text.toUpperCase
+import com.example.sw0b_001.data.Datastore
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
+import com.example.sw0b_001.data.models.StoredPlatformsEntity
+import com.example.sw0b_001.data.Publishers
+import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.ui.views.addAccounts.PNBAPhoneNumberCodeRequestView
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
+import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
+import com.example.sw0b_001.ui.navigation.ComposeScreen
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.triggerAddPlatformRequest
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.encodeToJsonElement
+import java.util.Locale
+import java.util.Locale.getDefault
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlatformOptionsModal(
     showPlatformsModal: Boolean,
-    platformsViewModel: PlatformsViewModel,
     isActive: Boolean,
     isCompose: Boolean,
     navController: NavController,
+    platform: AvailablePlatforms?,
+    isOnboarding: Boolean = false,
+    onCompleteCallback: () -> Unit= {},
     onDismissRequest: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -88,8 +92,6 @@ fun PlatformOptionsModal(
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Expanded,
         skipHiddenState = false,
-        confirmValueChange = { !isAddLoading ||
-                platformsViewModel.platform?.service_type == Platforms.ProtocolTypes.PNBA.type }
     )
 
     if (showPlatformsModal) {
@@ -105,7 +107,7 @@ fun PlatformOptionsModal(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 if(isRevokeLoading) {
-                    RevokeAccountLoading(platformsViewModel.platform!!)
+                    RevokeAccountLoading(platform!!)
                 }
                 else if(revokeAccountConfirmationRequested) {
                     ConfirmationModal(
@@ -115,7 +117,7 @@ fun PlatformOptionsModal(
                             isRevokeLoading = true
                             triggerAccountRevoke(
                                 context = context,
-                                platform = platformsViewModel.platform!!,
+                                platform = platform!!,
                                 account = account!!,
                                 onCompletedCallback = {
                                     isRevokeLoading = false
@@ -130,7 +132,7 @@ fun PlatformOptionsModal(
                 }
                 else if(removeAccountRequested) {
                     SelectAccountModal(
-                        platformsViewModel = platformsViewModel,
+                        name = platform!!.name,
                         onAccountSelected = { storedAccount ->
                             removeAccountRequested = false
                             revokeAccountConfirmationRequested = true
@@ -143,23 +145,21 @@ fun PlatformOptionsModal(
                 else if(isAddLoading) {
                     AddAccountLoading(
                         context,
-                        platformsViewModel.platform!!
+                        platform!!
                     ) {
                         onDismissRequest()
                     }
-                } else {
+                }
+                else {
                     Image(
-                        bitmap = if(platformsViewModel.platform != null &&
-                            platformsViewModel.platform!!.logo != null
-                        ) {
+                        bitmap = if(platform?.logo != null) {
                             BitmapFactory.decodeByteArray(
-                                platformsViewModel.platform!!.logo,
+                                platform.logo,
                                 0,
-                                platformsViewModel.platform!!.logo!!.count()
+                                platform.logo!!.count()
                             ).asImageBitmap()
                         }
-                        else BitmapFactory.decodeResource(
-                            context.resources,
+                        else BitmapFactory.decodeResource( context.resources,
                             R.drawable.logo
                         ).asImageBitmap(),
                         contentDescription = stringResource(R.string.selected_platform),
@@ -170,42 +170,39 @@ fun PlatformOptionsModal(
                     Text(
                         text = if (isCompose) {
                             getServiceBasedComposeDescriptions(
-                                if(platformsViewModel.platform != null)
-                                    platformsViewModel.platform!!.service_type!!
-                                else "",
-                                context
-                            )
+                                platform?.service_type ?: "",
+                                context)
                         } else {
                             getServiceBasedAvailableDescription(
-                                if(platformsViewModel.platform != null)
-                                    platformsViewModel.platform!!.service_type!!
-                                else "",
-                                context
-                            )
+                                platform?.service_type ?: "",
+                                context)
                         },
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    if (isCompose || platformsViewModel.platform == null) {
+                    if (isCompose || platform == null) {
                         ComposeMessages(
-                            platform = platformsViewModel.platform,
-                            navController = navController
+                            platform = platform,
+                            navController = navController,
+                            isOnboarding = isOnboarding,
                         ) {
                             onDismissRequest()
                         }
                     } else {
                         ManageAccounts(
                             isActive,
+                            isOnboarding = isOnboarding,
                             addAccountsCallback = {
                                 isAddLoading = true
                                 triggerAddPlatformRequest(
                                     context = context,
-                                    platform = platformsViewModel.platform!!
+                                    platform = platform
                                 ) {
                                     isAddLoading = false
                                     onDismissRequest()
+                                    onCompleteCallback()
                                 }
                             },
                             removeAccountsCallback = {
@@ -220,55 +217,6 @@ fun PlatformOptionsModal(
     }
 }
 
-private fun triggerAddPlatformRequest(
-    context: Context,
-    platform: AvailablePlatforms,
-    onCompletedCallback: () -> Unit
-) {
-    CoroutineScope(Dispatchers.Default).launch {
-
-        when(platform.protocol_type) {
-            Platforms.ProtocolTypes.OAUTH2.type -> {
-                val publishers = Publishers(context)
-                val publicKeyBytes = Publishers.fetchPublisherPublicKey(context)
-                val requestIdentifier = Base64.encodeToString(publicKeyBytes, Base64.NO_WRAP)
-                println("Request Identifier: $requestIdentifier")
-                try {
-                    val response = publishers.getOAuthURL(
-                        availablePlatforms = platform,
-                        autogenerateCodeVerifier = true,
-                        supportsUrlScheme = platform.support_url_scheme!!,
-                        requestIdentifier = requestIdentifier
-                    )
-
-                    Publishers.storeOauthRequestCodeVerifier(context, response.codeVerifier)
-
-                    CoroutineScope(Dispatchers.Main).launch {
-                        val intentUri = response.authorizationUrl.toUri()
-                        val intent = Intent(Intent.ACTION_VIEW, intentUri)
-                        context.startActivity(intent)
-                    }
-                } catch(e: StatusRuntimeException) {
-                    e.printStackTrace()
-                    CoroutineScope(Dispatchers.Main).launch {
-                        e.status.description?.let {
-                            Toast.makeText(context, e.status.description,
-                                Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                } catch(e: Exception) {
-                    CoroutineScope(Dispatchers.Main).launch {
-                        Toast.makeText(context, e.message, Toast.LENGTH_SHORT)
-                            .show()
-                    }
-                } finally {
-                    publishers.shutdown()
-                    onCompletedCallback()
-                }
-            }
-        }
-    }
-}
 
 
 @Composable
@@ -303,14 +251,14 @@ private fun triggerAccountRevoke(
         val publishers = Publishers(context)
         try {
             when(platform.protocol_type) {
-                Platforms.ProtocolTypes.OAUTH2.type -> {
+                Platforms.ProtocolTypes.oauth2.name -> {
                     publishers.revokeOAuthPlatforms(
                         llt,
                         account.name!!,
                         account.account!!,
                     )
                 }
-                Platforms.ProtocolTypes.PNBA.type -> {
+                Platforms.ProtocolTypes.pnba.name -> {
                     publishers.revokePNBAPlatforms(
                         llt,
                         account.name!!,
@@ -364,13 +312,13 @@ private fun AddAccountLoading(
         )
 
         when(platform.protocol_type) {
-            Platforms.ProtocolTypes.OAUTH2.type -> {
+            Platforms.ProtocolTypes.oauth2.name -> {
                 CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.secondary,
                     trackColor = MaterialTheme.colorScheme.surfaceVariant,
                 )
             }
-            Platforms.ProtocolTypes.PNBA.type -> {
+            Platforms.ProtocolTypes.pnba.name -> {
                 PNBAPhoneNumberCodeRequestView(
                     isLoading = isLoading,
                     platform = platform,
@@ -402,7 +350,9 @@ private fun AddAccountLoading(
                                 if(authCodeRequested) {
                                     try {
                                         val vault = Vaults(context)
-                                        vault.refreshStoredTokens(context)
+                                        vault.refreshStoredTokens(
+                                            context,
+                                            context.settingsGetStoreTokensOnDevice)
                                         onCompletedCallback()
                                     } catch(e: Exception) {
                                         e.printStackTrace()
@@ -428,7 +378,9 @@ private fun AddAccountLoading(
                             onSuccessCallback = {_, _ ->
                                 try {
                                     val vault = Vaults(context)
-                                    vault.refreshStoredTokens(context)
+                                    vault.refreshStoredTokens(
+                                        context,
+                                        context.settingsGetStoreTokensOnDevice)
                                     onCompletedCallback()
                                 } catch(e: Exception) {
                                     e.printStackTrace()
@@ -528,27 +480,19 @@ private fun triggerPNBARequested(
 private fun ComposeMessages(
     platform: AvailablePlatforms?,
     navController: NavController,
+    subscriptionId: Long = -1L,
+    isOnboarding: Boolean = false,
     onDismissRequest: () -> Unit
 ) {
     Button(
         onClick = {
             onDismissRequest()
-            if(platform == null) {
-                navController.navigate(BridgeEmailComposeScreen)
-            }
-            else {
-                when(platform.service_type) {
-                    ServiceTypes.EMAIL.type -> {
-                        navController.navigate(EmailComposeScreen)
-                    }
-                    ServiceTypes.MESSAGE.type -> {
-                        navController.navigate(MessageComposeScreen)
-                    }
-                    ServiceTypes.TEXT.type, ServiceTypes.TEST.type -> {
-                        navController.navigate(TextComposeScreen)
-                    }
-                }
-            }
+            navController.navigate(ComposeScreen(
+                type = if(platform != null) ServiceTypes.valueOf(platform.service_type!!)
+                    else ServiceTypes.BRIDGE,
+                isOnboarding = isOnboarding,
+                platformName = platform?.name ?: ServiceTypes.BRIDGE.name
+            ))
         },
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -559,6 +503,7 @@ private fun ComposeMessages(
 @Composable
 private fun ManageAccounts(
     isActive: Boolean,
+    isOnboarding: Boolean,
     addAccountsCallback: () -> Unit,
     removeAccountsCallback: () -> Unit
 ) {
@@ -569,7 +514,8 @@ private fun ManageAccounts(
         Text(stringResource(R.string.add_account))
     }
     Spacer(modifier = Modifier.height(8.dp))
-    if (isActive) {
+
+    if (LocalInspectionMode.current ||  (isActive && !isOnboarding)) {
         TextButton(
             onClick = {removeAccountsCallback()},
             modifier = Modifier.fillMaxWidth(),
@@ -582,13 +528,13 @@ private fun ManageAccounts(
 
 private fun getServiceBasedAvailableDescription(serviceType: String, context: Context) : String {
     return when(serviceType) {
-        ServiceTypes.EMAIL.type -> {
+        ServiceTypes.EMAIL.name -> {
             context.getString(R.string.adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported)
         }
-        ServiceTypes.MESSAGE.type -> {
+        ServiceTypes.MESSAGE.name -> {
             context.getString(R.string.adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported)
         }
-        ServiceTypes.TEXT.type, ServiceTypes.TEST.type -> {
+        ServiceTypes.TEXT.name, ServiceTypes.TEST.name -> {
             return context.getString(R.string.adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported)
         }
         else -> context.getString(R.string.your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias)
@@ -597,13 +543,13 @@ private fun getServiceBasedAvailableDescription(serviceType: String, context: Co
 
 private fun getServiceBasedComposeDescriptions(serviceType: String, context: Context) : String {
     return when(serviceType) {
-        ServiceTypes.EMAIL.type -> {
+        ServiceTypes.EMAIL.name -> {
             context.getString(R.string.continue_to_send_an_email_from_your_saved_email_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
         }
-        ServiceTypes.MESSAGE.type -> {
+        ServiceTypes.MESSAGE.name -> {
             context.getString(R.string.continue_to_send_messages_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
         }
-        ServiceTypes.TEXT.type, ServiceTypes.TEST.type -> {
+        ServiceTypes.TEXT.name, ServiceTypes.TEST.name -> {
             context.getString(R.string.continue_to_make_posts_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
         }
         else ->  context.getString(R.string.your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
@@ -625,13 +571,11 @@ fun PlatformOptionsModalPreview() {
             support_url_scheme = true,
             logo = null
         )
-        val platformsViewModel = PlatformsViewModel()
-        platformsViewModel.platform = platform
         PlatformOptionsModal(
-            showPlatformsModal = false,
-            platformsViewModel = PlatformsViewModel(),
+            showPlatformsModal = true,
             isActive = true,
             isCompose = false,
+            platform = platform,
             onDismissRequest = {},
             navController = rememberNavController()
         )

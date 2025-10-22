@@ -1,7 +1,7 @@
 package com.example.sw0b_001.ui.views
 
 import android.content.Context
-import android.util.Log
+import android.telephony.PhoneNumberUtils
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -60,15 +60,13 @@ import androidx.compose.material3.TextButton
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.example.sw0b_001.BuildConfig
-import com.example.sw0b_001.Models.Messages.EncryptedContent
-import com.example.sw0b_001.Models.Messages.MessagesViewModel
-import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
-import com.example.sw0b_001.Models.Vaults
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
+import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.ForgotPasswordScreen
-import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
+import com.example.sw0b_001.ui.navigation.OnboardingInteractiveScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
@@ -79,7 +77,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoginView(
     navController: NavController = rememberNavController(),
-    platformsViewModel: PlatformsViewModel,
+    isOnboarding: Boolean = false,
 ) {
     val context = LocalContext.current
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
@@ -260,19 +258,27 @@ fun LoginView(
                             phoneNumber = phoneNumber,
                             password = password,
                             otpRequiredCallback = { nextAttemptTimestamp ->
-                                platformsViewModel.loginSignupPassword = password
-                                platformsViewModel.loginSignupPhoneNumber = phoneNumber
-                                platformsViewModel.otpRequestType =
-                                    OTPCodeVerificationType.AUTHENTICATE
-                                platformsViewModel.nextAttemptTimestamp = nextAttemptTimestamp
-
                                 CoroutineScope(Dispatchers.Main).launch {
-                                    navController.navigate(OTPCodeScreen)
+                                    navController.navigate(OTPCodeScreen(
+                                        loginSignupPhoneNumber = phoneNumber,
+                                        loginSignupPassword = password,
+                                        countryCode = selectedCountry!!.countryCode,
+                                        otpRequestType = OTPCodeVerificationType.AUTHENTICATE,
+                                        nextAttemptTimestamp = nextAttemptTimestamp,
+                                        isOnboarding = isOnboarding
+                                    )) {
+                                        if(isOnboarding) {
+                                            popUpTo(OnboardingInteractiveScreen) {
+                                                inclusive = false
+                                            }
+                                        }
+                                    }
                                 }
                             },
                             passwordRequiredCallback = {
                                 CoroutineScope(Dispatchers.Main).launch {
-                                    navController.navigate(ForgotPasswordScreen)
+                                    navController.navigate(ForgotPasswordScreen(
+                                        isOnboarding = isOnboarding))
                                 }
                             },
                             failedCallback = {
@@ -301,16 +307,21 @@ fun LoginView(
                         Text(stringResource(R.string.log_in))
                     }
                 }
-                
+
                 TextButton(
                     onClick = {
-                        platformsViewModel.loginSignupPassword = password
-                        platformsViewModel.loginSignupPhoneNumber = phoneNumber
-                        platformsViewModel.otpRequestType =
-                            OTPCodeVerificationType.AUTHENTICATE
-                        navController.navigate(OTPCodeScreen)
+                        val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+                        navController.navigate(OTPCodeScreen(
+                            loginSignupPhoneNumber = phoneNumber,
+                            loginSignupPassword = password,
+                            countryCode = selectedCountry!!.countryCode,
+                            otpRequestType = OTPCodeVerificationType.AUTHENTICATE,
+                            isOnboarding = isOnboarding
+                        ))
                     },
-                    enabled = (phoneNumber.isNotEmpty() && password.isNotEmpty()) && !isLoading,
+                    enabled = (
+                            PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
+                                    && password.isNotEmpty()) && !isLoading,
                     modifier = Modifier.padding(bottom=16.dp)) {
                     Text(stringResource(R.string.already_got_code))
                 }
@@ -333,7 +344,8 @@ fun LoginView(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .clickable {
-                            navController.navigate(CreateAccountScreen)
+                            navController.navigate(CreateAccountScreen(
+                                isOnboarding = isOnboarding))
                         },
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -385,7 +397,8 @@ private fun login(
 @Composable
 fun LoginViewPreview() {
     AppTheme(darkTheme = false) {
-        LoginView(platformsViewModel = PlatformsViewModel())
+        LoginView(rememberNavController(),)
+
     }
 }
 

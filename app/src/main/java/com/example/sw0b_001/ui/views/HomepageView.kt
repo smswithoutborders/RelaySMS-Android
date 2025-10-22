@@ -1,23 +1,19 @@
 package com.example.sw0b_001.ui.views
 
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.BubbleChart
 import androidx.compose.material.icons.filled.ContentPaste
-import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -31,7 +27,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -39,14 +34,12 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.sw0b_001.Models.GatewayClients.GatewayClientViewModel
-import com.example.sw0b_001.Models.Messages.EncryptedContent
-import com.example.sw0b_001.Models.Messages.MessagesViewModel
-import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
-import com.example.sw0b_001.Models.Vaults
+import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
+import com.example.sw0b_001.ui.viewModels.MessagesViewModel
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
+import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.appbars.GatewayClientsAppBar
@@ -55,17 +48,18 @@ import com.example.sw0b_001.ui.modals.ActivePlatformsModal
 import com.example.sw0b_001.ui.modals.AddGatewayClientModal
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.theme.AppTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
+import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.ui.features.AppFeatures
 import com.example.sw0b_001.ui.features.FeatureInfo
 import com.example.sw0b_001.ui.features.FeatureManager
 import com.example.sw0b_001.ui.features.NewFeatureModal
 import com.example.sw0b_001.ui.modals.GetStartedModal
+import kotlinx.coroutines.launch
 
 
 enum class BottomTabsItems {
@@ -79,11 +73,14 @@ enum class BottomTabsItems {
 @Composable
 fun HomepageView(
     _messages: List<EncryptedContent> = emptyList<EncryptedContent>(),
-    isLoggedIn: Boolean = false,
     navController: NavController,
     platformsViewModel : PlatformsViewModel,
     messagesViewModel: MessagesViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
+    imageViewModel: ImageViewModel,
+    isLoggedIn: Boolean = false,
+    showTopBar: Boolean = true,
+    drawerCallback: (() -> Unit)? = {},
 ) {
     val context = LocalContext.current
     val inspectionMode = LocalInspectionMode.current
@@ -95,11 +92,11 @@ fun HomepageView(
         )
     }
 
-    val messages: List<EncryptedContent> = if(LocalInspectionMode.current) _messages
-    else messagesViewModel.getMessages(context).observeAsState(emptyList()).value
-
     val inboxMessages: List<EncryptedContent> = if(LocalInspectionMode.current) _messages
     else messagesViewModel.getInboxMessages(context).observeAsState(emptyList()).value
+
+    val messagesPagingSource = messagesViewModel.getMessages(context = context)
+    val messages = messagesPagingSource.collectAsLazyPagingItems()
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -108,82 +105,65 @@ fun HomepageView(
     val refreshSuccess = Runnable {
         Toast.makeText(context,
             context.getString(R.string.gateway_clients_refreshed_successfully), Toast.LENGTH_SHORT).show()
-        Log.d("GatewayClients", "Gateway clients refreshed successfully!")
     }
 
     var sendNewMessageRequested by remember { mutableStateOf(false)}
 
-    val isLoading by messagesViewModel.isLoading.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
-    var isSearchDone by remember { mutableStateOf(false) }
-
-    var featureToShow by remember { mutableStateOf<FeatureInfo?>(null) }
-
-    LaunchedEffect(Unit) {
-        val nextFeature = AppFeatures.ALL_FEATURES.firstOrNull {
-            !FeatureManager.hasFeatureBeenShown(context, it.id)
-        }
-        featureToShow = nextFeature
-    }
 
     Scaffold (
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            when (platformsViewModel.bottomTabsItem) {
-                BottomTabsItems.BottomBarRecentTab -> {
-                    if (isLoggedIn || messages.isNotEmpty()) {
+            if(showTopBar) {
+                when (platformsViewModel.bottomTabsItem) {
+                    BottomTabsItems.BottomBarRecentTab -> {
                         RecentAppBar(
                             navController = navController,
                             onSearchQueryChanged = { searchQuery = it },
                             searchQuery = searchQuery,
                             isSearchActive = isSearchActive,
-                            onToggleSearch = {
-                                isSearchActive = !isSearchActive
-                                if (!isSearchActive) {
-                                    searchQuery = ""
-                                    isSearchDone = false
-                                }
-                            },
-                            onSearchDone = {
-                                isSearchDone = true
-                            },
+                            onToggleSearch = {},
+                            onSearchDone = {},
                             isSelectionMode = platformsViewModel.isSelectionMode,
                             selectedCount = platformsViewModel.selectedMessagesCount,
                             onSelectAll = platformsViewModel.onSelectAll,
                             onDeleteSelected = platformsViewModel.onDeleteSelected,
-                            onCancelSelection = platformsViewModel.onCancelSelection
+                            onCancelSelection = platformsViewModel.onCancelSelection,
+                            onMenuClickCallback = drawerCallback
                         )
                     }
-                }
-                BottomTabsItems.BottomBarPlatformsTab -> {}
-                BottomTabsItems.BottomBarCountriesTab -> {
-                    GatewayClientsAppBar(
-                        navController = navController,
-                        onRefreshClicked = {
-                            gatewayClientViewModel.get(context, refreshSuccess)
-                        }
-                    )
-                }
-
-                BottomTabsItems.BottomBarInboxTab -> {
-                    TopAppBar(
-                        title = {
-                            Text(
-                                text = stringResource(R.string.inbox),
-                                style = MaterialTheme.typography.headlineLarge,
-                                fontWeight = FontWeight.Bold
-                            )
-                        },
-                        colors = TopAppBarDefaults.topAppBarColors()
-                    )
+                    BottomTabsItems.BottomBarCountriesTab -> {
+                        GatewayClientsAppBar(
+                            navController = navController,
+                            onAddClicked = {
+                                showAddGatewayClientsModal = true
+                            },
+                            onRefreshClicked = {
+                                gatewayClientViewModel.get(context, refreshSuccess)
+                            }
+                        )
+                    }
+                    BottomTabsItems.BottomBarInboxTab -> {
+                        TopAppBar(
+                            title = {
+                                Text(
+                                    text = stringResource(R.string.inbox),
+                                    style = MaterialTheme.typography.headlineLarge,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            },
+                            colors = TopAppBarDefaults.topAppBarColors()
+                        )
+                    }
+                    else -> {}
                 }
             }
         },
         bottomBar = {
             BottomNavBar(
                 selectedTab = platformsViewModel.bottomTabsItem,
-                isLoggedIn = isLoggedIn
+                isLoggedIn = isLoggedIn,
             ) { selectedTab ->
                 platformsViewModel.bottomTabsItem = selectedTab
             }
@@ -191,73 +171,43 @@ fun HomepageView(
         floatingActionButton = {
             when(platformsViewModel.bottomTabsItem) {
                 BottomTabsItems.BottomBarRecentTab -> {
-                    if(messages.isNotEmpty()) {
-                        if(isLoggedIn) {
-                            ExtendedFloatingActionButton(
-                                onClick = {
-                                    sendNewMessageRequested = true
-                                },
-                                containerColor = MaterialTheme.colorScheme.secondary,
-                                icon = {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Default.Message,
-                                        contentDescription = stringResource(R.string.add_account),
-                                        tint = MaterialTheme.colorScheme.onSecondary
-                                    )
-                                },
-                                text = {
-                                    Text(
-                                        text = stringResource(R.string.compose_new),
-                                        color = MaterialTheme.colorScheme.onSecondary
-                                    )
-                                }
-                            )
-                        } else {
-                            ExtendedFloatingActionButton(
-                                onClick = {
-                                    sendNewMessageRequested = true
-                                },
-                                containerColor = MaterialTheme.colorScheme.secondary,
-                                icon = {
-                                    Icon(
-                                        imageVector = Icons.Filled.PersonAdd,
-                                        contentDescription = stringResource(R.string.add_account),
-                                        tint = MaterialTheme.colorScheme.onSecondary
-                                    )
-                                },
-                                text = {
-                                    Text(
-                                        text = stringResource(R.string.add_account_compose_new),
-                                        color = MaterialTheme.colorScheme.onSecondary
-                                    )
-                                }
-                            )
-                        }
+                    if(isLoggedIn) {
+                        ExtendedFloatingActionButton(
+                            onClick = {
+                                sendNewMessageRequested = true
+                            },
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Default.BubbleChart,
+                                    contentDescription = stringResource(R.string.compose_new),
+                                )
+                            },
+                            text = {
+                                Text(
+                                    text = stringResource(R.string.compose_new),
+                                )
+                            }
+                        )
+                    }
+                    else if (LocalInspectionMode.current ||
+                        (messages.loadState.isIdle && messages.itemCount > 0)
+                    ) {
+                        ExtendedFloatingActionButton(
+                            onClick = { sendNewMessageRequested = true },
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Filled.PersonAdd,
+                                    contentDescription = stringResource(R.string.add_account),
+                                )
+                            },
+                            text = {
+                                Text(
+                                    text = stringResource(R.string.add_account_compose_new),
+                                )
+                            }
+                        )
                     }
                 }
-                BottomTabsItems.BottomBarPlatformsTab -> {}
-                BottomTabsItems.BottomBarCountriesTab -> {
-                    ExtendedFloatingActionButton(
-                        onClick = {
-                            showAddGatewayClientsModal = true
-                        },
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Filled.Add,
-                                contentDescription = stringResource(R.string.add_new_gateway_clients),
-                                tint = MaterialTheme.colorScheme.onSecondary
-                            )
-                        },
-                        text = {
-                            Text(
-                                text = stringResource(R.string.add_number),
-                                color = MaterialTheme.colorScheme.onSecondary
-                            )
-                        }
-                    )
-                }
-
                 BottomTabsItems.BottomBarInboxTab -> {
                     if (inboxMessages.isNotEmpty()) {
                         ExtendedFloatingActionButton(
@@ -281,73 +231,40 @@ fun HomepageView(
                         )
                     }
                 }
+                else -> {}
             }
         }
     ) { innerPadding ->
-        featureToShow?.let { currentFeature ->
-            NewFeatureModal(
-                featureInfo = currentFeature,
-                onDismiss = {
-                    FeatureManager.markFeatureAsShown(context, currentFeature.id)
-                    featureToShow = null
-                }
-            )
-        }
         Box(
             Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            when(platformsViewModel.bottomTabsItem) {
-                BottomTabsItems.BottomBarRecentTab -> {
-                    if (isLoggedIn || messages.isNotEmpty()) {
-                        RecentView(
-                            _messages = _messages,
-                            navController = navController,
-                            messagesViewModel = messagesViewModel,
-                            platformsViewModel = platformsViewModel,
-                            searchQuery = searchQuery,
-                            isSearchDone = isSearchDone,
-
-                        ) {
-                            platformsViewModel.bottomTabsItem =
-                                BottomTabsItems.BottomBarPlatformsTab
-                        }
-                    } else if(!isLoading){
-                        GetStartedView(navController = navController)
-                    }
-                }
-                BottomTabsItems.BottomBarPlatformsTab -> {
-                    AvailablePlatformsView(
-                        navController = navController,
-                        platformsViewModel = platformsViewModel
-                    )
-                }
-                BottomTabsItems.BottomBarCountriesTab -> {
-                    GatewayClientView( viewModel = gatewayClientViewModel )
-                }
-
-                BottomTabsItems.BottomBarInboxTab -> {
-                    InboxView(
-                        messagesViewModel = messagesViewModel,
-                        platformsViewModel = platformsViewModel,
-                        navController = navController
-                    )
-                }
-            }
+            GetTabViews(
+                platformsViewModel.bottomTabsItem,
+                navController = navController,
+                messagesViewModel = messagesViewModel,
+                platformsViewModel = platformsViewModel,
+                gatewayClientViewModel = gatewayClientViewModel,
+                isLoggedIn = isLoggedIn,
+            )
 
             if (sendNewMessageRequested) {
                 if(isLoggedIn) {
                     ActivePlatformsModal(
                         sendNewMessageRequested = sendNewMessageRequested,
-                        platformsViewModel = platformsViewModel,
                         navController = navController,
-                        isCompose = true
+                        isCompose = true,
+                        isLoggedIn = true
                     ) {
                         sendNewMessageRequested = false
                     }
                 } else {
-                    GetStartedModal(sendNewMessageRequested, navController) {
+                    GetStartedModal(
+                        sendNewMessageRequested,
+                        navController = navController,
+                        isLoggedIn = isLoggedIn,
+                    ) {
                         sendNewMessageRequested = false
                     }
                 }
@@ -367,6 +284,46 @@ fun HomepageView(
     }
 }
 
+@Composable
+fun GetTabViews(
+    bottomTabsItems: BottomTabsItems,
+    navController: NavController,
+    messagesViewModel: MessagesViewModel,
+    platformsViewModel: PlatformsViewModel,
+    gatewayClientViewModel: GatewayClientViewModel,
+    isLoggedIn: Boolean,
+) {
+    when(bottomTabsItems) {
+        BottomTabsItems.BottomBarRecentTab -> {
+            RecentView(
+                navController = navController,
+                messagesViewModel = messagesViewModel,
+                platformsViewModel = platformsViewModel,
+                isLoggedIn = isLoggedIn
+            ) {
+                platformsViewModel.bottomTabsItem =
+                    BottomTabsItems.BottomBarPlatformsTab
+            }
+        }
+        BottomTabsItems.BottomBarPlatformsTab -> {
+            AvailablePlatformsView(
+                navController = navController,
+            )
+        }
+        BottomTabsItems.BottomBarCountriesTab -> {
+            GatewayClientView( viewModel = gatewayClientViewModel )
+        }
+        BottomTabsItems.BottomBarInboxTab -> {
+            InboxView(
+                messagesViewModel = messagesViewModel,
+                platformsViewModel = platformsViewModel,
+                navController = navController
+            )
+        }
+    }
+
+}
+
 
 @Preview(showBackground = false)
 @Composable
@@ -374,9 +331,10 @@ fun HomepageView_Preview() {
     AppTheme(darkTheme = false) {
         HomepageView(
             navController = rememberNavController(),
-            platformsViewModel = PlatformsViewModel(),
-            messagesViewModel = MessagesViewModel(),
-            gatewayClientViewModel = GatewayClientViewModel(),
+            platformsViewModel = remember{ PlatformsViewModel() },
+            messagesViewModel = remember{ MessagesViewModel() },
+            gatewayClientViewModel = remember{ GatewayClientViewModel() },
+            imageViewModel = remember{ ImageViewModel() },
         )
     }
 }
@@ -389,9 +347,10 @@ fun HomepageViewLoggedIn_Preview() {
         HomepageView(
             isLoggedIn = true,
             navController = rememberNavController(),
-            platformsViewModel = PlatformsViewModel(),
-            messagesViewModel = MessagesViewModel(),
-            gatewayClientViewModel = GatewayClientViewModel(),
+            platformsViewModel = remember{ PlatformsViewModel() },
+            messagesViewModel = remember{ MessagesViewModel() },
+            gatewayClientViewModel = remember{ GatewayClientViewModel() },
+            imageViewModel = remember{ ImageViewModel() },
         )
     }
 }
@@ -414,9 +373,10 @@ fun HomepageViewLoggedInMessages_Preview() {
             _messages = listOf(encryptedContent),
             isLoggedIn = true,
             navController = rememberNavController(),
-            platformsViewModel = PlatformsViewModel(),
-            messagesViewModel = MessagesViewModel(),
-            gatewayClientViewModel = GatewayClientViewModel(),
+            platformsViewModel = remember{ PlatformsViewModel() },
+            messagesViewModel = remember{ MessagesViewModel() },
+            gatewayClientViewModel = remember{ GatewayClientViewModel() },
+            imageViewModel = remember{ ImageViewModel() },
         )
     }
 }

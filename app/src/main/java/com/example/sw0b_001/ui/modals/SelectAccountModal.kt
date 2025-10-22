@@ -25,10 +25,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -47,9 +45,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
-import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
+import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.coroutines.launch
@@ -65,8 +62,8 @@ data class Account(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectAccountModal(
-    _accounts: List<StoredPlatformsEntity> = emptyList<StoredPlatformsEntity>(),
-    platformsViewModel: PlatformsViewModel,
+    _accounts: List<StoredPlatformsEntity> = emptyList(),
+    name: String,
     onAccountSelected: (StoredPlatformsEntity) -> Unit = {},
     onDismissRequest: () -> Unit
 ) {
@@ -78,8 +75,9 @@ fun SelectAccountModal(
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(true) }
 
+    val platformsViewModel = remember{ PlatformsViewModel() }
     val accounts: List<StoredPlatformsEntity> = if(LocalInspectionMode.current) _accounts
-    else platformsViewModel.getAccounts(context, platformsViewModel.platform?.name!!)
+    else platformsViewModel.getAccounts(context, name)
         .observeAsState(emptyList()).value
 
     if (showBottomSheet) {
@@ -198,7 +196,7 @@ fun SelectAccountModalPreview() {
         )
         SelectAccountModal(
             _accounts = listOf(storedPlatform),
-            platformsViewModel = PlatformsViewModel(),
+            name = "gmail",
             onAccountSelected = {},
             onDismissRequest = {}
         )

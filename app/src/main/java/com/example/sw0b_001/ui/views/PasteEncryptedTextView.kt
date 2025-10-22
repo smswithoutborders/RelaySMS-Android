@@ -2,14 +2,11 @@ package com.example.sw0b_001.ui.views
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -34,25 +31,25 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.sw0b_001.Bridges.Bridges
-import com.example.sw0b_001.Database.Datastore
-import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
-import com.example.sw0b_001.Models.Vaults
+import com.example.sw0b_001.data.models.Bridges
+import com.example.sw0b_001.data.Datastore
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
+import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.BridgeViewScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
+import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import vault.v1.Vault
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasteEncryptedTextView(
     platformsViewModel: PlatformsViewModel,
+    messagesViewModel: MessagesViewModel,
     navController: NavController
 ) {
     val context = LocalContext.current
@@ -169,7 +166,7 @@ fun PasteEncryptedTextView(
                             onSuccessCallback = {
                                 val scope = CoroutineScope(Dispatchers.Main).launch {
 //                            navController.popBackStack()
-                                    platformsViewModel.message = it
+                                    messagesViewModel.message = it
                                     navController.navigate(BridgeViewScreen)
                                 }
                             }
@@ -198,7 +195,8 @@ fun PasteEncryptedTextView(
 @Composable
 fun PasteTextViewPreview() {
     PasteEncryptedTextView(
-        platformsViewModel = PlatformsViewModel(),
+        platformsViewModel = remember{ PlatformsViewModel() },
+        messagesViewModel = remember{ MessagesViewModel() },
         navController = NavController(LocalContext.current)
     )
 }

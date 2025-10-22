@@ -6,11 +6,9 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.ContactsContract
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.launch
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -41,7 +39,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -50,12 +47,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import androidx.navigation.activity
-import com.example.sw0b_001.Models.GatewayClients.GatewayClient
-import com.example.sw0b_001.Models.GatewayClients.GatewayClientViewModel
+import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.models.GatewayClients
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.views.compose.verifyPhoneNumberFormat
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.verifyPhoneNumberFormat
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,7 +60,7 @@ fun AddGatewayClientModal(
     onDismiss: () -> Unit,
     showBottomSheet: Boolean,
     viewModel: GatewayClientViewModel,
-    gatewayClient: GatewayClient? = null,
+    gatewayClients: GatewayClients? = null,
     onGatewayClientSaved: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -74,8 +70,8 @@ fun AddGatewayClientModal(
         skipHiddenState = false
     )
     val scope = rememberCoroutineScope()
-    var phoneNumber by remember { mutableStateOf(gatewayClient?.mSISDN ?: "") }
-    var alias by remember { mutableStateOf(gatewayClient?.alias ?: "") }
+    var phoneNumber by remember { mutableStateOf(gatewayClients?.msisdn ?: "") }
+    var alias by remember { mutableStateOf(gatewayClients?.alias ?: "") }
 
     var isSaving by remember { mutableStateOf(false) }
     var isError by remember { mutableStateOf(false) }
@@ -145,7 +141,7 @@ fun AddGatewayClientModal(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = if (gatewayClient == null) stringResource(R.string.add_gateway_client) else stringResource(
+                    text = if (gatewayClients == null) stringResource(R.string.add_gateway_client) else stringResource(
                         R.string.edit_gateway_client
                     ),
                     style = MaterialTheme.typography.headlineSmall,
@@ -241,47 +237,42 @@ fun AddGatewayClientModal(
                         scope.launch {
                             try {
                                 val successRunnable = Runnable {
-                                    Log.i(
-                                        "AddGatewayClientModal",
-                                        if (gatewayClient == null) "Gateway client added successfully" else "Gateway client edited successfully"
-                                    )
                                     isSaving = false
                                     onGatewayClientSaved()
                                     onDismiss()
                                 }
 
                                 val failureRunnable = Runnable {
-                                    Log.e(
-                                        "AddGatewayClientModal",
-                                        if (gatewayClient == null) "Failed to add gateway client" else "Failed to edit gateway client"
-                                    )
                                     isSaving = false
                                     isError = true
                                 }
 
-                                if (gatewayClient == null) {
-                                    val newGatewayClient = GatewayClient()
-                                    newGatewayClient.mSISDN = phoneNumber
-                                    newGatewayClient.alias = alias
-                                    newGatewayClient.type = GatewayClient.TYPE.CUSTOM.value
+                                if (gatewayClients == null) {
+                                    val newGatewayClients = GatewayClients(
+                                        msisdn = phoneNumber,
+                                        operator = "Unknown",
+                                        country = "Unknown",
+                                        alias = alias,
+                                        manuallyAdded = true,
+                                    )
                                     viewModel.insertGatewayClient(
                                         context,
-                                        newGatewayClient,
+                                        newGatewayClients,
                                         successRunnable,
                                         failureRunnable
                                     )
                                 } else {
-                                    gatewayClient.mSISDN = phoneNumber
-                                    gatewayClient.alias = alias
+                                    gatewayClients.msisdn = phoneNumber
+                                    gatewayClients.alias = alias
                                     viewModel.updateGatewayClient(
                                         context,
-                                        gatewayClient,
+                                        gatewayClients,
                                         successRunnable,
                                         failureRunnable
                                     )
                                 }
                             } catch (e: Exception) {
-                                Log.e("AddGatewayClientModal", "Error saving gateway client", e)
+                                e.printStackTrace()
                                 isSaving = false
                                 isError = true
                             }
@@ -312,7 +303,7 @@ fun AddGatewayClientModalPreview() {
         AddGatewayClientModal(
             showBottomSheet = true,
             onDismiss = {},
-            viewModel = GatewayClientViewModel(),
+            viewModel = remember{ GatewayClientViewModel() },
         )
     }
 }

@@ -1,2 +1,12 @@
-include ':app'
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { setUrl("https://jitpack.io") }
+    }
+}
 rootProject.name = "sw0b_0.0.1"
+include ':app'
+//include ':lib_smsmms_android:lib_smsmms_android'
+//include ':lib_image_android:app'

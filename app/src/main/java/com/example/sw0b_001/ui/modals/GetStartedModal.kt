@@ -4,17 +4,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetValue
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.views.AvailablePlatformsView
 import com.example.sw0b_001.ui.views.GetStartedView
 import kotlinx.coroutines.launch
 
@@ -23,11 +21,13 @@ import kotlinx.coroutines.launch
 fun GetStartedModal(
     getStartedRequested: Boolean,
     navController: NavController,
+    isLoggedIn: Boolean,
     onDismiss: () -> Unit,
 ) {
-    val sheetState = rememberStandardBottomSheetState(
-        initialValue = SheetValue.Expanded,
-        skipHiddenState = false
+    val sheetState = rememberModalBottomSheetState(
+//        initialValue = SheetValue.Expanded,
+//        skipHiddenState = false,
+        skipPartiallyExpanded = true
     )
     val scope = rememberCoroutineScope()
 
@@ -41,11 +41,24 @@ fun GetStartedModal(
             sheetState = sheetState,
             modifier = Modifier.fillMaxWidth()
         ) {
-            GetStartedView(navController)
+            GetStartedView(navController, isLoggedIn)
         }
 
     }
 
+}
+
+@Preview(showBackground = true)
+@Composable
+fun GetStartedModalPreviewNotLoggedIn() {
+    AppTheme {
+        GetStartedModal (
+            getStartedRequested = true,
+            navController = rememberNavController(),
+            false,
+            onDismiss = {},
+        )
+    }
 }
 
 @Preview(showBackground = true)
@@ -55,6 +68,7 @@ fun GetStartedModalPreview() {
         GetStartedModal (
             getStartedRequested = true,
             navController = rememberNavController(),
+            true,
             onDismiss = {},
         )
     }

@@ -12,13 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -38,30 +33,28 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.sw0b_001.Models.Messages.EncryptedContent
-import com.example.sw0b_001.Models.Messages.MessagesViewModel
-import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
-import com.example.sw0b_001.Modules.Helpers
+import com.example.sw0b_001.ui.viewModels.MessagesViewModel
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
+import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.Composers
+import com.example.sw0b_001.data.models.EncryptedContent
+import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.ui.appbars.RelayAppBar
-import com.example.sw0b_001.ui.navigation.BridgeEmailComposeScreen
-import com.example.sw0b_001.ui.navigation.EmailComposeScreen
-import com.example.sw0b_001.ui.navigation.HomepageScreen
-import com.example.sw0b_001.ui.navigation.MessageComposeScreen
-import com.example.sw0b_001.ui.navigation.TextComposeScreen
+import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.views.compose.MessageComposeHandler
-import com.example.sw0b_001.ui.views.compose.MessageComposeView
-import com.example.sw0b_001.ui.views.compose.TextComposeHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageDetailsView(
     platformsViewModel: PlatformsViewModel,
-    navController: NavController
+    messagesViewModel: MessagesViewModel,
+    navController: NavController,
+    isOnboarding: Boolean = false
 ) {
     val context = LocalContext.current
     var fromDisplay by remember { mutableStateOf("") }
@@ -69,19 +62,19 @@ fun MessageDetailsView(
     var messageBody by remember { mutableStateOf("") }
     var date by remember { mutableLongStateOf(0L) }
 
-    val message = platformsViewModel.message
+    val message = messagesViewModel.message
     if (message?.encryptedContent != null) {
         try {
             val contentBytes = Base64.decode(message.encryptedContent, Base64.DEFAULT)
-            val decomposed = MessageComposeHandler.decomposeMessage(contentBytes)
+            val decomposed = Composers.MessageComposeHandler.decomposeMessage(contentBytes)
 
-            fromDisplay = decomposed.from
-            toDisplay = decomposed.to
-            messageBody = decomposed.message
+            fromDisplay = decomposed.from.value!!
+            toDisplay = decomposed.to.value
+            messageBody = decomposed.message.value
             date = message.date
 
         } catch (e: Exception) {
-            Log.e("MessageDetailsView", "Failed to decompose V1 message content: ${e.message}")
+            e.printStackTrace()
             fromDisplay = message.fromAccount ?: stringResource(R.string.unknown)
             toDisplay = stringResource(R.string.unknown)
             messageBody = stringResource(R.string.this_message_s_content_could_not_be_displayed)
@@ -95,16 +88,23 @@ fun MessageDetailsView(
             RelayAppBar(navController = navController, {
                 CoroutineScope(Dispatchers.Default).launch {
                     val platform = platformsViewModel.getAvailablePlatforms(context,
-                        platformsViewModel.message!!.platformName!!)
+                        messagesViewModel.message!!.platformName!!)
                     platformsViewModel.platform = platform
+                    messagesViewModel.message = message
 
                     CoroutineScope(Dispatchers.Main).launch {
-                        navController.navigate(MessageComposeScreen)
+                        navController.navigate(
+                            ComposeScreen(
+                                type = Platforms.ServiceTypes.MESSAGE,
+                                isOnboarding = isOnboarding,
+                                platformName = message?.platformName
+                            )
+                        )
                     }
                 }
             }) {
                 val messagesViewModel = MessagesViewModel()
-                messagesViewModel.delete(context, platformsViewModel.message!!) {
+                messagesViewModel.delete(context, messagesViewModel.message!!) {
                     navController.popBackStack()
                 }
             }
@@ -172,11 +172,13 @@ fun MessageDetailsPreview() {
         message.gatewayClientMSISDN = "+237123456789"
         message.encryptedContent = "+123456789:+237123456789:hello Telegram"
 
-        val platformsViewModel = PlatformsViewModel()
-        platformsViewModel.message = message
+        val platformsViewModel = remember{ PlatformsViewModel() }
+        val messagesViewModel = remember{ MessagesViewModel() }
+        messagesViewModel.message = message
 
         MessageDetailsView(
             platformsViewModel = platformsViewModel,
+            messagesViewModel = messagesViewModel,
             navController = NavController(LocalContext.current)
         )
     }

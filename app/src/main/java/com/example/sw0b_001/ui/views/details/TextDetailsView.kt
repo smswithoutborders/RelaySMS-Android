@@ -36,25 +36,27 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.sw0b_001.Models.Messages.EncryptedContent
-import com.example.sw0b_001.Models.Messages.MessagesViewModel
-import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
-import com.example.sw0b_001.Modules.Helpers
+import com.example.sw0b_001.data.Composers
+import com.example.sw0b_001.ui.viewModels.MessagesViewModel
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
+import com.example.sw0b_001.data.Helpers
+import com.example.sw0b_001.data.models.EncryptedContent
+import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.ui.appbars.RelayAppBar
-import com.example.sw0b_001.ui.navigation.HomepageScreen
-import com.example.sw0b_001.ui.navigation.MessageComposeScreen
-import com.example.sw0b_001.ui.navigation.TextComposeScreen
+import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.views.compose.TextComposeHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextDetailsView(
     platformsViewModel: PlatformsViewModel,
+    messagesViewModel: MessagesViewModel,
     navController: NavController,
+    isOnboarding: Boolean = false,
 ) {
     val context = LocalContext.current
 
@@ -64,17 +66,17 @@ fun TextDetailsView(
     var date by remember { mutableLongStateOf(0L) }
 
     // Decompose the message content when the view is composed
-    val message = platformsViewModel.message
+    val message = messagesViewModel.message
     if (message?.encryptedContent != null) {
         try {
             val contentBytes = Base64.decode(message.encryptedContent, Base64.DEFAULT)
-            val decomposedMessage = TextComposeHandler.decomposeMessage(contentBytes)
+            val decomposedMessage = Composers.TextComposeHandler
+                .decomposeMessage(contentBytes)
 
-            from = decomposedMessage.from
-            text = decomposedMessage.text
+            from = decomposedMessage.from.value!!
+            text = decomposedMessage.text.value
             date = message.date
         } catch (e: Exception) {
-            Log.e("TextDetailsView", "Failed to decompose V1 text content: ${e.message}")
             from = message.fromAccount ?: "Unknown Sender"
             text = "This message's content could not be displayed."
             date = message.date
@@ -89,17 +91,24 @@ fun TextDetailsView(
                 editCallback = {
                     CoroutineScope(Dispatchers.Default).launch {
                         val platform = platformsViewModel.getAvailablePlatforms(context,
-                            platformsViewModel.message!!.platformName!!)
+                            messagesViewModel.message!!.platformName!!)
                         platformsViewModel.platform = platform
+                        messagesViewModel.message = message
 
                         CoroutineScope(Dispatchers.Main).launch {
-                            navController.navigate(TextComposeScreen)
+                            navController.navigate(
+                                ComposeScreen(
+                                    type = Platforms.ServiceTypes.TEXT,
+                                    isOnboarding = isOnboarding,
+                                    platformName = message?.platformName
+                                )
+                            )
                         }
                     }
                 }
             ) {
                 val messagesViewModel = MessagesViewModel()
-                messagesViewModel.delete(context, platformsViewModel.message!!) {
+                messagesViewModel.delete(context, messagesViewModel.message!!) {
                     navController.popBackStack()
                 }
             }
@@ -161,11 +170,14 @@ fun TextDetailsPreview() {
         text.gatewayClientMSISDN = "+237123456789"
         text.encryptedContent = "@relaysms.me:Hello world"
 
-        val platformsViewModel = PlatformsViewModel()
-        platformsViewModel.message = text
+        val platformsViewModel = remember{ PlatformsViewModel() }
+        val messagesViewModel = remember{ MessagesViewModel() }
+
+        messagesViewModel.message = text
 
         TextDetailsView(
             platformsViewModel = platformsViewModel,
+            messagesViewModel = messagesViewModel,
             navController = rememberNavController()
         )
     }
