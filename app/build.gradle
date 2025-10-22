@@ -16,26 +16,40 @@ versionProperties.load(new FileInputStream(versionsPropertiesFile))
 android {
     signingConfigs {
         def localPropertiesFile = rootProject.file("local.properties")
-        def localProperties = new Properties()
-        localProperties.load(new FileInputStream(localPropertiesFile))
 
-        if (localProperties['storeFile'] && localProperties['keyAlias'] &&
-                localProperties['storePassword'] && localProperties['keyPassword']) {
+        // 🔑 Check if the file exists before proceeding
+        if (localPropertiesFile.exists()) {
+            def localProperties = new Properties()
 
-            debug {
-                keyAlias = localProperties['keyAlias']
-                storeFile = new File(localProperties['storeFile'])
-                storePassword = localProperties['storePassword']
-                keyPassword = localProperties['keyPassword']
+            // Note: It's safer to use 'new FileInputStream(localPropertiesFile)' within 'try-catch'
+            // or use the file's 'withInputStream' method, but for a simple check,
+            // the 'exists()' guard is the primary requirement.
+            localProperties.load(new FileInputStream(localPropertiesFile))
+
+            if (localProperties['storeFile'] && localProperties['keyAlias'] &&
+                    localProperties['storePassword'] && localProperties['keyPassword']) {
+
+                // Configuration logic remains the same
+                debug {
+                    keyAlias = localProperties['keyAlias']
+                    storeFile = new File(localProperties['storeFile'])
+                    storePassword = localProperties['storePassword']
+                    keyPassword = localProperties['keyPassword']
+                }
+                release {
+                    keyAlias = localProperties['keyAlias']
+                    storeFile = new File(localProperties['storeFile'])
+                    storePassword = localProperties['storePassword']
+                    keyPassword = localProperties['keyPassword']
+                }
+            } else {
+                // Optional: Print a warning if the file exists but is missing required properties
+                println("⚠️ Warning: local.properties file exists, but is missing one or more required signing properties.")
             }
-            release {
-                keyAlias = localProperties['keyAlias']
-                storeFile = new File(localProperties['storeFile'])
-                storePassword = localProperties['storePassword']
-                keyPassword = localProperties['keyPassword']
-            }
+        } else {
+            // Optional: Print a warning if the file doesn't exist
+            println("⚠️ Warning: local.properties file not found. Signing configurations will not be applied.")
         }
-
     }
     compileSdk 36
 
