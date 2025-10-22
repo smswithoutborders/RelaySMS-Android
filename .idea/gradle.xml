@@ -11,6 +11,10 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/lib_image_android" />
+            <option value="$PROJECT_DIR$/lib_image_android/app" />
+            <option value="$PROJECT_DIR$/lib_smsmms_android" />
+            <option value="$PROJECT_DIR$/lib_smsmms_android/lib_smsmms_android" />
           </set>
         </option>
       </GradleProjectSettings>
