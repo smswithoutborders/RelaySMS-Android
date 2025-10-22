@@ -78,6 +78,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.core.content.edit
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -263,7 +264,6 @@ class MainActivity : AppCompatActivity() {
                 navDrawItemSelected -> {
                     {
                         showThreadsTopBar = false
-                        imageViewModel.resetComplete()
                         HomepageView(
                             navController = navController,
                             platformsViewModel = platformsViewModel,
@@ -430,7 +430,8 @@ class MainActivity : AppCompatActivity() {
                 ImageRender(
                     navController = navController,
                     imageViewModel = imageViewModel,
-                    initialize = imageRenderNav.initialize
+                    smsCountPaddingValue = imageRenderNav.smsCountPadding,
+                    uri = imageRenderNav.uri.toUri()
                 )
             }
 

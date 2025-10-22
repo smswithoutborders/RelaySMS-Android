@@ -261,9 +261,7 @@ fun EmailDetailsView(
                     AttachImageView(
                         it,
                         onCancelCallback = {}
-                    ) {
-                        TODO()
-                    }
+                    ) { }
                 }
             }
         }

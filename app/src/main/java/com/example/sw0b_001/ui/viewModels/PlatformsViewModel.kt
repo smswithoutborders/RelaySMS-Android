@@ -104,7 +104,7 @@ class PlatformsViewModel : ViewModel() {
 
     fun sendPublishingForImage(
         context: Context,
-        imageViewModel: ImageViewModel,
+        imageByteArray: ByteArray,
         account: StoredPlatformsEntity? = null,
         text: ByteArray,
         isBridge: Boolean,
@@ -121,9 +121,9 @@ class PlatformsViewModel : ViewModel() {
                     if(!isLoggedIn) getKeypairForTransmission(context)
                     val content = Bridges.encryptContent(
                         context,
-                        imageViewModel.processedImage.value!!.rawBytes!! + text,
+                        imageByteArray + text,
                         false,
-                        imageLength = imageViewModel.processedImage.value!!.rawBytes!!.size,
+                        imageLength = imageByteArray.size,
                         textLength = text.size,
                         subscriptionId = subscriptionId,
                         isLoggedIn = isLoggedIn
@@ -146,7 +146,7 @@ class PlatformsViewModel : ViewModel() {
                     val ad = Publishers.fetchPublisherPublicKey(context)
                     payload = PayloadEncryptionComposeDecomposeInit.compose(
                         context = context,
-                        content = imageViewModel.processedImage.value!!.rawBytes!! + text,
+                        content = imageByteArray + text,
                         ad = ad!!,
                         platform = platform,
                         account = account,
@@ -166,7 +166,7 @@ class PlatformsViewModel : ViewModel() {
                     logo = R.drawable.logo,
                     version = ITP_VERSION_VALUE,
                     sessionId = ImageTransmissionProtocol.getItpSession(context).toByte(),
-                    imageLength = imageViewModel.processedImage.value!!.rawBytes!!.size.toShort(),
+                    imageLength = imageByteArray.size.toShort(),
                     textLength = text.size.toShort(),
                     address = gatewayClients.msisdn,
                     subscriptionId = subscriptionId,

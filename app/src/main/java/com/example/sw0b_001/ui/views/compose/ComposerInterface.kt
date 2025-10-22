@@ -116,7 +116,7 @@ fun ComposerInterface(
     val context = LocalContext.current
     val inPreviewMode = LocalInspectionMode.current
 
-    val message by remember{ mutableStateOf(messagesViewModel.message)}
+    var message by remember{ mutableStateOf(messagesViewModel.message)}
 
     val subscriptionId by remember{
         mutableLongStateOf(
@@ -124,20 +124,21 @@ fun ComposerInterface(
             if(context.isDefault()) context.getDefaultSimSubscription() ?: -1L else -1L)
     }
     BackHandler {
-        imageViewModel.reset()
+        imageViewModel.processedImage = null
         navController.popBackStack()
     }
 
     var isBridge by remember{ mutableStateOf(type == Platforms.ServiceTypes.BRIDGE) }
 
-    val processedImage by imageViewModel.processedImage.collectAsState()
+    var processedImage by remember{ mutableStateOf(imageViewModel.processedImage) }
 
-    val imageBitmap: Bitmap? = remember(processedImage){
-        if(inPreviewMode) {
-            BitmapFactory.decodeResource(context.resources,
-                com.afkanerd.lib_image_android.R.drawable._0241226_124819)
-        }
-        else processedImage?.image ?: imageViewModel.originalBitmap
+    var imageBitmap: Bitmap? by remember {
+        mutableStateOf(
+            if(inPreviewMode) {
+                BitmapFactory.decodeResource(context.resources,
+                    com.afkanerd.lib_image_android.R.drawable._0241226_124819)
+            } else processedImage?.image
+        )
     }
 
     val from = remember { mutableStateOf(when(type) {
@@ -172,13 +173,16 @@ fun ComposerInterface(
                         message?.textLength!!,
                         type == Platforms.ServiceTypes.BRIDGE
                     ).apply {
-                        if(message?.imageLength!! > 0) {
-                            imageViewModel.setImage(
-                                bitmap = BitmapFactory.decodeByteArray(
+                        if(message?.imageLength!! > 0 && processedImage == null) {
+                            processedImage = ImageViewModel.ProcessedImage(
+                                image = BitmapFactory.decodeByteArray(
                                     this.image.value, 0,
-                                        this.image.value!!.size),
-                                rawBytes = this.image.value!!
+                                    this.image.value!!.size
+                                ),
+                                rawBytes = this.image.value!!,
+                                size = this.image.value!!.size.toLong(),
                             )
+                            imageBitmap = processedImage!!.image
                         }
                     }
             } catch (e: Exception) {
@@ -249,16 +253,19 @@ fun ComposerInterface(
         )
     }
 
+
+    var imageUri by remember{ mutableStateOf<Uri?>(null) }
+
+    fun imageRenderSubModule() {
+        imageViewModel.processedImage = null
+        processedImage = null
+        imageBitmap = null
+        navController.navigate(ImageRenderNav(imageUri.toString()))
+    }
+
     val imagePicker = mmsImagePicker { uri ->
-        val flag = Intent.FLAG_GRANT_READ_URI_PERMISSION
-        context.contentResolver.takePersistableUriPermission(uri, flag)
-        imageViewModel.originalBitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            ImageDecoder.decodeBitmap(ImageDecoder
-                .createSource(context.contentResolver, uri))
-        } else {
-            MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
-        }
-        navController.navigate(ImageRenderNav(true))
+        imageUri = uri
+        imageRenderSubModule()
     }
 
     val platformsViewModel = remember{ PlatformsViewModel() }
@@ -275,7 +282,7 @@ fun ComposerInterface(
             } else {
                 CoroutineScope(Dispatchers.Main).launch {
                     onSendCallback?.invoke(true)
-                    imageViewModel.reset()
+                    imageViewModel.processedImage = null
                     val route = if(context.isDefault()) HomeScreenNav()
                     else HomepageScreen
                     navController.navigate(route) {
@@ -300,9 +307,8 @@ fun ComposerInterface(
         if(imageBitmap != null) {
             platformsViewModel.sendPublishingForImage(
                 context = context,
-                imageViewModel = imageViewModel,
                 account = selectedAccount,
-                text = when(type) {
+                text = when (type) {
                     Platforms.ServiceTypes.BRIDGE,
                     Platforms.ServiceTypes.BRIDGE_INCOMING,
                     Platforms.ServiceTypes.EMAIL -> {
@@ -316,12 +322,14 @@ fun ComposerInterface(
                             isBridge = type == Platforms.ServiceTypes.BRIDGE
                         )
                     }
+
                     Platforms.ServiceTypes.TEXT -> {
                         Composers.TextComposeHandler.createTextByteBuffer(
                             from = from.value!!,
                             body = decomposedEmailMessage?.body!!.value,
                         )
                     }
+
                     Platforms.ServiceTypes.MESSAGE -> {
                         Composers.MessageComposeHandler.createMessageByteBuffer(
                             from = from.value!!,
@@ -329,11 +337,13 @@ fun ComposerInterface(
                             message = decomposedEmailMessage?.body!!.value,
                         )
                     }
+
                     else -> byteArrayOf()
                 },
                 isBridge = isBridge,
                 isLoggedIn = !isBridge,
                 onFailure = { onFailureCallback(it) },
+                imageByteArray = processedImage?.rawBytes!!,
             ) { sendingCallback(it) }
         }
         else {
@@ -396,7 +406,7 @@ fun ComposerInterface(
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-                        imageViewModel.reset()
+                        imageViewModel.processedImage = null
                         navController.popBackStack()
                     }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack,
@@ -495,11 +505,12 @@ fun ComposerInterface(
                         AttachImageView(
                             it,
                             onCancelCallback = {
-                                imageViewModel.reset()
-//                                imageBitmap = null
+                                processedImage = null
+                                imageViewModel.processedImage = null
+                                imageBitmap = null
                             }
                         ) {
-                            navController.navigate(ImageRenderNav(false))
+                            imageRenderSubModule()
                         }
                     }
                 }
