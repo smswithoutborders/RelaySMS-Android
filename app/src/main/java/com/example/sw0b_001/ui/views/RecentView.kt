@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -30,10 +31,13 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -57,6 +61,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
+import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.example.sw0b_001.data.models.Bridges
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.data.models.AvailablePlatforms
@@ -64,6 +69,7 @@ import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.Composers
 import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
 import com.example.sw0b_001.ui.navigation.BridgeViewScreen
@@ -72,84 +78,6 @@ import com.example.sw0b_001.ui.navigation.MessageViewScreen
 import com.example.sw0b_001.ui.navigation.TextViewScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import java.util.Locale
-
-@Composable
-fun RecentViewNoMessages(
-    saveNewPlatformCallback: () -> Unit,
-    sendNewMessageCallback: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Spacer(modifier = Modifier.weight(1f))
-
-        Image(
-            painter = painterResource(id = R.drawable.empty_message),
-            contentDescription = stringResource(R.string.get_started_illustration),
-            modifier = Modifier
-                .size(200.dp)
-                .padding(bottom = 16.dp)
-        )
-
-        Text(
-            text = stringResource(R.string.send_your_first_message),
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Thin,
-            textAlign = TextAlign.Center,
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-
-            Button(
-                onClick = { sendNewMessageCallback() },
-                modifier = Modifier
-                    .padding(bottom = 16.dp)
-                    .height(50.dp)
-                    .fillMaxWidth(),
-            ) {
-                Text(
-                    text = stringResource(R.string.send_new_message),
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
-
-            Button(
-                onClick = { saveNewPlatformCallback() },
-                modifier = Modifier
-                    .height(50.dp)
-                    .fillMaxWidth(),
-                colors = ButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-                    disabledContentColor = MaterialTheme.colorScheme.onSurface
-                )
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.save_platforms_),
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(64.dp))
-        }
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -161,6 +89,11 @@ fun RecentView(
     tabRequestedCallback: () -> Unit
 ) {
     val context = LocalContext.current
+
+    SideEffect{
+        messagesViewModel.message = null
+    }
+
     var sendNewMessageRequested by remember { mutableStateOf(false) }
 
     val messagesPagingSource = messagesViewModel.getMessages(context = context)
@@ -169,17 +102,13 @@ fun RecentView(
     val platforms: LiveData<List<AvailablePlatforms>> = platformsViewModel.getAvailablePlatforms(context)
     val platformsList by platforms.observeAsState(initial = emptyList())
 
-    Box(Modifier
-        .padding(8.dp)
-        .fillMaxSize()
+    val listState = rememberLazyListState()
+    Box(Modifier.fillMaxSize()
     ) {
         if ((LocalInspectionMode.current || messages.loadState.isIdle) && messages.itemCount > 0) {
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(vertical = 8.dp)
+                modifier = Modifier.fillMaxSize(),
+                state = listState
             ) {
                 items(
                     count = messages.itemCount,
@@ -189,13 +118,14 @@ fun RecentView(
 
                     val platform = platformsList.find { it.name == message.platformName }
                     val logo =
-                        platform?.logo?.let { BitmapFactory.decodeByteArray(it, 0, it.size) }
+                        platform?.logo?.let { BitmapFactory
+                            .decodeByteArray(it, 0, it.size) }
 
                     RecentMessageCard(
                         message = message, 
                         logo = logo,
                         onClickCallback = { clickedMessage ->
-                            platformsViewModel.message = clickedMessage
+                            messagesViewModel.message = clickedMessage
                             when (clickedMessage.type?.uppercase()) {
                                 Platforms.ServiceTypes.EMAIL.name -> {
                                     navController.navigate(EmailViewScreen)
@@ -242,22 +172,19 @@ fun RecentView(
 @Composable
 fun GetMessageAvatar(logo: Bitmap? = null) {
     val context = LocalContext.current
-    if(LocalInspectionMode.current) {
+    val imageSize = 38.dp
+    if(LocalInspectionMode.current || logo == null) {
         Image(
             painterResource(R.drawable.relaysms_icon_default_shape),
             contentDescription = stringResource(R.string.avatar_image),
-            modifier = Modifier.size(48.dp)
+            modifier = Modifier.size(imageSize)
         )
     }
     else {
         Image(
-            bitmap = logo?.asImageBitmap()
-                ?: BitmapFactory.decodeResource(
-                    context.resources,
-                    R.drawable.logo
-                ).asImageBitmap(),
+            bitmap = logo.asImageBitmap(),
             contentDescription = stringResource(R.string.avatar_image),
-            modifier = Modifier.size(48.dp)
+            modifier = Modifier.size(imageSize)
         )
     }
 }
@@ -277,32 +204,40 @@ fun RecentMessageCard(
     when(message.type?.uppercase(Locale.getDefault())) {
         Platforms.ServiceTypes.EMAIL.name -> {
             val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
-            val decomposed = PlatformsViewModel.EmailComposeHandler.decomposeMessage(contentBytes)
+            val decomposed = Composers.EmailComposeHandler
+                .decomposeMessage(
+                    contentBytes,
+                    imageLength = message.imageLength,
+                    textLength = message.textLength,
+                    isBridge = message.type == Platforms.ServiceTypes.BRIDGE.name
+                )
             heading = message.fromAccount ?: "Email"
             subHeading = decomposed.subject.value
             text = decomposed.body.value
         }
         Platforms.ServiceTypes.BRIDGE_INCOMING.name -> {
-            val decomposed = Bridges.BridgeComposeHandler.decomposeInboxMessage(
-                message.encryptedContent!!,
-            )
-            heading = message.fromAccount ?: "RelaySMS"
-            subHeading = decomposed.subject
-            text = decomposed.body
+            TODO()
+//            val decomposed = TODO()
+//            heading = message.fromAccount ?: "RelaySMS"
+//            subHeading = decomposed.subject
+//            text = decomposed.body
         }
         Platforms.ServiceTypes.BRIDGE.name -> {
-            val decomposed = Bridges.BridgeComposeHandler.decomposeMessage(
-                message.encryptedContent!!,
+            val decomposed = Composers.EmailComposeHandler.decomposeMessage(
+                Base64.decode(message.encryptedContent, Base64.DEFAULT),
+                message.imageLength,
+                message.textLength,
+                true
             )
             heading = message.fromAccount ?: "RelaySMS"
-            subHeading = decomposed.subject
-            text = decomposed.body
+            subHeading = decomposed.subject.value
+            text = decomposed.body.value
         }
         Platforms.ServiceTypes.TEXT.name -> {
             try {
                 val contentBytes = Base64.decode(message.encryptedContent!!,
                     Base64.DEFAULT)
-                val decomposed = PlatformsViewModel.TextComposeHandler
+                val decomposed = Composers.TextComposeHandler
                     .decomposeMessage(contentBytes)
                 heading = decomposed.from.value ?: ""
                 subHeading = ""
@@ -318,7 +253,7 @@ fun RecentMessageCard(
             try {
                 val contentBytes = Base64.decode(message.encryptedContent!!,
                     Base64.DEFAULT)
-                val decomposed = PlatformsViewModel.MessageComposeHandler
+                val decomposed = Composers.MessageComposeHandler
                     .decomposeMessage(contentBytes)
 
                 if (message.fromAccount == decomposed.from.value) {
@@ -338,64 +273,56 @@ fun RecentMessageCard(
     }
 
     Column {
-        OutlinedCard(
-            onClick = {
-                onClickCallback(message)
-            },
+        ListItem(
             modifier = Modifier
+                .combinedClickable(
+                    hapticFeedbackEnabled = true,
+                    onLongClick = {},
+                    onClick = { onClickCallback(message) }
+                )
                 .fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp),
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            headlineContent = {
+                Text(
+                    subHeading,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            },
+            overlineContent = {
+                Text(
+                    heading,
+                    style = if (message.type == Platforms.ServiceTypes.TEXT.name) {
+                        MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                    } else {
+                        MaterialTheme.typography.bodyLarge
+                    },
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            },
+            supportingContent = {
+                Text(
+                    text = text,
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            },
+            leadingContent = {
                 GetMessageAvatar(logo)
-
-                Spacer(modifier = Modifier.width(16.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    // Heading Text
-                    Text(
-                        heading,
-                        style = if (message.type == Platforms.ServiceTypes.TEXT.name) {
-                            MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-                        } else {
-                            MaterialTheme.typography.bodyLarge
-                        },
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    // Subheading Text
-                    if (message.encryptedContent != null) {
-                        Text(
-                            subHeading,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                    // Message Preview
-                    Text(
-                        text = text,
-                        style = MaterialTheme.typography.bodySmall,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-
-                // Date
+            },
+            trailingContent = {
                 Text(
                     text = Helpers.formatDate(LocalContext.current, message.date),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-            }
-        }
+            },
+        )
     }
 }
 

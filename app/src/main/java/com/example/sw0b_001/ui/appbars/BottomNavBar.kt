@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Inbox
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material3.Icon
@@ -32,39 +33,12 @@ import com.example.sw0b_001.ui.views.BottomTabsItems
 fun BottomNavBar(
     selectedTab: BottomTabsItems,
     isLoggedIn: Boolean = true,
-    onChangeTab: (BottomTabsItems) -> Unit = {}
+    onChangeTab: (BottomTabsItems) -> Unit = {},
 ) {
     val context = LocalContext.current
-    val isDefaultSmsApp = context.isDefault()
+    val isDefaultSmsApp = if(LocalInspectionMode.current) true else context.isDefault()
 
     NavigationBar {
-        if(isDefaultSmsApp || LocalInspectionMode.current) {
-            NavigationBarItem(
-                icon = { Icon(
-                    Icons.Filled.Inbox,
-                    contentDescription = stringResource(R.string.sms_mms),
-                    modifier = Modifier.size(20.dp)
-                ) },
-                label = {
-                    Text(
-                        text = stringResource(R.string.sms_mms),
-                        style = MaterialTheme.typography.labelSmall
-                    )
-                },
-                selected = selectedTab == BottomTabsItems.BottomBarSmsMmsTab,
-                onClick = {
-                    onChangeTab(BottomTabsItems.BottomBarSmsMmsTab)
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.onSurface,
-                    selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    indicatorColor = MaterialTheme.colorScheme.primaryContainer
-                )
-            )
-        }
-
         NavigationBarItem(
             icon = { Icon(
                 Icons.Filled.Home,
@@ -82,13 +56,6 @@ fun BottomNavBar(
             onClick = {
                 onChangeTab(BottomTabsItems.BottomBarRecentTab)
             },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = MaterialTheme.colorScheme.onSurface,
-                selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                indicatorColor = MaterialTheme.colorScheme.primaryContainer
-            )
         )
 
         NavigationBarItem(
@@ -105,39 +72,23 @@ fun BottomNavBar(
             onClick = {
                 onChangeTab(BottomTabsItems.BottomBarPlatformsTab,)
             },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = MaterialTheme.colorScheme.onSurface,
-                selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                indicatorColor = MaterialTheme.colorScheme.primaryContainer
-            )
         )
 
-        if(!isDefaultSmsApp || LocalInspectionMode.current) {
-            NavigationBarItem(
-                icon = { Icon(
-                    Icons.Filled.Inbox,
-                    contentDescription = stringResource(R.string.inbox),
-                    modifier = Modifier.size(20.dp)
-                ) },
-                label = { Text(
-                    text = stringResource(R.string.inbox),
-                    style = MaterialTheme.typography.labelSmall
-                ) },
-                selected = selectedTab == BottomTabsItems.BottomBarInboxTab,
-                onClick = {
-                    onChangeTab(BottomTabsItems.BottomBarInboxTab,)
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = MaterialTheme.colorScheme.onSurface,
-                    selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                    unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    indicatorColor = MaterialTheme.colorScheme.primaryContainer
-                )
-            )
-        }
+        NavigationBarItem(
+            icon = { Icon(
+                Icons.Filled.Inbox,
+                contentDescription = stringResource(R.string.inbox),
+                modifier = Modifier.size(20.dp)
+            ) },
+            label = { Text(
+                text = stringResource(R.string.inbox),
+                style = MaterialTheme.typography.labelSmall
+            ) },
+            selected = selectedTab == BottomTabsItems.BottomBarInboxTab,
+            onClick = {
+                onChangeTab(BottomTabsItems.BottomBarInboxTab,)
+            },
+        )
 
         NavigationBarItem(
             icon = { Icon(
@@ -153,13 +104,6 @@ fun BottomNavBar(
             onClick = {
                 onChangeTab(BottomTabsItems.BottomBarCountriesTab,)
             },
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = MaterialTheme.colorScheme.onSurface,
-                selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                unselectedIconColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                unselectedTextColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                indicatorColor = MaterialTheme.colorScheme.primaryContainer
-            )
         )
 
     }

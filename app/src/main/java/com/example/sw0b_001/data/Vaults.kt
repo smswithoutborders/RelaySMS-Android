@@ -49,77 +49,59 @@ class Vaults(val context: Context) {
         }
     }
 
+    @Throws
+    fun isStoredOnDevice(): Boolean {
+        try {
+            val llt = fetchLongLivedToken(context)
+
+            val response = getStoredAccountTokens(llt, false)
+
+            return !response.storedTokensList.any { !it.isStoredOnDevice }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw e
+        }
+    }
+
     fun refreshStoredTokens(
         context: Context,
-        missingCallback: (Map<String, List<String>>) -> Unit = {}
+        migrateToDevice: Boolean = false,
     ) {
         try {
             val llt = fetchLongLivedToken(context)
 
-            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-            val storeTokensOnDevice = sharedPreferences.getBoolean("store_tokens_on_device", false)
-
-            val response = getStoredAccountTokens(llt, storeTokensOnDevice)
+            val response = getStoredAccountTokens(llt, migrateToDevice)
 
             val datastore = Datastore.getDatastore(context)
-            val platformsToSave = ArrayList<StoredPlatformsEntity>()
-            val storedPlatforms = datastore.storedPlatformsDao().fetchAllList()
+            val platformsToSave = mutableListOf<StoredPlatformsEntity>()
 
-            val accountsMissingTokens = mutableMapOf<String, MutableList<String>>()
             response.storedTokensList.forEach { accountTokens ->
                 val uuid = Base64.encodeToString(
-                    buildPlatformsUUID(accountTokens.platform, accountTokens.accountIdentifier),
-                    Base64.DEFAULT
-                )
+                    buildPlatformsUUID(
+                        accountTokens.platform,
+                        accountTokens.accountIdentifier
+                    ), Base64.DEFAULT)
 
-                val isStoredOnDevice = accountTokens.isStoredOnDevice
-                val accessToken = if(accountTokens.accountTokensMap.containsKey("access_token")) {
-                    accountTokens.accountTokensMap["access_token"]
-                } else ""
-                val refreshToken = if(accountTokens.accountTokensMap.containsKey("refresh_token")) {
-                    accountTokens.accountTokensMap["refresh_token"]
-                } else ""
+                if(!accountTokens.isStoredOnDevice) {
+                    val accessToken = if(accountTokens.accountTokensMap.containsKey("access_token")) {
+                        accountTokens.accountTokensMap["access_token"]
+                    } else ""
+                    val refreshToken = if(accountTokens.accountTokensMap.containsKey("refresh_token")) {
+                        accountTokens.accountTokensMap["refresh_token"]
+                    } else ""
 
-                // TODO: add storing in case there's something to store
-                if (isStoredOnDevice &&
-                    accessToken.isNullOrEmpty() &&
-                    storedPlatforms.find { it.id == uuid &&
-                            !it.accessToken.isNullOrEmpty() } == null) {
-                    accountsMissingTokens[accountTokens.platform].let { accountsIds ->
-                        if (accountsIds.isNullOrEmpty())
-                            accountsMissingTokens[accountTokens.platform] =
-                                mutableListOf(accountTokens.accountIdentifier)
-                        else
-                            accountsMissingTokens[accountTokens.platform]
-                                ?.add(accountTokens.accountIdentifier)
-                    }
-                }
-                else {
                     platformsToSave.add(
-                        if(storedPlatforms.find { it.id == uuid } != null) {
-                            storedPlatforms.first { it.id == uuid }.apply {
-                                if (this.accessToken.isNullOrEmpty()) {
-                                    this.accessToken = accessToken
-                                }
-                                if (this.refreshToken.isNullOrEmpty()) {
-                                    this.refreshToken = refreshToken
-                                }
-                            }
-                        }
-                        else {
-                            StoredPlatformsEntity(
-                                id = uuid,
-                                account = accountTokens.accountIdentifier,
-                                name = accountTokens.platform,
-                                accessToken = accessToken,
-                                refreshToken = refreshToken
-                            )
-                        }
+                        StoredPlatformsEntity(
+                            id = uuid,
+                            account = accountTokens.accountIdentifier,
+                            name = accountTokens.platform,
+                            accessToken = accessToken,
+                            refreshToken = refreshToken
+                        )
                     )
                 }
             }
             datastore.storedPlatformsDao().insert(platformsToSave)
-            missingCallback(accountsMissingTokens)
         } catch (e: Exception) {
             e.printStackTrace()
             throw e
@@ -310,14 +292,14 @@ class Vaults(val context: Context) {
             Datastore.getDatastore(context).storedPlatformsDao().fetchAllList().forEach { platform ->
                 availablePlatforms.filter { it.name == platform.name }.forEach {
                     when(it.protocol_type) {
-                        Platforms.ProtocolTypes.OAUTH2.type -> {
+                        Platforms.ProtocolTypes.oauth2.name -> {
                             publishers.revokeOAuthPlatforms(
                                 llt,
                                 platform.name!!,
                                 platform.account!!,
                             )
                         }
-                        Platforms.ProtocolTypes.PNBA.type -> {
+                        Platforms.ProtocolTypes.pnba.name -> {
                             publishers.revokePNBAPlatforms(
                                 llt,
                                 platform.name!!,
@@ -370,12 +352,10 @@ class Vaults(val context: Context) {
             KeystoreHelpers.removeFromKeystore(context, DEVICE_ID_PUB_KEY)
             KeystoreHelpers.removeFromKeystore(context, LONG_LIVED_TOKEN_KEYSTORE_ALIAS)
 
-            CoroutineScope(Dispatchers.Default).launch {
-                Datastore.getDatastore(context).storedPlatformsDao().deleteAll()
-                Datastore.getDatastore(context).encryptedContentDAO().deleteAll()
-                Datastore.getDatastore(context).ratchetStatesDAO().deleteAll()
-                successRunnable.run()
-            }
+            Datastore.getDatastore(context).storedPlatformsDao().deleteAll()
+            Datastore.getDatastore(context).encryptedContentDAO().deleteAll()
+            Datastore.getDatastore(context).ratchetStatesDAO().deleteAll()
+            successRunnable.run()
         }
 
         fun storeArtifacts(context: Context,

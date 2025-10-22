@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.sw0b_001.data.Composers
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Helpers
@@ -43,7 +44,6 @@ import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.navigation.ComposeScreen
-import com.example.sw0b_001.ui.navigation.TextComposeNav
 import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -54,6 +54,7 @@ import kotlinx.serialization.json.Json
 @Composable
 fun TextDetailsView(
     platformsViewModel: PlatformsViewModel,
+    messagesViewModel: MessagesViewModel,
     navController: NavController,
     isOnboarding: Boolean = false,
 ) {
@@ -65,11 +66,11 @@ fun TextDetailsView(
     var date by remember { mutableLongStateOf(0L) }
 
     // Decompose the message content when the view is composed
-    val message = platformsViewModel.message
+    val message = messagesViewModel.message
     if (message?.encryptedContent != null) {
         try {
             val contentBytes = Base64.decode(message.encryptedContent, Base64.DEFAULT)
-            val decomposedMessage = PlatformsViewModel.TextComposeHandler
+            val decomposedMessage = Composers.TextComposeHandler
                 .decomposeMessage(contentBytes)
 
             from = decomposedMessage.from.value!!
@@ -90,23 +91,16 @@ fun TextDetailsView(
                 editCallback = {
                     CoroutineScope(Dispatchers.Default).launch {
                         val platform = platformsViewModel.getAvailablePlatforms(context,
-                            platformsViewModel.message!!.platformName!!)
+                            messagesViewModel.message!!.platformName!!)
                         platformsViewModel.platform = platform
+                        messagesViewModel.message = message
 
                         CoroutineScope(Dispatchers.Main).launch {
                             navController.navigate(
                                 ComposeScreen(
                                     type = Platforms.ServiceTypes.TEXT,
-                                    textNav = Json.encodeToString(
-                                        TextComposeNav(
-                                            platformName = platform!!.name,
-                                            subscriptionId = -1L,
-                                            encryptedContent = message?.encryptedContent,
-                                            fromAccount = from,
-                                            serviceType = Platforms.ServiceTypes.TEXT,
-                                        )
-                                    ),
-                                    isOnboarding = isOnboarding
+                                    isOnboarding = isOnboarding,
+                                    platformName = message?.platformName
                                 )
                             )
                         }
@@ -114,7 +108,7 @@ fun TextDetailsView(
                 }
             ) {
                 val messagesViewModel = MessagesViewModel()
-                messagesViewModel.delete(context, platformsViewModel.message!!) {
+                messagesViewModel.delete(context, messagesViewModel.message!!) {
                     navController.popBackStack()
                 }
             }
@@ -177,10 +171,13 @@ fun TextDetailsPreview() {
         text.encryptedContent = "@relaysms.me:Hello world"
 
         val platformsViewModel = remember{ PlatformsViewModel() }
-        platformsViewModel.message = text
+        val messagesViewModel = remember{ MessagesViewModel() }
+
+        messagesViewModel.message = text
 
         TextDetailsView(
             platformsViewModel = platformsViewModel,
+            messagesViewModel = messagesViewModel,
             navController = rememberNavController()
         )
     }

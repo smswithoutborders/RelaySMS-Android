@@ -25,9 +25,9 @@ class Platforms {
         TEST,
     }
 
-    enum class ProtocolTypes(val type: String) {
-        OAUTH2("oauth2"),
-        PNBA("pnba"),
+    enum class ProtocolTypes{
+        oauth2,
+        pnba,
     }
 
     @PrimaryKey(autoGenerate = true)
@@ -46,41 +46,4 @@ class Platforms {
     @ColumnInfo(defaultValue = "0")
     var isSaved: Boolean = false
 
-    constructor()
-    constructor(id: Long) {
-        this.id = id
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (other is Platforms) {
-            return (other.id == this.id &&
-                    other.description == description &&
-                    other.name == name &&
-                    other.type == type &&
-                    other.letter == letter)
-        }
-        return false
-    }
-
-    companion object {
-        fun refreshAvailablePlatforms(context: Context) {
-            CoroutineScope(Dispatchers.Default).launch {
-                try {
-                    Publishers.Companion.getAvailablePlatforms(context).let{ json ->
-                        json.forEach { it->
-                            if(it.icon_png?.isNotEmpty() == true) {
-                                val url = URL(it.icon_png)
-                                it.logo = url.readBytes()
-                            }
-                        }
-                        Datastore.getDatastore(context).availablePlatformsDao().clear()
-                        Datastore.getDatastore(context).availablePlatformsDao().insertAll(json)
-                    }
-                } catch(e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-        }
-
-    }
 }

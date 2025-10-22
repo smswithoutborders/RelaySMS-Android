@@ -11,11 +11,8 @@ import com.example.sw0b_001.data.models.StoredPlatformsEntity
 
 @Dao
 interface StoredPlatformsDao {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertAll(platforms: ArrayList<StoredPlatformsEntity>)
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertOrUpdate(platform: StoredPlatformsEntity)
+    fun insertAll(platforms: List<StoredPlatformsEntity>)
 
     @Query("SELECT * FROM StoredPlatformsEntity")
     fun fetchAll() : LiveData<List<StoredPlatformsEntity>>
@@ -45,7 +42,7 @@ interface StoredPlatformsDao {
     fun getAllAccountIds(): List<String>
 
     @Transaction
-    fun insert(platforms: ArrayList<StoredPlatformsEntity>) {
+    fun insert(platforms: List<StoredPlatformsEntity>) {
         deleteAll()
         insertAll(platforms)
     }

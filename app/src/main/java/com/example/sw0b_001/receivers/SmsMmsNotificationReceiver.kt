@@ -60,6 +60,7 @@ class SmsMmsNotificationReceiver : BroadcastReceiver () {
             actions = false,
             text = content,
             cls = cls,
+            title = context.getString(R.string.failed_to_send_message)
         )
     }
 

@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BubbleChart
 import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -48,7 +49,9 @@ import com.example.sw0b_001.ui.modals.AddGatewayClientModal
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.ui.features.AppFeatures
@@ -56,10 +59,10 @@ import com.example.sw0b_001.ui.features.FeatureInfo
 import com.example.sw0b_001.ui.features.FeatureManager
 import com.example.sw0b_001.ui.features.NewFeatureModal
 import com.example.sw0b_001.ui.modals.GetStartedModal
+import kotlinx.coroutines.launch
 
 
 enum class BottomTabsItems {
-    BottomBarSmsMmsTab,
     BottomBarRecentTab,
     BottomBarPlatformsTab,
     BottomBarInboxTab,
@@ -74,9 +77,10 @@ fun HomepageView(
     platformsViewModel : PlatformsViewModel,
     messagesViewModel: MessagesViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
+    imageViewModel: ImageViewModel,
     isLoggedIn: Boolean = false,
-    showBottomBar: Boolean = true,
     showTopBar: Boolean = true,
+    drawerCallback: (() -> Unit)? = {},
 ) {
     val context = LocalContext.current
     val inspectionMode = LocalInspectionMode.current
@@ -105,19 +109,8 @@ fun HomepageView(
 
     var sendNewMessageRequested by remember { mutableStateOf(false)}
 
-    val isLoading by messagesViewModel.isLoading.collectAsState()
     var searchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
-    var isSearchDone by remember { mutableStateOf(false) }
-
-    var featureToShow by remember { mutableStateOf<FeatureInfo?>(null) }
-
-    LaunchedEffect(Unit) {
-        val nextFeature = AppFeatures.ALL_FEATURES.firstOrNull {
-            !FeatureManager.hasFeatureBeenShown(context, it.id)
-        }
-        featureToShow = nextFeature
-    }
 
     Scaffold (
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -130,26 +123,22 @@ fun HomepageView(
                             onSearchQueryChanged = { searchQuery = it },
                             searchQuery = searchQuery,
                             isSearchActive = isSearchActive,
-                            onToggleSearch = {
-                                isSearchActive = !isSearchActive
-                                if (!isSearchActive) {
-                                    searchQuery = ""
-                                    isSearchDone = false
-                                }
-                            },
-                            onSearchDone = {
-                                isSearchDone = true
-                            },
+                            onToggleSearch = {},
+                            onSearchDone = {},
                             isSelectionMode = platformsViewModel.isSelectionMode,
                             selectedCount = platformsViewModel.selectedMessagesCount,
                             onSelectAll = platformsViewModel.onSelectAll,
                             onDeleteSelected = platformsViewModel.onDeleteSelected,
-                            onCancelSelection = platformsViewModel.onCancelSelection
+                            onCancelSelection = platformsViewModel.onCancelSelection,
+                            onMenuClickCallback = drawerCallback
                         )
                     }
                     BottomTabsItems.BottomBarCountriesTab -> {
                         GatewayClientsAppBar(
                             navController = navController,
+                            onAddClicked = {
+                                showAddGatewayClientsModal = true
+                            },
                             onRefreshClicked = {
                                 gatewayClientViewModel.get(context, refreshSuccess)
                             }
@@ -172,13 +161,11 @@ fun HomepageView(
             }
         },
         bottomBar = {
-            if(showBottomBar) {
-                BottomNavBar(
-                    selectedTab = platformsViewModel.bottomTabsItem,
-                    isLoggedIn = isLoggedIn,
-                ) { selectedTab ->
-                    platformsViewModel.bottomTabsItem = selectedTab
-                }
+            BottomNavBar(
+                selectedTab = platformsViewModel.bottomTabsItem,
+                isLoggedIn = isLoggedIn,
+            ) { selectedTab ->
+                platformsViewModel.bottomTabsItem = selectedTab
             }
         },
         floatingActionButton = {
@@ -221,27 +208,6 @@ fun HomepageView(
                         )
                     }
                 }
-                BottomTabsItems.BottomBarCountriesTab -> {
-                    ExtendedFloatingActionButton(
-                        onClick = {
-                            showAddGatewayClientsModal = true
-                        },
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Filled.Add,
-                                contentDescription = stringResource(R.string.add_new_gateway_clients),
-                                tint = MaterialTheme.colorScheme.onSecondary
-                            )
-                        },
-                        text = {
-                            Text(
-                                text = stringResource(R.string.add_number),
-                                color = MaterialTheme.colorScheme.onSecondary
-                            )
-                        }
-                    )
-                }
                 BottomTabsItems.BottomBarInboxTab -> {
                     if (inboxMessages.isNotEmpty()) {
                         ExtendedFloatingActionButton(
@@ -269,15 +235,6 @@ fun HomepageView(
             }
         }
     ) { innerPadding ->
-        featureToShow?.let { currentFeature ->
-            NewFeatureModal(
-                featureInfo = currentFeature,
-                onDismiss = {
-                    FeatureManager.markFeatureAsShown(context, currentFeature.id)
-                    featureToShow = null
-                }
-            )
-        }
         Box(
             Modifier
                 .fillMaxSize()
@@ -297,7 +254,8 @@ fun HomepageView(
                     ActivePlatformsModal(
                         sendNewMessageRequested = sendNewMessageRequested,
                         navController = navController,
-                        isCompose = true
+                        isCompose = true,
+                        isLoggedIn = true
                     ) {
                         sendNewMessageRequested = false
                     }
@@ -362,7 +320,6 @@ fun GetTabViews(
                 navController = navController
             )
         }
-        BottomTabsItems.BottomBarSmsMmsTab -> null
     }
 
 }
@@ -377,6 +334,7 @@ fun HomepageView_Preview() {
             platformsViewModel = remember{ PlatformsViewModel() },
             messagesViewModel = remember{ MessagesViewModel() },
             gatewayClientViewModel = remember{ GatewayClientViewModel() },
+            imageViewModel = remember{ ImageViewModel() },
         )
     }
 }
@@ -392,6 +350,7 @@ fun HomepageViewLoggedIn_Preview() {
             platformsViewModel = remember{ PlatformsViewModel() },
             messagesViewModel = remember{ MessagesViewModel() },
             gatewayClientViewModel = remember{ GatewayClientViewModel() },
+            imageViewModel = remember{ ImageViewModel() },
         )
     }
 }
@@ -417,6 +376,7 @@ fun HomepageViewLoggedInMessages_Preview() {
             platformsViewModel = remember{ PlatformsViewModel() },
             messagesViewModel = remember{ MessagesViewModel() },
             gatewayClientViewModel = remember{ GatewayClientViewModel() },
+            imageViewModel = remember{ ImageViewModel() },
         )
     }
 }

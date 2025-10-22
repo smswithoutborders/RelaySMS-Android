@@ -1,0 +1,255 @@
+kotlin version: 2.2.20
+error message: org.jetbrains.kotlin.backend.common.CompilationException: Back-end: Please report this problem https://kotl.in/issue
+/home/sherlock/StudioProjects/RelaySMS-Android/app/src/main/java/com/example/sw0b_001/ui/viewModels/PlatformsViewModel.kt:625:9
+Problem with `@Serializable
+data class EmailContent {
+  constructor(to: MutableState<String> = mutableStateOf<String>(value = ""), cc: MutableState<String> = mutableStateOf<String>(value = ""), bcc: MutableState<String> = mutableStateOf<String>(value = ""), subject: MutableState<String> = mutableStateOf<String>(value = ""), body: MutableState<String> = mutableStateOf<String>(value = ""), imageUri: MutableState<Uri?> = mutableStateOf<Uri?>(value = null)) /* primary */ {
+    super/*Any*/()
+    /* <init>() */
+
+  }
+
+  @Serializable(with = MutableStateSerializer<*>::class)
+  var to: MutableState<String>
+    field = to
+    get
+    set
+
+  @Serializable(with = MutableStateSerializer<*>::class)
+  var cc: MutableState<String>
+    field = cc
+    get
+    set
+
+  @Serializable(with = MutableStateSerializer<*>::class)
+  var bcc: MutableState<String>
+    field = bcc
+    get
+    set
+
+  @Serializable(with = MutableStateSerializer<*>::class)
+  var subject: MutableState<String>
+    field = subject
+    get
+    set
+
+  @Serializable(with = MutableStateSerializer<*>::class)
+  var body: MutableState<String>
+    field = body
+    get
+    set
+
+  @Serializable(with = MutableStateSerializer<*>::class)
+  var imageUri: MutableState<Uri?>
+    field = imageUri
+    get
+    set
+
+  companion object Companion {
+    private constructor() /* primary */ {
+      super/*Any*/()
+      /* <init>() */
+
+    }
+
+    fun serializer(): KSerializer<EmailContent>
+
+    /* fake */ override operator fun equals(other: Any?): Boolean
+
+    /* fake */ override fun hashCode(): Int
+
+    /* fake */ override fun toString(): String
+
+  }
+
+  @Deprecated(message = "This synthesized declaration should not be used directly", level = DeprecationLevel.HIDDEN)
+  object $serializer : GeneratedSerializer<EmailContent> {
+    private constructor() /* primary */ {
+      super/*Any*/()
+      /* <init>() */
+
+    }
+
+    override fun serialize(encoder: Encoder, value: EmailContent)
+
+    override fun deserialize(decoder: Decoder): EmailContent
+
+    override val descriptor: SerialDescriptor
+      override get
+
+    override fun childSerializers(): Array<KSerializer<*>>
+
+    /* fake */ override fun typeParametersSerializers(): Array<KSerializer<*>>
+
+    /* fake */ override operator fun equals(other: Any?): Boolean
+
+    /* fake */ override fun hashCode(): Int
+
+    /* fake */ override fun toString(): String
+
+  }
+
+  operator fun component1(): MutableState<String> {
+    return <this>.#to
+  }
+
+  operator fun component2(): MutableState<String> {
+    return <this>.#cc
+  }
+
+  operator fun component3(): MutableState<String> {
+    return <this>.#bcc
+  }
+
+  operator fun component4(): MutableState<String> {
+    return <this>.#subject
+  }
+
+  operator fun component5(): MutableState<String> {
+    return <this>.#body
+  }
+
+  operator fun component6(): MutableState<Uri?> {
+    return <this>.#imageUri
+  }
+
+  fun copy(to: MutableState<String> = <this>.#to, cc: MutableState<String> = <this>.#cc, bcc: MutableState<String> = <this>.#bcc, subject: MutableState<String> = <this>.#subject, body: MutableState<String> = <this>.#body, imageUri: MutableState<Uri?> = <this>.#imageUri): EmailContent {
+    return EmailContent(to = to, cc = cc, bcc = bcc, subject = subject, body = body, imageUri = imageUri)
+  }
+
+  override fun toString(): String {
+    return "EmailContent(" + "to=" + <this>.#to + ", " + "cc=" + <this>.#cc + ", " + "bcc=" + <this>.#bcc + ", " + "subject=" + <this>.#subject + ", " + "body=" + <this>.#body + ", " + "imageUri=" + <this>.#imageUri + ")"
+  }
+
+  override fun hashCode(): Int {
+    var result: Int = <this>.#to.hashCode()
+    result = result.times(other = 31).plus(other = <this>.#cc.hashCode())
+    result = result.times(other = 31).plus(other = <this>.#bcc.hashCode())
+    result = result.times(other = 31).plus(other = <this>.#subject.hashCode())
+    result = result.times(other = 31).plus(other = <this>.#body.hashCode())
+    result = result.times(other = 31).plus(other = <this>.#imageUri.hashCode())
+    return result
+  }
+
+  override operator fun equals(other: Any?): Boolean {
+    when {
+      EQEQEQ(arg0 = <this>, arg1 = other) -> return true
+    }
+    when {
+      other !is EmailContent -> return false
+    }
+    val tmp0_other_with_cast: EmailContent = other /*as EmailContent */
+    when {
+      EQEQ(arg0 = <this>.#to, arg1 = tmp0_other_with_cast.#to).not() -> return false
+    }
+    when {
+      EQEQ(arg0 = <this>.#cc, arg1 = tmp0_other_with_cast.#cc).not() -> return false
+    }
+    when {
+      EQEQ(arg0 = <this>.#bcc, arg1 = tmp0_other_with_cast.#bcc).not() -> return false
+    }
+    when {
+      EQEQ(arg0 = <this>.#subject, arg1 = tmp0_other_with_cast.#subject).not() -> return false
+    }
+    when {
+      EQEQ(arg0 = <this>.#body, arg1 = tmp0_other_with_cast.#body).not() -> return false
+    }
+    when {
+      EQEQ(arg0 = <this>.#imageUri, arg1 = tmp0_other_with_cast.#imageUri).not() -> return false
+    }
+    return true
+  }
+
+  @JvmStatic
+  internal /* static */ fun write$Self(self: EmailContent, output: CompositeEncoder, serialDesc: SerialDescriptor)
+
+  internal constructor(seen0: Int, to: MutableState<String>?, cc: MutableState<String>?, bcc: MutableState<String>?, subject: MutableState<String>?, body: MutableState<String>?, imageUri: MutableState<Uri?>?, serializationConstructorMarker: SerializationConstructorMarker?)
+
+}
+
+`
+Details: kotlinx.serialization compiler plugin internal error: unable to transform declaration, see cause
+	at org.jetbrains.kotlinx.serialization.compiler.extensions.SerializerClassLowering.lower(SerializationLoweringExtension.kt:233)
+	at org.jetbrains.kotlinx.serialization.compiler.extensions.SerializationLoweringExtensionKt$runOnFileInOrder$1.visitClass(SerializationLoweringExtension.kt:46)
+	at org.jetbrains.kotlin.ir.visitors.IrVisitorVoid.visitClass(IrVisitorVoid.kt:44)
+	at org.jetbrains.kotlin.ir.visitors.IrVisitorVoid.visitClass(IrVisitorVoid.kt:18)
+	at org.jetbrains.kotlin.ir.declarations.IrClass.accept(IrClass.kt:72)
+	at org.jetbrains.kotlin.ir.declarations.IrClass.acceptChildren(IrClass.kt:76)
+	at org.jetbrains.kotlin.ir.visitors.IrVisitorsKt.acceptChildrenVoid(IrVisitors.kt:23)
+	at org.jetbrains.kotlinx.serialization.compiler.extensions.SerializationLoweringExtensionKt$runOnFileInOrder$1.visitClass(SerializationLoweringExtension.kt:47)
+	at org.jetbrains.kotlin.ir.visitors.IrVisitorVoid.visitClass(IrVisitorVoid.kt:44)
+	at org.jetbrains.kotlin.ir.visitors.IrVisitorVoid.visitClass(IrVisitorVoid.kt:18)
+	at org.jetbrains.kotlin.ir.declarations.IrClass.accept(IrClass.kt:72)
+	at org.jetbrains.kotlin.ir.declarations.IrClass.acceptChildren(IrClass.kt:76)
+	at org.jetbrains.kotlin.ir.visitors.IrVisitorsKt.acceptChildrenVoid(IrVisitors.kt:23)
+	at org.jetbrains.kotlinx.serialization.compiler.extensions.SerializationLoweringExtensionKt$runOnFileInOrder$1.visitClass(SerializationLoweringExtension.kt:47)
+	at org.jetbrains.kotlin.ir.visitors.IrVisitorVoid.visitClass(IrVisitorVoid.kt:44)
+	at org.jetbrains.kotlin.ir.visitors.IrVisitorVoid.visitClass(IrVisitorVoid.kt:18)
+	at org.jetbrains.kotlin.ir.declarations.IrClass.accept(IrClass.kt:72)
+	at org.jetbrains.kotlin.ir.declarations.IrPackageFragment.acceptChildren(IrPackageFragment.kt:27)
+	at org.jetbrains.kotlin.ir.visitors.IrVisitorsKt.acceptChildrenVoid(IrVisitors.kt:23)
+	at org.jetbrains.kotlinx.serialization.compiler.extensions.SerializationLoweringExtensionKt$runOnFileInOrder$1.visitElement(SerializationLoweringExtension.kt:42)
+	at org.jetbrains.kotlin.ir.visitors.IrVisitorVoid.visitPackageFragment(IrVisitorVoid.kt:168)
+	at org.jetbrains.kotlin.ir.visitors.IrVisitorVoid.visitFile(IrVisitorVoid.kt:184)
+	at org.jetbrains.kotlin.ir.visitors.IrVisitorVoid.visitFile(IrVisitorVoid.kt:180)
+	at org.jetbrains.kotlin.ir.visitors.IrVisitorVoid.visitFile(IrVisitorVoid.kt:18)
+	at org.jetbrains.kotlin.ir.declarations.IrFile.accept(IrFile.kt:27)
+	at org.jetbrains.kotlin.ir.visitors.IrVisitorsKt.acceptVoid(IrVisitors.kt:11)
+	at org.jetbrains.kotlinx.serialization.compiler.extensions.SerializationLoweringExtensionKt.runOnFileInOrder(SerializationLoweringExtension.kt:40)
+	at org.jetbrains.kotlinx.serialization.compiler.extensions.SerializationLoweringExtension.generate(SerializationLoweringExtension.kt:197)
+	at org.jetbrains.kotlin.fir.pipeline.ConvertToIrKt.applyIrGenerationExtensions(convertToIr.kt:498)
+	at org.jetbrains.kotlin.fir.pipeline.Fir2IrPipeline.runActualizationPipeline(convertToIr.kt:253)
+	at org.jetbrains.kotlin.fir.pipeline.Fir2IrPipeline.convertToIrAndActualize(convertToIr.kt:134)
+	at org.jetbrains.kotlin.fir.pipeline.ConvertToIrKt.convertToIrAndActualize(convertToIr.kt:100)
+	at org.jetbrains.kotlin.fir.pipeline.ConvertToIrKt.convertToIrAndActualize$default(convertToIr.kt:73)
+	at org.jetbrains.kotlin.cli.jvm.compiler.legacy.pipeline.JvmCompilerPipelineKt.convertToIrAndActualizeForJvm(jvmCompilerPipeline.kt:101)
+	at org.jetbrains.kotlin.cli.pipeline.jvm.JvmFir2IrPipelinePhase.executePhase(JvmFir2IrPipelinePhase.kt:30)
+	at org.jetbrains.kotlin.cli.pipeline.jvm.JvmFir2IrPipelinePhase.executePhase(JvmFir2IrPipelinePhase.kt:25)
+	at org.jetbrains.kotlin.cli.pipeline.jvm.JvmFir2IrPipelinePhase.executePhase(JvmFir2IrPipelinePhase.kt:19)
+	at org.jetbrains.kotlin.cli.pipeline.PipelinePhase.phaseBody(PipelinePhase.kt:68)
+	at org.jetbrains.kotlin.cli.pipeline.PipelinePhase.phaseBody(PipelinePhase.kt:58)
+	at org.jetbrains.kotlin.config.phaser.NamedCompilerPhase.invoke(CompilerPhase.kt:102)
+	at org.jetbrains.kotlin.backend.common.phaser.CompositePhase.invoke(PhaseBuilders.kt:22)
+	at org.jetbrains.kotlin.config.phaser.CompilerPhaseKt.invokeToplevel(CompilerPhase.kt:53)
+	at org.jetbrains.kotlin.cli.pipeline.AbstractCliPipeline.runPhasedPipeline(AbstractCliPipeline.kt:109)
+	at org.jetbrains.kotlin.cli.pipeline.AbstractCliPipeline.execute(AbstractCliPipeline.kt:68)
+	at org.jetbrains.kotlin.cli.jvm.K2JVMCompiler.doExecutePhased(K2JVMCompiler.kt:79)
+	at org.jetbrains.kotlin.cli.jvm.K2JVMCompiler.doExecutePhased(K2JVMCompiler.kt:45)
+	at org.jetbrains.kotlin.cli.common.CLICompiler.execImpl(CLICompiler.kt:90)
+	at org.jetbrains.kotlin.cli.common.CLICompiler.exec(CLICompiler.kt:352)
+	at org.jetbrains.kotlin.incremental.IncrementalJvmCompilerRunnerBase.runCompiler(IncrementalJvmCompilerRunnerBase.kt:176)
+	at org.jetbrains.kotlin.incremental.IncrementalJvmCompilerRunnerBase.runCompiler(IncrementalJvmCompilerRunnerBase.kt:39)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.doCompile(IncrementalCompilerRunner.kt:499)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.compileImpl(IncrementalCompilerRunner.kt:416)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.tryCompileIncrementally$lambda$0$compile(IncrementalCompilerRunner.kt:249)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.tryCompileIncrementally(IncrementalCompilerRunner.kt:267)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.compile(IncrementalCompilerRunner.kt:119)
+	at org.jetbrains.kotlin.daemon.CompileServiceImplBase.execIncrementalCompiler(CompileServiceImpl.kt:684)
+	at org.jetbrains.kotlin.daemon.CompileServiceImplBase.access$execIncrementalCompiler(CompileServiceImpl.kt:94)
+	at org.jetbrains.kotlin.daemon.CompileServiceImpl.compile(CompileServiceImpl.kt:1810)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(Unknown Source)
+	at java.base/java.lang.reflect.Method.invoke(Unknown Source)
+	at java.rmi/sun.rmi.server.UnicastServerRef.dispatch(Unknown Source)
+	at java.rmi/sun.rmi.transport.Transport$1.run(Unknown Source)
+	at java.rmi/sun.rmi.transport.Transport$1.run(Unknown Source)
+	at java.base/java.security.AccessController.doPrivileged(Unknown Source)
+	at java.rmi/sun.rmi.transport.Transport.serviceCall(Unknown Source)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport.handleMessages(Unknown Source)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run0(Unknown Source)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.lambda$run$0(Unknown Source)
+	at java.base/java.security.AccessController.doPrivileged(Unknown Source)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run(Unknown Source)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(Unknown Source)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(Unknown Source)
+	at java.base/java.lang.Thread.run(Unknown Source)
+Caused by: java.lang.IllegalStateException: Serializer for element of type android.net.Uri? has not been found
+	at org.jetbrains.kotlinx.serialization.compiler.backend.ir.SerializerSearchUtilKt.findTypeSerializerOrContext(SerializerSearchUtil.kt:85)
+	at org.jetbrains.kotlinx.serialization.compiler.backend.ir.BaseIrGenerator.createSerializerOnlyForClasses(BaseIrGenerator.kt:511)
+	at org.jetbrains.kotlinx.serialization.compiler.backend.ir.BaseIrGenerator.cacheableChildSerializerInstance(BaseIrGenerator.kt:479)
+	at org.jetbrains.kotlinx.serialization.compiler.backend.ir.BaseIrGenerator.createCachedChildSerializers(BaseIrGenerator.kt:465)
+	at org.jetbrains.kotlinx.serialization.compiler.backend.ir.SerializableIrGenerator.<init>(SerializableIrGenerator.kt:62)
+	at org.jetbrains.kotlinx.serialization.compiler.backend.ir.SerializableIrGenerator$Companion.generate(SerializableIrGenerator.kt:407)
+	at org.jetbrains.kotlinx.serialization.compiler.extensions.SerializerClassLowering.lower(SerializationLoweringExtension.kt:149)
+	... 72 more
+
+

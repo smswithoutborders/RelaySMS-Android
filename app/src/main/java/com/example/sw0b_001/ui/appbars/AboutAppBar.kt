@@ -8,10 +8,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.BugReport
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -66,11 +66,9 @@ fun AboutAppBar(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Icon(
-                    imageVector = Icons.Filled.BugReport,
+                    imageVector = Icons.Default.Email,
                     contentDescription = stringResource(R.string.report_bug_feedback)
                 )
-
-
             }
         },
         colors = TopAppBarDefaults.topAppBarColors()

@@ -1,107 +1,69 @@
 package com.example.sw0b_001.data
 
 import android.content.Context
-import android.content.SharedPreferences
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.models.GatewayClient
+import com.example.sw0b_001.data.models.GatewayClients
+import com.example.sw0b_001.extensions.context.relaySmsDatastore
+import com.example.sw0b_001.extensions.context.settingsGetDefaultGatewayClients
+import com.example.sw0b_001.extensions.context.settingsSetDefaultGatewayClient
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
-class GatewayClientsCommunications(context: Context) {
-
+object GatewayClientsCommunications {
     @Serializable
-    data class GatewayClientJsonPayload(val msisdn: String,
-                                        val country: String,
-                                        val operator: String,
-                                        val operator_code: String,
-                                        val protocols: ArrayList<String>,
-                                        val last_published_date: Int)
+    data class GatewayClientRequestPayload(
+        val address: String,
+        val text: String,
+        val date: Long = System.currentTimeMillis(),
+        val date_sent: Long = System.currentTimeMillis(),
+    )
 
-    private val filename = "gateway_client_prefs"
-    private val defaultKey = "DEFAULT_KEY"
+    const val GATEWAY_CLIENTS_FILENAME = "gateway_clients.json"
 
-    val sharedPreferences: SharedPreferences =
-            context.getSharedPreferences(filename, Context.MODE_PRIVATE)
+    val json = Json{ ignoreUnknownKeys = true }
 
-    fun updateDefaultGatewayClient(msisdn: String) {
-        sharedPreferences.edit()
-                .putString(defaultKey, msisdn)
-                .apply()
-    }
-
-    fun getDefaultGatewayClient(): String? {
-        return sharedPreferences.getString(defaultKey, "")
-    }
-
-    companion object {
-
-        fun populateDefaultGatewayClientsSetDefaults(context: Context) {
-            val gatewayClientList: MutableList<GatewayClient> = java.util.ArrayList()
-
-            val gatewayClient = GatewayClient()
-            gatewayClient.country = "Cameroon"
-            gatewayClient.mSISDN = context.getString(R.string.default_gateway_MSISDN_0)
-            gatewayClient.operatorName = "MTN Cameroon"
-            gatewayClient.operatorId = "62401"
-            gatewayClient.type = GatewayClient.TYPE.DEFAULT.value
-
-            val gatewayClient2 = GatewayClient()
-            gatewayClient2.country = "Cameroon"
-            gatewayClient2.mSISDN = context.getString(R.string.default_gateway_MSISDN_2)
-            gatewayClient2.operatorName = "Orange Cameroon"
-            gatewayClient2.operatorId = "62402"
-            gatewayClient2.type = GatewayClient.TYPE.DEFAULT.value
-
-            val gatewayClient3 = GatewayClient()
-            gatewayClient3.country = "Nigeria"
-            gatewayClient3.mSISDN = context.getString(R.string.default_gateway_MSISDN_3)
-            gatewayClient3.operatorName = "MTN Nigeria"
-            gatewayClient3.operatorId = "62130"
-            gatewayClient3.type = GatewayClient.TYPE.DEFAULT.value
-            if(GatewayClientsCommunications(context)
-                    .getDefaultGatewayClient().isNullOrEmpty())
-                GatewayClientsCommunications(context)
-                    .updateDefaultGatewayClient(gatewayClient3.mSISDN!!)
-
-            gatewayClientList.add(gatewayClient)
-            gatewayClientList.add(gatewayClient2)
-            gatewayClientList.add(gatewayClient3)
-
-            Datastore.getDatastore(context).gatewayClientsDao().refresh(gatewayClientList)
-        }
-
-        private fun fetchRemote(context: Context): ArrayList<GatewayClientJsonPayload> {
-            val url = context.getString(R.string.smswithoutboarders_official_gateway_client_seeding_url)
-            val networkResponseResults = Network.requestGet(url)
-            when(networkResponseResults.response.statusCode) {
-                in 400..500 -> throw Exception("Failed to fetch Gateway clients")
-                in 500..600 -> throw Exception("Error fetching Gateway clients")
-                else -> {
-                    val json = Json { ignoreUnknownKeys = true }
-                    return json.decodeFromString<
-                            ArrayList<
-                                    GatewayClientJsonPayload>>(networkResponseResults.result.get())
+    suspend fun populateDefaultGatewayClientsSetDefaults(context: Context) {
+        val inputStream = context.assets.open(GATEWAY_CLIENTS_FILENAME)
+        val buffer = BufferedReader(InputStreamReader(inputStream))
+        val rawGatewayClients = buffer.use{ it.readText() }
+        val gatewayClients = json
+            .decodeFromString<ArrayList<GatewayClients>>(rawGatewayClients).apply {
+                if(context.settingsGetDefaultGatewayClients == null) {
+                    firstOrNull { gwc -> gwc.isDefault }?.let {
+                        context.settingsSetDefaultGatewayClient(Json.encodeToString(it))
+                    }
                 }
             }
-        }
+        Datastore.getDatastore(context).gatewayClientsDao().insertAll(gatewayClients)
+    }
 
-        fun fetchAndPopulateWithDefault(context: Context) {
-//            populateDefaultGatewayClientsSetDefaults(context)
-            val gatewayClientList = ArrayList<GatewayClient>()
-            try {
-                val gatewayClients : ArrayList<GatewayClientJsonPayload> = fetchRemote(context)
-                gatewayClients.forEach {
-                    val gatewayClient = GatewayClient()
-                    gatewayClient.country = it.country
-                    gatewayClient.mSISDN = it.msisdn
-                    gatewayClient.operatorName = it.operator
-                    gatewayClient.operatorId = it.operator_code
-                    gatewayClientList.add(gatewayClient)
-                }
-                Datastore.getDatastore(context).gatewayClientsDao().insertAll(gatewayClientList)
-            } catch (e: Exception) {
-                e.printStackTrace()
+    private fun remoteCall(context: Context): ArrayList<GatewayClients> {
+        val url = context.getString(R.string.smswithoutboarders_official_gateway_client_seeding_url)
+        val networkResponseResults = Network.requestGet(url)
+        when(networkResponseResults.response.statusCode) {
+            in 400..500 -> throw Exception("Failed to fetch Gateway clients")
+            in 500..600 -> throw Exception("Error fetching Gateway clients")
+            else -> {
+                return json.decodeFromString<ArrayList<GatewayClients>>(
+                        networkResponseResults.result.get())
             }
+        }
+    }
+
+    fun fetchRemote(context: Context) {
+        try {
+            val gatewayClients = remoteCall(context).apply {
+                forEach { it.manuallyAdded = true }
+            }
+            Datastore.getDatastore(context).gatewayClientsDao().insertAll(gatewayClients)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }

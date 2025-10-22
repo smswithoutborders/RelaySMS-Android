@@ -37,6 +37,9 @@ interface EncryptedContentDAO {
     @Query("SELECT * FROM EncryptedContent WHERE id=:encryptedContentId")
     fun get(encryptedContentId: Long): EncryptedContent
 
+    @Query("SELECT * FROM EncryptedContent WHERE id=:encryptedContentId")
+    fun getLiveData(encryptedContentId: Long): LiveData<EncryptedContent>
+
     @Query("SELECT * FROM EncryptedContent WHERE encryptedContent LIKE '%' || :filterText || '%'")
     fun getForFilterText(filterText: String?): MutableList<EncryptedContent>?
 }

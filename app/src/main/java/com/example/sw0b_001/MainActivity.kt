@@ -36,25 +36,28 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import androidx.biometric.BiometricPrompt
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Inbox
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.Vaults
-import com.example.sw0b_001.ui.components.MissingTokenInfoDialog
 import com.example.sw0b_001.ui.navigation.AboutScreen
 import com.example.sw0b_001.ui.navigation.BridgeViewScreen
 import com.example.sw0b_001.ui.navigation.EmailViewScreen
@@ -76,6 +79,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.core.content.edit
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Observer
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
@@ -98,20 +103,20 @@ import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ThreadsViewModel
 import com.example.sw0b_001.extensions.context.promptBiometrics
 import com.example.sw0b_001.extensions.context.settingsGetLockDownApp
 import com.example.sw0b_001.extensions.context.settingsGetOnboardedCompletely
+import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
 import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.navigation.ComposeScreen
-import com.example.sw0b_001.ui.navigation.EmailComposeNav
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreenRelay
-import com.example.sw0b_001.ui.navigation.MessageComposeNav
 import com.example.sw0b_001.ui.navigation.OnboardingInteractiveScreen
 import com.example.sw0b_001.ui.navigation.OnboardingSkipScreen
-import com.example.sw0b_001.ui.navigation.TextComposeNav
+import com.example.sw0b_001.ui.navigation.SettingsScreen
 import com.example.sw0b_001.ui.navigation.WelcomeScreen
 import com.example.sw0b_001.ui.onboarding.OnboardingInteractive
 import com.example.sw0b_001.ui.views.WelcomeMainView
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
 import com.example.sw0b_001.ui.views.BottomTabsItems
+import com.example.sw0b_001.ui.views.SettingsView
 import com.example.sw0b_001.ui.views.compose.ComposerInterface
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
@@ -121,18 +126,15 @@ import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavHostController
+    private lateinit var searchViewModel: SearchViewModel
 
     val threadsViewModel: ThreadsViewModel by viewModels()
     val onboardingViewModel: OnboardingViewModel by viewModels()
-
-    private lateinit var searchViewModel: SearchViewModel
 
     val platformsViewModel: PlatformsViewModel by viewModels()
     val messagesViewModel: MessagesViewModel by viewModels()
     val gatewayClientViewModel: GatewayClientViewModel by viewModels()
     val imageViewModel: ImageViewModel by viewModels()
-
-    var showMissingTokenDialog by mutableStateOf(false)
 
     var loggedInAlready by mutableStateOf(false)
 
@@ -165,47 +167,19 @@ class MainActivity : AppCompatActivity() {
                                 AppTheme {
                                     navController = rememberNavController()
 
-                                    LaunchedEffect(true) {
-                                        refreshTokensCallback(platformsViewModel
-                                            .accountsForMissingDialog)
-                                    }
-
                                     LaunchedEffect(loggedInAlready) {
                                         if(loggedInAlready) {
+                                            val route = if(isDefault()) HomeScreenNav()
+                                            else HomepageScreen
                                             navController.navigate(GetMeOutScreen) {
-                                                popUpTo(HomepageScreen) {
+                                                popUpTo(route) {
                                                     inclusive = true
                                                 }
                                             }
                                         }
                                     }
 
-                                    if (showMissingTokenDialog) {
-                                        MissingTokenInfoDialog(
-                                            groupedAccounts = platformsViewModel.accountsForMissingDialog,
-                                            onDismiss = { showMissingTokenDialog = false },
-                                            onConfirm = { doNotShowAgain ->
-                                                showMissingTokenDialog = false
-                                                if (doNotShowAgain) {
-                                                    PreferenceManager
-                                                        .getDefaultSharedPreferences(applicationContext)
-                                                        .edit {
-                                                            putBoolean(
-                                                                Vaults.Companion.PrefKeys
-                                                                    .KEY_DO_NOT_SHOW_MISSING_TOKEN_DIALOG,
-                                                                true
-                                                            )
-                                                        }
-                                                }
-                                            }
-                                        )
-                                    }
-
                                     Surface( Modifier.fillMaxSize()) {
-                                        if(LocalContext.current.isDefault()) {
-                                            platformsViewModel.bottomTabsItem =
-                                                BottomTabsItems.BottomBarSmsMmsTab
-                                        }
                                         MainNavigation(navController = navController, newLayoutInfo)
                                     }
                                 }
@@ -268,23 +242,41 @@ class MainActivity : AppCompatActivity() {
         var showThreadsTopBar by remember { mutableStateOf(true) }
         var customThreadView: (@Composable () -> Unit)? by remember { mutableStateOf(null)}
 
-        LaunchedEffect(platformsViewModel.bottomTabsItem, defaultSmsApp) {
-            customThreadView = when(platformsViewModel.bottomTabsItem) {
-                BottomTabsItems.BottomBarSmsMmsTab -> {
-                    showThreadsTopBar = true
-                    null
-                }
-                else -> {
+
+        var navDrawItemSelected by remember{ mutableStateOf(false) }
+        var drawerCallback by remember { mutableStateOf<(() -> Unit)?>(null) }
+
+        val lifeCycleOwner = LocalLifecycleOwner.current
+        DisposableEffect(lifeCycleOwner) {
+            val observer = Observer<ThreadsViewModel.InboxType> { newInboxType ->
+                navDrawItemSelected = newInboxType == ThreadsViewModel.InboxType.CUSTOM
+            }
+            threadsViewModel.selectedInbox.observe(lifeCycleOwner, observer)
+
+            onDispose {
+                threadsViewModel.selectedInbox.removeObserver(observer)
+            }
+        }
+
+        LaunchedEffect(navDrawItemSelected) {
+            customThreadView = when {
+                navDrawItemSelected -> {
                     {
-                        showThreadsTopBar = !defaultSmsApp
+                        showThreadsTopBar = false
+                        imageViewModel.resetComplete()
                         HomepageView(
                             navController = navController,
                             platformsViewModel = platformsViewModel,
                             messagesViewModel = messagesViewModel,
                             gatewayClientViewModel = gatewayClientViewModel,
-                            showBottomBar = true,
+                            imageViewModel = imageViewModel,
+                            drawerCallback = drawerCallback
                         )
                     }
+                }
+                else -> {
+                    showThreadsTopBar = true
+                    null
                 }
             }
         }
@@ -299,16 +291,29 @@ class MainActivity : AppCompatActivity() {
             startDestination = if(hasSeenOnboarding) {
                 if(defaultSmsApp) HomeScreenNav() else HomepageScreen
             } else WelcomeScreen,
-            customBottomBar = {
-                BottomNavBar(
-                    selectedTab = platformsViewModel.bottomTabsItem,
-                    isLoggedIn = isLoggedIn,
-//                    isDefaultSmsApp = false
-                ) { selectedTab ->
-                    platformsViewModel.bottomTabsItem = selectedTab
-                }
-            },
             customThreadsView = customThreadView,
+            modalNavigationModalItems = { callback ->
+                NavigationDrawerItem(
+                    icon = {
+                        Icon(
+                            painter = painterResource(R.drawable.logo),
+                            contentDescription = "RelaySMS",
+                            modifier = Modifier.size(20.dp)
+                        )
+                    },
+                    label = {
+                        Text(
+                            stringResource(R.string.relaysms_inbox),
+                            fontSize = 14.sp
+                        )
+                    },
+                    selected = navDrawItemSelected,
+                    onClick = {
+                        drawerCallback = callback.invoke(ThreadsViewModel.InboxType.CUSTOM)
+                        threadsViewModel.setInboxType(ThreadsViewModel.InboxType.CUSTOM)
+                    }
+                )
+            }
         ) {
             composable<WelcomeScreen> {
                 WelcomeMainView(navController)
@@ -328,6 +333,7 @@ class MainActivity : AppCompatActivity() {
                     platformsViewModel = platformsViewModel,
                     messagesViewModel = messagesViewModel,
                     gatewayClientViewModel = gatewayClientViewModel,
+                    imageViewModel = imageViewModel,
                 )
             }
             composable<LoginScreen> { backEntry ->
@@ -360,7 +366,6 @@ class MainActivity : AppCompatActivity() {
                     countryCode = otpCodeNav.countryCode,
                     otpRequestType = otpCodeNav.otpRequestType,
                     nextAttemptTimestamp = otpCodeNav.nextAttemptTimestamp,
-                    platformViewModel = platformsViewModel,
                     onCompleteCallback = if(otpCodeNav.isOnboarding)
                         onboardingViewModel.callback else null,
                 )
@@ -375,47 +380,47 @@ class MainActivity : AppCompatActivity() {
                     navController = navController,
                     type = composeScreenNav.type,
                     imageViewModel = imageViewModel,
-                    emailNav = if(!composeScreenNav.emailNav.isNullOrEmpty())
-                        Json.decodeFromString<EmailComposeNav>(composeScreenNav.emailNav)
-                    else null,
-                    textNav = if(!composeScreenNav.textNav.isNullOrEmpty())
-                        Json.decodeFromString<TextComposeNav>(composeScreenNav.textNav)
-                    else null,
-                    messageNav = if(!composeScreenNav.messageNav.isNullOrEmpty())
-                        Json.decodeFromString<MessageComposeNav>(composeScreenNav.messageNav)
-                    else null,
+                    messagesViewModel = messagesViewModel,
                     onSendCallback = if(composeScreenNav.isOnboarding)
-                        onboardingViewModel.callback else null
+                        onboardingViewModel.callback else null,
+                    platformName = composeScreenNav.platformName,
                 )
             }
             composable<EmailViewScreen> {
                 EmailDetailsView(
                     navController = navController,
                     platformsViewModel = platformsViewModel,
+                    messagesViewModel = messagesViewModel,
+                    imageViewModel = imageViewModel,
                 )
             }
             composable<BridgeViewScreen> {
                 EmailDetailsView(
                     navController = navController,
                     platformsViewModel = platformsViewModel,
+                    messagesViewModel = messagesViewModel,
+                    imageViewModel = imageViewModel,
                     isBridge = true
                 )
             }
             composable<TextViewScreen> {
                 TextDetailsView(
                     navController = navController,
+                    messagesViewModel = messagesViewModel,
                     platformsViewModel = platformsViewModel,
                 )
             }
             composable<MessageViewScreen> {
                 MessageDetailsView(
                     navController = navController,
+                    messagesViewModel = messagesViewModel,
                     platformsViewModel = platformsViewModel,
                 )
             }
             composable<PasteEncryptedTextScreen> {
                 PasteEncryptedTextView(
                     platformsViewModel = platformsViewModel,
+                    messagesViewModel = messagesViewModel,
                     navController = navController,
                 )
             }
@@ -428,23 +433,16 @@ class MainActivity : AppCompatActivity() {
                     initialize = imageRenderNav.initialize
                 )
             }
+
+            composable<SettingsScreen> {
+                SettingsView(
+                    navController = navController,
+                    activity = this@MainActivity
+                )
+            }
         }
 
         processIntent(navController)
-    }
-
-    private fun refreshTokensCallback(accountsInfo: Map<String, List<String>> ){
-        val sharedPreferences = PreferenceManager
-            .getDefaultSharedPreferences(applicationContext)
-        val doNotShowDialog = sharedPreferences
-            .getBoolean(Vaults.Companion.PrefKeys
-                .KEY_DO_NOT_SHOW_MISSING_TOKEN_DIALOG, false)
-
-        if (!doNotShowDialog && accountsInfo.isNotEmpty()) {
-            showMissingTokenDialog = true
-            platformsViewModel.accountsForMissingDialog = accountsInfo
-        }
-
     }
 
     override fun onResume() {
@@ -459,9 +457,9 @@ class MainActivity : AppCompatActivity() {
                         if(llt.isNotEmpty()) {
                             val vault = Vaults(applicationContext)
                             try {
-                                vault.refreshStoredTokens(applicationContext, ) {
-                                    if(it.isNotEmpty()) refreshTokensCallback(it)
-                                }
+                                vault.refreshStoredTokens(
+                                    applicationContext,
+                                    settingsGetStoreTokensOnDevice)
                             } catch(e: StatusRuntimeException) {
                                 if(e.status.code == Status.UNAUTHENTICATED.code) {
                                     loggedInAlready = true
@@ -477,8 +475,6 @@ class MainActivity : AppCompatActivity() {
                 e.printStackTrace()
             }
         }
-
-        Platforms.refreshAvailablePlatforms(applicationContext)
     }
 
     private fun processIntent(navController: NavController, newIntent: Intent? = null) {

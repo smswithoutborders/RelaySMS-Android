@@ -5,11 +5,13 @@ import android.util.Base64
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.Composers
 import com.example.sw0b_001.data.Cryptography
-import com.example.sw0b_001.data.ComposeHandlers
-import com.example.sw0b_001.data.models.Platforms
+import com.example.sw0b_001.data.PayloadEncryptionComposeDecomposeInit
 import com.example.sw0b_001.data.Publishers
 import com.example.sw0b_001.data.Vaults
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.parseLocalImageContent
+import com.example.sw0b_001.ui.views.AvailablePlatformsView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,57 +29,6 @@ object Bridges {
         val status: String,
         val version: String
     )
-
-    data class BridgeEmailContent(
-        var to: String,
-        var cc: String,
-        var bcc: String,
-        var subject: String,
-        var body: String
-    )
-    data class BridgeIncomingEmailContent(
-        var alias: String,
-        var sender: String,
-        var cc: String,
-        var bcc: String,
-        var subject: String,
-        var date: Long,
-        var body: String
-    )
-
-    object BridgeComposeHandler {
-        fun decomposeMessage(
-            message: String,
-        ): BridgeEmailContent {
-            println(message)
-            return message.split(":").let {
-                BridgeEmailContent(
-                    to = it[0],
-                    cc = it[1],
-                    bcc = it[2],
-                    subject = it[3],
-                    body = it.subList(4, it.size).joinToString()
-                )
-            }
-        }
-
-        fun decomposeInboxMessage(
-            message: String,
-        ): BridgeIncomingEmailContent {
-            return message.split("\n").let {
-                BridgeIncomingEmailContent(
-                    alias = it[0],
-                    sender = it[1],
-                    cc = it[2],
-                    bcc = it[3],
-                    subject = it[4],
-                    date = it[5].split(".")[0]
-                        .replace(" ", "").toLong(),
-                    body = it.subList(6, it.size).joinToString()
-                )
-            }
-        }
-    }
 
     private fun getStaticKeys(
         context: Context,
@@ -121,15 +72,32 @@ object Bridges {
         context: Context,
         formattedContent: ByteArray,
         smsTransmission: Boolean,
-        onSuccessCallback: (EncryptedContent) -> Unit = {},
+        imageLength: Int,
+        textLength: Int,
+        subscriptionId: Long,
+        isLoggedIn: Boolean,
     ): ByteArray {
         val ad = Publishers.fetchPublisherPublicKey(context)
-        return ComposeHandlers.compose(
+        return PayloadEncryptionComposeDecomposeInit.compose(
             context = context,
-            formattedContent = formattedContent,
-            AD = ad!!,
+            content = formattedContent,
+            ad = ad!!,
+            platform = AvailablePlatforms(
+                name = "BRIDGE",
+                service_type = Platforms.ServiceTypes.BRIDGE.name,
+                shortcode = null,
+                protocol_type = null,
+                icon_svg = null,
+                icon_png = null,
+                support_url_scheme = false,
+            ),
+            imageLength = imageLength,
+            textLength = textLength,
+            account = null,
+            subscriptionId = subscriptionId,
             smsTransmission = smsTransmission,
-        ) { onSuccessCallback(it) }
+            isLoggedIn = isLoggedIn
+        )
     }
 
     fun compose(
@@ -140,35 +108,46 @@ object Bridges {
         subject: String,
         body: String,
         smsTransmission: Boolean = false,
-        onSuccessCallback: () -> Unit?
-    ) : Pair<String?, ByteArray?> {
-        val isLoggedIn = Vaults.Companion.fetchLongLivedToken(context).isNotEmpty()
-        var clientPublicKey: ByteArray? = Publishers.fetchClientPublisherPublicKey(context)
+        imageLength: Int,
+        textLength: Int,
+        subscriptionId: Long,
+    ) : String? {
+        val isLoggedIn = Vaults.fetchLongLivedToken(context).isNotEmpty()
 
-        if(!isLoggedIn) { clientPublicKey = getKeypairForTransmission(context) }
+        val content = Composers.EmailComposeHandler.createEmailByteBuffer(
+            from = null,
+            to = to,
+            cc = cc,
+            bcc = bcc,
+            subject = subject,
+            body = body,
+            isBridge = true
+        )
 
-        val formattedString = "$to:$cc:$bcc:$subject:$body"
+        if(!isLoggedIn) getKeypairForTransmission(context)
+
         val encryptedContent = encryptContent(
             context = context,
-            formattedContent = formattedString.encodeToByteArray(),
+            formattedContent = content,
             smsTransmission = smsTransmission,
-        ) { onSuccessCallback() }
+            imageLength = imageLength,
+            textLength = textLength,
+            subscriptionId = subscriptionId,
+            isLoggedIn = isLoggedIn
+        )
 
-        val payload: String = if(!isLoggedIn) {
-            val content = authRequestAndPayload(clientPublicKey!!,
-                encryptedContent)
-            Base64.encodeToString(content, Base64.DEFAULT)
+        val payload = if(!isLoggedIn) {
+            authRequestAndPayload( context, encryptedContent, )
         } else {
-            val content = payloadOnly(encryptedContent)
-            Base64.encodeToString(content, Base64.DEFAULT)
+            payloadOnly(encryptedContent)
         }
 
-        return Pair(payload, clientPublicKey)
+        return Base64.encodeToString(payload, Base64.NO_WRAP)
     }
 
     fun payloadOnly(cipherText: ByteArray) : ByteArray {
         val mode: ByteArray = ByteArray(1).apply { this[0] = 0x00 }
-        val versionMarker: ByteArray = ByteArray(1).apply { this[0] = 0x0A }
+        val versionMarker: ByteArray = ByteArray(1).apply { this[0] = 0x02 }
         val switchValue: ByteArray = ByteArray(1).apply { this[0] = 0x01 }
 
         val cipherTextLength = ByteArray(2)
@@ -182,22 +161,22 @@ object Bridges {
                 switchValue +
                 cipherTextLength +
                 bridgeLetter +
-                cipherText
+                cipherText +
+                "en".encodeToByteArray()
     }
 
     fun authRequestAndPayload(
-        clientPublicKey: ByteArray,
+        context: Context,
         cipherText: ByteArray,
-        serverKID: Byte = 0x00
+        serverKID: Byte = 0.toByte()
     ) : ByteArray {
         val mode: ByteArray = ByteArray(1).apply { this[0] = 0x00 }
-        val versionMarker: ByteArray = ByteArray(1).apply { this[0] = 0x0A }
+        val versionMarker: ByteArray = ByteArray(1).apply { this[0] = 0x02 }
         val switchValue: ByteArray = ByteArray(1).apply { this[0] = 0x00 }
 
-        val clientPublicKeyLen = ByteArray(1).run {
-            clientPublicKey.size.toByte()
-        }
+        val clientPublicKey = Publishers.fetchClientPublisherPublicKey(context)
 
+        val clientPublicKeyLen = ByteArray(1).run { clientPublicKey!!.size.toByte() }
         val cipherTextLength = ByteArray(2)
         ByteBuffer.wrap(cipherTextLength).order(ByteOrder.LITTLE_ENDIAN)
             .putShort(cipherText.size.toShort())
@@ -211,8 +190,9 @@ object Bridges {
                 cipherTextLength +
                 bridgeLetter +
                 serverKID +
-                clientPublicKey +
-                cipherText
+                clientPublicKey!! +
+                cipherText +
+                "en".encodeToByteArray()
     }
 
     fun decryptIncomingMessages(
@@ -252,7 +232,7 @@ object Bridges {
             val isLoggedIn = Vaults.Companion.fetchLongLivedToken(context).isNotEmpty()
             val AD = Publishers.Companion.fetchClientPublisherPublicKey(context)
             val scope = CoroutineScope(Dispatchers.Default).launch {
-                ComposeHandlers.decompose(
+                PayloadEncryptionComposeDecomposeInit.decompose(
                     context = context,
                     cipherText = cipherText,
                     AD = AD!!,

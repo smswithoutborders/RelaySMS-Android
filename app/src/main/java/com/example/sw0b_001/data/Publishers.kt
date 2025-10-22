@@ -15,6 +15,10 @@ import kotlinx.serialization.json.Json
 import publisher.v1.PublisherGrpc
 import publisher.v1.PublisherOuterClass
 import androidx.core.content.edit
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.net.URL
 
 class Publishers(val context: Context) {
 
@@ -239,6 +243,32 @@ class Publishers(val context: Context) {
             }
             sharedPreferences.edit {
                 putString(PUBLISHER_CLIENT_PUBLIC_KEY, clientPublishPublicKey)
+            }
+        }
+
+        fun refreshAvailablePlatforms(
+            context: Context,
+            callback: (String?) -> Unit = {}
+        ) {
+            CoroutineScope(Dispatchers.Default).launch {
+                try {
+                    getAvailablePlatforms(context).let{ json ->
+                        json.forEach { it->
+                            if(it.icon_png?.isNotEmpty() == true) {
+                                val url = URL(it.icon_png)
+                                it.logo = url.readBytes()
+                            }
+                        }
+                        Datastore.getDatastore(context).availablePlatformsDao().clear()
+                        Datastore.getDatastore(context).availablePlatformsDao()
+                            .insertAll(json)
+
+                        callback(null)
+                    }
+                } catch(e: Exception) {
+                    e.printStackTrace()
+                    callback(e.message)
+                }
             }
         }
     }

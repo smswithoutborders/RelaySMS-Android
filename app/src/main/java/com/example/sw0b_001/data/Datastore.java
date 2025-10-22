@@ -14,12 +14,13 @@ import androidx.room.RenameTable;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.migration.AutoMigrationSpec;
+import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.sqlite.db.SupportSQLiteOpenHelper;
 
 import com.example.sw0b_001.data.dao.EncryptedContentDAO;
 import com.example.sw0b_001.data.dao.GatewayClientsDao;
 import com.example.sw0b_001.data.models.EncryptedContent;
-import com.example.sw0b_001.data.models.GatewayClient;
+import com.example.sw0b_001.data.models.GatewayClients;
 import com.example.sw0b_001.data.models.GatewayServer;
 import com.example.sw0b_001.data.dao.GatewayServersDAO;
 import com.example.sw0b_001.data.dao.RatchetStatesDAO;
@@ -38,10 +39,10 @@ import org.jetbrains.annotations.NotNull;
         GatewayServer.class,
         Platforms.class,
         AvailablePlatforms.class,
-        GatewayClient.class,
+        GatewayClients.class,
         StoredPlatformsEntity.class,
         EncryptedContent.class,},
-        version = 20,
+        version = 23,
         autoMigrations = {
         @AutoMigration( from = 8, to = 9, spec = Datastore.DatastoreMigrations.class),
         @AutoMigration( from = 9, to = 10, spec= Datastore.DatastoreMigrations.class),
@@ -55,6 +56,9 @@ import org.jetbrains.annotations.NotNull;
         @AutoMigration( from = 17, to = 18, spec = Datastore.Migrate17To18.class),
         @AutoMigration( from = 18, to = 19),
         @AutoMigration( from = 19, to = 20),
+        @AutoMigration( from = 20, to = 21),
+        @AutoMigration( from = 21, to = 22, spec = Datastore.Migrate21To22.class),
+        @AutoMigration( from = 22, to = 23, spec = Datastore.Migrate22To23.class),
 })
 
 public abstract class Datastore extends RoomDatabase {
@@ -102,4 +106,21 @@ public abstract class Datastore extends RoomDatabase {
             @DeleteColumn(tableName = "EncryptedContent", columnName = "platform_id"),
     })
     static class Migrate17To18 implements AutoMigrationSpec { }
+
+    static class Migrate21To22 implements AutoMigrationSpec {
+        @Override
+        public void onPostMigrate(@NonNull SupportSQLiteDatabase db) {
+            AutoMigrationSpec.super.onPostMigrate(db);
+            db.compileStatement("DELETE FROM EncryptedContent").executeUpdateDelete();
+        }
+    }
+
+    @DeleteTable.Entries({
+            @DeleteTable(tableName = "GatewayClient")
+    })
+    static class Migrate22To23 implements AutoMigrationSpec {
+        @Override
+        public void onPostMigrate(@NonNull SupportSQLiteDatabase db) {
+        }
+    }
 }

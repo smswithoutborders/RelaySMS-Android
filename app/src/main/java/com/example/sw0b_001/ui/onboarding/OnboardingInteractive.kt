@@ -51,6 +51,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
+import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
+import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.R
 import com.example.sw0b_001.extensions.context.settingsGetOnboardedCompletely
 import com.example.sw0b_001.extensions.context.settingsSetOnboardedCompletely
@@ -63,6 +65,7 @@ import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.navigation.OnboardingSkipScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
+import com.example.sw0b_001.ui.views.makeDefault
 
 data class InteractiveOnboarding(
     val title: String,
@@ -82,6 +85,19 @@ fun OnboardingInteractive(
     val context = LocalContext.current
     val activity = LocalActivity.current as AppCompatActivity
     val showingOnboarding by onboardingViewModel.onboardingState.collectAsState()
+
+    val defaultBehaviour = getSetDefaultBehaviour(context) {
+        if(context.isDefault()) {
+            if(onboardingViewModel.next()) {
+                context.settingsSetOnboardedCompletely(true)
+                navController.navigate(HomepageScreen) {
+                    popUpTo(HomepageScreen) {
+                        inclusive = true
+                    }
+                }
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -215,6 +231,10 @@ fun OnboardingInteractive(
                     isOnboarding = true,
                     onCompleteCallback = {}
                 ) { onboardingViewModel.showSendPlatformsModal = false }
+            }
+
+            if(onboardingViewModel.showMakeDefaultRequest) {
+                defaultBehaviour.launch(makeDefault(context))
             }
         }
     }

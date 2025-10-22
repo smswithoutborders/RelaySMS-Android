@@ -60,12 +60,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
+import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
 import com.example.sw0b_001.ui.navigation.ComposeScreen
-import com.example.sw0b_001.ui.navigation.EmailComposeNav
-import com.example.sw0b_001.ui.navigation.MessageComposeNav
-import com.example.sw0b_001.ui.navigation.TextComposeNav
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.triggerAddPlatformRequest
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.EmailComposeHandler.EmailContent
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
 import java.util.Locale
@@ -177,7 +174,7 @@ fun PlatformOptionsModal(
                                 context)
                         } else {
                             getServiceBasedAvailableDescription(
-                                platform?.service_type!!,
+                                platform?.service_type ?: "",
                                 context)
                         },
                         style = MaterialTheme.typography.bodyMedium,
@@ -185,7 +182,7 @@ fun PlatformOptionsModal(
                     )
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    if (isCompose) {
+                    if (isCompose || platform == null) {
                         ComposeMessages(
                             platform = platform,
                             navController = navController,
@@ -201,7 +198,7 @@ fun PlatformOptionsModal(
                                 isAddLoading = true
                                 triggerAddPlatformRequest(
                                     context = context,
-                                    platform = platform!!
+                                    platform = platform
                                 ) {
                                     isAddLoading = false
                                     onDismissRequest()
@@ -254,14 +251,14 @@ private fun triggerAccountRevoke(
         val publishers = Publishers(context)
         try {
             when(platform.protocol_type) {
-                Platforms.ProtocolTypes.OAUTH2.type -> {
+                Platforms.ProtocolTypes.oauth2.name -> {
                     publishers.revokeOAuthPlatforms(
                         llt,
                         account.name!!,
                         account.account!!,
                     )
                 }
-                Platforms.ProtocolTypes.PNBA.type -> {
+                Platforms.ProtocolTypes.pnba.name -> {
                     publishers.revokePNBAPlatforms(
                         llt,
                         account.name!!,
@@ -315,13 +312,13 @@ private fun AddAccountLoading(
         )
 
         when(platform.protocol_type) {
-            Platforms.ProtocolTypes.OAUTH2.type -> {
+            Platforms.ProtocolTypes.oauth2.name -> {
                 CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.secondary,
                     trackColor = MaterialTheme.colorScheme.surfaceVariant,
                 )
             }
-            Platforms.ProtocolTypes.PNBA.type -> {
+            Platforms.ProtocolTypes.pnba.name -> {
                 PNBAPhoneNumberCodeRequestView(
                     isLoading = isLoading,
                     platform = platform,
@@ -353,7 +350,9 @@ private fun AddAccountLoading(
                                 if(authCodeRequested) {
                                     try {
                                         val vault = Vaults(context)
-                                        vault.refreshStoredTokens(context)
+                                        vault.refreshStoredTokens(
+                                            context,
+                                            context.settingsGetStoreTokensOnDevice)
                                         onCompletedCallback()
                                     } catch(e: Exception) {
                                         e.printStackTrace()
@@ -379,7 +378,9 @@ private fun AddAccountLoading(
                             onSuccessCallback = {_, _ ->
                                 try {
                                     val vault = Vaults(context)
-                                    vault.refreshStoredTokens(context)
+                                    vault.refreshStoredTokens(
+                                        context,
+                                        context.settingsGetStoreTokensOnDevice)
                                     onCompletedCallback()
                                 } catch(e: Exception) {
                                     e.printStackTrace()
@@ -489,26 +490,8 @@ private fun ComposeMessages(
             navController.navigate(ComposeScreen(
                 type = if(platform != null) ServiceTypes.valueOf(platform.service_type!!)
                     else ServiceTypes.BRIDGE,
-                emailNav = if(platform?.service_type == ServiceTypes.EMAIL.name)
-                    Json.encodeToString<EmailComposeNav>(EmailComposeNav(
-                        platformName = platform.name,
-                        subscriptionId = subscriptionId,
-                    ))
-                else null,
-                textNav = if(platform?.service_type == ServiceTypes.TEXT.name)
-                    Json.encodeToString<TextComposeNav>(TextComposeNav(
-                        platformName = platform.name,
-                        subscriptionId = subscriptionId,
-                        serviceType = ServiceTypes.valueOf(platform.service_type!!),
-                    ))
-                else null,
-                messageNav = if(platform?.service_type == ServiceTypes.MESSAGE.name)
-                    Json.encodeToString<MessageComposeNav>(MessageComposeNav(
-                        platformName = platform.name,
-                        subscriptionId = subscriptionId,
-                    ))
-                else null,
-                isOnboarding = isOnboarding
+                isOnboarding = isOnboarding,
+                platformName = platform?.name ?: ServiceTypes.BRIDGE.name
             ))
         },
         modifier = Modifier.fillMaxWidth()

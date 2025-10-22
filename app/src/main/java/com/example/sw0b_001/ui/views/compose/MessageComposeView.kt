@@ -57,11 +57,11 @@ import com.example.sw0b_001.data.models.AvailablePlatforms
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.Composers
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.verifyPhoneNumberFormat
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.MessageComposeHandler.MessageContent
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -96,7 +96,7 @@ private fun getRecipientFieldInfo(): RecipientFieldInfo {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun MessageComposeView(
-    messageContent: MessageContent,
+    messageContent: Composers.MessageComposeHandler.MessageContent,
     from: String?= null
 ) {
 
@@ -208,7 +208,8 @@ fun MessageComposePreview() {
     AppTheme(darkTheme = false) {
 
         val messageContent by remember{ mutableStateOf(
-            MessageContent( ))
+            Composers.MessageComposeHandler.MessageContent()
+        )
         }
         MessageComposeView(
             messageContent = messageContent,

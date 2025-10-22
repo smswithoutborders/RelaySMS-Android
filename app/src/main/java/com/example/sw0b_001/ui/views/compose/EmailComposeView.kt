@@ -63,6 +63,7 @@ import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.Composers
 import com.example.sw0b_001.extensions.context.settingsGetNotShowChooseGatewayClient
 import com.example.sw0b_001.ui.modals.ComposeChooseGatewayClientsModal
 import com.example.sw0b_001.ui.modals.SelectAccountModal
@@ -87,7 +88,7 @@ data class GatewayClientRequest(
 @Composable
 fun EmailComposeView(
     isBridge: Boolean,
-    emailContent: PlatformsViewModel.EmailComposeHandler.EmailContent,
+    emailContent: Composers.EmailComposeHandler.EmailContent,
     from: String? = null,
 ) {
     val inPreviewMode = LocalInspectionMode.current
@@ -352,7 +353,7 @@ fun EmailComposeView(
 @Composable
 fun EmailComposePreview() {
     AppTheme(darkTheme = false) {
-        val emailContent = PlatformsViewModel.EmailComposeHandler.EmailContent()
+        val emailContent = Composers.EmailComposeHandler.EmailContent()
         EmailComposeView(
             isBridge = false,
             emailContent = emailContent,

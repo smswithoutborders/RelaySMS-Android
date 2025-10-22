@@ -62,10 +62,13 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
+import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.data.savePhoneNumberToPrefs
+import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.google.android.gms.auth.api.phone.SmsRetriever
@@ -155,7 +158,6 @@ fun OtpCodeVerificationView(
     loginSignupPhoneNumber: String,
     loginSignupPassword: String,
     countryCode: String,
-    platformViewModel: PlatformsViewModel?,
     otpRequestType: OTPCodeVerificationType,
     nextAttemptTimestamp: Int? = null,
     onCompleteCallback: ((Boolean) -> Unit)? = null
@@ -298,7 +300,6 @@ fun OtpCodeVerificationView(
                         password = loginSignupPassword,
                         countryCode = countryCode,
                         code = otpCode,
-                        platformsViewModel = platformViewModel,
                         type = otpRequestType,
                         onFailedCallback = {isLoading = false},
                         onCompleteCallback = {isLoading = false}
@@ -308,8 +309,10 @@ fun OtpCodeVerificationView(
                                 onCompleteCallback.invoke(true)
                                 navController.popBackStack()
                             } else {
-                                navController.navigate(HomepageScreen) {
-                                    popUpTo(HomepageScreen) {
+                                val route = if(context.isDefault()) HomeScreenNav()
+                                else HomepageScreen
+                                navController.navigate(route) {
+                                    popUpTo(route) {
                                         inclusive = true
                                     }
                                 }
@@ -434,7 +437,6 @@ private fun submitOTPCode(
     countryCode: String = "",
     code: String,
     type: OTPCodeVerificationType,
-    platformsViewModel: PlatformsViewModel?,
     onFailedCallback: (String?) -> Unit,
     onCompleteCallback: () -> Unit,
     onSuccessCallback: () -> Unit,
@@ -444,7 +446,7 @@ private fun submitOTPCode(
         try {
             when(type) {
                 OTPCodeVerificationType.CREATE -> {
-                    val response = vault.createEntity(
+                    vault.createEntity(
                         context,
                         phoneNumber,
                         countryCode,
@@ -453,7 +455,7 @@ private fun submitOTPCode(
                     )
                 }
                 OTPCodeVerificationType.AUTHENTICATE -> {
-                    val response = vault.authenticateEntity(
+                    vault.authenticateEntity(
                         context,
                         phoneNumber,
                         password,
@@ -461,7 +463,7 @@ private fun submitOTPCode(
                     )
                 }
                 OTPCodeVerificationType.RECOVER -> {
-                    val response = vault.recoverEntityPassword(
+                    vault.recoverEntityPassword(
                         context,
                         phoneNumber,
                         password,
@@ -471,10 +473,9 @@ private fun submitOTPCode(
             }
 
             savePhoneNumberToPrefs(context, phoneNumber)
-
-            vault.refreshStoredTokens(context) {
-                platformsViewModel?.accountsForMissingDialog = it
-            }
+            Vaults(context)
+                .refreshStoredTokens(context,
+                    context.settingsGetStoreTokensOnDevice)
             onSuccessCallback()
         } catch(e: StatusRuntimeException) {
             e.printStackTrace()
@@ -498,7 +499,6 @@ fun OtpCodeVerificationViewPreview() {
             "",
             loginSignupPassword = "",
             countryCode = "",
-            platformViewModel = remember { PlatformsViewModel() },
             otpRequestType = OTPCodeVerificationType.CREATE,
         ) {}
     }

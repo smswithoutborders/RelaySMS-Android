@@ -59,14 +59,13 @@ fun InboxView(
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                contentPadding = PaddingValues(8.dp),
             ) {
                 items(messages) { message ->
                     RecentMessageCard(
                         message,
                         onClickCallback = {
-                            platformsViewModel.message = message
+                            messagesViewModel.message = message
                             navController.navigate(BridgeViewScreen)
                         },
                     )

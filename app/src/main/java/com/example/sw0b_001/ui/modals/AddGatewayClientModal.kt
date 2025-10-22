@@ -49,7 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.models.GatewayClient
+import com.example.sw0b_001.data.models.GatewayClients
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.verifyPhoneNumberFormat
 import kotlinx.coroutines.launch
@@ -60,7 +60,7 @@ fun AddGatewayClientModal(
     onDismiss: () -> Unit,
     showBottomSheet: Boolean,
     viewModel: GatewayClientViewModel,
-    gatewayClient: GatewayClient? = null,
+    gatewayClients: GatewayClients? = null,
     onGatewayClientSaved: () -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -70,8 +70,8 @@ fun AddGatewayClientModal(
         skipHiddenState = false
     )
     val scope = rememberCoroutineScope()
-    var phoneNumber by remember { mutableStateOf(gatewayClient?.mSISDN ?: "") }
-    var alias by remember { mutableStateOf(gatewayClient?.alias ?: "") }
+    var phoneNumber by remember { mutableStateOf(gatewayClients?.msisdn ?: "") }
+    var alias by remember { mutableStateOf(gatewayClients?.alias ?: "") }
 
     var isSaving by remember { mutableStateOf(false) }
     var isError by remember { mutableStateOf(false) }
@@ -141,7 +141,7 @@ fun AddGatewayClientModal(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = if (gatewayClient == null) stringResource(R.string.add_gateway_client) else stringResource(
+                    text = if (gatewayClients == null) stringResource(R.string.add_gateway_client) else stringResource(
                         R.string.edit_gateway_client
                     ),
                     style = MaterialTheme.typography.headlineSmall,
@@ -247,28 +247,32 @@ fun AddGatewayClientModal(
                                     isError = true
                                 }
 
-                                if (gatewayClient == null) {
-                                    val newGatewayClient = GatewayClient()
-                                    newGatewayClient.mSISDN = phoneNumber
-                                    newGatewayClient.alias = alias
-                                    newGatewayClient.type = GatewayClient.TYPE.CUSTOM.value
+                                if (gatewayClients == null) {
+                                    val newGatewayClients = GatewayClients(
+                                        msisdn = phoneNumber,
+                                        operator = "Unknown",
+                                        country = "Unknown",
+                                        alias = alias,
+                                        manuallyAdded = true,
+                                    )
                                     viewModel.insertGatewayClient(
                                         context,
-                                        newGatewayClient,
+                                        newGatewayClients,
                                         successRunnable,
                                         failureRunnable
                                     )
                                 } else {
-                                    gatewayClient.mSISDN = phoneNumber
-                                    gatewayClient.alias = alias
+                                    gatewayClients.msisdn = phoneNumber
+                                    gatewayClients.alias = alias
                                     viewModel.updateGatewayClient(
                                         context,
-                                        gatewayClient,
+                                        gatewayClients,
                                         successRunnable,
                                         failureRunnable
                                     )
                                 }
                             } catch (e: Exception) {
+                                e.printStackTrace()
                                 isSaving = false
                                 isError = true
                             }

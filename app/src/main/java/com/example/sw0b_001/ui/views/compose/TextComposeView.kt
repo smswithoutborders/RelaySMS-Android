@@ -41,6 +41,7 @@ import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.Composers
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
@@ -59,7 +60,7 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextComposeView(
-    textContent: PlatformsViewModel.TextComposeHandler.TextContent,
+    textContent: Composers.TextComposeHandler.TextContent,
     serviceType: Platforms.ServiceTypes,
 ) {
     Column(
@@ -101,7 +102,7 @@ data class ReliabilityTestResponsePayload(
 fun TextComposePreview() {
     AppTheme(darkTheme = false) {
         TextComposeView(
-            textContent = PlatformsViewModel.TextComposeHandler.TextContent(),
+            textContent = Composers.TextComposeHandler.TextContent(),
             serviceType = Platforms.ServiceTypes.TEXT
         )
     }
