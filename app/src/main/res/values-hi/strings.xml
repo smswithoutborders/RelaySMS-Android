@@ -361,5 +361,32 @@
     <string name="ready_to_save_platforms">प्लेटफॉर्म बचाने के लिए तैयार!</string>
     <string name="you_are_now_ready">अब आप तैयार हैं!</string>
     <string name="you_have_successfully_carried_out_the_essentials_of_messaging_with_relaysms">आपने RelaySMS के साथ संदेश भेजने के अनिवार्य कार्यों को सफलतापूर्वक पूरा कर लिया है!</string>
+    <string name="secure_your_app">अपना ऐप सुरक्षित करें!</string>
+    <string name="let_s_lock_this_down">आइये इसे बंद कर दें!</string>
+    <string name="from_locking_with_device_pin_code_to_other_secure_ways_of_making_sure_you_maintain_your_app_s_privacy">डिवाइस पिन कोड से लॉक करने से लेकर अन्य सुरक्षित तरीकों से यह सुनिश्चित करना कि आप अपने ऐप की गोपनीयता बनाए रखें!</string>
+    <string name="failed_to_set_biometric_authentication">बायोमेट्रिक प्रमाणीकरण सेट करने में विफल</string>
+    <string name="make_default_sms_app">डिफ़ॉल्ट SMS ऐप बनाएं</string>
+    <string name="you_can_manage_all_your_sms_messages_from_a_single_place">आप अपने सभी एसएमएस संदेशों को एक ही स्थान से प्रबंधित कर सकते हैं।</string>
+    <string name="this_also_unlocks_features_like_sending_images_with_sms_yes_not_mms">इससे एसएमएस के साथ चित्र भेजने जैसी सुविधाएं भी उपलब्ध हो जाती हैं (हां, एमएमएस नहीं)</string>
+    <string name="you_can_only_save_these_platforms_after_you_log_in">आप इन प्लेटफ़ॉर्म को केवल लॉग इन करने के बाद ही सेव कर सकते हैं</string>
+    <string name="unknown_error">अज्ञात त्रुटि</string>
+    <string name="add_photos">तस्वीरें जोडो</string>
+    <string name="relaysms_inbox">रिलेएसएमएस इनबॉक्स</string>
+    <string name="open_menu">मेनू खोलें</string>
+    <string name="default_sms_receiver">डिफ़ॉल्ट SMS रिसीवर</string>
+    <string name="set_as_default">डिफाल्ट के रूप में सेट</string>
+    <string name="this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer">इससे आपके सभी स्टोर किए गए टोकन, सिक्योरिटी की और डिवाइस और वॉल्ट पर स्टोर किया गया हर डेटा रद्द हो जाएगा। आप जब चाहें तब भी ब्रिज का इस्तेमाल कर सकते हैं।</string>
+    <string name="this_would_migrate_your_tokens_stored_on_the_vault_to_your_device_this_would_send_the_token_alongside_every_time_you_send_the_message_potentially_increasing_the_size_of_messages">इससे वॉल्ट में स्टोर आपके टोकन आपके डिवाइस पर माइग्रेट हो जाएंगे। इससे हर बार जब आप मैसेज भेजेंगे तो टोकन भी साथ में भेजा जाएगा - जिससे मैसेज का साइज़ बढ़ सकता है।</string>
+    <string name="delete_gateway_client">गेटवे क्लाइंट हटाएँ</string>
+    <string name="english1">अंग्रेज़ी</string>
+    <string name="system">प्रणाली</string>
+    <string name="publishing">प्रकाशित करना</string>
+    <string name="send_messages_with_device_id">डिवाइस ID से संदेश भेजें</string>
+    <string name="device_id_lets_you_send_messages_without_using_your_actual_phone_number_for_authentication_this_works_well_for_dual_sim_phones">डिवाइस ID से आप ऑथेंटिकेशन के लिए अपने असली फ़ोन नंबर का इस्तेमाल किए बिना मैसेज भेज सकते हैं। यह डुअल सिम फ़ोन के लिए अच्छा काम करता है।</string>
+    <string name="lock_app">लॉक ऐप</string>
+    <string name="this_will_lock_the_app_using_your_phone_s_biometric_security_configurations_you_will_need_to_globally_set_for_the_device">यह आपके फ़ोन के बायोमेट्रिक सिक्योरिटी कॉन्फ़िगरेशन का इस्तेमाल करके ऐप को लॉक कर देगा। आपको डिवाइस के लिए ग्लोबली सेट करना होगा।</string>
+    <string name="log_out">लॉग आउट</string>
+    <string name="this_would_log_you_out_of_your_vault_account_on_this_device_you_can_log_back_in_at_anytime_with_an_internet_connection">इससे आप इस डिवाइस पर अपने Vault अकाउंट से लॉग आउट हो जाएंगे। आप कभी भी (इंटरनेट कनेक्शन के साथ) वापस लॉग इन कर सकते हैं।</string>
+    <string name="delete_account">खाता हटा दो</string>
 
 </resources>
