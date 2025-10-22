@@ -366,5 +366,22 @@
     <string name="you_can_only_save_these_platforms_after_you_log_in">Unaweza tu kuhifadhi mifumo hii baada ya kuingia</string>
     <string name="unknown_error">Hitilafu isiyojulikana</string>
     <string name="add_photos">Ongeza picha</string>
+    <string name="relaysms_inbox">RelaySMS Inbox</string>
+    <string name="open_menu">Fungua menyu</string>
+    <string name="default_sms_receiver">Kipokeaji SMS chaguomsingi</string>
+    <string name="set_as_default">Weka kama chaguomsingi</string>
+    <string name="delete_gateway_client">Futa mteja wa lango</string>
+    <string name="english1">Kiingereza</string>
+    <string name="system">Mfumo</string>
+    <string name="publishing">Kuchapisha</string>
+    <string name="send_messages_with_device_id">Tuma ujumbe ukitumia kitambulisho cha kifaa</string>
+    <string name="device_id_lets_you_send_messages_without_using_your_actual_phone_number_for_authentication_this_works_well_for_dual_sim_phones">Kitambulisho cha Kifaa hukuwezesha kutuma ujumbe bila kutumia nambari yako halisi ya simu kwa uthibitishaji. Hii inafanya kazi vizuri kwa simu mbili za sim.</string>
+    <string name="lock_app">Funga programu</string>
+    <string name="this_will_lock_the_app_using_your_phone_s_biometric_security_configurations_you_will_need_to_globally_set_for_the_device">Hii itafunga programu kwa kutumia usanidi wa usalama wa kibayometriki wa simu yako. Utahitaji kuweka kifaa kote ulimwenguni</string>
+    <string name="log_out">Toka nje</string>
+    <string name="this_would_log_you_out_of_your_vault_account_on_this_device_you_can_log_back_in_at_anytime_with_an_internet_connection">Hii itakuondoa kwenye akaunti yako ya Vault kwenye kifaa hiki. Unaweza kuingia tena wakati wowote (ukiwa na muunganisho wa intaneti)</string>
+    <string name="delete_account">Futa Akaunti</string>
+    <string name="this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer">Hii inaweza kubatilisha tokeni zako zote zilizohifadhiwa, funguo za usalama na kila data uliyohifadhi kwenye kifaa na Vault. Bado unaweza kutumia madaraja wakati wowote upendavyo</string>
+    <string name="this_would_migrate_your_tokens_stored_on_the_vault_to_your_device_this_would_send_the_token_alongside_every_time_you_send_the_message_potentially_increasing_the_size_of_messages">Hii inaweza kuhamisha tokeni zako zilizohifadhiwa kwenye Vault hadi kwenye kifaa chako. Hii inaweza kutuma ishara pamoja kila wakati unapotuma ujumbe - uwezekano wa kuongeza ukubwa wa ujumbe</string>
 
 </resources>

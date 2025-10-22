@@ -367,5 +367,22 @@
     <string name="you_can_only_save_these_platforms_after_you_log_in">لا يمكنك حفظ هذه المنصات إلا بعد تسجيل الدخول</string>
     <string name="unknown_error">خطأ غير معروف</string>
     <string name="add_photos">أضف الصور</string>
+    <string name="relaysms_inbox">صندوق الوارد RelaySMS</string>
+    <string name="open_menu">افتح القائمة</string>
+    <string name="default_sms_receiver">مستقبل الرسائل القصيرة الافتراضي</string>
+    <string name="set_as_default">تعيين كإعداد افتراضي</string>
+    <string name="delete_gateway_client">حذف عميل البوابة</string>
+    <string name="english1">إنجليزي</string>
+    <string name="system">نظام</string>
+    <string name="publishing">نشر</string>
+    <string name="send_messages_with_device_id">إرسال الرسائل باستخدام معرف الجهاز</string>
+    <string name="device_id_lets_you_send_messages_without_using_your_actual_phone_number_for_authentication_this_works_well_for_dual_sim_phones">يتيح لك مُعرِّف الجهاز إرسال الرسائل دون الحاجة إلى استخدام رقم هاتفك للمصادقة. يعمل هذا بشكل جيد مع الهواتف ثنائية الشريحة.</string>
+    <string name="lock_app">قفل التطبيق</string>
+    <string name="this_will_lock_the_app_using_your_phone_s_biometric_security_configurations_you_will_need_to_globally_set_for_the_device">سيؤدي هذا إلى قفل التطبيق باستخدام إعدادات الأمان البيومترية لهاتفك. ستحتاج إلى ضبط الإعدادات عالميًا للجهاز.</string>
+    <string name="log_out">تسجيل الخروج</string>
+    <string name="this_would_log_you_out_of_your_vault_account_on_this_device_you_can_log_back_in_at_anytime_with_an_internet_connection">سيؤدي هذا إلى تسجيل خروجك من حساب Vault على هذا الجهاز. يمكنك تسجيل الدخول مرة أخرى في أي وقت (مع اتصال بالإنترنت).</string>
+    <string name="delete_account">حذف الحساب</string>
+    <string name="this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer">سيؤدي هذا إلى إلغاء جميع رموزك ومفاتيح الأمان وجميع البيانات المخزنة على جهازك وVault. لا يزال بإمكانك استخدام الجسور متى شئت.</string>
+    <string name="this_would_migrate_your_tokens_stored_on_the_vault_to_your_device_this_would_send_the_token_alongside_every_time_you_send_the_message_potentially_increasing_the_size_of_messages">سيؤدي هذا إلى نقل رموزك المخزنة في الخزنة إلى جهازك. سيؤدي هذا إلى إرسال الرمز مع كل رسالة تُرسلها، مما قد يزيد من حجم الرسائل.</string>
 
 </resources>

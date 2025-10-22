@@ -368,5 +368,22 @@
     <string name="you_can_only_save_these_platforms_after_you_log_in">Bu platformları yalnızca oturum açtıktan sonra kaydedebilirsiniz</string>
     <string name="unknown_error">Bilinmeyen hata</string>
     <string name="add_photos">Fotoğraf ekle</string>
+    <string name="relaysms_inbox">RelaySMS gelen kutusu</string>
+    <string name="open_menu">Menüyü aç</string>
+    <string name="default_sms_receiver">Varsayılan SMS alıcısı</string>
+    <string name="set_as_default">Varsayılan olarak ayarla</string>
+    <string name="delete_gateway_client">Ağ geçidi istemcisini sil</string>
+    <string name="english1">İngilizce</string>
+    <string name="system">Sistem</string>
+    <string name="publishing">Yayıncılık</string>
+    <string name="send_messages_with_device_id">Cihaz kimliğiyle mesaj gönder</string>
+    <string name="device_id_lets_you_send_messages_without_using_your_actual_phone_number_for_authentication_this_works_well_for_dual_sim_phones">Cihaz Kimliği, kimlik doğrulama için gerçek telefon numaranızı kullanmadan mesaj göndermenizi sağlar. Bu özellik, çift SIM kartlı telefonlar için uygundur.</string>
+    <string name="lock_app">Kilit uygulaması</string>
+    <string name="this_will_lock_the_app_using_your_phone_s_biometric_security_configurations_you_will_need_to_globally_set_for_the_device">Bu, uygulamayı telefonunuzun biyometrik güvenlik yapılandırmalarını kullanarak kilitleyecektir. Cihaz için genel bir ayar yapmanız gerekecektir.</string>
+    <string name="log_out">Çıkış yap</string>
+    <string name="this_would_log_you_out_of_your_vault_account_on_this_device_you_can_log_back_in_at_anytime_with_an_internet_connection">Bu işlem, bu cihazdaki Vault hesabınızdan çıkış yapmanıza neden olur. İstediğiniz zaman (internet bağlantısıyla) tekrar giriş yapabilirsiniz.</string>
+    <string name="delete_account">Hesabı Sil</string>
+    <string name="this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer">Bu, depolanan tüm token\'larınızı, güvenlik anahtarlarınızı ve cihazınızda ve Kasa\'da depoladığınız tüm verileri iptal edecektir. Köprüleri istediğiniz zaman kullanmaya devam edebilirsiniz.</string>
+    <string name="this_would_migrate_your_tokens_stored_on_the_vault_to_your_device_this_would_send_the_token_alongside_every_time_you_send_the_message_potentially_increasing_the_size_of_messages">Bu, Kasa\'da depolanan token\'larınızı cihazınıza taşıyacaktır. Bu, her mesaj gönderdiğinizde token\'ı da gönderecektir; bu da mesajların boyutunu artırma potansiyeline sahiptir.</string>
 
 </resources>

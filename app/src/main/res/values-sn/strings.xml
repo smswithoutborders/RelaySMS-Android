@@ -364,4 +364,21 @@
     <string name="you_can_only_save_these_platforms_after_you_log_in">Iwe unogona chete kuchengetedza mapuratifomu aya mushure mekupinda mukati</string>
     <string name="unknown_error">Kukanganisa kusingazivikanwe</string>
     <string name="add_photos">Wedzera mapikicha</string>
+    <string name="relaysms_inbox">RelaySMS inbox</string>
+    <string name="open_menu">Vhura menyu</string>
+    <string name="default_sms_receiver">Default SMS inogamuchira</string>
+    <string name="set_as_default">Seta seyakagadzika</string>
+    <string name="delete_gateway_client">Delete gateway client</string>
+    <string name="english1">Chirungu</string>
+    <string name="system">System</string>
+    <string name="publishing">Publishing</string>
+    <string name="send_messages_with_device_id">Tumira mameseji neID yemudziyo</string>
+    <string name="device_id_lets_you_send_messages_without_using_your_actual_phone_number_for_authentication_this_works_well_for_dual_sim_phones">ID yemudziyo inoita kuti utumire mameseji pasina kushandisa yako chaiyo nhamba yefoni kuratidza. Izvi zvinoshanda zvakanaka kune maviri maviri sim mafoni.</string>
+    <string name="lock_app">Kiya app</string>
+    <string name="this_will_lock_the_app_using_your_phone_s_biometric_security_configurations_you_will_need_to_globally_set_for_the_device">Izvi zvinokiya iyo app uchishandisa foni yako biometric kuchengetedza zvigadziriso. Iwe unozofanirwa kuseta pasi rose kune mudziyo</string>
+    <string name="log_out">Log out</string>
+    <string name="this_would_log_you_out_of_your_vault_account_on_this_device_you_can_log_back_in_at_anytime_with_an_internet_connection">Izvi zvinokuburitsa kunze kweVault account yako pane iyi kifaa. Unogona kupinda mukati chero nguva (neinternet chinongedzo)</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer">Izvi zvingadzora ma tokeni ako akachengetwa, makiyi ekuchengetedza uye data rese rawakachengeta pane mudziyo uye Vault. Unogona kushandisa mabhiriji chero nguva yaunoda</string>
+    <string name="this_would_migrate_your_tokens_stored_on_the_vault_to_your_device_this_would_send_the_token_alongside_every_time_you_send_the_message_potentially_increasing_the_size_of_messages">Izvi zvingadzora ma tokeni ako akachengetwa, makiyi ekuchengetedza uye data rese rawakachengeta pane mudziyo uye Vault. Unogona kushandisa mabhiriji chero nguva yaunoda</string>
 </resources>

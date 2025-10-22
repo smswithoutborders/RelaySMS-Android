@@ -365,5 +365,22 @@
     <string name="you_can_only_save_these_platforms_after_you_log_in">Sie können diese Plattformen erst speichern, nachdem Sie sich angemeldet haben</string>
     <string name="unknown_error">Unbekannter Fehler</string>
     <string name="add_photos">Fotos hinzufügen</string>
+    <string name="relaysms_inbox">RelaySMS-Posteingang</string>
+    <string name="open_menu">Menü öffnen</string>
+    <string name="default_sms_receiver">Standard-SMS-Empfänger</string>
+    <string name="set_as_default">Als Standard festlegen</string>
+    <string name="this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer">Dadurch werden alle Ihre gespeicherten Token, Sicherheitsschlüssel und alle auf dem Gerät und im Vault gespeicherten Daten gelöscht. Sie können Bridges weiterhin jederzeit verwenden.</string>
+    <string name="this_would_migrate_your_tokens_stored_on_the_vault_to_your_device_this_would_send_the_token_alongside_every_time_you_send_the_message_potentially_increasing_the_size_of_messages">Dadurch werden Ihre im Vault gespeicherten Token auf Ihr Gerät migriert. Dadurch wird das Token bei jedem Senden der Nachricht mitgesendet, was möglicherweise die Größe der Nachrichten erhöht.</string>
+    <string name="delete_gateway_client">Gateway-Client löschen</string>
+    <string name="english1">Englisch</string>
+    <string name="system">System</string>
+    <string name="publishing">Veröffentlichen</string>
+    <string name="send_messages_with_device_id">Senden Sie Nachrichten mit der Geräte-ID</string>
+    <string name="device_id_lets_you_send_messages_without_using_your_actual_phone_number_for_authentication_this_works_well_for_dual_sim_phones">Mit der Geräte-ID können Sie Nachrichten senden, ohne Ihre tatsächliche Telefonnummer zur Authentifizierung zu verwenden. Dies funktioniert gut für Dual-SIM-Telefone.</string>
+    <string name="lock_app">App sperren</string>
+    <string name="this_will_lock_the_app_using_your_phone_s_biometric_security_configurations_you_will_need_to_globally_set_for_the_device">Dadurch wird die App mit den biometrischen Sicherheitseinstellungen Ihres Telefons gesperrt. Sie müssen global für das Gerät einstellen</string>
+    <string name="log_out">Ausloggen</string>
+    <string name="this_would_log_you_out_of_your_vault_account_on_this_device_you_can_log_back_in_at_anytime_with_an_internet_connection">Dadurch werden Sie von Ihrem Vault-Konto auf diesem Gerät abgemeldet. Sie können sich jederzeit wieder anmelden (mit einer Internetverbindung).</string>
+    <string name="delete_account">Konto löschen</string>
 
 </resources>

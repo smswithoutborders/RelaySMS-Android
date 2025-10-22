@@ -370,5 +370,22 @@
     <string name="you_can_only_save_these_platforms_after_you_log_in">로그인 후에만 이 플랫폼을 저장할 수 있습니다.</string>
     <string name="unknown_error">알 수 없는 오류</string>
     <string name="add_photos">사진 추가</string>
+    <string name="relaysms_inbox">RelaySMS 받은 편지함</string>
+    <string name="open_menu">메뉴 열기</string>
+    <string name="default_sms_receiver">기본 SMS 수신자</string>
+    <string name="set_as_default">기본값으로 설정</string>
+    <string name="this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer">이렇게 하면 저장된 토큰, 보안 키, 그리고 기기와 Vault에 저장된 모든 데이터가 취소됩니다. 브리지는 언제든지 사용할 수 있습니다.</string>
+    <string name="this_would_migrate_your_tokens_stored_on_the_vault_to_your_device_this_would_send_the_token_alongside_every_time_you_send_the_message_potentially_increasing_the_size_of_messages">이렇게 하면 Vault에 저장된 토큰이 기기로 마이그레이션됩니다. 메시지를 보낼 때마다 토큰이 함께 전송되므로 메시지 크기가 커질 수 있습니다.</string>
+    <string name="delete_gateway_client">게이트웨이 클라이언트 삭제</string>
+    <string name="english1">영어</string>
+    <string name="system">체계</string>
+    <string name="publishing">출판</string>
+    <string name="send_messages_with_device_id">기기 ID로 메시지 보내기</string>
+    <string name="device_id_lets_you_send_messages_without_using_your_actual_phone_number_for_authentication_this_works_well_for_dual_sim_phones">기기 ID를 사용하면 실제 전화번호를 인증에 사용하지 않고도 메시지를 보낼 수 있습니다. 이 기능은 듀얼 SIM 휴대폰에 적합합니다.</string>
+    <string name="lock_app">앱 잠금</string>
+    <string name="this_will_lock_the_app_using_your_phone_s_biometric_security_configurations_you_will_need_to_globally_set_for_the_device">이렇게 하면 휴대폰의 생체 인식 보안 설정을 사용하여 앱이 잠깁니다. 기기에 전역적으로 설정해야 합니다.</string>
+    <string name="log_out">로그아웃</string>
+    <string name="this_would_log_you_out_of_your_vault_account_on_this_device_you_can_log_back_in_at_anytime_with_an_internet_connection">이렇게 하면 이 기기의 Vault 계정에서 로그아웃됩니다. 인터넷에 연결된 상태에서 언제든지 다시 로그인할 수 있습니다.</string>
+    <string name="delete_account">계정 삭제</string>
 
 </resources>
