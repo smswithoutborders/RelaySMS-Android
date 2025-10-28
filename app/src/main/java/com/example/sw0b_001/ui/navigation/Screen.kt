@@ -39,6 +39,7 @@ data class OTPCodeScreen(
     val loginSignupPhoneNumber: String,
     val loginSignupPassword: String,
     val countryCode: String,
+    val recaptcha: String,
     val otpRequestType: OTPCodeVerificationType = OTPCodeVerificationType.AUTHENTICATE,
     val nextAttemptTimestamp: Int? = null,
     val isOnboarding: Boolean = false

@@ -86,12 +86,14 @@ fun GetMeOutOfHere(
                 .fillMaxWidth()
                 .padding(bottom = 32.dp),
             onClick={
-                Vaults.logout(context) {
-                    Vaults.setGetMeOut(context, false)
-                    CoroutineScope(Dispatchers.Main).launch {
-                        navController.navigate(HomepageScreen) {
-                            popUpTo(0) {
-                                inclusive = true
+                CoroutineScope(Dispatchers.Default).launch {
+                    Vaults.logout(context) {
+                        Vaults.setGetMeOut(context, false)
+                        CoroutineScope(Dispatchers.Main).launch {
+                            navController.navigate(HomepageScreen) {
+                                popUpTo(0) {
+                                    inclusive = true
+                                }
                             }
                         }
                     }
