@@ -362,7 +362,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 
-    implementation libs.play.services.safetynet
+    implementation 'com.google.android.recaptcha:recaptcha:18.8.0'
     coreLibraryDesugaring libs.desugar.jdk.libs
 }
 
