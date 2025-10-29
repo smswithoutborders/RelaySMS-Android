@@ -161,6 +161,7 @@ class Vaults(val context: Context) {
             setPassword(password)
             setClientPublishPubKey(Base64.encodeToString(publishPubKey, Base64.DEFAULT))
             setClientDeviceIdPubKey(Base64.encodeToString(deviceIdPubKey, Base64.DEFAULT))
+            setRecaptchaToken(recaptchaToken)
         }.build()
 
         val response = entityStub.createEntity(createEntityRequest1)

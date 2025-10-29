@@ -388,8 +388,9 @@ fun CreateAccountView(
 
                     vaultsViewModel.executeRecaptcha(
                         activity = activity!!,
-                        onFailureCallback = {
+                        onFailureCallback = { e ->
                             isLoading = false
+                            Toast.makeText(context, e, Toast.LENGTH_LONG).show()
                         }
                     ) { recaptchaToken ->
                         navController.navigate(OTPCodeScreen(

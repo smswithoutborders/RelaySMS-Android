@@ -18,7 +18,7 @@ class VaultsViewModel : ViewModel() {
 
     fun executeRecaptcha(
         activity: Activity,
-        onFailureCallback: () -> Unit,
+        onFailureCallback: (String) -> Unit,
         onSuccessCallback: (String) -> Unit,
     ) {
         viewModelScope.launch{
@@ -33,7 +33,7 @@ class VaultsViewModel : ViewModel() {
                 })
                 .addOnFailureListener(executor, OnFailureListener { e ->
                     e.printStackTrace()
-                    onFailureCallback()
+                    onFailureCallback(e.message ?: "Verification failed")
 //                    if (e is ApiException) {
 //                        // An error occurred when communicating with the
 //                        // reCAPTCHA service. Refer to the status code to
