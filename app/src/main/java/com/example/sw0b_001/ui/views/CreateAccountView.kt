@@ -39,6 +39,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -75,6 +76,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
 import com.example.sw0b_001.BuildConfig
+import com.example.sw0b_001.ui.components.CaptchaImage
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.VaultsViewModel
 
@@ -96,6 +98,10 @@ fun CreateAccountView(
     var acceptedPrivatePolicy by remember { mutableStateOf (false) }
 
     var isLoading by remember { mutableStateOf(false) }
+
+    var challengeId by remember { mutableStateOf("") }
+    var showCaptcha by remember { mutableStateOf(false) }
+    val captchaImage = vaultsViewModel.captchaImage.collectAsState()
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val activity = LocalActivity.current
@@ -129,6 +135,52 @@ fun CreateAccountView(
         modifier = Modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection),
     ) { innerPadding ->
+
+        if(showCaptcha && captchaImage.value != null) {
+            CaptchaImage(captchaImage.value!!, {
+                showCaptcha = false
+                vaultsViewModel.resetCaptchaImage()
+            }) { answer ->
+                showCaptcha = false
+                vaultsViewModel.executeRecaptcha(
+                    answer = answer,
+                    challengeId = challengeId,
+                    onFailureCallback = {
+                        isLoading = false
+                    }
+                ) { recaptchaToken ->
+                    val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+                    createAccount(
+                        context = context,
+                        phoneNumber = phoneNumber,
+                        countryCode = selectedCountry!!.countryCode,
+                        password = password,
+                        recaptchaToken = recaptchaToken,
+                        otpRequiredCallback = {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                navController.navigate(OTPCodeScreen(
+                                    loginSignupPhoneNumber = phoneNumber,
+                                    loginSignupPassword = password,
+                                    countryCode = selectedCountry!!.countryCode,
+                                    otpRequestType = OTPCodeVerificationType.CREATE,
+                                    nextAttemptTimestamp = it,
+                                    recaptcha = answer,
+                                ))
+                            }
+                        },
+                        failedCallback = {
+                            isLoading = false
+                            CoroutineScope(Dispatchers.Main).launch {
+                                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    ) {
+                        isLoading = false
+                    }
+                }
+            }
+        }
+
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -315,43 +367,16 @@ fun CreateAccountView(
                 Button(onClick = {
                     if (password == reenterPassword) {
                         isLoading = true
-                        val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
 
-                        vaultsViewModel.executeRecaptcha(
-                            activity = activity!!,
-                            onFailureCallback = {
-                                isLoading = false
+                        vaultsViewModel.initiateCaptchaRequest({
+                            isLoading = false
+                            CoroutineScope(Dispatchers.Main).launch {
+                                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
                             }
-                        ) { recaptchaToken ->
-                            createAccount(
-                                context = context,
-                                phoneNumber = phoneNumber,
-                                countryCode = selectedCountry!!.countryCode,
-                                password = password,
-                                recaptchaToken = recaptchaToken,
-                                otpRequiredCallback = {
-                                    CoroutineScope(Dispatchers.Main).launch {
-                                        navController.navigate(OTPCodeScreen(
-                                            loginSignupPhoneNumber = phoneNumber,
-                                            loginSignupPassword = password,
-                                            countryCode = selectedCountry!!.countryCode,
-                                            otpRequestType = OTPCodeVerificationType.CREATE,
-                                            recaptcha = recaptchaToken,
-                                            nextAttemptTimestamp = it,
-                                        ))
-                                    }
-                                },
-                                failedCallback = {
-                                    isLoading = false
-                                    CoroutineScope(Dispatchers.Main).launch {
-                                        Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-                                    }
-                                }
-                            ) {
-                                isLoading = false
-                            }
+                        }) {
+                            showCaptcha = true
+                            challengeId = it
                         }
-
                     } else {
                         CoroutineScope(Dispatchers.Main).launch {
                             Toast.makeText(
@@ -385,27 +410,17 @@ fun CreateAccountView(
             TextButton(
                 onClick = {
                     val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
-
-                    vaultsViewModel.executeRecaptcha(
-                        activity = activity!!,
-                        onFailureCallback = { e ->
-                            isLoading = false
-                            Toast.makeText(context, e, Toast.LENGTH_LONG).show()
-                        }
-                    ) { recaptchaToken ->
-                        navController.navigate(OTPCodeScreen(
-                            loginSignupPhoneNumber = phoneNumber,
-                            loginSignupPassword = password,
-                            countryCode = selectedCountry!!.countryCode,
-                            otpRequestType = OTPCodeVerificationType.AUTHENTICATE,
-                            recaptcha = recaptchaToken,
-                            isOnboarding = isOnboarding
-                        ))
-                    }
+                    navController.navigate(OTPCodeScreen(
+                        loginSignupPhoneNumber = phoneNumber,
+                        loginSignupPassword = password,
+                        countryCode = selectedCountry!!.countryCode,
+                        otpRequestType = OTPCodeVerificationType.AUTHENTICATE,
+                        isOnboarding = isOnboarding,
+                        recaptcha = vaultsViewModel.recaptchaAnswer,
+                    ))
                 },
-                enabled = (
-                        PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
-                                && password.isNotEmpty()) && !isLoading,
+                enabled = PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
+                        && !isLoading,
                 modifier = Modifier.padding(bottom=16.dp)) {
                 Text(stringResource(R.string.already_got_code))
             }

@@ -438,5 +438,7 @@
     <string name="delete_account">Delete Account</string>
     <string name="this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer">This would revoke all your stored tokens, security keys and every data you have stored on device and Vault. You can still use bridges whenever you prefer</string>
     <string name="this_would_migrate_your_tokens_stored_on_the_vault_to_your_device_this_would_send_the_token_alongside_every_time_you_send_the_message_potentially_increasing_the_size_of_messages">This would migrate your tokens stored on the Vault to your device. This would send the token alongside every time you send the message - potentially increasing the size of messages</string>
+    <string name="enter_the_text_in_the_image">Enter the text in the image</string>
+    <string name="submit1">Submit</string>
 
 </resources>

@@ -60,14 +60,17 @@ import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getActivity
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.R
+import com.example.sw0b_001.ui.components.CaptchaImage
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.ForgotPasswordScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
@@ -92,6 +95,10 @@ fun LoginView(
     var phoneNumber by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
+    var challengeId by remember { mutableStateOf("") }
+    var showCaptcha by remember { mutableStateOf(false) }
+    val captchaImage = vaultViewModel.captchaImage.collectAsState()
+
     if(BuildConfig.DEBUG) {
         phoneNumber = "1123579"
         password = "dMd2Kmo9#"
@@ -102,8 +109,6 @@ fun LoginView(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     var isLoading by remember { mutableStateOf(false) }
-
-    val activity = LocalActivity.current
 
     BackHandler {
         navController.popBackStack()
@@ -128,6 +133,74 @@ fun LoginView(
             )
         },
     ) { innerPadding ->
+
+        if(showCaptcha && captchaImage.value != null) {
+            CaptchaImage(captchaImage.value!!, {
+                showCaptcha = false
+                vaultViewModel.resetCaptchaImage()
+            }) {
+                showCaptcha = false
+                isLoading = true
+                vaultViewModel.recaptchaAnswer = it
+                vaultViewModel.executeRecaptcha(
+                    answer = it,
+                    challengeId = challengeId,
+                    onFailureCallback = {
+                        isLoading = false
+                    }) { recaptchaToken ->
+                    val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+                    vaultViewModel.recaptchaAnswer = recaptchaToken
+                    login(
+                        context = context,
+                        phoneNumber = phoneNumber,
+                        password = password,
+                        otpRequiredCallback = { nextAttemptTimestamp ->
+                            CoroutineScope(Dispatchers.Main).launch {
+                                navController.navigate(
+                                    OTPCodeScreen(
+                                        loginSignupPhoneNumber = phoneNumber,
+                                        loginSignupPassword = password,
+                                        countryCode = selectedCountry!!.countryCode,
+                                        otpRequestType = OTPCodeVerificationType.AUTHENTICATE,
+                                        nextAttemptTimestamp = nextAttemptTimestamp,
+                                        isOnboarding = isOnboarding,
+                                        recaptcha = recaptchaToken
+                                    )
+                                ) {
+                                    if (isOnboarding) {
+                                        popUpTo(OnboardingInteractiveScreen) {
+                                            inclusive = false
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        passwordRequiredCallback = {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                navController.navigate(
+                                    ForgotPasswordScreen(
+                                        isOnboarding = isOnboarding
+                                    )
+                                )
+                            }
+                        },
+                        failedCallback = {
+                            isLoading = false
+                            CoroutineScope(Dispatchers.Main).launch {
+                                Toast.makeText(
+                                    context, it,
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        },
+                        recaptchaToken = recaptchaToken
+                    ) {
+                        isLoading = false
+                    }
+                }
+            }
+        }
+
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -170,8 +243,12 @@ fun LoginView(
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .padding(top = 0.dp)
-                        .clickable {
-                            // Handle click on "save platforms"
+                        .apply {
+                            if(!LocalInspectionMode.current) {
+                                this.clickable {
+                                    // Handle click on "save platforms"
+                                }
+                            }
                         },
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -209,7 +286,7 @@ fun LoginView(
                 ) {
                     TextButton(
                         onClick = {
-                            navController.navigate(ForgotPasswordScreen)
+                            navController.navigate(ForgotPasswordScreen())
                         }
                     ) {
                         Text(stringResource(R.string.forgot_password))
@@ -247,8 +324,6 @@ fun LoginView(
                     ),
                     enabled = !isLoading
                 )
-
-
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -260,67 +335,15 @@ fun LoginView(
                 Button(
                     onClick = {
                         isLoading = true
-                        val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
-
-
-                        vaultViewModel.executeRecaptcha(
-                            activity!!,
-                            onFailureCallback = {
-                                isLoading = false
-                            }) { recaptchaToken ->
-                            vaultViewModel.executeRecaptcha(
-                                activity,
-                                onFailureCallback = {
-                                    isLoading = false
-                                }) {
-                                login(
-                                    context = context,
-                                    phoneNumber = phoneNumber,
-                                    password = password,
-                                    otpRequiredCallback = { nextAttemptTimestamp ->
-                                        CoroutineScope(Dispatchers.Main).launch {
-                                            navController.navigate(
-                                                OTPCodeScreen(
-                                                    loginSignupPhoneNumber = phoneNumber,
-                                                    loginSignupPassword = password,
-                                                    countryCode = selectedCountry!!.countryCode,
-                                                    otpRequestType = OTPCodeVerificationType.AUTHENTICATE,
-                                                    nextAttemptTimestamp = nextAttemptTimestamp,
-                                                    recaptcha = recaptchaToken,
-                                                    isOnboarding = isOnboarding
-                                                )
-                                            ) {
-                                                if (isOnboarding) {
-                                                    popUpTo(OnboardingInteractiveScreen) {
-                                                        inclusive = false
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    },
-                                    passwordRequiredCallback = {
-                                        CoroutineScope(Dispatchers.Main).launch {
-                                            navController.navigate(
-                                                ForgotPasswordScreen(
-                                                    isOnboarding = isOnboarding
-                                                )
-                                            )
-                                        }
-                                    },
-                                    failedCallback = {
-                                        isLoading = false
-                                        CoroutineScope(Dispatchers.Main).launch {
-                                            Toast.makeText(
-                                                context, it,
-                                                Toast.LENGTH_LONG
-                                            ).show()
-                                        }
-                                    },
-                                    recaptchaToken = recaptchaToken
-                                ) {
-                                    isLoading = false
-                                }
+                        vaultViewModel.initiateCaptchaRequest({
+                            isLoading = false
+                            CoroutineScope(Dispatchers.Main).launch {
+                                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
                             }
+                        }) {
+                            showCaptcha = true
+                            challengeId = it
+                            isLoading = false
                         }
                     },
                     enabled = (phoneNumber.isNotEmpty() && password.isNotEmpty()) && !isLoading,
@@ -342,53 +365,45 @@ fun LoginView(
 
                 TextButton(
                     onClick = {
-                        val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
-                        vaultViewModel.executeRecaptcha(
-                            activity = activity!!,
-                            onFailureCallback = {
-                                isLoading = false
-                            }
-                        ) { recaptchaToken ->
-                            navController.navigate(OTPCodeScreen(
-                                loginSignupPhoneNumber = phoneNumber,
-                                loginSignupPassword = password,
-                                countryCode = selectedCountry!!.countryCode,
-                                otpRequestType = OTPCodeVerificationType.AUTHENTICATE,
-                                recaptcha = recaptchaToken,
-                                isOnboarding = isOnboarding
-                            ))
-                        }
+                        isLoading = true
+                        navController.navigate(OTPCodeScreen(
+                            loginSignupPhoneNumber = phoneNumber,
+                            loginSignupPassword = password,
+                            countryCode = selectedCountry!!.countryCode,
+                            otpRequestType = OTPCodeVerificationType.AUTHENTICATE,
+                            isOnboarding = isOnboarding,
+                            recaptcha = vaultViewModel.recaptchaAnswer
+                        ))
                     },
-                    enabled = (
-                            PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
-                                    && password.isNotEmpty()) && !isLoading,
+                    enabled = PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
+                            && !isLoading,
                     modifier = Modifier.padding(bottom=16.dp)) {
                     Text(stringResource(R.string.already_got_code))
                 }
 
-                Text(
-                    text = buildAnnotatedString {
-                        append(stringResource(R.string.do_not_have_an_account))
-                        pushStringAnnotation(tag = "signup", annotation = "signup")
-                        withStyle(
-                            style = SpanStyle(
-                                color = MaterialTheme.colorScheme.tertiary,
-                                textDecoration = TextDecoration.Underline
-                            )
-                        ) {
-                            append(stringResource(R.string.create_account))
-                        }
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .clickable {
-                            navController.navigate(CreateAccountScreen(
-                                isOnboarding = isOnboarding))
+                TextButton(
+                    onClick = { navController
+                        .navigate(CreateAccountScreen(isOnboarding = isOnboarding))
+                    }
+                ) {
+                    Text(
+                        text = buildAnnotatedString {
+                            append(stringResource(R.string.do_not_have_an_account))
+                            pushStringAnnotation(tag = "signup", annotation = "signup")
+                            withStyle(
+                                style = SpanStyle(
+                                    color = MaterialTheme.colorScheme.tertiary,
+                                    textDecoration = TextDecoration.Underline
+                                )
+                            ) {
+                                append(stringResource(R.string.create_account))
+                            }
                         },
-                    color = MaterialTheme.colorScheme.onBackground
-                )
+                        style = MaterialTheme.typography.bodySmall,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
             }
         }
     }

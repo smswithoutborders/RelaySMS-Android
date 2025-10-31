@@ -35,6 +35,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,6 +61,7 @@ import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.R
+import com.example.sw0b_001.ui.components.CaptchaImage
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.VaultsViewModel
@@ -88,6 +90,10 @@ fun ForgotPasswordView(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     var isLoading by remember { mutableStateOf(false) }
+
+    var challengeId by remember { mutableStateOf("") }
+    var showCaptcha by remember { mutableStateOf(false) }
+    val captchaImage = vaultsViewModel.captchaImage.collectAsState()
 
     val activity = LocalActivity.current
 
@@ -119,6 +125,53 @@ fun ForgotPasswordView(
             )
         },
     ) { innerPadding ->
+
+        if(showCaptcha && captchaImage.value != null) {
+            CaptchaImage(captchaImage.value!!, {
+                showCaptcha = false
+                vaultsViewModel.resetCaptchaImage()
+            }) { answer ->
+                showCaptcha = false
+
+                val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+                vaultsViewModel.executeRecaptcha(
+                    answer = answer,
+                    challengeId = challengeId,
+                    onFailureCallback = {
+                        isLoading = false
+                    }) {recaptchaToken ->
+                    recoverPassword(
+                        context = context,
+                        phoneNumber = phoneNumber,
+                        password = password,
+                        otpRequiredCallback = {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                navController.navigate(
+                                    OTPCodeScreen(
+                                        loginSignupPhoneNumber = phoneNumber,
+                                        loginSignupPassword = password,
+                                        countryCode = selectedCountry!!.countryCode,
+                                        otpRequestType = OTPCodeVerificationType.RECOVER,
+                                        nextAttemptTimestamp = it,
+                                        isOnboarding = isOnboarding,
+                                        recaptcha = answer
+                                    )
+                                )
+                            }
+                        },
+                        failedCallback = {
+                            isLoading = false
+                            CoroutineScope(Dispatchers.Main).launch {
+                                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                            }
+                        },
+                        recaptchaToken = recaptchaToken
+                    ) {
+                        isLoading = false
+                    }
+                }
+            }
+        }
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -255,44 +308,16 @@ fun ForgotPasswordView(
                 onClick = {
                     if (password == reenterPassword) {
                         isLoading = true
-                        val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
 
-                        vaultsViewModel.executeRecaptcha(
-                            activity!!,
-                            onFailureCallback = {
-                                isLoading = false
-                            }) {recaptchaToken ->
-                            recoverPassword(
-                                context = context,
-                                phoneNumber = phoneNumber,
-                                password = password,
-                                otpRequiredCallback = {
-                                    CoroutineScope(Dispatchers.Main).launch {
-                                        navController.navigate(
-                                            OTPCodeScreen(
-                                                loginSignupPhoneNumber = phoneNumber,
-                                                loginSignupPassword = password,
-                                                countryCode = selectedCountry!!.countryCode,
-                                                otpRequestType = OTPCodeVerificationType.RECOVER,
-                                                nextAttemptTimestamp = it,
-                                                recaptcha = recaptchaToken,
-                                                isOnboarding = isOnboarding
-                                            )
-                                        )
-                                    }
-                                },
-                                failedCallback = {
-                                    isLoading = false
-                                    CoroutineScope(Dispatchers.Main).launch {
-                                        Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-                                    }
-                                },
-                                recaptchaToken = recaptchaToken
-                            ) {
-                                isLoading = false
+                        vaultsViewModel.initiateCaptchaRequest({
+                            isLoading = false
+                            CoroutineScope(Dispatchers.Main).launch {
+                                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
                             }
+                        }) {
+                            showCaptcha = true
+                            challengeId = it
                         }
-
                     } else {
                         CoroutineScope(Dispatchers.Main).launch {
                             Toast.makeText(context,
@@ -321,21 +346,14 @@ fun ForgotPasswordView(
                 onClick = {
                     val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
 
-                    vaultsViewModel.executeRecaptcha(
-                        activity = activity!!,
-                        onFailureCallback = {
-                            isLoading = false
-                        }
-                    ) { recaptchaToken ->
-                        navController.navigate(OTPCodeScreen(
-                            loginSignupPhoneNumber = phoneNumber,
-                            loginSignupPassword = password,
-                            countryCode = selectedCountry!!.countryCode,
-                            otpRequestType = OTPCodeVerificationType.AUTHENTICATE,
-                            recaptcha = recaptchaToken,
-                            isOnboarding = isOnboarding
-                        ))
-                    }
+                    navController.navigate(OTPCodeScreen(
+                        loginSignupPhoneNumber = phoneNumber,
+                        loginSignupPassword = password,
+                        countryCode = selectedCountry!!.countryCode,
+                        otpRequestType = OTPCodeVerificationType.AUTHENTICATE,
+                        isOnboarding = isOnboarding,
+                        recaptcha = vaultsViewModel.recaptchaAnswer,
+                    ))
                 },
                 enabled = (
                         PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
