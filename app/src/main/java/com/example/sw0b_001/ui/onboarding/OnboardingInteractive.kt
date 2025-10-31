@@ -91,9 +91,8 @@ fun OnboardingInteractive(
             if(onboardingViewModel.next()) {
                 context.settingsSetOnboardedCompletely(true)
                 navController.navigate(HomepageScreen) {
-                    popUpTo(HomepageScreen) {
-                        inclusive = true
-                    }
+                    popUpTo(0)
+                    launchSingleTop = true
                 }
             }
         }
@@ -107,9 +106,8 @@ fun OnboardingInteractive(
                     IconButton(onClick = {
                         context.settingsSetOnboardedCompletely(true)
                         navController.navigate(HomepageScreen) {
-                            popUpTo(HomepageScreen) {
-                                inclusive = true
-                            }
+                            popUpTo(0)
+                            launchSingleTop = true
                         }
                     },
                         modifier = Modifier.size(50.dp)
