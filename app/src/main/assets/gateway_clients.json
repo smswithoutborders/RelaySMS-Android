@@ -9,7 +9,8 @@
       "https"
     ],
     "reliability": "0",
-    "isDefault": true
+    "isDefault": true,
+    "region": "America"
   },
   {
     "country": "Nigeria",
@@ -23,7 +24,8 @@
       "ftp"
     ],
     "reliability": "0",
-    "isDefault": false
+    "isDefault": true,
+    "region": "Africa"
   },
   {
     "country": "Cameroon",
@@ -37,7 +39,8 @@
       "ftp"
     ],
     "reliability": "36",
-    "isDefault": false
+    "isDefault": false,
+    "region": "Africa"
   },
   {
     "country": "Cameroon",
@@ -51,6 +54,7 @@
       "ftp"
     ],
     "reliability": "0",
-    "isDefault": false
+    "isDefault": false,
+    "region": "Africa"
   }
 ]

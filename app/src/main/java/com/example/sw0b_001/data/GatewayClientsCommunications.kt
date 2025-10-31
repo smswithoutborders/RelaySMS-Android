@@ -3,6 +3,7 @@ package com.example.sw0b_001.data
 import android.content.Context
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.GatewayClients
+import com.example.sw0b_001.extensions.context.getTelephonyRegion
 import com.example.sw0b_001.extensions.context.relaySmsDatastore
 import com.example.sw0b_001.extensions.context.settingsGetDefaultGatewayClients
 import com.example.sw0b_001.extensions.context.settingsSetDefaultGatewayClient
@@ -32,11 +33,24 @@ object GatewayClientsCommunications {
         val inputStream = context.assets.open(GATEWAY_CLIENTS_FILENAME)
         val buffer = BufferedReader(InputStreamReader(inputStream))
         val rawGatewayClients = buffer.use{ it.readText() }
+
+        val region = context.getTelephonyRegion()
         val gatewayClients = json
             .decodeFromString<ArrayList<GatewayClients>>(rawGatewayClients).apply {
                 if(context.settingsGetDefaultGatewayClients == null) {
-                    firstOrNull { gwc -> gwc.isDefault }?.let {
-                        context.settingsSetDefaultGatewayClient(Json.encodeToString(it))
+                    when(region) {
+                        "Africa", "Asia" -> {
+                            firstOrNull { gwc -> gwc.region == region && gwc.isDefault }?.let {
+                                context.settingsSetDefaultGatewayClient(
+                                    Json.encodeToString(it))
+                            }
+                        }
+                        else -> {
+                            firstOrNull { gwc -> gwc.region != "Africa" && gwc.isDefault }?.let {
+                                context.settingsSetDefaultGatewayClient(
+                                    Json.encodeToString(it))
+                            }
+                        }
                     }
                 }
             }
