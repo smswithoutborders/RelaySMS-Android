@@ -70,25 +70,25 @@ class PublishersTest {
     private val publisherEndpoint = "https://gatewayserver.staging.smswithoutborders.com/v3/publish"
 
 
-    @Before
-    fun init() {
-        publishers = Publishers(context)
-        vault = Vaults(context)
-        datastore = Datastore.getDatastore(context)
-//        storedTokenDao = datastore.storedTokenDao()
-        platformsViewModel = PlatformsViewModel()
-
-        // Authenticate the user
-        val res = vault.authenticateEntity(context, globalPhoneNumber, globalPassword)
-        assertTrue(res.requiresOwnershipProof)
-        val res1 = vault.authenticateEntity(context, globalPhoneNumber, globalPassword, "123456")
-        longLivedToken = Vaults.fetchLongLivedToken(context)
-    }
-
-    @After
-    fun tearDown() {
-        publishers.shutdown()
-    }
+//    @Before
+//    fun init() {
+//        publishers = Publishers(context)
+//        vault = Vaults(context)
+//        datastore = Datastore.getDatastore(context)
+////        storedTokenDao = datastore.storedTokenDao()
+//        platformsViewModel = PlatformsViewModel()
+//
+//        // Authenticate the user
+//        val res = vault.authenticateEntity(context, globalPhoneNumber, globalPassword)
+//        assertTrue(res.requiresOwnershipProof)
+//        val res1 = vault.authenticateEntity(context, globalPhoneNumber, globalPassword, "123456")
+//        longLivedToken = Vaults.fetchLongLivedToken(context)
+//    }
+//
+//    @After
+//    fun tearDown() {
+//        publishers.shutdown()
+//    }
 
 //    @Test
 //    fun storeTokensToPublishTest() {

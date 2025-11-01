@@ -158,6 +158,7 @@ fun OtpCodeVerificationView(
     loginSignupPhoneNumber: String,
     loginSignupPassword: String,
     countryCode: String,
+    recaptcha: String,
     otpRequestType: OTPCodeVerificationType,
     nextAttemptTimestamp: Int? = null,
     onCompleteCallback: ((Boolean) -> Unit)? = null
@@ -300,6 +301,7 @@ fun OtpCodeVerificationView(
                         password = loginSignupPassword,
                         countryCode = countryCode,
                         code = otpCode,
+                        recaptcha = recaptcha,
                         type = otpRequestType,
                         onFailedCallback = {isLoading = false},
                         onCompleteCallback = {isLoading = false}
@@ -436,6 +438,7 @@ private fun submitOTPCode(
     password: String,
     countryCode: String = "",
     code: String,
+    recaptcha: String,
     type: OTPCodeVerificationType,
     onFailedCallback: (String?) -> Unit,
     onCompleteCallback: () -> Unit,
@@ -451,6 +454,7 @@ private fun submitOTPCode(
                         phoneNumber,
                         countryCode,
                         password,
+                        recaptcha,
                         code
                     )
                 }
@@ -459,6 +463,7 @@ private fun submitOTPCode(
                         context,
                         phoneNumber,
                         password,
+                        recaptcha,
                         code
                     )
                 }
@@ -467,6 +472,7 @@ private fun submitOTPCode(
                         context,
                         phoneNumber,
                         password,
+                        recaptcha,
                         code
                     )
                 }
@@ -499,6 +505,7 @@ fun OtpCodeVerificationViewPreview() {
             "",
             loginSignupPassword = "",
             countryCode = "",
+            "",
             otpRequestType = OTPCodeVerificationType.CREATE,
         ) {}
     }

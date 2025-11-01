@@ -140,11 +140,14 @@ class Vaults(val context: Context) {
         }
     }
 
-    fun createEntity(context: Context,
-                     phoneNumber: String,
-                     countryCode: String,
-                     password: String,
-                     ownershipResponse: String = "") : Vault.CreateEntityResponse {
+    fun createEntity(
+        context: Context,
+        phoneNumber: String,
+        countryCode: String,
+        password: String,
+        recaptchaToken: String,
+        ownershipResponse: String = ""
+    ) : Vault.CreateEntityResponse {
 
         val deviceIdPubKey = Cryptography.generateKey(context, DEVICE_ID_KEYSTORE_ALIAS)
         val publishPubKey = Cryptography.generateKey(context, Publishers.PUBLISHER_ID_KEYSTORE_ALIAS)
@@ -158,7 +161,7 @@ class Vaults(val context: Context) {
             setPassword(password)
             setClientPublishPubKey(Base64.encodeToString(publishPubKey, Base64.DEFAULT))
             setClientDeviceIdPubKey(Base64.encodeToString(deviceIdPubKey, Base64.DEFAULT))
-
+            setRecaptchaToken(recaptchaToken)
         }.build()
 
         val response = entityStub.createEntity(createEntityRequest1)
@@ -174,19 +177,27 @@ class Vaults(val context: Context) {
         return response
     }
 
-    fun authenticateEntity(context: Context,
-                           phoneNumber: String,
-                           password: String,
-                           ownershipResponse: String = "") : Vault.AuthenticateEntityResponse {
+    fun authenticateEntity(
+        context: Context,
+        phoneNumber: String,
+        password: String,
+        recaptchaToken: String,
+        ownershipResponse: String = ""
+    ) : Vault.AuthenticateEntityResponse {
 
-        val deviceIdPubKey = Cryptography.generateKey(context, DEVICE_ID_KEYSTORE_ALIAS)
-        val publishPubKey = Cryptography.generateKey(context, Publishers.PUBLISHER_ID_KEYSTORE_ALIAS)
+        val deviceIdPubKey = Cryptography.generateKey(context,
+            DEVICE_ID_KEYSTORE_ALIAS)
+        val publishPubKey = Cryptography.generateKey(context,
+            Publishers.PUBLISHER_ID_KEYSTORE_ALIAS)
 
         val authenticateEntityRequest = Vault.AuthenticateEntityRequest.newBuilder().apply {
             setPhoneNumber(phoneNumber)
             setPassword(password)
-            setClientPublishPubKey(Base64.encodeToString(publishPubKey, Base64.DEFAULT))
-            setClientDeviceIdPubKey(Base64.encodeToString(deviceIdPubKey, Base64.DEFAULT))
+            setClientPublishPubKey(Base64.encodeToString(publishPubKey,
+                Base64.DEFAULT))
+            setClientDeviceIdPubKey(Base64.encodeToString(deviceIdPubKey,
+                Base64.DEFAULT))
+            setRecaptchaToken(recaptchaToken)
 
             if(ownershipResponse.isNotBlank()) {
                 setOwnershipProofResponse(ownershipResponse)
@@ -210,19 +221,27 @@ class Vaults(val context: Context) {
         return response
     }
 
-    fun recoverEntityPassword(context: Context,
-                              phoneNumber: String,
-                              newPassword: String,
-                              ownershipResponse: String? = null) : Vault.ResetPasswordResponse {
+    fun recoverEntityPassword(
+        context: Context,
+        phoneNumber: String,
+        newPassword: String,
+        recaptchaToken: String,
+        ownershipResponse: String? = null
+    ) : Vault.ResetPasswordResponse {
 
-        val deviceIdPubKey = Cryptography.generateKey(context, DEVICE_ID_KEYSTORE_ALIAS)
-        val publishPubKey = Cryptography.generateKey(context, Publishers.PUBLISHER_ID_KEYSTORE_ALIAS)
+        val deviceIdPubKey = Cryptography.generateKey(context,
+            DEVICE_ID_KEYSTORE_ALIAS)
+        val publishPubKey = Cryptography.generateKey(context,
+            Publishers.PUBLISHER_ID_KEYSTORE_ALIAS)
 
         val resetPasswordRequest = Vault.ResetPasswordRequest.newBuilder().apply {
             setPhoneNumber(phoneNumber)
             setNewPassword(newPassword)
-            setClientPublishPubKey(Base64.encodeToString(publishPubKey, Base64.DEFAULT))
-            setClientDeviceIdPubKey(Base64.encodeToString(deviceIdPubKey, Base64.DEFAULT))
+            setClientPublishPubKey(Base64.encodeToString(publishPubKey,
+                Base64.DEFAULT))
+            setClientDeviceIdPubKey(Base64.encodeToString(deviceIdPubKey,
+                Base64.DEFAULT))
+            setRecaptchaToken(recaptchaToken)
 
             ownershipResponse?.let {
                 setOwnershipProofResponse(ownershipResponse)

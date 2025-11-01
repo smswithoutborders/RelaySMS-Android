@@ -116,6 +116,7 @@ import com.example.sw0b_001.ui.navigation.WelcomeScreen
 import com.example.sw0b_001.ui.onboarding.OnboardingInteractive
 import com.example.sw0b_001.ui.views.WelcomeMainView
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
+import com.example.sw0b_001.ui.viewModels.VaultsViewModel
 import com.example.sw0b_001.ui.views.BottomTabsItems
 import com.example.sw0b_001.ui.views.SettingsView
 import com.example.sw0b_001.ui.views.compose.ComposerInterface
@@ -139,6 +140,8 @@ class MainActivity : AppCompatActivity() {
 
     var loggedInAlready by mutableStateOf(false)
 
+    lateinit var vaultViewModel: VaultsViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -148,6 +151,7 @@ class MainActivity : AppCompatActivity() {
             window.isNavigationBarContrastEnforced = false
         }
 
+        vaultViewModel = VaultsViewModel(applicationContext)
         searchViewModel = SearchViewModel(getDatabase().threadsDao()!!)
 
         fun beginAppLifecycle() {
@@ -340,6 +344,7 @@ class MainActivity : AppCompatActivity() {
                 val loginNav: LoginScreen = backEntry.toRoute()
                 LoginView(
                     navController = navController,
+                    vaultViewModel = vaultViewModel,
                     isOnboarding = loginNav.isOnboarding,
                 )
             }
@@ -347,6 +352,7 @@ class MainActivity : AppCompatActivity() {
                 val forgotPasswordNav: ForgotPasswordScreen = backEntry.toRoute()
                 ForgotPasswordView(
                     navController = navController,
+                    vaultsViewModel = vaultViewModel,
                     isOnboarding = forgotPasswordNav.isOnboarding,
                 )
             }
@@ -354,6 +360,7 @@ class MainActivity : AppCompatActivity() {
                 val createAccountNav: ForgotPasswordScreen = backEntry.toRoute()
                 CreateAccountView(
                     navController = navController,
+                    vaultsViewModel = vaultViewModel,
                     isOnboarding = createAccountNav.isOnboarding,
                 )
             }
@@ -365,6 +372,7 @@ class MainActivity : AppCompatActivity() {
                     loginSignupPassword = otpCodeNav.loginSignupPassword,
                     countryCode = otpCodeNav.countryCode,
                     otpRequestType = otpCodeNav.otpRequestType,
+                    recaptcha = otpCodeNav.recaptcha,
                     nextAttemptTimestamp = otpCodeNav.nextAttemptTimestamp,
                     onCompleteCallback = if(otpCodeNav.isOnboarding)
                         onboardingViewModel.callback else null,
