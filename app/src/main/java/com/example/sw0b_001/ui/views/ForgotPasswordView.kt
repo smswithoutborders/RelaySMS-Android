@@ -405,8 +405,9 @@ private fun recoverPassword(
 @Preview(showBackground = true)
 @Composable
 fun ForgotPasswordPreview() {
+    val context = LocalContext.current
     AppTheme(darkTheme = false) {
         ForgotPasswordView(rememberNavController(),
-            remember{ VaultsViewModel()})
+            remember{ VaultsViewModel(context)})
     }
 }

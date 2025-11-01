@@ -140,7 +140,7 @@ class MainActivity : AppCompatActivity() {
 
     var loggedInAlready by mutableStateOf(false)
 
-    val vaultViewModel: VaultsViewModel by viewModels()
+    lateinit var vaultViewModel: VaultsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -151,6 +151,7 @@ class MainActivity : AppCompatActivity() {
             window.isNavigationBarContrastEnforced = false
         }
 
+        vaultViewModel = VaultsViewModel(applicationContext)
         searchViewModel = SearchViewModel(getDatabase().threadsDao()!!)
 
         fun beginAppLifecycle() {

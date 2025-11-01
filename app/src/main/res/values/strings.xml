@@ -4,6 +4,8 @@
     <string name="select_all">Select All</string>
     <string name="selected_messages">%d selected</string>
 
+    <string name="recaptcha_key" translatable="false">dc4def40b6961289f969a236bb2bc433e32b29e0af06458fea56f7f2daad9eac</string>
+
     <!-- Homepage menu -->
 
     <string name="settings_settings">Settings</string>

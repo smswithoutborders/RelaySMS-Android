@@ -1,6 +1,7 @@
 package com.example.sw0b_001.ui.viewModels
 
 import android.app.Activity
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.hardware.camera2.CaptureRequest
@@ -11,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.sw0b_001.R
 import com.example.sw0b_001.data.GatewayClientsCommunications.json
 import com.example.sw0b_001.data.Network
 import com.google.android.gms.safetynet.SafetyNet
@@ -28,10 +30,14 @@ import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
 
-class VaultsViewModel : ViewModel() {
+class VaultsViewModel(val context: Context) : ViewModel() {
 
     val captchaUrl = "https://captcha.smswithoutborders.com"
-    val clientId = com.example.sw0b_001.BuildConfig.RECAPTCHA_KEY
+    lateinit var clientId: String
+
+    init {
+        clientId = context.getString(R.string.recaptcha_key)
+    }
 
     private val _captchaImage = MutableStateFlow<Bitmap?>(null)
     val captchaImage: StateFlow<Bitmap?> = _captchaImage.asStateFlow()

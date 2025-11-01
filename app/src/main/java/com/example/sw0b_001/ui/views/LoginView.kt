@@ -453,9 +453,10 @@ private fun login(
 @Preview(showBackground = true)
 @Composable
 fun LoginViewPreview() {
+    val context = LocalContext.current
     AppTheme(darkTheme = false) {
         LoginView(rememberNavController(),
-            remember{ VaultsViewModel() })
+            remember{ VaultsViewModel(context) })
 
     }
 }

@@ -498,10 +498,11 @@ private fun createAccount(
 @Preview(showBackground = true)
 @Composable
 fun CreateAccountPreview() {
+    val context = LocalContext.current
     AppTheme(darkTheme = false) {
         CreateAccountView(
             rememberNavController(),
-            remember { VaultsViewModel() }
+            remember { VaultsViewModel(context) }
         )
     }
 }
