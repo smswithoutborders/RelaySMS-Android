@@ -95,7 +95,10 @@ fun CaptchaImage(
                 Spacer(Modifier.padding(8.dp))
 
                 Button(onClick = {onSubmitCallback(answer)}, Modifier.fillMaxWidth()) {
-                    Text(stringResource(R.string.submit1))
+                    Text(
+                        stringResource(R.string.submit1),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
                 }
             }
         }
