@@ -2,9 +2,11 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
 //    id 'org.jetbrains.kotlin.jvm' version '1.9.23'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.9.23'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '2.2.20'
     id "com.google.protobuf"
     alias(libs.plugins.compose.compiler)
+    id 'kotlin-kapt' // Add this line
+    id 'com.google.devtools.ksp' version '2.2.10-2.0.2'
 }
 
 def versionsPropertiesFile = rootProject.file("version.properties")
@@ -12,7 +14,44 @@ def versionProperties = new Properties()
 versionProperties.load(new FileInputStream(versionsPropertiesFile))
 
 android {
-    compileSdk 35
+    signingConfigs {
+        def localPropertiesFile = rootProject.file("local.properties")
+
+        // 🔑 Check if the file exists before proceeding
+        if (localPropertiesFile.exists()) {
+            def localProperties = new Properties()
+
+            // Note: It's safer to use 'new FileInputStream(localPropertiesFile)' within 'try-catch'
+            // or use the file's 'withInputStream' method, but for a simple check,
+            // the 'exists()' guard is the primary requirement.
+            localProperties.load(new FileInputStream(localPropertiesFile))
+
+            if (localProperties['storeFile'] && localProperties['keyAlias'] &&
+                    localProperties['storePassword'] && localProperties['keyPassword']) {
+
+                // Configuration logic remains the same
+                debug {
+                    keyAlias = localProperties['keyAlias']
+                    storeFile = new File(localProperties['storeFile'])
+                    storePassword = localProperties['storePassword']
+                    keyPassword = localProperties['keyPassword']
+                }
+                release {
+                    keyAlias = localProperties['keyAlias']
+                    storeFile = new File(localProperties['storeFile'])
+                    storePassword = localProperties['storePassword']
+                    keyPassword = localProperties['keyPassword']
+                }
+            } else {
+                // Optional: Print a warning if the file exists but is missing required properties
+                println("⚠️ Warning: local.properties file exists, but is missing one or more required signing properties.")
+            }
+        } else {
+            // Optional: Print a warning if the file doesn't exist
+            println("⚠️ Warning: local.properties file not found. Signing configurations will not be applied.")
+        }
+    }
+    compileSdk 36
 
     buildFeatures {
         viewBinding true
@@ -21,16 +60,17 @@ android {
     def _versionName = versionProperties['versionName']
     def tagVersion = Integer.parseInt(versionProperties['tagVersion'])
 
-    println(tagVersion)
-
     defaultConfig {
         applicationId "com.afkanerd.sw0b"
         minSdk 24
-        targetSdk 35
+        targetSdk 36
         versionCode tagVersion
         versionName _versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        ksp {
+            arg('room.schemaLocation', "$projectDir/schemas")
+        }
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments += ["room.schemaLocation":
@@ -41,6 +81,13 @@ android {
 
         manifestPlaceholders =
                 ['appAuthRedirectScheme': 'oauth.afkanerd.com']
+
+        // ...
+        Properties properties = new Properties()
+        if (rootProject.file("local.properties").exists()) {
+            properties.load(rootProject.file("local.properties").newDataInputStream())
+        }
+        buildConfigField "String", "RECAPTCHA_KEY", properties.getProperty("recaptcha_key", "\"\"")
 
     }
 
@@ -74,6 +121,7 @@ android {
     }
 
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
 //        kotlinCompilerExtensionVersion compose_compiler
@@ -141,6 +189,11 @@ configurations {
 
 
 dependencies {
+//    implementation project(':lib_smsmms_android:lib_smsmms_android')
+//    implementation project(':lib_image_android:app')
+    implementation 'com.github.smswithoutborders:lib_image_android:3275ac7'
+    implementation 'com.github.smswithoutborders:lib_smsmms_android:e906520'
+
     implementation libs.androidx.appcompat
     implementation libs.material
     implementation libs.androidx.constraintlayout
@@ -156,6 +209,10 @@ dependencies {
     implementation libs.play.services.auth
     implementation libs.play.services.auth.api.phone
     implementation libs.androidx.ui.text.google.fonts
+    implementation libs.androidx.paging.common
+//    implementation libs.androidx.datastore.core.jvm
+    implementation libs.androidx.datastore.preferences.core
+    implementation libs.androidx.datastore.preferences
     testImplementation libs.junit
     androidTestImplementation libs.androidx.junit
     androidTestImplementation libs.androidx.espresso.core
@@ -194,7 +251,7 @@ dependencies {
     implementation libs.androidx.swiperefreshlayout
 
     implementation libs.androidx.startup.runtime
-    implementation libs.armadillo
+//    implementation libs.armadillo
     implementation libs.smswithoutborders.libsignal
     implementation libs.appauth
     implementation libs.ccp
@@ -246,11 +303,8 @@ dependencies {
     // Optional - Included automatically by material, only add when you need
     // the icons but not the material library (e.g. when using Material3 or a
     // custom design system based on Foundation)
-    implementation libs.androidx.material.icons.core
-    // Optional - Add full set of material icons
-    implementation libs.androidx.material.icons.extended
-    // Optional - Add window size utils
-    implementation libs.androidx.adaptive
+    implementation 'androidx.compose.material:material-icons-core:1.7.8'
+    implementation "androidx.compose.material:material-icons-extended:1.7.8"
 
     // Optional - Integration with activities
     implementation libs.androidx.activity.compose
@@ -261,7 +315,6 @@ dependencies {
     // Optional - Integration with RxJava
     implementation libs.androidx.runtime.rxjava2
 
-    def nav_version = "2.8.5"
     implementation libs.androidx.navigation.compose
 
     implementation libs.material.v180alpha01
@@ -277,6 +330,39 @@ dependencies {
 
     implementation libs.accompanist.permissions
 
-    implementation("androidx.leanback:leanback:1.1.0-rc02")
+    implementation(libs.androidx.leanback)
+
+    def paging_version = "3.3.6"
+
+    implementation libs.androidx.paging.runtime
+
+    // alternatively - without Android dependencies for tests
+    testImplementation "androidx.paging:paging-common:$paging_version"
+
+    // optional - RxJava2 support
+    implementation libs.androidx.paging.rxjava2
+
+    // optional - RxJava3 support
+    implementation libs.androidx.paging.rxjava3
+
+    // optional - Guava ListenableFuture support
+    implementation libs.androidx.paging.guava
+
+    // optional - Jetpack Compose integration
+    implementation libs.androidx.paging.compose
+
+    def room_version = "2.7.2"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+    ksp "androidx.room:room-compiler:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+    testImplementation "androidx.room:room-testing:$room_version"
+    implementation "androidx.room:room-paging:$room_version"
+    implementation libs.androidx.browser
+
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+
+    implementation libs.play.services.safetynet
+    coreLibraryDesugaring libs.desugar.jdk.libs
 }
 

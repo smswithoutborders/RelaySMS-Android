@@ -4,6 +4,8 @@
     <string name="select_all">Select All</string>
     <string name="selected_messages">%d selected</string>
 
+    <string name="recaptcha_key" translatable="false">dc4def40b6961289f969a236bb2bc433e32b29e0af06458fea56f7f2daad9eac</string>
+
     <!-- Homepage menu -->
 
     <string name="settings_settings">Settings</string>
@@ -373,12 +375,72 @@
     <string name="message_">Message</string>
     <string name="message_content_could_not_be_displayed">Message content could not be displayed</string>
     <string name="text_message">Text Message</string>
-    <string name="get_platforms_url" translatable="false">https://publisher.staging.smswithoutborders.com/v1/platforms</string>"
+    <string name="get_platforms_url" translatable="false">https://publisher.smswithoutborders.com/v1/platforms</string>"
     <string name="recipient_account">Recipient account</string>
     <string name="recipient_account_format_hint">Make sure the recipient account is in the right format.</string>
     <string name="slack_recipient">Slack Channel or User</string>
     <string name="slack_hint">For channels: use #name or an ID (e.g., #general or C123ABC). For DMs: use @username, an email, or a user ID (e.g., @jane or @user@gmail.com or U456DEF).</string>
     <string name="view_account_menu">You can now see the account you are currently logged into by clicking the menu icon on the navigation bar"</string>
     <string name="your_account">Your Account</string>
+    <string name="set_as_default_sms_app">Set as default SMS app</string>
+    <string name="log_in_or_sign_up_to_save_your_online_accounts">Log in or sign up to save your online accounts.</string>
+    <string name="sms_mms">SMS/MMS</string>
+    <string name="could_not_fetch_publisher_key">Could not fetch publisher key.</string>
+    <string name="could_not_find_platform_details_for">Could not find platform details for \'%1$s\'.</string>
+    <string name="no_default_gateway_client_configured">No default gateway client configured.</string>
+    <string name="multiple_ratchet_states_found_in_database_expected_at_most_one">Multiple Ratchet states found in database. Expected at most one.</string>
+    <string name="send_failed">Send failed</string>
+    <string name="account_is_required_for_v1_platform_messages">Account is required for V1 platform messages.</string>
+    <string name="could_not_fetch_publisher_key_cannot_encrypt_message">Could not fetch publisher key. Cannot encrypt message.</string>
+    <string name="sms_an_email_right_now">SMS an email right now!</string>
+    <string name="you_don_t_need_an_account_we_d_create_one_for_you_email_yourself">You don\'t need an account, we\'d create one for you!\nEmail yourself!</string>
+    <string name="don_t_ask_again">Don\'t ask again</string>
+    <string name="close_this_to_continue_sending">Close this to continue sending...</string>
+    <string name="way_to_go">Way to go!!</string>
+    <string name="there_is_more">There is more!!</string>
+    <string name="you_have_interacted_with_how_easy_it_is_to_send_your_first_message">You have interacted with how easy it is to send your first message!</string>
+    <string name="save_your_accounts">Save your accounts!</string>
+    <string name="you_can_also_use_sms_to_send_messages_from_your_online_accounts_saving_them_guarantees_you_can_use_them_without_an_internet_connection">You can also use SMS to send messages from your online accounts! Saving them guarantees you can use them without an internet connection.</string>
+    <string name="give_it_a_try">Give it a try!</string>
+    <string name="your_platforms_and_security_keys_are_saved_in_your_account_create_one_or_login_if_you_have_created_already">Your platforms and security keys are saved in your account! Create one or login if you have created already</string>
+    <string name="let_s_get_you_started">Let\'s get you started!</string>
+    <string name="now_we_can_save_platforms_in_your_account">Now we can save platforms in your account!</string>
+    <string name="save_platforms_to_your_account">Save platforms to your account</string>
+    <string name="it_s_easier_than_you_can_imagine">It\'s easier than you can imagine</string>
+    <string name="you_can_save_more_accounts_per_platform_at_anytime_from_inside_the_app">You can save more accounts per platform at anytime from inside the app!</string>
+    <string name="start_messaging_now">Start messaging now!</string>
+    <string name="you_can_now_send_messages_from_your_saved_accounts_you_can_also_save_more_accounts_later">You can now send messages from your saved accounts!\nYou can also save more accounts later...</string>
+    <string name="ready_to_save_platforms">Ready to save platforms!</string>
+    <string name="you_are_now_ready">You are now ready!</string>
+    <string name="you_have_successfully_carried_out_the_essentials_of_messaging_with_relaysms">You have successfully carried out the essentials of messaging with RelaySMS!</string>
+    <string name="secure_your_app">Secure your app!</string>
+    <string name="let_s_lock_this_down">Let\'s lock this down!</string>
+    <string name="from_locking_with_device_pin_code_to_other_secure_ways_of_making_sure_you_maintain_your_app_s_privacy">From locking with device pin code to other secure ways of making sure you maintain your app\'s privacy!</string>
+    <string name="failed_to_set_biometric_authentication">Failed to set biometric authentication</string>
+    <string name="make_default_sms_app">Make default SMS app</string>
+    <string name="you_can_manage_all_your_sms_messages_from_a_single_place">You can manage all your SMS messages from a single place.</string>
+    <string name="this_also_unlocks_features_like_sending_images_with_sms_yes_not_mms">This also unlocks features like sending images with SMS (yes not MMS)</string>
+    <string name="you_can_only_save_these_platforms_after_you_log_in">You can only save these platforms after you log in</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="add_photos">Add photos</string>
+    <string name="relaysms_inbox">RelaySMS inbox</string>
+    <string name="open_menu">Open menu</string>
+    <string name="default_sms_receiver">Default SMS receiver</string>
+    <string name="set_as_default">Set as default</string>
+    <string name="delete_gateway_client">Delete gateway client</string>
+    <string name="english1">English</string>
+    <string name="system">System</string>
+    <string name="publishing">Publishing</string>
+    <string name="send_messages_with_device_id">Send messages with device ID</string>
+    <string name="device_id_lets_you_send_messages_without_using_your_actual_phone_number_for_authentication_this_works_well_for_dual_sim_phones">Device ID lets you send messages without using your actual phone number for authentication. This works well for dual sim phones.</string>
+    <string name="lock_app">Lock app</string>
+    <string name="this_will_lock_the_app_using_your_phone_s_biometric_security_configurations_you_will_need_to_globally_set_for_the_device">This will lock the app using your phone\'s biometric security configurations. You will need to globally set for the device</string>
+    <string name="log_out">Log out</string>
+    <string name="this_would_log_you_out_of_your_vault_account_on_this_device_you_can_log_back_in_at_anytime_with_an_internet_connection">This would log you out of your Vault account on this device. You can log back in at anytime (with an internet connection)</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer">This would revoke all your stored tokens, security keys and every data you have stored on device and Vault. You can still use bridges whenever you prefer</string>
+    <string name="this_would_migrate_your_tokens_stored_on_the_vault_to_your_device_this_would_send_the_token_alongside_every_time_you_send_the_message_potentially_increasing_the_size_of_messages">This would migrate your tokens stored on the Vault to your device. This would send the token alongside every time you send the message - potentially increasing the size of messages</string>
+    <string name="enter_the_text_in_the_image">Enter the text in the image</string>
+    <string name="submit1">Submit</string>
 
 </resources>

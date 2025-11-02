@@ -2,9 +2,10 @@ package com.example.sw0b_001.ui.views
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import android.telephony.PhoneNumberUtils
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -38,6 +39,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -63,11 +65,8 @@ import androidx.navigation.compose.rememberNavController
 import com.arpitkatiyarprojects.countrypicker.CountryPickerOutlinedTextField
 import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
-import com.example.sw0b_001.Models.Platforms.AvailablePlatforms
-import com.example.sw0b_001.Models.Platforms.StoredPlatformsEntity
-import com.example.sw0b_001.Models.Vaults
+import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
@@ -75,17 +74,19 @@ import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlin.contracts.contract
 import androidx.core.net.toUri
 import com.example.sw0b_001.BuildConfig
-import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
+import com.example.sw0b_001.ui.components.CaptchaImage
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
+import com.example.sw0b_001.ui.viewModels.VaultsViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateAccountView(
     navController: NavController = rememberNavController(),
-    platformsViewModel: PlatformsViewModel
+    vaultsViewModel: VaultsViewModel,
+    isOnboarding: Boolean = false,
 ) {
     val context = LocalContext.current
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
@@ -98,7 +99,12 @@ fun CreateAccountView(
 
     var isLoading by remember { mutableStateOf(false) }
 
+    var challengeId by remember { mutableStateOf("") }
+    var showCaptcha by remember { mutableStateOf(false) }
+    val captchaImage = vaultsViewModel.captchaImage.collectAsState()
+
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val activity = LocalActivity.current
 
     if(BuildConfig.DEBUG) {
         phoneNumber = "1123579"
@@ -129,6 +135,52 @@ fun CreateAccountView(
         modifier = Modifier
             .nestedScroll(scrollBehavior.nestedScrollConnection),
     ) { innerPadding ->
+
+        if(showCaptcha && captchaImage.value != null) {
+            CaptchaImage(captchaImage.value!!, {
+                showCaptcha = false
+                vaultsViewModel.resetCaptchaImage()
+            }) { answer ->
+                showCaptcha = false
+                vaultsViewModel.executeRecaptcha(
+                    answer = answer,
+                    challengeId = challengeId,
+                    onFailureCallback = {
+                        isLoading = false
+                    }
+                ) { recaptchaToken ->
+                    val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+                    createAccount(
+                        context = context,
+                        phoneNumber = phoneNumber,
+                        countryCode = selectedCountry!!.countryCode,
+                        password = password,
+                        recaptchaToken = recaptchaToken,
+                        otpRequiredCallback = {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                navController.navigate(OTPCodeScreen(
+                                    loginSignupPhoneNumber = phoneNumber,
+                                    loginSignupPassword = password,
+                                    countryCode = selectedCountry!!.countryCode,
+                                    otpRequestType = OTPCodeVerificationType.CREATE,
+                                    nextAttemptTimestamp = it,
+                                    recaptcha = answer,
+                                ))
+                            }
+                        },
+                        failedCallback = {
+                            isLoading = false
+                            CoroutineScope(Dispatchers.Main).launch {
+                                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    ) {
+                        isLoading = false
+                    }
+                }
+            }
+        }
+
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -315,33 +367,15 @@ fun CreateAccountView(
                 Button(onClick = {
                     if (password == reenterPassword) {
                         isLoading = true
-                        val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
 
-                        createAccount(
-                            context = context,
-                            phoneNumber = phoneNumber,
-                            countryCode = selectedCountry!!.countryCode,
-                            password = password,
-                            otpRequiredCallback = {
-                                platformsViewModel.loginSignupPassword = password
-                                platformsViewModel.loginSignupPhoneNumber = phoneNumber
-                                platformsViewModel.countryCode = selectedCountry!!.countryCode
-                                platformsViewModel.nextAttemptTimestamp = it
-                                platformsViewModel.otpRequestType =
-                                    OTPCodeVerificationType.CREATE
-
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    navController.navigate(OTPCodeScreen)
-                                }
-                            },
-                            failedCallback = {
-                                isLoading = false
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-                                }
-                            }
-                        ) {
+                        vaultsViewModel.initiateCaptchaRequest({
                             isLoading = false
+                            CoroutineScope(Dispatchers.Main).launch {
+                                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                            }
+                        }) {
+                            showCaptcha = true
+                            challengeId = it
                         }
                     } else {
                         CoroutineScope(Dispatchers.Main).launch {
@@ -375,15 +409,18 @@ fun CreateAccountView(
 
             TextButton(
                 onClick = {
-                    platformsViewModel.loginSignupPassword = password
-                    platformsViewModel.loginSignupPhoneNumber = phoneNumber
-                    platformsViewModel.otpRequestType =
-                        OTPCodeVerificationType.AUTHENTICATE
-                    navController.navigate(OTPCodeScreen)
+                    val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+                    navController.navigate(OTPCodeScreen(
+                        loginSignupPhoneNumber = phoneNumber,
+                        loginSignupPassword = password,
+                        countryCode = selectedCountry!!.countryCode,
+                        otpRequestType = OTPCodeVerificationType.AUTHENTICATE,
+                        isOnboarding = isOnboarding,
+                        recaptcha = vaultsViewModel.recaptchaAnswer,
+                    ))
                 },
-                enabled = (phoneNumber.isNotEmpty()
-                        && password.isNotEmpty()
-                        && reenterPassword.isNotEmpty()) && !isLoading,
+                enabled = PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
+                        && !isLoading,
                 modifier = Modifier.padding(bottom=16.dp)) {
                 Text(stringResource(R.string.already_got_code))
             }
@@ -406,7 +443,7 @@ fun CreateAccountView(
                 modifier = Modifier
                     .padding(top = 0.dp)
                     .clickable {
-                        navController.navigate(LoginScreen)
+                        navController.navigate(LoginScreen(isOnboarding = isOnboarding))
                     },
                 color = MaterialTheme.colorScheme.onBackground
             )
@@ -424,6 +461,7 @@ private fun createAccount(
     phoneNumber: String,
     countryCode: String,
     password: String,
+    recaptchaToken: String,
     otpRequiredCallback: (Int) -> Unit,
     failedCallback: (String?) -> Unit = {},
     completedCallback: () -> Unit = {},
@@ -435,7 +473,8 @@ private fun createAccount(
                 context = context,
                 phoneNumber = phoneNumber,
                 countryCode = countryCode,
-                password = password
+                password = password,
+                recaptchaToken = recaptchaToken,
             )
 
             if(response.requiresOwnershipProof) {
@@ -459,7 +498,11 @@ private fun createAccount(
 @Preview(showBackground = true)
 @Composable
 fun CreateAccountPreview() {
+    val context = LocalContext.current
     AppTheme(darkTheme = false) {
-        CreateAccountView(rememberNavController(), PlatformsViewModel())
+        CreateAccountView(
+            rememberNavController(),
+            remember { VaultsViewModel(context) }
+        )
     }
 }

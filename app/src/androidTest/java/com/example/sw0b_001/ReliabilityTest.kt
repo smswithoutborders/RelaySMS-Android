@@ -1,18 +1,10 @@
 package com.example.sw0b_001
 
-import android.content.Intent
-import android.widget.Toast
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.sw0b_001.Models.GatewayClients.GatewayClientsCommunications
-import com.example.sw0b_001.Models.SMSHandler
-import com.example.sw0b_001.Modules.Network
+import com.example.sw0b_001.data.Network
 import com.example.sw0b_001.ui.views.compose.ReliabilityTestRequestPayload
 import com.example.sw0b_001.ui.views.compose.ReliabilityTestResponsePayload
 import junit.framework.TestCase.assertTrue
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.Test
 import java.text.SimpleDateFormat

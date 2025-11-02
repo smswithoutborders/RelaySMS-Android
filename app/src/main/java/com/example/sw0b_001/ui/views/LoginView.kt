@@ -1,7 +1,9 @@
 package com.example.sw0b_001.ui.views
 
+import android.app.Activity
+import android.app.Application
 import android.content.Context
-import android.util.Log
+import android.telephony.PhoneNumberUtils
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -54,22 +56,27 @@ import com.arpitkatiyarprojects.countrypicker.CountryPickerOutlinedTextField
 import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getActivity
 import com.example.sw0b_001.BuildConfig
-import com.example.sw0b_001.Models.Messages.EncryptedContent
-import com.example.sw0b_001.Models.Messages.MessagesViewModel
-import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
-import com.example.sw0b_001.Models.Vaults
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
+import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.R
+import com.example.sw0b_001.ui.components.CaptchaImage
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.ForgotPasswordScreen
-import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
+import com.example.sw0b_001.ui.navigation.OnboardingInteractiveScreen
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.VaultsViewModel
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -79,13 +86,18 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoginView(
     navController: NavController = rememberNavController(),
-    platformsViewModel: PlatformsViewModel,
+    vaultViewModel: VaultsViewModel,
+    isOnboarding: Boolean = false,
 ) {
     val context = LocalContext.current
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
 
     var phoneNumber by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    var challengeId by remember { mutableStateOf("") }
+    var showCaptcha by remember { mutableStateOf(false) }
+    val captchaImage = vaultViewModel.captchaImage.collectAsState()
 
     if(BuildConfig.DEBUG) {
         phoneNumber = "1123579"
@@ -121,6 +133,74 @@ fun LoginView(
             )
         },
     ) { innerPadding ->
+
+        if(showCaptcha && captchaImage.value != null) {
+            CaptchaImage(captchaImage.value!!, {
+                showCaptcha = false
+                vaultViewModel.resetCaptchaImage()
+            }) {
+                showCaptcha = false
+                isLoading = true
+                vaultViewModel.recaptchaAnswer = it
+                vaultViewModel.executeRecaptcha(
+                    answer = it,
+                    challengeId = challengeId,
+                    onFailureCallback = {
+                        isLoading = false
+                    }) { recaptchaToken ->
+                    val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+                    vaultViewModel.recaptchaAnswer = recaptchaToken
+                    login(
+                        context = context,
+                        phoneNumber = phoneNumber,
+                        password = password,
+                        otpRequiredCallback = { nextAttemptTimestamp ->
+                            CoroutineScope(Dispatchers.Main).launch {
+                                navController.navigate(
+                                    OTPCodeScreen(
+                                        loginSignupPhoneNumber = phoneNumber,
+                                        loginSignupPassword = password,
+                                        countryCode = selectedCountry!!.countryCode,
+                                        otpRequestType = OTPCodeVerificationType.AUTHENTICATE,
+                                        nextAttemptTimestamp = nextAttemptTimestamp,
+                                        isOnboarding = isOnboarding,
+                                        recaptcha = recaptchaToken
+                                    )
+                                ) {
+                                    if (isOnboarding) {
+                                        popUpTo(OnboardingInteractiveScreen) {
+                                            inclusive = false
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        passwordRequiredCallback = {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                navController.navigate(
+                                    ForgotPasswordScreen(
+                                        isOnboarding = isOnboarding
+                                    )
+                                )
+                            }
+                        },
+                        failedCallback = {
+                            isLoading = false
+                            CoroutineScope(Dispatchers.Main).launch {
+                                Toast.makeText(
+                                    context, it,
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                        },
+                        recaptchaToken = recaptchaToken
+                    ) {
+                        isLoading = false
+                    }
+                }
+            }
+        }
+
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -163,8 +243,12 @@ fun LoginView(
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .padding(top = 0.dp)
-                        .clickable {
-                            // Handle click on "save platforms"
+                        .apply {
+                            if(!LocalInspectionMode.current) {
+                                this.clickable {
+                                    // Handle click on "save platforms"
+                                }
+                            }
                         },
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -202,7 +286,7 @@ fun LoginView(
                 ) {
                     TextButton(
                         onClick = {
-                            navController.navigate(ForgotPasswordScreen)
+                            navController.navigate(ForgotPasswordScreen())
                         }
                     ) {
                         Text(stringResource(R.string.forgot_password))
@@ -240,8 +324,6 @@ fun LoginView(
                     ),
                     enabled = !isLoading
                 )
-
-
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -253,35 +335,14 @@ fun LoginView(
                 Button(
                     onClick = {
                         isLoading = true
-                        val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
-
-                        login(
-                            context = context,
-                            phoneNumber = phoneNumber,
-                            password = password,
-                            otpRequiredCallback = { nextAttemptTimestamp ->
-                                platformsViewModel.loginSignupPassword = password
-                                platformsViewModel.loginSignupPhoneNumber = phoneNumber
-                                platformsViewModel.otpRequestType =
-                                    OTPCodeVerificationType.AUTHENTICATE
-                                platformsViewModel.nextAttemptTimestamp = nextAttemptTimestamp
-
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    navController.navigate(OTPCodeScreen)
-                                }
-                            },
-                            passwordRequiredCallback = {
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    navController.navigate(ForgotPasswordScreen)
-                                }
-                            },
-                            failedCallback = {
-                                isLoading = false
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-                                }
+                        vaultViewModel.initiateCaptchaRequest({
+                            isLoading = false
+                            CoroutineScope(Dispatchers.Main).launch {
+                                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
                             }
-                        ) {
+                        }) {
+                            showCaptcha = true
+                            challengeId = it
                             isLoading = false
                         }
                     },
@@ -301,42 +362,48 @@ fun LoginView(
                         Text(stringResource(R.string.log_in))
                     }
                 }
-                
+
                 TextButton(
                     onClick = {
-                        platformsViewModel.loginSignupPassword = password
-                        platformsViewModel.loginSignupPhoneNumber = phoneNumber
-                        platformsViewModel.otpRequestType =
-                            OTPCodeVerificationType.AUTHENTICATE
-                        navController.navigate(OTPCodeScreen)
+                        isLoading = true
+                        navController.navigate(OTPCodeScreen(
+                            loginSignupPhoneNumber = phoneNumber,
+                            loginSignupPassword = password,
+                            countryCode = selectedCountry!!.countryCode,
+                            otpRequestType = OTPCodeVerificationType.AUTHENTICATE,
+                            isOnboarding = isOnboarding,
+                            recaptcha = vaultViewModel.recaptchaAnswer
+                        ))
                     },
-                    enabled = (phoneNumber.isNotEmpty() && password.isNotEmpty()) && !isLoading,
+                    enabled = PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
+                            && !isLoading,
                     modifier = Modifier.padding(bottom=16.dp)) {
                     Text(stringResource(R.string.already_got_code))
                 }
 
-                Text(
-                    text = buildAnnotatedString {
-                        append(stringResource(R.string.do_not_have_an_account))
-                        pushStringAnnotation(tag = "signup", annotation = "signup")
-                        withStyle(
-                            style = SpanStyle(
-                                color = MaterialTheme.colorScheme.tertiary,
-                                textDecoration = TextDecoration.Underline
-                            )
-                        ) {
-                            append(stringResource(R.string.create_account))
-                        }
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .clickable {
-                            navController.navigate(CreateAccountScreen)
+                TextButton(
+                    onClick = { navController
+                        .navigate(CreateAccountScreen(isOnboarding = isOnboarding))
+                    }
+                ) {
+                    Text(
+                        text = buildAnnotatedString {
+                            append(stringResource(R.string.do_not_have_an_account))
+                            pushStringAnnotation(tag = "signup", annotation = "signup")
+                            withStyle(
+                                style = SpanStyle(
+                                    color = MaterialTheme.colorScheme.tertiary,
+                                    textDecoration = TextDecoration.Underline
+                                )
+                            ) {
+                                append(stringResource(R.string.create_account))
+                            }
                         },
-                    color = MaterialTheme.colorScheme.onBackground
-                )
+                        style = MaterialTheme.typography.bodySmall,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
             }
         }
     }
@@ -347,6 +414,7 @@ private fun login(
     context: Context,
     phoneNumber: String,
     password: String,
+    recaptchaToken: String,
     otpRequiredCallback: (Int) -> Unit,
     passwordRequiredCallback: () -> Unit = {},
     failedCallback: (String?) -> Unit = {},
@@ -358,7 +426,8 @@ private fun login(
             val response = vaults.authenticateEntity(
                 context,
                 phoneNumber,
-                password
+                password,
+                recaptchaToken = recaptchaToken
             )
 
             if (response.requiresPasswordReset) {
@@ -384,8 +453,11 @@ private fun login(
 @Preview(showBackground = true)
 @Composable
 fun LoginViewPreview() {
+    val context = LocalContext.current
     AppTheme(darkTheme = false) {
-        LoginView(platformsViewModel = PlatformsViewModel())
+        LoginView(rememberNavController(),
+            remember{ VaultsViewModel(context) })
+
     }
 }
 

@@ -1,0 +1,413 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 24,
+    "identityHash": "a1e0aadb18cd1d01a5d7ec8fa6b8c46f",
+    "entities": [
+      {
+        "tableName": "RatchetStates",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `value` BLOB NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "BLOB",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "GatewayServer",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `publicKey` TEXT NOT NULL, `url` TEXT, `protocol` TEXT, `port` INTEGER NOT NULL, `seedsUrl` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "publicKey",
+            "columnName": "publicKey",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "protocol",
+            "columnName": "protocol",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "port",
+            "columnName": "port",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "seedsUrl",
+            "columnName": "seedsUrl",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_GatewayServer_url",
+            "unique": true,
+            "columnNames": [
+              "url"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_GatewayServer_url` ON `${TABLE_NAME}` (`url`)"
+          }
+        ]
+      },
+      {
+        "tableName": "Platforms",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT, `description` TEXT, `logo` INTEGER NOT NULL, `letter` TEXT, `type` TEXT, `isSaved` INTEGER NOT NULL DEFAULT 0)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "logo",
+            "columnName": "logo",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "letter",
+            "columnName": "letter",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "isSaved",
+            "columnName": "isSaved",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_Platforms_name",
+            "unique": true,
+            "columnNames": [
+              "name"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_Platforms_name` ON `${TABLE_NAME}` (`name`)"
+          }
+        ]
+      },
+      {
+        "tableName": "AvailablePlatforms",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `shortcode` TEXT, `service_type` TEXT, `protocol_type` TEXT, `icon_svg` TEXT, `icon_png` TEXT, `support_url_scheme` INTEGER, `logo` BLOB, PRIMARY KEY(`name`))",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shortcode",
+            "columnName": "shortcode",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "service_type",
+            "columnName": "service_type",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "protocol_type",
+            "columnName": "protocol_type",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "icon_svg",
+            "columnName": "icon_svg",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "icon_png",
+            "columnName": "icon_png",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "support_url_scheme",
+            "columnName": "support_url_scheme",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "logo",
+            "columnName": "logo",
+            "affinity": "BLOB"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "name"
+          ]
+        }
+      },
+      {
+        "tableName": "GatewayClients",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `msisdn` TEXT NOT NULL, `operator` TEXT NOT NULL, `country` TEXT NOT NULL, `alias` TEXT, `date` INTEGER NOT NULL, `isDefault` INTEGER NOT NULL, `last_published_date` INTEGER, `manuallyAdded` INTEGER NOT NULL, `operatorCode` TEXT, `reliability` INTEGER, `region` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "msisdn",
+            "columnName": "msisdn",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "operator",
+            "columnName": "operator",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "country",
+            "columnName": "country",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "alias",
+            "columnName": "alias",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isDefault",
+            "columnName": "isDefault",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "last_published_date",
+            "columnName": "last_published_date",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "manuallyAdded",
+            "columnName": "manuallyAdded",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "operatorCode",
+            "columnName": "operatorCode",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "reliability",
+            "columnName": "reliability",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "region",
+            "columnName": "region",
+            "affinity": "TEXT"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_GatewayClients_msisdn",
+            "unique": true,
+            "columnNames": [
+              "msisdn"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_GatewayClients_msisdn` ON `${TABLE_NAME}` (`msisdn`)"
+          }
+        ]
+      },
+      {
+        "tableName": "StoredPlatformsEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `account` TEXT, `name` TEXT, `access_token` TEXT DEFAULT '', `refresh_token` TEXT DEFAULT '', PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "account",
+            "columnName": "account",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "accessToken",
+            "columnName": "access_token",
+            "affinity": "TEXT",
+            "defaultValue": "''"
+          },
+          {
+            "fieldPath": "refreshToken",
+            "columnName": "refresh_token",
+            "affinity": "TEXT",
+            "defaultValue": "''"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_StoredPlatformsEntity_account_name",
+            "unique": true,
+            "columnNames": [
+              "account",
+              "name"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_StoredPlatformsEntity_account_name` ON `${TABLE_NAME}` (`account`, `name`)"
+          }
+        ]
+      },
+      {
+        "tableName": "EncryptedContent",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `platformName` TEXT, `type` TEXT, `fromAccount` TEXT, `date` INTEGER NOT NULL, `gateway_client_MSISDN` TEXT, `encryptedContent` TEXT, `imageLength` INTEGER NOT NULL DEFAULT 0, `textLength` INTEGER NOT NULL DEFAULT 0)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "platformName",
+            "columnName": "platformName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "fromAccount",
+            "columnName": "fromAccount",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "gatewayClientMSISDN",
+            "columnName": "gateway_client_MSISDN",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "encryptedContent",
+            "columnName": "encryptedContent",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "imageLength",
+            "columnName": "imageLength",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          },
+          {
+            "fieldPath": "textLength",
+            "columnName": "textLength",
+            "affinity": "INTEGER",
+            "notNull": true,
+            "defaultValue": "0"
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a1e0aadb18cd1d01a5d7ec8fa6b8c46f')"
+    ]
+  }
+}

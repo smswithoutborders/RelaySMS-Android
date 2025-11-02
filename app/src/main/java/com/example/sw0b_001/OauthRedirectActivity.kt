@@ -8,15 +8,17 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
-import com.example.sw0b_001.Models.Publishers
-import com.example.sw0b_001.Models.Vaults
-import com.example.sw0b_001.Modules.Helpers
+import com.example.sw0b_001.data.Publishers
+import com.example.sw0b_001.data.Vaults
+import com.example.sw0b_001.data.Helpers
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 import java.net.URLDecoder
+import android.net.Uri
+import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
 
 
 class OauthRedirectActivity : AppCompatActivity() {
@@ -24,7 +26,6 @@ class OauthRedirectActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_open_idoauth_redirect)
-        Helpers.logIntentDetails(intent)
 
         /**
          * Send this to Vault to complete the OAuth process
@@ -32,7 +33,6 @@ class OauthRedirectActivity : AppCompatActivity() {
 
         val intentUrl = intent.dataString
         if(intentUrl.isNullOrEmpty()) {
-            Log.e(javaClass.name, "Intent has no URL")
             finish()
         }
 
@@ -57,10 +57,8 @@ class OauthRedirectActivity : AppCompatActivity() {
 
                 val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
                 val storeTokensOnDevice = sharedPreferences.getBoolean("store_tokens_on_device", false)
-                Log.d("Oauth redirect", "Store on device is $storeTokensOnDevice")
 
                 if (storeTokensOnDevice) {
-                    Log.d("Oauth redirect", "Store on device is true")
                     publishers.sendOAuthAuthorizationCode(
                         llt,
                         platform,
@@ -82,7 +80,9 @@ class OauthRedirectActivity : AppCompatActivity() {
                 }
 
                 val vaults = Vaults(applicationContext)
-                vaults.refreshStoredTokens(applicationContext)
+                vaults.refreshStoredTokens(
+                    applicationContext,
+                    settingsGetStoreTokensOnDevice)
                 vaults.shutdown()
             } catch(e: StatusRuntimeException) {
                 e.printStackTrace()
@@ -98,10 +98,17 @@ class OauthRedirectActivity : AppCompatActivity() {
             } finally {
                 publishers.shutdown()
             }
+
             runOnUiThread {
-                val intent = Intent(applicationContext, MainActivity::class.java).apply {
-                    setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                }
+                val isOnboarding = intent.getBooleanExtra("is_onboarding",
+                    false)
+                val intent = Intent( applicationContext,
+                    MainActivity::class.java)
+                    .apply {
+                        setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        setPackage(packageName)
+                        putExtra("is_onboarding", isOnboarding)
+                    }
                 startActivity(intent)
                 finish()
             }

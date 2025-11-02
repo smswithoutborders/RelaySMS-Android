@@ -9,10 +9,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
 import android.os.CountDownTimer
-import android.text.format.DateUtils
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -61,25 +59,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.ContextCompat
-import androidx.core.content.edit
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import androidx.preference.PreferenceManager
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
+import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.BuildConfig
-import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
-import com.example.sw0b_001.Models.Vaults
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
+import com.example.sw0b_001.data.Vaults
+import com.example.sw0b_001.data.savePhoneNumberToPrefs
+import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.utils.savePhoneNumberToPrefs
 import com.google.android.gms.auth.api.phone.SmsRetriever
 import com.google.android.gms.common.api.CommonStatusCodes
 import com.google.android.gms.common.api.Status
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -154,18 +151,21 @@ fun SmsRetrieverHandler(onSmsRetrieved: (String) -> Unit) {
     }
 }
 
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OtpCodeVerificationView(
     navController: NavController = rememberNavController(),
-    platformsViewModel: PlatformsViewModel,
+    loginSignupPhoneNumber: String,
+    loginSignupPassword: String,
+    countryCode: String,
+    recaptcha: String,
+    otpRequestType: OTPCodeVerificationType,
+    nextAttemptTimestamp: Int? = null,
+    onCompleteCallback: ((Boolean) -> Unit)? = null
 ) {
     val context = LocalContext.current
     var otpCode by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
-    val nextAttemptTimestamp = platformsViewModel.nextAttemptTimestamp
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -182,7 +182,6 @@ fun OtpCodeVerificationView(
 
     SmsRetrieverHandler {
         otpCode = it
-        println("Code came in: $otpCode")
     }
     configureVerificationListener(context)
 
@@ -298,19 +297,26 @@ fun OtpCodeVerificationView(
                     isLoading = true
                     submitOTPCode(
                         context = context,
-                        phoneNumber = platformsViewModel.loginSignupPhoneNumber,
-                        password = platformsViewModel.loginSignupPassword,
-                        countryCode = platformsViewModel.countryCode,
+                        phoneNumber = loginSignupPhoneNumber,
+                        password = loginSignupPassword,
+                        countryCode = countryCode,
                         code = otpCode,
-                        platformsViewModel = platformsViewModel,
-                        type = platformsViewModel.otpRequestType,
+                        recaptcha = recaptcha,
+                        type = otpRequestType,
                         onFailedCallback = {isLoading = false},
                         onCompleteCallback = {isLoading = false}
                     )  {
                         CoroutineScope(Dispatchers.Main).launch {
-                            navController.navigate(HomepageScreen) {
-                                popUpTo(HomepageScreen) {
-                                    inclusive = true
+                            if(onCompleteCallback != null) {
+                                onCompleteCallback.invoke(true)
+                                navController.popBackStack()
+                            } else {
+                                val route = if(context.isDefault()) HomeScreenNav()
+                                else HomepageScreen
+                                navController.navigate(route) {
+                                    popUpTo(route) {
+                                        inclusive = true
+                                    }
                                 }
                             }
                         }
@@ -432,8 +438,8 @@ private fun submitOTPCode(
     password: String,
     countryCode: String = "",
     code: String,
+    recaptcha: String,
     type: OTPCodeVerificationType,
-    platformsViewModel: PlatformsViewModel,
     onFailedCallback: (String?) -> Unit,
     onCompleteCallback: () -> Unit,
     onSuccessCallback: () -> Unit,
@@ -443,37 +449,39 @@ private fun submitOTPCode(
         try {
             when(type) {
                 OTPCodeVerificationType.CREATE -> {
-                    val response = vault.createEntity(
+                    vault.createEntity(
                         context,
                         phoneNumber,
                         countryCode,
                         password,
+                        recaptcha,
                         code
                     )
                 }
                 OTPCodeVerificationType.AUTHENTICATE -> {
-                    val response = vault.authenticateEntity(
+                    vault.authenticateEntity(
                         context,
                         phoneNumber,
                         password,
+                        recaptcha,
                         code
                     )
                 }
                 OTPCodeVerificationType.RECOVER -> {
-                    val response = vault.recoverEntityPassword(
+                    vault.recoverEntityPassword(
                         context,
                         phoneNumber,
                         password,
+                        recaptcha,
                         code
                     )
                 }
             }
 
             savePhoneNumberToPrefs(context, phoneNumber)
-
-            vault.refreshStoredTokens(context) {
-                platformsViewModel.accountsForMissingDialog = it
-            }
+            Vaults(context)
+                .refreshStoredTokens(context,
+                    context.settingsGetStoreTokensOnDevice)
             onSuccessCallback()
         } catch(e: StatusRuntimeException) {
             e.printStackTrace()
@@ -488,3 +496,17 @@ private fun submitOTPCode(
     }
 }
 
+@Preview
+@Composable
+fun OtpCodeVerificationViewPreview() {
+    AppTheme {
+        OtpCodeVerificationView(
+            rememberNavController(),
+            "",
+            loginSignupPassword = "",
+            countryCode = "",
+            "",
+            otpRequestType = OTPCodeVerificationType.CREATE,
+        ) {}
+    }
+}

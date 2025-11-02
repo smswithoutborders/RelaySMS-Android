@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SelectAll
@@ -43,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -50,11 +52,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.example.sw0b_001.R
-import com.example.sw0b_001.SettingsActivity
 import com.example.sw0b_001.ui.navigation.AboutScreen
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.utils.getPhoneNumberFromPrefs
+import com.example.sw0b_001.data.getPhoneNumberFromPrefs
+import com.example.sw0b_001.ui.navigation.SettingsScreen
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,23 +73,17 @@ fun RecentAppBar(
     onSelectAll: (() -> Unit)? = null,
     onDeleteSelected: (() -> Unit)? = null,
     onCancelSelection: (() -> Unit)? = null,
+    onMenuClickCallback: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     var showMenu by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    val isDarkTheme = isSystemInDarkTheme()
-    val logo by remember {
-        mutableIntStateOf(
-            if (isDarkTheme) {
-                R.drawable.relaysms_dark_theme
-            } else {
-                R.drawable.relaysms_default_shape_
-            }
-        )
-    }
+    val inPreviewMode = LocalInspectionMode.current
 
     val phoneNumber = remember { getPhoneNumberFromPrefs(context) }
+    val isDefault by remember { mutableStateOf(if(inPreviewMode) true
+    else context.isDefault()) }
 
     Column(modifier = Modifier.fillMaxWidth()) {
         if (isSelectionMode) {
@@ -130,14 +127,24 @@ fun RecentAppBar(
                         Text(stringResource(R.string.app_name))
                     }
                 },
-                actions = {
-                    if (!isSearchActive) {
-                        IconButton(onClick = onToggleSearch) {
+                navigationIcon = {
+                    if(isDefault) {
+                        IconButton(onClick = { onMenuClickCallback?.invoke() }) {
                             Icon(
-                                imageVector = Icons.Filled.Search,
-                                contentDescription = stringResource(R.string.search)
+                                imageVector = Icons.Filled.Menu,
+                                contentDescription = stringResource(R.string.open_menu)
                             )
                         }
+                    }
+                },
+                actions = {
+                    if (!isSearchActive) {
+//                        IconButton(onClick = onToggleSearch) {
+//                            Icon(
+//                                imageVector = Icons.Filled.Search,
+//                                contentDescription = stringResource(R.string.search)
+//                            )
+//                        }
                     }
 
                     IconButton(onClick = { showMenu = !showMenu }) {
@@ -183,13 +190,8 @@ fun RecentAppBar(
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.settings)) },
                             onClick = {
-                                context.startActivity(
-                                    Intent(context, SettingsActivity::class.java).apply {
-                                        flags =
-                                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_TASK_ON_HOME
-                                    }
-                                )
                                 showMenu = false
+                                navController.navigate(SettingsScreen)
                             }
                         )
                         DropdownMenuItem(

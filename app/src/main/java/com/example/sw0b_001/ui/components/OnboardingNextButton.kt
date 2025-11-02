@@ -23,7 +23,7 @@ import com.example.sw0b_001.ui.theme.AppTheme
 
 
 @Composable
-fun OnboardingNextButton(onNext: () -> Unit, nextButtonText: String) {
+fun OnboardingNextButton(nextButtonText: String, onNext: () -> Unit) {
     Surface(
         modifier = Modifier
             .size(72.dp)
@@ -52,6 +52,6 @@ fun OnboardingNextButton(onNext: () -> Unit, nextButtonText: String) {
 @Composable
 fun OnboardingNextButtonPreview() {
     AppTheme {
-        OnboardingNextButton(onNext = {}, nextButtonText = "Continue")
+        OnboardingNextButton(onNext = {}, nextButtonText = "")
     }
 }

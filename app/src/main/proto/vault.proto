@@ -4,358 +4,364 @@ package vault.v1;
 
 // Request message for creating an entity.
 message CreateEntityRequest {
-    // The ISO 3166-1 alpha-2 country code of the entity.
-    string country_code = 1;
-    // The phone number of the entity.
-    string phone_number = 2;
-    // The password of the entity.
-    string password = 3;
-    // The client's public key for publishing.
-    string client_publish_pub_key = 4;
-    // The client's public key for device identification.
-    string client_device_id_pub_key = 5;
-    // The ownership proof response from the client.
-    string ownership_proof_response = 6;
+  // The ISO 3166-1 alpha-2 country code of the entity.
+  string country_code = 1;
+  // The phone number of the entity.
+  string phone_number = 2;
+  // The password of the entity.
+  string password = 3;
+  // The client's public key for publishing.
+  string client_publish_pub_key = 4;
+  // The client's public key for device identification.
+  string client_device_id_pub_key = 5;
+  // The ownership proof response from the client.
+  string ownership_proof_response = 6;
+  // The reCAPTCHA token for verification.
+  string recaptcha_token = 7;
 }
 
 // Response message for creating an entity.
 message CreateEntityResponse {
-    // Indicates if ownership proof is required.
-    bool requires_ownership_proof = 1;
-    // A long-lived token for the authenticated entity.
-    string long_lived_token = 2;
-    // The server's public key for publishing.
-    string server_publish_pub_key = 3;
-    // The server's public key for device identification.
-    string server_device_id_pub_key = 4;
-    // A response message.
-    string message = 5;
-    // The next available time to request another proof of ownership.
-    int32 next_attempt_timestamp = 6;
+  // Indicates if ownership proof is required.
+  bool requires_ownership_proof = 1;
+  // A long-lived token for the authenticated entity.
+  string long_lived_token = 2;
+  // The server's public key for publishing.
+  string server_publish_pub_key = 3;
+  // The server's public key for device identification.
+  string server_device_id_pub_key = 4;
+  // A response message.
+  string message = 5;
+  // The next available time to request another proof of ownership.
+  int32 next_attempt_timestamp = 6;
 }
 
 // Request message for authenticating an entity.
 message AuthenticateEntityRequest {
-    // The phone number of the entity.
-    string phone_number = 1;
-    // The password of the entity.
-    string password = 2;
-    // The client's public key for publishing.
-    string client_publish_pub_key = 3;
-    // The client's public key for device identification.
-    string client_device_id_pub_key = 4;
-    // The ownership proof response from the client.
-    string ownership_proof_response = 5;
+  // The phone number of the entity.
+  string phone_number = 1;
+  // The password of the entity.
+  string password = 2;
+  // The client's public key for publishing.
+  string client_publish_pub_key = 3;
+  // The client's public key for device identification.
+  string client_device_id_pub_key = 4;
+  // The ownership proof response from the client.
+  string ownership_proof_response = 5;
+  // The reCAPTCHA token for verification.
+  string recaptcha_token = 6;
 }
 
 // Response message for authenticating an entity.
 message AuthenticateEntityResponse {
-    // Indicates if ownership proof is required.
-    bool requires_ownership_proof = 1;
-    // A long-lived token for the authenticated entity.
-    string long_lived_token = 2;
-    // The server's public key for publishing.
-    string server_publish_pub_key = 3;
-    // The server's public key for device identification.
-    string server_device_id_pub_key = 4;
-    // A response message.
-    string message = 5;
-    // The next available time to request another proof of ownership.
-    int32 next_attempt_timestamp = 6;
-    // indicates if user must reset their password
-    bool requires_password_reset = 7;
+  // Indicates if ownership proof is required.
+  bool requires_ownership_proof = 1;
+  // A long-lived token for the authenticated entity.
+  string long_lived_token = 2;
+  // The server's public key for publishing.
+  string server_publish_pub_key = 3;
+  // The server's public key for device identification.
+  string server_device_id_pub_key = 4;
+  // A response message.
+  string message = 5;
+  // The next available time to request another proof of ownership.
+  int32 next_attempt_timestamp = 6;
+  // indicates if user must reset their password
+  bool requires_password_reset = 7;
 }
 
 // Request message for listing entity's stored tokens.
 message ListEntityStoredTokensRequest {
-    // The long-lived token of the authenticated entity.
-    string long_lived_token = 1;
-    // Indicates if the token should be removed from the cloud and sent to the device.
-    bool migrate_to_device = 2;
+  // The long-lived token of the authenticated entity.
+  string long_lived_token = 1;
+  // Indicates if the token should be removed from the cloud and sent to the device.
+  bool migrate_to_device = 2;
 }
 
 // Response message for listing entity's stored tokens.
 message ListEntityStoredTokensResponse {
-    // The list of stored tokens.
-    repeated Token stored_tokens = 1;
-    // A response message.
-    string message = 2;
+  // The list of stored tokens.
+  repeated Token stored_tokens = 1;
+  // A response message.
+  string message = 2;
 }
 
 // Represents a token.
 message Token {
-    // The platform associated with the token.
-    string platform = 1;
-    // The unique identifier of the account associated with the token.
-    string account_identifier = 2;
-    // Access and refresh tokens
-    map<string, string> account_tokens = 3;
-    // Indicates if the token is already stored on the device.
-    bool is_stored_on_device = 4;
+  // The platform associated with the token.
+  string platform = 1;
+  // The unique identifier of the account associated with the token.
+  string account_identifier = 2;
+  // Access and refresh tokens
+  map<string, string> account_tokens = 3;
+  // Indicates if the token is already stored on the device.
+  bool is_stored_on_device = 4;
 }
 
 // Request message for storing an entity's token.
 message StoreEntityTokenRequest {
-    // The long-lived token of the authenticated entity.
-    string long_lived_token = 1;
-    // The OAuth2 token to be stored (JSON string).
-    string token = 2;
-    // The platform associated with the token.
-    string platform = 3;
-    // The identifier of the account associated with the token.
-    string account_identifier = 4;
+  // The long-lived token of the authenticated entity.
+  string long_lived_token = 1;
+  // The OAuth2 token to be stored (JSON string).
+  string token = 2;
+  // The platform associated with the token.
+  string platform = 3;
+  // The identifier of the account associated with the token.
+  string account_identifier = 4;
 }
 
 // Response message for storing an entity's token.
 message StoreEntityTokenResponse {
-    // A response message.
-    string message = 1;
-    // Indicates whether the operation was successful.
-    bool success = 2;
+  // A response message.
+  string message = 1;
+  // Indicates whether the operation was successful.
+  bool success = 2;
 }
 
 // Request message for getting entity access token.
 message GetEntityAccessTokenRequest {
-    // Device ID for identifying the requesting device.
-    string device_id = 1;
-    // The long-lived token of the authenticated entity.
-    string long_lived_token = 2;
-    // The platform associated with the token.
-    string platform = 3;
-    // The identifier of the account associated with the token.
-    string account_identifier = 4;
-    // The phone number of the entity.
-    string phone_number = 5;
+  // Device ID for identifying the requesting device.
+  string device_id = 1;
+  // The long-lived token of the authenticated entity.
+  string long_lived_token = 2;
+  // The platform associated with the token.
+  string platform = 3;
+  // The identifier of the account associated with the token.
+  string account_identifier = 4;
+  // The phone number of the entity.
+  string phone_number = 5;
 }
 
 // Response message for getting entity access token.
 message GetEntityAccessTokenResponse {
-    // Entity access token (JSON string).
-    string token = 1;
-    // A response message.
-    string message = 2;
-    // Indicates whether the operation was successful.
-    bool success = 3;
+  // Entity access token (JSON string).
+  string token = 1;
+  // A response message.
+  string message = 2;
+  // Indicates whether the operation was successful.
+  bool success = 3;
 }
 
 // Request message for decrypting payload.
 message DecryptPayloadRequest {
-    // Device ID for identifying the requesting device.
-    string device_id = 1;
-    // Encrypted payload that needs to be decrypted.
-    string payload_ciphertext = 2;
-    // The phone number of the entity.
-    string phone_number = 3;
+  // Device ID for identifying the requesting device.
+  string device_id = 1;
+  // Encrypted payload that needs to be decrypted.
+  string payload_ciphertext = 2;
+  // The phone number of the entity.
+  string phone_number = 3;
 }
 
 message DecryptPayloadResponse {
-    // Decrypted plaintext payload.
-    string payload_plaintext = 1;
-    // A response message.
-    string message = 2;
-    // Indicates whether the operation was successful.
-    bool success = 3;
-    // The ISO 3166-1 alpha-2 country code of the entity.
-    string country_code = 4;
+  // Decrypted plaintext payload.
+  string payload_plaintext = 1;
+  // A response message.
+  string message = 2;
+  // Indicates whether the operation was successful.
+  bool success = 3;
+  // The ISO 3166-1 alpha-2 country code of the entity.
+  string country_code = 4;
 }
 
 // Request message for encrypting payload.
 message EncryptPayloadRequest {
-    // Device ID for identifying the requesting device.
-    string device_id = 1;
-    // Plaintext payload to be encrypted.
-    string payload_plaintext = 2;
-    // The phone number of the entity.
-    string phone_number = 3;
+  // Device ID for identifying the requesting device.
+  string device_id = 1;
+  // Plaintext payload to be encrypted.
+  string payload_plaintext = 2;
+  // The phone number of the entity.
+  string phone_number = 3;
 }
 
 // Response message for encrypting payload.
 message EncryptPayloadResponse {
-    // Encrypted payload.
-    string payload_ciphertext = 1;
-    // A response message.
-    string message = 2;
-    // Indicates whether the operation was successful.
-    bool success = 3;
+  // Encrypted payload.
+  string payload_ciphertext = 1;
+  // A response message.
+  string message = 2;
+  // Indicates whether the operation was successful.
+  bool success = 3;
 }
 
 // Request message for updating an entity's token.
 message UpdateEntityTokenRequest {
-    // Device ID for identifying the requesting device.
-    string device_id = 1;
-    // The OAuth2 token to be stored (JSON string).
-    string token = 2;
-    // The platform associated with the token.
-    string platform = 3;
-    // The identifier of the account associated with the token.
-    string account_identifier = 4;
-    // The phone number of the entity.
-    string phone_number = 5;
+  // Device ID for identifying the requesting device.
+  string device_id = 1;
+  // The OAuth2 token to be stored (JSON string).
+  string token = 2;
+  // The platform associated with the token.
+  string platform = 3;
+  // The identifier of the account associated with the token.
+  string account_identifier = 4;
+  // The phone number of the entity.
+  string phone_number = 5;
 }
 
 // Response message for updating an entity's token.
 message UpdateEntityTokenResponse {
-    // A response message.
-    string message = 1;
-    // Indicates whether the operation was successful.
-    bool success = 2;
+  // A response message.
+  string message = 1;
+  // Indicates whether the operation was successful.
+  bool success = 2;
 }
 
 // Request message for deleting an entity's token.
 message DeleteEntityTokenRequest {
-    // The long-lived token of the authenticated entity.
-    string long_lived_token = 1;
-    // The platform associated with the token.
-    string platform = 2;
-    // The identifier of the account associated with the token.
-    string account_identifier = 3;
+  // The long-lived token of the authenticated entity.
+  string long_lived_token = 1;
+  // The platform associated with the token.
+  string platform = 2;
+  // The identifier of the account associated with the token.
+  string account_identifier = 3;
 }
 
 // Response message for deleting an entity's token.
 message DeleteEntityTokenResponse {
-    // A response message.
-    string message = 1;
-    // Indicates whether the operation was successful.
-    bool success = 2;
+  // A response message.
+  string message = 1;
+  // Indicates whether the operation was successful.
+  bool success = 2;
 }
 
 // Request message for deleting an entity.
 message DeleteEntityRequest {
-    // The long-lived token of the authenticated entity.
-    string long_lived_token = 1;
+  // The long-lived token of the authenticated entity.
+  string long_lived_token = 1;
 }
 
 // Response message for deleting an entity.
 message DeleteEntityResponse {
-    // A response message.
-    string message = 1;
-    // Indicates whether the operation was successful.
-    bool success = 2;
+  // A response message.
+  string message = 1;
+  // Indicates whether the operation was successful.
+  bool success = 2;
 }
 
 // Request message for resetting an entity's password.
 message ResetPasswordRequest {
-    // The phone number of the entity.
-    string phone_number = 1;
-    // The new password of the entity.
-    string new_password = 2;
-    // The client's public key for publishing.
-    string client_publish_pub_key = 3;
-    // The client's public key for device identification.
-    string client_device_id_pub_key = 4;
-    // The ownership proof response from the client.
-    string ownership_proof_response = 5;
+  // The phone number of the entity.
+  string phone_number = 1;
+  // The new password of the entity.
+  string new_password = 2;
+  // The client's public key for publishing.
+  string client_publish_pub_key = 3;
+  // The client's public key for device identification.
+  string client_device_id_pub_key = 4;
+  // The ownership proof response from the client.
+  string ownership_proof_response = 5;
+  // The reCAPTCHA token for verification.
+  string recaptcha_token = 6;
 }
 
 // Response message for resetting an entity's password.
 message ResetPasswordResponse {
-    // Indicates if ownership proof is required.
-    bool requires_ownership_proof = 1;
-    // A long-lived token for the authenticated entity.
-    string long_lived_token = 2;
-    // The server's public key for publishing.
-    string server_publish_pub_key = 3;
-    // The server's public key for device identification.
-    string server_device_id_pub_key = 4;
-    // A response message.
-    string message = 5;
-    // The next available time to request another proof of ownership.
-    int32 next_attempt_timestamp = 6;
+  // Indicates if ownership proof is required.
+  bool requires_ownership_proof = 1;
+  // A long-lived token for the authenticated entity.
+  string long_lived_token = 2;
+  // The server's public key for publishing.
+  string server_publish_pub_key = 3;
+  // The server's public key for device identification.
+  string server_device_id_pub_key = 4;
+  // A response message.
+  string message = 5;
+  // The next available time to request another proof of ownership.
+  int32 next_attempt_timestamp = 6;
 }
 
 // Request message for updating an entity's password.
 message UpdateEntityPasswordRequest {
-    // The long-lived token of the authenticated entity.
-    string long_lived_token = 1;
-    // The current password of the entity.
-    string current_password = 2;
-    // The new password of the entity.
-    string new_password = 3;
+  // The long-lived token of the authenticated entity.
+  string long_lived_token = 1;
+  // The current password of the entity.
+  string current_password = 2;
+  // The new password of the entity.
+  string new_password = 3;
 }
 
 // Response message for updating an entity's password.
 message UpdateEntityPasswordResponse {
-    // A response message.
-    string message = 1;
-    // Indicates whether the operation was successful.
-    bool success = 2;
+  // A response message.
+  string message = 1;
+  // Indicates whether the operation was successful.
+  bool success = 2;
 }
 
 // Request message for creating a bridge entity.
 message CreateBridgeEntityRequest {
-    // The ISO 3166-1 alpha-2 country code of the entity.
-    string country_code = 1;
-    // The phone number of the entity.
-    string phone_number = 2;
-    // The client's public key for publishing.
-    string client_publish_pub_key = 3;
-    // The ownership proof response from the client.
-    string ownership_proof_response = 4;
-    // The server's public key identifier.
-    string server_pub_key_identifier = 5;
-    // The server's public key version.
-    string server_pub_key_version = 6;
-    // The preferred language of the entity in ISO 639-1 format.
-    string language = 7;
+  // The ISO 3166-1 alpha-2 country code of the entity.
+  string country_code = 1;
+  // The phone number of the entity.
+  string phone_number = 2;
+  // The client's public key for publishing.
+  string client_publish_pub_key = 3;
+  // The ownership proof response from the client.
+  string ownership_proof_response = 4;
+  // The server's public key identifier.
+  string server_pub_key_identifier = 5;
+  // The server's public key version.
+  string server_pub_key_version = 6;
+  // The preferred language of the entity in ISO 639-1 format.
+  string language = 7;
 }
 
 // Response message for creating a bridge entity.
 message CreateBridgeEntityResponse {
-    // A response message.
-    string message = 1;
-    // Indicates whether the operation was successful.
-    bool success = 2;
+  // A response message.
+  string message = 1;
+  // Indicates whether the operation was successful.
+  bool success = 2;
 }
 
 // Response message for authenticating a bridge entity,
 message AuthenticateBridgeEntityRequest {
-    // The phone number of the entity.
-    string phone_number = 1;
-    // The preferred language of the entity in ISO 639-1 format.
-    string language = 2;
+  // The phone number of the entity.
+  string phone_number = 1;
+  // The preferred language of the entity in ISO 639-1 format.
+  string language = 2;
 }
 
 message AuthenticateBridgeEntityResponse {
-    // A response message.
-    string message = 1;
-    // Indicates whether the operation was successful.
-    bool success = 2;
-    // The preferred language of the entity in ISO 639-1 format.
-    string language = 3;
+  // A response message.
+  string message = 1;
+  // Indicates whether the operation was successful.
+  bool success = 2;
+  // The preferred language of the entity in ISO 639-1 format.
+  string language = 3;
 }
 
 // Service for managing entities.
 service Entity {
-    // Creates an entity.
-    rpc CreateEntity(CreateEntityRequest) returns (CreateEntityResponse);
-    // Authenticates an entity.
-    rpc AuthenticateEntity(AuthenticateEntityRequest) returns (AuthenticateEntityResponse);
-    // Lists all stored access tokens for an entity.
-    rpc ListEntityStoredTokens(ListEntityStoredTokensRequest) returns (ListEntityStoredTokensResponse);
-    // Deletes an entity.
-    rpc DeleteEntity(DeleteEntityRequest) returns (DeleteEntityResponse);
-    // Resets an entity's password
-    rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordResponse);
-    // Updates an entity's password.
-    rpc UpdateEntityPassword(UpdateEntityPasswordRequest) returns (UpdateEntityPasswordResponse);
+  // Creates an entity.
+  rpc CreateEntity(CreateEntityRequest) returns (CreateEntityResponse);
+  // Authenticates an entity.
+  rpc AuthenticateEntity(AuthenticateEntityRequest) returns (AuthenticateEntityResponse);
+  // Lists all stored access tokens for an entity.
+  rpc ListEntityStoredTokens(ListEntityStoredTokensRequest) returns (ListEntityStoredTokensResponse);
+  // Deletes an entity.
+  rpc DeleteEntity(DeleteEntityRequest) returns (DeleteEntityResponse);
+  // Resets an entity's password
+  rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordResponse);
+  // Updates an entity's password.
+  rpc UpdateEntityPassword(UpdateEntityPasswordRequest) returns (UpdateEntityPasswordResponse);
 }
 
 // Service for managing entities internally.
 service EntityInternal {
-    // Stores a token for an entity.
-    rpc StoreEntityToken(StoreEntityTokenRequest) returns (StoreEntityTokenResponse);
-    // Get an entity's access token.
-    rpc GetEntityAccessToken(GetEntityAccessTokenRequest) returns (GetEntityAccessTokenResponse);
-    // Decrypt payload.
-    rpc DecryptPayload(DecryptPayloadRequest) returns (DecryptPayloadResponse);
-    // Encrypt payload.
-    rpc EncryptPayload(EncryptPayloadRequest) returns (EncryptPayloadResponse);
-    // Updates an entity's access token.
-    rpc UpdateEntityToken(UpdateEntityTokenRequest) returns (UpdateEntityTokenResponse);
-    // Deletes an entity's access token.
-    rpc DeleteEntityToken(DeleteEntityTokenRequest) returns (DeleteEntityTokenResponse);
-    // Creates a bridge entity.
-    rpc CreateBridgeEntity(CreateBridgeEntityRequest) returns (CreateBridgeEntityResponse);
-    // Authenticates a bridge entity.
-    rpc AuthenticateBridgeEntity(AuthenticateBridgeEntityRequest) returns (AuthenticateBridgeEntityResponse);
+  // Stores a token for an entity.
+  rpc StoreEntityToken(StoreEntityTokenRequest) returns (StoreEntityTokenResponse);
+  // Get an entity's access token.
+  rpc GetEntityAccessToken(GetEntityAccessTokenRequest) returns (GetEntityAccessTokenResponse);
+  // Decrypt payload.
+  rpc DecryptPayload(DecryptPayloadRequest) returns (DecryptPayloadResponse);
+  // Encrypt payload.
+  rpc EncryptPayload(EncryptPayloadRequest) returns (EncryptPayloadResponse);
+  // Updates an entity's access token.
+  rpc UpdateEntityToken(UpdateEntityTokenRequest) returns (UpdateEntityTokenResponse);
+  // Deletes an entity's access token.
+  rpc DeleteEntityToken(DeleteEntityTokenRequest) returns (DeleteEntityTokenResponse);
+  // Creates a bridge entity.
+  rpc CreateBridgeEntity(CreateBridgeEntityRequest) returns (CreateBridgeEntityResponse);
+  // Authenticates a bridge entity.
+  rpc AuthenticateBridgeEntity(AuthenticateBridgeEntityRequest) returns (AuthenticateBridgeEntityResponse);
 }

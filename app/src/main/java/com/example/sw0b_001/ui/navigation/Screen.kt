@@ -1,31 +1,52 @@
 package com.example.sw0b_001.ui.navigation
 
+import android.content.Context
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
+import com.example.sw0b_001.data.models.Platforms
+import com.example.sw0b_001.ui.views.OTPCodeVerificationType
 import kotlinx.serialization.Serializable
 
 @Serializable
-object OnboardingScreen
+object WelcomeScreen
+
+@Serializable
+object OnboardingSkipScreen
+
+@Serializable
+object OnboardingInteractiveScreen
 
 @Serializable
 object GetMeOutScreen
-@Serializable
-object HomepageScreen
-@Serializable
-object LoginScreen
-@Serializable
-object CreateAccountScreen
-@Serializable
-object OTPCodeScreen
-@Serializable
-object AboutScreen
 
 @Serializable
-object EmailComposeScreen
+object HomepageScreen
+
 @Serializable
-object BridgeEmailComposeScreen
+object HomepageScreenRelay
+
 @Serializable
-object TextComposeScreen
+data class LoginScreen(
+    val isOnboarding: Boolean = false
+)
+
 @Serializable
-object MessageComposeScreen
+data class CreateAccountScreen(
+    val isOnboarding: Boolean = false
+)
+
+@Serializable
+data class OTPCodeScreen(
+    val loginSignupPhoneNumber: String,
+    val loginSignupPassword: String,
+    val countryCode: String,
+    val recaptcha: String,
+    val otpRequestType: OTPCodeVerificationType = OTPCodeVerificationType.AUTHENTICATE,
+    val nextAttemptTimestamp: Int? = null,
+    val isOnboarding: Boolean = false
+)
+
+@Serializable
+object AboutScreen
 
 @Serializable
 object BridgeViewScreen
@@ -40,4 +61,17 @@ object MessageViewScreen
 object PasteEncryptedTextScreen
 
 @Serializable
-object ForgotPasswordScreen
+object SettingsScreen
+
+@Serializable
+data class ForgotPasswordScreen(
+    val isOnboarding: Boolean = false
+)
+
+@Serializable
+data class ComposeScreen(
+    val type: Platforms.ServiceTypes,
+    val platformName: String?,
+    val isOnboarding: Boolean = false,
+)
+

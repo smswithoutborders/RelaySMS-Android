@@ -1,13 +1,10 @@
 package com.example.sw0b_001
 
-import com.example.sw0b_001.Modules.Helpers
-import com.github.kittinunf.fuel.util.encodeBase64
+import com.example.sw0b_001.data.Helpers
 import junit.framework.TestCase.assertEquals
 import org.junit.Assert.assertArrayEquals
 import org.junit.Test
-import java.net.URL
 import java.nio.ByteBuffer
-import kotlin.io.encoding.Base64
 
 class HelperTest {
 

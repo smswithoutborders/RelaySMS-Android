@@ -1,10 +1,11 @@
 package com.example.sw0b_001.ui.views
 
 import android.content.Context
+import android.telephony.PhoneNumberUtils
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,6 +35,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,14 +46,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -60,12 +58,13 @@ import com.arpitkatiyarprojects.countrypicker.CountryPickerOutlinedTextField
 import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
 import com.example.sw0b_001.BuildConfig
-import com.example.sw0b_001.Models.Platforms.PlatformsViewModel
-import com.example.sw0b_001.Models.Vaults
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
+import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.navigation.CreateAccountScreen
+import com.example.sw0b_001.ui.components.CaptchaImage
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.VaultsViewModel
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -75,7 +74,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun ForgotPasswordView(
     navController: NavController = rememberNavController(),
-    platformsViewModel: PlatformsViewModel,
+    vaultsViewModel: VaultsViewModel,
+    isOnboarding: Boolean = false
 ) {
     val context = LocalContext.current
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
@@ -90,6 +90,12 @@ fun ForgotPasswordView(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     var isLoading by remember { mutableStateOf(false) }
+
+    var challengeId by remember { mutableStateOf("") }
+    var showCaptcha by remember { mutableStateOf(false) }
+    val captchaImage = vaultsViewModel.captchaImage.collectAsState()
+
+    val activity = LocalActivity.current
 
     BackHandler {
         navController.popBackStack()
@@ -119,6 +125,53 @@ fun ForgotPasswordView(
             )
         },
     ) { innerPadding ->
+
+        if(showCaptcha && captchaImage.value != null) {
+            CaptchaImage(captchaImage.value!!, {
+                showCaptcha = false
+                vaultsViewModel.resetCaptchaImage()
+            }) { answer ->
+                showCaptcha = false
+
+                val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+                vaultsViewModel.executeRecaptcha(
+                    answer = answer,
+                    challengeId = challengeId,
+                    onFailureCallback = {
+                        isLoading = false
+                    }) {recaptchaToken ->
+                    recoverPassword(
+                        context = context,
+                        phoneNumber = phoneNumber,
+                        password = password,
+                        otpRequiredCallback = {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                navController.navigate(
+                                    OTPCodeScreen(
+                                        loginSignupPhoneNumber = phoneNumber,
+                                        loginSignupPassword = password,
+                                        countryCode = selectedCountry!!.countryCode,
+                                        otpRequestType = OTPCodeVerificationType.RECOVER,
+                                        nextAttemptTimestamp = it,
+                                        isOnboarding = isOnboarding,
+                                        recaptcha = answer
+                                    )
+                                )
+                            }
+                        },
+                        failedCallback = {
+                            isLoading = false
+                            CoroutineScope(Dispatchers.Main).launch {
+                                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                            }
+                        },
+                        recaptchaToken = recaptchaToken
+                    ) {
+                        isLoading = false
+                    }
+                }
+            }
+        }
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -255,31 +308,15 @@ fun ForgotPasswordView(
                 onClick = {
                     if (password == reenterPassword) {
                         isLoading = true
-                        val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
 
-                        recoverPassword(
-                            context = context,
-                            phoneNumber = phoneNumber,
-                            password = password,
-                            otpRequiredCallback = {
-                                platformsViewModel.loginSignupPassword = password
-                                platformsViewModel.loginSignupPhoneNumber = phoneNumber
-                                platformsViewModel.otpRequestType =
-                                    OTPCodeVerificationType.RECOVER
-                                platformsViewModel.nextAttemptTimestamp = it
-
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    navController.navigate(OTPCodeScreen)
-                                }
-                            },
-                            failedCallback = {
-                                isLoading = false
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    Toast.makeText(context, it, Toast.LENGTH_LONG).show()
-                                }
-                            }
-                        ) {
+                        vaultsViewModel.initiateCaptchaRequest({
                             isLoading = false
+                            CoroutineScope(Dispatchers.Main).launch {
+                                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                            }
+                        }) {
+                            showCaptcha = true
+                            challengeId = it
                         }
                     } else {
                         CoroutineScope(Dispatchers.Main).launch {
@@ -307,19 +344,23 @@ fun ForgotPasswordView(
 
             TextButton(
                 onClick = {
-                    platformsViewModel.loginSignupPassword = password
-                    platformsViewModel.loginSignupPhoneNumber = phoneNumber
-                    platformsViewModel.otpRequestType =
-                        OTPCodeVerificationType.AUTHENTICATE
-                    navController.navigate(OTPCodeScreen)
+                    val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+
+                    navController.navigate(OTPCodeScreen(
+                        loginSignupPhoneNumber = phoneNumber,
+                        loginSignupPassword = password,
+                        countryCode = selectedCountry!!.countryCode,
+                        otpRequestType = OTPCodeVerificationType.AUTHENTICATE,
+                        isOnboarding = isOnboarding,
+                        recaptcha = vaultsViewModel.recaptchaAnswer,
+                    ))
                 },
-                enabled = (phoneNumber.isNotEmpty()
-                        && password.isNotEmpty()
-                        && reenterPassword.isNotEmpty()) && !isLoading,
+                enabled = (
+                        PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
+                                && password.isNotEmpty()) && !isLoading,
                 modifier = Modifier.padding(bottom=16.dp)) {
                 Text(stringResource(R.string.already_got_code))
             }
-
         }
     }
 }
@@ -329,6 +370,7 @@ private fun recoverPassword(
     context: Context,
     phoneNumber: String,
     password: String,
+    recaptchaToken: String,
     otpRequiredCallback: (Int) -> Unit,
     failedCallback: (String?) -> Unit = {},
     completedCallback: () -> Unit = {},
@@ -339,7 +381,8 @@ private fun recoverPassword(
             val response = vaults.recoverEntityPassword(
                 context,
                 phoneNumber,
-                password
+                password,
+                recaptchaToken = recaptchaToken,
             )
 
             if(response.requiresOwnershipProof) {
@@ -362,7 +405,9 @@ private fun recoverPassword(
 @Preview(showBackground = true)
 @Composable
 fun ForgotPasswordPreview() {
+    val context = LocalContext.current
     AppTheme(darkTheme = false) {
-        ForgotPasswordView(rememberNavController(), PlatformsViewModel())
+        ForgotPasswordView(rememberNavController(),
+            remember{ VaultsViewModel(context)})
     }
 }
