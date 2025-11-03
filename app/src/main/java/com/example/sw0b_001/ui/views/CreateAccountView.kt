@@ -49,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -92,6 +93,7 @@ fun CreateAccountView(
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
     var phoneNumber by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var reenterPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var reenterPasswordVisible by remember { mutableStateOf (false) }
@@ -104,9 +106,9 @@ fun CreateAccountView(
     val captchaImage = vaultsViewModel.captchaImage.collectAsState()
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    val activity = LocalActivity.current
 
     if(BuildConfig.DEBUG) {
+        email = "developers@smswithoutborders.com"
         phoneNumber = "1123579"
         password = "dMd2Kmo9#"
         reenterPassword = "dMd2Kmo9#"
@@ -152,6 +154,7 @@ fun CreateAccountView(
                     val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
                     createAccount(
                         context = context,
+                        email = email,
                         phoneNumber = phoneNumber,
                         countryCode = selectedCountry!!.countryCode,
                         password = password,
@@ -220,11 +223,6 @@ fun CreateAccountView(
                     },
                     style = MaterialTheme.typography.bodySmall,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .padding(top = 0.dp)
-                        .clickable {
-                            // Handle click on "save platforms"
-                        },
                     color = MaterialTheme.colorScheme.onBackground
                 )
             }
@@ -234,6 +232,21 @@ fun CreateAccountView(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = {
+                        Text(
+                            text = stringResource(R.string.email_address),
+                            style = MaterialTheme.typography.bodySmall)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 CountryPickerOutlinedTextField(
                     mobileNumber = phoneNumber,
                     onMobileNumberChange = { phoneNumber = it },
@@ -242,7 +255,8 @@ fun CreateAccountView(
                     countryListDisplayType = CountryListDisplayType.Dialog,
                     modifier = Modifier.fillMaxWidth(),
                     label = {
-                        Text(text = stringResource(R.string.phone_number),
+                        Text(text = stringResource(R.string.phone_number) +
+                                stringResource(R.string.optional),
                             style = MaterialTheme.typography.bodySmall)
                     }
                 )
@@ -349,14 +363,18 @@ fun CreateAccountView(
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .padding(top = 0.dp)
-                            .clickable {
-                                val intent = Intent(
-                                    Intent.ACTION_VIEW,
-                                    context
-                                        .getString(R.string.https_smswithoutborders_com_privacy_policy)
-                                        .toUri()
-                                )
-                                context.startActivity(intent)
+                            .apply {
+                                if(!LocalInspectionMode.current) {
+                                    this.clickable {
+                                        val intent = Intent(
+                                            Intent.ACTION_VIEW,
+                                            context
+                                                .getString(R.string.https_smswithoutborders_com_privacy_policy)
+                                                .toUri()
+                                        )
+                                        context.startActivity(intent)
+                                    }
+                                }
                             },
                         color = MaterialTheme.colorScheme.onBackground
                     )
@@ -385,9 +403,8 @@ fun CreateAccountView(
                                 Toast.LENGTH_LONG
                             ).show()
                         }
-                    }
-                },
-                    enabled = phoneNumber.isNotEmpty() &&
+                    }},
+                    enabled = email.isNotEmpty() &&
                             password.isNotEmpty() &&
                             reenterPassword.isNotEmpty() && acceptedPrivatePolicy,
                     modifier = Modifier
@@ -442,8 +459,12 @@ fun CreateAccountView(
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(top = 0.dp)
-                    .clickable {
-                        navController.navigate(LoginScreen(isOnboarding = isOnboarding))
+                    .apply {
+                        if(!LocalInspectionMode.current) {
+                            this.clickable {
+                                navController.navigate(LoginScreen(isOnboarding = isOnboarding))
+                            }
+                        }
                     },
                 color = MaterialTheme.colorScheme.onBackground
             )
@@ -458,6 +479,7 @@ fun CreateAccountView(
 
 private fun createAccount(
     context: Context,
+    email: String,
     phoneNumber: String,
     countryCode: String,
     password: String,

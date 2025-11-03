@@ -57,6 +57,7 @@ import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.TextButton
@@ -93,6 +94,7 @@ fun LoginView(
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
 
     var phoneNumber by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     var challengeId by remember { mutableStateOf("") }
@@ -259,6 +261,20 @@ fun LoginView(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = {
+                        Text(
+                            text = stringResource(R.string.email_address),
+                            style = MaterialTheme.typography.bodySmall)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
                 CountryPickerOutlinedTextField(
                     mobileNumber = phoneNumber,
                     onMobileNumberChange = { phoneNumber = it },
@@ -375,8 +391,9 @@ fun LoginView(
                             recaptcha = vaultViewModel.recaptchaAnswer
                         ))
                     },
-                    enabled = PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
-                            && !isLoading,
+                    enabled = (email.isNotEmpty() ||
+                            PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber))
+                            && password.isNotEmpty() && !isLoading,
                     modifier = Modifier.padding(bottom=16.dp)) {
                     Text(stringResource(R.string.already_got_code))
                 }

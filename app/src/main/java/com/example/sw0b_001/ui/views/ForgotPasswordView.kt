@@ -81,6 +81,7 @@ fun ForgotPasswordView(
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
 
     var phoneNumber by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     var reenterPassword by remember { mutableStateOf("") }
@@ -210,6 +211,21 @@ fun ForgotPasswordView(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = {
+                        Text(
+                            text = stringResource(R.string.email_address),
+                            style = MaterialTheme.typography.bodySmall)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 CountryPickerOutlinedTextField(
                     mobileNumber = phoneNumber,
                     onMobileNumberChange = { phoneNumber = it },
@@ -268,7 +284,6 @@ fun ForgotPasswordView(
                     enabled = !isLoading
                 )
 
-//                Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = reenterPassword,
                     onValueChange = { reenterPassword = it },
@@ -325,7 +340,8 @@ fun ForgotPasswordView(
                         }
                     }
                 },
-                enabled = (phoneNumber.isNotEmpty() && password.isNotEmpty()) && !isLoading,
+                enabled = (email.isNotEmpty() || PhoneNumberUtils
+                    .isWellFormedSmsAddress(phoneNumber)) && !isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 16.dp, end = 16.dp)
@@ -355,9 +371,8 @@ fun ForgotPasswordView(
                         recaptcha = vaultsViewModel.recaptchaAnswer,
                     ))
                 },
-                enabled = (
-                        PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
-                                && password.isNotEmpty()) && !isLoading,
+                enabled = (email.isNotEmpty() || PhoneNumberUtils
+                    .isWellFormedSmsAddress(phoneNumber)) && !isLoading,
                 modifier = Modifier.padding(bottom=16.dp)) {
                 Text(stringResource(R.string.already_got_code))
             }
