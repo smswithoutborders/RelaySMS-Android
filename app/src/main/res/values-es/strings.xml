@@ -383,5 +383,9 @@
     <string name="delete_account">Eliminar cuenta</string>
     <string name="this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer">Esto revocaría todos tus tokens, claves de seguridad y todos los datos que tengas guardados en el dispositivo y en Vault. Podrás seguir usando los puentes cuando quieras.</string>
     <string name="this_would_migrate_your_tokens_stored_on_the_vault_to_your_device_this_would_send_the_token_alongside_every_time_you_send_the_message_potentially_increasing_the_size_of_messages">Esto revocaría todos tus tokens, claves de seguridad y todos los datos que tengas guardados en el dispositivo y en Vault. Podrás seguir usando los puentes cuando quieras.</string>
+    <string name="enter_the_text_in_the_image">Introduce el texto de la imagen.</string>
+    <string name="submit1">Entregar</string>
+    <string name="email_address">Dirección de correo electrónico</string>
+    <string name="optional">(Opcional)</string>
 
 </resources>

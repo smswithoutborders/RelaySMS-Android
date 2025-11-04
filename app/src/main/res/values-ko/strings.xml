@@ -387,5 +387,9 @@
     <string name="log_out">로그아웃</string>
     <string name="this_would_log_you_out_of_your_vault_account_on_this_device_you_can_log_back_in_at_anytime_with_an_internet_connection">이렇게 하면 이 기기의 Vault 계정에서 로그아웃됩니다. 인터넷에 연결된 상태에서 언제든지 다시 로그인할 수 있습니다.</string>
     <string name="delete_account">계정 삭제</string>
+    <string name="enter_the_text_in_the_image">이미지에 텍스트를 입력하세요</string>
+    <string name="submit1">제출하다</string>
+    <string name="email_address">이메일 주소</string>
+    <string name="optional">(선택 과목)</string>
 
 </resources>
