@@ -160,6 +160,7 @@ fun LoginView(
                             CoroutineScope(Dispatchers.Main).launch {
                                 navController.navigate(
                                     OTPCodeScreen(
+                                        email = email,
                                         loginSignupPhoneNumber = phoneNumber,
                                         loginSignupPassword = password,
                                         countryCode = selectedCountry!!.countryCode,
@@ -186,16 +187,17 @@ fun LoginView(
                                 )
                             }
                         },
-                        failedCallback = {
+                        failedCallback = { msg ->
                             isLoading = false
                             CoroutineScope(Dispatchers.Main).launch {
                                 Toast.makeText(
-                                    context, it,
+                                    context, msg,
                                     Toast.LENGTH_LONG
                                 ).show()
                             }
                         },
-                        recaptchaToken = recaptchaToken
+                        recaptchaToken = recaptchaToken,
+                        email = email
                     ) {
                         isLoading = false
                     }
@@ -383,6 +385,7 @@ fun LoginView(
                     onClick = {
                         isLoading = true
                         navController.navigate(OTPCodeScreen(
+                            email = email,
                             loginSignupPhoneNumber = phoneNumber,
                             loginSignupPassword = password,
                             countryCode = selectedCountry!!.countryCode,
@@ -429,6 +432,7 @@ fun LoginView(
 
 private fun login(
     context: Context,
+    email: String,
     phoneNumber: String,
     password: String,
     recaptchaToken: String,
@@ -442,8 +446,9 @@ private fun login(
         try {
             val response = vaults.authenticateEntity(
                 context,
-                phoneNumber,
-                password,
+                email = email,
+                phoneNumber = phoneNumber,
+                password = password,
                 recaptchaToken = recaptchaToken
             )
 

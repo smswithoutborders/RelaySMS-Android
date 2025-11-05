@@ -149,6 +149,7 @@ fun ForgotPasswordView(
                             CoroutineScope(Dispatchers.Main).launch {
                                 navController.navigate(
                                     OTPCodeScreen(
+                                        email = email,
                                         loginSignupPhoneNumber = phoneNumber,
                                         loginSignupPassword = password,
                                         countryCode = selectedCountry!!.countryCode,
@@ -166,7 +167,8 @@ fun ForgotPasswordView(
                                 Toast.makeText(context, it, Toast.LENGTH_LONG).show()
                             }
                         },
-                        recaptchaToken = recaptchaToken
+                        recaptchaToken = recaptchaToken,
+                        email = email
                     ) {
                         isLoading = false
                     }
@@ -363,6 +365,7 @@ fun ForgotPasswordView(
                     val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
 
                     navController.navigate(OTPCodeScreen(
+                        email = email,
                         loginSignupPhoneNumber = phoneNumber,
                         loginSignupPassword = password,
                         countryCode = selectedCountry!!.countryCode,
@@ -383,6 +386,7 @@ fun ForgotPasswordView(
 
 private fun recoverPassword(
     context: Context,
+    email: String,
     phoneNumber: String,
     password: String,
     recaptchaToken: String,
@@ -395,8 +399,9 @@ private fun recoverPassword(
         try {
             val response = vaults.recoverEntityPassword(
                 context,
-                phoneNumber,
-                password,
+                email = email,
+                phoneNumber = phoneNumber,
+                newPassword = password,
                 recaptchaToken = recaptchaToken,
             )
 

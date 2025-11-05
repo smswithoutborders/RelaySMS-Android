@@ -155,6 +155,7 @@ fun SmsRetrieverHandler(onSmsRetrieved: (String) -> Unit) {
 @Composable
 fun OtpCodeVerificationView(
     navController: NavController = rememberNavController(),
+    email: String,
     loginSignupPhoneNumber: String,
     loginSignupPassword: String,
     countryCode: String,
@@ -297,6 +298,7 @@ fun OtpCodeVerificationView(
                     isLoading = true
                     submitOTPCode(
                         context = context,
+                        email = email,
                         phoneNumber = loginSignupPhoneNumber,
                         password = loginSignupPassword,
                         countryCode = countryCode,
@@ -434,6 +436,7 @@ private fun configureVerificationListener(context: Context) {
 
 private fun submitOTPCode(
     context: Context,
+    email: String,
     phoneNumber: String,
     password: String,
     countryCode: String = "",
@@ -451,11 +454,12 @@ private fun submitOTPCode(
                 OTPCodeVerificationType.CREATE -> {
                     vault.createEntity(
                         context,
-                        phoneNumber,
-                        countryCode,
-                        password,
-                        recaptcha,
-                        code
+                        email = email,
+                        phoneNumber = phoneNumber,
+                        countryCode = countryCode,
+                        password = password,
+                        recaptchaToken = recaptcha,
+                        ownershipResponse = code
                     )
                 }
                 OTPCodeVerificationType.AUTHENTICATE -> {
@@ -502,6 +506,7 @@ fun OtpCodeVerificationViewPreview() {
     AppTheme {
         OtpCodeVerificationView(
             rememberNavController(),
+            "",
             "",
             loginSignupPassword = "",
             countryCode = "",

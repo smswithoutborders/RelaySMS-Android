@@ -1,5 +1,6 @@
 package com.example.sw0b_001.data
 
+import android.R.attr.phoneNumber
 import android.content.Context
 import android.util.Base64
 import android.util.Log
@@ -108,13 +109,15 @@ class Vaults(val context: Context) {
         }
     }
 
-    private fun processVaultArtifacts(context: Context,
-                                      encodedLlt: String,
-                                      deviceIdPubKey: String,
-                                      publisherPubKey: String,
-                                      phoneNumber: String,
-                                      clientDeviceIDPubKey: ByteArray,
-                                      clientPublisherPubKey: ByteArray) {
+    private fun processVaultArtifacts(
+        context: Context,
+        encodedLlt: String,
+        deviceIdPubKey: String,
+        publisherPubKey: String,
+        authValue: String,
+        clientDeviceIDPubKey: ByteArray,
+        clientPublisherPubKey: ByteArray
+    ) {
         val deviceIdSharedKey = Cryptography.calculateSharedSecret(
             context,
             DEVICE_ID_KEYSTORE_ALIAS,
@@ -126,7 +129,7 @@ class Vaults(val context: Context) {
 
         val deviceId = getDeviceID(
             deviceIdSharedKey,
-            phoneNumber,
+            authValue,
             clientDeviceIDPubKey
         )
 
@@ -143,6 +146,7 @@ class Vaults(val context: Context) {
     fun createEntity(
         context: Context,
         phoneNumber: String,
+        email: String,
         countryCode: String,
         password: String,
         recaptchaToken: String,
@@ -161,7 +165,8 @@ class Vaults(val context: Context) {
             setPassword(password)
             setClientPublishPubKey(Base64.encodeToString(publishPubKey, Base64.DEFAULT))
             setClientDeviceIdPubKey(Base64.encodeToString(deviceIdPubKey, Base64.DEFAULT))
-            setRecaptchaToken(recaptchaToken)
+            setCaptchaToken(recaptchaToken)
+            setEmailAddress(email)
         }.build()
 
         val response = entityStub.createEntity(createEntityRequest1)
@@ -171,7 +176,7 @@ class Vaults(val context: Context) {
                 response.longLivedToken,
                 response.serverDeviceIdPubKey,
                 response.serverPublishPubKey,
-                phoneNumber,
+                email.ifEmpty { phoneNumber },
                 deviceIdPubKey, publishPubKey)
         }
         return response
@@ -180,6 +185,7 @@ class Vaults(val context: Context) {
     fun authenticateEntity(
         context: Context,
         phoneNumber: String,
+        email: String,
         password: String,
         recaptchaToken: String,
         ownershipResponse: String = ""
@@ -197,7 +203,8 @@ class Vaults(val context: Context) {
                 Base64.DEFAULT))
             setClientDeviceIdPubKey(Base64.encodeToString(deviceIdPubKey,
                 Base64.DEFAULT))
-            setRecaptchaToken(recaptchaToken)
+            setCaptchaToken(recaptchaToken)
+            setEmailAddress(email)
 
             if(ownershipResponse.isNotBlank()) {
                 setOwnershipProofResponse(ownershipResponse)
@@ -215,7 +222,7 @@ class Vaults(val context: Context) {
                 response.longLivedToken,
                 response.serverDeviceIdPubKey,
                 response.serverPublishPubKey,
-                phoneNumber,
+                email.ifEmpty { phoneNumber },
                 deviceIdPubKey, publishPubKey)
         }
         return response
@@ -224,6 +231,7 @@ class Vaults(val context: Context) {
     fun recoverEntityPassword(
         context: Context,
         phoneNumber: String,
+        email: String,
         newPassword: String,
         recaptchaToken: String,
         ownershipResponse: String? = null
@@ -241,7 +249,8 @@ class Vaults(val context: Context) {
                 Base64.DEFAULT))
             setClientDeviceIdPubKey(Base64.encodeToString(deviceIdPubKey,
                 Base64.DEFAULT))
-            setRecaptchaToken(recaptchaToken)
+            setCaptchaToken(recaptchaToken)
+            setEmailAddress(email)
 
             ownershipResponse?.let {
                 setOwnershipProofResponse(ownershipResponse)
@@ -254,7 +263,7 @@ class Vaults(val context: Context) {
                 response.longLivedToken,
                 response.serverDeviceIdPubKey,
                 response.serverPublishPubKey,
-                phoneNumber,
+                email.ifEmpty { phoneNumber },
                 deviceIdPubKey, publishPubKey)
         }
         return response

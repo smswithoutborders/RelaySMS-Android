@@ -36,6 +36,7 @@ data class CreateAccountScreen(
 
 @Serializable
 data class OTPCodeScreen(
+    val email: String,
     val loginSignupPhoneNumber: String,
     val loginSignupPassword: String,
     val countryCode: String,

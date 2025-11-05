@@ -151,7 +151,8 @@ fun CreateAccountView(
                         isLoading = false
                     }
                 ) { recaptchaToken ->
-                    val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+                    val phoneNumber = if(phoneNumber.isNotEmpty())
+                        selectedCountry!!.countryPhoneNumberCode + phoneNumber else ""
                     createAccount(
                         context = context,
                         email = email,
@@ -162,6 +163,7 @@ fun CreateAccountView(
                         otpRequiredCallback = {
                             CoroutineScope(Dispatchers.Main).launch {
                                 navController.navigate(OTPCodeScreen(
+                                    email = email,
                                     loginSignupPhoneNumber = phoneNumber,
                                     loginSignupPassword = password,
                                     countryCode = selectedCountry!!.countryCode,
@@ -428,6 +430,7 @@ fun CreateAccountView(
                 onClick = {
                     val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
                     navController.navigate(OTPCodeScreen(
+                        email = email,
                         loginSignupPhoneNumber = phoneNumber,
                         loginSignupPassword = password,
                         countryCode = selectedCountry!!.countryCode,
@@ -493,6 +496,7 @@ private fun createAccount(
         try {
             val response = vaults.createEntity(
                 context = context,
+                email = email,
                 phoneNumber = phoneNumber,
                 countryCode = countryCode,
                 password = password,
