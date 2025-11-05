@@ -32,6 +32,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -81,6 +82,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
+import com.arpitkatiyarprojects.countrypicker.CountryPicker
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.ui.components.CaptchaImage
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
@@ -159,8 +161,9 @@ fun CreateAccountView(
                         isLoading = false
                     }
                 ) { recaptchaToken ->
-                    val phoneNumber = if(phoneNumber.isNotEmpty())
+                    val phoneNumber = if(selectedAuthMethod == 0 ) "" else if(phoneNumber.isNotEmpty())
                         selectedCountry!!.countryPhoneNumberCode + phoneNumber else ""
+
                     createAccount(
                         context = context,
                         email = email,
@@ -257,19 +260,28 @@ fun CreateAccountView(
 
                 Spacer(modifier = Modifier.height(16.dp))
                 if(selectedAuthMethod == 0) {
-                    OutlinedTextField(
-                        value = email,
-                        onValueChange = { email = it },
-                        label = {
-                            Text(
-                                text = stringResource(R.string.email_address),
-                                style = MaterialTheme.typography.bodySmall)
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(8.dp),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    )
-
+                    OutlinedCard {
+                        Row(
+                            modifier = Modifier.padding(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            CountryPicker(defaultCountryCode = "cm",) {
+                                selectedCountry = it
+                            }
+                            OutlinedTextField(
+                                value = email,
+                                onValueChange = { email = it },
+                                label = {
+                                    Text(
+                                        text = stringResource(R.string.email_address),
+                                        style = MaterialTheme.typography.bodySmall)
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(8.dp),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                            )
+                        }
+                    }
                 }
 
                 else if(selectedAuthMethod == 1) {

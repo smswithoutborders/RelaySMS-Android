@@ -58,6 +58,7 @@ import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.CircularProgressIndicator
@@ -72,6 +73,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getActivity
+import com.arpitkatiyarprojects.countrypicker.CountryPicker
+import com.arpitkatiyarprojects.countrypicker.models.SelectedCountryDisplayProperties
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Vaults
@@ -83,6 +86,7 @@ import com.example.sw0b_001.ui.navigation.OTPCodeScreen
 import com.example.sw0b_001.ui.navigation.OnboardingInteractiveScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.VaultsViewModel
+import com.hbb20.CountryCodePicker
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -159,7 +163,10 @@ fun LoginView(
                     onFailureCallback = {
                         isLoading = false
                     }) { recaptchaToken ->
-                    val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+
+                    val phoneNumber = if(selectedAuthMethod == 0 ) "" else if(phoneNumber.isNotEmpty())
+                        selectedCountry!!.countryPhoneNumberCode + phoneNumber else ""
+
                     vaultViewModel.recaptchaAnswer = recaptchaToken
                     login(
                         context = context,
@@ -289,6 +296,12 @@ fun LoginView(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 if(selectedAuthMethod == 0) {
+                    selectedCountry = CountryDetails(
+                        countryCode = "",
+                        countryPhoneNumberCode = "",
+                        countryName = "",
+                        countryFlag = -1
+                    )
                     OutlinedTextField(
                         value = email,
                         onValueChange = { email = it },

@@ -58,6 +58,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.arpitkatiyarprojects.countrypicker.CountryPicker
 import com.arpitkatiyarprojects.countrypicker.CountryPickerOutlinedTextField
 import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
@@ -235,6 +236,12 @@ fun ForgotPasswordView(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 if(selectedAuthMethod == 0) {
+                    selectedCountry = CountryDetails(
+                        countryCode = "",
+                        countryPhoneNumberCode = "",
+                        countryName = "",
+                        countryFlag = -1
+                    )
                     OutlinedTextField(
                         value = email,
                         onValueChange = { email = it },
@@ -247,7 +254,6 @@ fun ForgotPasswordView(
                         shape = RoundedCornerShape(8.dp),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     )
-
                 }
 
                 else if(selectedAuthMethod == 1) {
@@ -390,7 +396,8 @@ fun ForgotPasswordView(
 
             TextButton(
                 onClick = {
-                    val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+                    val phoneNumber = if(selectedAuthMethod == 0 ) "" else if(phoneNumber.isNotEmpty())
+                        selectedCountry!!.countryPhoneNumberCode + phoneNumber else ""
 
                     navController.navigate(OTPCodeScreen(
                         email = email,
