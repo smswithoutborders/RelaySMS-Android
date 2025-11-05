@@ -28,8 +28,15 @@ private object Settings {
     const val SETTINGS_LOCK_DOWN_APP = "SETTINGS_LOCK_DOWN_APP"
     const val SETTINGS_USE_DEVICE_ID = "SETTINGS_USE_DEVICE_ID"
     const val SETTINGS_STORE_TOKENS_ON_DEVICE = "SETTINGS_STORE_TOKENS_ON_DEVICE"
+    const val SETTINGS_IS_EMAIL_LOGIN = "SETTINGS_IS_EMAIL_LOGIN"
 }
 
+val Context.settingsGetIsEmailLogin get(): Boolean {
+    val sharedPreferences = getSharedPreferences(
+        Settings.FILENAME, Context.MODE_PRIVATE)
+    return sharedPreferences
+        .getBoolean(Settings.SETTINGS_IS_EMAIL_LOGIN, false)
+}
 val Context.settingsGetStoreTokensOnDevice get(): Boolean {
     val sharedPreferences = getSharedPreferences(
         Settings.FILENAME, Context.MODE_PRIVATE)
@@ -107,6 +114,12 @@ fun Context.settingsSetNotShowChooseGatewayClient(state: Boolean) {
     }
 }
 
+fun Context.settingsSetIsEmailLogin(state: Boolean) {
+    getSharedPreferences( Settings.FILENAME, Context.MODE_PRIVATE).edit {
+        putBoolean(Settings.SETTINGS_IS_EMAIL_LOGIN, state)
+        apply()
+    }
+}
 fun Context.settingsSetOnboardedCompletely(state: Boolean) {
     getSharedPreferences( Settings.FILENAME, Context.MODE_PRIVATE).edit {
         putBoolean(Settings.SETTINGS_ONBOARDED_COMPLETELY, state)

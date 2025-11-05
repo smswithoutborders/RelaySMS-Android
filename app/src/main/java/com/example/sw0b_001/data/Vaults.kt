@@ -24,6 +24,7 @@ import java.security.DigestException
 import java.security.MessageDigest
 import androidx.core.content.edit
 import com.example.sw0b_001.data.Publishers.Companion.PUBLISHER_ATTRIBUTE_FILES
+import com.example.sw0b_001.extensions.context.settingsSetIsEmailLogin
 
 class Vaults(val context: Context) {
     private val DEVICE_ID_KEYSTORE_ALIAS = "DEVICE_ID_KEYSTORE_ALIAS"
@@ -116,7 +117,8 @@ class Vaults(val context: Context) {
         publisherPubKey: String,
         authValue: String,
         clientDeviceIDPubKey: ByteArray,
-        clientPublisherPubKey: ByteArray
+        clientPublisherPubKey: ByteArray,
+        isEmailLogin: Boolean,
     ) {
         val deviceIdSharedKey = Cryptography.calculateSharedSecret(
             context,
@@ -133,6 +135,7 @@ class Vaults(val context: Context) {
             clientDeviceIDPubKey
         )
 
+        context.settingsSetIsEmailLogin(isEmailLogin)
         storeArtifacts(context, llt, deviceId, clientDeviceIDPubKey)
         Publishers.storeArtifacts(context, publisherPubKey,
             Base64.encodeToString(clientPublisherPubKey,
@@ -177,7 +180,9 @@ class Vaults(val context: Context) {
                 response.serverDeviceIdPubKey,
                 response.serverPublishPubKey,
                 email.ifEmpty { phoneNumber },
-                deviceIdPubKey, publishPubKey)
+                deviceIdPubKey, publishPubKey,
+                email.isNotEmpty(),
+            )
         }
         return response
     }
@@ -223,7 +228,9 @@ class Vaults(val context: Context) {
                 response.serverDeviceIdPubKey,
                 response.serverPublishPubKey,
                 email.ifEmpty { phoneNumber },
-                deviceIdPubKey, publishPubKey)
+                deviceIdPubKey, publishPubKey,
+                email.isNotEmpty(),
+            )
         }
         return response
     }
@@ -264,7 +271,9 @@ class Vaults(val context: Context) {
                 response.serverDeviceIdPubKey,
                 response.serverPublishPubKey,
                 email.ifEmpty { phoneNumber },
-                deviceIdPubKey, publishPubKey)
+                deviceIdPubKey, publishPubKey,
+                email.isNotEmpty(),
+            )
         }
         return response
     }

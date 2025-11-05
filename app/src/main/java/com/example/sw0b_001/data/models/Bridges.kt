@@ -10,6 +10,7 @@ import com.example.sw0b_001.data.Cryptography
 import com.example.sw0b_001.data.PayloadEncryptionComposeDecomposeInit
 import com.example.sw0b_001.data.Publishers
 import com.example.sw0b_001.data.Vaults
+import com.example.sw0b_001.extensions.context.settingsGetIsEmailLogin
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.parseLocalImageContent
 import com.example.sw0b_001.ui.views.AvailablePlatformsView
 import kotlinx.coroutines.CoroutineScope
@@ -112,7 +113,8 @@ object Bridges {
         textLength: Int,
         subscriptionId: Long,
     ) : String? {
-        val isLoggedIn = Vaults.fetchLongLivedToken(context).isNotEmpty()
+        val generateKey = Vaults.fetchLongLivedToken(context).isEmpty() ||
+                context.settingsGetIsEmailLogin
 
         val content = Composers.EmailComposeHandler.createEmailByteBuffer(
             from = null,
@@ -124,7 +126,7 @@ object Bridges {
             isBridge = true
         )
 
-        if(!isLoggedIn) getKeypairForTransmission(context)
+        if(generateKey) getKeypairForTransmission(context)
 
         val encryptedContent = encryptContent(
             context = context,
@@ -133,10 +135,10 @@ object Bridges {
             imageLength = imageLength,
             textLength = textLength,
             subscriptionId = subscriptionId,
-            isLoggedIn = isLoggedIn
+            isLoggedIn = generateKey
         )
 
-        val payload = if(!isLoggedIn) {
+        val payload = if(generateKey) {
             authRequestAndPayload( context, encryptedContent, )
         } else {
             payloadOnly(encryptedContent)
