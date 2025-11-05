@@ -444,5 +444,7 @@
     <string name="submit1">Submit</string>
     <string name="email_address">Email address</string>
     <string name="optional">" (Optional)"</string>
+    <string name="email">Email</string>
+    <string name="phone_number1">Phone number</string>
 
 </resources>

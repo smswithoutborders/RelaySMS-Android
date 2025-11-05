@@ -465,19 +465,21 @@ private fun submitOTPCode(
                 OTPCodeVerificationType.AUTHENTICATE -> {
                     vault.authenticateEntity(
                         context,
-                        phoneNumber,
-                        password,
-                        recaptcha,
-                        code
+                        email = email,
+                        phoneNumber = phoneNumber,
+                        password = password,
+                        recaptchaToken = recaptcha,
+                        ownershipResponse = code
                     )
                 }
                 OTPCodeVerificationType.RECOVER -> {
                     vault.recoverEntityPassword(
                         context,
-                        phoneNumber,
-                        password,
-                        recaptcha,
-                        code
+                        email = email,
+                        phoneNumber = phoneNumber,
+                        newPassword = password,
+                        recaptchaToken = recaptcha,
+                        ownershipResponse = code
                     )
                 }
             }

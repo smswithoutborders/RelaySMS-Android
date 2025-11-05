@@ -30,6 +30,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -37,6 +40,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -96,7 +100,11 @@ fun ForgotPasswordView(
     var showCaptcha by remember { mutableStateOf(false) }
     val captchaImage = vaultsViewModel.captchaImage.collectAsState()
 
-    val activity = LocalActivity.current
+    var selectedAuthMethod by remember { mutableIntStateOf(0) }
+    val authOptions = listOf(
+        stringResource(R.string.email),
+        stringResource(R.string.phone_number1)
+    )
 
     BackHandler {
         navController.popBackStack()
@@ -213,41 +221,58 @@ fun ForgotPasswordView(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = {
-                        Text(
-                            text = stringResource(R.string.email_address),
-                            style = MaterialTheme.typography.bodySmall)
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                )
+                SingleChoiceSegmentedButtonRow( Modifier.fillMaxWidth() ) {
+                    authOptions.forEachIndexed { index, label ->
+                        SegmentedButton(
+                            shape = SegmentedButtonDefaults.itemShape(index = index, count = 2),
+                            onClick = { selectedAuthMethod = index },
+                            selected = index == selectedAuthMethod
+                        ) {
+                            Text(label)
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
 
-                Spacer(modifier = Modifier.height(8.dp))
+                if(selectedAuthMethod == 0) {
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = {
+                            Text(
+                                text = stringResource(R.string.email_address),
+                                style = MaterialTheme.typography.bodySmall)
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(8.dp),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    )
 
-                CountryPickerOutlinedTextField(
-                    mobileNumber = phoneNumber,
-                    onMobileNumberChange = { phoneNumber = it },
-                    onCountrySelected = {
-                        selectedCountry = it
-                    },
-                    defaultCountryCode = "cm",
-                    countryListDisplayType = CountryListDisplayType.Dialog,
-                    modifier = Modifier
-                        .padding(bottom = 8.dp)
-                        .fillMaxWidth(),
-                    label = {
-                        Text(
-                            text = stringResource(R.string.phone_number),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    },
-                    enabled = !isLoading
-                )
+                }
 
+                else if(selectedAuthMethod == 1) {
+                    CountryPickerOutlinedTextField(
+                        mobileNumber = phoneNumber,
+                        onMobileNumberChange = { phoneNumber = it },
+                        onCountrySelected = {
+                            selectedCountry = it
+                        },
+                        defaultCountryCode = "cm",
+                        countryListDisplayType = CountryListDisplayType.Dialog,
+                        modifier = Modifier
+                            .padding(bottom = 8.dp)
+                            .fillMaxWidth(),
+                        label = {
+                            Text(
+                                text = stringResource(R.string.phone_number),
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        },
+                        enabled = !isLoading
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedTextField(
                     value = password,
@@ -342,8 +367,11 @@ fun ForgotPasswordView(
                         }
                     }
                 },
-                enabled = (email.isNotEmpty() || PhoneNumberUtils
-                    .isWellFormedSmsAddress(phoneNumber)) && !isLoading,
+                enabled = !isLoading && password.isNotEmpty()
+                        && reenterPassword.isNotEmpty() && when(selectedAuthMethod) {
+                    0 -> email.isNotEmpty()
+                    1 -> PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
+                    else -> false },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 16.dp, end = 16.dp)
@@ -374,8 +402,11 @@ fun ForgotPasswordView(
                         recaptcha = vaultsViewModel.recaptchaAnswer,
                     ))
                 },
-                enabled = (email.isNotEmpty() || PhoneNumberUtils
-                    .isWellFormedSmsAddress(phoneNumber)) && !isLoading,
+                enabled = !isLoading && password.isNotEmpty()
+                        && reenterPassword.isNotEmpty() && when(selectedAuthMethod) {
+                    0 -> email.isNotEmpty()
+                    1 -> PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
+                    else -> false },
                 modifier = Modifier.padding(bottom=16.dp)) {
                 Text(stringResource(R.string.already_got_code))
             }

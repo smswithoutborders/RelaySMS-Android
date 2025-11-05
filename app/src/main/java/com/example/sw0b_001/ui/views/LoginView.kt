@@ -57,11 +57,16 @@ import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -102,6 +107,7 @@ fun LoginView(
     val captchaImage = vaultViewModel.captchaImage.collectAsState()
 
     if(BuildConfig.DEBUG) {
+        email = "developers@smswithoutborders.com"
         phoneNumber = "1123579"
         password = "dMd2Kmo9#"
     }
@@ -111,6 +117,9 @@ fun LoginView(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     var isLoading by remember { mutableStateOf(false) }
+
+    var selectedAuthMethod by remember { mutableIntStateOf(0) }
+    val authOptions = listOf(stringResource(R.string.email), stringResource(R.string.phone_number1))
 
     BackHandler {
         navController.popBackStack()
@@ -260,42 +269,60 @@ fun LoginView(
 
             Column(
                 modifier = Modifier
+                    .imePadding()
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = {
-                        Text(
-                            text = stringResource(R.string.email_address),
-                            style = MaterialTheme.typography.bodySmall)
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                )
+                SingleChoiceSegmentedButtonRow( Modifier.fillMaxWidth() ) {
+                    authOptions.forEachIndexed { index, label ->
+                        SegmentedButton(
+                            shape = SegmentedButtonDefaults.itemShape(index = index, count = 2),
+                            onClick = { selectedAuthMethod = index },
+                            selected = index == selectedAuthMethod
+                        ) {
+                            Text(label)
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
 
-                Spacer(modifier = Modifier.height(8.dp))
-                CountryPickerOutlinedTextField(
-                    mobileNumber = phoneNumber,
-                    onMobileNumberChange = { phoneNumber = it },
-                    onCountrySelected = {
-                        selectedCountry = it
-                    },
-                    defaultCountryCode = "cm",
-                    countryListDisplayType = CountryListDisplayType.Dialog,
-                    modifier = Modifier
-                        .padding(bottom = 8.dp)
-                        .fillMaxWidth(),
-                    label = {
-                        Text(
-                            text = stringResource(R.string.phone_number),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    },
-                    enabled = !isLoading
-                )
+                if(selectedAuthMethod == 0) {
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = {
+                            Text(
+                                text = stringResource(R.string.email_address),
+                                style = MaterialTheme.typography.bodySmall)
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(8.dp),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    )
+                }
+                else if(selectedAuthMethod == 1) {
+                    CountryPickerOutlinedTextField(
+                        mobileNumber = phoneNumber,
+                        onMobileNumberChange = { phoneNumber = it },
+                        onCountrySelected = {
+                            selectedCountry = it
+                        },
+                        defaultCountryCode = "cm",
+                        countryListDisplayType = CountryListDisplayType.Dialog,
+                        modifier = Modifier
+                            .padding(bottom = 8.dp)
+                            .fillMaxWidth(),
+                        label = {
+                            Text(
+                                text = stringResource(R.string.phone_number),
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        },
+                        enabled = !isLoading
+                    )
+                }
 
                 Column(
                     modifier = Modifier
@@ -364,7 +391,11 @@ fun LoginView(
                             isLoading = false
                         }
                     },
-                    enabled = (phoneNumber.isNotEmpty() && password.isNotEmpty()) && !isLoading,
+                    enabled = password.isNotEmpty() && !isLoading && when(selectedAuthMethod) {
+                        0 -> email.isNotEmpty()
+                        1 -> PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
+                        else -> false
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 16.dp, end = 16.dp)
@@ -394,9 +425,11 @@ fun LoginView(
                             recaptcha = vaultViewModel.recaptchaAnswer
                         ))
                     },
-                    enabled = (email.isNotEmpty() ||
-                            PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber))
-                            && password.isNotEmpty() && !isLoading,
+                    enabled = password.isNotEmpty() && !isLoading && when(selectedAuthMethod) {
+                        0 -> email.isNotEmpty()
+                        1 -> PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
+                        else -> false
+                    },
                     modifier = Modifier.padding(bottom=16.dp)) {
                     Text(stringResource(R.string.already_got_code))
                 }
