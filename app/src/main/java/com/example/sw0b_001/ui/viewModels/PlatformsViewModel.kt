@@ -118,7 +118,7 @@ class PlatformsViewModel : ViewModel() {
             val subscriptionId = context.getDefaultSimSubscription()!!
             try {
                 if(isBridge) {
-                    if(!isLoggedIn) getKeypairForTransmission(context)
+                    if(!isLoggedIn) getKeypairForTransmission(context, true, 0)
                     val content = Bridges.encryptContent(
                         context,
                         imageByteArray + text,

@@ -28,13 +28,20 @@ object Cryptography {
         }
     }
 
-    fun generateKey(context: Context, keystoreAlias: String): ByteArray {
+    fun generateKey(
+        context: Context,
+        keystoreAlias: String,
+        store: Boolean = true,
+    ): ByteArray {
         val libSigCurve25519 = SecurityCurve25519()
         val publicKey = libSigCurve25519.generateKey()
-        val encryptionPublicKey = SecurityRSA.generateKeyPair(keystoreAlias, 2048)
-        val privateKeyCipherText = SecurityRSA.encrypt(encryptionPublicKey,
-            libSigCurve25519.privateKey)
-        secureStorePrivateKey(context, keystoreAlias, privateKeyCipherText)
+        if(store) {
+            val encryptionPublicKey = SecurityRSA.generateKeyPair(keystoreAlias, 2048)
+            val privateKeyCipherText = SecurityRSA.encrypt(encryptionPublicKey,
+                libSigCurve25519.privateKey)
+            secureStorePrivateKey(context, keystoreAlias,
+                privateKeyCipherText)
+        }
         return publicKey
     }
 
