@@ -55,7 +55,7 @@ val Context.settingsGetUseDeviceId get(): Boolean {
     val sharedPreferences = getSharedPreferences(
         Settings.FILENAME, Context.MODE_PRIVATE)
     return sharedPreferences
-        .getBoolean(Settings.SETTINGS_USE_DEVICE_ID, false)
+        .getBoolean(Settings.SETTINGS_USE_DEVICE_ID, true)
 }
 
 val Context.settingsGetLockDownApp get(): Boolean {

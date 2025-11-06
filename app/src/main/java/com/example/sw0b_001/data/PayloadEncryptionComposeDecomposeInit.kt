@@ -262,7 +262,7 @@ object PayloadEncryptionComposeDecomposeInit {
         platformShortcode: Byte,
         languageCode: ByteArray,
     ): String {
-        val deviceIDBytes = if (!context.settingsGetUseDeviceId) {
+        val deviceIDBytes = if (context.settingsGetUseDeviceId) {
             Vaults.fetchDeviceId(context) ?: byteArrayOf()
         } else {
             byteArrayOf()

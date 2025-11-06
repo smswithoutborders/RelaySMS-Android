@@ -64,6 +64,7 @@ import com.afkanerd.smswithoutborders_libsmsmms.ui.SettingsItem
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.extensions.context.promptBiometrics
+import com.example.sw0b_001.extensions.context.settingsGetIsEmailLogin
 import com.example.sw0b_001.extensions.context.settingsGetLockDownApp
 import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
 import com.example.sw0b_001.extensions.context.settingsGetUseDeviceId
@@ -87,9 +88,13 @@ fun SettingsView(
     val inPreviewMode = LocalInspectionMode.current
     val scrollState = rememberScrollState()
 
+    val isEmailLogin = context.settingsGetIsEmailLogin
+
     var localeExpanded by remember { mutableStateOf(false) }
     var setLockDownApp by remember { mutableStateOf( context.settingsGetLockDownApp) }
-    var useDeviceId by remember { mutableStateOf( context.settingsGetUseDeviceId) }
+    var useDeviceId by remember { mutableStateOf(
+        if(isEmailLogin) true  else context.settingsGetUseDeviceId )
+    }
     var storeTokensOnDevice by remember {
         mutableStateOf( context.settingsGetStoreTokensOnDevice) }
 
@@ -234,7 +239,7 @@ fun SettingsView(
                 itemTitle = stringResource(R.string.send_messages_with_device_id),
                 itemDescription = stringResource(R.string.device_id_lets_you_send_messages_without_using_your_actual_phone_number_for_authentication_this_works_well_for_dual_sim_phones),
                 checked = useDeviceId,
-                enabled = !isLoading,
+                enabled = !isEmailLogin && !isLoading,
             ) {
                 context.settingsSetUseDeviceId(it ?: true)
                 useDeviceId = it ?: true
