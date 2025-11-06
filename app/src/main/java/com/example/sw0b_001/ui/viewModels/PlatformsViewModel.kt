@@ -294,6 +294,7 @@ class PlatformsViewModel : ViewModel() {
                                 }
                                 context.startActivity(intent)
                             }
+                            onCompleteCallback(null)
                         }
                     }
                     else {
