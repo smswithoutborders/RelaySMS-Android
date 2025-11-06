@@ -149,7 +149,7 @@ object Bridges {
         var serverPublisherPublicKey: ByteArray? = null
 
         if(generateKey) {
-            if(!context.settingsGetIsEmailLogin) {
+            if(context.settingsGetIsEmailLogin) {
                 getKeypairForTransmissionOnly(context, random).apply {
                     clientPublicKey = this.first.first
                     clientPrivateKey = this.first.second

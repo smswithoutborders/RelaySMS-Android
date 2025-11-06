@@ -200,12 +200,15 @@ object PayloadEncryptionComposeDecomposeInit {
 
         val (header, cipherText) = encryptPayload(context, state, content, ad,
             when(privateKey != null) {
-                true -> Cryptography.calculateSharedSecret(privateKey, ad)
+                true -> Cryptography.calculateSharedSecret(ad, privateKey)
                 else -> null
             }
         )
 
-        saveState(context,state, states.firstOrNull()?.id)
+        if(privateKey == null) {
+            saveState(context,state, states.firstOrNull()?.id)
+        }
+
         val message = saveContent(
             context = context,
             content = content,
