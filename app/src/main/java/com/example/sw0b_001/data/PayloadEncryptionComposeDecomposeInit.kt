@@ -1,5 +1,6 @@
 package com.example.sw0b_001.data
 
+import android.R.id.message
 import android.content.Context
 import android.content.Intent
 import android.util.Base64
@@ -79,9 +80,10 @@ object PayloadEncryptionComposeDecomposeInit {
         state: States,
         content: ByteArray,
         ad: ByteArray,
+        sk: ByteArray? = null,
     ): Pair<Headers, ByteArray> {
         if(state.DHs == null) {
-            val sk = Publishers.fetchPublisherSharedKey(context)
+            val sk = sk ?: Publishers.fetchPublisherSharedKey(context)
             Ratchets.ratchetInitAlice(state, sk, ad)
         }
 
@@ -181,6 +183,7 @@ object PayloadEncryptionComposeDecomposeInit {
         languageCode: String = "en",
         smsTransmission: Boolean = true,
         isLoggedIn: Boolean = true,
+        privateKey: ByteArray? = null,
         onSuccessRunnable: (EncryptedContent) -> Unit? = {}
     ): ByteArray {
         val states = Datastore.getDatastore(context).ratchetStatesDAO().fetch()
@@ -195,7 +198,12 @@ object PayloadEncryptionComposeDecomposeInit {
             States()
         }
 
-        val (header, cipherText) = encryptPayload(context, state, content, ad)
+        val (header, cipherText) = encryptPayload(context, state, content, ad,
+            when(privateKey != null) {
+                true -> Cryptography.calculateSharedSecret(privateKey, ad)
+                else -> null
+            }
+        )
 
         saveState(context,state, states.firstOrNull()?.id)
         val message = saveContent(
@@ -226,10 +234,9 @@ object PayloadEncryptionComposeDecomposeInit {
             languageCode = languageCode.encodeToByteArray(),
         )
 
-        val gatewayClient = context.settingsGetDefaultGatewayClients
-        if(gatewayClient == null) {
+        val gatewayClient =
+            context.settingsGetDefaultGatewayClients ?:
             throw Exception("No default Gateway client")
-        }
 
         if (smsTransmission) {
             sendSms(

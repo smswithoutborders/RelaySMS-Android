@@ -223,10 +223,16 @@ class Publishers(val context: Context) {
                 Base64.DEFAULT)
         }
 
-        fun fetchPublisherSharedKey(context: Context, publicKey: ByteArray? = null) : ByteArray {
+        fun fetchPublisherSharedKey(
+            context: Context,
+            publicKey: ByteArray? = null,
+        ) : ByteArray {
             val pubKey = publicKey ?: fetchPublisherPublicKey(context)
-            return Cryptography.calculateSharedSecret(context, PUBLISHER_ID_KEYSTORE_ALIAS,
-                pubKey!!)
+            return Cryptography.calculateSharedSecret(
+                context,
+                PUBLISHER_ID_KEYSTORE_ALIAS,
+                pubKey!!
+            )
         }
 
         fun storeArtifacts(

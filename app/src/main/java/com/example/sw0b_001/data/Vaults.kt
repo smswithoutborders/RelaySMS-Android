@@ -24,6 +24,8 @@ import java.security.DigestException
 import java.security.MessageDigest
 import androidx.core.content.edit
 import com.example.sw0b_001.data.Publishers.Companion.PUBLISHER_ATTRIBUTE_FILES
+import com.example.sw0b_001.data.Publishers.Companion.storeArtifacts
+import com.example.sw0b_001.extensions.context.Settings
 import com.example.sw0b_001.extensions.context.settingsSetIsEmailLogin
 
 class Vaults(val context: Context) {
@@ -383,6 +385,10 @@ class Vaults(val context: Context) {
                 .getSharedPreferences(
                     PUBLISHER_ATTRIBUTE_FILES, Context.MODE_PRIVATE)
             sharedPreferences.edit { clear() }
+
+            context.getSharedPreferences(Settings.FILENAME, Context.MODE_PRIVATE).apply {
+                edit { putBoolean(Settings.SETTINGS_IS_EMAIL_LOGIN, false ).apply() }
+            }
 
             KeystoreHelpers.removeFromKeystore(context, DEVICE_ID_KEYSTORE_ALIAS)
             KeystoreHelpers.removeFromKeystore(context, DEVICE_ID_SECRET_KEY_KEYSTORE_ALIAS)

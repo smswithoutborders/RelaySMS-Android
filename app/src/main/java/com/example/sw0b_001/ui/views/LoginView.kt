@@ -66,6 +66,7 @@ import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.TextButton
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -110,11 +111,6 @@ fun LoginView(
     var showCaptcha by remember { mutableStateOf(false) }
     val captchaImage = vaultViewModel.captchaImage.collectAsState()
 
-    if(BuildConfig.DEBUG) {
-        email = "developers@smswithoutborders.com"
-        phoneNumber = "1123579"
-        password = "dMd2Kmo9#"
-    }
 
     var passwordVisible by remember { mutableStateOf(false) }
 
@@ -124,6 +120,20 @@ fun LoginView(
 
     var selectedAuthMethod by remember { mutableIntStateOf(0) }
     val authOptions = listOf(stringResource(R.string.email), stringResource(R.string.phone_number1))
+
+    LaunchedEffect(selectedAuthMethod) {
+        if(BuildConfig.DEBUG) {
+            if(selectedAuthMethod == 0) {
+                email = "developers@afkanerd.com"
+                phoneNumber = ""
+                password = "dMd2Kmo9#"
+            } else {
+                email = ""
+                phoneNumber = "1123579"
+                password = "dMd2Kmo9#"
+            }
+        }
+    }
 
     BackHandler {
         navController.popBackStack()

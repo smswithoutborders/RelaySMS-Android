@@ -118,7 +118,7 @@ fun CreateAccountView(
     val authOptions = listOf(stringResource(R.string.email), stringResource(R.string.phone_number1))
 
     if(BuildConfig.DEBUG) {
-        email = "developers@smswithoutborders.com"
+        email = "developers@afkanerd.com"
         phoneNumber = "1123579"
         password = "dMd2Kmo9#"
         reenterPassword = "dMd2Kmo9#"

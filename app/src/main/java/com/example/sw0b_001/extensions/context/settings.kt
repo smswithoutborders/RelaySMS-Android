@@ -21,7 +21,7 @@ import kotlinx.serialization.json.Json
 
 val Context.relaySmsDatastore: DataStore<Preferences> by preferencesDataStore(name = "relaysms_settings")
 
-private object Settings {
+object Settings {
     const val FILENAME: String = "com.afkanerd.smswithoutborders.settings"
     const val SETTINGS_NOT_SHOW_CHOOSE_GATEWAY_CLIENT = "SETTINGS_NOT_SHOW_CHOOSE_GATEWAY_CLIENT"
     const val SETTINGS_ONBOARDED_COMPLETELY = "SETTINGS_ONBOARDED_COMPLETELY"
@@ -37,6 +37,7 @@ val Context.settingsGetIsEmailLogin get(): Boolean {
     return sharedPreferences
         .getBoolean(Settings.SETTINGS_IS_EMAIL_LOGIN, false)
 }
+
 val Context.settingsGetStoreTokensOnDevice get(): Boolean {
     val sharedPreferences = getSharedPreferences(
         Settings.FILENAME, Context.MODE_PRIVATE)

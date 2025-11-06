@@ -118,7 +118,8 @@ class PlatformsViewModel : ViewModel() {
             val subscriptionId = context.getDefaultSimSubscription()!!
             try {
                 if(isBridge) {
-                    if(!isLoggedIn) getKeypairForTransmission(context, true, 0)
+                    val random = (0..255).random()
+                    if(!isLoggedIn) getKeypairForTransmission(context, random)
                     val content = Bridges.encryptContent(
                         context,
                         imageByteArray + text,
@@ -131,7 +132,8 @@ class PlatformsViewModel : ViewModel() {
 
                     payload = if(isLoggedIn) { Bridges.payloadOnly(content) }
                     else {
-                        Bridges.authRequestAndPayload(context, content)
+                        Bridges.authRequestAndPayload(
+                            context, content, random.toUByte())
                     }
                 }
                 else {
@@ -156,9 +158,7 @@ class PlatformsViewModel : ViewModel() {
                 }
 
                 val gatewayClients = context.settingsGetDefaultGatewayClients
-                if(gatewayClients == null) {
-                    throw Exception("No default Gateway client")
-                }
+                    ?: throw Exception("No default Gateway client")
 
                 ImageTransmissionProtocol.startWorkManager(
                     context = context,
