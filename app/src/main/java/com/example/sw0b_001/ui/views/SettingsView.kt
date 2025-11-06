@@ -132,7 +132,6 @@ fun SettingsView(
         Column( modifier = Modifier
             .verticalScroll(scrollState)
             .padding(innerPadding),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             if(isLoading || inPreviewMode)
                 LinearProgressIndicator(Modifier.fillMaxWidth())
@@ -227,10 +226,11 @@ fun SettingsView(
 
 //            HorizontalDivider(Modifier.padding(8.dp))
 
+            Spacer(Modifier.padding(8.dp))
             Text(
                 stringResource(R.string.publishing),
                 fontSize = 13.sp,
-                modifier = Modifier.padding(start = 10.dp),
+                modifier = Modifier.padding(start = 12.dp),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.secondary,
             )
@@ -274,11 +274,12 @@ fun SettingsView(
                     }
                 } else { isLoading = false }
             }
+            Spacer(Modifier.padding(8.dp))
 
             Text(
                 stringResource(R.string.security),
                 fontSize = 13.sp,
-                modifier = Modifier.padding(start = 10.dp),
+                modifier = Modifier.padding(start = 12.dp),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.secondary,
             )
@@ -288,6 +289,7 @@ fun SettingsView(
                 itemDescription = stringResource(R.string.this_will_lock_the_app_using_your_phone_s_biometric_security_configurations_you_will_need_to_globally_set_for_the_device),
                 checked = setLockDownApp,
                 enabled = !isLoading,
+                horizontalDivide = false
             ) { checked ->
                 context.promptBiometrics(activity) {
                     if(it) {
