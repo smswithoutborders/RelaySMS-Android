@@ -192,7 +192,7 @@ dependencies {
 //    implementation project(':lib_smsmms_android:lib_smsmms_android')
 //    implementation project(':lib_image_android:app')
     implementation 'com.github.smswithoutborders:lib_image_android:3275ac7'
-    implementation 'com.github.smswithoutborders:lib_smsmms_android:e906520'
+    implementation 'com.github.smswithoutborders:lib_smsmms_android:91141a5'
 
     implementation libs.androidx.appcompat
     implementation libs.material
@@ -362,7 +362,6 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
 
-    implementation 'com.google.android.recaptcha:recaptcha:18.8.0'
     coreLibraryDesugaring libs.desugar.jdk.libs
 }
 

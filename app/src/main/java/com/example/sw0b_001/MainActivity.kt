@@ -368,6 +368,7 @@ class MainActivity : AppCompatActivity() {
                 val otpCodeNav: OTPCodeScreen = backEntry.toRoute()
                 OtpCodeVerificationView(
                     navController = navController,
+                    email = otpCodeNav.email,
                     loginSignupPhoneNumber = otpCodeNav.loginSignupPhoneNumber,
                     loginSignupPassword = otpCodeNav.loginSignupPassword,
                     countryCode = otpCodeNav.countryCode,

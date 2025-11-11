@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,9 +32,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -41,6 +46,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -76,6 +82,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
+import com.arpitkatiyarprojects.countrypicker.CountryPicker
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.ui.components.CaptchaImage
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
@@ -107,8 +114,11 @@ fun CreateAccountView(
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
+    var selectedAuthMethod by remember { mutableIntStateOf(0) }
+    val authOptions = listOf(stringResource(R.string.email), stringResource(R.string.phone_number1))
+
     if(BuildConfig.DEBUG) {
-        email = "developers@smswithoutborders.com"
+        email = "developers@afkanerd.com"
         phoneNumber = "1123579"
         password = "dMd2Kmo9#"
         reenterPassword = "dMd2Kmo9#"
@@ -151,7 +161,9 @@ fun CreateAccountView(
                         isLoading = false
                     }
                 ) { recaptchaToken ->
-                    val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+                    val phoneNumber = if(selectedAuthMethod == 0 ) "" else if(phoneNumber.isNotEmpty())
+                        selectedCountry!!.countryPhoneNumberCode + phoneNumber else ""
+
                     createAccount(
                         context = context,
                         email = email,
@@ -162,6 +174,7 @@ fun CreateAccountView(
                         otpRequiredCallback = {
                             CoroutineScope(Dispatchers.Main).launch {
                                 navController.navigate(OTPCodeScreen(
+                                    email = email,
                                     loginSignupPhoneNumber = phoneNumber,
                                     loginSignupPassword = password,
                                     countryCode = selectedCountry!!.countryCode,
@@ -186,6 +199,7 @@ fun CreateAccountView(
 
         Column(
             modifier = Modifier
+                .imePadding()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
                 .background(MaterialTheme.colorScheme.surface),
@@ -232,34 +246,59 @@ fun CreateAccountView(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = {
-                        Text(
-                            text = stringResource(R.string.email_address),
-                            style = MaterialTheme.typography.bodySmall)
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                CountryPickerOutlinedTextField(
-                    mobileNumber = phoneNumber,
-                    onMobileNumberChange = { phoneNumber = it },
-                    onCountrySelected = { selectedCountry = it },
-                    defaultCountryCode = "cm",
-                    countryListDisplayType = CountryListDisplayType.Dialog,
-                    modifier = Modifier.fillMaxWidth(),
-                    label = {
-                        Text(text = stringResource(R.string.phone_number) +
-                                stringResource(R.string.optional),
-                            style = MaterialTheme.typography.bodySmall)
+                SingleChoiceSegmentedButtonRow( Modifier.fillMaxWidth() ) {
+                    authOptions.forEachIndexed { index, label ->
+                        SegmentedButton(
+                            shape = SegmentedButtonDefaults.itemShape(index = index, count = 2),
+                            onClick = { selectedAuthMethod = index },
+                            selected = index == selectedAuthMethod
+                        ) {
+                            Text(label)
+                        }
                     }
-                )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+                if(selectedAuthMethod == 0) {
+                    OutlinedCard {
+                        Row(
+                            modifier = Modifier.padding(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            CountryPicker(defaultCountryCode = "cm",) {
+                                selectedCountry = it
+                            }
+                            OutlinedTextField(
+                                value = email,
+                                onValueChange = { email = it },
+                                label = {
+                                    Text(
+                                        text = stringResource(R.string.email_address),
+                                        style = MaterialTheme.typography.bodySmall)
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(8.dp),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                            )
+                        }
+                    }
+                }
+
+                else if(selectedAuthMethod == 1) {
+                    CountryPickerOutlinedTextField(
+                        mobileNumber = phoneNumber,
+                        onMobileNumberChange = { phoneNumber = it },
+                        onCountrySelected = { selectedCountry = it },
+                        defaultCountryCode = "cm",
+                        countryListDisplayType = CountryListDisplayType.Dialog,
+                        modifier = Modifier.fillMaxWidth(),
+                        label = {
+                            Text(text = stringResource(R.string.phone_number) +
+                                    stringResource(R.string.optional),
+                                style = MaterialTheme.typography.bodySmall)
+                        }
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -404,9 +443,11 @@ fun CreateAccountView(
                             ).show()
                         }
                     }},
-                    enabled = email.isNotEmpty() &&
-                            password.isNotEmpty() &&
-                            reenterPassword.isNotEmpty() && acceptedPrivatePolicy,
+                    enabled = !isLoading && acceptedPrivatePolicy && password.isNotEmpty()
+                            && reenterPassword.isNotEmpty() && when(selectedAuthMethod) {
+                                0 -> email.isNotEmpty()
+                                1 -> PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
+                                else -> false },
                     modifier = Modifier
                         .fillMaxWidth()
                         .align(Alignment.CenterHorizontally)) {
@@ -428,6 +469,7 @@ fun CreateAccountView(
                 onClick = {
                     val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
                     navController.navigate(OTPCodeScreen(
+                        email = email,
                         loginSignupPhoneNumber = phoneNumber,
                         loginSignupPassword = password,
                         countryCode = selectedCountry!!.countryCode,
@@ -436,8 +478,11 @@ fun CreateAccountView(
                         recaptcha = vaultsViewModel.recaptchaAnswer,
                     ))
                 },
-                enabled = PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
-                        && !isLoading,
+                enabled = !isLoading && acceptedPrivatePolicy && password.isNotEmpty()
+                        && reenterPassword.isNotEmpty() && when(selectedAuthMethod) {
+                    0 -> email.isNotEmpty()
+                    1 -> PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
+                    else -> false },
                 modifier = Modifier.padding(bottom=16.dp)) {
                 Text(stringResource(R.string.already_got_code))
             }
@@ -493,6 +538,7 @@ private fun createAccount(
         try {
             val response = vaults.createEntity(
                 context = context,
+                email = email,
                 phoneNumber = phoneNumber,
                 countryCode = countryCode,
                 password = password,

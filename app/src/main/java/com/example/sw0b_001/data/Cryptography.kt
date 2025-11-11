@@ -28,13 +28,23 @@ object Cryptography {
         }
     }
 
-    fun generateKey(context: Context, keystoreAlias: String): ByteArray {
+    fun generateKey(): Pair<ByteArray, ByteArray> {
+        val libSigCurve25519 = SecurityCurve25519()
+        val publicKey = libSigCurve25519.generateKey()
+        return Pair(publicKey,libSigCurve25519.privateKey)
+    }
+
+    fun generateKey(
+        context: Context,
+        keystoreAlias: String,
+    ): ByteArray {
         val libSigCurve25519 = SecurityCurve25519()
         val publicKey = libSigCurve25519.generateKey()
         val encryptionPublicKey = SecurityRSA.generateKeyPair(keystoreAlias, 2048)
         val privateKeyCipherText = SecurityRSA.encrypt(encryptionPublicKey,
             libSigCurve25519.privateKey)
-        secureStorePrivateKey(context, keystoreAlias, privateKeyCipherText)
+        secureStorePrivateKey(context, keystoreAlias,
+            privateKeyCipherText)
         return publicKey
     }
 
@@ -55,6 +65,11 @@ object Cryptography {
         val cipherPrivateKey = Base64.decode(cipherPrivateKeyString, Base64.DEFAULT)
         val keypair = KeystoreHelpers.getKeyPairFromKeystore(keystoreAlias)
         return SecurityRSA.decrypt(keypair.private, cipherPrivateKey)
+    }
+
+    fun calculateSharedSecret(publicKey: ByteArray, privateKey: ByteArray): ByteArray {
+        val libSigCurve25519 = SecurityCurve25519(privateKey)
+        return libSigCurve25519.calculateSharedSecret(publicKey)
     }
 
     fun calculateSharedSecret(context: Context, keystoreAlias: String, publicKey: ByteArray): ByteArray {

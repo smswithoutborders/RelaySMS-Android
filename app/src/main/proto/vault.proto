@@ -6,7 +6,7 @@ package vault.v1;
 message CreateEntityRequest {
   // The ISO 3166-1 alpha-2 country code of the entity.
   string country_code = 1;
-  // The phone number of the entity.
+  // The phone number of the entity (optional).
   string phone_number = 2;
   // The password of the entity.
   string password = 3;
@@ -16,8 +16,10 @@ message CreateEntityRequest {
   string client_device_id_pub_key = 5;
   // The ownership proof response from the client.
   string ownership_proof_response = 6;
-  // The reCAPTCHA token for verification.
-  string recaptcha_token = 7;
+  // The captcha token
+  string captcha_token = 7;
+  // The email address of the entity (optional).
+  string email_address = 8;
 }
 
 // Response message for creating an entity.
@@ -38,7 +40,7 @@ message CreateEntityResponse {
 
 // Request message for authenticating an entity.
 message AuthenticateEntityRequest {
-  // The phone number of the entity.
+  // The phone number of the entity (optional).
   string phone_number = 1;
   // The password of the entity.
   string password = 2;
@@ -48,8 +50,10 @@ message AuthenticateEntityRequest {
   string client_device_id_pub_key = 4;
   // The ownership proof response from the client.
   string ownership_proof_response = 5;
-  // The reCAPTCHA token for verification.
-  string recaptcha_token = 6;
+  // The captcha token
+  string captcha_token = 6;
+  // The email address of the entity (optional).
+  string email_address = 7;
 }
 
 // Response message for authenticating an entity.
@@ -239,7 +243,7 @@ message DeleteEntityResponse {
 
 // Request message for resetting an entity's password.
 message ResetPasswordRequest {
-  // The phone number of the entity.
+  // The phone number of the entity (optional).
   string phone_number = 1;
   // The new password of the entity.
   string new_password = 2;
@@ -249,8 +253,10 @@ message ResetPasswordRequest {
   string client_device_id_pub_key = 4;
   // The ownership proof response from the client.
   string ownership_proof_response = 5;
-  // The reCAPTCHA token for verification.
-  string recaptcha_token = 6;
+  // The captcha token
+  string captcha_token = 6;
+  // The email address of the entity (optional).
+  string email_address = 7;
 }
 
 // Response message for resetting an entity's password.
