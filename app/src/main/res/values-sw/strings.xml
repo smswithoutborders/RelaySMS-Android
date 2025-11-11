@@ -383,5 +383,9 @@
     <string name="delete_account">Futa Akaunti</string>
     <string name="this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer">Hii inaweza kubatilisha tokeni zako zote zilizohifadhiwa, funguo za usalama na kila data uliyohifadhi kwenye kifaa na Vault. Bado unaweza kutumia madaraja wakati wowote upendavyo</string>
     <string name="this_would_migrate_your_tokens_stored_on_the_vault_to_your_device_this_would_send_the_token_alongside_every_time_you_send_the_message_potentially_increasing_the_size_of_messages">Hii inaweza kuhamisha tokeni zako zilizohifadhiwa kwenye Vault hadi kwenye kifaa chako. Hii inaweza kutuma ishara pamoja kila wakati unapotuma ujumbe - uwezekano wa kuongeza ukubwa wa ujumbe</string>
+    <string name="enter_the_text_in_the_image">Ingiza maandishi kwenye picha</string>
+    <string name="submit1">Wasilisha</string>
+    <string name="email_address">Anwani ya barua pepe</string>
+    <string name="optional">(Si lazima)</string>
 
 </resources>
