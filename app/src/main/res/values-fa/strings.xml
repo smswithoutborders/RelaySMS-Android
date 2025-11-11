@@ -387,5 +387,7 @@
     <string name="submit1">ارسال</string>
     <string name="email_address">آدرس ایمیل</string>
     <string name="optional">(اختیاری)</string>
+    <string name="email">ایمیل</string>
+    <string name="phone_number1">شماره تلفن</string>
 
 </resources>

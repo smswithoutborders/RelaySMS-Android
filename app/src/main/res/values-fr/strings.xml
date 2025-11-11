@@ -387,4 +387,6 @@
     <string name="submit1">Soumettre</string>
     <string name="email_address">Adresse email</string>
     <string name="optional">(Facultative)</string>
+    <string name="email">E-mail</string>
+    <string name="phone_number1">Numéro de téléphone</string>
 </resources>

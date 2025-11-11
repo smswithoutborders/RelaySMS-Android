@@ -388,5 +388,7 @@
     <string name="submit1">يُقدِّم</string>
     <string name="email_address">عنوان البريد الإلكتروني</string>
     <string name="optional">(خياري)</string>
+    <string name="email">بريد إلكتروني</string>
+    <string name="phone_number1">رقم التليفون</string>
 
 </resources>

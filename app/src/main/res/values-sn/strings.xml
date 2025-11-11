@@ -385,4 +385,6 @@
     <string name="submit1">Tumira</string>
     <string name="email_address">Chikero chetsamba yemumhepo</string>
     <string name="optional">(Sarudzo)</string>
+    <string name="email">Email</string>
+    <string name="phone_number1">Nhamba yenhare</string>
 </resources>
