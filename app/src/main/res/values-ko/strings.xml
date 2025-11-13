@@ -391,5 +391,7 @@
     <string name="submit1">제출하다</string>
     <string name="email_address">이메일 주소</string>
     <string name="optional">(선택 과목)</string>
+    <string name="email">이메일</string>
+    <string name="phone_number1">전화 번호</string>
 
 </resources>

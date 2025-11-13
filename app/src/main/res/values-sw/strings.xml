@@ -387,5 +387,7 @@
     <string name="submit1">Wasilisha</string>
     <string name="email_address">Anwani ya barua pepe</string>
     <string name="optional">(Si lazima)</string>
+    <string name="email">Barua pepe</string>
+    <string name="phone_number1">Nambari ya simu</string>
 
 </resources>

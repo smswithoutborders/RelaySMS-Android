@@ -387,5 +387,7 @@
     <string name="submit1">Entregar</string>
     <string name="email_address">Dirección de correo electrónico</string>
     <string name="optional">(Opcional)</string>
+    <string name="email">Correo electrónico</string>
+    <string name="phone_number1">Número de teléfono</string>
 
 </resources>

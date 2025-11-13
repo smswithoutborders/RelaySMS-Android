@@ -389,5 +389,7 @@
     <string name="submit1">Göndermek</string>
     <string name="email_address">E-posta adresi</string>
     <string name="optional">(İsteğe bağlı)</string>
+    <string name="email">E-posta</string>
+    <string name="phone_number1">Telefon numarası</string>
 
 </resources>

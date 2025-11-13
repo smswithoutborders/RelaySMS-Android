@@ -392,5 +392,7 @@
     <string name="submit1">जमा करना</string>
     <string name="email_address">मेल पता</string>
     <string name="optional">(वैकल्पिक)</string>
+    <string name="email">ईमेल</string>
+    <string name="phone_number1">फ़ोन नंबर</string>
 
 </resources>
