@@ -388,5 +388,11 @@
     <string name="log_out">लॉग आउट</string>
     <string name="this_would_log_you_out_of_your_vault_account_on_this_device_you_can_log_back_in_at_anytime_with_an_internet_connection">इससे आप इस डिवाइस पर अपने Vault अकाउंट से लॉग आउट हो जाएंगे। आप कभी भी (इंटरनेट कनेक्शन के साथ) वापस लॉग इन कर सकते हैं।</string>
     <string name="delete_account">खाता हटा दो</string>
+    <string name="enter_the_text_in_the_image">इमेज में टेक्स्ट एंटर करें</string>
+    <string name="submit1">जमा करना</string>
+    <string name="email_address">मेल पता</string>
+    <string name="optional">(वैकल्पिक)</string>
+    <string name="email">ईमेल</string>
+    <string name="phone_number1">फ़ोन नंबर</string>
 
 </resources>

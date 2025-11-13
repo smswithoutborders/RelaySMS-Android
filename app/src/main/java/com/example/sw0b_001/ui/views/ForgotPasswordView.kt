@@ -30,6 +30,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -37,6 +40,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -54,6 +58,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.arpitkatiyarprojects.countrypicker.CountryPicker
 import com.arpitkatiyarprojects.countrypicker.CountryPickerOutlinedTextField
 import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
@@ -81,6 +86,7 @@ fun ForgotPasswordView(
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
 
     var phoneNumber by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
     var reenterPassword by remember { mutableStateOf("") }
@@ -95,7 +101,11 @@ fun ForgotPasswordView(
     var showCaptcha by remember { mutableStateOf(false) }
     val captchaImage = vaultsViewModel.captchaImage.collectAsState()
 
-    val activity = LocalActivity.current
+    var selectedAuthMethod by remember { mutableIntStateOf(0) }
+    val authOptions = listOf(
+        stringResource(R.string.email),
+        stringResource(R.string.phone_number1)
+    )
 
     BackHandler {
         navController.popBackStack()
@@ -148,6 +158,7 @@ fun ForgotPasswordView(
                             CoroutineScope(Dispatchers.Main).launch {
                                 navController.navigate(
                                     OTPCodeScreen(
+                                        email = email,
                                         loginSignupPhoneNumber = phoneNumber,
                                         loginSignupPassword = password,
                                         countryCode = selectedCountry!!.countryCode,
@@ -165,7 +176,8 @@ fun ForgotPasswordView(
                                 Toast.makeText(context, it, Toast.LENGTH_LONG).show()
                             }
                         },
-                        recaptchaToken = recaptchaToken
+                        recaptchaToken = recaptchaToken,
+                        email = email
                     ) {
                         isLoading = false
                     }
@@ -210,26 +222,63 @@ fun ForgotPasswordView(
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                CountryPickerOutlinedTextField(
-                    mobileNumber = phoneNumber,
-                    onMobileNumberChange = { phoneNumber = it },
-                    onCountrySelected = {
-                        selectedCountry = it
-                    },
-                    defaultCountryCode = "cm",
-                    countryListDisplayType = CountryListDisplayType.Dialog,
-                    modifier = Modifier
-                        .padding(bottom = 8.dp)
-                        .fillMaxWidth(),
-                    label = {
-                        Text(
-                            text = stringResource(R.string.phone_number),
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    },
-                    enabled = !isLoading
-                )
+                SingleChoiceSegmentedButtonRow( Modifier.fillMaxWidth() ) {
+                    authOptions.forEachIndexed { index, label ->
+                        SegmentedButton(
+                            shape = SegmentedButtonDefaults.itemShape(index = index, count = 2),
+                            onClick = { selectedAuthMethod = index },
+                            selected = index == selectedAuthMethod
+                        ) {
+                            Text(label)
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(16.dp))
 
+                if(selectedAuthMethod == 0) {
+                    selectedCountry = CountryDetails(
+                        countryCode = "",
+                        countryPhoneNumberCode = "",
+                        countryName = "",
+                        countryFlag = -1
+                    )
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = {
+                            Text(
+                                text = stringResource(R.string.email_address),
+                                style = MaterialTheme.typography.bodySmall)
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(8.dp),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    )
+                }
+
+                else if(selectedAuthMethod == 1) {
+                    CountryPickerOutlinedTextField(
+                        mobileNumber = phoneNumber,
+                        onMobileNumberChange = { phoneNumber = it },
+                        onCountrySelected = {
+                            selectedCountry = it
+                        },
+                        defaultCountryCode = "cm",
+                        countryListDisplayType = CountryListDisplayType.Dialog,
+                        modifier = Modifier
+                            .padding(bottom = 8.dp)
+                            .fillMaxWidth(),
+                        label = {
+                            Text(
+                                text = stringResource(R.string.phone_number),
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        },
+                        enabled = !isLoading
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedTextField(
                     value = password,
@@ -268,7 +317,6 @@ fun ForgotPasswordView(
                     enabled = !isLoading
                 )
 
-//                Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = reenterPassword,
                     onValueChange = { reenterPassword = it },
@@ -325,7 +373,11 @@ fun ForgotPasswordView(
                         }
                     }
                 },
-                enabled = (phoneNumber.isNotEmpty() && password.isNotEmpty()) && !isLoading,
+                enabled = !isLoading && password.isNotEmpty()
+                        && reenterPassword.isNotEmpty() && when(selectedAuthMethod) {
+                    0 -> email.isNotEmpty()
+                    1 -> PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
+                    else -> false },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 16.dp, end = 16.dp)
@@ -344,9 +396,11 @@ fun ForgotPasswordView(
 
             TextButton(
                 onClick = {
-                    val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+                    val phoneNumber = if(selectedAuthMethod == 0 ) "" else if(phoneNumber.isNotEmpty())
+                        selectedCountry!!.countryPhoneNumberCode + phoneNumber else ""
 
                     navController.navigate(OTPCodeScreen(
+                        email = email,
                         loginSignupPhoneNumber = phoneNumber,
                         loginSignupPassword = password,
                         countryCode = selectedCountry!!.countryCode,
@@ -355,9 +409,11 @@ fun ForgotPasswordView(
                         recaptcha = vaultsViewModel.recaptchaAnswer,
                     ))
                 },
-                enabled = (
-                        PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
-                                && password.isNotEmpty()) && !isLoading,
+                enabled = !isLoading && password.isNotEmpty()
+                        && reenterPassword.isNotEmpty() && when(selectedAuthMethod) {
+                    0 -> email.isNotEmpty()
+                    1 -> PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
+                    else -> false },
                 modifier = Modifier.padding(bottom=16.dp)) {
                 Text(stringResource(R.string.already_got_code))
             }
@@ -368,6 +424,7 @@ fun ForgotPasswordView(
 
 private fun recoverPassword(
     context: Context,
+    email: String,
     phoneNumber: String,
     password: String,
     recaptchaToken: String,
@@ -380,8 +437,9 @@ private fun recoverPassword(
         try {
             val response = vaults.recoverEntityPassword(
                 context,
-                phoneNumber,
-                password,
+                email = email,
+                phoneNumber = phoneNumber,
+                newPassword = password,
                 recaptchaToken = recaptchaToken,
             )
 

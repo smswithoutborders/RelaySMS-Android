@@ -383,4 +383,10 @@
     <string name="delete_account">Supprimer le compte</string>
     <string name="this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer">Cela révoquera tous vos jetons, clés de sécurité et données enregistrés sur votre appareil et dans Vault. Vous pouvez continuer à utiliser les ponts quand vous le souhaitez.</string>
     <string name="this_would_migrate_your_tokens_stored_on_the_vault_to_your_device_this_would_send_the_token_alongside_every_time_you_send_the_message_potentially_increasing_the_size_of_messages">Cela migrerait vos jetons stockés dans le coffre vers votre appareil. Le jeton serait alors envoyé à chaque envoi de message, ce qui pourrait augmenter la taille des messages.</string>
+    <string name="enter_the_text_in_the_image">Saisissez le texte dans l\'image</string>
+    <string name="submit1">Soumettre</string>
+    <string name="email_address">Adresse email</string>
+    <string name="optional">(Facultative)</string>
+    <string name="email">E-mail</string>
+    <string name="phone_number1">Numéro de téléphone</string>
 </resources>

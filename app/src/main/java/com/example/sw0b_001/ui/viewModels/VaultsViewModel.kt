@@ -15,9 +15,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.GatewayClientsCommunications.json
 import com.example.sw0b_001.data.Network
-import com.google.android.gms.safetynet.SafetyNet
-import com.google.android.gms.tasks.OnFailureListener
-import com.google.android.gms.tasks.OnSuccessListener
 import com.hbb20.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,11 +30,7 @@ import java.util.concurrent.Executors
 class VaultsViewModel(val context: Context) : ViewModel() {
 
     val captchaUrl = "https://captcha.smswithoutborders.com"
-    lateinit var clientId: String
-
-    init {
-        clientId = context.getString(R.string.recaptcha_key)
-    }
+    var clientId: String = context.getString(R.string.recaptcha_key)
 
     private val _captchaImage = MutableStateFlow<Bitmap?>(null)
     val captchaImage: StateFlow<Bitmap?> = _captchaImage.asStateFlow()

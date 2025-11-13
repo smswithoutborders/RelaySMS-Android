@@ -388,4 +388,10 @@
     <string name="delete_account">删除帐户</string>
     <string name="this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer">这将撤销您存储的所有令牌、安全密钥以及您在设备和 Vault 上存储的所有数据。您仍然可以随时使用桥接服务。</string>
     <string name="this_would_migrate_your_tokens_stored_on_the_vault_to_your_device_this_would_send_the_token_alongside_every_time_you_send_the_message_potentially_increasing_the_size_of_messages">这会将你存储在 Vault 中的令牌迁移到你的设备。这样每次发送消息时都会同时发送令牌，这可能会增加消息的大小。</string>
+    <string name="enter_the_text_in_the_image">在图片中输入文字</string>
+    <string name="submit1">提交</string>
+    <string name="email_address">电子邮件</string>
+    <string name="optional">（选修的）</string>
+    <string name="email">电子邮件</string>
+    <string name="phone_number1">电话号码</string>
 </resources>

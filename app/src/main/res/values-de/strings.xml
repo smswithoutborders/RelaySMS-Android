@@ -382,5 +382,11 @@
     <string name="log_out">Ausloggen</string>
     <string name="this_would_log_you_out_of_your_vault_account_on_this_device_you_can_log_back_in_at_anytime_with_an_internet_connection">Dadurch werden Sie von Ihrem Vault-Konto auf diesem Gerät abgemeldet. Sie können sich jederzeit wieder anmelden (mit einer Internetverbindung).</string>
     <string name="delete_account">Konto löschen</string>
+    <string name="enter_the_text_in_the_image">Geben Sie den Text in das Bild ein.</string>
+    <string name="submit1">Einreichen</string>
+    <string name="email_address">E-Mail-Adresse</string>
+    <string name="optional">(Optional)</string>
+    <string name="email">E-Mail</string>
+    <string name="phone_number1">Telefonnummer</string>
 
 </resources>

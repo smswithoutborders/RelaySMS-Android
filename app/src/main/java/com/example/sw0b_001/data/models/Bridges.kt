@@ -10,6 +10,8 @@ import com.example.sw0b_001.data.Cryptography
 import com.example.sw0b_001.data.PayloadEncryptionComposeDecomposeInit
 import com.example.sw0b_001.data.Publishers
 import com.example.sw0b_001.data.Vaults
+import com.example.sw0b_001.data.models.Bridges.getKeypairForTransmission
+import com.example.sw0b_001.extensions.context.settingsGetIsEmailLogin
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.parseLocalImageContent
 import com.example.sw0b_001.ui.views.AvailablePlatformsView
 import kotlinx.coroutines.CoroutineScope
@@ -50,22 +52,34 @@ object Bridges {
         }
     }
 
+    fun getKeypairForTransmissionOnly(
+        context: Context,
+        random: Int,
+    ) : Pair<Pair<ByteArray, ByteArray>, String?> {
+        val clientPublishKey = Cryptography.generateKey()
+        val serverPublisherPublicKey = getStaticKeys(context)?.get(random)?.keypair
+        return Pair(clientPublishKey, serverPublisherPublicKey)
+    }
+
     fun getKeypairForTransmission(
-        context: Context
-    ) : ByteArray {
-        return Cryptography.generateKey(context,
-            Publishers.PUBLISHER_ID_KEYSTORE_ALIAS).also { clientPublicKey ->
-            getStaticKeys(context)?.get(0)?.keypair?.let { serverPublicKey ->
-                Publishers.storeArtifacts(
-                    context,
-                    serverPublicKey,
-                    Base64.encodeToString(
-                        clientPublicKey,
-                        Base64.DEFAULT
-                    )
-                )
-            }
-        }
+        context: Context,
+        random: Int,
+    ) : Pair<ByteArray, String?> {
+        val clientPublishKey = Cryptography.generateKey(context,
+            Publishers.PUBLISHER_ID_KEYSTORE_ALIAS)
+
+        val serverPublisherPublicKey = getStaticKeys(context)?.get(random)?.keypair
+
+        Publishers.storeArtifacts(
+            context,
+            serverPublisherPublicKey!!,
+            Base64.encodeToString(
+                clientPublishKey,
+                Base64.DEFAULT
+            )
+        )
+
+        return Pair(clientPublishKey, serverPublisherPublicKey)
     }
 
     fun encryptContent(
@@ -76,8 +90,10 @@ object Bridges {
         textLength: Int,
         subscriptionId: Long,
         isLoggedIn: Boolean,
+        serverPublisherPublicKey: ByteArray? = null,
+        clientPrivateKey: ByteArray? = null
     ): ByteArray {
-        val ad = Publishers.fetchPublisherPublicKey(context)
+        val ad = serverPublisherPublicKey ?: Publishers.fetchPublisherPublicKey(context)
         return PayloadEncryptionComposeDecomposeInit.compose(
             context = context,
             content = formattedContent,
@@ -96,7 +112,8 @@ object Bridges {
             account = null,
             subscriptionId = subscriptionId,
             smsTransmission = smsTransmission,
-            isLoggedIn = isLoggedIn
+            isLoggedIn = isLoggedIn,
+            privateKey = clientPrivateKey
         )
     }
 
@@ -112,8 +129,6 @@ object Bridges {
         textLength: Int,
         subscriptionId: Long,
     ) : String? {
-        val isLoggedIn = Vaults.fetchLongLivedToken(context).isNotEmpty()
-
         val content = Composers.EmailComposeHandler.createEmailByteBuffer(
             from = null,
             to = to,
@@ -124,7 +139,29 @@ object Bridges {
             isBridge = true
         )
 
-        if(!isLoggedIn) getKeypairForTransmission(context)
+        val isLoggedIn = Vaults.fetchLongLivedToken(context).isNotEmpty()
+        val generateKey = !isLoggedIn || context.settingsGetIsEmailLogin
+
+        val random = (0..255).random()
+
+        var clientPrivateKey: ByteArray? = null
+        var clientPublicKey: ByteArray? = null
+        var serverPublisherPublicKey: ByteArray? = null
+
+        if(generateKey) {
+            if(context.settingsGetIsEmailLogin) {
+                getKeypairForTransmissionOnly(context, random).apply {
+                    clientPublicKey = this.first.first
+                    clientPrivateKey = this.first.second
+                    serverPublisherPublicKey = Base64.decode(this.second, Base64.DEFAULT)
+                }
+            } else {
+                getKeypairForTransmission(context, random).apply {
+                    clientPublicKey = this.first
+                    serverPublisherPublicKey = Base64.decode(this.second, Base64.DEFAULT)
+                }
+            }
+        }
 
         val encryptedContent = encryptContent(
             context = context,
@@ -133,11 +170,18 @@ object Bridges {
             imageLength = imageLength,
             textLength = textLength,
             subscriptionId = subscriptionId,
-            isLoggedIn = isLoggedIn
+            isLoggedIn = !generateKey,
+            serverPublisherPublicKey = serverPublisherPublicKey,
+            clientPrivateKey = clientPrivateKey
         )
 
-        val payload = if(!isLoggedIn) {
-            authRequestAndPayload( context, encryptedContent, )
+        val payload = if(generateKey) {
+            authRequestAndPayload(
+                context,
+                encryptedContent,
+                random.toUByte(),
+                clientPublicKey = clientPublicKey
+            )
         } else {
             payloadOnly(encryptedContent)
         }
@@ -168,13 +212,14 @@ object Bridges {
     fun authRequestAndPayload(
         context: Context,
         cipherText: ByteArray,
-        serverKID: Byte = 0.toByte()
+        serverKID: UByte = 0.toUByte(),
+        clientPublicKey: ByteArray? = null,
     ) : ByteArray {
         val mode: ByteArray = ByteArray(1).apply { this[0] = 0x00 }
         val versionMarker: ByteArray = ByteArray(1).apply { this[0] = 0x02 }
         val switchValue: ByteArray = ByteArray(1).apply { this[0] = 0x00 }
 
-        val clientPublicKey = Publishers.fetchClientPublisherPublicKey(context)
+        val clientPublicKey = clientPublicKey ?: Publishers.fetchClientPublisherPublicKey(context)
 
         val clientPublicKeyLen = ByteArray(1).run { clientPublicKey!!.size.toByte() }
         val cipherTextLength = ByteArray(2)
@@ -189,7 +234,7 @@ object Bridges {
                 clientPublicKeyLen +
                 cipherTextLength +
                 bridgeLetter +
-                serverKID +
+                serverKID.toByte() +
                 clientPublicKey!! +
                 cipherText +
                 "en".encodeToByteArray()
