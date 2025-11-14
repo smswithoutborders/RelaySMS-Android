@@ -17,6 +17,9 @@ track=$(python3 track.py "$branch")
 
 git tag -f "${tagVersion}"
 
+git add .
+git commit -m "release: making release"
+
 ./gradlew clean assembleRelease
 apksigner sign --ks app/keys/app-release-key.jks \
   --ks-pass pass:"$1" \
@@ -32,26 +35,26 @@ apksigner sign --ks app/keys/app-release-key.jks \
 # This will now stop the script immediately if diffoscope fails
 diffoscope apk-outputs/"$label".apk app/build/outputs/apk/release/"$label".apk
 
-./gradlew assemble bundleRelease
-apksigner sign --ks app/keys/app-release-key.jks \
-  --ks-pass pass:"$1" \
-  --in app/build/outputs/bundle/release/app-release.aab \
-  --out app/build/outputs/bundle/release/app-bundle.aab \
-  --min-sdk-version "$MIN_SDK"
-
-git push origin "$branch"
-git push --tag
-
-venv/bin/python release.py \
-	--version_code "${tagVersion}" \
-        --version_name "${label}" \
-        --description "<b>Release</b>: ${label}<br><b>Build No</b>: ${tagVersion}<br><b>shasum</b>: $(shasum apk-outputs/${label}.apk)" \
-        --branch "${branch}" \
-        --track "${track}" \
-        --app_bundle_file app/build/outputs/bundle/release/app-bundle.aab \
-        --app_apk_file app/build/outputs/apk/release/"${label}".apk \
-        --status "completed" \
-        --platforms "all" \
-        --github_url "${github_url}"
-
-rm apk-outputs/"$label".apk
+#./gradlew assemble bundleRelease
+#apksigner sign --ks app/keys/app-release-key.jks \
+#  --ks-pass pass:"$1" \
+#  --in app/build/outputs/bundle/release/app-release.aab \
+#  --out app/build/outputs/bundle/release/app-bundle.aab \
+#  --min-sdk-version "$MIN_SDK"
+#
+#git push origin "$branch"
+#git push --tag
+#
+#venv/bin/python release.py \
+#	--version_code "${tagVersion}" \
+#        --version_name "${label}" \
+#        --description "<b>Release</b>: ${label}<br><b>Build No</b>: ${tagVersion}<br><b>shasum</b>: $(shasum apk-outputs/${label}.apk)" \
+#        --branch "${branch}" \
+#        --track "${track}" \
+#        --app_bundle_file app/build/outputs/bundle/release/app-bundle.aab \
+#        --app_apk_file app/build/outputs/apk/release/"${label}".apk \
+#        --status "completed" \
+#        --platforms "all" \
+#        --github_url "${github_url}"
+#
+#rm apk-outputs/"$label".apk
