@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -87,6 +88,9 @@ import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.ui.components.CaptchaImage
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.VaultsViewModel
+
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.ui.platform.LocalUriHandler
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -265,7 +269,7 @@ fun CreateAccountView(
                             modifier = Modifier.padding(8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            CountryPicker(defaultCountryCode = "cm",) {
+                            CountryPicker(defaultCountryCode = "cm") {
                                 selectedCountry = it
                             }
                             OutlinedTextField(
@@ -375,6 +379,8 @@ fun CreateAccountView(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+
+
                 Row(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
@@ -385,39 +391,41 @@ fun CreateAccountView(
                             acceptedPrivatePolicy = it
                         }
                     )
-                    Text(
-                        text = buildAnnotatedString {
-                            append(stringResource(R.string.i_have_read_the))
-                            pushStringAnnotation(tag = "privacy_policy", annotation = "privacy_policy")
-                            withStyle(
-                                style = SpanStyle(
-                                    color = MaterialTheme.colorScheme.tertiary,
-                                    textDecoration = TextDecoration.Underline
-                                )
-                            ) {
-                                append(stringResource(R.string.privacy_policy))
-                            }
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .padding(top = 0.dp)
-                            .apply {
-                                if(!LocalInspectionMode.current) {
-                                    this.clickable {
-                                        val intent = Intent(
-                                            Intent.ACTION_VIEW,
-                                            context
-                                                .getString(R.string.https_smswithoutborders_com_privacy_policy)
-                                                .toUri()
-                                        )
-                                        context.startActivity(intent)
-                                    }
+
+                    val annotatedString = buildAnnotatedString {
+                        append(stringResource(R.string.i_have_read_the))
+                        pushStringAnnotation(
+                            tag = "URL",
+                            annotation = stringResource(R.string.https_smswithoutborders_com_privacy_policy)
+                        )
+                        withStyle(
+                            style = SpanStyle(
+                                color = MaterialTheme.colorScheme.tertiary,
+                                textDecoration = TextDecoration.Underline
+                            )
+                        ) {
+                            append(stringResource(R.string.privacy_policy))
+                        }
+                        pop()
+                    }
+
+                    val uriHandler = LocalUriHandler.current
+
+                    ClickableText(
+                        text = annotatedString,
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = MaterialTheme.colorScheme.onBackground,
+                            textAlign = TextAlign.Center
+                        ),
+                        onClick = { offset ->
+                            annotatedString.getStringAnnotations(tag = "URL", start = offset, end = offset)
+                                .firstOrNull()?.let { annotation ->
+                                    uriHandler.openUri(annotation.item)
                                 }
-                            },
-                        color = MaterialTheme.colorScheme.onBackground
+                        }
                     )
                 }
+
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -487,35 +495,38 @@ fun CreateAccountView(
                 Text(stringResource(R.string.already_got_code))
             }
 
-            Text(
-                text = buildAnnotatedString {
-                    append(stringResource(R.string.already_have_an_account) + " ")
-                    pushStringAnnotation(tag = "login", annotation = "login")
-                    withStyle(
-                        style = SpanStyle(
-                            color = MaterialTheme.colorScheme.tertiary,
-                            textDecoration = TextDecoration.Underline
-                        )
-                    ) {
-                        append(stringResource(R.string.log_in))
-                    }
-                },
-                style = MaterialTheme.typography.bodySmall,
-                textAlign = TextAlign.Center,
+            val loginText = buildAnnotatedString {
+                append(stringResource(R.string.already_have_an_account) + " ")
+                pushStringAnnotation(tag = "login", annotation = "login")
+                withStyle(
+                    style = SpanStyle(
+                        color = MaterialTheme.colorScheme.tertiary,
+                        textDecoration = TextDecoration.Underline
+                    )
+                ) {
+                    append(stringResource(R.string.log_in))
+                }
+                pop()
+            }
+
+            ClickableText(
+                text = loginText,
+                style = MaterialTheme.typography.bodySmall.copy(
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onBackground
+                ),
                 modifier = Modifier
                     .padding(top = 0.dp)
-                    .apply {
-                        if(!LocalInspectionMode.current) {
-                            this.clickable {
-                                navController.navigate(LoginScreen(isOnboarding = isOnboarding))
-                            }
+                    .fillMaxWidth(),
+                onClick = { offset ->
+                    loginText.getStringAnnotations(tag = "login", start = offset, end = offset)
+                        .firstOrNull()?.let {
+                            navController.navigate(LoginScreen(isOnboarding = isOnboarding))
                         }
-                    },
-                color = MaterialTheme.colorScheme.onBackground
+                }
             )
 
             Spacer(modifier = Modifier.height(32.dp))
-
         }
 
     }
