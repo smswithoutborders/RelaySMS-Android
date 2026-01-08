@@ -43,8 +43,13 @@ object Cryptography {
         val encryptionPublicKey = SecurityRSA.generateKeyPair(keystoreAlias, 2048)
         val privateKeyCipherText = SecurityRSA.encrypt(encryptionPublicKey,
             libSigCurve25519.privateKey)
-        secureStorePrivateKey(context, keystoreAlias,
-            privateKeyCipherText)
+        privateKeyCipherText?.let {
+            secureStorePrivateKey(
+                context,
+                keystoreAlias,
+                it
+            )
+        }
         return publicKey
     }
 
@@ -56,7 +61,7 @@ object Cryptography {
     }
 
 
-    private fun fetchPrivateKey(context: Context, keystoreAlias: String) : ByteArray {
+    private fun fetchPrivateKey(context: Context, keystoreAlias: String) : ByteArray? {
         val cipherPrivateKeyString = getSecuredStoredPrivateKey(context, keystoreAlias)
         if(cipherPrivateKeyString.isBlank()) {
             throw Exception("Cipher private key is empty...")
@@ -72,8 +77,12 @@ object Cryptography {
         return libSigCurve25519.calculateSharedSecret(publicKey)
     }
 
-    fun calculateSharedSecret(context: Context, keystoreAlias: String, publicKey: ByteArray): ByteArray {
-        val privateKey = fetchPrivateKey(context, keystoreAlias)
+    fun calculateSharedSecret(
+        context: Context,
+        keystoreAlias: String,
+        publicKey: ByteArray
+    ): ByteArray? {
+        val privateKey = fetchPrivateKey(context, keystoreAlias) ?: return null
         val libSigCurve25519 = SecurityCurve25519(privateKey)
         return libSigCurve25519.calculateSharedSecret(publicKey)
     }

@@ -191,6 +191,7 @@ configurations {
 dependencies {
 //    implementation project(':lib_smsmms_android:lib_smsmms_android')
 //    implementation project(':lib_image_android:app')
+    implementation project(':lib_signal_double_ratchet_java')
     implementation 'com.github.smswithoutborders:lib_image_android:3275ac7'
     implementation 'com.github.smswithoutborders:lib_smsmms_android:a8c65c5'
 

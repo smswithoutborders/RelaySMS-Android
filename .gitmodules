@@ -4,3 +4,6 @@
 [submodule "lib_image_android"]
 	path = lib_image_android
 	url = git@github.com:smswithoutborders/lib_image_android.git
+[submodule "lib_signal_double_ratchet_java"]
+	path = lib_signal_double_ratchet_java
+	url = https://github.com/smswithoutborders/lib_signal_double_ratchet_java

@@ -126,7 +126,7 @@ class Vaults(val context: Context) {
             context,
             DEVICE_ID_KEYSTORE_ALIAS,
             Base64.decode(deviceIdPubKey, Base64.DEFAULT),
-        )
+        )!!
 
         val llt = Crypto.decryptFernet(deviceIdSharedKey,
             String(Base64.decode(encodedLlt, Base64.DEFAULT), Charsets.UTF_8))
