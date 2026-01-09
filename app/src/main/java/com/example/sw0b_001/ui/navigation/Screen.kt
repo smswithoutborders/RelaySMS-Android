@@ -1,7 +1,5 @@
 package com.example.sw0b_001.ui.navigation
 
-import android.content.Context
-import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.ui.views.OTPCodeVerificationType
 import kotlinx.serialization.Serializable

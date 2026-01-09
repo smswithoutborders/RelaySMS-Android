@@ -11,8 +11,12 @@ import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
-import com.example.sw0b_001.R
+import com.example.sw0b_001.BuildConfig
+import com.example.sw0b_001.data.models.Bridges.StaticKeys
+import kotlinx.serialization.json.Json
+import okio.IOException
 import java.util.concurrent.Executor
+import kotlin.io.encoding.Base64
 
 fun Context.isBiometricLockAvailable(): Int {
     val biometricManager = BiometricManager.from(this)
@@ -98,3 +102,29 @@ fun Context.promptBiometrics(
 
     biometricPrompt.authenticate(promptInfo)
 }
+
+fun Context.getStaticKeys(
+    kid: Int
+) : ByteArray? {
+    val key = getStaticKeys()?.get(kid)?.keypair ?: return null
+    return android.util.Base64.decode(key, android.util.Base64.DEFAULT)
+}
+
+fun Context.getStaticKeys() : List<StaticKeys>? {
+    try {
+        val filename = if(BuildConfig.DEBUG) "staging-static-x25519.json" else "static-x25519.json"
+        val inputStream = assets.open(filename)
+        val size = inputStream.available()
+        val buffer = ByteArray(size)
+        inputStream.read(buffer)
+        inputStream.close()
+
+        val json = String(buffer, Charsets.UTF_8)
+        return if(kid == null) Json.decodeFromString<List<StaticKeys>>(json)
+        else listOf(Json.decodeFromString<List<StaticKeys>>(json)[kid])
+    } catch(e: IOException) {
+        e.printStackTrace()
+        return null
+    }
+}
+

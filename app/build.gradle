@@ -364,5 +364,6 @@ dependencies {
     implementation(libs.coil.network.okhttp)
 
     coreLibraryDesugaring libs.desugar.jdk.libs
+    implementation("com.google.protobuf:protobuf-kotlin:4.33.2")
 }
 

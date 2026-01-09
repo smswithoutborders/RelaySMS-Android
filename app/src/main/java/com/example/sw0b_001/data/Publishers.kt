@@ -126,7 +126,6 @@ class Publishers(val context: Context) {
     }
 
     companion object {
-        const val PUBLISHER_ID_KEYSTORE_ALIAS = "PUBLISHER_ID_KEYSTORE_ALIAS"
         const val OAUTH2_PARAMETERS_FILE = "OAUTH2_PARAMETERS_FILE"
 
         const val PUBLISHER_ATTRIBUTE_FILES =

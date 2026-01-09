@@ -11,6 +11,7 @@ import com.example.sw0b_001.data.PayloadEncryptionComposeDecomposeInit
 import com.example.sw0b_001.data.Publishers
 import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.data.models.Bridges.getKeypairForTransmission
+import com.example.sw0b_001.extensions.context.getStaticKeys
 import com.example.sw0b_001.extensions.context.settingsGetIsEmailLogin
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.parseLocalImageContent
 import com.example.sw0b_001.ui.views.AvailablePlatformsView
@@ -32,32 +33,12 @@ object Bridges {
         val version: String
     )
 
-    private fun getStaticKeys(
-        context: Context,
-        kid: Int? = null
-    ) : List<StaticKeys>? {
-        try {
-            val filename = if(BuildConfig.DEBUG) "staging-static-x25519.json" else "static-x25519.json"
-            val inputStream = context.assets.open(filename)
-            val size = inputStream.available()
-            val buffer = ByteArray(size)
-            inputStream.read(buffer)
-            inputStream.close()
-
-            val json = String(buffer, Charsets.UTF_8)
-            return Json.Default.decodeFromString<List<StaticKeys>>(json)
-        } catch(e: IOException) {
-            e.printStackTrace()
-            return null
-        }
-    }
-
     fun getKeypairForTransmissionOnly(
         context: Context,
         random: Int,
     ) : Pair<Pair<ByteArray, ByteArray>, String?> {
         val clientPublishKey = Cryptography.generateKey()
-        val serverPublisherPublicKey = getStaticKeys(context)?.get(random)?.keypair
+        val serverPublisherPublicKey = context.getStaticKeys()?.get(random)?.keypair
         return Pair(clientPublishKey, serverPublisherPublicKey)
     }
 
@@ -68,7 +49,7 @@ object Bridges {
         val clientPublishKey = Cryptography.generateKey(context,
             Publishers.PUBLISHER_ID_KEYSTORE_ALIAS)
 
-        val serverPublisherPublicKey = getStaticKeys(context)?.get(random)?.keypair
+        val serverPublisherPublicKey = context.getStaticKeys()?.get(random)?.keypair
 
         Publishers.storeArtifacts(
             context,

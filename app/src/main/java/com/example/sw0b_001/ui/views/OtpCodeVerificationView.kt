@@ -1,6 +1,5 @@
 package com.example.sw0b_001.ui.views
 
-import com.example.sw0b_001.R
 import android.app.Activity.RESULT_OK
 import android.content.ActivityNotFoundException
 import android.content.BroadcastReceiver
@@ -65,10 +64,8 @@ import androidx.navigation.compose.rememberNavController
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.BuildConfig
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
+import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Vaults
-import com.example.sw0b_001.data.savePhoneNumberToPrefs
-import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.google.android.gms.auth.api.phone.SmsRetriever
@@ -300,10 +297,7 @@ fun OtpCodeVerificationView(
                         context = context,
                         email = email,
                         phoneNumber = loginSignupPhoneNumber,
-                        password = loginSignupPassword,
-                        countryCode = countryCode,
                         code = otpCode,
-                        recaptcha = recaptcha,
                         type = otpRequestType,
                         onFailedCallback = {isLoading = false},
                         onCompleteCallback = {isLoading = false}
@@ -438,10 +432,7 @@ private fun submitOTPCode(
     context: Context,
     email: String,
     phoneNumber: String,
-    password: String,
-    countryCode: String = "",
     code: String,
-    recaptcha: String,
     type: OTPCodeVerificationType,
     onFailedCallback: (String?) -> Unit,
     onCompleteCallback: () -> Unit,
@@ -450,44 +441,13 @@ private fun submitOTPCode(
     CoroutineScope(Dispatchers.Default).launch {
         val vault = Vaults(context)
         try {
-            when(type) {
-                OTPCodeVerificationType.CREATE -> {
-                    vault.createEntity(
-                        context,
-                        email = email,
-                        phoneNumber = phoneNumber,
-                        countryCode = countryCode,
-                        password = password,
-                        recaptchaToken = recaptcha,
-                        ownershipResponse = code
-                    )
-                }
-                OTPCodeVerificationType.AUTHENTICATE -> {
-                    vault.authenticateEntity(
-                        context,
-                        email = email,
-                        phoneNumber = phoneNumber,
-                        password = password,
-                        recaptchaToken = recaptcha,
-                        ownershipResponse = code
-                    )
-                }
-                OTPCodeVerificationType.RECOVER -> {
-                    vault.recoverEntityPassword(
-                        context,
-                        email = email,
-                        phoneNumber = phoneNumber,
-                        newPassword = password,
-                        recaptchaToken = recaptcha,
-                        ownershipResponse = code
-                    )
-                }
-            }
+            vault.submitOTPCode(
+                email = email,
+                phoneNumber = phoneNumber,
+                otpCode = code,
+                type = type
+            )
 
-            savePhoneNumberToPrefs(context, phoneNumber)
-            Vaults(context)
-                .refreshStoredTokens(context,
-                    context.settingsGetStoreTokensOnDevice)
             onSuccessCallback()
         } catch(e: StatusRuntimeException) {
             e.printStackTrace()

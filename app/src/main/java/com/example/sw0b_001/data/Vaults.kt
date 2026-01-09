@@ -17,27 +17,34 @@ import io.grpc.ManagedChannelBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import vault.v1.EntityGrpc
-import vault.v1.EntityGrpc.EntityBlockingStub
-import vault.v1.Vault
 import java.security.DigestException
 import java.security.MessageDigest
 import androidx.core.content.edit
+import com.afkanerd.smswithoutborders.libsignal_doubleratchet.CryptoHelpers
 import com.example.sw0b_001.data.Publishers.Companion.PUBLISHER_ATTRIBUTE_FILES
 import com.example.sw0b_001.data.Publishers.Companion.storeArtifacts
+import com.example.sw0b_001.data.models.Credentials
 import com.example.sw0b_001.extensions.context.Settings
+import com.example.sw0b_001.extensions.context.getStaticKeys
 import com.example.sw0b_001.extensions.context.settingsSetIsEmailLogin
+import com.example.sw0b_001.ui.views.OTPCodeVerificationType
+import com.google.protobuf.kotlin.toByteString
+import okio.ByteString.Companion.toByteString
+import vault.v2.EntityGrpc
+import vault.v2.Vault
 
 class Vaults(val context: Context) {
-    private val DEVICE_ID_KEYSTORE_ALIAS = "DEVICE_ID_KEYSTORE_ALIAS"
-    private val KEY_ACCOUNTS_MISSING_TOKENS_JSON = "accounts_with_missing_tokens_ids"
+    private val CLIENT_ID_KEY_KEYSTORE_ALIAS = "CLIENT_ID_KEY_KEYSTORE_ALIAS"
+    private val CLIENT_RATCHET_KEY_KEYSTORE_ALIAS = "CLIENT_RATCHET_KEY_KEYSTORE_ALIAS"
+    private val RATCHET_SHARED_SECRET_KEYSTORE_ALIAS = "RATCHET_SHARED_SECRET_KEYSTORE_ALIAS"
+    private val LLT_KEYSTORE_ALIAS = "LLT_KEYSTORE_ALIAS"
 
     private var channel: ManagedChannel = ManagedChannelBuilder
         .forAddress(context.getString(R.string.vault_grpc_url),
             context.getString(R.string.vault_grpc_port).toInt())
         .useTransportSecurity()
         .build()
-    private var entityStub: EntityBlockingStub = EntityGrpc.newBlockingStub(channel)
+    private var entityStub: EntityGrpc.EntityBlockingStub = EntityGrpc.newBlockingStub(channel)
 
     fun shutdown() {
         channel.shutdown()
@@ -112,39 +119,133 @@ class Vaults(val context: Context) {
         }
     }
 
-    private fun processVaultArtifacts(
-        context: Context,
-        encodedLlt: String,
-        deviceIdPubKey: String,
-        publisherPubKey: String,
-        authValue: String,
-        clientDeviceIDPubKey: ByteArray,
-        clientPublisherPubKey: ByteArray,
-        isEmailLogin: Boolean,
+    private fun storeCredentials(
+        llt: ByteArray,
+        deviceId: ByteArray,
     ) {
-        val deviceIdSharedKey = Cryptography.calculateSharedSecret(
-            context,
-            DEVICE_ID_KEYSTORE_ALIAS,
-            Base64.decode(deviceIdPubKey, Base64.DEFAULT),
-        )!!
+        Datastore.getDatastore(context).credentialsDao().insert(Credentials(
+            llt = llt,
+            deviceID = deviceId,
+            keystoreAlias = LLT_KEYSTORE_ALIAS
+        ))
+    }
 
-        val llt = Crypto.decryptFernet(deviceIdSharedKey,
-            String(Base64.decode(encodedLlt, Base64.DEFAULT), Charsets.UTF_8))
+    private fun storeEncryptedSharedSecret( sharedSecret: ByteArray ) {
+        val db = Datastore.getDatastore(context).securityKeystoreDao()
+        val secretKeys = db.fetch(CLIENT_RATCHET_KEY_KEYSTORE_ALIAS)
+        secretKeys.sharedSecret = sharedSecret
+        db.update(secretKeys)
+    }
 
-        val deviceId = getDeviceID(
-            deviceIdSharedKey,
-            authValue,
-            clientDeviceIDPubKey
+    private fun securelyStoreCredentials(llt: ByteArray ) {
+        val encryptedSharedSecret = Cryptography.encryptWithKeyStore(
+            llt,
+            LLT_KEYSTORE_ALIAS
+        ) ?: throw Exception("Failed to encrypt shared secret")
+
+        val message = "RelaySMS DID v1".encodeToByteArray()
+        val ho = MessageDigest.getInstance("SHA-256")
+        val clientPublicKey = KeystoreHelpers
+            .getKeyPairFromKeystore(CLIENT_ID_KEY_KEYSTORE_ALIAS)
+            .public
+            .encoded
+
+        val deviceId = ho.digest(message + clientPublicKey).copyOfRange(0, 16)
+
+        storeCredentials(
+            encryptedSharedSecret,
+            deviceId
         )
+    }
 
-        context.settingsSetIsEmailLogin(isEmailLogin)
-        storeArtifacts(context, llt, deviceId, clientDeviceIDPubKey)
-        Publishers.storeArtifacts(context, publisherPubKey,
-            Base64.encodeToString(clientPublisherPubKey,
-            Base64.DEFAULT))
-        Publishers.removeEncryptedStates(context)
-        CoroutineScope(Dispatchers.Default).launch {
+    private fun completeVaultHandshake(
+        serverRatchetPublicKey: ByteArray,
+        serverNonce: ByteArray,
+    ) {
+        val serverAuthenticationKey = context.getStaticKeys(255) ?:
+        throw Exception("Failed to find static keys")
+
+        val sharedSecret = Cryptography.calculateSharedSecretWithNonce(
+            context,
+            CLIENT_RATCHET_KEY_KEYSTORE_ALIAS,
+            serverRatchetPublicKey,
+            serverAuthenticationKey,
+            serverNonce
+        ) ?: throw Exception("Failed to generate shared secret")
+
+        KeystoreHelpers.removeFromKeystore(context, CLIENT_RATCHET_KEY_KEYSTORE_ALIAS)
+        Datastore.getDatastore(context).securityKeystoreDao()
+            .remove(CLIENT_RATCHET_KEY_KEYSTORE_ALIAS)
+
+        val encryptedSharedSecret = Cryptography.encryptWithKeyStore(
+            sharedSecret,
+            CLIENT_RATCHET_KEY_KEYSTORE_ALIAS
+        ) ?: throw Exception("Failed to encrypt shared secret")
+
+        storeEncryptedSharedSecret(encryptedSharedSecret)
+    }
+
+    fun submitOTPCode(
+        phoneNumber: String,
+        email: String,
+        otpCode: String,
+        type: OTPCodeVerificationType,
+    ) {
+        var serverRatchetPublicKey: ByteArray? = null
+        var serverNonce: ByteArray? = null
+        var llt: ByteArray? = null
+
+        when(type) {
+            OTPCodeVerificationType.CREATE -> {
+                val createEntityRequest = Vault.CreateEntityRequest.newBuilder().apply {
+                    setOwnershipProofResponse(otpCode)
+                    setPhoneNumber(phoneNumber)
+                    setEmailAddress(email)
+                }.build()
+
+                val response = entityStub.createEntity(createEntityRequest)
+                serverRatchetPublicKey = response.serverRatchetPubKey.toByteArray()
+                serverNonce = response.serverNonce.toByteArray()
+                llt = response.longLivedToken.toByteArray()
+            }
+            OTPCodeVerificationType.AUTHENTICATE -> {
+                val authenticateEntityRequest = Vault.AuthenticateEntityRequest.newBuilder().apply {
+                    setOwnershipProofResponse(otpCode)
+                    setPhoneNumber(phoneNumber)
+                    setEmailAddress(email)
+                }.build()
+
+                val response = entityStub.authenticateEntity(authenticateEntityRequest)
+                serverRatchetPublicKey = response.serverRatchetPubKey.toByteArray()
+                serverNonce = response.serverNonce.toByteArray()
+                llt = response.longLivedToken.toByteArray()
+            }
+            OTPCodeVerificationType.RECOVER -> {
+                val resetPasswordRequest = Vault.ResetPasswordRequest.newBuilder().apply {
+                    setOwnershipProofResponse(otpCode)
+                    setPhoneNumber(phoneNumber)
+                    setEmailAddress(email)
+                }.build()
+
+                val response = entityStub.resetPassword(resetPasswordRequest)
+                serverRatchetPublicKey = response.serverRatchetPubKey.toByteArray()
+                serverNonce = response.serverNonce.toByteArray()
+                llt = response.longLivedToken.toByteArray()
+            }
+        }
+
+        try {
+            completeVaultHandshake(
+                serverRatchetPublicKey!!,
+                serverNonce!!
+            )
+
+            securelyStoreCredentials(llt)
+
+            Publishers.removeEncryptedStates(context)
             Datastore.getDatastore(context).ratchetStatesDAO().deleteAll()
+        } catch(e: Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -155,38 +256,29 @@ class Vaults(val context: Context) {
         countryCode: String,
         password: String,
         recaptchaToken: String,
-        ownershipResponse: String = ""
     ) : Vault.CreateEntityResponse {
 
-        val deviceIdPubKey = Cryptography.generateKey(context, DEVICE_ID_KEYSTORE_ALIAS)
-        val publishPubKey = Cryptography.generateKey(context, Publishers.PUBLISHER_ID_KEYSTORE_ALIAS)
+        val (clientIdKey, _) = Cryptography.generateKey(
+            context,
+            CLIENT_ID_KEY_KEYSTORE_ALIAS
+        )
+        val (clientRatchetKey, nonce) = Cryptography.generateKey(
+            context,
+            CLIENT_RATCHET_KEY_KEYSTORE_ALIAS
+        )
 
         val createEntityRequest1 = Vault.CreateEntityRequest.newBuilder().apply {
-            if(ownershipResponse.isNotBlank()) {
-                setOwnershipProofResponse(ownershipResponse)
-            }
             setCountryCode(countryCode)
             setPhoneNumber(phoneNumber)
             setPassword(password)
-            setClientPublishPubKey(Base64.encodeToString(publishPubKey, Base64.DEFAULT))
-            setClientDeviceIdPubKey(Base64.encodeToString(deviceIdPubKey, Base64.DEFAULT))
+            setClientIdPubKey(clientIdKey.toByteString())
+            setClientRatchetPubKey(clientRatchetKey.toByteString())
+            setClientNonce(nonce.toByteString())
             setCaptchaToken(recaptchaToken)
             setEmailAddress(email)
         }.build()
 
-        val response = entityStub.createEntity(createEntityRequest1)
-
-        if(!response.requiresOwnershipProof) {
-            processVaultArtifacts(context,
-                response.longLivedToken,
-                response.serverDeviceIdPubKey,
-                response.serverPublishPubKey,
-                email.ifEmpty { phoneNumber },
-                deviceIdPubKey, publishPubKey,
-                email.isNotEmpty(),
-            )
-        }
-        return response
+        return entityStub.createEntity(createEntityRequest1)
     }
 
     fun authenticateEntity(
@@ -195,46 +287,28 @@ class Vaults(val context: Context) {
         email: String,
         password: String,
         recaptchaToken: String,
-        ownershipResponse: String = ""
     ) : Vault.AuthenticateEntityResponse {
 
-        val deviceIdPubKey = Cryptography.generateKey(context,
-            DEVICE_ID_KEYSTORE_ALIAS)
-        val publishPubKey = Cryptography.generateKey(context,
-            Publishers.PUBLISHER_ID_KEYSTORE_ALIAS)
+        val (clientIdKey, _) = Cryptography.generateKey(
+            context,
+            CLIENT_ID_KEY_KEYSTORE_ALIAS
+        )
+        val (clientRatchetKey, nonce) = Cryptography.generateKey(
+            context,
+            CLIENT_RATCHET_KEY_KEYSTORE_ALIAS
+        )
 
         val authenticateEntityRequest = Vault.AuthenticateEntityRequest.newBuilder().apply {
             setPhoneNumber(phoneNumber)
             setPassword(password)
-            setClientPublishPubKey(Base64.encodeToString(publishPubKey,
-                Base64.DEFAULT))
-            setClientDeviceIdPubKey(Base64.encodeToString(deviceIdPubKey,
-                Base64.DEFAULT))
+            setClientIdPubKey(clientIdKey.toByteString())
+            setClientRatchetPubKey(clientRatchetKey.toByteString())
+            setClientNonce(nonce.toByteString())
             setCaptchaToken(recaptchaToken)
             setEmailAddress(email)
-
-            if(ownershipResponse.isNotBlank()) {
-                setOwnershipProofResponse(ownershipResponse)
-            }
         }.build()
 
-        val response = entityStub.authenticateEntity(authenticateEntityRequest)
-
-        if (response.requiresPasswordReset) {
-            return response
-        }
-
-        if(!response.requiresOwnershipProof) {
-            processVaultArtifacts(context,
-                response.longLivedToken,
-                response.serverDeviceIdPubKey,
-                response.serverPublishPubKey,
-                email.ifEmpty { phoneNumber },
-                deviceIdPubKey, publishPubKey,
-                email.isNotEmpty(),
-            )
-        }
-        return response
+        return entityStub.authenticateEntity(authenticateEntityRequest)
     }
 
     fun recoverEntityPassword(
@@ -243,41 +317,28 @@ class Vaults(val context: Context) {
         email: String,
         newPassword: String,
         recaptchaToken: String,
-        ownershipResponse: String? = null
     ) : Vault.ResetPasswordResponse {
 
-        val deviceIdPubKey = Cryptography.generateKey(context,
-            DEVICE_ID_KEYSTORE_ALIAS)
-        val publishPubKey = Cryptography.generateKey(context,
-            Publishers.PUBLISHER_ID_KEYSTORE_ALIAS)
+        val (clientIdKey, _) = Cryptography.generateKey(
+            context,
+            CLIENT_ID_KEY_KEYSTORE_ALIAS
+        )
+        val (clientRatchetKey, nonce) = Cryptography.generateKey(
+            context,
+            CLIENT_RATCHET_KEY_KEYSTORE_ALIAS
+        )
 
         val resetPasswordRequest = Vault.ResetPasswordRequest.newBuilder().apply {
             setPhoneNumber(phoneNumber)
             setNewPassword(newPassword)
-            setClientPublishPubKey(Base64.encodeToString(publishPubKey,
-                Base64.DEFAULT))
-            setClientDeviceIdPubKey(Base64.encodeToString(deviceIdPubKey,
-                Base64.DEFAULT))
+            setClientIdPubKey(clientIdKey.toByteString())
+            setClientRatchetPubKey(clientRatchetKey.toByteString())
+            setClientNonce(nonce.toByteString())
             setCaptchaToken(recaptchaToken)
             setEmailAddress(email)
-
-            ownershipResponse?.let {
-                setOwnershipProofResponse(ownershipResponse)
-            }
         }.build()
 
-        val response = entityStub.resetPassword(resetPasswordRequest)
-        if(!response.requiresOwnershipProof) {
-            processVaultArtifacts(context,
-                response.longLivedToken,
-                response.serverDeviceIdPubKey,
-                response.serverPublishPubKey,
-                email.ifEmpty { phoneNumber },
-                deviceIdPubKey, publishPubKey,
-                email.isNotEmpty(),
-            )
-        }
-        return response
+        return entityStub.resetPassword(resetPasswordRequest)
     }
 
     fun getStoredAccountTokens(
@@ -308,8 +369,6 @@ class Vaults(val context: Context) {
 
         private const val LONG_LIVED_TOKEN_KEYSTORE_ALIAS =
             "com.afkanerd.relaysms.LONG_LIVED_TOKEN_KEYSTORE_ALIAS"
-        const val DEVICE_ID_KEYSTORE_ALIAS =
-            "com.afkanerd.relaysms.DEVICE_ID_KEYSTORE_ALIAS"
         const val DEVICE_ID_PUB_KEY =
             "com.afkanerd.relaysms.DEVICE_ID_PUB_KEY"
 

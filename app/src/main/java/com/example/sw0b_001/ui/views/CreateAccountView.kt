@@ -5,7 +5,6 @@ import android.content.Intent
 import android.telephony.PhoneNumberUtils
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -67,26 +66,25 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.arpitkatiyarprojects.countrypicker.CountryPicker
 import com.arpitkatiyarprojects.countrypicker.CountryPickerOutlinedTextField
 import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
-import com.example.sw0b_001.data.Vaults
+import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.Vaults
+import com.example.sw0b_001.ui.components.CaptchaImage
 import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.VaultsViewModel
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import androidx.core.net.toUri
-import com.arpitkatiyarprojects.countrypicker.CountryPicker
-import com.example.sw0b_001.BuildConfig
-import com.example.sw0b_001.ui.components.CaptchaImage
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
-import com.example.sw0b_001.ui.viewModels.VaultsViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -545,9 +543,7 @@ private fun createAccount(
                 recaptchaToken = recaptchaToken,
             )
 
-            if(response.requiresOwnershipProof) {
-                otpRequiredCallback(response.nextAttemptTimestamp)
-            }
+            otpRequiredCallback(response.nextAttemptTimestamp)
         } catch(e: StatusRuntimeException) {
             e.printStackTrace()
             failedCallback(e.message)

@@ -17,8 +17,11 @@ import androidx.room.migration.AutoMigrationSpec;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.sqlite.db.SupportSQLiteOpenHelper;
 
+import com.example.sw0b_001.data.dao.CredentialsDao;
 import com.example.sw0b_001.data.dao.EncryptedContentDAO;
 import com.example.sw0b_001.data.dao.GatewayClientsDao;
+import com.example.sw0b_001.data.dao.SecurityKeystoreDao;
+import com.example.sw0b_001.data.models.Credentials;
 import com.example.sw0b_001.data.models.EncryptedContent;
 import com.example.sw0b_001.data.models.GatewayClients;
 import com.example.sw0b_001.data.models.GatewayServer;
@@ -29,6 +32,7 @@ import com.example.sw0b_001.data.dao.AvailablePlatformsDao;
 import com.example.sw0b_001.data.models.Platforms;
 import com.example.sw0b_001.data.dao.PlatformDao;
 import com.example.sw0b_001.data.dao.StoredPlatformsDao;
+import com.example.sw0b_001.data.models.SecurityKeys;
 import com.example.sw0b_001.data.models.StoredPlatformsEntity;
 import com.example.sw0b_001.data.models.RatchetStates;
 
@@ -41,8 +45,10 @@ import org.jetbrains.annotations.NotNull;
         AvailablePlatforms.class,
         GatewayClients.class,
         StoredPlatformsEntity.class,
+        SecurityKeys.class,
+        Credentials.class,
         EncryptedContent.class,},
-        version = 24,
+        version = 25,
         autoMigrations = {
         @AutoMigration( from = 8, to = 9, spec = Datastore.DatastoreMigrations.class),
         @AutoMigration( from = 9, to = 10, spec= Datastore.DatastoreMigrations.class),
@@ -60,6 +66,7 @@ import org.jetbrains.annotations.NotNull;
         @AutoMigration( from = 21, to = 22, spec = Datastore.Migrate21To22.class),
         @AutoMigration( from = 22, to = 23, spec = Datastore.Migrate22To23.class),
         @AutoMigration( from = 23, to = 24),
+        @AutoMigration( from = 24, to = 25),
 })
 
 public abstract class Datastore extends RoomDatabase {
@@ -88,6 +95,8 @@ public abstract class Datastore extends RoomDatabase {
     public abstract EncryptedContentDAO encryptedContentDAO();
     public abstract StoredPlatformsDao storedPlatformsDao();
     public abstract RatchetStatesDAO ratchetStatesDAO();
+    public abstract SecurityKeystoreDao securityKeystoreDao();
+    public abstract CredentialsDao credentialsDao();
 
     @NonNull
     @NotNull
