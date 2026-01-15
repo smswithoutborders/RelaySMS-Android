@@ -11,6 +11,7 @@ data class Credentials (
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0,
     var keystoreAlias: String,
-    var llt: ByteArray?,
-    var deviceID: ByteArray?,
+    var llt: ByteArray,
+    var deviceID: ByteArray,
+    var sharedSecret: ByteArray,
 )

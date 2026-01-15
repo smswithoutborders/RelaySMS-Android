@@ -21,4 +21,7 @@ interface SecurityKeystoreDao {
 
     @Query("SELECT * FROM SecurityKeys WHERE keystoreAlias = :keystoreAlias")
     fun fetch(keystoreAlias: String): SecurityKeys
+
+    @Query("DELETE FROM SecurityKeys")
+    fun clear()
 }

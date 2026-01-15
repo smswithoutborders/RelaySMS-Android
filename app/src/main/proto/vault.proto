@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package vault.v2;
 
+// ===== Public Services =====
+
 // Request message for creating an entity.
 message CreateEntityRequest {
   // The ISO 3166-1 alpha-2 country code of the entity.
@@ -20,8 +22,12 @@ message CreateEntityRequest {
   bytes client_id_pub_key = 7;
   // The client's ratchet public key.
   bytes client_ratchet_pub_key = 8;
+  // The client's header public key.
+  bytes client_header_pub_key = 9;
+  // The client's next header public key.
+  bytes client_next_header_pub_key = 10;
   // The client's nonce.
-  bytes client_nonce = 9;
+  bytes client_nonce = 11;
 }
 
 // Response message for creating an entity.
@@ -32,12 +38,16 @@ message CreateEntityResponse {
   string long_lived_token = 2;
   // The server's ratchet public key.
   bytes server_ratchet_pub_key = 3;
+  // The server's header public key.
+  bytes server_header_pub_key = 4;
+  // The server's next header public key.
+  bytes server_next_header_pub_key = 5;
   // The server's nonce.
-  bytes server_nonce = 4;
+  bytes server_nonce = 6;
   // A response message.
-  string message = 5;
+  string message = 7;
   // The next available time to request another proof of ownership.
-  int32 next_attempt_timestamp = 6;
+  int32 next_attempt_timestamp = 8;
 }
 
 // Request message for authenticating an entity.
@@ -56,8 +66,12 @@ message AuthenticateEntityRequest {
   bytes client_id_pub_key = 6;
   // The client's ratchet public key.
   bytes client_ratchet_pub_key = 7;
+  // The client's header public key.
+  bytes client_header_pub_key = 8;
+  // The client's next header public key.
+  bytes client_next_header_pub_key = 9;
   // The client's nonce.
-  bytes client_nonce = 8;
+  bytes client_nonce = 10;
 }
 
 // Response message for authenticating an entity.
@@ -68,14 +82,44 @@ message AuthenticateEntityResponse {
   string long_lived_token = 2;
   // The server's ratchet public key.
   bytes server_ratchet_pub_key = 3;
+  // The server's header public key.
+  bytes server_header_pub_key = 4;
+  // The server's next header public key.
+  bytes server_next_header_pub_key = 5;
   // The server's nonce.
-  bytes server_nonce = 4;
+  bytes server_nonce = 6;
   // A response message.
-  string message = 5;
+  string message = 7;
   // The next available time to request another proof of ownership.
-  int32 next_attempt_timestamp = 6;
+  int32 next_attempt_timestamp = 8;
   // indicates if user must reset their password
-  bool requires_password_reset = 7;
+  bool requires_password_reset = 9;
+}
+
+// Request message for listing entity's stored tokens.
+message ListEntityStoredTokensRequest {
+  // Indicates if the token should be removed from the cloud and sent to the device.
+  bool migrate_to_device = 1;
+}
+
+// Response message for listing entity's stored tokens.
+message ListEntityStoredTokensResponse {
+  // The list of stored tokens.
+  repeated Token stored_tokens = 1;
+  // A response message.
+  string message = 2;
+}
+
+// Represents a token.
+message Token {
+  // The platform associated with the token.
+  string platform = 1;
+  // The unique identifier of the account associated with the token.
+  string account_identifier = 2;
+  // Access and refresh tokens
+  map<string, string> account_tokens = 3;
+  // Indicates if the token is already stored on the device.
+  bool is_stored_on_device = 4;
 }
 
 // Request message for resetting an entity's password.
@@ -94,8 +138,12 @@ message ResetPasswordRequest {
   bytes client_id_pub_key = 6;
   // The client's ratchet public key.
   bytes client_ratchet_pub_key = 7;
+  // The client's header public key.
+  bytes client_header_pub_key = 8;
+  // The client's next header public key.
+  bytes client_next_header_pub_key = 9;
   // The client's nonce.
-  bytes client_nonce = 8;
+  bytes client_nonce = 10;
 }
 
 // Response message for resetting an entity's password.
@@ -106,14 +154,43 @@ message ResetPasswordResponse {
   string long_lived_token = 2;
   // The server's ratchet public key.
   bytes server_ratchet_pub_key = 3;
+  // The server's header public key.
+  bytes server_header_pub_key = 4;
+  // The server's next header public key.
+  bytes server_next_header_pub_key = 5;
   // The server's nonce.
-  bytes server_nonce = 4;
+  bytes server_nonce = 6;
   // A response message.
-  string message = 5;
+  string message = 7;
   // The next available time to request another proof of ownership.
-  int32 next_attempt_timestamp = 6;
-  // indicates if user must reset their password
-  bool requires_password_reset = 7;
+  int32 next_attempt_timestamp = 8;
+}
+
+// Request message for updating an entity's password.
+message UpdateEntityPasswordRequest {
+  // The current password of the entity.
+  string current_password = 1;
+  // The new password of the entity.
+  string new_password = 2;
+}
+
+// Response message for updating an entity's password.
+message UpdateEntityPasswordResponse {
+  // A response message.
+  string message = 1;
+  // Indicates whether the operation was successful.
+  bool success = 2;
+}
+
+// Request message for deleting an entity.
+message DeleteEntityRequest {}
+
+// Response message for deleting an entity.
+message DeleteEntityResponse {
+  // A response message.
+  string message = 1;
+  // Indicates whether the operation was successful.
+  bool success = 2;
 }
 
 // Service for managing entities.
@@ -122,6 +199,125 @@ service Entity {
   rpc CreateEntity(CreateEntityRequest) returns (CreateEntityResponse);
   // Authenticates an entity.
   rpc AuthenticateEntity(AuthenticateEntityRequest) returns (AuthenticateEntityResponse);
+  // Lists all stored access tokens for an entity.
+  rpc ListEntityStoredTokens(ListEntityStoredTokensRequest) returns (ListEntityStoredTokensResponse);
   // Resets an entity's password
   rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordResponse);
+  // Updates an entity's password.
+  rpc UpdateEntityPassword(UpdateEntityPasswordRequest) returns (UpdateEntityPasswordResponse);
+  // Deletes an entity.
+  rpc DeleteEntity(DeleteEntityRequest) returns (DeleteEntityResponse);
+}
+
+// ===== Internal Services =====
+
+// Request message for decrypting payload.
+message DecryptPayloadRequest {
+  // Device ID for identifying the requesting device.
+  string device_id = 1;
+  // Encrypted payload that needs to be decrypted.
+  string payload_ciphertext = 2;
+  // The phone number of the entity.
+  string phone_number = 3;
+}
+
+message DecryptPayloadResponse {
+  // Decrypted plaintext payload.
+  string payload_plaintext = 1;
+  // A response message.
+  string message = 2;
+  // Indicates whether the operation was successful.
+  bool success = 3;
+  // The ISO 3166-1 alpha-2 country code of the entity.
+  string country_code = 4;
+}
+
+// Request message for encrypting payload.
+message EncryptPayloadRequest {
+  // Device ID for identifying the requesting device.
+  string device_id = 1;
+  // Plaintext payload to be encrypted.
+  string payload_plaintext = 2;
+  // The phone number of the entity.
+  string phone_number = 3;
+}
+
+// Response message for encrypting payload.
+message EncryptPayloadResponse {
+  // Encrypted payload.
+  string payload_ciphertext = 1;
+  // A response message.
+  string message = 2;
+  // Indicates whether the operation was successful.
+  bool success = 3;
+}
+
+// Request message for storing an entity's token.
+message StoreEntityTokenRequest {
+  // The OAuth2 token to be stored (JSON string).
+  string token = 1;
+  // The platform associated with the token.
+  string platform = 2;
+  // The identifier of the account associated with the token.
+  string account_identifier = 3;
+}
+
+// Response message for storing an entity's token.
+message StoreEntityTokenResponse {
+  // A response message.
+  string message = 1;
+  // Indicates whether the operation was successful.
+  bool success = 2;
+}
+
+// Request message for getting entity access token.
+message GetEntityAccessTokenRequest {
+  // Device ID for identifying the requesting device.
+  string device_id = 1;
+  // The platform associated with the token.
+  string platform = 2;
+  // The identifier of the account associated with the token.
+  string account_identifier = 3;
+  // The phone number of the entity.
+  string phone_number = 4;
+}
+
+// Response message for getting entity access token.
+message GetEntityAccessTokenResponse {
+  // Entity access token (JSON string).
+  string token = 1;
+  // A response message.
+  string message = 2;
+  // Indicates whether the operation was successful.
+  bool success = 3;
+}
+
+// Request message for deleting an entity's token.
+message DeleteEntityTokenRequest {
+  // The platform associated with the token.
+  string platform = 1;
+  // The identifier of the account associated with the token.
+  string account_identifier = 2;
+}
+
+// Response message for deleting an entity's token.
+message DeleteEntityTokenResponse {
+  // A response message.
+  string message = 1;
+  // Indicates whether the operation was successful.
+  bool success = 2;
+}
+
+// Service for managing entities internally.
+service EntityInternal {
+  // Decrypt payload.
+  rpc DecryptPayload(DecryptPayloadRequest) returns (DecryptPayloadResponse);
+  // Encrypt payload.
+  rpc EncryptPayload(EncryptPayloadRequest) returns (EncryptPayloadResponse);
+  // Stores a token for an entity.
+  rpc StoreEntityToken(StoreEntityTokenRequest) returns (StoreEntityTokenResponse);
+  // Get an entity's access token.
+  rpc GetEntityAccessToken(GetEntityAccessTokenRequest) returns (GetEntityAccessTokenResponse);
+  // Deletes an entity's access token.
+  rpc DeleteEntityToken(DeleteEntityTokenRequest) returns (DeleteEntityTokenResponse);
 }

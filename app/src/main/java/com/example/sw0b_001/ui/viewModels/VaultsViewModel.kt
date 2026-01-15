@@ -1,30 +1,32 @@
 package com.example.sw0b_001.ui.viewModels
 
-import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.hardware.camera2.CaptureRequest
 import android.util.Base64
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.afkanerd.smswithoutborders.libsignal_doubleratchet.KeystoreHelpers
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.GatewayClientsCommunications.json
 import com.example.sw0b_001.data.Network
-import com.hbb20.BuildConfig
+import com.example.sw0b_001.data.Publishers
+import com.example.sw0b_001.data.Vaults
+import com.example.sw0b_001.data.models.Platforms
+import com.example.sw0b_001.extensions.context.settingsClear
+import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
+import io.grpc.Status
+import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import java.util.concurrent.Executor
-import java.util.concurrent.Executors
 
 
 class VaultsViewModel(val context: Context) : ViewModel() {
@@ -115,6 +117,93 @@ class VaultsViewModel(val context: Context) : ViewModel() {
                 e.printStackTrace()
                 onFailureCallback(e.message)
             }
+        }
+    }
+
+    suspend fun getDeviceID(context: Context) : ByteArray {
+        return Datastore.getDatastore(context).credentialsDao()
+            .fetch(Vaults.LLT_KEYSTORE_ALIAS).deviceID
+    }
+
+    suspend fun logout(context: Context, successRunnable: Runnable) {
+        KeystoreHelpers.removeAllFromKeystore(context)
+        Datastore.getDatastore(context).clearAllTables()
+        context.settingsClear()
+
+        successRunnable.run()
+    }
+
+
+    fun completeDelete(
+        context: Context,
+        onFailureCallback: (String?) -> Unit,
+        onSuccessCallback: () -> Unit,
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val vaults = Vaults(context)
+            val publishers = Publishers(context)
+            try {
+                val availablePlatforms = Datastore.getDatastore(context).availablePlatformsDao()
+                    .fetchAllList()
+
+                Datastore.getDatastore(context).storedPlatformsDao().fetchAllList().forEach { platform ->
+                    availablePlatforms.filter { it.name == platform.name }.forEach {
+                        when(it.protocol_type) {
+                            Platforms.ProtocolTypes.oauth2.name -> {
+                                publishers.revokeOAuthPlatforms(
+                                    platform.name!!,
+                                    platform.account!!,
+                                )
+                            }
+                            Platforms.ProtocolTypes.pnba.name -> {
+                                publishers.revokePNBAPlatforms(
+                                    platform.name!!,
+                                    platform.account!!
+                                )
+                            }
+                        }
+                    }
+                }
+
+                val response = vaults.deleteEntity()
+                if(response.success) { logout(context) {
+                    onSuccessCallback()
+                }}
+                else onFailureCallback(null)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                onFailureCallback(e.message)
+            } finally {
+                vaults.shutdown()
+                publishers.shutdown()
+            }
+        }
+    }
+
+    fun validateSession(
+        context: Context,
+        onFailureCallback: (Pair<Boolean, String?>) -> Unit,
+        onSuccessCallback: () -> Unit,
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val vault = Vaults(context)
+            try {
+                vault.refreshStoredTokens(
+                    context,
+                    context.settingsGetStoreTokensOnDevice)
+            } catch(e: StatusRuntimeException) {
+                if(e.status.code == Status.UNAUTHENTICATED.code) {
+                    onFailureCallback(Pair(true, e.message))
+                    return@launch
+                }
+                else {
+                    onFailureCallback(Pair(false, e.message))
+                    return@launch
+                }
+            } finally {
+                vault.shutdown()
+            }
+            onSuccessCallback()
         }
     }
 }

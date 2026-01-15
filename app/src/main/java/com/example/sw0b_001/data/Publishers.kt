@@ -50,21 +50,19 @@ class Publishers(val context: Context) {
         return publisherStub.getOAuth2AuthorizationUrl(request)
     }
 
-    fun revokeOAuthPlatforms(llt: String, platform: String, account: String) {
+    fun revokeOAuthPlatforms(platform: String, account: String) {
         val request = PublisherOuterClass.RevokeAndDeleteOAuth2TokenRequest.newBuilder().apply {
             setPlatform(platform)
-            setLongLivedToken(llt)
             setAccountIdentifier(account)
         }.build()
 
         publisherStub.revokeAndDeleteOAuth2Token(request)
     }
 
-    fun revokePNBAPlatforms(llt: String, platform: String, account: String) :
+    fun revokePNBAPlatforms(platform: String, account: String) :
             PublisherOuterClass.RevokeAndDeletePNBATokenResponse {
         val request = PublisherOuterClass.RevokeAndDeletePNBATokenRequest.newBuilder().apply {
             setPlatform(platform)
-            setLongLivedToken(llt)
             setAccountIdentifier(account)
         }.build()
 

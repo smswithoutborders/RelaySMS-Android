@@ -1,83 +1,34 @@
 package com.example.sw0b_001
 
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
-import com.example.sw0b_001.ui.theme.AppTheme
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.example.sw0b_001.ui.viewModels.MessagesViewModel
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
-import com.example.sw0b_001.ui.views.CreateAccountView
-import com.example.sw0b_001.ui.views.LoginView
-import com.example.sw0b_001.ui.navigation.CreateAccountScreen
-import com.example.sw0b_001.ui.navigation.LoginScreen
-import com.example.sw0b_001.ui.navigation.OTPCodeScreen
-import com.example.sw0b_001.ui.views.AboutView
-import com.example.sw0b_001.ui.views.HomepageView
-import com.example.sw0b_001.ui.views.OtpCodeVerificationView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.biometric.BiometricManager
-import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
-import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
-import androidx.biometric.BiometricPrompt
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.DrawerState
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
-import androidx.preference.PreferenceManager
-import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
-import com.example.sw0b_001.data.models.Platforms
-import com.example.sw0b_001.data.Vaults
-import com.example.sw0b_001.ui.navigation.AboutScreen
-import com.example.sw0b_001.ui.navigation.BridgeViewScreen
-import com.example.sw0b_001.ui.navigation.EmailViewScreen
-import com.example.sw0b_001.ui.navigation.ForgotPasswordScreen
-import com.example.sw0b_001.ui.navigation.GetMeOutScreen
-import com.example.sw0b_001.ui.navigation.MessageViewScreen
-import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
-import com.example.sw0b_001.ui.navigation.TextViewScreen
-import com.example.sw0b_001.ui.views.ForgotPasswordView
-import com.example.sw0b_001.ui.views.GetMeOutOfHere
-import com.example.sw0b_001.ui.views.PasteEncryptedTextView
-import com.example.sw0b_001.ui.views.details.EmailDetailsView
-import com.example.sw0b_001.ui.views.details.MessageDetailsView
-import com.example.sw0b_001.ui.views.details.TextDetailsView
-import io.grpc.Status
-import io.grpc.StatusRuntimeException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import androidx.core.content.edit
 import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
@@ -85,6 +36,9 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.window.layout.WindowInfoTracker
 import androidx.window.layout.WindowLayoutInfo
@@ -102,28 +56,52 @@ import com.afkanerd.smswithoutborders_libsmsmms.ui.requiredReadPhoneStatePermiss
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.SearchViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ThreadsViewModel
 import com.example.sw0b_001.extensions.context.promptBiometrics
+import com.example.sw0b_001.extensions.context.settingsGetIsGetMeOut
 import com.example.sw0b_001.extensions.context.settingsGetLockDownApp
 import com.example.sw0b_001.extensions.context.settingsGetOnboardedCompletely
-import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
-import com.example.sw0b_001.ui.appbars.BottomNavBar
+import com.example.sw0b_001.extensions.context.settingsIsLoggedIn
+import com.example.sw0b_001.ui.navigation.AboutScreen
+import com.example.sw0b_001.ui.navigation.BridgeViewScreen
 import com.example.sw0b_001.ui.navigation.ComposeScreen
+import com.example.sw0b_001.ui.navigation.CreateAccountScreen
+import com.example.sw0b_001.ui.navigation.EmailViewScreen
+import com.example.sw0b_001.ui.navigation.ForgotPasswordScreen
+import com.example.sw0b_001.ui.navigation.GetMeOutScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
-import com.example.sw0b_001.ui.navigation.HomepageScreenRelay
+import com.example.sw0b_001.ui.navigation.LoginScreen
+import com.example.sw0b_001.ui.navigation.MessageViewScreen
+import com.example.sw0b_001.ui.navigation.OTPCodeScreen
 import com.example.sw0b_001.ui.navigation.OnboardingInteractiveScreen
-import com.example.sw0b_001.ui.navigation.OnboardingSkipScreen
+import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.navigation.SettingsScreen
+import com.example.sw0b_001.ui.navigation.TextViewScreen
 import com.example.sw0b_001.ui.navigation.WelcomeScreen
 import com.example.sw0b_001.ui.onboarding.OnboardingInteractive
-import com.example.sw0b_001.ui.views.WelcomeMainView
+import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
+import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.VaultsViewModel
-import com.example.sw0b_001.ui.views.BottomTabsItems
+import com.example.sw0b_001.ui.views.AboutView
+import com.example.sw0b_001.ui.views.CreateAccountView
+import com.example.sw0b_001.ui.views.ForgotPasswordView
+import com.example.sw0b_001.ui.views.GetMeOutOfHere
+import com.example.sw0b_001.ui.views.HomepageView
+import com.example.sw0b_001.ui.views.LoginView
+import com.example.sw0b_001.ui.views.OtpCodeVerificationView
+import com.example.sw0b_001.ui.views.PasteEncryptedTextView
 import com.example.sw0b_001.ui.views.SettingsView
+import com.example.sw0b_001.ui.views.WelcomeMainView
 import com.example.sw0b_001.ui.views.compose.ComposerInterface
+import com.example.sw0b_001.ui.views.details.EmailDetailsView
+import com.example.sw0b_001.ui.views.details.MessageDetailsView
+import com.example.sw0b_001.ui.views.details.TextDetailsView
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
-import kotlinx.serialization.json.Json
-import java.util.concurrent.Executor
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
@@ -240,7 +218,7 @@ class MainActivity : AppCompatActivity() {
         var isLoggedIn by remember {
             mutableStateOf(
                 if(inPreview) true else
-                    Vaults.fetchLongLivedToken(context).isNotBlank()
+                context.settingsIsLoggedIn
             )
         }
 
@@ -459,30 +437,29 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
 
         CoroutineScope(Dispatchers.Default).launch {
-            try {
-                if(Vaults.isGetMeOut(applicationContext)) {
-                    loggedInAlready = true
-                } else {
-                    Vaults.fetchLongLivedToken(applicationContext).let { llt ->
-                        if(llt.isNotEmpty()) {
-                            val vault = Vaults(applicationContext)
-                            try {
-                                vault.refreshStoredTokens(
-                                    applicationContext,
-                                    settingsGetStoreTokensOnDevice)
-                            } catch(e: StatusRuntimeException) {
-                                if(e.status.code == Status.UNAUTHENTICATED.code) {
-                                    loggedInAlready = true
-                                }
-                            } finally {
-                                vault.shutdown()
-                            }
+            if(applicationContext.settingsGetIsGetMeOut) {
+                loggedInAlready = true
+                return@launch
+            }
+            vaultViewModel.validateSession(
+                applicationContext,
+                onFailureCallback = {
+                    val lltIsNotAuthenticated = it.first
+                    val errorMessage = it.second
 
+                    loggedInAlready = lltIsNotAuthenticated
+                    if(!loggedInAlready) {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            Toast.makeText(
+                                applicationContext,
+                                errorMessage,
+                                Toast.LENGTH_LONG
+                            )
                         }
                     }
                 }
-            } catch(e: Exception) {
-                e.printStackTrace()
+            ) {
+
             }
         }
     }

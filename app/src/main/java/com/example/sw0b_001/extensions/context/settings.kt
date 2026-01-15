@@ -5,17 +5,10 @@ import androidx.core.content.edit
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.models.GatewayClients
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 
@@ -29,6 +22,23 @@ object Settings {
     const val SETTINGS_USE_DEVICE_ID = "SETTINGS_USE_DEVICE_ID"
     const val SETTINGS_STORE_TOKENS_ON_DEVICE = "SETTINGS_STORE_TOKENS_ON_DEVICE"
     const val SETTINGS_IS_EMAIL_LOGIN = "SETTINGS_IS_EMAIL_LOGIN"
+    const val SETTINGS_GET_ME_OUT = "SETTINGS_IS_EMAIL_LOGIN"
+
+    const val SETTINGS_LOGGED_IN = "SETTINGS_IS_EMAIL_LOGIN"
+}
+
+val Context.settingsIsLoggedIn get(): Boolean {
+    val sharedPreferences = getSharedPreferences(
+        Settings.FILENAME, Context.MODE_PRIVATE)
+    return sharedPreferences
+        .getBoolean(Settings.SETTINGS_LOGGED_IN, false)
+}
+
+val Context.settingsGetIsGetMeOut get(): Boolean {
+    val sharedPreferences = getSharedPreferences(
+        Settings.FILENAME, Context.MODE_PRIVATE)
+    return sharedPreferences
+        .getBoolean(Settings.SETTINGS_GET_ME_OUT, false)
 }
 
 val Context.settingsGetIsEmailLogin get(): Boolean {
@@ -115,15 +125,36 @@ fun Context.settingsSetNotShowChooseGatewayClient(state: Boolean) {
     }
 }
 
+fun Context.settingsClear() {
+    getSharedPreferences( Settings.FILENAME, Context.MODE_PRIVATE).edit {
+        clear()
+    }
+}
+
+fun Context.settingsSetOnboardedCompletely(state: Boolean) {
+    getSharedPreferences( Settings.FILENAME, Context.MODE_PRIVATE).edit {
+        putBoolean(Settings.SETTINGS_ONBOARDED_COMPLETELY, state)
+        apply()
+    }
+}
+
+fun Context.settingsSetGetMeOut(state: Boolean) {
+    getSharedPreferences( Settings.FILENAME, Context.MODE_PRIVATE).edit {
+        putBoolean(Settings.SETTINGS_GET_ME_OUT, state)
+        apply()
+    }
+}
+
 fun Context.settingsSetIsEmailLogin(state: Boolean) {
     getSharedPreferences( Settings.FILENAME, Context.MODE_PRIVATE).edit {
         putBoolean(Settings.SETTINGS_IS_EMAIL_LOGIN, state)
         apply()
     }
 }
-fun Context.settingsSetOnboardedCompletely(state: Boolean) {
+
+fun Context.settingsIsLoggedIn(state: Boolean) {
     getSharedPreferences( Settings.FILENAME, Context.MODE_PRIVATE).edit {
-        putBoolean(Settings.SETTINGS_ONBOARDED_COMPLETELY, state)
+        putBoolean(Settings.SETTINGS_LOGGED_IN, state)
         apply()
     }
 }

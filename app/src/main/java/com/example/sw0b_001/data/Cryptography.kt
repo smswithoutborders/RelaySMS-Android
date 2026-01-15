@@ -93,12 +93,18 @@ object Cryptography {
     fun calculateSharedSecret(
         context: Context,
         keystoreAlias: String,
-        publicKey: ByteArray
+        publicKey: ByteArray,
+        salt: ByteArray? = null,
+        info: ByteArray? = null,
     ): ByteArray? {
         val (privateKey, nonce) = fetchPrivateKey(context, keystoreAlias)
         if(privateKey == null) return null
         val libSigCurve25519 = SecurityCurve25519(privateKey)
-        return libSigCurve25519.calculateSharedSecret(publicKey)
+        return libSigCurve25519.calculateSharedSecret(
+            publicKey,
+            salt = salt,
+            info = info
+        )
     }
 
     fun calculateSharedSecretWithNonce(
@@ -168,6 +174,32 @@ object Cryptography {
         // Use the secret key at your convenience
         val cipher: Cipher = Cipher.getInstance("AES/GCM/NoPadding")
         cipher.init(Cipher.ENCRYPT_MODE, key)
+        return cipher.doFinal(data)
+    }
+
+
+    @Throws(
+        KeyStoreException::class,
+        UnrecoverableEntryException::class,
+        NoSuchAlgorithmException::class,
+        CertificateException::class,
+        IOException::class,
+        NoSuchPaddingException::class,
+        InvalidKeyException::class,
+        IllegalBlockSizeException::class,
+        BadPaddingException::class
+    )
+    fun decryptWithKeyStore(data: ByteArray, keystoreAlias: String): ByteArray? {
+        // Initialize KeyStore
+        val keyStore: KeyStore = KeyStore.getInstance("AndroidKeyStore")
+        keyStore.load(null)
+        // Retrieve the key with alias androidKeyStoreAlias created before
+        val keyEntry: KeyStore.SecretKeyEntry =
+            keyStore.getEntry(keystoreAlias, null) as KeyStore.SecretKeyEntry
+        val key: SecretKey = keyEntry.secretKey
+        // Use the secret key at your convenience
+        val cipher: Cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        cipher.init(Cipher.DECRYPT_MODE, key)
         return cipher.doFinal(data)
     }
 
