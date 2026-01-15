@@ -27,7 +27,7 @@ class GrpcClientInterceptor(val context: Context) : ClientInterceptor{
                 val nonce = CryptoHelpers.generateRandomBytes(16)
                 val methodName = method?.fullMethodName
                 val llt = Base64.encodeToString(
-                    Vaults(context).fetchLongLivedToken(), Base64.DEFAULT)
+                    Vaults(context).fetchLongLivedToken(), Base64.URL_SAFE)
 
                 val digest = MessageDigest.getInstance("SHA-256")
                 digest.update(methodName?.encodeToByteArray() ?: byteArrayOf())
@@ -41,9 +41,9 @@ class GrpcClientInterceptor(val context: Context) : ClientInterceptor{
                 val bearer = Metadata.Key.of("Authorization", Metadata.ASCII_STRING_MARSHALLER)
 
                 headers?.put(bearer, "Bearer $llt")
-                headers?.put(sigKey, Base64.encodeToString(signature, Base64.DEFAULT))
+                headers?.put(sigKey, Base64.encodeToString(signature, Base64.URL_SAFE))
                 headers?.put(tsKey, timestamp)
-                headers?.put(nonceKey, Base64.encodeToString(nonce, Base64.DEFAULT))
+                headers?.put(nonceKey, Base64.encodeToString(nonce, Base64.URL_SAFE))
                 super.start(responseListener, headers)
             }
         }

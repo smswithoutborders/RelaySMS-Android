@@ -152,7 +152,7 @@ fun Context.settingsSetIsEmailLogin(state: Boolean) {
     }
 }
 
-fun Context.settingsIsLoggedIn(state: Boolean) {
+fun Context.settingsSetIsLoggedIn(state: Boolean) {
     getSharedPreferences( Settings.FILENAME, Context.MODE_PRIVATE).edit {
         putBoolean(Settings.SETTINGS_LOGGED_IN, state)
         apply()

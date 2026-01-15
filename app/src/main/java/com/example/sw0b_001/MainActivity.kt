@@ -60,6 +60,7 @@ import com.example.sw0b_001.extensions.context.settingsGetIsGetMeOut
 import com.example.sw0b_001.extensions.context.settingsGetLockDownApp
 import com.example.sw0b_001.extensions.context.settingsGetOnboardedCompletely
 import com.example.sw0b_001.extensions.context.settingsIsLoggedIn
+import com.example.sw0b_001.extensions.context.settingsSetGetMeOut
 import com.example.sw0b_001.ui.navigation.AboutScreen
 import com.example.sw0b_001.ui.navigation.BridgeViewScreen
 import com.example.sw0b_001.ui.navigation.ComposeScreen
@@ -456,6 +457,8 @@ class MainActivity : AppCompatActivity() {
                                 Toast.LENGTH_LONG
                             )
                         }
+                    } else {
+                        settingsSetGetMeOut(true)
                     }
                 }
             ) {
