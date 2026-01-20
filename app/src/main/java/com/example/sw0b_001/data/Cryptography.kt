@@ -8,13 +8,14 @@ import androidx.datastore.core.IOException
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.CryptoHelpers
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.KeystoreHelpers
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityCurve25519
-import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityRSA
 import com.example.sw0b_001.data.models.SecurityKeys
 import java.security.InvalidAlgorithmParameterException
 import java.security.InvalidKeyException
+import java.security.KeyPairGenerator
 import java.security.KeyStore
 import java.security.NoSuchAlgorithmException
 import java.security.NoSuchProviderException
+import java.security.Signature
 import java.security.UnrecoverableEntryException
 import java.security.cert.CertificateException
 import javax.crypto.BadPaddingException
@@ -25,18 +26,30 @@ import javax.crypto.SecretKey
 
 
 object Cryptography {
-    val HYBRID_KEYS_FILE = "com.afkanerd.relaysms.HYBRID_KEYS_FILE"
-
     private fun secureStorePrivateKey(
         context: Context,
         keystoreAlias: String,
-        encryptedCipherPrivateKey: ByteArray,
-        nonce: ByteArray
+        headerKeystoreAlias: String,
+        nextHeaderKeystoreAlias: String,
+        rootKeyPrivateKey: ByteArray,
+        nonce: ByteArray,
+        headerPrivateKey: ByteArray,
+        nextHeaderPrivateKey: ByteArray,
     ) {
         Datastore.getDatastore(context).securityKeystoreDao().insert(SecurityKeys(
             keystoreAlias = keystoreAlias,
-            privateKey = encryptedCipherPrivateKey,
-            nonce = nonce
+            privateKey = rootKeyPrivateKey,
+            nonce = nonce,
+        ))
+        Datastore.getDatastore(context).securityKeystoreDao().insert(SecurityKeys(
+            keystoreAlias = headerKeystoreAlias,
+            privateKey = headerPrivateKey,
+            nonce = null,
+        ))
+        Datastore.getDatastore(context).securityKeystoreDao().insert(SecurityKeys(
+            keystoreAlias = nextHeaderKeystoreAlias,
+            privateKey = nextHeaderPrivateKey,
+            nonce = null,
         ))
     }
 
@@ -50,82 +63,177 @@ object Cryptography {
     fun generateKey(
         context: Context,
         keystoreAlias: String,
-    ): Pair<ByteArray, ByteArray> {
-        val libSigCurve25519 = SecurityCurve25519()
-        val publicKey = libSigCurve25519.generateKey()
-        val encryptionPublicKey = SecurityRSA.generateKeyPair(keystoreAlias, 4096)
-        val privateKeyCipherText = SecurityRSA.encrypt(encryptionPublicKey,
-            libSigCurve25519.privateKey)
+        headerKeystoreAlias: String,
+        nextHeaderKeystoreAlias: String,
+    ): Triple<Pair<ByteArray, ByteArray>, ByteArray, ByteArray>{
+        val publicKeyCurve = SecurityCurve25519()
+        val headerCurve = SecurityCurve25519()
+        val nextHeaderCurve = SecurityCurve25519()
+
+        val publicKey = publicKeyCurve.generateKey()
+        val headerPublicKey = headerCurve.generateKey()
+        val nextHeaderPublicKey = nextHeaderCurve.generateKey()
+
+//        val encryptionPublicKey = SecurityRSA.generateKeyPair(keystoreAlias, 4096)
+//
+//        val headerEncryptionPublicKey = SecurityRSA.generateKeyPair(
+//            headerKeystoreAlias, 4096)
+//
+//        val nextHeaderEncryptionPublicKey = SecurityRSA.generateKeyPair(
+//            nextHeaderKeystoreAlias, 4096)
+//
+//        val encryptedPrivateKey = SecurityRSA.encrypt(encryptionPublicKey,
+//            publicKeyCurve.privateKey) ?:
+//        throw Exception("Failed to encrypt root key private key")
+//        val encryptedHeaderPrivateKey = SecurityRSA.encrypt(headerEncryptionPublicKey,
+//            headerCurve.privateKey) ?:
+//        throw Exception("Failed to encrypt header key private key")
+//        val encryptedNextHeaderPrivateKey = SecurityRSA.encrypt(nextHeaderEncryptionPublicKey,
+//            nextHeaderCurve.privateKey) ?:
+//        throw Exception("Failed to encrypt next header key private key")
+
+        val encryptedPrivateKey = encryptWithKeyStore(
+            publicKeyCurve.privateKey, keystoreAlias) ?:
+            throw Exception("Failed to encrypt root key private key")
+
+        val encryptedHeaderPrivateKey = encryptWithKeyStore(headerCurve.privateKey,
+            headerKeystoreAlias) ?:
+            throw Exception("Failed to encrypt header key private key")
+
+        val encryptedNextHeaderPrivateKey = encryptWithKeyStore( nextHeaderCurve.privateKey,
+            nextHeaderKeystoreAlias) ?:
+            throw Exception("Failed to encrypt next header key private key")
+
         val nonce = CryptoHelpers.generateRandomBytes(16)
-        privateKeyCipherText?.let {
-            secureStorePrivateKey(
-                context,
-                keystoreAlias,
-                it,
-                nonce
-            )
-        }
-        return Pair(publicKey, nonce)
+        secureStorePrivateKey(
+            context = context,
+            keystoreAlias = keystoreAlias,
+            headerKeystoreAlias = headerKeystoreAlias,
+            nextHeaderKeystoreAlias = nextHeaderKeystoreAlias,
+            rootKeyPrivateKey = encryptedPrivateKey,
+            nonce = nonce,
+            headerPrivateKey = encryptedHeaderPrivateKey,
+            nextHeaderPrivateKey = encryptedNextHeaderPrivateKey
+        )
+        return Triple(
+            Pair(publicKey, nonce),
+            headerPublicKey,
+            nextHeaderPublicKey
+        )
     }
 
     private fun getSecuredStoredPrivateKey(context: Context, keystoreAlias: String) : SecurityKeys {
         return Datastore.getDatastore(context).securityKeystoreDao().fetch(keystoreAlias)
     }
 
-
-    private fun fetchPrivateKey(
+    private fun fetchPrivateKeys(
         context: Context,
-        keystoreAlias: String
-    ) : Pair<ByteArray?, ByteArray?> {
-        val securityKeys = getSecuredStoredPrivateKey(context, keystoreAlias)
-        val keypair = KeystoreHelpers.getKeyPairFromKeystore(keystoreAlias)
-        return Pair(
-            SecurityRSA.decrypt(keypair.private, securityKeys.privateKey),
-            securityKeys.nonce
+        keystoreAlias: String,
+        headerKeystoreAlias: String,
+        nextHeaderKeystoreAlias: String,
+    ): Triple<SecurityKeys, SecurityKeys, SecurityKeys> {
+        val rootKeySecurityKeys = getSecuredStoredPrivateKey(context, keystoreAlias)
+        val headerKeySecurityKeys = getSecuredStoredPrivateKey(context, keystoreAlias)
+        val nextHeaderKeySecurityKeys = getSecuredStoredPrivateKey(context, keystoreAlias)
+
+        rootKeySecurityKeys.privateKey =
+            decryptWithKeyStore(rootKeySecurityKeys.privateKey, keystoreAlias) ?:
+            throw Exception("Failed to decrypt private key")
+
+        headerKeySecurityKeys.privateKey =
+            decryptWithKeyStore( headerKeySecurityKeys.privateKey, headerKeystoreAlias) ?:
+                    throw Exception("Failed to decrypt header private key")
+
+        nextHeaderKeySecurityKeys.privateKey =
+            decryptWithKeyStore( nextHeaderKeySecurityKeys.privateKey,
+                nextHeaderKeystoreAlias) ?:
+                    throw Exception("Failed to decrypt next header private key")
+
+        return Triple(
+            rootKeySecurityKeys,
+            headerKeySecurityKeys,
+            nextHeaderKeySecurityKeys
         )
     }
 
-    fun calculateSharedSecret(publicKey: ByteArray, privateKey: ByteArray): ByteArray {
-        val libSigCurve25519 = SecurityCurve25519(privateKey)
-        return libSigCurve25519.calculateSharedSecret(publicKey)
-    }
-
-    fun calculateSharedSecret(
+    fun calculateSharedSecrets(
         context: Context,
         keystoreAlias: String,
+        headerKeystoreAlias: String,
+        nextHeaderKeystoreAlias: String,
         publicKey: ByteArray,
         salt: ByteArray? = null,
         info: ByteArray? = null,
-    ): ByteArray? {
-        val (privateKey, nonce) = fetchPrivateKey(context, keystoreAlias)
-        if(privateKey == null) return null
-        val libSigCurve25519 = SecurityCurve25519(privateKey)
-        return libSigCurve25519.calculateSharedSecret(
+    ): Triple<ByteArray, ByteArray, ByteArray> {
+        val securityKeys = fetchPrivateKeys(
+            context,
+            keystoreAlias,
+            headerKeystoreAlias,
+            nextHeaderKeystoreAlias,
+        )
+
+        val rootKeyCurve = SecurityCurve25519(securityKeys.first.privateKey)
+        val headerKeyCurve = SecurityCurve25519(securityKeys.second.privateKey)
+        val nextHeaderKeyCurve = SecurityCurve25519(securityKeys.third.privateKey)
+
+        val rootKey = rootKeyCurve.calculateSharedSecret(
             publicKey,
             salt = salt,
             info = info
         )
+
+        val headerKey = headerKeyCurve.calculateSharedSecret(
+            publicKey,
+            salt = salt,
+            info = info
+        )
+
+        val nextHeaderKey = nextHeaderKeyCurve.calculateSharedSecret(
+            publicKey,
+            salt = salt,
+            info = info
+        )
+
+        return Triple(rootKey, headerKey, nextHeaderKey)
     }
 
     fun calculateSharedSecretWithNonce(
         context: Context,
         keystoreAlias: String,
+        headerKeystoreAlias: String,
+        nextHeaderKeystoreAlias: String,
         publicKey: ByteArray,
         authenticationPublicKey: ByteArray,
         serverNonce: ByteArray,
-    ): ByteArray? {
-        val (privateKey, nonce) = fetchPrivateKey(context, keystoreAlias)
-        if(privateKey == null || nonce == null) return null
+        headerPublicKey: ByteArray,
+        nextHeaderPublicKey: ByteArray,
+    ): Triple<ByteArray, ByteArray, ByteArray> {
+        val securityKeys = fetchPrivateKeys(
+            context,
+            keystoreAlias,
+            headerKeystoreAlias,
+            nextHeaderKeystoreAlias,
+        )
+
+        val rootKeyCurve = SecurityCurve25519(securityKeys.first.privateKey)
+        val headerKeyCurve = SecurityCurve25519(securityKeys.second.privateKey)
+        val nextHeaderKeyCurve = SecurityCurve25519(securityKeys.third.privateKey)
 
         val salt = "RelaySMS v1".encodeToByteArray()
         val info  = "RelaySMS C2S DR v1".encodeToByteArray()
-        return SecurityCurve25519(privateKey).agreeWithAuthAndNonce(
+
+        return rootKeyCurve.agreeWithAuthAndNonce(
             authenticationPublicKey = authenticationPublicKey,
             publicKey = publicKey,
             salt = salt,
-            nonce1 = nonce,
+            nonce1 = securityKeys.first.nonce!!,
             nonce2 = serverNonce,
-            info = info
+            info = info,
+            authenticationPrivateKey = null,
+            headerPrivateKey = headerKeyCurve.privateKey,
+            nextHeaderPrivateKey = nextHeaderKeyCurve.privateKey,
+            headerPublicKey = headerPublicKey,
+            nextHeaderPublicKey = nextHeaderPublicKey
         )
     }
 
@@ -201,6 +309,39 @@ object Cryptography {
         val cipher: Cipher = Cipher.getInstance("AES/GCM/NoPadding")
         cipher.init(Cipher.DECRYPT_MODE, key)
         return cipher.doFinal(data)
+    }
+
+    fun generateSigningKey(keystoreAlias: String): ByteArray {
+        val kpg: KeyPairGenerator = KeyPairGenerator.getInstance(
+            KeyProperties.KEY_ALGORITHM_EC,
+            "AndroidKeyStore"
+        )
+        val parameterSpec: KeyGenParameterSpec = KeyGenParameterSpec.Builder(
+            keystoreAlias,
+            KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY
+        ).run {
+            setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
+            build()
+        }
+
+        kpg.initialize(parameterSpec)
+        return kpg.generateKeyPair().public.encoded
+    }
+
+    fun signWithIdentity(keystoreAlias: String, data: String): ByteArray {
+        val ks: KeyStore = KeyStore.getInstance("AndroidKeyStore").apply {
+            load(null)
+        }
+        val entry: KeyStore.Entry = ks.getEntry(keystoreAlias, null)
+        if (entry !is KeyStore.PrivateKeyEntry) {
+            throw Exception("No instance of keystore")
+        }
+
+        return Signature.getInstance("SHA256withECDSA").run {
+            initSign(entry.privateKey)
+            update(data.encodeToByteArray())
+            sign()
+        }
     }
 
 }

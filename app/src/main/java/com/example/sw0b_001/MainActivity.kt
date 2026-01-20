@@ -308,7 +308,10 @@ class MainActivity : AppCompatActivity() {
                 )
             }
             composable<GetMeOutScreen> {
-                GetMeOutOfHere(navController)
+                GetMeOutOfHere(
+                    navController,
+                    vaultViewModel
+                )
             }
             composable<HomepageScreen> {
                 HomepageView(
@@ -426,7 +429,8 @@ class MainActivity : AppCompatActivity() {
             composable<SettingsScreen> {
                 SettingsView(
                     navController = navController,
-                    activity = this@MainActivity
+                    activity = this@MainActivity,
+                    vaultsViewModel = vaultViewModel
                 )
             }
         }

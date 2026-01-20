@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,28 +43,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.sw0b_001.data.models.Platforms
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
-import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.modals.PlatformOptionsModal
-import com.example.sw0b_001.ui.theme.AppTheme
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.style.TextAlign
-import androidx.navigation.compose.rememberNavController
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
-import com.example.sw0b_001.data.Vaults
+import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.AvailablePlatforms
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
+import com.example.sw0b_001.extensions.context.settingsIsLoggedIn
+import com.example.sw0b_001.ui.modals.PlatformOptionsModal
+import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import java.util.Locale
 
 
@@ -98,9 +94,7 @@ fun AvailablePlatformsView(
     }
 
     var isLoggedIn by remember {
-        mutableStateOf(
-            inPreviewMode || Vaults.fetchLongLivedToken(context).isNotBlank()
-        )
+        mutableStateOf( inPreviewMode || context.settingsIsLoggedIn )
     }
 
     Column(

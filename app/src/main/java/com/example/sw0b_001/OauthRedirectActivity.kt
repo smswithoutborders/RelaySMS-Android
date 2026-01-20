@@ -3,22 +3,19 @@ package com.example.sw0b_001
 import android.content.Intent
 import android.os.Bundle
 import android.util.Base64
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
+import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.data.Publishers
 import com.example.sw0b_001.data.Vaults
-import com.example.sw0b_001.data.Helpers
+import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
 import java.net.URLDecoder
-import android.net.Uri
-import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
 
 
 class OauthRedirectActivity : AppCompatActivity() {
@@ -50,9 +47,8 @@ class OauthRedirectActivity : AppCompatActivity() {
         scope.launch {
             val publishers = Publishers(applicationContext)
             try {
-                val llt = Vaults.fetchLongLivedToken(applicationContext)
                 val codeVerifier = Publishers.fetchOauthRequestVerifier(applicationContext)
-                val publisherPublicKey = Publishers.fetchPublisherPublicKey(context = applicationContext)
+                val publisherPublicKey = Vaults.getIdentitySigningKey()
                 val requestIdentifier = Base64.encodeToString(publisherPublicKey, Base64.NO_WRAP)
 
                 val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
@@ -60,7 +56,6 @@ class OauthRedirectActivity : AppCompatActivity() {
 
                 if (storeTokensOnDevice) {
                     publishers.sendOAuthAuthorizationCode(
-                        llt,
                         platform,
                         code,
                         codeVerifier,
@@ -70,7 +65,6 @@ class OauthRedirectActivity : AppCompatActivity() {
                     )
                 } else {
                     publishers.sendOAuthAuthorizationCode(
-                        llt,
                         platform,
                         code,
                         codeVerifier,

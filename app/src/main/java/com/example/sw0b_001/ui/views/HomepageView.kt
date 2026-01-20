@@ -1,17 +1,13 @@
 package com.example.sw0b_001.ui.views
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Message
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BubbleChart
 import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.PersonAdd
-import androidx.compose.material3.DrawerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -21,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -36,30 +31,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
-import com.example.sw0b_001.ui.viewModels.MessagesViewModel
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
-import com.example.sw0b_001.data.Vaults
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.models.EncryptedContent
+import com.example.sw0b_001.extensions.context.settingsIsLoggedIn
 import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.appbars.GatewayClientsAppBar
 import com.example.sw0b_001.ui.appbars.RecentAppBar
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
 import com.example.sw0b_001.ui.modals.AddGatewayClientModal
+import com.example.sw0b_001.ui.modals.GetStartedModal
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.theme.AppTheme
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.paging.compose.collectAsLazyPagingItems
-import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
-import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
-import com.example.sw0b_001.data.models.EncryptedContent
-import com.example.sw0b_001.ui.features.AppFeatures
-import com.example.sw0b_001.ui.features.FeatureInfo
-import com.example.sw0b_001.ui.features.FeatureManager
-import com.example.sw0b_001.ui.features.NewFeatureModal
-import com.example.sw0b_001.ui.modals.GetStartedModal
-import kotlinx.coroutines.launch
+import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
+import com.example.sw0b_001.ui.viewModels.MessagesViewModel
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 
 
 enum class BottomTabsItems {
@@ -88,7 +75,7 @@ fun HomepageView(
     var isLoggedIn by remember {
         mutableStateOf(
             if(inspectionMode) isLoggedIn else
-            Vaults.fetchLongLivedToken(context).isNotBlank()
+            context.settingsIsLoggedIn
         )
     }
 

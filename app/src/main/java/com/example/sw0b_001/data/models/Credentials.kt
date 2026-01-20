@@ -13,5 +13,4 @@ data class Credentials (
     var keystoreAlias: String,
     var llt: ByteArray,
     var deviceID: ByteArray,
-    var sharedSecret: ByteArray,
 )

@@ -3,6 +3,7 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/lib_image_android" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib_signal_double_ratchet_java" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/lib_smsmms_android" vcs="Git" />
   </component>
 </project>

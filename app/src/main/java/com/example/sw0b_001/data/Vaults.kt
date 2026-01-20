@@ -5,6 +5,7 @@ import android.util.Base64
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.KeystoreHelpers
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.Credentials
+import com.example.sw0b_001.data.models.SecurityKeys
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.extensions.context.getStaticKeys
 import com.example.sw0b_001.ui.views.OTPCodeVerificationType
@@ -18,8 +19,9 @@ import java.security.MessageDigest
 
 class Vaults(val context: Context) {
     private val CLIENT_ID_KEY_KEYSTORE_ALIAS = "CLIENT_ID_KEY_KEYSTORE_ALIAS"
-    private val GRPC_SHARED_SECRET_KEYSTORE_ALIAS = "GRPC_SHARED_SECRET_KEYSTORE_ALIAS"
     private val CLIENT_RATCHET_KEY_KEYSTORE_ALIAS = "CLIENT_RATCHET_KEY_KEYSTORE_ALIAS"
+    private val CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS = "CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS"
+    private val CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS = "CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS"
 
     private var channel: ManagedChannel = ManagedChannelBuilder
         .forAddress(context.getString(R.string.vault_grpc_url),
@@ -41,6 +43,11 @@ class Vaults(val context: Context) {
         } catch (e: CloneNotSupportedException) {
             throw DigestException("couldn't make digest of partial content");
         }
+    }
+
+    fun fetchDeviceID(): ByteArray {
+        return Datastore.getDatastore(context).credentialsDao()
+            .fetch(LLT_KEYSTORE_ALIAS).deviceID
     }
 
     fun fetchLongLivedToken() : ByteArray? {
@@ -116,60 +123,53 @@ class Vaults(val context: Context) {
     private fun storeCredentials(
         llt: ByteArray,
         deviceId: ByteArray,
-        sharedSecret: ByteArray
     ) {
         Datastore.getDatastore(context).credentialsDao().insert(Credentials(
             llt = llt,
             deviceID = deviceId,
             keystoreAlias = LLT_KEYSTORE_ALIAS,
-            sharedSecret = sharedSecret
         ))
     }
 
-    private fun storeEncryptedSharedSecret( sharedSecret: ByteArray ) {
+    private fun storeEncryptedSharedSecret(
+        rootKey: ByteArray,
+        headerKey: ByteArray,
+        nextHeaderKey: ByteArray
+    ) {
         val db = Datastore.getDatastore(context).securityKeystoreDao()
-        val secretKeys = db.fetch(CLIENT_RATCHET_KEY_KEYSTORE_ALIAS)
-        secretKeys.sharedSecret = sharedSecret
-        db.update(secretKeys)
+        val rootKeys: SecurityKeys = db.fetch(CLIENT_RATCHET_KEY_KEYSTORE_ALIAS)
+        val headerKeys: SecurityKeys = db
+            .fetch(CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS)
+        val nextHeaderKeys: SecurityKeys = db
+            .fetch(CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS)
+
+        rootKeys.sharedSecret = rootKey
+        headerKeys.sharedSecret = headerKey
+        nextHeaderKeys.sharedSecret = nextHeaderKey
+        db.update(rootKeys)
+        db.update(headerKeys)
+        db.update(nextHeaderKeys)
     }
 
     private fun securelyStoreCredentials(llt: ByteArray ) {
-        val encryptedSharedSecret = Cryptography.encryptWithKeyStore(
+        val encryptedLlt = Cryptography.encryptWithKeyStore(
             llt,
             LLT_KEYSTORE_ALIAS
-        ) ?: throw Exception("Failed to encrypt shared secret")
+        ) ?: throw Exception("Failed to encrypt LLT")
 
         val message = "RelaySMS DID v1".encodeToByteArray()
         val ho = MessageDigest.getInstance("SHA-256")
+
         val clientPublicKey = KeystoreHelpers
-            .getKeyPairFromKeystore(CLIENT_ID_KEY_KEYSTORE_ALIAS)
+            .getKeyPairFromKeystore(CLIENT_SIGNING_KEY_KEYSTORE_ALIAS)
             .public
             .encoded
 
         val deviceId = ho.digest(message + clientPublicKey).copyOfRange(0, 16)
 
-        val serverAuthenticationKey = context.getStaticKeys(255) ?:
-        throw Exception("Failed to find static keys")
-
-        val salt = "RelaySMS_GRPC_SIGNING_SALT".encodeToByteArray()
-        val info  = "RelaySMS C2S gRPC v2".encodeToByteArray()
-        val sharedSecret = Cryptography.calculateSharedSecret(
-            context,
-            CLIENT_ID_KEY_KEYSTORE_ALIAS,
-            serverAuthenticationKey,
-            salt = salt,
-            info = info
-        ) ?: throw Exception("Failed to calculate shared secret")
-
-        val encryptedGrpcSharedSecret = Cryptography.encryptWithKeyStore(
-            sharedSecret,
-            GRPC_SHARED_SECRET_KEYSTORE_ALIAS
-        ) ?: throw Exception("Failed to encrypt shared secret")
-
         storeCredentials(
-            encryptedSharedSecret,
+            encryptedLlt,
             deviceId,
-            encryptedGrpcSharedSecret
         )
 
     }
@@ -177,28 +177,53 @@ class Vaults(val context: Context) {
     private fun completeVaultHandshake(
         serverRatchetPublicKey: ByteArray,
         serverNonce: ByteArray,
+        serverHeaderPublicKey: ByteArray,
+        serverNextHeaderPublicKey: ByteArray
     ) {
         val serverAuthenticationKey = context.getStaticKeys(255) ?:
         throw Exception("Failed to find static keys")
 
-        val sharedSecret = Cryptography.calculateSharedSecretWithNonce(
-            context,
-            CLIENT_RATCHET_KEY_KEYSTORE_ALIAS,
-            serverRatchetPublicKey,
-            serverAuthenticationKey,
-            serverNonce
-        ) ?: throw Exception("Failed to generate shared secret")
+        val (rootKey, headerKey, nextHeaderKey) = Cryptography.calculateSharedSecretWithNonce(
+            context = context,
+            keystoreAlias = CLIENT_RATCHET_KEY_KEYSTORE_ALIAS,
+            headerKeystoreAlias = CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS,
+            nextHeaderKeystoreAlias = CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS,
+            publicKey = serverRatchetPublicKey,
+            authenticationPublicKey = serverAuthenticationKey,
+            serverNonce = serverNonce,
+            headerPublicKey = serverHeaderPublicKey,
+            nextHeaderPublicKey = serverNextHeaderPublicKey
+        )
 
         KeystoreHelpers.removeFromKeystore(context, CLIENT_RATCHET_KEY_KEYSTORE_ALIAS)
+        KeystoreHelpers.removeFromKeystore(context, CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS)
+        KeystoreHelpers.removeFromKeystore(context, CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS)
+
         Datastore.getDatastore(context).securityKeystoreDao()
             .remove(CLIENT_RATCHET_KEY_KEYSTORE_ALIAS)
+        Datastore.getDatastore(context).securityKeystoreDao()
+            .remove(CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS)
+        Datastore.getDatastore(context).securityKeystoreDao()
+            .remove(CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS)
 
-        val encryptedSharedSecret = Cryptography.encryptWithKeyStore(
-            sharedSecret,
+        val encryptedRootKey = Cryptography.encryptWithKeyStore(
+            rootKey,
             CLIENT_RATCHET_KEY_KEYSTORE_ALIAS
-        ) ?: throw Exception("Failed to encrypt shared secret")
+        ) ?: throw Exception("Failed to encrypt root key")
+        val encryptedHeaderKey = Cryptography.encryptWithKeyStore(
+            headerKey,
+            CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS
+        ) ?: throw Exception("Failed to encrypt header key")
+        val encryptedNextHeaderKey = Cryptography.encryptWithKeyStore(
+            nextHeaderKey,
+            CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS
+        ) ?: throw Exception("Failed to encrypt next header key")
 
-        storeEncryptedSharedSecret(encryptedSharedSecret)
+        storeEncryptedSharedSecret(
+            encryptedRootKey,
+            encryptedHeaderKey,
+            encryptedNextHeaderKey
+        )
     }
 
     fun submitOTPCode(
@@ -208,6 +233,8 @@ class Vaults(val context: Context) {
         type: OTPCodeVerificationType,
     ) {
         var serverRatchetPublicKey: ByteArray? = null
+        var serverHeaderPublicKey: ByteArray? = null
+        var serverNextHeaderPublicKey: ByteArray? = null
         var serverNonce: ByteArray? = null
         var llt: ByteArray? = null
 
@@ -221,6 +248,8 @@ class Vaults(val context: Context) {
 
                 val response = entityStub.createEntity(createEntityRequest)
                 serverRatchetPublicKey = response.serverRatchetPubKey.toByteArray()
+                serverHeaderPublicKey = response.serverHeaderPubKey.toByteArray()
+                serverNextHeaderPublicKey = response.serverNextHeaderPubKey.toByteArray()
                 serverNonce = response.serverNonce.toByteArray()
                 llt = response.longLivedToken.toByteArray()
             }
@@ -233,6 +262,8 @@ class Vaults(val context: Context) {
 
                 val response = entityStub.authenticateEntity(authenticateEntityRequest)
                 serverRatchetPublicKey = response.serverRatchetPubKey.toByteArray()
+                serverHeaderPublicKey = response.serverHeaderPubKey.toByteArray()
+                serverNextHeaderPublicKey = response.serverNextHeaderPubKey.toByteArray()
                 serverNonce = response.serverNonce.toByteArray()
                 llt = response.longLivedToken.toByteArray()
             }
@@ -245,6 +276,8 @@ class Vaults(val context: Context) {
 
                 val response = entityStub.resetPassword(resetPasswordRequest)
                 serverRatchetPublicKey = response.serverRatchetPubKey.toByteArray()
+                serverHeaderPublicKey = response.serverHeaderPubKey.toByteArray()
+                serverNextHeaderPublicKey = response.serverNextHeaderPubKey.toByteArray()
                 serverNonce = response.serverNonce.toByteArray()
                 llt = response.longLivedToken.toByteArray()
             }
@@ -252,14 +285,14 @@ class Vaults(val context: Context) {
 
         try {
             completeVaultHandshake(
-                serverRatchetPublicKey!!,
-                serverNonce!!
+                serverRatchetPublicKey = serverRatchetPublicKey!!,
+                serverNonce = serverNonce!!,
+                serverHeaderPublicKey = serverHeaderPublicKey,
+                serverNextHeaderPublicKey = serverNextHeaderPublicKey
             )
 
             securelyStoreCredentials(llt)
-
             Publishers.removeEncryptedStates(context)
-            Datastore.getDatastore(context).ratchetStatesDAO().deleteAll()
         } catch(e: Exception) {
             e.printStackTrace()
         }
@@ -274,27 +307,29 @@ class Vaults(val context: Context) {
         recaptchaToken: String,
     ) : Vault.CreateEntityResponse {
 
-        val (clientIdKey, _) = Cryptography.generateKey(
-            context,
-            CLIENT_ID_KEY_KEYSTORE_ALIAS
-        )
-        val (clientRatchetKey, nonce) = Cryptography.generateKey(
-            context,
-            CLIENT_RATCHET_KEY_KEYSTORE_ALIAS
-        )
+        val clientIdKey = Cryptography.generateSigningKey(CLIENT_ID_KEY_KEYSTORE_ALIAS)
+        val (clientPublicKeyAndNonce, headerPublicKey, nextHeaderPublicKey) =
+            Cryptography.generateKey(
+                context,
+                CLIENT_RATCHET_KEY_KEYSTORE_ALIAS,
+                CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS,
+                CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS
+            )
 
-        val createEntityRequest1 = Vault.CreateEntityRequest.newBuilder().apply {
+        val createEntityRequest = Vault.CreateEntityRequest.newBuilder().apply {
             setCountryCode(countryCode)
             setPhoneNumber(phoneNumber)
             setPassword(password)
             setClientIdPubKey(clientIdKey.toByteString())
-            setClientRatchetPubKey(clientRatchetKey.toByteString())
-            setClientNonce(nonce.toByteString())
+            setClientRatchetPubKey(clientPublicKeyAndNonce.first.toByteString())
+            setClientNonce(clientPublicKeyAndNonce.second.toByteString())
+            setClientHeaderPubKey(headerPublicKey.toByteString())
+            setClientNextHeaderPubKey(nextHeaderPublicKey.toByteString())
             setCaptchaToken(recaptchaToken)
             setEmailAddress(email)
         }.build()
 
-        return entityStub.createEntity(createEntityRequest1)
+        return entityStub.createEntity(createEntityRequest)
     }
 
     fun authenticateEntity(
@@ -305,21 +340,23 @@ class Vaults(val context: Context) {
         recaptchaToken: String,
     ) : Vault.AuthenticateEntityResponse {
 
-        val (clientIdKey, _) = Cryptography.generateKey(
-            context,
-            CLIENT_ID_KEY_KEYSTORE_ALIAS
-        )
-        val (clientRatchetKey, nonce) = Cryptography.generateKey(
-            context,
-            CLIENT_RATCHET_KEY_KEYSTORE_ALIAS
-        )
+        val clientIdKey = Cryptography.generateSigningKey(CLIENT_ID_KEY_KEYSTORE_ALIAS)
+        val (clientPublicKeyAndNonce, headerPublicKey, nextHeaderPublicKey) =
+            Cryptography.generateKey(
+                context,
+                CLIENT_RATCHET_KEY_KEYSTORE_ALIAS,
+                CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS,
+                CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS
+            )
 
         val authenticateEntityRequest = Vault.AuthenticateEntityRequest.newBuilder().apply {
             setPhoneNumber(phoneNumber)
             setPassword(password)
             setClientIdPubKey(clientIdKey.toByteString())
-            setClientRatchetPubKey(clientRatchetKey.toByteString())
-            setClientNonce(nonce.toByteString())
+            setClientRatchetPubKey(clientPublicKeyAndNonce.first.toByteString())
+            setClientNonce(clientPublicKeyAndNonce.second.toByteString())
+            setClientHeaderPubKey(headerPublicKey.toByteString())
+            setClientNextHeaderPubKey(nextHeaderPublicKey.toByteString())
             setCaptchaToken(recaptchaToken)
             setEmailAddress(email)
         }.build()
@@ -335,21 +372,23 @@ class Vaults(val context: Context) {
         recaptchaToken: String,
     ) : Vault.ResetPasswordResponse {
 
-        val (clientIdKey, _) = Cryptography.generateKey(
-            context,
-            CLIENT_ID_KEY_KEYSTORE_ALIAS
-        )
-        val (clientRatchetKey, nonce) = Cryptography.generateKey(
-            context,
-            CLIENT_RATCHET_KEY_KEYSTORE_ALIAS
-        )
+        val clientIdKey = Cryptography.generateSigningKey(CLIENT_ID_KEY_KEYSTORE_ALIAS)
+        val (clientPublicKeyAndNonce, headerPublicKey, nextHeaderPublicKey) =
+            Cryptography.generateKey(
+                context,
+                CLIENT_RATCHET_KEY_KEYSTORE_ALIAS,
+                CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS,
+                CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS
+            )
 
         val resetPasswordRequest = Vault.ResetPasswordRequest.newBuilder().apply {
             setPhoneNumber(phoneNumber)
             setNewPassword(newPassword)
             setClientIdPubKey(clientIdKey.toByteString())
-            setClientRatchetPubKey(clientRatchetKey.toByteString())
-            setClientNonce(nonce.toByteString())
+            setClientRatchetPubKey(clientPublicKeyAndNonce.first.toByteString())
+            setClientNonce(clientPublicKeyAndNonce.second.toByteString())
+            setClientHeaderPubKey(headerPublicKey.toByteString())
+            setClientNextHeaderPubKey(nextHeaderPublicKey.toByteString())
             setCaptchaToken(recaptchaToken)
             setEmailAddress(email)
         }.build()
@@ -372,8 +411,33 @@ class Vaults(val context: Context) {
         return entityStub.deleteEntity(deleteEntityRequest)
     }
 
+    fun getRatchetKeys(): Triple<ByteArray, ByteArray, ByteArray> {
+        val rootKey = Datastore.getDatastore(context).securityKeystoreDao()
+            .fetch(CLIENT_RATCHET_KEY_KEYSTORE_ALIAS)
+        val headerKey = Datastore.getDatastore(context).securityKeystoreDao()
+            .fetch(CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS)
+        val nextHeaderKey = Datastore.getDatastore(context).securityKeystoreDao()
+            .fetch(CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS)
+
+        return Triple(
+            rootKey.sharedSecret!!,
+            headerKey.sharedSecret!!,
+            nextHeaderKey.sharedSecret!!
+        )
+    }
+
     companion object {
         const val LLT_KEYSTORE_ALIAS = "LLT_KEYSTORE_ALIAS"
+
+        const val CLIENT_SIGNING_KEY_KEYSTORE_ALIAS = "CLIENT_SIGNING_KEY_KEYSTORE_ALIAS"
+
+        fun getIdentitySigningKey(): ByteArray {
+            return KeystoreHelpers
+                .getKeyPairFromKeystore(CLIENT_SIGNING_KEY_KEYSTORE_ALIAS)
+                .public
+                .encoded
+        }
+
         fun decomposeRefreshToken(data: String): Pair<String, String> {
             /*
             RelaySMS Delivery: Successfully sent message to twitter at 2025-05-27 22:10:02 (UTC).

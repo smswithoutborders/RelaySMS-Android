@@ -3,20 +3,14 @@ package com.example.sw0b_001
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.sw0b_001.data.Publishers
 import io.grpc.testing.GrpcCleanupRule
-import org.junit.After
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import android.util.Base64
 import android.util.Log
 import com.example.sw0b_001.data.Datastore
-import com.example.sw0b_001.data.PayloadEncryptionComposeDecomposeInit
-import com.example.sw0b_001.data.models.AvailablePlatforms
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
-import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.data.Vaults
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaType
@@ -25,7 +19,6 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONObject
-import org.junit.Assert.assertTrue
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.TimeUnit
 

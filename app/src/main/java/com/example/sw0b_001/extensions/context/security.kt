@@ -16,7 +16,6 @@ import com.example.sw0b_001.data.models.Bridges.StaticKeys
 import kotlinx.serialization.json.Json
 import okio.IOException
 import java.util.concurrent.Executor
-import kotlin.io.encoding.Base64
 
 fun Context.isBiometricLockAvailable(): Int {
     val biometricManager = BiometricManager.from(this)
@@ -120,8 +119,7 @@ fun Context.getStaticKeys() : List<StaticKeys>? {
         inputStream.close()
 
         val json = String(buffer, Charsets.UTF_8)
-        return if(kid == null) Json.decodeFromString<List<StaticKeys>>(json)
-        else listOf(Json.decodeFromString<List<StaticKeys>>(json)[kid])
+        return Json.decodeFromString<List<StaticKeys>>(json)
     } catch(e: IOException) {
         e.printStackTrace()
         return null

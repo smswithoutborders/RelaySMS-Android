@@ -21,7 +21,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.data.ImageTransmissionProtocol
 import com.afkanerd.smswithoutborders_libsmsmms.data.data.models.SmsManager
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDefaultSimSubscription
@@ -30,36 +29,29 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewModel
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Composers
-import com.example.sw0b_001.data.PayloadEncryptionComposeDecomposeInit
 import com.example.sw0b_001.data.Datastore
-import com.example.sw0b_001.data.GatewayClientsCommunications
-import com.example.sw0b_001.data.Helpers.toBytes
 import com.example.sw0b_001.data.Network
 import com.example.sw0b_001.data.Publishers
+import com.example.sw0b_001.data.PublishersImpl
 import com.example.sw0b_001.data.SMSHandler
+import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.data.models.AvailablePlatforms
 import com.example.sw0b_001.data.models.Bridges
-import com.example.sw0b_001.data.models.Bridges.getKeypairForTransmission
-import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.extensions.context.settingsGetDefaultGatewayClients
 import com.example.sw0b_001.ui.views.BottomTabsItems
 import com.example.sw0b_001.ui.views.compose.GatewayClientRequest
-import com.example.sw0b_001.ui.views.compose.ReliabilityTestRequestPayload
-import com.example.sw0b_001.ui.views.compose.ReliabilityTestResponsePayload
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
-import java.net.URL
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.StandardCharsets
@@ -119,7 +111,6 @@ class PlatformsViewModel : ViewModel() {
             try {
                 if(isBridge) {
                     val random = (0..255).random()
-                    if(!isLoggedIn) getKeypairForTransmission(context, random)
                     val content = Bridges.encryptContent(
                         context,
                         imageByteArray + text,
@@ -133,7 +124,10 @@ class PlatformsViewModel : ViewModel() {
                     payload = if(isLoggedIn) { Bridges.payloadOnly(content) }
                     else {
                         Bridges.authRequestAndPayload(
-                            context, content, random.toUByte())
+                            content = content,
+                            serverKID = random.toUByte(),
+                            clientPublicKey = TODO()
+                        )
                     }
                 }
                 else {
@@ -145,8 +139,8 @@ class PlatformsViewModel : ViewModel() {
                                 account.name
                             ))
 
-                    val ad = Publishers.fetchPublisherPublicKey(context)
-                    payload = PayloadEncryptionComposeDecomposeInit.compose(
+                    val ad = TODO()
+                    payload = PublishersImpl.compose(
                         context = context,
                         content = imageByteArray + text,
                         ad = ad!!,
@@ -202,9 +196,7 @@ class PlatformsViewModel : ViewModel() {
                     val languageCode = Locale.getDefault().language.take(2).lowercase()
                     val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
 
-                    val ad = Publishers.fetchPublisherPublicKey(context)
-                        ?: return@withContext onFailure(
-                            context.getString(R.string.could_not_fetch_publisher_key))
+                    val ad = TODO()
 
                     val platform = Datastore.getDatastore(context).availablePlatformsDao()
                         .fetch(account.name!!)
@@ -214,7 +206,7 @@ class PlatformsViewModel : ViewModel() {
                                 account.name
                             ))
 
-                    val payload = PayloadEncryptionComposeDecomposeInit.compose(
+                    val payload = PublishersImpl.compose(
                         context = context,
                         content = contentFormatV2Bytes,
                         ad = ad,
@@ -303,7 +295,7 @@ class PlatformsViewModel : ViewModel() {
                             return@withContext
                         }
 
-                        val ad = Publishers.fetchPublisherPublicKey(context)
+                        val ad = TODO()
                         if (ad == null) {
                             onFailureCallback(context.getString(R.string.could_not_fetch_publisher_key_cannot_encrypt_message))
                             return@withContext
@@ -335,11 +327,11 @@ class PlatformsViewModel : ViewModel() {
                         val languageCode = Locale.getDefault().language.take(2).lowercase(Locale.ROOT)
                         val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
 
-                        val payload = PayloadEncryptionComposeDecomposeInit.compose(
+                        val payload = PublishersImpl.compose(
                             context = context,
                             content = contentFormatBytes,
                             ad = ad,
-                            platform = platform,
+                            platform = platform!!,
                             account = account,
                             languageCode = validLanguageCode,
                             smsTransmission = smsTransmission,
@@ -356,64 +348,6 @@ class PlatformsViewModel : ViewModel() {
                     }
                 }
             }
-        }
-    }
-
-    fun sendPublishingForTest(
-        context: Context,
-        startTime: String,
-        platform: AvailablePlatforms,
-        subscriptionId: Long,
-        onFailure: (String?) -> Unit,
-        onSuccess: () -> Unit,
-        smsTransmission: Boolean = true
-    ) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                try {
-                    val gatewayClient = context.settingsGetDefaultGatewayClients
-                        ?: return@withContext onFailure("No Gateway Client set for testing.")
-                    val url = context.getString(R.string.test_url,
-                        gatewayClient.msisdn)
-                    val requestPayload = Json.encodeToString(ReliabilityTestRequestPayload(startTime))
-                    val response = Network.jsonRequestPost(url, requestPayload)
-                    val responsePayload = Json.decodeFromString<ReliabilityTestResponsePayload>(response.result.get())
-                    val testId = responsePayload.test_id.toString()
-                    val AD = Publishers.fetchPublisherPublicKey(context)
-                        ?: return@withContext onFailure("Could not fetch publisher key.")
-
-                    val contentFormatV2Bytes = createTestByteBuffer(testId).array()
-
-                    val languageCode = Locale.getDefault().language.take(2).lowercase()
-                    val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
-
-                    val v2PayloadBytes = PayloadEncryptionComposeDecomposeInit.compose(
-                        context = context,
-                        content = contentFormatV2Bytes,
-                        ad = AD,
-                        platform = platform,
-                        account = null,
-                        languageCode = validLanguageCode,
-                        smsTransmission = true,
-                        subscriptionId = subscriptionId
-                    )
-
-                    if (smsTransmission) {
-                        val base64Payload = Base64.encodeToString(v2PayloadBytes, Base64.NO_WRAP)
-                        SMSHandler.transferToDefaultSMSApp(
-                            context,
-                            gatewayClient.msisdn,
-                            base64Payload
-                        )
-                    }
-                    onSuccess()
-
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    onFailure(e.message)
-                }
-            }
-
         }
     }
 
@@ -453,8 +387,7 @@ class PlatformsViewModel : ViewModel() {
         viewModelScope.launch {
             withContext(Dispatchers.IO){
                 try {
-                    val AD = Publishers.fetchPublisherPublicKey(context)
-                        ?: return@withContext onFailure("Could not fetch publisher key.")
+                    val AD = TODO()
 
                     val contentFormatV2Bytes = Composers.TextComposeHandler.createTextByteBuffer(
                         from = account.account!!,
@@ -469,7 +402,7 @@ class PlatformsViewModel : ViewModel() {
                     val languageCode = Locale.getDefault().language.take(2).lowercase()
                     val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
 
-                    val v2PayloadBytes = PayloadEncryptionComposeDecomposeInit.compose(
+                    val v2PayloadBytes = PublishersImpl.compose(
                         context = context,
                         content = contentFormatV2Bytes,
                         ad = AD,
@@ -575,8 +508,9 @@ class PlatformsViewModel : ViewModel() {
                 when(platform.protocol_type) {
                     Platforms.ProtocolTypes.oauth2.name -> {
                         val publishers = Publishers(context)
-                        val publicKeyBytes = Publishers.fetchPublisherPublicKey(context)
-                        val requestIdentifier = Base64.encodeToString(publicKeyBytes, Base64.NO_WRAP)
+                        val publicKeyBytes = Vaults.getIdentitySigningKey()
+                        val requestIdentifier = Base64.encodeToString(
+                            publicKeyBytes, Base64.NO_WRAP)
                         try {
                             val response = publishers.getOAuthURL(
                                 availablePlatforms = platform,

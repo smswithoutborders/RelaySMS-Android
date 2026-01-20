@@ -14,6 +14,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,17 +26,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.VaultsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
 fun GetMeOutOfHere(
-    navController: NavController
+    navController: NavController,
+    vaultsViewModel: VaultsViewModel
 ) {
     val activity = LocalActivity.current
     val context = LocalContext.current
@@ -87,8 +89,7 @@ fun GetMeOutOfHere(
                 .padding(bottom = 32.dp),
             onClick={
                 CoroutineScope(Dispatchers.Default).launch {
-                    Vaults.logout(context) {
-                        Vaults.setGetMeOut(context, false)
+                    vaultsViewModel.logout(context) {
                         CoroutineScope(Dispatchers.Main).launch {
                             navController.navigate(HomepageScreen) {
                                 popUpTo(0) {
@@ -108,6 +109,10 @@ fun GetMeOutOfHere(
 @Composable
 fun GetMeOutOfHerePreview() {
     AppTheme(darkTheme = false) {
-        GetMeOutOfHere(navController = rememberNavController())
+        val context = LocalContext.current
+        GetMeOutOfHere(
+            navController = rememberNavController(),
+            remember{ VaultsViewModel(context) }
+        )
     }
 }

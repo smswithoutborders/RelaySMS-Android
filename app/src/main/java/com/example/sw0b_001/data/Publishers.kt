@@ -2,22 +2,17 @@ package com.example.sw0b_001.data
 
 import android.content.Context
 import android.util.Base64
-import android.util.Log
-import com.afkanerd.smswithoutborders.libsignal_doubleratchet.KeystoreHelpers
-import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityAES
-import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityRSA
-import com.example.sw0b_001.data.models.AvailablePlatforms
+import androidx.core.content.edit
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.Cryptography
+import com.example.sw0b_001.data.models.AvailablePlatforms
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
-import kotlinx.serialization.json.Json
-import publisher.v1.PublisherGrpc
-import publisher.v1.PublisherOuterClass
-import androidx.core.content.edit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import publisher.v2.PublisherGrpc
+import publisher.v2.PublisherOuterClass
 import java.net.URL
 
 class Publishers(val context: Context) {
@@ -69,16 +64,15 @@ class Publishers(val context: Context) {
         return publisherStub.revokeAndDeletePNBAToken(request)
     }
 
-    fun sendOAuthAuthorizationCode(llt: String,
-                                   platform: String,
-                                   code: String,
-                                   codeVerifier: String,
-                                   supportsUrlScheme: Boolean,
-                                   storeOnDevice: Boolean = false,
-                                   requestIdentifier: String = ""):
-            PublisherOuterClass.ExchangeOAuth2CodeAndStoreResponse {
+    fun sendOAuthAuthorizationCode(
+        platform: String,
+        code: String,
+        codeVerifier: String,
+        supportsUrlScheme: Boolean,
+        storeOnDevice: Boolean = false,
+        requestIdentifier: String = ""
+    ): PublisherOuterClass.ExchangeOAuth2CodeAndStoreResponse {
         val request = PublisherOuterClass.ExchangeOAuth2CodeAndStoreRequest.newBuilder().apply {
-            setLongLivedToken(llt)
             setPlatform(platform)
             setAuthorizationCode(code)
             setCodeVerifier(codeVerifier)
@@ -102,7 +96,6 @@ class Publishers(val context: Context) {
 
     fun phoneNumberBaseAuthenticationExchange(
         authorizationCode: String,
-        llt: String,
         phoneNumber: String,
         platform: String,
         password: String = "",
@@ -110,7 +103,6 @@ class Publishers(val context: Context) {
             PublisherOuterClass.ExchangePNBACodeAndStoreResponse {
         val request = PublisherOuterClass.ExchangePNBACodeAndStoreRequest.newBuilder().apply {
             setPlatform(platform)
-            setLongLivedToken(llt)
             setAuthorizationCode(authorizationCode)
             setPassword(password)
             setPhoneNumber(phoneNumber)
@@ -124,61 +116,32 @@ class Publishers(val context: Context) {
     }
 
     companion object {
-        const val OAUTH2_PARAMETERS_FILE = "OAUTH2_PARAMETERS_FILE"
+        const val RATCHET_STATES_KEYSTORE_ALIAS = "RATCHET_STATES_KEYSTORE_ALIAS"
+        private const val OAUTH2_PARAMETERS_FILE = "OAUTH2_PARAMETERS_FILE"
 
-        const val PUBLISHER_ATTRIBUTE_FILES =
-            "com.afkanerd.relaysms.PUBLISHER_ATTRIBUTE_FILES"
-
-        private const val PUBLISHER_PUBLIC_KEY =
-            "com.afkanerd.relaysms.PUBLISHER_PUBLIC_KEY"
-        private const val PUBLISHER_CLIENT_PUBLIC_KEY =
-            "com.afkanerd.relaysms.PUBLISHER_CLIENT_PUBLIC_KEY"
-
-        private const val PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS =
-            "com.afkanerd.relaysms.PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS"
-
-        fun encryptStates(context: Context, states: String) : ByteArray {
-            val publicKey = SecurityRSA.generateKeyPair(PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS,
-                2048)
-            val secretKey = SecurityAES.generateSecretKey(256)
-
-            val sharedPreferences = context
-                .getSharedPreferences(
-                    PUBLISHER_ATTRIBUTE_FILES, Context.MODE_PRIVATE)
-            val encryptedSecretKey = SecurityRSA.encrypt(publicKey, secretKey.encoded)
-            sharedPreferences.edit {
-                putString(
-                    PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS,
-                    Base64.encodeToString(encryptedSecretKey, Base64.DEFAULT)
-                )
+        fun getDecryptedStates(context: Context): String? {
+            val states = Datastore.getDatastore(context).ratchetStatesDAO().fetch().apply {
+                if(this.isEmpty()) return null
             }
 
-            return SecurityAES.encryptAES256CBC(states.encodeToByteArray(), secretKey.encoded,
-                null)
+            if(states.size > 1) {
+                throw Exception("More than 1 states exist")
+            }
+
+            val state = Cryptography.decryptWithKeyStore(states[0].value,
+                RATCHET_STATES_KEYSTORE_ALIAS) ?:
+                throw Exception("Failed to decrypt ratchet state")
+            return String(state)
+        }
+
+        fun encryptStates(states: String) : ByteArray {
+            return Cryptography.encryptWithKeyStore(states.encodeToByteArray(),
+                RATCHET_STATES_KEYSTORE_ALIAS ) ?:
+                throw Exception("Failed to encrypt ratchet state")
         }
 
         fun removeEncryptedStates(context: Context) {
-            val sharedPreferences = context
-                .getSharedPreferences(
-                    PUBLISHER_ATTRIBUTE_FILES, Context.MODE_PRIVATE)
-
-            KeystoreHelpers.removeFromKeystore(context, PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS)
-            sharedPreferences.edit() { remove(PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS) }
-        }
-
-        fun getEncryptedStates(context: Context, states: ByteArray) : ByteArray {
-            val sharedPreferences = context
-                .getSharedPreferences(
-                    PUBLISHER_ATTRIBUTE_FILES, Context.MODE_PRIVATE)
-
-            val encryptedSecretKey = Base64.decode(sharedPreferences
-                .getString(PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS, ""),
-                Base64.DEFAULT)
-            val secretKey = SecurityRSA.decrypt(KeystoreHelpers
-                .getKeyPairFromKeystore(PUBLISHER_STATES_SHARED_KEY_KEYSTORE_ALIAS).private,
-                encryptedSecretKey)
-
-            return SecurityAES.decryptAES256CBC(states, secretKey, null)
+            Datastore.getDatastore(context).ratchetStatesDAO().deleteAll()
         }
 
         fun getAvailablePlatforms(context: Context): ArrayList<AvailablePlatforms> {
@@ -201,51 +164,6 @@ class Publishers(val context: Context) {
 
             sharedPreferences.edit {
                 putString("code_verifier", codeVerifier)
-            }
-        }
-
-        fun fetchPublisherPublicKey(context: Context) : ByteArray? {
-            val sharedPreferences = context
-                .getSharedPreferences(
-                    PUBLISHER_ATTRIBUTE_FILES, Context.MODE_PRIVATE)
-            return Base64.decode(sharedPreferences.getString(PUBLISHER_PUBLIC_KEY, ""),
-                Base64.DEFAULT)
-        }
-
-        fun fetchClientPublisherPublicKey(context: Context) : ByteArray? {
-            val sharedPreferences = context
-                .getSharedPreferences(
-                    PUBLISHER_ATTRIBUTE_FILES, Context.MODE_PRIVATE)
-            return Base64.decode(sharedPreferences.getString(PUBLISHER_CLIENT_PUBLIC_KEY, ""),
-                Base64.DEFAULT)
-        }
-
-        fun fetchPublisherSharedKey(
-            context: Context,
-            publicKey: ByteArray? = null,
-        ) : ByteArray? {
-            val pubKey = publicKey ?: fetchPublisherPublicKey(context)
-            return Cryptography.calculateSharedSecret(
-                context,
-                PUBLISHER_ID_KEYSTORE_ALIAS,
-                pubKey!!
-            )
-        }
-
-        fun storeArtifacts(
-            context: Context,
-            publisherPubKey: String,
-            clientPublishPublicKey: String,
-        ) {
-            val sharedPreferences = context
-                .getSharedPreferences(
-                    PUBLISHER_ATTRIBUTE_FILES, Context.MODE_PRIVATE)
-
-            sharedPreferences.edit {
-                putString(PUBLISHER_PUBLIC_KEY, publisherPubKey)
-            }
-            sharedPreferences.edit {
-                putString(PUBLISHER_CLIENT_PUBLIC_KEY, clientPublishPublicKey)
             }
         }
 
@@ -274,6 +192,7 @@ class Publishers(val context: Context) {
                 }
             }
         }
+
     }
 
 }

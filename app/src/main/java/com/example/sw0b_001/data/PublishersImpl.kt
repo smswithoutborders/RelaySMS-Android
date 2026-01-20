@@ -1,74 +1,59 @@
 package com.example.sw0b_001.data
 
-import android.R.id.message
 import android.content.Context
 import android.content.Intent
 import android.util.Base64
 import androidx.core.util.component1
 import androidx.core.util.component2
-import androidx.preference.PreferenceManager
-import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.Headers
-import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.Ratchets
+import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.RatchetsHE
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.States
 import com.afkanerd.smswithoutborders_libsmsmms.data.data.models.SmsManager
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getThreadId
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.toLittleEndianBytes
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewModel
-import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Helpers.toBytes
 import com.example.sw0b_001.data.models.AvailablePlatforms
-import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.data.models.RatchetStates
-import com.example.sw0b_001.extensions.context.relaySmsDatastore
-import com.example.sw0b_001.extensions.context.settingsDefaultGatewayClientKey
+import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.extensions.context.settingsGetDefaultGatewayClients
 import com.example.sw0b_001.extensions.context.settingsGetUseDeviceId
-import kotlinx.coroutines.flow.firstOrNull
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
-import java.nio.charset.StandardCharsets
 
-object PayloadEncryptionComposeDecomposeInit {
+object PublishersImpl {
     fun decompose(
         context: Context,
-        cipherText: ByteArray,
+        content: ByteArray,
         AD: ByteArray,
         onSuccessCallback: (String) -> Unit?,
         onFailureCallback: (String?) -> Unit?
     ) {
         try {
-            val states = Datastore.getDatastore(context).ratchetStatesDAO().fetch()
-            if(states.size > 1) {
-                throw Exception("More than 1 states exist")
-            }
+            val stateStr = Publishers.getDecryptedStates(context) ?:
+            throw Exception("Cannot decrypt without encrypted states")
 
-            val state = States(String(Publishers.getEncryptedStates(
-                context,
-                states[0].value),
-                Charsets.UTF_8)
-            )
+            val state = States.deserialize(stateStr)
 
-            val ratchetComposerFormatter = RatchetComposerFormatter(context, state, AD)
-            val lenHeader = cipherText.copyOfRange(0, 4).run {
+            val lenHeader = content.copyOfRange(0, 4).run {
                 ByteBuffer.wrap(this).order(ByteOrder.LITTLE_ENDIAN).int
             }
-            val header = cipherText.copyOfRange(4, 4 + lenHeader).run {
-                Headers.deSerializeHeader(this)
-            }
+            val header = content.copyOfRange(4, 4 + lenHeader)
 
-            val ct = cipherText.copyOfRange(4 + lenHeader, cipherText.size)
-            val text = ratchetComposerFormatter.decryptBridge(
-                header = header,
-                content = ct
+            val ciphertext = content.copyOfRange(4 + lenHeader, content.size)
+            val text = RatchetsHE.ratchetDecrypt(
+                state = state,
+                encHeader = header,
+                cipherText = ciphertext,
+                AD = AD
             )
 
-            val encryptedStates = Publishers.encryptStates(context, state.serializedStates)
+            val encryptedStates = Publishers.encryptStates(state.serialize())
             val ratchetsStates = RatchetStates(value = encryptedStates)
-            Datastore.getDatastore(context).ratchetStatesDAO().update(ratchetsStates)
+            Datastore.getDatastore(context).ratchetStatesDAO().insert(ratchetsStates)
 
-            onSuccessCallback(text)
+            onSuccessCallback(String(text))
         } catch(e: Exception) {
             e.printStackTrace()
             onFailureCallback(e.message)
@@ -80,35 +65,32 @@ object PayloadEncryptionComposeDecomposeInit {
         state: States,
         content: ByteArray,
         ad: ByteArray,
-        sk: ByteArray? = null,
-    ): Pair<Headers, ByteArray> {
-        if(state.DHs == null) {
-            val sk = sk ?: Publishers.fetchPublisherSharedKey(context)
-            Ratchets.ratchetInitAlice(state, sk, ad)
+        serverPublicKey: ByteArray?,
+    ): Pair<ByteArray, ByteArray> {
+        if(state.DHs == null && serverPublicKey != null) {
+            val (rootKey, headerKey, nextHeaderKey) = Vaults(context).getRatchetKeys()
+            RatchetsHE.ratchetInitAlice(
+                state = state,
+                SK = rootKey,
+                bobDhPublicKey = serverPublicKey,
+                sharedHka = headerKey,
+                sharedNhkb = nextHeaderKey,
+            )
         }
 
-        val (header, cipherText) = Ratchets.ratchetEncrypt(state, content, ad )
+        val (header, cipherText) = RatchetsHE.ratchetEncrypt(state, content, ad)
         return Pair(header, cipherText)
     }
 
     private fun saveState(
         context: Context,
         states: States,
-        statesId: Int?,
+        statesId: Int = 0,
     ) {
-        // The state saving logic is the same.
         try {
-            val encryptedStatesValue = Publishers.encryptStates(context, states.serializedStates)
-
-            val ratchetStatesEntry = RatchetStates( statesId ?: 0, encryptedStatesValue)
-            if (statesId != null) {
-                Datastore.getDatastore(context).ratchetStatesDAO()
-                    .update(ratchetStatesEntry)
-            } else {
-                Datastore.getDatastore(context).ratchetStatesDAO().deleteAll()
-                Datastore.getDatastore(context).ratchetStatesDAO()
-                    .insert(RatchetStates(value = encryptedStatesValue))
-            }
+            val encryptedState = Publishers.encryptStates(states.serialize())
+            val ratchetStatesEntry = RatchetStates(statesId, encryptedState)
+            Datastore.getDatastore(context).ratchetStatesDAO().insert(ratchetStatesEntry)
         } catch (e: Exception) {
             throw e
         }
@@ -182,32 +164,21 @@ object PayloadEncryptionComposeDecomposeInit {
         subscriptionId: Long = -1,
         languageCode: String = "en",
         smsTransmission: Boolean = true,
-        isLoggedIn: Boolean = true,
-        privateKey: ByteArray? = null,
+        serverEphemeralPublicKey: ByteArray? = null,
         onSuccessRunnable: (EncryptedContent) -> Unit? = {}
     ): ByteArray {
-        val states = Datastore.getDatastore(context).ratchetStatesDAO().fetch()
-        if (states.size > 1) {
-            throw IllegalStateException(context.getString(R.string.multiple_ratchet_states_found_in_database_expected_at_most_one))
-        }
+        val stateStr = Publishers.getDecryptedStates(context)
+        val state = if(stateStr.isNullOrBlank()) States()
+        else States.deserialize(stateStr)
 
-        val state = if(isLoggedIn && states.isNotEmpty()) {
-            States(String(Publishers
-                .getEncryptedStates(context, states[0].value)))
-        } else {
-            States()
-        }
-
-        val (header, cipherText) = encryptPayload(context, state, content, ad,
-            when(privateKey != null) {
-                true -> Cryptography.calculateSharedSecret(ad, privateKey)
-                else -> null
-            }
+        val (header, cipherText) = encryptPayload(
+            context = context,
+            state = state,
+            content = content,
+            ad = ad,
+            serverPublicKey = serverEphemeralPublicKey
         )
-
-        if(privateKey == null) {
-            saveState(context,state, states.firstOrNull()?.id)
-        }
+        saveState(context,state)
 
         val message = saveContent(
             context = context,
@@ -217,12 +188,12 @@ object PayloadEncryptionComposeDecomposeInit {
             imageLength = imageLength,
             textLength = textLength
         )
+
         if(account == null) {
-            val serializedHeader = header.serialized
             val headerSize = ByteArray(4).apply {
-                this[0] = serializedHeader.size.toByte()
+                this[0] = header.size.toByte()
             }
-            return headerSize + serializedHeader + cipherText
+            return headerSize + header + cipherText
         }
 
         val platformShortcodeByte = platform.shortcode?.firstOrNull()?.code?.toByte()
@@ -231,7 +202,7 @@ object PayloadEncryptionComposeDecomposeInit {
 
         val payload = formatTransmissionV2(
             context = context,
-            headers = header,
+            header = header,
             encryptedDrBody = cipherText,
             platformShortcode = platformShortcodeByte,
             languageCode = languageCode.encodeToByteArray(),
@@ -257,21 +228,20 @@ object PayloadEncryptionComposeDecomposeInit {
 
     fun formatTransmissionV2(
         context: Context,
-        headers: Headers,
+        header: ByteArray,
         encryptedDrBody: ByteArray,
         platformShortcode: Byte,
         languageCode: ByteArray,
     ): String {
         val deviceIDBytes = if (context.settingsGetUseDeviceId) {
-            Vaults.fetchDeviceId(context) ?: byteArrayOf()
+            Vaults(context).fetchDeviceID()
         } else {
             byteArrayOf()
         }
 
         val versionMarker = 0x02.toByte()
-        val serializedDrHeader = headers.serialized
-        val drHeaderLengthBytes = serializedDrHeader.size.toBytes()
-        val payload = drHeaderLengthBytes + serializedDrHeader + encryptedDrBody
+        val drHeaderLengthBytes = header.size.toBytes()
+        val payload = drHeaderLengthBytes + header + encryptedDrBody
 
         if (payload.size >= Int.MAX_VALUE) {
             throw IllegalArgumentException("V2 Ciphertext block is too long (max 65535 bytes).")

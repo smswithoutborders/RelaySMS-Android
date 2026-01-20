@@ -12,6 +12,6 @@ data class SecurityKeys(
     var id: Long = 0,
     var keystoreAlias: String,
     var privateKey: ByteArray,
-    var nonce: ByteArray,
+    var nonce: ByteArray?,
     var sharedSecret: ByteArray? = null,
 )
