@@ -8,6 +8,8 @@ import com.example.sw0b_001.data.models.Credentials
 import com.example.sw0b_001.data.models.SecurityKeys
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.extensions.context.getStaticKeys
+import com.example.sw0b_001.extensions.context.settingsSetIsEmailLogin
+import com.example.sw0b_001.extensions.context.settingsSetIsLoggedIn
 import com.example.sw0b_001.ui.views.OTPCodeVerificationType
 import com.google.protobuf.kotlin.toByteString
 import io.grpc.ManagedChannel
@@ -45,7 +47,7 @@ class Vaults(val context: Context) {
         }
     }
 
-    fun fetchDeviceID(): ByteArray {
+    fun fetchDeviceID(): ByteArray? {
         return Datastore.getDatastore(context).credentialsDao()
             .fetch(LLT_KEYSTORE_ALIAS).deviceID
     }
@@ -56,8 +58,12 @@ class Vaults(val context: Context) {
         }
         val credentials = Datastore.getDatastore(context).credentialsDao()
             .fetch(LLT_KEYSTORE_ALIAS)
+
+        if(credentials.llt == null) return null
+
         return try {
-            Cryptography.decryptWithKeyStore(credentials.llt, LLT_KEYSTORE_ALIAS)
+            Cryptography.decryptWithKeyStore(credentials.llt!!,
+                LLT_KEYSTORE_ALIAS)
         } catch (e: Exception) {
             throw e
         }
@@ -120,15 +126,29 @@ class Vaults(val context: Context) {
         }
     }
 
-    private fun storeCredentials(
+    private fun storeCredentialsPreOtp(
+        publicKey: ByteArray,
+        privateKey: ByteArray,
+    ) {
+        Datastore.getDatastore(context).credentialsDao().insert(Credentials(
+            keystoreAlias = LLT_KEYSTORE_ALIAS,
+            identityPublicKey = publicKey,
+            identityPrivateKey = privateKey
+        ))
+    }
+
+    private fun storeCredentialsPostOtp(
         llt: ByteArray,
         deviceId: ByteArray,
     ) {
-        Datastore.getDatastore(context).credentialsDao().insert(Credentials(
-            llt = llt,
-            deviceID = deviceId,
-            keystoreAlias = LLT_KEYSTORE_ALIAS,
-        ))
+        val credentials = Datastore.getDatastore(context).credentialsDao()
+            .fetch(LLT_KEYSTORE_ALIAS)
+            .apply {
+                this.llt = llt
+                this.deviceID = deviceId
+            }
+
+        Datastore.getDatastore(context).credentialsDao().update(credentials)
     }
 
     private fun storeEncryptedSharedSecret(
@@ -155,19 +175,17 @@ class Vaults(val context: Context) {
         val encryptedLlt = Cryptography.encryptWithKeyStore(
             llt,
             LLT_KEYSTORE_ALIAS
-        ) ?: throw Exception("Failed to encrypt LLT")
+        )
 
         val message = "RelaySMS DID v1".encodeToByteArray()
         val ho = MessageDigest.getInstance("SHA-256")
 
-        val clientPublicKey = KeystoreHelpers
-            .getKeyPairFromKeystore(CLIENT_SIGNING_KEY_KEYSTORE_ALIAS)
-            .public
-            .encoded
+        val clientIdPublicKey = getIdentitySigningKey(context) ?:
+        throw Exception("Failed to fetch client id key for device id")
 
-        val deviceId = ho.digest(message + clientPublicKey).copyOfRange(0, 16)
+        val deviceId = ho.digest(message + clientIdPublicKey).copyOfRange(0, 16)
 
-        storeCredentials(
+        storeCredentialsPostOtp(
             encryptedLlt,
             deviceId,
         )
@@ -180,7 +198,7 @@ class Vaults(val context: Context) {
         serverHeaderPublicKey: ByteArray,
         serverNextHeaderPublicKey: ByteArray
     ) {
-        val serverAuthenticationKey = context.getStaticKeys(255) ?:
+        val serverAuthenticationKey = context.getStaticKeys(254) ?:
         throw Exception("Failed to find static keys")
 
         val (rootKey, headerKey, nextHeaderKey) = Cryptography.calculateSharedSecretWithNonce(
@@ -195,29 +213,18 @@ class Vaults(val context: Context) {
             nextHeaderPublicKey = serverNextHeaderPublicKey
         )
 
-        KeystoreHelpers.removeFromKeystore(context, CLIENT_RATCHET_KEY_KEYSTORE_ALIAS)
-        KeystoreHelpers.removeFromKeystore(context, CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS)
-        KeystoreHelpers.removeFromKeystore(context, CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS)
-
-        Datastore.getDatastore(context).securityKeystoreDao()
-            .remove(CLIENT_RATCHET_KEY_KEYSTORE_ALIAS)
-        Datastore.getDatastore(context).securityKeystoreDao()
-            .remove(CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS)
-        Datastore.getDatastore(context).securityKeystoreDao()
-            .remove(CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS)
-
         val encryptedRootKey = Cryptography.encryptWithKeyStore(
             rootKey,
             CLIENT_RATCHET_KEY_KEYSTORE_ALIAS
-        ) ?: throw Exception("Failed to encrypt root key")
+        )
         val encryptedHeaderKey = Cryptography.encryptWithKeyStore(
             headerKey,
             CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS
-        ) ?: throw Exception("Failed to encrypt header key")
+        )
         val encryptedNextHeaderKey = Cryptography.encryptWithKeyStore(
             nextHeaderKey,
             CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS
-        ) ?: throw Exception("Failed to encrypt next header key")
+        )
 
         storeEncryptedSharedSecret(
             encryptedRootKey,
@@ -293,8 +300,22 @@ class Vaults(val context: Context) {
 
             securelyStoreCredentials(llt)
             Publishers.removeEncryptedStates(context)
+            context.settingsSetIsLoggedIn(true)
         } catch(e: Exception) {
             e.printStackTrace()
+        }
+
+    }
+
+    fun resetPersistentData() {
+        KeystoreHelpers.removeFromKeystore(context, CLIENT_RATCHET_KEY_KEYSTORE_ALIAS)
+        KeystoreHelpers.removeFromKeystore(context, CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS)
+        KeystoreHelpers.removeFromKeystore(context, CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS)
+
+        Datastore.getDatastore(context).securityKeystoreDao().apply {
+            remove(CLIENT_RATCHET_KEY_KEYSTORE_ALIAS)
+            remove(CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS)
+            remove(CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS)
         }
     }
 
@@ -306,8 +327,8 @@ class Vaults(val context: Context) {
         password: String,
         recaptchaToken: String,
     ) : Vault.CreateEntityResponse {
-
-        val clientIdKey = Cryptography.generateSigningKey(CLIENT_ID_KEY_KEYSTORE_ALIAS)
+        resetPersistentData()
+        val clientIdKeyPair = Cryptography.generateSigningKey(CLIENT_ID_KEY_KEYSTORE_ALIAS)
         val (clientPublicKeyAndNonce, headerPublicKey, nextHeaderPublicKey) =
             Cryptography.generateKey(
                 context,
@@ -320,7 +341,7 @@ class Vaults(val context: Context) {
             setCountryCode(countryCode)
             setPhoneNumber(phoneNumber)
             setPassword(password)
-            setClientIdPubKey(clientIdKey.toByteString())
+            setClientIdPubKey(clientIdKeyPair.first.toByteString())
             setClientRatchetPubKey(clientPublicKeyAndNonce.first.toByteString())
             setClientNonce(clientPublicKeyAndNonce.second.toByteString())
             setClientHeaderPubKey(headerPublicKey.toByteString())
@@ -328,6 +349,15 @@ class Vaults(val context: Context) {
             setCaptchaToken(recaptchaToken)
             setEmailAddress(email)
         }.build()
+
+        storeCredentialsPreOtp(
+            publicKey = clientIdKeyPair.first,
+            privateKey = clientIdKeyPair.second
+        )
+
+        if(email.isNotEmpty()) {
+            context.settingsSetIsEmailLogin(true)
+        }
 
         return entityStub.createEntity(createEntityRequest)
     }
@@ -339,8 +369,8 @@ class Vaults(val context: Context) {
         password: String,
         recaptchaToken: String,
     ) : Vault.AuthenticateEntityResponse {
-
-        val clientIdKey = Cryptography.generateSigningKey(CLIENT_ID_KEY_KEYSTORE_ALIAS)
+        resetPersistentData()
+        val clientIdKeyPair = Cryptography.generateSigningKey(CLIENT_ID_KEY_KEYSTORE_ALIAS)
         val (clientPublicKeyAndNonce, headerPublicKey, nextHeaderPublicKey) =
             Cryptography.generateKey(
                 context,
@@ -352,7 +382,7 @@ class Vaults(val context: Context) {
         val authenticateEntityRequest = Vault.AuthenticateEntityRequest.newBuilder().apply {
             setPhoneNumber(phoneNumber)
             setPassword(password)
-            setClientIdPubKey(clientIdKey.toByteString())
+            setClientIdPubKey(clientIdKeyPair.first.toByteString())
             setClientRatchetPubKey(clientPublicKeyAndNonce.first.toByteString())
             setClientNonce(clientPublicKeyAndNonce.second.toByteString())
             setClientHeaderPubKey(headerPublicKey.toByteString())
@@ -360,6 +390,15 @@ class Vaults(val context: Context) {
             setCaptchaToken(recaptchaToken)
             setEmailAddress(email)
         }.build()
+
+        storeCredentialsPreOtp(
+            publicKey = clientIdKeyPair.first,
+            privateKey = clientIdKeyPair.second
+        )
+
+        if(email.isNotEmpty()) {
+            context.settingsSetIsEmailLogin(true)
+        }
 
         return entityStub.authenticateEntity(authenticateEntityRequest)
     }
@@ -371,8 +410,8 @@ class Vaults(val context: Context) {
         newPassword: String,
         recaptchaToken: String,
     ) : Vault.ResetPasswordResponse {
-
-        val clientIdKey = Cryptography.generateSigningKey(CLIENT_ID_KEY_KEYSTORE_ALIAS)
+        resetPersistentData()
+        val clientIdKeyPair = Cryptography.generateSigningKey(CLIENT_ID_KEY_KEYSTORE_ALIAS)
         val (clientPublicKeyAndNonce, headerPublicKey, nextHeaderPublicKey) =
             Cryptography.generateKey(
                 context,
@@ -384,7 +423,7 @@ class Vaults(val context: Context) {
         val resetPasswordRequest = Vault.ResetPasswordRequest.newBuilder().apply {
             setPhoneNumber(phoneNumber)
             setNewPassword(newPassword)
-            setClientIdPubKey(clientIdKey.toByteString())
+            setClientIdPubKey(clientIdKeyPair.first.toByteString())
             setClientRatchetPubKey(clientPublicKeyAndNonce.first.toByteString())
             setClientNonce(clientPublicKeyAndNonce.second.toByteString())
             setClientHeaderPubKey(headerPublicKey.toByteString())
@@ -392,6 +431,15 @@ class Vaults(val context: Context) {
             setCaptchaToken(recaptchaToken)
             setEmailAddress(email)
         }.build()
+
+        storeCredentialsPreOtp(
+            publicKey = clientIdKeyPair.first,
+            privateKey = clientIdKeyPair.second
+        )
+
+        if(email.isNotEmpty()) {
+            context.settingsSetIsEmailLogin(true)
+        }
 
         return entityStub.resetPassword(resetPasswordRequest)
     }
@@ -431,11 +479,21 @@ class Vaults(val context: Context) {
 
         const val CLIENT_SIGNING_KEY_KEYSTORE_ALIAS = "CLIENT_SIGNING_KEY_KEYSTORE_ALIAS"
 
-        fun getIdentitySigningKey(): ByteArray {
-            return KeystoreHelpers
-                .getKeyPairFromKeystore(CLIENT_SIGNING_KEY_KEYSTORE_ALIAS)
-                .public
-                .encoded
+        fun signGrpcRequest(context: Context, message: ByteArray): ByteArray {
+            val privateKey = Datastore.getDatastore(context).credentialsDao()
+                .fetch(CLIENT_SIGNING_KEY_KEYSTORE_ALIAS).identityPrivateKey ?:
+                throw Exception("Missing private key in credentials for signing")
+
+            return Cryptography.signWithSigningKey(
+                keystoreAlias = CLIENT_SIGNING_KEY_KEYSTORE_ALIAS,
+                privateKey = privateKey,
+                message = message
+            )
+        }
+
+        fun getIdentitySigningKey(context: Context): ByteArray? {
+            return Datastore.getDatastore(context).credentialsDao()
+                .fetch(LLT_KEYSTORE_ALIAS).identityPublicKey
         }
 
         fun decomposeRefreshToken(data: String): Pair<String, String> {

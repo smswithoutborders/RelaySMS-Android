@@ -58,7 +58,7 @@ import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.AvailablePlatforms
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
-import com.example.sw0b_001.extensions.context.settingsIsLoggedIn
+import com.example.sw0b_001.extensions.context.settingsGetIsLoggedIn
 import com.example.sw0b_001.ui.modals.PlatformOptionsModal
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
@@ -94,7 +94,7 @@ fun AvailablePlatformsView(
     }
 
     var isLoggedIn by remember {
-        mutableStateOf( inPreviewMode || context.settingsIsLoggedIn )
+        mutableStateOf( inPreviewMode || context.settingsGetIsLoggedIn )
     }
 
     Column(

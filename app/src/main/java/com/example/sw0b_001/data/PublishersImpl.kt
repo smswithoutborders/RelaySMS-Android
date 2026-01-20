@@ -234,7 +234,7 @@ object PublishersImpl {
         languageCode: ByteArray,
     ): String {
         val deviceIDBytes = if (context.settingsGetUseDeviceId) {
-            Vaults(context).fetchDeviceID()
+            Vaults(context).fetchDeviceID() ?: throw Exception("No device ID found")
         } else {
             byteArrayOf()
         }

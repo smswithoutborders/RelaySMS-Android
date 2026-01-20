@@ -35,7 +35,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.EncryptedContent
-import com.example.sw0b_001.extensions.context.settingsIsLoggedIn
+import com.example.sw0b_001.extensions.context.settingsGetIsLoggedIn
 import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.appbars.GatewayClientsAppBar
 import com.example.sw0b_001.ui.appbars.RecentAppBar
@@ -75,7 +75,7 @@ fun HomepageView(
     var isLoggedIn by remember {
         mutableStateOf(
             if(inspectionMode) isLoggedIn else
-            context.settingsIsLoggedIn
+            context.settingsGetIsLoggedIn
         )
     }
 

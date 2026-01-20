@@ -9,7 +9,7 @@ import com.example.sw0b_001.data.Cryptography
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.PublishersImpl
 import com.example.sw0b_001.extensions.context.getStaticKeys
-import com.example.sw0b_001.extensions.context.settingsIsLoggedIn
+import com.example.sw0b_001.extensions.context.settingsGetIsLoggedIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -85,7 +85,7 @@ object Bridges {
             clientPrivateKey = TODO()
         )
 
-        val payload = if(context.settingsIsLoggedIn) {
+        val payload = if(context.settingsGetIsLoggedIn) {
             authRequestAndPayload(
                 content = encryptedContent,
                 serverKID = random.toUByte(),

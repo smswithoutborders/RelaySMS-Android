@@ -52,7 +52,7 @@ import com.example.sw0b_001.extensions.context.settingsGetIsEmailLogin
 import com.example.sw0b_001.extensions.context.settingsGetLockDownApp
 import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
 import com.example.sw0b_001.extensions.context.settingsGetUseDeviceId
-import com.example.sw0b_001.extensions.context.settingsIsLoggedIn
+import com.example.sw0b_001.extensions.context.settingsGetIsLoggedIn
 import com.example.sw0b_001.extensions.context.settingsSetLockDownApp
 import com.example.sw0b_001.extensions.context.settingsSetStoreTokensOnDevice
 import com.example.sw0b_001.extensions.context.settingsSetUseDeviceId
@@ -89,7 +89,7 @@ fun SettingsView(
     var isLoading by remember { mutableStateOf(false) }
 
     val isLoggedIn by remember{ mutableStateOf(
-        inPreviewMode || context.settingsIsLoggedIn) }
+        inPreviewMode || context.settingsGetIsLoggedIn) }
 
     val localeArraysValues = stringArrayResource(R.array.language_values)
     val localeArraysOptions= stringArrayResource(R.array.language_options)

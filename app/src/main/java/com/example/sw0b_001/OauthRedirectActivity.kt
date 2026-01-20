@@ -48,7 +48,7 @@ class OauthRedirectActivity : AppCompatActivity() {
             val publishers = Publishers(applicationContext)
             try {
                 val codeVerifier = Publishers.fetchOauthRequestVerifier(applicationContext)
-                val publisherPublicKey = Vaults.getIdentitySigningKey()
+                val publisherPublicKey = Vaults.getIdentitySigningKey(applicationContext)
                 val requestIdentifier = Base64.encodeToString(publisherPublicKey, Base64.NO_WRAP)
 
                 val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)

@@ -59,7 +59,7 @@ import com.example.sw0b_001.extensions.context.promptBiometrics
 import com.example.sw0b_001.extensions.context.settingsGetIsGetMeOut
 import com.example.sw0b_001.extensions.context.settingsGetLockDownApp
 import com.example.sw0b_001.extensions.context.settingsGetOnboardedCompletely
-import com.example.sw0b_001.extensions.context.settingsIsLoggedIn
+import com.example.sw0b_001.extensions.context.settingsGetIsLoggedIn
 import com.example.sw0b_001.extensions.context.settingsSetGetMeOut
 import com.example.sw0b_001.ui.navigation.AboutScreen
 import com.example.sw0b_001.ui.navigation.BridgeViewScreen
@@ -219,7 +219,7 @@ class MainActivity : AppCompatActivity() {
         var isLoggedIn by remember {
             mutableStateOf(
                 if(inPreview) true else
-                context.settingsIsLoggedIn
+                context.settingsGetIsLoggedIn
             )
         }
 
@@ -446,27 +446,29 @@ class MainActivity : AppCompatActivity() {
                 loggedInAlready = true
                 return@launch
             }
-            vaultViewModel.validateSession(
-                applicationContext,
-                onFailureCallback = {
-                    val lltIsNotAuthenticated = it.first
-                    val errorMessage = it.second
+            if(settingsGetIsLoggedIn) {
+                vaultViewModel.validateSession(
+                    applicationContext,
+                    onFailureCallback = {
+                        val lltIsNotAuthenticated = it.first
+                        val errorMessage = it.second
 
-                    loggedInAlready = lltIsNotAuthenticated
-                    if(!loggedInAlready) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            Toast.makeText(
-                                applicationContext,
-                                errorMessage,
-                                Toast.LENGTH_LONG
-                            )
+                        loggedInAlready = lltIsNotAuthenticated
+                        if(!loggedInAlready) {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                Toast.makeText(
+                                    applicationContext,
+                                    errorMessage,
+                                    Toast.LENGTH_LONG
+                                )
+                            }
+                        } else {
+                            settingsSetGetMeOut(true)
                         }
-                    } else {
-                        settingsSetGetMeOut(true)
                     }
-                }
-            ) {
+                ) {
 
+                }
             }
         }
     }

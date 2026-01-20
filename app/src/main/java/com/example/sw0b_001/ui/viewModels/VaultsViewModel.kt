@@ -120,11 +120,6 @@ class VaultsViewModel(val context: Context) : ViewModel() {
         }
     }
 
-    suspend fun getDeviceID(context: Context) : ByteArray {
-        return Datastore.getDatastore(context).credentialsDao()
-            .fetch(Vaults.LLT_KEYSTORE_ALIAS).deviceID
-    }
-
     suspend fun logout(context: Context, successRunnable: Runnable) {
         KeystoreHelpers.removeAllFromKeystore(context)
         Datastore.getDatastore(context).clearAllTables()

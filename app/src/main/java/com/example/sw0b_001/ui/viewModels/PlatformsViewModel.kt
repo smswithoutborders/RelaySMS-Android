@@ -508,7 +508,7 @@ class PlatformsViewModel : ViewModel() {
                 when(platform.protocol_type) {
                     Platforms.ProtocolTypes.oauth2.name -> {
                         val publishers = Publishers(context)
-                        val publicKeyBytes = Vaults.getIdentitySigningKey()
+                        val publicKeyBytes = Vaults.getIdentitySigningKey(context)
                         val requestIdentifier = Base64.encodeToString(
                             publicKeyBytes, Base64.NO_WRAP)
                         try {

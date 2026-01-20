@@ -10,7 +10,6 @@ import io.grpc.ClientInterceptor
 import io.grpc.ForwardingClientCall
 import io.grpc.Metadata
 import io.grpc.MethodDescriptor
-import java.security.MessageDigest
 
 class GrpcClientInterceptor(val context: Context) : ClientInterceptor{
     override fun <ReqT : Any?, RespT : Any?> interceptCall(
@@ -29,11 +28,10 @@ class GrpcClientInterceptor(val context: Context) : ClientInterceptor{
                 val llt = Base64.encodeToString(
                     Vaults(context).fetchLongLivedToken(), Base64.URL_SAFE)
 
-                val digest = MessageDigest.getInstance("SHA-256")
-                digest.update(methodName?.encodeToByteArray() ?: byteArrayOf())
-                digest.update(timestamp.encodeToByteArray())
-                digest.update(nonce)
-                val signature = digest.digest()
+                val requestString = methodName!!.encodeToByteArray() +
+                        timestamp.encodeToByteArray() +
+                        nonce
+                val signature = Vaults.signGrpcRequest(context, requestString)
 
                 val sigKey = Metadata.Key.of("X-Sig", Metadata.ASCII_STRING_MARSHALLER)
                 val tsKey = Metadata.Key.of("X-Timestamp", Metadata.ASCII_STRING_MARSHALLER)

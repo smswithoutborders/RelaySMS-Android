@@ -364,6 +364,9 @@ dependencies {
     implementation(libs.coil.network.okhttp)
 
     coreLibraryDesugaring libs.desugar.jdk.libs
-    implementation("com.google.protobuf:protobuf-kotlin:4.33.2")
+    implementation(libs.protobuf.kotlin)
+    implementation(libs.bcprov.jdk15to18)
+
+    implementation "androidx.security:security-crypto:1.1.0"
 }
 

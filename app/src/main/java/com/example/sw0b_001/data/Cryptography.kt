@@ -9,20 +9,26 @@ import com.afkanerd.smswithoutborders.libsignal_doubleratchet.CryptoHelpers
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.KeystoreHelpers
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityCurve25519
 import com.example.sw0b_001.data.models.SecurityKeys
+import org.bouncycastle.crypto.generators.Ed25519KeyPairGenerator
+import org.bouncycastle.crypto.params.Ed25519KeyGenerationParameters
+import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters
+import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters
+import org.bouncycastle.crypto.signers.Ed25519Signer
 import java.security.InvalidAlgorithmParameterException
 import java.security.InvalidKeyException
-import java.security.KeyPairGenerator
 import java.security.KeyStore
 import java.security.NoSuchAlgorithmException
 import java.security.NoSuchProviderException
-import java.security.Signature
+import java.security.SecureRandom
 import java.security.UnrecoverableEntryException
 import java.security.cert.CertificateException
 import javax.crypto.BadPaddingException
 import javax.crypto.Cipher
 import javax.crypto.IllegalBlockSizeException
+import javax.crypto.KeyGenerator
 import javax.crypto.NoSuchPaddingException
 import javax.crypto.SecretKey
+import javax.crypto.spec.GCMParameterSpec
 
 
 object Cryptography {
@@ -74,35 +80,14 @@ object Cryptography {
         val headerPublicKey = headerCurve.generateKey()
         val nextHeaderPublicKey = nextHeaderCurve.generateKey()
 
-//        val encryptionPublicKey = SecurityRSA.generateKeyPair(keystoreAlias, 4096)
-//
-//        val headerEncryptionPublicKey = SecurityRSA.generateKeyPair(
-//            headerKeystoreAlias, 4096)
-//
-//        val nextHeaderEncryptionPublicKey = SecurityRSA.generateKeyPair(
-//            nextHeaderKeystoreAlias, 4096)
-//
-//        val encryptedPrivateKey = SecurityRSA.encrypt(encryptionPublicKey,
-//            publicKeyCurve.privateKey) ?:
-//        throw Exception("Failed to encrypt root key private key")
-//        val encryptedHeaderPrivateKey = SecurityRSA.encrypt(headerEncryptionPublicKey,
-//            headerCurve.privateKey) ?:
-//        throw Exception("Failed to encrypt header key private key")
-//        val encryptedNextHeaderPrivateKey = SecurityRSA.encrypt(nextHeaderEncryptionPublicKey,
-//            nextHeaderCurve.privateKey) ?:
-//        throw Exception("Failed to encrypt next header key private key")
-
         val encryptedPrivateKey = encryptWithKeyStore(
-            publicKeyCurve.privateKey, keystoreAlias) ?:
-            throw Exception("Failed to encrypt root key private key")
+            publicKeyCurve.privateKey, keystoreAlias)
 
         val encryptedHeaderPrivateKey = encryptWithKeyStore(headerCurve.privateKey,
-            headerKeystoreAlias) ?:
-            throw Exception("Failed to encrypt header key private key")
+            headerKeystoreAlias)
 
         val encryptedNextHeaderPrivateKey = encryptWithKeyStore( nextHeaderCurve.privateKey,
-            nextHeaderKeystoreAlias) ?:
-            throw Exception("Failed to encrypt next header key private key")
+            nextHeaderKeystoreAlias)
 
         val nonce = CryptoHelpers.generateRandomBytes(16)
         secureStorePrivateKey(
@@ -133,8 +118,8 @@ object Cryptography {
         nextHeaderKeystoreAlias: String,
     ): Triple<SecurityKeys, SecurityKeys, SecurityKeys> {
         val rootKeySecurityKeys = getSecuredStoredPrivateKey(context, keystoreAlias)
-        val headerKeySecurityKeys = getSecuredStoredPrivateKey(context, keystoreAlias)
-        val nextHeaderKeySecurityKeys = getSecuredStoredPrivateKey(context, keystoreAlias)
+        val headerKeySecurityKeys = getSecuredStoredPrivateKey(context, headerKeystoreAlias)
+        val nextHeaderKeySecurityKeys = getSecuredStoredPrivateKey(context, nextHeaderKeystoreAlias)
 
         rootKeySecurityKeys.privateKey =
             decryptWithKeyStore(rootKeySecurityKeys.privateKey, keystoreAlias) ?:
@@ -243,10 +228,13 @@ object Cryptography {
         NoSuchProviderException::class,
         InvalidAlgorithmParameterException::class
     )
-    private fun createAndStoreSecretKey(
-        keystoreAlias: String
-    ) {
-        KeyGenParameterSpec.Builder(
+    private fun createAndStoreSecretKey(keystoreAlias: String) {
+        val keyGenerator = KeyGenerator.getInstance(
+            KeyProperties.KEY_ALGORITHM_AES,
+            "AndroidKeyStore"
+        )
+
+        val params = KeyGenParameterSpec.Builder(
             keystoreAlias,
             KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
         )
@@ -255,6 +243,9 @@ object Cryptography {
             .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
             .setRandomizedEncryptionRequired(true)
             .build()
+
+        keyGenerator.init(params)
+        keyGenerator.generateKey()
     }
 
     @Throws(
@@ -268,7 +259,7 @@ object Cryptography {
         IllegalBlockSizeException::class,
         BadPaddingException::class
     )
-    fun encryptWithKeyStore(data: ByteArray, keystoreAlias: String): ByteArray? {
+    fun encryptWithKeyStore(data: ByteArray, keystoreAlias: String): ByteArray {
         if(!KeystoreHelpers.isAvailableInKeystore(keystoreAlias))
             createAndStoreSecretKey(keystoreAlias)
 
@@ -282,7 +273,7 @@ object Cryptography {
         // Use the secret key at your convenience
         val cipher: Cipher = Cipher.getInstance("AES/GCM/NoPadding")
         cipher.init(Cipher.ENCRYPT_MODE, key)
-        return cipher.doFinal(data)
+        return cipher.iv + cipher.doFinal(data)
     }
 
 
@@ -298,6 +289,10 @@ object Cryptography {
         BadPaddingException::class
     )
     fun decryptWithKeyStore(data: ByteArray, keystoreAlias: String): ByteArray? {
+        val ivSize = 12 // GCM standard
+        val iv = data.copyOfRange(0, ivSize)
+        val data = data.copyOfRange(ivSize, data.size)
+
         // Initialize KeyStore
         val keyStore: KeyStore = KeyStore.getInstance("AndroidKeyStore")
         keyStore.load(null)
@@ -307,41 +302,38 @@ object Cryptography {
         val key: SecretKey = keyEntry.secretKey
         // Use the secret key at your convenience
         val cipher: Cipher = Cipher.getInstance("AES/GCM/NoPadding")
-        cipher.init(Cipher.DECRYPT_MODE, key)
+        val spec = GCMParameterSpec(128, iv) // 128-bit auth tag
+        cipher.init(Cipher.DECRYPT_MODE, key, spec)
         return cipher.doFinal(data)
     }
 
-    fun generateSigningKey(keystoreAlias: String): ByteArray {
-        val kpg: KeyPairGenerator = KeyPairGenerator.getInstance(
-            KeyProperties.KEY_ALGORITHM_EC,
-            "AndroidKeyStore"
+    fun generateSigningKey(keystoreAlias: String): Pair<ByteArray, ByteArray> {
+        val secureRandom = SecureRandom()
+        val keyPairGenerator = Ed25519KeyPairGenerator()
+        keyPairGenerator.init(Ed25519KeyGenerationParameters(secureRandom))
+        val keyPair = keyPairGenerator.generateKeyPair()
+
+        val publicKey = (keyPair.public as Ed25519PublicKeyParameters).encoded
+        val privateKey = encryptWithKeyStore(
+            (keyPair.private as Ed25519PrivateKeyParameters).encoded,
+            keystoreAlias
         )
-        val parameterSpec: KeyGenParameterSpec = KeyGenParameterSpec.Builder(
-            keystoreAlias,
-            KeyProperties.PURPOSE_SIGN or KeyProperties.PURPOSE_VERIFY
-        ).run {
-            setDigests(KeyProperties.DIGEST_SHA256, KeyProperties.DIGEST_SHA512)
-            build()
-        }
 
-        kpg.initialize(parameterSpec)
-        return kpg.generateKeyPair().public.encoded
+        return Pair(publicKey, privateKey)
     }
 
-    fun signWithIdentity(keystoreAlias: String, data: String): ByteArray {
-        val ks: KeyStore = KeyStore.getInstance("AndroidKeyStore").apply {
-            load(null)
-        }
-        val entry: KeyStore.Entry = ks.getEntry(keystoreAlias, null)
-        if (entry !is KeyStore.PrivateKeyEntry) {
-            throw Exception("No instance of keystore")
-        }
+    fun signWithSigningKey(
+        keystoreAlias: String,
+        privateKey: ByteArray,
+        message: ByteArray,
+    ): ByteArray {
+        val decryptedPrivateKey = decryptWithKeyStore(privateKey, keystoreAlias)
+        val privateKey = Ed25519PrivateKeyParameters(decryptedPrivateKey, 0)
 
-        return Signature.getInstance("SHA256withECDSA").run {
-            initSign(entry.privateKey)
-            update(data.encodeToByteArray())
-            sign()
-        }
+        val signer = Ed25519Signer()
+        signer.init(true, privateKey)
+        signer.update(message, 0, message.size)
+
+        return signer.generateSignature()
     }
-
 }

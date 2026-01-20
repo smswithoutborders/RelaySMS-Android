@@ -7,10 +7,13 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import com.example.sw0b_001.data.models.GatewayClients
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
+
 
 val Context.relaySmsDatastore: DataStore<Preferences> by preferencesDataStore(name = "relaysms_settings")
 
@@ -27,11 +30,18 @@ object Settings {
     const val SETTINGS_LOGGED_IN = "SETTINGS_IS_EMAIL_LOGIN"
 }
 
-val Context.settingsIsLoggedIn get(): Boolean {
-    val sharedPreferences = getSharedPreferences(
-        Settings.FILENAME, Context.MODE_PRIVATE)
-    return sharedPreferences
-        .getBoolean(Settings.SETTINGS_LOGGED_IN, false)
+val Context.settingsGetIsLoggedIn get(): Boolean {
+    val masterKey: MasterKey = MasterKey.Builder(this)
+        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+        .build()
+
+    return EncryptedSharedPreferences.create(
+        this,
+        Settings.FILENAME,
+        masterKey,
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    ).getBoolean(Settings.SETTINGS_LOGGED_IN, false)
 }
 
 val Context.settingsGetIsGetMeOut get(): Boolean {
@@ -153,7 +163,17 @@ fun Context.settingsSetIsEmailLogin(state: Boolean) {
 }
 
 fun Context.settingsSetIsLoggedIn(state: Boolean) {
-    getSharedPreferences( Settings.FILENAME, Context.MODE_PRIVATE).edit {
+    val masterKey: MasterKey = MasterKey.Builder(this)
+        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+        .build()
+
+    EncryptedSharedPreferences.create(
+        this,
+        Settings.FILENAME,
+        masterKey,
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    ).edit {
         putBoolean(Settings.SETTINGS_LOGGED_IN, state)
         apply()
     }
