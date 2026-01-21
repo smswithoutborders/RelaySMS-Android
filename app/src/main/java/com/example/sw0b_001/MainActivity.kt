@@ -56,11 +56,9 @@ import com.afkanerd.smswithoutborders_libsmsmms.ui.requiredReadPhoneStatePermiss
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.SearchViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ThreadsViewModel
 import com.example.sw0b_001.extensions.context.promptBiometrics
-import com.example.sw0b_001.extensions.context.settingsGetIsGetMeOut
+import com.example.sw0b_001.extensions.context.settingsGetIsLoggedIn
 import com.example.sw0b_001.extensions.context.settingsGetLockDownApp
 import com.example.sw0b_001.extensions.context.settingsGetOnboardedCompletely
-import com.example.sw0b_001.extensions.context.settingsGetIsLoggedIn
-import com.example.sw0b_001.extensions.context.settingsSetGetMeOut
 import com.example.sw0b_001.ui.navigation.AboutScreen
 import com.example.sw0b_001.ui.navigation.BridgeViewScreen
 import com.example.sw0b_001.ui.navigation.ComposeScreen
@@ -442,10 +440,6 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
 
         CoroutineScope(Dispatchers.Default).launch {
-            if(applicationContext.settingsGetIsGetMeOut) {
-                loggedInAlready = true
-                return@launch
-            }
             if(settingsGetIsLoggedIn) {
                 vaultViewModel.validateSession(
                     applicationContext,
@@ -460,10 +454,8 @@ class MainActivity : AppCompatActivity() {
                                     applicationContext,
                                     errorMessage,
                                     Toast.LENGTH_LONG
-                                )
+                                ).show()
                             }
-                        } else {
-                            settingsSetGetMeOut(true)
                         }
                     }
                 ) {

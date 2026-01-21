@@ -138,19 +138,14 @@ fun Context.settingsSetNotShowChooseGatewayClient(state: Boolean) {
 fun Context.settingsClear() {
     getSharedPreferences( Settings.FILENAME, Context.MODE_PRIVATE).edit {
         clear()
+        apply()
     }
+    settingsSetOnboardedCompletely(true)
 }
 
 fun Context.settingsSetOnboardedCompletely(state: Boolean) {
     getSharedPreferences( Settings.FILENAME, Context.MODE_PRIVATE).edit {
         putBoolean(Settings.SETTINGS_ONBOARDED_COMPLETELY, state)
-        apply()
-    }
-}
-
-fun Context.settingsSetGetMeOut(state: Boolean) {
-    getSharedPreferences( Settings.FILENAME, Context.MODE_PRIVATE).edit {
-        putBoolean(Settings.SETTINGS_GET_ME_OUT, state)
         apply()
     }
 }

@@ -20,5 +20,5 @@ interface CredentialsDao {
     fun insert(credentials: Credentials)
 
     @Query("SELECT * FROM Credentials WHERE keystoreAlias = :keystoreAlias")
-    fun fetch(keystoreAlias: String): Credentials
+    fun fetch(keystoreAlias: String): Credentials?
 }

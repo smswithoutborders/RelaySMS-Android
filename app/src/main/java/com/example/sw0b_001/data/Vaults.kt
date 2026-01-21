@@ -20,7 +20,7 @@ import java.security.DigestException
 import java.security.MessageDigest
 
 class Vaults(val context: Context) {
-    private val CLIENT_ID_KEY_KEYSTORE_ALIAS = "CLIENT_ID_KEY_KEYSTORE_ALIAS"
+    val CLIENT_ID_KEY_KEYSTORE_ALIAS = "CLIENT_ID_KEY_KEYSTORE_ALIAS"
     private val CLIENT_RATCHET_KEY_KEYSTORE_ALIAS = "CLIENT_RATCHET_KEY_KEYSTORE_ALIAS"
     private val CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS = "CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS"
     private val CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS = "CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS"
@@ -49,17 +49,14 @@ class Vaults(val context: Context) {
 
     fun fetchDeviceID(): ByteArray? {
         return Datastore.getDatastore(context).credentialsDao()
-            .fetch(LLT_KEYSTORE_ALIAS).deviceID
+            .fetch(LLT_KEYSTORE_ALIAS)?.deviceID
     }
 
     fun fetchLongLivedToken() : ByteArray? {
-        if(!KeystoreHelpers.isAvailableInKeystore(LLT_KEYSTORE_ALIAS)) {
-            return null
-        }
         val credentials = Datastore.getDatastore(context).credentialsDao()
             .fetch(LLT_KEYSTORE_ALIAS)
 
-        if(credentials.llt == null) return null
+        if(credentials?.llt == null) return null
 
         return try {
             Cryptography.decryptWithKeyStore(credentials.llt!!,
@@ -72,10 +69,7 @@ class Vaults(val context: Context) {
     @Throws
     fun isStoredOnDevice(): Boolean {
         try {
-            val llt = fetchLongLivedToken()
-
-            val response = getStoredAccountTokens(false)
-
+            val response = getStoredAccountTokens(false, )
             return !response.storedTokensList.any { !it.isStoredOnDevice }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -144,11 +138,12 @@ class Vaults(val context: Context) {
         val credentials = Datastore.getDatastore(context).credentialsDao()
             .fetch(LLT_KEYSTORE_ALIAS)
             .apply {
+                if(this == null) throw Exception("Credentials is empty")
                 this.llt = llt
                 this.deviceID = deviceId
             }
 
-        Datastore.getDatastore(context).credentialsDao().update(credentials)
+        Datastore.getDatastore(context).credentialsDao().update(credentials!!)
     }
 
     private fun storeEncryptedSharedSecret(
@@ -451,7 +446,8 @@ class Vaults(val context: Context) {
             setMigrateToDevice(migrateToDevice)
         }.build()
 
-        return entityStub.listEntityStoredTokens(request)
+        val inEntityStub = entityStub.withInterceptors(GrpcClientInterceptor(context))
+        return inEntityStub.listEntityStoredTokens(request)
     }
 
     fun deleteEntity() : Vault.DeleteEntityResponse {
@@ -474,26 +470,24 @@ class Vaults(val context: Context) {
         )
     }
 
+    fun signGrpcRequest(message: ByteArray): ByteArray {
+        val privateKey = Datastore.getDatastore(context).credentialsDao()
+            .fetch(LLT_KEYSTORE_ALIAS)?.identityPrivateKey ?:
+        throw Exception("Missing private key in credentials for signing")
+
+        return Cryptography.signWithSigningKey(
+            keystoreAlias = CLIENT_ID_KEY_KEYSTORE_ALIAS,
+            encPrivateKey = privateKey,
+            message = message
+        )
+    }
+
     companion object {
         const val LLT_KEYSTORE_ALIAS = "LLT_KEYSTORE_ALIAS"
 
-        const val CLIENT_SIGNING_KEY_KEYSTORE_ALIAS = "CLIENT_SIGNING_KEY_KEYSTORE_ALIAS"
-
-        fun signGrpcRequest(context: Context, message: ByteArray): ByteArray {
-            val privateKey = Datastore.getDatastore(context).credentialsDao()
-                .fetch(CLIENT_SIGNING_KEY_KEYSTORE_ALIAS).identityPrivateKey ?:
-                throw Exception("Missing private key in credentials for signing")
-
-            return Cryptography.signWithSigningKey(
-                keystoreAlias = CLIENT_SIGNING_KEY_KEYSTORE_ALIAS,
-                privateKey = privateKey,
-                message = message
-            )
-        }
-
         fun getIdentitySigningKey(context: Context): ByteArray? {
             return Datastore.getDatastore(context).credentialsDao()
-                .fetch(LLT_KEYSTORE_ALIAS).identityPublicKey
+                .fetch(LLT_KEYSTORE_ALIAS)?.identityPublicKey
         }
 
         fun decomposeRefreshToken(data: String): Pair<String, String> {

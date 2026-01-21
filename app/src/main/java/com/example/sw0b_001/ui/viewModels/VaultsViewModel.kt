@@ -187,6 +187,7 @@ class VaultsViewModel(val context: Context) : ViewModel() {
                     context,
                     context.settingsGetStoreTokensOnDevice)
             } catch(e: StatusRuntimeException) {
+                e.printStackTrace()
                 if(e.status.code == Status.UNAUTHENTICATED.code) {
                     onFailureCallback(Pair(true, e.message))
                     return@launch

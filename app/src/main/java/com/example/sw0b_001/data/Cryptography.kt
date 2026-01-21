@@ -324,10 +324,10 @@ object Cryptography {
 
     fun signWithSigningKey(
         keystoreAlias: String,
-        privateKey: ByteArray,
+        encPrivateKey: ByteArray,
         message: ByteArray,
     ): ByteArray {
-        val decryptedPrivateKey = decryptWithKeyStore(privateKey, keystoreAlias)
+        val decryptedPrivateKey = decryptWithKeyStore(encPrivateKey, keystoreAlias)
         val privateKey = Ed25519PrivateKeyParameters(decryptedPrivateKey, 0)
 
         val signer = Ed25519Signer()
