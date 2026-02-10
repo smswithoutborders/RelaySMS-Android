@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
+import android.util.Base64
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
@@ -11,8 +12,18 @@ import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import com.example.sw0b_001.R
+import java.security.SecureRandom
 import java.util.concurrent.Executor
+
+
+private object Security {
+    const val FILENAME: String = "com.afkanerd.deku.security"
+    const val DB_PASSWORD = "DB_PASSWORD"
+}
 
 fun Context.isBiometricLockAvailable(): Int {
     val biometricManager = BiometricManager.from(this)
@@ -97,4 +108,46 @@ fun Context.promptBiometrics(
         .build()
 
     biometricPrompt.authenticate(promptInfo)
+}
+
+val Context.settingsGetDbPassword get(): ByteArray? {
+    val masterKey: MasterKey = MasterKey.Builder(this)
+        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+        .build()
+
+    return EncryptedSharedPreferences.create(
+        this,
+        Security.FILENAME,
+        masterKey,
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    ).getString(Security.DB_PASSWORD, "").run {
+        if(!this.isNullOrBlank()) Base64.decode(this, Base64.DEFAULT) else null
+    }
+}
+
+fun Context.settingsSetDbPassword(password: ByteArray) {
+    val masterKey: MasterKey = MasterKey.Builder(this)
+        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+        .build()
+
+    EncryptedSharedPreferences.create(
+        this,
+        Security.FILENAME,
+        masterKey,
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    ).edit {
+        putString(
+            Security.DB_PASSWORD,
+            Base64.encodeToString(password, Base64.DEFAULT))
+        apply()
+    }
+}
+
+fun Context.generateSecureRandom() : ByteArray{
+    val secureRandom = SecureRandom()
+    val secretBytes = ByteArray(32) // Example: 256 bits
+    secureRandom.nextBytes(secretBytes)
+    return secretBytes
 }

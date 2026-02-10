@@ -32,7 +32,11 @@ import com.example.sw0b_001.data.dao.StoredPlatformsDao;
 import com.example.sw0b_001.data.models.StoredPlatformsEntity;
 import com.example.sw0b_001.data.models.RatchetStates;
 
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory;
+
 import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
 
 @Database(entities = {
         RatchetStates.class,
@@ -67,14 +71,28 @@ public abstract class Datastore extends RoomDatabase {
     @DeleteTable(tableName = "Notifications")
     static class DatastoreMigrations implements AutoMigrationSpec { }
 
-    public static String databaseName = "SMSWithoutBorders-Android-App-DB";
+    public static String databaseName = "afkanerd.smswithoutborders.relaysms.db";
     private static Datastore datastore;
+    private static final String dbKeystoreAlias = "afkanerd.smswithoutborders.sms_mms_keystore_alias";
+
+    public Datastore() {
+        System.loadLibrary("sqlcipher");
+    }
+
 
     public static Datastore getDatastore(Context context) {
         if(datastore == null || !datastore.isOpen()) {
-            datastore = Room.databaseBuilder(context, Datastore.class, databaseName)
+            byte[] password = Cryptography.getDatabasePassword(context, dbKeystoreAlias);
+
+            File databaseFile = context.getDatabasePath(databaseName);
+            SupportOpenHelperFactory factory = new SupportOpenHelperFactory(password);
+            datastore = Room.databaseBuilder(context, Datastore.class, databaseFile.getAbsolutePath())
                     .enableMultiInstanceInvalidation()
+                    .openHelperFactory(factory)
                     .build();
+//            datastore = Room.databaseBuilder(context, Datastore.class, databaseName)
+//                    .enableMultiInstanceInvalidation()
+//                    .build();
         }
 
         return datastore;
