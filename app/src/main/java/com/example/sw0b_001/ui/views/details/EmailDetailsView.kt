@@ -1,5 +1,6 @@
 package com.example.sw0b_001.ui.views.details
 
+import android.R.attr.text
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
@@ -122,7 +123,26 @@ fun EmailDetailsView(
                         }
                 }
                 Platforms.ServiceTypes.BRIDGE_INCOMING.name -> {
-                    //
+                    Composers.EmailComposeHandler
+                        .decomposeBridgeMessage(
+                            message.encryptedContent!!,
+                        ).apply {
+                            from = message.fromAccount ?: "Bridge Message"
+                            to = this.to.value
+                            cc = this.cc.value
+                            bcc = this.bcc.value
+                            subject = this.subject.value
+                            body = this.body.value
+                            date = message.date
+
+                            this.image.value?.let { byteArray ->
+                                imageBitmap = BitmapFactory.decodeByteArray(
+                                    byteArray,
+                                    0,
+                                    byteArray.size
+                                )
+                            }
+                        }
                 }
             }
         }

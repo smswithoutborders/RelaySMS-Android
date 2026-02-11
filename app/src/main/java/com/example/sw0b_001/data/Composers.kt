@@ -110,7 +110,7 @@ object Composers {
             val body = splitMessage.subList(6, splitMessage.size).joinToString(separator = "\n")
 
             return EmailContent(
-//                mutableStateOf(to),
+                to =mutableStateOf(alias),
                 cc = mutableStateOf(cc),
                 bcc = mutableStateOf(bcc),
                 subject = mutableStateOf(subject),
