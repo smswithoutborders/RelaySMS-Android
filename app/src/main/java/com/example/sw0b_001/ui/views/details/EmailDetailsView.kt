@@ -122,7 +122,7 @@ fun EmailDetailsView(
                         }
                 }
                 Platforms.ServiceTypes.BRIDGE_INCOMING.name -> {
-                    TODO()
+                    //
                 }
             }
         }
