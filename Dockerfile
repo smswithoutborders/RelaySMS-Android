@@ -7,7 +7,7 @@ WORKDIR /android
 COPY . .
 
 ENV ANDROID_HOME "/usr/lib/android-sdk/"
-ENV PATH "${PATH}:${ANDROID_HOME}tools/:${ANDROID_HOME}platforms-tools/"
+ENV PATH "${PATH}:${ANDROID_HOME}tools/:${ANDROID_HOME}platform-tools/"
 # ENV GRADLE_OPTS "-Xmx2048m"
 
 RUN yes | sdkmanager --licenses
