@@ -97,6 +97,28 @@ object Composers {
             return buffer.array()
         }
 
+        fun decomposeBridgeMessage(
+            message: String
+        ): EmailContent {
+            val splitMessage = message.split("\n");
+            val alias = splitMessage[0]
+            val from = splitMessage[1]
+            val cc = splitMessage[2]
+            val bcc = splitMessage[3]
+            val subject = splitMessage[4]
+            val timestamp = splitMessage[5]
+            val body = splitMessage.subList(6, splitMessage.size).joinToString(separator = "\n")
+
+            return EmailContent(
+                to =mutableStateOf(alias),
+                cc = mutableStateOf(cc),
+                bcc = mutableStateOf(bcc),
+                subject = mutableStateOf(subject),
+                body = mutableStateOf(body),
+//                mutableStateOf(image),
+            )
+        }
+
         fun decomposeMessage(
             contentBytes: ByteArray,
             imageLength: Int,

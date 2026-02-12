@@ -216,11 +216,11 @@ fun RecentMessageCard(
             text = decomposed.body.value
         }
         Platforms.ServiceTypes.BRIDGE_INCOMING.name -> {
-            TODO()
-//            val decomposed = TODO()
-//            heading = message.fromAccount ?: "RelaySMS"
-//            subHeading = decomposed.subject
-//            text = decomposed.body
+            val decomposed = Composers.EmailComposeHandler
+                .decomposeBridgeMessage(message.encryptedContent ?: "")
+            heading = message.fromAccount ?: "RelaySMS"
+            subHeading = decomposed.subject.value
+            text = decomposed.body.value
         }
         Platforms.ServiceTypes.BRIDGE.name -> {
             val decomposed = Composers.EmailComposeHandler.decomposeMessage(

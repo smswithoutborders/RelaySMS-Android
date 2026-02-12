@@ -290,6 +290,7 @@ fun OnboardingScreen(onboardingScreen: InteractiveOnboarding) {
     }
 }
 
+
 @Preview(
     uiMode = Configuration.UI_MODE_NIGHT_YES,
     name = "DefaultPreviewDark",
