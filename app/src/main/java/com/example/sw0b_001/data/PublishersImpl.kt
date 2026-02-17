@@ -200,7 +200,7 @@ object PublishersImpl {
             ?: throw IllegalArgumentException("Platform shortcode is missing or " +
                     "invalid for platform: ${platform.name}")
 
-        val payload = formatTransmissionV2(
+        val payload = derivePayloadV2(
             context = context,
             header = header,
             encryptedDrBody = cipherText,
@@ -226,7 +226,11 @@ object PublishersImpl {
         return Base64.decode(payload, Base64.DEFAULT)
     }
 
-    fun formatTransmissionV2(
+    /**
+     * This is payload v2, separate from content format
+     * The content is part of the payload format.
+     */
+    fun derivePayloadV2(
         context: Context,
         header: ByteArray,
         encryptedDrBody: ByteArray,

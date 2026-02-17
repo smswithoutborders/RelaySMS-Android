@@ -136,8 +136,7 @@ class Publishers(val context: Context) {
 
         fun encryptStates(states: String) : ByteArray {
             return Cryptography.encryptWithKeyStore(states.encodeToByteArray(),
-                RATCHET_STATES_KEYSTORE_ALIAS ) ?:
-                throw Exception("Failed to encrypt ratchet state")
+                RATCHET_STATES_KEYSTORE_ALIAS )
         }
 
         fun removeEncryptedStates(context: Context) {
