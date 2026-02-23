@@ -66,6 +66,9 @@ import com.example.sw0b_001.ui.navigation.OnboardingSkipScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
 import com.example.sw0b_001.ui.views.makeDefault
+// progress bar
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.animation.core.animateFloatAsState
 
 data class InteractiveOnboarding(
     val title: String,
@@ -131,12 +134,30 @@ fun OnboardingInteractive(
             )
         },
     ) { innerPadding ->
+
+        val animatedProgress by animateFloatAsState(
+            targetValue = onboardingViewModel.progress,
+            label = "OnboardingProgress"
+        )
+
         Column(Modifier
             .fillMaxSize()
             .padding(innerPadding),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // progress bar starts
+            if (onboardingViewModel.totalSteps > 0) {
+                LinearProgressIndicator(
+                    progress = animatedProgress,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(6.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+//            progress bar ends
             Spacer(modifier = Modifier.weight(1f))
 
             if(showingOnboarding == null)

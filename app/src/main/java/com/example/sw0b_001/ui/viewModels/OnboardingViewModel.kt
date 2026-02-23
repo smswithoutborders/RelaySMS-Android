@@ -29,7 +29,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class OnboardingViewModel : ViewModel() {
+    //    progress bar starts
+    val totalSteps: Int
+        get() = if(::screensList.isInitialized) screensList.size else 0
 
+    val currentStep: Int
+        get() = if(index >= 0) index + 1 else 0
+
+    val progress: Float
+        get() = if(totalSteps > 0) currentStep / totalSteps.toFloat() else 0f
+//    progress bar ends
     var showLoginSignupModal by mutableStateOf(false)
     var showAddPlatformsModal by mutableStateOf(false)
     var showSendPlatformsModal by mutableStateOf(false)
