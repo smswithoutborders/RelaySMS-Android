@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
+import android.security.KeyStoreException
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
@@ -14,8 +15,12 @@ import androidx.core.content.ContextCompat
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.data.models.Bridges.StaticKeys
 import kotlinx.serialization.json.Json
-import okio.IOException
+import java.io.IOException
+import java.security.KeyStore
+import java.security.NoSuchAlgorithmException
 import java.util.concurrent.Executor
+import javax.security.cert.CertificateException
+
 
 fun Context.isBiometricLockAvailable(): Int {
     val biometricManager = BiometricManager.from(this)
@@ -120,9 +125,41 @@ fun Context.getStaticKeys() : List<StaticKeys>? {
 
         val json = String(buffer, Charsets.UTF_8)
         return Json.decodeFromString<List<StaticKeys>>(json)
-    } catch(e: IOException) {
+    } catch(e: java.io.IOException) {
         e.printStackTrace()
         return null
     }
+}
+
+@Throws(
+    KeyStoreException::class,
+    CertificateException::class,
+    java.io.IOException::class,
+    NoSuchAlgorithmException::class,
+    InterruptedException::class
+)
+fun Context.removeFromKeystore(keystoreAlias: String?) {
+    /*
+         * Load the Android KeyStore instance using the
+         * AndroidKeyStore provider to list the currently stored entries.
+         */
+    val keyStore = KeyStore.getInstance("AndroidKeyStore")
+    keyStore.load(null)
+    keyStore.deleteEntry(keystoreAlias)
+}
+
+@Throws(
+    KeyStoreException::class,
+    CertificateException::class,
+    IOException::class,
+    NoSuchAlgorithmException::class
+)
+fun Context.removeAllFromKeystore() {
+    val keyStore = KeyStore.getInstance("AndroidKeyStore")
+    keyStore.load(null)
+    val aliases = keyStore.aliases()
+    if (aliases.hasMoreElements()) do {
+        keyStore.deleteEntry(aliases.nextElement())
+    } while (aliases.hasMoreElements())
 }
 

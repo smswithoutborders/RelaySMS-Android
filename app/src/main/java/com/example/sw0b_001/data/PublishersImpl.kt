@@ -49,7 +49,7 @@ object PublishersImpl {
                 AD = AD
             )
 
-            val encryptedStates = Publishers.encryptStates(state.serialize())
+            val encryptedStates = Publishers.encryptStates(context, state.serialize())
             val ratchetsStates = RatchetStates(value = encryptedStates)
             Datastore.getDatastore(context).ratchetStatesDAO().insert(ratchetsStates)
 
@@ -88,7 +88,7 @@ object PublishersImpl {
         statesId: Int = 0,
     ) {
         try {
-            val encryptedState = Publishers.encryptStates(states.serialize())
+            val encryptedState = Publishers.encryptStates(context, states.serialize())
             val ratchetStatesEntry = RatchetStates(statesId, encryptedState)
             Datastore.getDatastore(context).ratchetStatesDAO().insert(ratchetStatesEntry)
         } catch (e: Exception) {

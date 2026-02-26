@@ -27,10 +27,12 @@ class Publishers(val context: Context) {
 
     private var oAuthRedirectUrl = "https://relay.smswithoutborders.com/android"
 
-    fun getOAuthURL(availablePlatforms: AvailablePlatforms,
-                    autogenerateCodeVerifier: Boolean = true,
-                    supportsUrlScheme: Boolean = true,
-                    requestIdentifier: String) : PublisherOuterClass.GetOAuth2AuthorizationUrlResponse {
+    fun getOAuthURL(
+        availablePlatforms: AvailablePlatforms,
+        autogenerateCodeVerifier: Boolean = true,
+        supportsUrlScheme: Boolean = true,
+        requestIdentifier: String
+    ) : PublisherOuterClass.GetOAuth2AuthorizationUrlResponse {
         val scheme = if (supportsUrlScheme) "true" else "false"
         val request = PublisherOuterClass
             .GetOAuth2AuthorizationUrlRequest.newBuilder().apply {
@@ -134,9 +136,12 @@ class Publishers(val context: Context) {
             return String(state)
         }
 
-        fun encryptStates(states: String) : ByteArray {
-            return Cryptography.encryptWithKeyStore(states.encodeToByteArray(),
-                RATCHET_STATES_KEYSTORE_ALIAS )
+        fun encryptStates(context: Context, states: String) : ByteArray {
+            return Cryptography.encryptWithKeyStore(
+                context,
+                states.encodeToByteArray(),
+                RATCHET_STATES_KEYSTORE_ALIAS
+            )
         }
 
         fun removeEncryptedStates(context: Context) {

@@ -168,8 +168,6 @@ protobuf-gradle-plugin = { module = "com.google.protobuf:protobuf-gradle-plugin"
 protobuf-java = { module = "com.google.protobuf:protobuf-java", version.ref = "protobufJava" }
 protobuf-kotlin = { module = "com.google.protobuf:protobuf-kotlin", version.ref = "protobufKotlin" }
 recaptcha = { module = "com.google.android.recaptcha:recaptcha", version.ref = "recaptcha" }
-smswithoutborders_libsignal = { module = "com.afkanerd.oss1:smswithoutborders_libsignal", version.ref = "smswithoutborders_libsignal" }
-smswithoutborders_libsmsmms = { module = "com.afkanerd.oss1:smswithoutborders_libsmsmms", version.ref = "smswithoutborders_libsmsmms" }
 ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "uiTestJunit4" }
 volley = { module = "com.android.volley:volley", version.ref = "volley" }
 androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }

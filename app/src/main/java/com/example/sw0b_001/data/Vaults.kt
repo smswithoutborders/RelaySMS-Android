@@ -2,12 +2,12 @@ package com.example.sw0b_001.data
 
 import android.content.Context
 import android.util.Base64
-import com.afkanerd.smswithoutborders.libsignal_doubleratchet.KeystoreHelpers
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.Credentials
 import com.example.sw0b_001.data.models.SecurityKeys
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.extensions.context.getStaticKeys
+import com.example.sw0b_001.extensions.context.removeFromKeystore
 import com.example.sw0b_001.extensions.context.settingsSetIsEmailLogin
 import com.example.sw0b_001.extensions.context.settingsSetIsLoggedIn
 import com.example.sw0b_001.ui.views.OTPCodeVerificationType
@@ -168,6 +168,7 @@ class Vaults(val context: Context) {
 
     private fun securelyStoreCredentials(llt: ByteArray ) {
         val encryptedLlt = Cryptography.encryptWithKeyStore(
+            context,
             llt,
             LLT_KEYSTORE_ALIAS
         )
@@ -209,14 +210,17 @@ class Vaults(val context: Context) {
         )
 
         val encryptedRootKey = Cryptography.encryptWithKeyStore(
+            context,
             rootKey,
             CLIENT_RATCHET_KEY_KEYSTORE_ALIAS
         )
         val encryptedHeaderKey = Cryptography.encryptWithKeyStore(
+            context,
             headerKey,
             CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS
         )
         val encryptedNextHeaderKey = Cryptography.encryptWithKeyStore(
+            context,
             nextHeaderKey,
             CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS
         )
@@ -303,9 +307,9 @@ class Vaults(val context: Context) {
     }
 
     fun resetPersistentData() {
-        KeystoreHelpers.removeFromKeystore(context, CLIENT_RATCHET_KEY_KEYSTORE_ALIAS)
-        KeystoreHelpers.removeFromKeystore(context, CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS)
-        KeystoreHelpers.removeFromKeystore(context, CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS)
+        context.removeFromKeystore(CLIENT_RATCHET_KEY_KEYSTORE_ALIAS)
+        context.removeFromKeystore(CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS)
+        context.removeFromKeystore(CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS)
 
         Datastore.getDatastore(context).securityKeystoreDao().apply {
             remove(CLIENT_RATCHET_KEY_KEYSTORE_ALIAS)
@@ -323,7 +327,8 @@ class Vaults(val context: Context) {
         recaptchaToken: String,
     ) : Vault.CreateEntityResponse {
         resetPersistentData()
-        val clientIdKeyPair = Cryptography.generateSigningKey(CLIENT_ID_KEY_KEYSTORE_ALIAS)
+        val clientIdKeyPair = Cryptography
+            .generateSigningKey(context, CLIENT_ID_KEY_KEYSTORE_ALIAS)
         val (clientPublicKeyAndNonce, headerPublicKey, nextHeaderPublicKey) =
             Cryptography.generateKey(
                 context,
@@ -365,7 +370,8 @@ class Vaults(val context: Context) {
         recaptchaToken: String,
     ) : Vault.AuthenticateEntityResponse {
         resetPersistentData()
-        val clientIdKeyPair = Cryptography.generateSigningKey(CLIENT_ID_KEY_KEYSTORE_ALIAS)
+        val clientIdKeyPair = Cryptography
+            .generateSigningKey(context,CLIENT_ID_KEY_KEYSTORE_ALIAS)
         val (clientPublicKeyAndNonce, headerPublicKey, nextHeaderPublicKey) =
             Cryptography.generateKey(
                 context,
@@ -406,7 +412,8 @@ class Vaults(val context: Context) {
         recaptchaToken: String,
     ) : Vault.ResetPasswordResponse {
         resetPersistentData()
-        val clientIdKeyPair = Cryptography.generateSigningKey(CLIENT_ID_KEY_KEYSTORE_ALIAS)
+        val clientIdKeyPair = Cryptography
+            .generateSigningKey(context,CLIENT_ID_KEY_KEYSTORE_ALIAS)
         val (clientPublicKeyAndNonce, headerPublicKey, nextHeaderPublicKey) =
             Cryptography.generateKey(
                 context,

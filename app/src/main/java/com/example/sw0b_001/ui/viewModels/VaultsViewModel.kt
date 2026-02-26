@@ -9,7 +9,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.afkanerd.smswithoutborders.libsignal_doubleratchet.KeystoreHelpers
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.GatewayClientsCommunications.json
@@ -17,6 +16,7 @@ import com.example.sw0b_001.data.Network
 import com.example.sw0b_001.data.Publishers
 import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.data.models.Platforms
+import com.example.sw0b_001.extensions.context.removeAllFromKeystore
 import com.example.sw0b_001.extensions.context.settingsClear
 import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
 import io.grpc.Status
@@ -121,7 +121,7 @@ class VaultsViewModel(val context: Context) : ViewModel() {
     }
 
     suspend fun logout(context: Context, successRunnable: Runnable) {
-        KeystoreHelpers.removeAllFromKeystore(context)
+        context.removeAllFromKeystore()
         Datastore.getDatastore(context).clearAllTables()
         context.settingsClear()
 

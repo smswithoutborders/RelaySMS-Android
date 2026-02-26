@@ -6,8 +6,8 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import androidx.datastore.core.IOException
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.CryptoHelpers
-import com.afkanerd.smswithoutborders.libsignal_doubleratchet.KeystoreHelpers
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityCurve25519
+import com.afkanerd.smswithoutborders.libsignal_doubleratchet.extensions.isAvailableInKeystore
 import com.example.sw0b_001.data.models.SecurityKeys
 import org.bouncycastle.crypto.generators.Ed25519KeyPairGenerator
 import org.bouncycastle.crypto.params.Ed25519KeyGenerationParameters
@@ -81,13 +81,13 @@ object Cryptography {
         val nextHeaderPublicKey = nextHeaderCurve.generateKey()
 
         val encryptedPrivateKey = encryptWithKeyStore(
-            publicKeyCurve.privateKey, keystoreAlias)
+            context,publicKeyCurve.privateKey, keystoreAlias)
 
-        val encryptedHeaderPrivateKey = encryptWithKeyStore(headerCurve.privateKey,
-            headerKeystoreAlias)
+        val encryptedHeaderPrivateKey = encryptWithKeyStore(
+            context,headerCurve.privateKey, headerKeystoreAlias)
 
-        val encryptedNextHeaderPrivateKey = encryptWithKeyStore( nextHeaderCurve.privateKey,
-            nextHeaderKeystoreAlias)
+        val encryptedNextHeaderPrivateKey = encryptWithKeyStore(
+            context,nextHeaderCurve.privateKey, nextHeaderKeystoreAlias)
 
         val nonce = CryptoHelpers.generateRandomBytes(16)
         secureStorePrivateKey(
@@ -259,8 +259,8 @@ object Cryptography {
         IllegalBlockSizeException::class,
         BadPaddingException::class
     )
-    fun encryptWithKeyStore(data: ByteArray, keystoreAlias: String): ByteArray {
-        if(!KeystoreHelpers.isAvailableInKeystore(keystoreAlias))
+    fun encryptWithKeyStore(context: Context, data: ByteArray, keystoreAlias: String): ByteArray {
+        if(!context.isAvailableInKeystore(keystoreAlias))
             createAndStoreSecretKey(keystoreAlias)
 
         // Initialize KeyStore
@@ -307,7 +307,7 @@ object Cryptography {
         return cipher.doFinal(data)
     }
 
-    fun generateSigningKey(keystoreAlias: String): Pair<ByteArray, ByteArray> {
+    fun generateSigningKey(context: Context, keystoreAlias: String): Pair<ByteArray, ByteArray> {
         val secureRandom = SecureRandom()
         val keyPairGenerator = Ed25519KeyPairGenerator()
         keyPairGenerator.init(Ed25519KeyGenerationParameters(secureRandom))
@@ -315,6 +315,7 @@ object Cryptography {
 
         val publicKey = (keyPair.public as Ed25519PublicKeyParameters).encoded
         val privateKey = encryptWithKeyStore(
+            context,
             (keyPair.private as Ed25519PrivateKeyParameters).encoded,
             keystoreAlias
         )
