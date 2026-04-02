@@ -34,7 +34,7 @@
 
     <!-- settings language -->
     <string name="language_english">English</string>
-    <string name="language_french">"French</string>
+    <string name="language_french">French</string>
     <string name="language_farsi">Farsi</string>
     <string name="language_spanish">Spanish</string>
     <string name="language_turkish" >Turkish</string>
