@@ -9,7 +9,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.GatewayClientsCommunications
 import com.example.sw0b_001.data.models.GatewayClients
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -22,7 +21,7 @@ class GatewayClientViewModel() : ViewModel() {
     fun get(context: Context, successRunnable: Runnable?): LiveData<List<GatewayClients>> {
         if(liveData.value.isNullOrEmpty()) {
             liveData = Datastore.getDatastore(context).gatewayClientsDao().all
-//            loadRemote(context, successRunnable, successRunnable)
+            loadRemote(context, successRunnable, successRunnable)
         }
         return liveData
     }

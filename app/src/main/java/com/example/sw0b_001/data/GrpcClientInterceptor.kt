@@ -1,7 +1,7 @@
 package com.example.sw0b_001.data
 
 import android.content.Context
-import com.afkanerd.smswithoutborders.libsignal_doubleratchet.CryptoHelpers
+import com.afkanerd.smswithoutborders.libsignal_doubleratchet.extensions.generateRandomBytes
 import io.grpc.CallOptions
 import io.grpc.Channel
 import io.grpc.ClientCall
@@ -22,7 +22,7 @@ class GrpcClientInterceptor(val context: Context) : ClientInterceptor{
         ) {
             override fun start(responseListener: Listener<RespT?>?, headers: Metadata?) {
                 val timestamp = (System.currentTimeMillis() / 1000).toString()
-                val nonce = CryptoHelpers.generateRandomBytes(16)
+                val nonce = context.generateRandomBytes(16)
                 val methodName = "/${method?.fullMethodName}"
                 val llt = String(Vaults(context).fetchLongLivedToken()!!,
                     Charsets.UTF_8)

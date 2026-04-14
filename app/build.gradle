@@ -191,7 +191,7 @@ configurations {
 dependencies {
     implementation 'com.github.smswithoutborders:lib_image_android:3275ac7'
     implementation 'com.github.smswithoutborders:lib_smsmms_android:a8c65c5'
-    implementation 'com.github.smswithoutborders:lib_signal_double_ratchet_java:648acd2'
+    implementation 'com.github.smswithoutborders:lib_signal_double_ratchet_java:439872d'
 
     implementation libs.androidx.appcompat
     implementation libs.material

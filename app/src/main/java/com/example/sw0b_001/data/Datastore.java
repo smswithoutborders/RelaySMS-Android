@@ -48,7 +48,7 @@ import org.jetbrains.annotations.NotNull;
         SecurityKeys.class,
         Credentials.class,
         EncryptedContent.class,},
-        version = 27,
+        version = 28,
         autoMigrations = {
         @AutoMigration( from = 8, to = 9, spec = Datastore.DatastoreMigrations.class),
         @AutoMigration( from = 9, to = 10, spec= Datastore.DatastoreMigrations.class),
@@ -69,6 +69,7 @@ import org.jetbrains.annotations.NotNull;
         @AutoMigration( from = 24, to = 25),
         @AutoMigration( from = 25, to = 26),
         @AutoMigration( from = 26, to = 27),
+        @AutoMigration( from = 27, to = 28, spec = Datastore.Migrate27To28.class),
 })
 
 public abstract class Datastore extends RoomDatabase {
@@ -131,6 +132,18 @@ public abstract class Datastore extends RoomDatabase {
             @DeleteTable(tableName = "GatewayClient")
     })
     static class Migrate22To23 implements AutoMigrationSpec {
+        @Override
+        public void onPostMigrate(@NonNull SupportSQLiteDatabase db) {
+        }
+    }
+
+    @DeleteColumn.Entries(
+            @DeleteColumn(
+                    tableName = "GatewayClients",
+                    columnName = "reliability"
+            )
+    )
+    static class Migrate27To28 implements AutoMigrationSpec {
         @Override
         public void onPostMigrate(@NonNull SupportSQLiteDatabase db) {
         }

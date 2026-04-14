@@ -163,3 +163,8 @@ fun Context.removeAllFromKeystore() {
     } while (aliases.hasMoreElements())
 }
 
+fun Context.isAvailableInKeystore(keystoreAlias: String) : Boolean {
+    val ks = KeyStore.getInstance("AndroidKeyStore")
+    ks.load(null)
+    return ks.containsAlias(keystoreAlias)
+}

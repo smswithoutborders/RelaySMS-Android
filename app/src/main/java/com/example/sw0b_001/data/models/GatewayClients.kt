@@ -1,6 +1,5 @@
 package com.example.sw0b_001.data.models
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -20,6 +19,5 @@ data class GatewayClients(
     var last_published_date: Long? = null,
     var manuallyAdded: Boolean = false,
     var operatorCode: String? = null,
-    var reliability: Long? = null,
     val region: String? = null,
 )

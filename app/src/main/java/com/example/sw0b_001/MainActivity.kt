@@ -440,6 +440,9 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
 
         CoroutineScope(Dispatchers.Default).launch {
+            gatewayClientViewModel.get(applicationContext) {
+            }
+
             if(settingsGetIsLoggedIn) {
                 vaultViewModel.validateSession(
                     applicationContext,

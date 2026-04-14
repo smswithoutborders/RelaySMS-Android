@@ -5,10 +5,8 @@ import android.security.KeyStoreException
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import androidx.datastore.core.IOException
-import com.afkanerd.smswithoutborders.libsignal_doubleratchet.CryptoHelpers
-import com.afkanerd.smswithoutborders.libsignal_doubleratchet.SecurityCurve25519
-import com.afkanerd.smswithoutborders.libsignal_doubleratchet.extensions.isAvailableInKeystore
 import com.example.sw0b_001.data.models.SecurityKeys
+import com.example.sw0b_001.extensions.context.isAvailableInKeystore
 import org.bouncycastle.crypto.generators.Ed25519KeyPairGenerator
 import org.bouncycastle.crypto.params.Ed25519KeyGenerationParameters
 import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters
@@ -59,54 +57,6 @@ object Cryptography {
         ))
     }
 
-    // Used in bridges for one time use keys
-    fun generateKey(): Pair<ByteArray, ByteArray> {
-        val libSigCurve25519 = SecurityCurve25519()
-        val publicKey = libSigCurve25519.generateKey()
-        return Pair(publicKey,libSigCurve25519.privateKey)
-    }
-
-    fun generateKey(
-        context: Context,
-        keystoreAlias: String,
-        headerKeystoreAlias: String,
-        nextHeaderKeystoreAlias: String,
-    ): Triple<Pair<ByteArray, ByteArray>, ByteArray, ByteArray>{
-        val publicKeyCurve = SecurityCurve25519()
-        val headerCurve = SecurityCurve25519()
-        val nextHeaderCurve = SecurityCurve25519()
-
-        val publicKey = publicKeyCurve.generateKey()
-        val headerPublicKey = headerCurve.generateKey()
-        val nextHeaderPublicKey = nextHeaderCurve.generateKey()
-
-        val encryptedPrivateKey = encryptWithKeyStore(
-            context,publicKeyCurve.privateKey, keystoreAlias)
-
-        val encryptedHeaderPrivateKey = encryptWithKeyStore(
-            context,headerCurve.privateKey, headerKeystoreAlias)
-
-        val encryptedNextHeaderPrivateKey = encryptWithKeyStore(
-            context,nextHeaderCurve.privateKey, nextHeaderKeystoreAlias)
-
-        val nonce = CryptoHelpers.generateRandomBytes(16)
-        secureStorePrivateKey(
-            context = context,
-            keystoreAlias = keystoreAlias,
-            headerKeystoreAlias = headerKeystoreAlias,
-            nextHeaderKeystoreAlias = nextHeaderKeystoreAlias,
-            rootKeyPrivateKey = encryptedPrivateKey,
-            nonce = nonce,
-            headerPrivateKey = encryptedHeaderPrivateKey,
-            nextHeaderPrivateKey = encryptedNextHeaderPrivateKey
-        )
-        return Triple(
-            Pair(publicKey, nonce),
-            headerPublicKey,
-            nextHeaderPublicKey
-        )
-    }
-
     private fun getSecuredStoredPrivateKey(context: Context, keystoreAlias: String) : SecurityKeys {
         return Datastore.getDatastore(context).securityKeystoreDao().fetch(keystoreAlias)
     }
@@ -138,87 +88,6 @@ object Cryptography {
             rootKeySecurityKeys,
             headerKeySecurityKeys,
             nextHeaderKeySecurityKeys
-        )
-    }
-
-    fun calculateSharedSecrets(
-        context: Context,
-        keystoreAlias: String,
-        headerKeystoreAlias: String,
-        nextHeaderKeystoreAlias: String,
-        publicKey: ByteArray,
-        salt: ByteArray? = null,
-        info: ByteArray? = null,
-    ): Triple<ByteArray, ByteArray, ByteArray> {
-        val securityKeys = fetchPrivateKeys(
-            context,
-            keystoreAlias,
-            headerKeystoreAlias,
-            nextHeaderKeystoreAlias,
-        )
-
-        val rootKeyCurve = SecurityCurve25519(securityKeys.first.privateKey)
-        val headerKeyCurve = SecurityCurve25519(securityKeys.second.privateKey)
-        val nextHeaderKeyCurve = SecurityCurve25519(securityKeys.third.privateKey)
-
-        val rootKey = rootKeyCurve.calculateSharedSecret(
-            publicKey,
-            salt = salt,
-            info = info
-        )
-
-        val headerKey = headerKeyCurve.calculateSharedSecret(
-            publicKey,
-            salt = salt,
-            info = info
-        )
-
-        val nextHeaderKey = nextHeaderKeyCurve.calculateSharedSecret(
-            publicKey,
-            salt = salt,
-            info = info
-        )
-
-        return Triple(rootKey, headerKey, nextHeaderKey)
-    }
-
-    fun calculateSharedSecretWithNonce(
-        context: Context,
-        keystoreAlias: String,
-        headerKeystoreAlias: String,
-        nextHeaderKeystoreAlias: String,
-        publicKey: ByteArray,
-        authenticationPublicKey: ByteArray,
-        serverNonce: ByteArray,
-        headerPublicKey: ByteArray,
-        nextHeaderPublicKey: ByteArray,
-    ): Triple<ByteArray, ByteArray, ByteArray> {
-        val securityKeys = fetchPrivateKeys(
-            context,
-            keystoreAlias,
-            headerKeystoreAlias,
-            nextHeaderKeystoreAlias,
-        )
-
-        val rootKeyCurve = SecurityCurve25519(securityKeys.first.privateKey)
-        val headerKeyCurve = SecurityCurve25519(securityKeys.second.privateKey)
-        val nextHeaderKeyCurve = SecurityCurve25519(securityKeys.third.privateKey)
-
-        val salt = "RelaySMS v1".encodeToByteArray()
-        val info  = "RelaySMS C2S DR v1".encodeToByteArray()
-
-        return rootKeyCurve.agreeWithAuthAndNonce(
-            authenticationPublicKey = authenticationPublicKey,
-            publicKey = publicKey,
-            salt = salt,
-            nonce1 = securityKeys.first.nonce!!,
-            nonce2 = serverNonce,
-            info = info,
-            authenticationPrivateKey = null,
-            headerPrivateKey = headerKeyCurve.privateKey,
-            nextHeaderPrivateKey = nextHeaderKeyCurve.privateKey,
-            headerPublicKey = headerPublicKey,
-            nextHeaderPublicKey = nextHeaderPublicKey
         )
     }
 
