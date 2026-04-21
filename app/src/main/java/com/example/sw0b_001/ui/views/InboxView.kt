@@ -31,7 +31,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.models.EncryptedContent
+import com.example.sw0b_001.data.models.Messages
 import com.example.sw0b_001.ui.navigation.BridgeViewScreen
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.theme.AppTheme
@@ -39,13 +39,13 @@ import com.example.sw0b_001.ui.theme.AppTheme
 
 @Composable
 fun InboxView(
-    _messages: List<EncryptedContent> = emptyList<EncryptedContent>(),
+    _messages: List<Messages> = emptyList<Messages>(),
     messagesViewModel: MessagesViewModel,
     platformsViewModel: PlatformsViewModel,
     navController: NavController,
 ) {
     val context = LocalContext.current
-    val messages: List<EncryptedContent> = if(LocalInspectionMode.current) _messages
+    val messages: List<Messages> = if(LocalInspectionMode.current) _messages
     else messagesViewModel.getInboxMessages(context).observeAsState(emptyList()).value
 
     Box(
@@ -119,25 +119,25 @@ fun InboxViewEmptyPreview() {
 @Composable
 fun InboxScreenMessages_Preview() {
     AppTheme(darkTheme = false) {
-        val encryptedContent = EncryptedContent()
-        encryptedContent.id = 0
-        encryptedContent.type = "email"
-        encryptedContent.date = System.currentTimeMillis()
-        encryptedContent.platformName = "gmail"
-        encryptedContent.fromAccount = "developers@relaysms.me"
-        encryptedContent.gatewayClientMSISDN = "+237123456789"
-        encryptedContent.encryptedContent = "dev@relaysms.me:::subject here:This is an encrypted content"
+        val messages = Messages()
+        messages.id = 0
+        messages.type = "email"
+        messages.date = System.currentTimeMillis()
+        messages.platformName = "gmail"
+        messages.fromAccount = "developers@relaysms.me"
+        messages.gatewayClientMSISDN = "+237123456789"
+        messages.body = "dev@relaysms.me:::subject here:This is an encrypted content"
 
-        val text = EncryptedContent()
+        val text = Messages()
         text.id = 1
         text.type = "text"
         text.date = System.currentTimeMillis()
         text.platformName = "twitter"
         text.fromAccount = "@relaysms.me"
         text.gatewayClientMSISDN = "+237123456789"
-        text.encryptedContent = "@relaysms.me:Hello world"
+        text.body = "@relaysms.me:Hello world"
         InboxView(
-            _messages = listOf(encryptedContent, text),
+            _messages = listOf(messages, text),
             messagesViewModel = MessagesViewModel(),
             platformsViewModel = PlatformsViewModel(),
             navController = rememberNavController(),

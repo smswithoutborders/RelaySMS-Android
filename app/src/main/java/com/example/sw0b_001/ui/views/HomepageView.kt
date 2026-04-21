@@ -34,7 +34,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.models.EncryptedContent
+import com.example.sw0b_001.data.models.Messages
 import com.example.sw0b_001.extensions.context.settingsGetIsLoggedIn
 import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.appbars.GatewayClientsAppBar
@@ -59,7 +59,7 @@ enum class BottomTabsItems {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomepageView(
-    _messages: List<EncryptedContent> = emptyList<EncryptedContent>(),
+    _messages: List<Messages> = emptyList<Messages>(),
     navController: NavController,
     platformsViewModel : PlatformsViewModel,
     messagesViewModel: MessagesViewModel,
@@ -79,7 +79,7 @@ fun HomepageView(
         )
     }
 
-    val inboxMessages: List<EncryptedContent> = if(LocalInspectionMode.current) _messages
+    val inboxMessages: List<Messages> = if(LocalInspectionMode.current) _messages
     else messagesViewModel.getInboxMessages(context).observeAsState(emptyList()).value
 
     val messagesPagingSource = messagesViewModel.getMessages(context = context)
@@ -347,17 +347,17 @@ fun HomepageViewLoggedIn_Preview() {
 @Composable
 fun HomepageViewLoggedInMessages_Preview() {
     AppTheme(darkTheme = false) {
-        val encryptedContent = EncryptedContent()
-        encryptedContent.id = 0
-        encryptedContent.type = "email"
-        encryptedContent.date = System.currentTimeMillis()
-        encryptedContent.platformName = "gmail"
-        encryptedContent.fromAccount = "developers@relaysms.me"
-        encryptedContent.gatewayClientMSISDN = "+237123456789"
-        encryptedContent.encryptedContent = "origin@gmail.com:dev@relaysms.me:::subject here:This is an encrypted content"
+        val messages = Messages()
+        messages.id = 0
+        messages.type = "email"
+        messages.date = System.currentTimeMillis()
+        messages.platformName = "gmail"
+        messages.fromAccount = "developers@relaysms.me"
+        messages.gatewayClientMSISDN = "+237123456789"
+        messages.body = "origin@gmail.com:dev@relaysms.me:::subject here:This is an encrypted content"
 
         HomepageView(
-            _messages = listOf(encryptedContent),
+            _messages = listOf(messages),
             isLoggedIn = true,
             navController = rememberNavController(),
             platformsViewModel = remember{ PlatformsViewModel() },

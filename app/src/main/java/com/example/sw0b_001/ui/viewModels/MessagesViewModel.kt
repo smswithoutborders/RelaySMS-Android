@@ -1,9 +1,6 @@
 package com.example.sw0b_001.ui.viewModels
 
 import android.content.Context
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,7 +10,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.models.Platforms
-import com.example.sw0b_001.data.models.EncryptedContent
+import com.example.sw0b_001.data.models.Messages
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -23,12 +20,12 @@ import kotlinx.coroutines.launch
 
 class MessagesViewModel : ViewModel() {
 //    var message by mutableStateOf<EncryptedContent?>(null)
-    var message: EncryptedContent? = null
+    var message: Messages? = null
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    private lateinit var messagesList: LiveData<MutableList<EncryptedContent>>
-    private lateinit var inboxMessageList: LiveData<MutableList<EncryptedContent>>
+    private lateinit var messagesList: LiveData<MutableList<Messages>>
+    private lateinit var inboxMessageList: LiveData<MutableList<Messages>>
 
     private lateinit var datastore: Datastore
 
@@ -39,15 +36,15 @@ class MessagesViewModel : ViewModel() {
     var maxSize: Int = PagingConfig.Companion.MAX_SIZE_UNBOUNDED
 
 
-    private var conversationsPager: Flow<PagingData<EncryptedContent>>? = null
+    private var conversationsPager: Flow<PagingData<Messages>>? = null
 
-    fun getMessage( context: Context, messageId: Long?): LiveData<EncryptedContent>? {
+    fun getMessage( context: Context, messageId: Long?): LiveData<Messages>? {
         if(messageId == null) return null
         return Datastore.getDatastore(context).encryptedContentDAO()
             .getLiveData(messageId)
     }
 
-    fun getMessages(context: Context): Flow<PagingData<EncryptedContent>> {
+    fun getMessages(context: Context): Flow<PagingData<Messages>> {
         if(conversationsPager == null) {
             conversationsPager = Pager(
                 config = PagingConfig(
@@ -65,7 +62,7 @@ class MessagesViewModel : ViewModel() {
         return conversationsPager!!
     }
 
-    fun getInboxMessages(context: Context): LiveData<MutableList<EncryptedContent>> {
+    fun getInboxMessages(context: Context): LiveData<MutableList<Messages>> {
         viewModelScope.launch {
             if (!::inboxMessageList.isInitialized) {
                 _isLoading.value = true
@@ -80,11 +77,11 @@ class MessagesViewModel : ViewModel() {
         return inboxMessageList
     }
 
-    fun insert(encryptedContent: EncryptedContent) : Long {
-        return datastore.encryptedContentDAO().insert(encryptedContent)
+    fun insert(messages: Messages) : Long {
+        return datastore.encryptedContentDAO().insert(messages)
     }
 
-    fun delete(context: Context, message: EncryptedContent, onCompleteCallback: () -> Unit) {
+    fun delete(context: Context, message: Messages, onCompleteCallback: () -> Unit) {
         viewModelScope.launch(Dispatchers.Default) {
             Datastore.getDatastore(context).encryptedContentDAO().delete(message)
             launch(Dispatchers.Main) {

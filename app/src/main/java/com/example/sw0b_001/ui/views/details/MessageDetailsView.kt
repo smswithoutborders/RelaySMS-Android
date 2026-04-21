@@ -1,7 +1,6 @@
 package com.example.sw0b_001.ui.views.details
 
 import android.util.Base64
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,7 +37,7 @@ import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Composers
-import com.example.sw0b_001.data.models.EncryptedContent
+import com.example.sw0b_001.data.models.Messages
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.navigation.ComposeScreen
@@ -46,7 +45,6 @@ import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,9 +61,9 @@ fun MessageDetailsView(
     var date by remember { mutableLongStateOf(0L) }
 
     val message = messagesViewModel.message
-    if (message?.encryptedContent != null) {
+    if (message?.body != null) {
         try {
-            val contentBytes = Base64.decode(message.encryptedContent, Base64.DEFAULT)
+            val contentBytes = Base64.decode(message.body, Base64.DEFAULT)
             val decomposed = Composers.MessageComposeHandler.decomposeMessage(contentBytes)
 
             fromDisplay = decomposed.from.value!!
@@ -163,14 +161,14 @@ fun MessageDetailsView(
 @Composable
 fun MessageDetailsPreview() {
     AppTheme(darkTheme = false) {
-        val message = EncryptedContent()
+        val message = Messages()
         message.id = 2
         message.type = "message"
         message.date = System.currentTimeMillis()
         message.platformName = "telegram"
         message.fromAccount = "+237123456789"
         message.gatewayClientMSISDN = "+237123456789"
-        message.encryptedContent = "+123456789:+237123456789:hello Telegram"
+        message.body = "+123456789:+237123456789:hello Telegram"
 
         val platformsViewModel = remember{ PlatformsViewModel() }
         val messagesViewModel = remember{ MessagesViewModel() }

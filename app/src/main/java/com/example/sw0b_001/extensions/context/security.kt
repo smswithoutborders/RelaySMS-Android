@@ -12,6 +12,7 @@ import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDualSim
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.data.models.Bridges.StaticKeys
 import kotlinx.serialization.json.Json
@@ -143,6 +144,7 @@ fun Context.removeFromKeystore(keystoreAlias: String?) {
          * Load the Android KeyStore instance using the
          * AndroidKeyStore provider to list the currently stored entries.
          */
+    this.isDualSim()
     val keyStore = KeyStore.getInstance("AndroidKeyStore")
     keyStore.load(null)
     keyStore.deleteEntry(keystoreAlias)

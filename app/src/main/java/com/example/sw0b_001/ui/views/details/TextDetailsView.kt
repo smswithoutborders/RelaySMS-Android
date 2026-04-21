@@ -2,7 +2,6 @@ package com.example.sw0b_001.ui.views.details
 
 
 import android.util.Base64
-import android.util.Log
 import com.example.sw0b_001.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -40,7 +39,7 @@ import com.example.sw0b_001.data.Composers
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Helpers
-import com.example.sw0b_001.data.models.EncryptedContent
+import com.example.sw0b_001.data.models.Messages
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.navigation.ComposeScreen
@@ -48,7 +47,6 @@ import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,9 +65,9 @@ fun TextDetailsView(
 
     // Decompose the message content when the view is composed
     val message = messagesViewModel.message
-    if (message?.encryptedContent != null) {
+    if (message?.body != null) {
         try {
-            val contentBytes = Base64.decode(message.encryptedContent, Base64.DEFAULT)
+            val contentBytes = Base64.decode(message.body, Base64.DEFAULT)
             val decomposedMessage = Composers.TextComposeHandler
                 .decomposeMessage(contentBytes)
 
@@ -161,14 +159,14 @@ fun TextDetailsView(
 @Composable
 fun TextDetailsPreview() {
     AppTheme(darkTheme = false) {
-        val text = EncryptedContent()
+        val text = Messages()
         text.id = 1
         text.type = "text"
         text.date = System.currentTimeMillis()
         text.platformName = "twitter"
         text.fromAccount = "@relaysms.me"
         text.gatewayClientMSISDN = "+237123456789"
-        text.encryptedContent = "@relaysms.me:Hello world"
+        text.body = "@relaysms.me:Hello world"
 
         val platformsViewModel = remember{ PlatformsViewModel() }
         val messagesViewModel = remember{ MessagesViewModel() }

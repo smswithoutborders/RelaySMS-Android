@@ -6,30 +6,23 @@ import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.Protocol
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.RatchetPayload
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.RatchetsHE
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.States
+import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.extensions.context.getStaticKeys
-import org.bouncycastle.crypto.AsymmetricCipherKeyPair
 import org.bouncycastle.crypto.params.X25519PublicKeyParameters
 
 class Bridges(val context: Context) {
-    val protocols = Protocols(context)
-
-    fun saveParametersForForwardSecrecy(
-        staticKeyPair: AsymmetricCipherKeyPair,
-        ephemeralKeyPair: AsymmetricCipherKeyPair,
-        h: ByteArray,
-        ck: ByteArray
-    ) {
-        TODO("Save params")
-    }
+    private val protocols = Protocols(context)
+    private val staticKeyAlias = "Bridges_Static_KeystoreAlias"
+    private val ephemeralKeyAlias = "Ephemeral_Static_KeystoreAlias"
 
     fun forSendingWithoutForwardSecrecy(
         plaintext: ByteArray,
-    ): RatchetPayload {
-        val staticPublicKeyId = (0..255).random()
+    ): RatchetPayload? {
+        var authenticationPublicKeyId = (0..255).random()
 
-        val authenticationPublicKey = context.getStaticKeys(staticPublicKeyId)?.run {
+        val authenticationPublicKey = context.getStaticKeys(authenticationPublicKeyId)?.run {
             X25519PublicKeyParameters(this, 0)
-        } ?: throw Exception("Could not find static keys for id: $staticPublicKeyId")
+        } ?: throw Exception("Could not find static keys for id")
 
         val info = "RelaySMS C2S DR v1".encodeToByteArray()
         val headerInfo = "RelaySMS C2S DRHE v1".encodeToByteArray()
@@ -37,103 +30,206 @@ class Bridges(val context: Context) {
         val ephemeralKeyPair = protocols.generateDH()
         val staticKeyPair = protocols.generateDH()
 
+        var ratchetPayload: RatchetPayload? = null
         try {
-            Cryptography.generateKeysIK(
-                context = context,
-                ephemeralKeyPair = ephemeralKeyPair,
-                authenticationPublicKey = authenticationPublicKey,
-                staticKeyPair = staticKeyPair,
-                info = info,
-                headerInfo = headerInfo
-            ).use { keys ->
-                val ratchet = RatchetsHE(context)
-                val state = States()
-                ratchet.ratchetInitAlice(
-                    state = state,
-                    sk = keys.rk,
-                    bobDhPublicKey = authenticationPublicKey,
-                    sharedHka = keys.hk,
-                    sharedNHka = keys.nhk
-                )
-
-                return ratchet.ratchetEncrypt(
-                    state = state,
-                    plaintext = plaintext,
-                    ad = keys.h!!
-                ).also {
-                    saveParametersForForwardSecrecy(
-                        staticKeyPair,
-                        ephemeralKeyPair,
-                        keys.h!!,
-                        keys.ck!!
+            ephemeralKeyPair.use { ephemeralKeyPair ->
+                staticKeyPair.use { staticKeyPair ->
+                    val keys = Cryptography.generateKeysIK(
+                        context = context,
+                        ephemeralKeyPair = ephemeralKeyPair,
+                        authenticationPublicKey = authenticationPublicKey,
+                        staticKeyPair = staticKeyPair,
+                        info = info,
+                        headerInfo = headerInfo
                     )
+
+                    try {
+                        keys.use { keys ->
+                            val ratchet = RatchetsHE(context)
+                            val state = States()
+                            state.use { persistentState ->
+                                ratchet.ratchetInitAlice(
+                                    state = persistentState,
+                                    sk = keys.rk,
+                                    bobDhPublicKey = authenticationPublicKey,
+                                    sharedHka = keys.hk,
+                                    sharedNHka = keys.nhk
+                                )
+
+                                ratchetPayload = ratchet.ratchetEncrypt(
+                                    state = persistentState,
+                                    plaintext = plaintext,
+                                    ad = keys.h!!
+                                )
+
+                                saveParametersForForwardSecrecy(
+                                    staticKeyPair,
+                                    ephemeralKeyPair,
+                                    keys.h!!,
+                                    keys.ck!!,
+                                    authenticationPublicKeyId
+                                )
+                            }
+                        }
+                    } finally {
+                        keys.close()
+                    }
                 }
             }
         } catch(e: Exception) {
             e.printStackTrace()
             throw e
         } finally {
+            authenticationPublicKeyId = -1
+            authenticationPublicKey.encoded.fill(0)
+            info.fill(0)
+            headerInfo.fill(0)
 
+            ephemeralKeyPair.close()
+            staticKeyPair.close()
+        }
+
+        return ratchetPayload
+    }
+
+    private fun saveParametersForForwardSecrecy(
+        staticKeyPair: Protocols.CloseableCurve15519KeyPair,
+        ephemeralKeyPair: Protocols.CloseableCurve15519KeyPair,
+        h: ByteArray,
+        ck: ByteArray,
+        authenticationPublicKeyId: Int,
+    ) {
+        val staticKeys = Keys(
+            keystoreAlias = staticKeyAlias,
+            authenticationPublicKeyId = authenticationPublicKeyId,
+            privateKey = staticKeyPair.privateKey!!,
+            publicKey = staticKeyPair.publicKey
+        )
+
+        val db = Datastore.getDatastore(context).keysDao()
+
+        try {
+            db.insert(staticKeys)
+        } catch(e: Exception) {
+            throw e
+        }
+
+        val ephemeralKeys = Keys(
+            keystoreAlias = ephemeralKeyAlias,
+            privateKey = ephemeralKeyPair.privateKey!!,
+            publicKey = ephemeralKeyPair.publicKey,
+            h = h,
+            ck = ck,
+        )
+
+        try {
+            db.insert(ephemeralKeys)
+        } catch(e: Exception) {
+            throw e
         }
     }
 
     fun forSendingWithForwardSecrecy(
         context: Context,
         plaintext: ByteArray,
-        ck: ByteArray,
-        h: ByteArray,
-        ephemeralKeyPair: AsymmetricCipherKeyPair,
-        ephemeralResponderPublicKey: X25519PublicKeyParameters,
         staticPublicKey: X25519PublicKeyParameters,
         staticPublicKeyId: Int,
-    ): RatchetPayload {
+    ): RatchetPayload? {
+        var ratchetPayload: RatchetPayload? = null
+
         val authenticationPublicKey = context.getStaticKeys(staticPublicKeyId)?.run {
             X25519PublicKeyParameters(this, 0)
         } ?: throw Exception("Could not find static keys for id: $staticPublicKeyId")
 
-        val info = "RelaySMS C2S DR v1".encodeToByteArray()
-        val headerInfo = "RelaySMS C2S DRHE v1".encodeToByteArray()
         val ad = "RelaySMS AD v1".encodeToByteArray() +
                 staticPublicKey.encoded +
                 authenticationPublicKey.encoded
 
         val ratchet = RatchetsHE(context)
-        val state = States() // TODO("Get states")
+        val ratchetState = Datastore.getDatastore(context).ratchetStatesDAO().fetch()
+            ?: throw Exception("No state found for Ratchets")
 
-        if(state == null) {
-            try {
-                Cryptography.generateKeysIKForwardSecrecy(
-                    context = context,
-                    h = h,
-                    ck = ck,
-                    ephemeralKeyPair = ephemeralKeyPair,
-                    ephemeralResponderPublicKey = ephemeralResponderPublicKey,
-                    authenticationPublicKey = authenticationPublicKey,
-                    info = info,
-                    headerInfo = headerInfo
-                ).use { keys ->
-                    ratchet.ratchetInitAlice(
+        try {
+            ratchetState.use { rs ->
+                val deserializedState = States.deserialize(rs.value)
+                deserializedState.use { state ->
+                    ratchetPayload = ratchet.ratchetEncrypt(
                         state = state,
-                        sk = keys.rk,
-                        bobDhPublicKey = authenticationPublicKey,
-                        sharedHka = keys.hk,
-                        sharedNHka = keys.nhk
+                        plaintext = plaintext,
+                        ad = ad
                     )
+                    val persistentState = RatchetStates(value = state.serialize())
+                    persistentState.use { rs ->
+                        rs.save(context)
+                    }
                 }
-            } catch(e: Exception) {
-                e.printStackTrace()
-                throw e
-            } finally {
-
             }
+        } catch (e: Exception) {
+            throw e
+        } finally {
+            authenticationPublicKey.encoded.fill(0)
+            ad.fill(0)
         }
+        return ratchetPayload
+    }
 
-        return ratchet.ratchetEncrypt(
-            state = state,
-            plaintext = plaintext,
-            ad = ad
-        ).also {
-            TODO("Save states")
+    fun initRatchet() {
+        val info = "RelaySMS C2S DR v1".encodeToByteArray()
+        val headerInfo = "RelaySMS C2S DRHE v1".encodeToByteArray()
+
+        val authenticationPublicKeyId = Datastore.getDatastore(context).keysDao()
+            .fetchAuthenticationId(staticKeyAlias)
+            ?: throw Exception("No authentication Id found")
+
+        val authenticationPublicKey = context
+            .getStaticKeys(authenticationPublicKeyId)?.run {
+                X25519PublicKeyParameters(this, 0)
+            } ?: throw Exception("Could not find static keys for id")
+
+        val ephemeralKeys = Datastore.getDatastore(context).keysDao()
+            .fetch(ephemeralKeyAlias)
+
+        try {
+            ephemeralKeys.use { ephemeralKeys ->
+                val ephemeralKeyPair = Protocols.CloseableCurve15519KeyPair(
+                    publicKey = ephemeralKeys.publicKey,
+                    privateKey = ephemeralKeys.privateKey
+                )
+                ephemeralKeyPair.use {
+                    val keys = Cryptography.generateKeysIKForwardSecrecy(
+                        context = context,
+                        h = ephemeralKeys.h!!,
+                        ck = ephemeralKeys.ck!!,
+                        ephemeralKeyPair = ephemeralKeyPair,
+                        ephemeralResponderPublicKey =
+                            X25519PublicKeyParameters(ephemeralKeys.publicKey),
+                        authenticationPublicKey = authenticationPublicKey,
+                        info = info,
+                        headerInfo = headerInfo
+                    )
+                    try {
+                        keys.use { keys ->
+                            RatchetStates.initialize(
+                                context = context,
+                                authenticationPublicKey = authenticationPublicKey,
+                                rk = keys.rk,
+                                hk = keys.hk,
+                                nhk = keys.nhk
+                            )
+                        }
+                    } finally {
+                        keys.close()
+                    }
+                }
+            }
+        } catch(e: Exception) {
+            e.printStackTrace()
+            throw e
+        } finally {
+            info.fill(0)
+            headerInfo.fill(0)
+            authenticationPublicKey.encoded.fill(0)
+            ephemeralKeys.close()
         }
     }
 }

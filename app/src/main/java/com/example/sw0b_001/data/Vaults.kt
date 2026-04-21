@@ -2,6 +2,7 @@ package com.example.sw0b_001.data
 
 import android.content.Context
 import android.util.Base64
+import com.afkanerd.smswithoutborders.libsignal_doubleratchet.extensions.generateRandomBytes
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.Credentials
 import com.example.sw0b_001.data.models.SecurityKeys
@@ -18,6 +19,9 @@ import vault.v2.EntityGrpc
 import vault.v2.Vault
 import java.security.DigestException
 import java.security.MessageDigest
+import com.example.sw0b_001.data.Cryptography
+import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.Protocols
+import org.bouncycastle.crypto.params.X25519PublicKeyParameters
 
 class Vaults(val context: Context) {
     val CLIENT_ID_KEY_KEYSTORE_ALIAS = "CLIENT_ID_KEY_KEYSTORE_ALIAS"
@@ -30,6 +34,8 @@ class Vaults(val context: Context) {
             context.getString(R.string.vault_grpc_port).toInt())
         .useTransportSecurity()
         .build()
+
+    val protocols = Protocols(context)
 
     private var entityStub: EntityGrpc.EntityBlockingStub = EntityGrpc.newBlockingStub(channel)
 
@@ -197,39 +203,11 @@ class Vaults(val context: Context) {
         val serverAuthenticationKey = context.getStaticKeys(254) ?:
         throw Exception("Failed to find static keys")
 
-        val (rootKey, headerKey, nextHeaderKey) = Cryptography.calculateSharedSecretWithNonce(
-            context = context,
-            keystoreAlias = CLIENT_RATCHET_KEY_KEYSTORE_ALIAS,
-            headerKeystoreAlias = CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS,
-            nextHeaderKeystoreAlias = CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS,
-            publicKey = serverRatchetPublicKey,
-            authenticationPublicKey = serverAuthenticationKey,
-            serverNonce = serverNonce,
-            headerPublicKey = serverHeaderPublicKey,
-            nextHeaderPublicKey = serverNextHeaderPublicKey
-        )
-
-        val encryptedRootKey = Cryptography.encryptWithKeyStore(
-            context,
-            rootKey,
-            CLIENT_RATCHET_KEY_KEYSTORE_ALIAS
-        )
-        val encryptedHeaderKey = Cryptography.encryptWithKeyStore(
-            context,
-            headerKey,
-            CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS
-        )
-        val encryptedNextHeaderKey = Cryptography.encryptWithKeyStore(
-            context,
-            nextHeaderKey,
-            CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS
-        )
-
-        storeEncryptedSharedSecret(
-            encryptedRootKey,
-            encryptedHeaderKey,
-            encryptedNextHeaderKey
-        )
+//        storeEncryptedSharedSecret(
+//            encryptedRootKey,
+//            encryptedHeaderKey,
+//            encryptedNextHeaderKey
+//        )
     }
 
     fun submitOTPCode(
@@ -326,24 +304,24 @@ class Vaults(val context: Context) {
         password: String,
         recaptchaToken: String,
     ) : Vault.CreateEntityResponse {
+
         resetPersistentData()
+
         val clientIdKeyPair = Cryptography
             .generateSigningKey(context, CLIENT_ID_KEY_KEYSTORE_ALIAS)
-        val (clientPublicKeyAndNonce, headerPublicKey, nextHeaderPublicKey) =
-            Cryptography.generateKey(
-                context,
-                CLIENT_RATCHET_KEY_KEYSTORE_ALIAS,
-                CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS,
-                CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS
-            )
+
+        val ephemeralKeyPair = protocols.generateDH()
+        val nonce = context.generateRandomBytes(16)
 
         val createEntityRequest = Vault.CreateEntityRequest.newBuilder().apply {
             setCountryCode(countryCode)
             setPhoneNumber(phoneNumber)
             setPassword(password)
             setClientIdPubKey(clientIdKeyPair.first.toByteString())
-            setClientRatchetPubKey(clientPublicKeyAndNonce.first.toByteString())
-            setClientNonce(clientPublicKeyAndNonce.second.toByteString())
+            setClientRatchetPubKey(
+                (ephemeralKeyPair.public as X25519PublicKeyParameters).encoded.toByteString()
+            )
+            setClientNonce(nonce.toByteString())
             setClientHeaderPubKey(headerPublicKey.toByteString())
             setClientNextHeaderPubKey(nextHeaderPublicKey.toByteString())
             setCaptchaToken(recaptchaToken)

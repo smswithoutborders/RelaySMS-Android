@@ -3,48 +3,28 @@ package com.example.sw0b_001.ui.views
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
@@ -52,7 +32,6 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -61,8 +40,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
-import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
-import com.example.sw0b_001.data.models.Bridges
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.data.models.AvailablePlatforms
 import com.example.sw0b_001.data.models.Platforms
@@ -70,7 +47,7 @@ import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Composers
-import com.example.sw0b_001.data.models.EncryptedContent
+import com.example.sw0b_001.data.models.Messages
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
 import com.example.sw0b_001.ui.navigation.BridgeViewScreen
 import com.example.sw0b_001.ui.navigation.EmailViewScreen
@@ -193,9 +170,9 @@ fun GetMessageAvatar(logo: Bitmap? = null) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RecentMessageCard(
-    message: EncryptedContent,
+    message: Messages,
     logo: Bitmap? = null,
-    onClickCallback: (EncryptedContent) -> Unit,
+    onClickCallback: (Messages) -> Unit,
 ) {
     var text by remember { mutableStateOf("" ) }
     var heading by remember { mutableStateOf( "") }
@@ -203,7 +180,7 @@ fun RecentMessageCard(
 
     when(message.type?.uppercase(Locale.getDefault())) {
         Platforms.ServiceTypes.EMAIL.name -> {
-            val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
+            val contentBytes = Base64.decode(message.body!!, Base64.DEFAULT)
             val decomposed = Composers.EmailComposeHandler
                 .decomposeMessage(
                     contentBytes,
@@ -224,7 +201,7 @@ fun RecentMessageCard(
         }
         Platforms.ServiceTypes.BRIDGE.name -> {
             val decomposed = Composers.EmailComposeHandler.decomposeMessage(
-                Base64.decode(message.encryptedContent, Base64.DEFAULT),
+                Base64.decode(message.body, Base64.DEFAULT),
                 message.imageLength,
                 message.textLength,
                 true
@@ -235,7 +212,7 @@ fun RecentMessageCard(
         }
         Platforms.ServiceTypes.TEXT.name -> {
             try {
-                val contentBytes = Base64.decode(message.encryptedContent!!,
+                val contentBytes = Base64.decode(message.body!!,
                     Base64.DEFAULT)
                 val decomposed = Composers.TextComposeHandler
                     .decomposeMessage(contentBytes)
@@ -251,7 +228,7 @@ fun RecentMessageCard(
         }
         Platforms.ServiceTypes.MESSAGE.name -> {
             try {
-                val contentBytes = Base64.decode(message.encryptedContent!!,
+                val contentBytes = Base64.decode(message.body!!,
                     Base64.DEFAULT)
                 val decomposed = Composers.MessageComposeHandler
                     .decomposeMessage(contentBytes)
@@ -330,14 +307,14 @@ fun RecentMessageCard(
 @Composable
 fun RecentScreenPreview() {
     AppTheme(darkTheme = false) {
-        val encryptedContent = EncryptedContent()
-        encryptedContent.id = 0
-        encryptedContent.type = "email"
-        encryptedContent.date = System.currentTimeMillis()
-        encryptedContent.platformName = "gmail"
-        encryptedContent.fromAccount = "developers@relaysms.me"
-        encryptedContent.gatewayClientMSISDN = "+237123456789"
-        encryptedContent.encryptedContent = "This is an encrypted content"
+        val messages = Messages()
+        messages.id = 0
+        messages.type = "email"
+        messages.date = System.currentTimeMillis()
+        messages.platformName = "gmail"
+        messages.fromAccount = "developers@relaysms.me"
+        messages.gatewayClientMSISDN = "+237123456789"
+        messages.body = "This is an encrypted content"
         RecentView(
             navController = rememberNavController(),
             messagesViewModel = remember { MessagesViewModel() },
@@ -352,32 +329,32 @@ fun RecentScreenPreview() {
 @Composable
 fun RecentScreenMessages_Preview() {
     AppTheme(darkTheme = false) {
-        val encryptedContent = EncryptedContent()
-        encryptedContent.id = 0
-        encryptedContent.type = "email"
-        encryptedContent.date = System.currentTimeMillis()
-        encryptedContent.platformName = "gmail"
-        encryptedContent.fromAccount = "developers@relaysms.me"
-        encryptedContent.gatewayClientMSISDN = "+237123456789"
-        encryptedContent.encryptedContent = "reply@relaysms.me:cc@relaysms.me:bcc@relaysms.me:subject here:This is an encrypted content"
+        val messages = Messages()
+        messages.id = 0
+        messages.type = "email"
+        messages.date = System.currentTimeMillis()
+        messages.platformName = "gmail"
+        messages.fromAccount = "developers@relaysms.me"
+        messages.gatewayClientMSISDN = "+237123456789"
+        messages.body = "reply@relaysms.me:cc@relaysms.me:bcc@relaysms.me:subject here:This is an encrypted content"
 
-        val text = EncryptedContent()
+        val text = Messages()
         text.id = 1
         text.type = "text"
         text.date = System.currentTimeMillis()
         text.platformName = "twitter"
         text.fromAccount = "@relaysms.me"
         text.gatewayClientMSISDN = "+237123456789"
-        text.encryptedContent = "@relaysms.me:Hello world"
+        text.body = "@relaysms.me:Hello world"
 
-        val message = EncryptedContent()
+        val message = Messages()
         message.id = 2
         message.type = "message"
         message.date = System.currentTimeMillis()
         message.platformName = "telegram"
         message.fromAccount = "+237123456789"
         message.gatewayClientMSISDN = "+237123456789"
-        message.encryptedContent = "+123456789:+237123456789:hello Telegram"
+        message.body = "+123456789:+237123456789:hello Telegram"
 
         RecentView(
             navController = rememberNavController(),
@@ -391,16 +368,16 @@ fun RecentScreenMessages_Preview() {
 @Composable
 fun RecentsCardPreview() {
     AppTheme(darkTheme = false) {
-        val encryptedContent = EncryptedContent()
-        encryptedContent.id = 0
-        encryptedContent.type = "email"
-        encryptedContent.date = System.currentTimeMillis()
-        encryptedContent.platformName = "gmail"
-        encryptedContent.fromAccount = "developers@relaysms.me"
-        encryptedContent.gatewayClientMSISDN = "+237123456789"
-        encryptedContent.encryptedContent = "reply@relaysms.me:cc@relaysms.me:bcc@relaysms.me:subject here:This is an encrypted content"
+        val messages = Messages()
+        messages.id = 0
+        messages.type = "email"
+        messages.date = System.currentTimeMillis()
+        messages.platformName = "gmail"
+        messages.fromAccount = "developers@relaysms.me"
+        messages.gatewayClientMSISDN = "+237123456789"
+        messages.body = "reply@relaysms.me:cc@relaysms.me:bcc@relaysms.me:subject here:This is an encrypted content"
         RecentMessageCard(
-            message = encryptedContent,
+            message = messages,
             onClickCallback = {},
         )
     }

@@ -3,8 +3,6 @@ package com.example.sw0b_001.data
 import android.content.Context
 import android.content.Intent
 import android.util.Base64
-import androidx.core.util.component1
-import androidx.core.util.component2
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.RatchetsHE
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.States
 import com.afkanerd.smswithoutborders_libsmsmms.data.data.models.SmsManager
@@ -14,7 +12,7 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.toLittleEndianBytes
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewModel
 import com.example.sw0b_001.data.Helpers.toBytes
 import com.example.sw0b_001.data.models.AvailablePlatforms
-import com.example.sw0b_001.data.models.EncryptedContent
+import com.example.sw0b_001.data.models.Messages
 import com.example.sw0b_001.data.models.RatchetStates
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.extensions.context.settingsGetDefaultGatewayClients
@@ -103,9 +101,9 @@ object PublishersImpl {
         account: StoredPlatformsEntity? = null,
         imageLength: Int,
         textLength: Int
-    ): EncryptedContent {
-        return EncryptedContent().apply {
-            encryptedContent = Base64
+    ): Messages {
+        return Messages().apply {
+            body = Base64
                 .encodeToString(content, Base64.DEFAULT)
             date = System.currentTimeMillis()
             type = platform.service_type
@@ -122,8 +120,8 @@ object PublishersImpl {
         payload: String,
         address: String,
         subscriptionId: Long,
-        encryptedContent: EncryptedContent,
-        onSuccessRunnable: (EncryptedContent) -> Unit
+        messages: Messages,
+        onSuccessRunnable: (Messages) -> Unit
     ) {
         val gatewayClient = context.settingsGetDefaultGatewayClients
 
@@ -136,7 +134,7 @@ object PublishersImpl {
                     address = address,
                     subscriptionId = subscriptionId,
                     threadId = context.getThreadId(gatewayClient.msisdn),
-                    callback = { conversation -> onSuccessRunnable(encryptedContent) }
+                    callback = { conversation -> onSuccessRunnable(messages) }
                 )
             }
             else {
@@ -165,7 +163,7 @@ object PublishersImpl {
         languageCode: String = "en",
         smsTransmission: Boolean = true,
         serverEphemeralPublicKey: ByteArray? = null,
-        onSuccessRunnable: (EncryptedContent) -> Unit? = {}
+        onSuccessRunnable: (Messages) -> Unit? = {}
     ): ByteArray {
         val stateStr = Publishers.getDecryptedStates(context)
         val state = if(stateStr.isNullOrBlank()) States()
@@ -218,7 +216,7 @@ object PublishersImpl {
                 payload = payload,
                 address = gatewayClient.msisdn,
                 subscriptionId = subscriptionId,
-                encryptedContent = message,
+                messages = message,
             ) {}
         }
 

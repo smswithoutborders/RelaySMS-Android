@@ -1,64 +1,36 @@
 package com.example.sw0b_001.ui.views.compose
 
-import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.ImageDecoder
 import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
 import android.util.Base64
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.AddToPhotos
 import androidx.compose.material.icons.filled.AttachFile
-import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.DeveloperMode
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
@@ -66,21 +38,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
 import com.afkanerd.lib_image_android.ui.navigation.ImageRenderNav
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDefaultSimSubscription
-import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getUriForDrawable
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.components.mmsImagePicker
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.BuildConfig
-import com.example.sw0b_001.MainActivity
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Composers
-import com.example.sw0b_001.data.GatewayClientsCommunications
-import com.example.sw0b_001.data.models.EncryptedContent
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.extensions.context.settingsGetNotShowChooseGatewayClient
@@ -96,11 +62,6 @@ import com.example.sw0b_001.ui.views.DeveloperHTTPView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import kotlin.text.isNotEmpty
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -162,12 +123,12 @@ fun ComposerInterface(
 
     val decomposedEmailMessage = remember {
         if((type == Platforms.ServiceTypes.BRIDGE || type == Platforms.ServiceTypes.EMAIL) &&
-            message?.encryptedContent != null
+            message?.body != null
         ) {
             try {
                 Composers.EmailComposeHandler
                     .decomposeMessage(
-                        Base64.decode(message?.encryptedContent,
+                        Base64.decode(message?.body,
                             Base64.DEFAULT),
                         message?.imageLength!!,
                         message?.textLength!!,
@@ -193,9 +154,9 @@ fun ComposerInterface(
     }
 
     val decomposedMessageMessage = remember {
-        if (type == Platforms.ServiceTypes.MESSAGE && message?.encryptedContent != null) {
+        if (type == Platforms.ServiceTypes.MESSAGE && message?.body != null) {
             try {
-                val contentBytes = Base64.decode(message!!.encryptedContent,
+                val contentBytes = Base64.decode(message!!.body,
                     Base64.DEFAULT)
                 Composers.MessageComposeHandler.decomposeMessage(contentBytes)
             } catch (e: Exception) {
@@ -207,9 +168,9 @@ fun ComposerInterface(
     }
 
     val decomposedTextMessage = remember {
-        if (type == Platforms.ServiceTypes.TEXT && message?.encryptedContent != null) {
+        if (type == Platforms.ServiceTypes.TEXT && message?.body != null) {
             try {
-                val contentBytes = Base64.decode(message?.encryptedContent,
+                val contentBytes = Base64.decode(message?.body,
                     Base64.DEFAULT)
                 Composers.TextComposeHandler.decomposeMessage(contentBytes)
             } catch (e: Exception) {

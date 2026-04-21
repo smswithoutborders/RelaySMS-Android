@@ -3,15 +3,11 @@ package com.example.sw0b_001.ui.views.details
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Base64
-import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,14 +15,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -50,26 +40,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
-import coil3.Uri
-import com.afkanerd.lib_image_android.ui.ImageMainView
-import com.afkanerd.lib_image_android.ui.navigation.ImageRenderNav
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.example.sw0b_001.data.Composers
-import com.example.sw0b_001.data.models.Bridges
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.data.models.Platforms
-import com.example.sw0b_001.data.models.EncryptedContent
+import com.example.sw0b_001.data.models.Messages
 import com.example.sw0b_001.ui.components.AttachImageView
 import com.example.sw0b_001.ui.navigation.ComposeScreen
-import com.example.sw0b_001.ui.navigation.MessageViewScreen
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,13 +75,13 @@ fun EmailDetailsView(
     var imageBitmap by remember{ mutableStateOf<Bitmap?>(null) }
 
     val message = messagesViewModel.message
-    if (message?.encryptedContent != null) {
+    if (message?.body != null) {
         if (isBridge) {
             when (message.type) {
                 Platforms.ServiceTypes.BRIDGE.name -> {
                     Composers.EmailComposeHandler
                         .decomposeMessage(
-                            Base64.decode(message.encryptedContent!!,
+                            Base64.decode(message.body!!,
                                 Base64.DEFAULT),
                             message.imageLength,
                             message.textLength,
@@ -128,7 +111,7 @@ fun EmailDetailsView(
         }
         else {
             try {
-                val contentBytes = Base64.decode(message.encryptedContent!!, Base64.DEFAULT)
+                val contentBytes = Base64.decode(message.body!!, Base64.DEFAULT)
                 val decomposed = Composers.EmailComposeHandler
                     .decomposeMessage(
                         contentBytes,
@@ -292,18 +275,18 @@ fun EmailDetailsRow(label: String, email: String) {
 @Preview
 fun EmailDetailsPreview() {
     AppTheme(darkTheme = false) {
-        val encryptedContent = EncryptedContent()
-        encryptedContent.id = 0
-        encryptedContent.type = "email"
-        encryptedContent.date = System.currentTimeMillis()
-        encryptedContent.platformName = "gmail"
-        encryptedContent.fromAccount = "developers@relaysms.me"
-        encryptedContent.gatewayClientMSISDN = "+237123456789"
-        encryptedContent.encryptedContent = "reply@relaysms.me:cc@relaysms.me:bcc@relaysms.me:subject here:This is an encrypted content"
+        val messages = Messages()
+        messages.id = 0
+        messages.type = "email"
+        messages.date = System.currentTimeMillis()
+        messages.platformName = "gmail"
+        messages.fromAccount = "developers@relaysms.me"
+        messages.gatewayClientMSISDN = "+237123456789"
+        messages.body = "reply@relaysms.me:cc@relaysms.me:bcc@relaysms.me:subject here:This is an encrypted content"
 
         val platformsViewModel = remember{ PlatformsViewModel() }
         val messagesViewModel = remember{ MessagesViewModel() }
-        messagesViewModel.message = encryptedContent
+        messagesViewModel.message = messages
         EmailDetailsView(
             platformsViewModel=platformsViewModel,
             messagesViewModel= messagesViewModel,
