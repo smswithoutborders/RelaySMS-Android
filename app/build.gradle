@@ -190,7 +190,7 @@ configurations {
 
 dependencies {
     implementation 'com.github.smswithoutborders:lib_image_android:3275ac7'
-    implementation 'com.github.smswithoutborders:lib_smsmms_android:a8c65c5'
+    implementation 'com.github.smswithoutborders:lib_smsmms_android:b0deb94'
     implementation 'com.github.smswithoutborders:lib_signal_double_ratchet_java:a42dea9'
 
     implementation libs.androidx.appcompat
@@ -364,6 +364,10 @@ dependencies {
     implementation(libs.protobuf.kotlin)
     implementation(libs.bcprov.jdk15to18)
 
+    implementation "androidx.security:security-crypto:1.1.0"
+
+    implementation 'net.zetetic:sqlcipher-android:4.14.1@aar'
+    implementation 'androidx.sqlite:sqlite:2.6.2'
     implementation "androidx.security:security-crypto:1.1.0"
 }
 

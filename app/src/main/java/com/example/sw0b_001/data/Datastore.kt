@@ -1,72 +1,74 @@
-package com.example.sw0b_001.data;
+package com.example.sw0b_001.data
+
+import android.content.Context
+import androidx.room.Database
+import androidx.room.Room.databaseBuilder
+import androidx.room.RoomDatabase
+import com.afkanerd.smswithoutborders_libsmsmms.data.Cryptography.getDatabasePassword
+import com.example.sw0b_001.data.dao.AvailablePlatformsDao
+import com.example.sw0b_001.data.dao.CredentialsDao
+import com.example.sw0b_001.data.dao.GatewayClientsDao
+import com.example.sw0b_001.data.dao.KeysDao
+import com.example.sw0b_001.data.dao.MessagesDao
+import com.example.sw0b_001.data.dao.PlatformDao
+import com.example.sw0b_001.data.dao.RatchetStatesDAO
+import com.example.sw0b_001.data.dao.StoredPlatformsDao
+import com.example.sw0b_001.data.models.AvailablePlatforms
+import com.example.sw0b_001.data.models.Credentials
+import com.example.sw0b_001.data.models.GatewayClients
+import com.example.sw0b_001.data.models.Keys
+import com.example.sw0b_001.data.models.Messages
+import com.example.sw0b_001.data.models.Platforms
+import com.example.sw0b_001.data.models.RatchetStates
+import com.example.sw0b_001.data.models.StoredPlatformsEntity
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 
 
-import android.content.Context;
-
-import androidx.room.Database;
-import androidx.room.DeleteTable;
-import androidx.room.RenameTable;
-import androidx.room.Room;
-import androidx.room.RoomDatabase;
-import androidx.room.migration.AutoMigrationSpec;
-
-import com.example.sw0b_001.data.dao.CredentialsDao;
-import com.example.sw0b_001.data.dao.MessagesDao;
-import com.example.sw0b_001.data.dao.GatewayClientsDao;
-import com.example.sw0b_001.data.dao.KeysDao;
-import com.example.sw0b_001.data.dao.SecurityKeystoreDao;
-import com.example.sw0b_001.data.models.Credentials;
-import com.example.sw0b_001.data.models.Messages;
-import com.example.sw0b_001.data.models.GatewayClients;
-import com.example.sw0b_001.data.dao.RatchetStatesDAO;
-import com.example.sw0b_001.data.models.AvailablePlatforms;
-import com.example.sw0b_001.data.dao.AvailablePlatformsDao;
-import com.example.sw0b_001.data.models.Keys;
-import com.example.sw0b_001.data.models.Platforms;
-import com.example.sw0b_001.data.dao.PlatformDao;
-import com.example.sw0b_001.data.dao.StoredPlatformsDao;
-import com.example.sw0b_001.data.models.SecurityKeys;
-import com.example.sw0b_001.data.models.StoredPlatformsEntity;
-import com.example.sw0b_001.data.models.RatchetStates;
-
-@Database(entities = {
-        RatchetStates.class,
-        Platforms.class,
-        AvailablePlatforms.class,
-        GatewayClients.class,
-        StoredPlatformsEntity.class,
-        Keys.class,
-        Credentials.class,
-        Messages.class,},
-        version = 1,
-        autoMigrations = { }
+@Database(
+    entities = [RatchetStates::class, Platforms::class, AvailablePlatforms::class, GatewayClients::class, StoredPlatformsEntity::class, Keys::class, Credentials::class, Messages::class],
+    version = 1,
+    autoMigrations = []
 )
+abstract class Datastore : RoomDatabase() {
+    abstract fun platformDao(): PlatformDao?
+    abstract fun availablePlatformsDao(): AvailablePlatformsDao?
+    abstract fun gatewayClientsDao(): GatewayClientsDao?
+    abstract fun encryptedContentDAO(): MessagesDao?
+    abstract fun storedPlatformsDao(): StoredPlatformsDao?
+    abstract fun ratchetStatesDAO(): RatchetStatesDAO?
+    abstract fun keysDao(): KeysDao?
+    abstract fun credentialsDao(): CredentialsDao?
 
-public abstract class Datastore extends RoomDatabase {
-    @RenameTable(fromTableName = "Platform", toTableName = "Platforms")
-    @DeleteTable(tableName = "Notifications")
-    static class DatastoreMigrations implements AutoMigrationSpec { }
+    companion object {
+        private var datastore: Datastore? = null
 
-    public static String databaseName = "smswithoutborders_relaysms.db";
-    private static Datastore datastore;
-
-    public static Datastore getDatastore(Context context) {
-        if(datastore == null || !datastore.isOpen()) {
-            datastore = Room.databaseBuilder(context, Datastore.class, databaseName)
-                    .enableMultiInstanceInvalidation()
-                    .build();
+        init {
+            System.loadLibrary("sqlcipher")
         }
 
-        return datastore;
+        fun getDatastore(context: Context): Datastore? {
+            if (datastore == null) {
+                val dbKeystoreAlias = "RelaySMS_KeystoreAlias"
+                val databaseName = "smswithoutborders_relaysms.db"
+
+                getDatabasePassword(context, dbKeystoreAlias).use { password ->
+                    val databaseFile = context.getDatabasePath(databaseName)
+
+                    password.useRaw { rawBytes ->
+                        datastore = databaseBuilder(
+                            context = context,
+                            klass = Datastore::class.java,
+                            databaseFile.absolutePath,
+                        )
+                            .openHelperFactory(SupportOpenHelperFactory(rawBytes))
+                            .fallbackToDestructiveMigration(false)
+                            .build()
+                    }
+                }
+
+            }
+
+            return datastore
+        }
     }
-
-
-    public abstract PlatformDao platformDao();
-    public abstract AvailablePlatformsDao availablePlatformsDao();
-    public abstract GatewayClientsDao gatewayClientsDao();
-    public abstract MessagesDao encryptedContentDAO();
-    public abstract StoredPlatformsDao storedPlatformsDao();
-    public abstract RatchetStatesDAO ratchetStatesDAO();
-    public abstract KeysDao keysDao();
-    public abstract CredentialsDao credentialsDao();
 }

@@ -15,9 +15,7 @@ class Bridges(val context: Context) {
     private val staticKeyAlias = "Bridges_Static_KeystoreAlias"
     private val ephemeralKeyAlias = "Ephemeral_Static_KeystoreAlias"
 
-    fun forSendingWithoutForwardSecrecy(
-        plaintext: ByteArray,
-    ): RatchetPayload? {
+    fun forSendingWithoutForwardSecrecy(plaintext: ByteArray): RatchetPayload? {
         var authenticationPublicKeyId = (0..255).random()
 
         val authenticationPublicKey = context.getStaticKeys(authenticationPublicKeyId)?.run {
@@ -106,7 +104,8 @@ class Bridges(val context: Context) {
             publicKey = staticKeyPair.publicKey
         )
 
-        val db = Datastore.getDatastore(context).keysDao()
+        val db = Datastore.getDatastore(context)?.keysDao()
+            ?: throw Exception("Failed to open database")
 
         try {
             db.insert(staticKeys)
@@ -146,8 +145,9 @@ class Bridges(val context: Context) {
                 authenticationPublicKey.encoded
 
         val ratchet = RatchetsHE(context)
-        val ratchetState = Datastore.getDatastore(context).ratchetStatesDAO().fetch()
-            ?: throw Exception("No state found for Ratchets")
+        val db = Datastore.getDatastore(context)?.ratchetStatesDAO()
+            ?: throw Exception("Failed to open database")
+        val ratchetState = db.fetch() ?: throw Exception("No state found for Ratchets")
 
         try {
             ratchetState.use { rs ->
@@ -177,8 +177,10 @@ class Bridges(val context: Context) {
         val info = "RelaySMS C2S DR v1".encodeToByteArray()
         val headerInfo = "RelaySMS C2S DRHE v1".encodeToByteArray()
 
-        val authenticationPublicKeyId = Datastore.getDatastore(context).keysDao()
-            .fetchAuthenticationId(staticKeyAlias)
+        val db = Datastore.getDatastore(context)?.keysDao()
+            ?: throw Exception("Failed to open database")
+
+        val authenticationPublicKeyId = db.fetchAuthenticationId(staticKeyAlias)
             ?: throw Exception("No authentication Id found")
 
         val authenticationPublicKey = context
@@ -186,8 +188,7 @@ class Bridges(val context: Context) {
                 X25519PublicKeyParameters(this, 0)
             } ?: throw Exception("Could not find static keys for id")
 
-        val ephemeralKeys = Datastore.getDatastore(context).keysDao()
-            .fetch(ephemeralKeyAlias)
+        val ephemeralKeys = db.fetch(ephemeralKeyAlias)
 
         try {
             ephemeralKeys.use { ephemeralKeys ->
