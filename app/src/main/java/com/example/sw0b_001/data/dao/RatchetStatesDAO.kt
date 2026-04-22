@@ -8,8 +8,8 @@ import com.example.sw0b_001.data.models.RatchetStates
 
 @Dao
 interface RatchetStatesDAO {
-    @Query("SELECT * FROM RatchetStates")
-    fun fetch(): RatchetStates?
+    @Query("SELECT * FROM RatchetStates where keystoreAlias = :keystoreAlias")
+    fun fetch(keystoreAlias: String): RatchetStates?
 
     @Query("DELETE FROM RatchetStates")
     fun deleteAll()

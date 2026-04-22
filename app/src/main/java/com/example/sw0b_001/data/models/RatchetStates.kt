@@ -12,6 +12,7 @@ import java.lang.AutoCloseable
 @Entity
 data class RatchetStates (
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val keystoreAlias: String,
     val value: ByteArray
 ): AutoCloseable {
     private var isClosed = false
@@ -21,16 +22,11 @@ data class RatchetStates (
         isClosed = true
     }
 
-    fun use(block: (RatchetStates) -> Unit) {
-        if (isClosed) throw IllegalStateException("Ratchet state already closed")
-        block(this)
-    }
-
     fun save(context: Context) {
         if (isClosed) throw IllegalStateException("Cannot save a closed state")
 
         try {
-            Datastore.getDatastore(context).ratchetStatesDAO().insert(this)
+            Datastore.getDatastore(context)?.ratchetStatesDAO()?.insert(this)
         } catch (e: Exception) {
             close()
             throw e
@@ -40,6 +36,7 @@ data class RatchetStates (
     companion object {
         fun initialize(
             context: Context,
+            keystoreAlias: String,
             authenticationPublicKey: CipherParameters,
             rk: ByteArray,
             hk: ByteArray,
@@ -55,7 +52,10 @@ data class RatchetStates (
                     sharedHka = hk,
                     sharedNHka = nhk
                 )
-                val ratchetStates = RatchetStates(value = closeableState.serialize())
+                val ratchetStates = RatchetStates(
+                    value = closeableState.serialize(),
+                    keystoreAlias = keystoreAlias
+                )
                 ratchetStates.use { rs ->
                     rs.save(context)
                 }

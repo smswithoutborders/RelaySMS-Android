@@ -2,32 +2,48 @@ package com.example.sw0b_001.data
 
 import android.content.Context
 import android.util.Base64
+import com.afkanerd.smswithoutborders.libsignal_doubleratchet.Cryptography
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.extensions.generateRandomBytes
+import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.Protocols
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.models.Credentials
-import com.example.sw0b_001.data.models.SecurityKeys
+import com.example.sw0b_001.data.models.Keys
+import com.example.sw0b_001.data.models.RatchetStates
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.extensions.context.getStaticKeys
-import com.example.sw0b_001.extensions.context.removeFromKeystore
 import com.example.sw0b_001.extensions.context.settingsSetIsEmailLogin
 import com.example.sw0b_001.extensions.context.settingsSetIsLoggedIn
+import com.example.sw0b_001.extensions.sha256
 import com.example.sw0b_001.ui.views.OTPCodeVerificationType
 import com.google.protobuf.kotlin.toByteString
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
+import org.bouncycastle.crypto.AsymmetricCipherKeyPair
+import org.bouncycastle.crypto.generators.Ed25519KeyPairGenerator
+import org.bouncycastle.crypto.params.Ed25519KeyGenerationParameters
+import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters
+import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters
+import org.bouncycastle.crypto.params.X25519PublicKeyParameters
+import org.bouncycastle.crypto.signers.Ed25519Signer
+import org.bouncycastle.jce.provider.BouncyCastleProvider
 import vault.v2.EntityGrpc
 import vault.v2.Vault
 import java.security.DigestException
 import java.security.MessageDigest
-import com.example.sw0b_001.data.Cryptography
-import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.Protocols
-import org.bouncycastle.crypto.params.X25519PublicKeyParameters
+import java.security.SecureRandom
+import java.security.Security
 
 class Vaults(val context: Context) {
-    val CLIENT_ID_KEY_KEYSTORE_ALIAS = "CLIENT_ID_KEY_KEYSTORE_ALIAS"
-    private val CLIENT_RATCHET_KEY_KEYSTORE_ALIAS = "CLIENT_RATCHET_KEY_KEYSTORE_ALIAS"
-    private val CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS = "CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS"
-    private val CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS = "CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS"
+    private val clientVaultHandshakeKeystoreAliasStaticKeys =
+        "clientVaultHandshakeKeystoreAlias_static_keys"
+
+    private val clientVaultHandshakeKeystoreAliasEphemeralKeys =
+        "clientVaultHandshakeKeystoreAlias_ephemeral_keys"
+    private val ratchetKeystoreAlias = "Vault_Ratchet_KeystoreAlias"
+
+    init {
+        Security.removeProvider("BC")
+        Security.insertProviderAt(BouncyCastleProvider(), 1)
+    }
 
     private var channel: ManagedChannel = ManagedChannelBuilder
         .forAddress(context.getString(R.string.vault_grpc_url),
@@ -53,23 +69,9 @@ class Vaults(val context: Context) {
         }
     }
 
-    fun fetchDeviceID(): ByteArray? {
-        return Datastore.getDatastore(context).credentialsDao()
-            .fetch(LLT_KEYSTORE_ALIAS)?.deviceID
-    }
-
     fun fetchLongLivedToken() : ByteArray? {
-        val credentials = Datastore.getDatastore(context).credentialsDao()
-            .fetch(LLT_KEYSTORE_ALIAS)
-
-        if(credentials?.llt == null) return null
-
-        return try {
-            Cryptography.decryptWithKeyStore(credentials.llt!!,
-                LLT_KEYSTORE_ALIAS)
-        } catch (e: Exception) {
-            throw e
-        }
+        return Datastore.getDatastore(context)?.keysDao()
+            ?.fetchLlt(clientVaultHandshakeKeystoreAliasStaticKeys)
     }
 
     @Throws
@@ -91,6 +93,7 @@ class Vaults(val context: Context) {
             val response = getStoredAccountTokens(migrateToDevice)
 
             val datastore = Datastore.getDatastore(context)
+                ?: throw Exception("Database could not be opened")
             val platformsToSave = mutableListOf<StoredPlatformsEntity>()
 
             response.storedTokensList.forEach { accountTokens ->
@@ -119,180 +122,200 @@ class Vaults(val context: Context) {
                     )
                 }
             }
-            datastore.storedPlatformsDao().insert(platformsToSave)
+            datastore.storedPlatformsDao()?.insert(platformsToSave)
         } catch (e: Exception) {
             e.printStackTrace()
             throw e
         }
     }
 
-    private fun storeCredentialsPreOtp(
-        publicKey: ByteArray,
-        privateKey: ByteArray,
-    ) {
-        Datastore.getDatastore(context).credentialsDao().insert(Credentials(
-            keystoreAlias = LLT_KEYSTORE_ALIAS,
-            identityPublicKey = publicKey,
-            identityPrivateKey = privateKey
-        ))
-    }
-
-    private fun storeCredentialsPostOtp(
-        llt: ByteArray,
-        deviceId: ByteArray,
-    ) {
-        val credentials = Datastore.getDatastore(context).credentialsDao()
-            .fetch(LLT_KEYSTORE_ALIAS)
-            .apply {
-                if(this == null) throw Exception("Credentials is empty")
-                this.llt = llt
-                this.deviceID = deviceId
-            }
-
-        Datastore.getDatastore(context).credentialsDao().update(credentials!!)
-    }
-
-    private fun storeEncryptedSharedSecret(
-        rootKey: ByteArray,
-        headerKey: ByteArray,
-        nextHeaderKey: ByteArray
-    ) {
-        val db = Datastore.getDatastore(context).securityKeystoreDao()
-        val rootKeys: SecurityKeys = db.fetch(CLIENT_RATCHET_KEY_KEYSTORE_ALIAS)
-        val headerKeys: SecurityKeys = db
-            .fetch(CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS)
-        val nextHeaderKeys: SecurityKeys = db
-            .fetch(CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS)
-
-        rootKeys.sharedSecret = rootKey
-        headerKeys.sharedSecret = headerKey
-        nextHeaderKeys.sharedSecret = nextHeaderKey
-        db.update(rootKeys)
-        db.update(headerKeys)
-        db.update(nextHeaderKeys)
-    }
-
-    private fun securelyStoreCredentials(llt: ByteArray ) {
-        val encryptedLlt = Cryptography.encryptWithKeyStore(
-            context,
-            llt,
-            LLT_KEYSTORE_ALIAS
-        )
-
+    fun getDeviceId(): ByteArray {
         val message = "RelaySMS DID v1".encodeToByteArray()
-        val ho = MessageDigest.getInstance("SHA-256")
 
-        val clientIdPublicKey = getIdentitySigningKey(context) ?:
-        throw Exception("Failed to fetch client id key for device id")
+        val db = Datastore.getDatastore(context)?.keysDao()
+            ?: throw Exception("Could not open database")
 
-        val deviceId = ho.digest(message + clientIdPublicKey).copyOfRange(0, 16)
+        val publicKey = db.fetchPublicKey(clientVaultHandshakeKeystoreAliasStaticKeys)
+            ?: throw Exception("Missing private key in credentials for signing")
 
-        storeCredentialsPostOtp(
-            encryptedLlt,
-            deviceId,
-        )
-
+        return (message + publicKey.copyOf()).sha256().copyOfRange(0, 16).also {
+            publicKey.fill(0)
+        }
     }
 
-    private fun completeVaultHandshake(
-        serverRatchetPublicKey: ByteArray,
+    fun initRatchet(
+        context: Context,
+        serverPublicKey: ByteArray,
         serverNonce: ByteArray,
-        serverHeaderPublicKey: ByteArray,
-        serverNextHeaderPublicKey: ByteArray
     ) {
-        val serverAuthenticationKey = context.getStaticKeys(254) ?:
-        throw Exception("Failed to find static keys")
+        val db = Datastore.getDatastore(context)?.keysDao()
+            ?: throw Exception("Could not open database")
 
-//        storeEncryptedSharedSecret(
-//            encryptedRootKey,
-//            encryptedHeaderKey,
-//            encryptedNextHeaderKey
-//        )
+        val ephemeralKeys = db.fetch(clientVaultHandshakeKeystoreAliasEphemeralKeys)
+            ?: throw Exception("Missing private key in credentials for signing")
+
+        val salt = "RelaySMS_NK_handshake_v1".toByteArray()
+
+        try {
+            ephemeralKeys.use { ek ->
+                val authenticationPublicKey = context
+                    .getStaticKeys(ek.authenticationPublicKeyId!!)
+                    ?: throw Exception("Could not find static keys for id")
+
+                val info = (ek.nonce!! + serverNonce + ek.publicKey +
+                        serverPublicKey + authenticationPublicKey).sha256()
+
+                try {
+                    val nkKeys = Cryptography.generateKeysNK(
+                        context = context,
+                        ephemeralKeyPair = Protocols.CloseableCurve15519KeyPair(
+                            publicKey = ek.publicKey,
+                            privateKey = ek.privateKey
+                        ),
+                        authenticationPublicKey =
+                            X25519PublicKeyParameters(authenticationPublicKey, 0),
+                        ephemeralPublicKey = X25519PublicKeyParameters(serverPublicKey, 0),
+                        salt = salt,
+                        info = info
+                    )
+                    try {
+                        nkKeys.use { nk ->
+                            RatchetStates.initialize(
+                                context = context,
+                                keystoreAlias = ratchetKeystoreAlias,
+                                authenticationPublicKey =
+                                    X25519PublicKeyParameters(authenticationPublicKey, 0),
+                                rk = nk.rk,
+                                hk = nk.hk,
+                                nhk = nk.nhk
+                            )
+                        }
+                    } finally {
+                        nkKeys.close()
+                    }
+                } finally {
+                    info.fill(0)
+                    authenticationPublicKey.fill(0)
+                }
+            }
+        } finally {
+            ephemeralKeys.close()
+            serverNonce.fill(0)
+            salt.fill(0)
+            serverPublicKey.fill(0)
+        }
     }
 
     fun submitOTPCode(
+        context: Context,
         phoneNumber: String,
         email: String,
         otpCode: String,
         type: OTPCodeVerificationType,
     ) {
         var serverRatchetPublicKey: ByteArray? = null
-        var serverHeaderPublicKey: ByteArray? = null
-        var serverNextHeaderPublicKey: ByteArray? = null
         var serverNonce: ByteArray? = null
         var llt: ByteArray? = null
 
-        when(type) {
-            OTPCodeVerificationType.CREATE -> {
-                val createEntityRequest = Vault.CreateEntityRequest.newBuilder().apply {
-                    setOwnershipProofResponse(otpCode)
-                    setPhoneNumber(phoneNumber)
-                    setEmailAddress(email)
-                }.build()
-
-                val response = entityStub.createEntity(createEntityRequest)
-                serverRatchetPublicKey = response.serverRatchetPubKey.toByteArray()
-                serverHeaderPublicKey = response.serverHeaderPubKey.toByteArray()
-                serverNextHeaderPublicKey = response.serverNextHeaderPubKey.toByteArray()
-                serverNonce = response.serverNonce.toByteArray()
-                llt = response.longLivedToken.toByteArray()
-            }
-            OTPCodeVerificationType.AUTHENTICATE -> {
-                val authenticateEntityRequest = Vault.AuthenticateEntityRequest.newBuilder().apply {
-                    setOwnershipProofResponse(otpCode)
-                    setPhoneNumber(phoneNumber)
-                    setEmailAddress(email)
-                }.build()
-
-                val response = entityStub.authenticateEntity(authenticateEntityRequest)
-                serverRatchetPublicKey = response.serverRatchetPubKey.toByteArray()
-                serverHeaderPublicKey = response.serverHeaderPubKey.toByteArray()
-                serverNextHeaderPublicKey = response.serverNextHeaderPubKey.toByteArray()
-                serverNonce = response.serverNonce.toByteArray()
-                llt = response.longLivedToken.toByteArray()
-            }
-            OTPCodeVerificationType.RECOVER -> {
-                val resetPasswordRequest = Vault.ResetPasswordRequest.newBuilder().apply {
-                    setOwnershipProofResponse(otpCode)
-                    setPhoneNumber(phoneNumber)
-                    setEmailAddress(email)
-                }.build()
-
-                val response = entityStub.resetPassword(resetPasswordRequest)
-                serverRatchetPublicKey = response.serverRatchetPubKey.toByteArray()
-                serverHeaderPublicKey = response.serverHeaderPubKey.toByteArray()
-                serverNextHeaderPublicKey = response.serverNextHeaderPubKey.toByteArray()
-                serverNonce = response.serverNonce.toByteArray()
-                llt = response.longLivedToken.toByteArray()
-            }
-        }
-
         try {
-            completeVaultHandshake(
-                serverRatchetPublicKey = serverRatchetPublicKey!!,
-                serverNonce = serverNonce!!,
-                serverHeaderPublicKey = serverHeaderPublicKey,
-                serverNextHeaderPublicKey = serverNextHeaderPublicKey
+            when(type) {
+                OTPCodeVerificationType.CREATE -> {
+                    val createEntityRequest = Vault.CreateEntityRequest.newBuilder().apply {
+                        setOwnershipProofResponse(otpCode)
+                        setPhoneNumber(phoneNumber)
+                        setEmailAddress(email)
+                    }.build()
+
+                    val response = entityStub.createEntity(createEntityRequest)
+                    serverRatchetPublicKey = response.serverRatchetPubKey.toByteArray()
+                    serverNonce = response.serverNonce.toByteArray()
+                    llt = response.longLivedToken.toByteArray()
+                }
+                OTPCodeVerificationType.AUTHENTICATE -> {
+                    val authenticateEntityRequest = Vault.AuthenticateEntityRequest.newBuilder().apply {
+                        setOwnershipProofResponse(otpCode)
+                        setPhoneNumber(phoneNumber)
+                        setEmailAddress(email)
+                    }.build()
+
+                    val response = entityStub.authenticateEntity(authenticateEntityRequest)
+                    serverRatchetPublicKey = response.serverRatchetPubKey.toByteArray()
+                    serverNonce = response.serverNonce.toByteArray()
+                    llt = response.longLivedToken.toByteArray()
+                }
+                OTPCodeVerificationType.RECOVER -> {
+                    val resetPasswordRequest = Vault.ResetPasswordRequest.newBuilder().apply {
+                        setOwnershipProofResponse(otpCode)
+                        setPhoneNumber(phoneNumber)
+                        setEmailAddress(email)
+                    }.build()
+
+                    val response = entityStub.resetPassword(resetPasswordRequest)
+                    serverRatchetPublicKey = response.serverRatchetPubKey.toByteArray()
+                    serverNonce = response.serverNonce.toByteArray()
+                    llt = response.longLivedToken.toByteArray()
+                }
+            }
+
+            initRatchet(
+                context,
+                serverRatchetPublicKey,
+                serverNonce
             )
 
-            securelyStoreCredentials(llt)
-            Publishers.removeEncryptedStates(context)
+            val db = Datastore.getDatastore(context)?.keysDao()
+                ?: throw Exception("Could not open database")
+
+            val key = db.fetch(clientVaultHandshakeKeystoreAliasStaticKeys)
+                ?: throw Exception("Missing private key in credentials for signing")
+            key.use { k ->
+                k.llt = llt
+                db.update(k)
+            }
+
             context.settingsSetIsLoggedIn(true)
         } catch(e: Exception) {
             e.printStackTrace()
+            context.settingsSetIsLoggedIn(false)
+        } finally {
+            llt?.fill(0)
+            serverRatchetPublicKey?.fill(0)
+            serverNonce?.fill(0)
+        }
+    }
+
+    data class CloseableSigningKeys(
+        val publicKey: ByteArray,
+        val privateKey: ByteArray
+    ): AutoCloseable {
+        private var isClosed = false
+
+        override fun close() {
+            if(isClosed) return
+            publicKey.fill(0)
+            privateKey.fill(0)
+            isClosed = true
         }
 
     }
 
-    fun resetPersistentData() {
-        context.removeFromKeystore(CLIENT_RATCHET_KEY_KEYSTORE_ALIAS)
-        context.removeFromKeystore(CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS)
-        context.removeFromKeystore(CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS)
+    private fun generateSigningKeys(): CloseableSigningKeys {
+        val generator = Ed25519KeyPairGenerator()
+        generator.init(Ed25519KeyGenerationParameters(SecureRandom()))
 
-        Datastore.getDatastore(context).securityKeystoreDao().apply {
-            remove(CLIENT_RATCHET_KEY_KEYSTORE_ALIAS)
-            remove(CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS)
-            remove(CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS)
+        val keyPair: AsymmetricCipherKeyPair = generator.generateKeyPair()
+
+        val publicKey = keyPair.public as Ed25519PublicKeyParameters
+        val privateKey = keyPair.private as Ed25519PrivateKeyParameters
+
+        return try {
+            CloseableSigningKeys(
+                publicKey = publicKey.encoded.copyOf(),
+                privateKey = privateKey.encoded.copyOf()
+            )
+        } finally {
+            publicKey.encoded.fill(0)
+            privateKey.encoded.fill(0)
         }
     }
 
@@ -303,41 +326,86 @@ class Vaults(val context: Context) {
         countryCode: String,
         password: String,
         recaptchaToken: String,
-    ) : Vault.CreateEntityResponse {
-
-        resetPersistentData()
-
-        val clientIdKeyPair = Cryptography
-            .generateSigningKey(context, CLIENT_ID_KEY_KEYSTORE_ALIAS)
-
-        val ephemeralKeyPair = protocols.generateDH()
+    ) : Vault.CreateEntityResponse? {
+        var response: Vault.CreateEntityResponse? = null
         val nonce = context.generateRandomBytes(16)
 
-        val createEntityRequest = Vault.CreateEntityRequest.newBuilder().apply {
-            setCountryCode(countryCode)
-            setPhoneNumber(phoneNumber)
-            setPassword(password)
-            setClientIdPubKey(clientIdKeyPair.first.toByteString())
-            setClientRatchetPubKey(
-                (ephemeralKeyPair.public as X25519PublicKeyParameters).encoded.toByteString()
-            )
-            setClientNonce(nonce.toByteString())
-            setClientHeaderPubKey(headerPublicKey.toByteString())
-            setClientNextHeaderPubKey(nextHeaderPublicKey.toByteString())
-            setCaptchaToken(recaptchaToken)
-            setEmailAddress(email)
-        }.build()
+        var authenticationPublicKeyId = 254
+        val authenticationPublicKey = context.getStaticKeys(authenticationPublicKeyId)
+            ?: throw Exception("Could not find static keys for id")
 
-        storeCredentialsPreOtp(
-            publicKey = clientIdKeyPair.first,
-            privateKey = clientIdKeyPair.second
-        )
+        try {
+            protocols.generateDH().use { ekp ->
+                generateSigningKeys().use { staticKp ->
+                    val createEntityRequest = Vault.CreateEntityRequest.newBuilder().apply {
+                        setCountryCode(countryCode)
+                        setPhoneNumber(phoneNumber)
+                        setPassword(password)
+                        setClientIdPubKey(staticKp.publicKey.toByteString())
+                        setClientRatchetPubKey(ekp.publicKey.toByteString())
+                        setClientNonce(nonce.toByteString())
+                        setCaptchaToken(recaptchaToken)
+                        setEmailAddress(email)
+                    }
 
-        if(email.isNotEmpty()) {
-            context.settingsSetIsEmailLogin(true)
+                    try {
+                        response = entityStub.createEntity(createEntityRequest.build())
+
+                        val db = Datastore.getDatastore(context)?.keysDao()
+                            ?: throw Exception("Failed to open database")
+
+                        val staticKeys = Keys(
+                            keystoreAlias = clientVaultHandshakeKeystoreAliasStaticKeys,
+                            privateKey = staticKp.privateKey,
+                            publicKey = staticKp.publicKey,
+                        )
+
+                        try {
+                            staticKeys.use { sk ->
+                                db.insert(sk)
+                            }
+                        } catch(e: Exception) {
+                            throw e
+                        } finally {
+                            staticKeys.close()
+                        }
+
+                        val ephemeralKeys = Keys(
+                            keystoreAlias = clientVaultHandshakeKeystoreAliasEphemeralKeys,
+                            privateKey = staticKp.privateKey,
+                            publicKey = staticKp.publicKey,
+                            nonce = nonce,
+                            authenticationPublicKeyId = authenticationPublicKeyId
+                        )
+
+                        try {
+                            ephemeralKeys.use { ek ->
+                                db.insert(ek)
+                            }
+                        } catch(e: Exception) {
+                            throw e
+                        } finally {
+                            ephemeralKeys.close()
+                        }
+
+                        if(email.isNotEmpty()) {
+                            context.settingsSetIsEmailLogin(true)
+                        }
+                    } catch (e: Exception){
+                        e.printStackTrace()
+                        context.settingsSetIsEmailLogin(false)
+                        throw e
+                    } finally {
+                        createEntityRequest.clear()
+                    }
+                }
+            }
+        } finally {
+            nonce.fill(0)
+            authenticationPublicKey.fill(0)
+            authenticationPublicKeyId = -1
         }
-
-        return entityStub.createEntity(createEntityRequest)
+        return response
     }
 
     fun authenticateEntity(
@@ -346,40 +414,89 @@ class Vaults(val context: Context) {
         email: String,
         password: String,
         recaptchaToken: String,
-    ) : Vault.AuthenticateEntityResponse {
-        resetPersistentData()
-        val clientIdKeyPair = Cryptography
-            .generateSigningKey(context,CLIENT_ID_KEY_KEYSTORE_ALIAS)
-        val (clientPublicKeyAndNonce, headerPublicKey, nextHeaderPublicKey) =
-            Cryptography.generateKey(
-                context,
-                CLIENT_RATCHET_KEY_KEYSTORE_ALIAS,
-                CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS,
-                CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS
-            )
+    ) : Vault.AuthenticateEntityResponse? {
+        var response: Vault.AuthenticateEntityResponse? = null
+        val nonce = context.generateRandomBytes(16)
 
-        val authenticateEntityRequest = Vault.AuthenticateEntityRequest.newBuilder().apply {
-            setPhoneNumber(phoneNumber)
-            setPassword(password)
-            setClientIdPubKey(clientIdKeyPair.first.toByteString())
-            setClientRatchetPubKey(clientPublicKeyAndNonce.first.toByteString())
-            setClientNonce(clientPublicKeyAndNonce.second.toByteString())
-            setClientHeaderPubKey(headerPublicKey.toByteString())
-            setClientNextHeaderPubKey(nextHeaderPublicKey.toByteString())
-            setCaptchaToken(recaptchaToken)
-            setEmailAddress(email)
-        }.build()
+        var authenticationPublicKeyId = 254
+        val authenticationPublicKey = context.getStaticKeys(authenticationPublicKeyId)
+            ?: throw Exception("Could not find static keys for id")
 
-        storeCredentialsPreOtp(
-            publicKey = clientIdKeyPair.first,
-            privateKey = clientIdKeyPair.second
-        )
+        try {
+            protocols.generateDH().use { ekp ->
+                generateSigningKeys().use { staticKp ->
+                    val authenticateEntityRequest = Vault.AuthenticateEntityRequest.newBuilder()
+                        .apply {
+                            setPhoneNumber(phoneNumber)
+                            setPassword(password)
+                            setClientIdPubKey(staticKp.publicKey.toByteString())
+                            setClientRatchetPubKey(ekp.publicKey.toByteString())
+                            setClientNonce(nonce.toByteString())
+                            setCaptchaToken(recaptchaToken)
+                            setEmailAddress(email)
+                        }
 
-        if(email.isNotEmpty()) {
-            context.settingsSetIsEmailLogin(true)
+                    try {
+                        response = entityStub
+                            .authenticateEntity(authenticateEntityRequest.build())
+
+                        val db = Datastore.getDatastore(context)?.keysDao()
+                            ?: throw Exception("Failed to open database")
+
+                        val staticKeys = Keys(
+                            keystoreAlias = clientVaultHandshakeKeystoreAliasStaticKeys,
+                            privateKey = staticKp.privateKey,
+                            publicKey = staticKp.publicKey,
+                            nonce = nonce,
+                            authenticationPublicKeyId = authenticationPublicKeyId,
+                        )
+
+                        try {
+                            staticKeys.use { sk ->
+                                db.insert(sk)
+                            }
+                        } catch(e: Exception) {
+                            throw e
+                        } finally {
+                            staticKeys.close()
+                        }
+
+                        val ephemeralKeys = Keys(
+                            keystoreAlias = clientVaultHandshakeKeystoreAliasEphemeralKeys,
+                            privateKey = staticKp.privateKey,
+                            publicKey = staticKp.publicKey,
+                            nonce = nonce,
+                            authenticationPublicKeyId = authenticationPublicKeyId
+                        )
+
+                        try {
+                            ephemeralKeys.use { ek ->
+                                db.insert(ek)
+                            }
+                        } catch(e: Exception) {
+                            throw e
+                        } finally {
+                            ephemeralKeys.close()
+                        }
+
+                        if(email.isNotEmpty()) {
+                            context.settingsSetIsEmailLogin(true)
+                        }
+                    } catch (e: Exception){
+                        e.printStackTrace()
+                        context.settingsSetIsEmailLogin(false)
+                        throw e
+                    } finally {
+                        authenticateEntityRequest.clear()
+                    }
+                }
+            }
+        } finally {
+            nonce.fill(0)
+            authenticationPublicKey.fill(0)
+            authenticationPublicKeyId = -1
         }
-
-        return entityStub.authenticateEntity(authenticateEntityRequest)
+        return response
     }
 
     fun recoverEntityPassword(
@@ -388,40 +505,89 @@ class Vaults(val context: Context) {
         email: String,
         newPassword: String,
         recaptchaToken: String,
-    ) : Vault.ResetPasswordResponse {
-        resetPersistentData()
-        val clientIdKeyPair = Cryptography
-            .generateSigningKey(context,CLIENT_ID_KEY_KEYSTORE_ALIAS)
-        val (clientPublicKeyAndNonce, headerPublicKey, nextHeaderPublicKey) =
-            Cryptography.generateKey(
-                context,
-                CLIENT_RATCHET_KEY_KEYSTORE_ALIAS,
-                CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS,
-                CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS
-            )
+    ) : Vault.ResetPasswordResponse? {
+        var response: Vault.ResetPasswordResponse? = null
+        val nonce = context.generateRandomBytes(16)
 
-        val resetPasswordRequest = Vault.ResetPasswordRequest.newBuilder().apply {
-            setPhoneNumber(phoneNumber)
-            setNewPassword(newPassword)
-            setClientIdPubKey(clientIdKeyPair.first.toByteString())
-            setClientRatchetPubKey(clientPublicKeyAndNonce.first.toByteString())
-            setClientNonce(clientPublicKeyAndNonce.second.toByteString())
-            setClientHeaderPubKey(headerPublicKey.toByteString())
-            setClientNextHeaderPubKey(nextHeaderPublicKey.toByteString())
-            setCaptchaToken(recaptchaToken)
-            setEmailAddress(email)
-        }.build()
+        var authenticationPublicKeyId = 254
+        val authenticationPublicKey = context.getStaticKeys(authenticationPublicKeyId)
+            ?: throw Exception("Could not find static keys for id")
 
-        storeCredentialsPreOtp(
-            publicKey = clientIdKeyPair.first,
-            privateKey = clientIdKeyPair.second
-        )
+        try {
+            protocols.generateDH().use { ekp ->
+                generateSigningKeys().use { staticKp ->
+                    val resetPasswordEntity = Vault.ResetPasswordRequest.newBuilder()
+                        .apply {
+                            setPhoneNumber(phoneNumber)
+                            setNewPassword(newPassword)
+                            setClientIdPubKey(staticKp.publicKey.toByteString())
+                            setClientRatchetPubKey(ekp.publicKey.toByteString())
+                            setClientNonce(nonce.toByteString())
+                            setCaptchaToken(recaptchaToken)
+                            setEmailAddress(email)
+                        }
 
-        if(email.isNotEmpty()) {
-            context.settingsSetIsEmailLogin(true)
+                    try {
+                        response = entityStub.resetPassword(resetPasswordEntity.build())
+
+                        val db = Datastore.getDatastore(context)?.keysDao()
+                            ?: throw Exception("Failed to open database")
+
+                        val staticKeys = Keys(
+                            keystoreAlias = clientVaultHandshakeKeystoreAliasStaticKeys,
+                            privateKey = staticKp.privateKey,
+                            publicKey = staticKp.publicKey,
+                            nonce = nonce,
+                            authenticationPublicKeyId = authenticationPublicKeyId,
+                        )
+
+                        try {
+                            staticKeys.use { sk ->
+                                db.insert(sk)
+                            }
+                        } catch(e: Exception) {
+                            throw e
+                        } finally {
+                            staticKeys.close()
+                        }
+
+                        val ephemeralKeys = Keys(
+                            keystoreAlias = clientVaultHandshakeKeystoreAliasEphemeralKeys,
+                            privateKey = staticKp.privateKey,
+                            publicKey = staticKp.publicKey,
+                            nonce = nonce,
+                            authenticationPublicKeyId = authenticationPublicKeyId
+                        )
+
+                        try {
+                            ephemeralKeys.use { ek ->
+                                db.insert(ek)
+                            }
+                        } catch(e: Exception) {
+                            throw e
+                        } finally {
+                            ephemeralKeys.close()
+                        }
+
+                        if(email.isNotEmpty()) {
+                            context.settingsSetIsEmailLogin(true)
+                        }
+                    } catch (e: Exception){
+                        e.printStackTrace()
+                        context.settingsSetIsEmailLogin(false)
+                        throw e
+                    } finally {
+                        resetPasswordEntity.clear()
+                    }
+                }
+            }
+        } finally {
+            nonce.fill(0)
+            authenticationPublicKey.fill(0)
+            authenticationPublicKeyId = -1
         }
+        return response
 
-        return entityStub.resetPassword(resetPasswordRequest)
     }
 
     fun getStoredAccountTokens(
@@ -440,50 +606,19 @@ class Vaults(val context: Context) {
         return entityStub.deleteEntity(deleteEntityRequest)
     }
 
-    fun getRatchetKeys(): Triple<ByteArray, ByteArray, ByteArray> {
-        val rootKey = Datastore.getDatastore(context).securityKeystoreDao()
-            .fetch(CLIENT_RATCHET_KEY_KEYSTORE_ALIAS)
-        val headerKey = Datastore.getDatastore(context).securityKeystoreDao()
-            .fetch(CLIENT_RATCHET_HEADER_KEY_KEYSTORE_ALIAS)
-        val nextHeaderKey = Datastore.getDatastore(context).securityKeystoreDao()
-            .fetch(CLIENT_RATCHET_NEXT_HEADER_KEY_KEYSTORE_ALIAS)
-
-        return Triple(
-            rootKey.sharedSecret!!,
-            headerKey.sharedSecret!!,
-            nextHeaderKey.sharedSecret!!
-        )
-    }
-
     fun signGrpcRequest(message: ByteArray): ByteArray {
-        val privateKey = Datastore.getDatastore(context).credentialsDao()
-            .fetch(LLT_KEYSTORE_ALIAS)?.identityPrivateKey ?:
-        throw Exception("Missing private key in credentials for signing")
+        val db = Datastore.getDatastore(context)?.keysDao()
+            ?: throw Exception("Could not open database")
 
-        return Cryptography.signWithSigningKey(
-            keystoreAlias = CLIENT_ID_KEY_KEYSTORE_ALIAS,
-            encPrivateKey = privateKey,
-            message = message
-        )
-    }
+        val keys = db.fetch(clientVaultHandshakeKeystoreAliasStaticKeys)
+            ?: throw Exception("Missing private key in credentials for signing")
 
-    companion object {
-        const val LLT_KEYSTORE_ALIAS = "LLT_KEYSTORE_ALIAS"
+        keys.use { k ->
+            val signer = Ed25519Signer()
+            signer.init(true, Ed25519PrivateKeyParameters(k.privateKey, 0))
+            signer.update(message, 0, message.size)
 
-        fun getIdentitySigningKey(context: Context): ByteArray? {
-            return Datastore.getDatastore(context).credentialsDao()
-                .fetch(LLT_KEYSTORE_ALIAS)?.identityPublicKey
-        }
-
-        fun decomposeRefreshToken(data: String): Pair<String, String> {
-            /*
-            RelaySMS Delivery: Successfully sent message to twitter at 2025-05-27 22:10:02 (UTC).
-
-            Please paste this message in your RelaySMS app
-            YW5hcmNoaXN0LnNvbnNvZnBlcmRpdGlvbkBnbWFpbC5jb206ZWs5T1lqTllVR2RxWjBaVVYzTldaMVZ2TXpoNlNEYzJNbFIxTW0xWmNEbGtOV3hUTTNaSWRXeFpibk01T2pFM05EZ3pPRE00TURJME16WTZNVG94T25KME9qRQ==             */
-            val splitData = data.split("\n")
-            val accountToken = String(Base64.decode(splitData[3], Base64.DEFAULT)).split(":")
-            return Pair(accountToken[0], accountToken[1])
+            return signer.generateSignature()
         }
     }
 }

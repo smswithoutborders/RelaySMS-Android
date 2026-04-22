@@ -25,7 +25,15 @@ import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 
 
 @Database(
-    entities = [RatchetStates::class, Platforms::class, AvailablePlatforms::class, GatewayClients::class, StoredPlatformsEntity::class, Keys::class, Credentials::class, Messages::class],
+    entities = [
+        RatchetStates::class,
+        Platforms::class,
+        AvailablePlatforms::class,
+        GatewayClients::class,
+        StoredPlatformsEntity::class,
+        Keys::class,
+        Credentials::class,
+        Messages::class],
     version = 1,
     autoMigrations = []
 )

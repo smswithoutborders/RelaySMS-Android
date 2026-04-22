@@ -13,21 +13,18 @@ data class Keys(
     val keystoreAlias: String,
     var privateKey: ByteArray,
     var publicKey: ByteArray,
-    var responderEphemeralPublicKey: ByteArray? = null,
     var h: ByteArray? = null,
     var ck: ByteArray? = null,
+    var nonce: ByteArray? = null,
+    var llt: ByteArray? = null,
     var authenticationPublicKeyId: Int? = null,
 ) : AutoCloseable {
     private var isClosed = false
-    fun use(block: (Keys) -> Unit) {
-        if (isClosed) throw IllegalStateException("Identity key already closed")
-        block(this)
-    }
 
     override fun close() {
         privateKey.fill(0)
         publicKey.fill(0)
-        responderEphemeralPublicKey?.fill(0)
+        nonce?.fill(0)
         h?.fill(0)
         ck?.fill(0)
         authenticationPublicKeyId = null

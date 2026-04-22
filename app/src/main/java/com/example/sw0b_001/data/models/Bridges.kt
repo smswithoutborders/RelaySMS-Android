@@ -14,6 +14,7 @@ class Bridges(val context: Context) {
     private val protocols = Protocols(context)
     private val staticKeyAlias = "Bridges_Static_KeystoreAlias"
     private val ephemeralKeyAlias = "Ephemeral_Static_KeystoreAlias"
+    private val ratchetKeystoreAlias = "Bridge_Ratchet_KeystoreAlias"
 
     fun forSendingWithoutForwardSecrecy(plaintext: ByteArray): RatchetPayload? {
         var authenticationPublicKeyId = (0..255).random()
@@ -147,7 +148,8 @@ class Bridges(val context: Context) {
         val ratchet = RatchetsHE(context)
         val db = Datastore.getDatastore(context)?.ratchetStatesDAO()
             ?: throw Exception("Failed to open database")
-        val ratchetState = db.fetch() ?: throw Exception("No state found for Ratchets")
+        val ratchetState = db.fetch(ratchetKeystoreAlias)
+            ?: throw Exception("No state found for Ratchets")
 
         try {
             ratchetState.use { rs ->
@@ -158,7 +160,10 @@ class Bridges(val context: Context) {
                         plaintext = plaintext,
                         ad = ad
                     )
-                    val persistentState = RatchetStates(value = state.serialize())
+                    val persistentState = RatchetStates(
+                        value = state.serialize(),
+                        keystoreAlias = ratchetKeystoreAlias
+                    )
                     persistentState.use { rs ->
                         rs.save(context)
                     }
@@ -189,6 +194,7 @@ class Bridges(val context: Context) {
             } ?: throw Exception("Could not find static keys for id")
 
         val ephemeralKeys = db.fetch(ephemeralKeyAlias)
+            ?: throw Exception("No Ephemeral keys found")
 
         try {
             ephemeralKeys.use { ephemeralKeys ->
@@ -212,10 +218,11 @@ class Bridges(val context: Context) {
                         keys.use { keys ->
                             RatchetStates.initialize(
                                 context = context,
+                                keystoreAlias = ratchetKeystoreAlias,
                                 authenticationPublicKey = authenticationPublicKey,
                                 rk = keys.rk,
                                 hk = keys.hk,
-                                nhk = keys.nhk
+                                nhk = keys.nhk,
                             )
                         }
                     } finally {

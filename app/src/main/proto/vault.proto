@@ -22,12 +22,8 @@ message CreateEntityRequest {
   bytes client_id_pub_key = 7;
   // The client's ratchet public key.
   bytes client_ratchet_pub_key = 8;
-  // The client's header public key.
-  bytes client_header_pub_key = 9;
-  // The client's next header public key.
-  bytes client_next_header_pub_key = 10;
   // The client's nonce.
-  bytes client_nonce = 11;
+  bytes client_nonce = 9;
 }
 
 // Response message for creating an entity.
@@ -38,16 +34,12 @@ message CreateEntityResponse {
   string long_lived_token = 2;
   // The server's ratchet public key.
   bytes server_ratchet_pub_key = 3;
-  // The server's header public key.
-  bytes server_header_pub_key = 4;
-  // The server's next header public key.
-  bytes server_next_header_pub_key = 5;
   // The server's nonce.
-  bytes server_nonce = 6;
+  bytes server_nonce = 4;
   // A response message.
-  string message = 7;
+  string message = 5;
   // The next available time to request another proof of ownership.
-  int32 next_attempt_timestamp = 8;
+  int32 next_attempt_timestamp = 6;
 }
 
 // Request message for authenticating an entity.
@@ -66,12 +58,8 @@ message AuthenticateEntityRequest {
   bytes client_id_pub_key = 6;
   // The client's ratchet public key.
   bytes client_ratchet_pub_key = 7;
-  // The client's header public key.
-  bytes client_header_pub_key = 8;
-  // The client's next header public key.
-  bytes client_next_header_pub_key = 9;
   // The client's nonce.
-  bytes client_nonce = 10;
+  bytes client_nonce = 8;
 }
 
 // Response message for authenticating an entity.
@@ -82,18 +70,14 @@ message AuthenticateEntityResponse {
   string long_lived_token = 2;
   // The server's ratchet public key.
   bytes server_ratchet_pub_key = 3;
-  // The server's header public key.
-  bytes server_header_pub_key = 4;
-  // The server's next header public key.
-  bytes server_next_header_pub_key = 5;
   // The server's nonce.
-  bytes server_nonce = 6;
+  bytes server_nonce = 4;
   // A response message.
-  string message = 7;
+  string message = 5;
   // The next available time to request another proof of ownership.
-  int32 next_attempt_timestamp = 8;
+  int32 next_attempt_timestamp = 6;
   // indicates if user must reset their password
-  bool requires_password_reset = 9;
+  bool requires_password_reset = 7;
 }
 
 // Request message for listing entity's stored tokens.
@@ -138,12 +122,8 @@ message ResetPasswordRequest {
   bytes client_id_pub_key = 6;
   // The client's ratchet public key.
   bytes client_ratchet_pub_key = 7;
-  // The client's header public key.
-  bytes client_header_pub_key = 8;
-  // The client's next header public key.
-  bytes client_next_header_pub_key = 9;
   // The client's nonce.
-  bytes client_nonce = 10;
+  bytes client_nonce = 8;
 }
 
 // Response message for resetting an entity's password.
@@ -154,16 +134,12 @@ message ResetPasswordResponse {
   string long_lived_token = 2;
   // The server's ratchet public key.
   bytes server_ratchet_pub_key = 3;
-  // The server's header public key.
-  bytes server_header_pub_key = 4;
-  // The server's next header public key.
-  bytes server_next_header_pub_key = 5;
   // The server's nonce.
-  bytes server_nonce = 6;
+  bytes server_nonce = 4;
   // A response message.
-  string message = 7;
+  string message = 5;
   // The next available time to request another proof of ownership.
-  int32 next_attempt_timestamp = 8;
+  int32 next_attempt_timestamp = 6;
 }
 
 // Request message for updating an entity's password.
@@ -253,6 +229,13 @@ message EncryptPayloadResponse {
 }
 
 // Request message for storing an entity's token.
+//
+// Headers:
+// authorization = Bearer token (format: `Bearer <long_lived_token>`) 
+// x-sig = Request signature (base64 url-safe encoded)
+// x-nonce = Nonce for request (must be unique, base64 url-safe encoded)
+// x-timestamp = Request timestamp
+// x-method-name = RPC URI (e.g., /vault.v2.EntityInternal/StoreEntityToken)
 message StoreEntityTokenRequest {
   // The OAuth2 token to be stored (JSON string).
   string token = 1;
@@ -271,6 +254,13 @@ message StoreEntityTokenResponse {
 }
 
 // Request message for getting entity access token.
+//
+// Headers (if using long-lived token):
+// authorization = Bearer token (format: `Bearer <long_lived_token>`) 
+// x-sig = Request signature (base64 url-safe encoded)
+// x-nonce = Nonce for request (must be unique, base64 url-safe encoded)
+// x-timestamp = Request timestamp
+// x-method-name = RPC URI (e.g., /vault.v2.EntityInternal/GetEntityAccessToken)
 message GetEntityAccessTokenRequest {
   // Device ID for identifying the requesting device.
   string device_id = 1;
@@ -293,6 +283,13 @@ message GetEntityAccessTokenResponse {
 }
 
 // Request message for deleting an entity's token.
+//
+// Headers:
+// authorization = Bearer token (format: `Bearer <long_lived_token>`) 
+// x-sig = Request signature (base64 url-safe encoded)
+// x-nonce = Nonce for request (must be unique, base64 url-safe encoded)
+// x-timestamp = Request timestamp
+// x-method-name = RPC URI (e.g., /vault.v2.EntityInternal/DeleteEntityToken)
 message DeleteEntityTokenRequest {
   // The platform associated with the token.
   string platform = 1;
