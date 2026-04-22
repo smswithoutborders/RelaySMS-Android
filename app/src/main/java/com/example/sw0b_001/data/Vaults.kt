@@ -27,8 +27,6 @@ import org.bouncycastle.crypto.signers.Ed25519Signer
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import vault.v2.EntityGrpc
 import vault.v2.Vault
-import java.security.DigestException
-import java.security.MessageDigest
 import java.security.SecureRandom
 import java.security.Security
 
@@ -57,16 +55,6 @@ class Vaults(val context: Context) {
 
     fun shutdown() {
         channel.shutdown()
-    }
-    private fun buildPlatformsUUID(name: String, account: String) : ByteArray {
-        val md: MessageDigest = MessageDigest.getInstance("SHA-256");
-        try {
-            md.update(name.encodeToByteArray());
-            md.update(account.encodeToByteArray());
-            return md.digest()
-        } catch (e: CloneNotSupportedException) {
-            throw DigestException("couldn't make digest of partial content");
-        }
     }
 
     fun fetchLongLivedToken() : ByteArray? {
@@ -98,10 +86,10 @@ class Vaults(val context: Context) {
 
             response.storedTokensList.forEach { accountTokens ->
                 val uuid = Base64.encodeToString(
-                    buildPlatformsUUID(
-                        accountTokens.platform,
-                        accountTokens.accountIdentifier
-                    ), Base64.DEFAULT)
+                    (
+                        accountTokens.platform.toByteArray() +
+                        accountTokens.accountIdentifier.toByteArray()
+                    ).sha256(), Base64.DEFAULT)
 
                 if(!accountTokens.isStoredOnDevice) {
                     val accessToken = if(accountTokens.accountTokensMap.containsKey("access_token")) {
