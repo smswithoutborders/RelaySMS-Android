@@ -56,8 +56,8 @@ import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.verifyPhoneNumberFormat
+import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel
+import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel.Companion.verifyPhoneNumberFormat
 import com.example.sw0b_001.ui.views.DeveloperHTTPView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -130,21 +130,22 @@ fun ComposerInterface(
                     .decomposeMessage(
                         Base64.decode(message?.body,
                             Base64.DEFAULT),
-                        message?.imageLength!!,
-                        message?.textLength!!,
+                        TODO(),
+                        TODO(),
                         type == Platforms.ServiceTypes.BRIDGE
                     ).apply {
-                        if(message?.imageLength!! > 0 && processedImage == null) {
-                            processedImage = ImageViewModel.ProcessedImage(
-                                image = BitmapFactory.decodeByteArray(
-                                    this.image.value, 0,
-                                    this.image.value!!.size
-                                ),
-                                rawBytes = this.image.value!!,
-                                size = this.image.value!!.size.toLong(),
-                            )
-                            imageBitmap = processedImage!!.image
-                        }
+                        TODO()
+//                        if(message?.imageLength!! > 0 && processedImage == null) {
+//                            processedImage = ImageViewModel.ProcessedImage(
+//                                image = BitmapFactory.decodeByteArray(
+//                                    this.image.value, 0,
+//                                    this.image.value!!.size
+//                                ),
+//                                rawBytes = this.image.value!!,
+//                                size = this.image.value!!.size.toLong(),
+//                            )
+//                            imageBitmap = processedImage!!.image
+//                        }
                     }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -164,7 +165,7 @@ fun ComposerInterface(
                 null
             }
         }
-        else Composers.MessageComposeHandler.MessageContent(from = from)
+        else Composers.MessageComposeHandler.MessageContent(TODO())
     }
 
     val decomposedTextMessage = remember {
@@ -178,7 +179,7 @@ fun ComposerInterface(
                 null
             }
         }
-        else Composers.TextComposeHandler.TextContent(from)
+        else Composers.TextComposeHandler.TextContent(TODO())
     }
 
     val isSendingEnabled by remember(
@@ -229,7 +230,7 @@ fun ComposerInterface(
         imageRenderSubModule()
     }
 
-    val platformsViewModel = remember{ PlatformsViewModel() }
+    val storedPlatformsViewModel = remember{ StoredPlatformsViewModel(context) }
 
     fun send(
         smsTransmission: Boolean = true,
@@ -266,83 +267,85 @@ fun ComposerInterface(
         }
 
         if(imageBitmap != null) {
-            platformsViewModel.sendPublishingForImage(
-                context = context,
-                account = selectedAccount,
-                text = when (type) {
-                    Platforms.ServiceTypes.BRIDGE,
-                    Platforms.ServiceTypes.BRIDGE_INCOMING,
-                    Platforms.ServiceTypes.EMAIL -> {
-                        Composers.EmailComposeHandler.createEmailByteBuffer(
-                            from = from.value,
-                            to = decomposedEmailMessage?.to!!.value,
-                            cc = decomposedEmailMessage.cc.value,
-                            bcc = decomposedEmailMessage.bcc.value,
-                            subject = decomposedEmailMessage.subject.value,
-                            body = decomposedEmailMessage.body.value,
-                            isBridge = type == Platforms.ServiceTypes.BRIDGE
-                        )
-                    }
-
-                    Platforms.ServiceTypes.TEXT -> {
-                        Composers.TextComposeHandler.createTextByteBuffer(
-                            from = from.value!!,
-                            body = decomposedEmailMessage?.body!!.value,
-                        )
-                    }
-
-                    Platforms.ServiceTypes.MESSAGE -> {
-                        Composers.MessageComposeHandler.createMessageByteBuffer(
-                            from = from.value!!,
-                            to = decomposedMessageMessage?.to!!.value,
-                            message = decomposedEmailMessage?.body!!.value,
-                        )
-                    }
-
-                    else -> byteArrayOf()
-                },
-                isBridge = isBridge,
-                isLoggedIn = !isBridge,
-                onFailure = { onFailureCallback(it) },
-                imageByteArray = processedImage?.rawBytes!!,
-            ) { sendingCallback(it) }
+//            storedPlatformsViewModel.sendPublishingForImage(
+//                context = context,
+//                account = selectedAccount,
+//                text = when (type) {
+//                    Platforms.ServiceTypes.BRIDGE,
+//                    Platforms.ServiceTypes.BRIDGE_INCOMING,
+//                    Platforms.ServiceTypes.EMAIL -> {
+//                        Composers.EmailComposeHandler.createEmailByteBuffer(
+//                            from = from.value,
+//                            to = decomposedEmailMessage?.to!!.value,
+//                            cc = decomposedEmailMessage.cc.value,
+//                            bcc = decomposedEmailMessage.bcc.value,
+//                            subject = decomposedEmailMessage.subject.value,
+//                            body = decomposedEmailMessage.body.value,
+//                            isBridge = type == Platforms.ServiceTypes.BRIDGE
+//                        )
+//                    }
+//
+//                    Platforms.ServiceTypes.TEXT -> {
+//                        Composers.TextComposeHandler.createTextByteBuffer(
+//                            from = from.value!!,
+//                            body = decomposedEmailMessage?.body!!.value,
+//                        )
+//                    }
+//
+//                    Platforms.ServiceTypes.MESSAGE -> {
+//                        Composers.MessageComposeHandler.createMessageByteBuffer(
+//                            from = from.value!!,
+//                            to = decomposedMessageMessage?.to!!.value,
+//                            message = decomposedEmailMessage?.body!!.value,
+//                        )
+//                    }
+//
+//                    else -> byteArrayOf()
+//                },
+//                isBridge = isBridge,
+//                isLoggedIn = !isBridge,
+//                onFailure = { onFailureCallback(it) },
+//                imageByteArray = processedImage?.rawBytes!!,
+//            ) { sendingCallback(it) }
+//
         }
         else {
-            when(type) {
-                Platforms.ServiceTypes.EMAIL,
-                Platforms.ServiceTypes.BRIDGE,
-                Platforms.ServiceTypes.BRIDGE_INCOMING -> {
-                    platformsViewModel.sendPublishingForEmail(
-                        context = context,
-                        emailContent = decomposedEmailMessage!!,
-                        account = selectedAccount,
-                        isBridge = isBridge,
-                        subscriptionId = subscriptionId,
-                        smsTransmission = smsTransmission,
-                        onFailureCallback = { onFailureCallback(it) },
-                    ) { sendingCallback(it) }
-                }
-                Platforms.ServiceTypes.TEXT -> {
-                    platformsViewModel.sendPublishingForPost(
-                        context = context,
-                        text = decomposedTextMessage?.text?.value ?: "",
-                        account = selectedAccount!!,
-                        onFailure = { onFailureCallback(it) },
-                        onSuccess = { sendingCallback(it) },
-                        subscriptionId = subscriptionId
-                    )
-                }
-                Platforms.ServiceTypes.MESSAGE -> {
-                    platformsViewModel.sendPublishingForMessaging(
-                        context = context,
-                        messageContent = decomposedMessageMessage!!,
-                        account = selectedAccount!!,
-                        subscriptionId = subscriptionId,
-                        onFailure = { onFailureCallback(it) },
-                    ) { sendingCallback(it) }
-                }
-                Platforms.ServiceTypes.TEST -> {}
-            }
+//            when(type) {
+//                Platforms.ServiceTypes.EMAIL,
+//                Platforms.ServiceTypes.BRIDGE,
+//                Platforms.ServiceTypes.BRIDGE_INCOMING -> {
+//                    storedPlatformsViewModel.sendPublishingForEmail(
+//                        context = context,
+//                        emailContent = decomposedEmailMessage!!,
+//                        account = selectedAccount,
+//                        isBridge = isBridge,
+//                        subscriptionId = subscriptionId,
+//                        smsTransmission = smsTransmission,
+//                        onFailureCallback = { onFailureCallback(it) },
+//                    ) { sendingCallback(it) }
+//                }
+//                Platforms.ServiceTypes.TEXT -> {
+//                    storedPlatformsViewModel.sendPublishingForPost(
+//                        context = context,
+//                        text = decomposedTextMessage?.text?.value ?: "",
+//                        account = selectedAccount!!,
+//                        onFailure = { onFailureCallback(it) },
+//                        onSuccess = { sendingCallback(it) },
+//                        subscriptionId = subscriptionId
+//                    )
+//                }
+//                Platforms.ServiceTypes.MESSAGE -> {
+//                    storedPlatformsViewModel.sendPublishingForMessaging(
+//                        context = context,
+//                        messageContent = decomposedMessageMessage!!,
+//                        account = selectedAccount!!,
+//                        subscriptionId = subscriptionId,
+//                        onFailure = { onFailureCallback(it) },
+//                    ) { sendingCallback(it) }
+//                }
+//                Platforms.ServiceTypes.TEST -> {}
+//            }
+//
         }
     }
 
@@ -438,7 +441,7 @@ fun ComposerInterface(
                             EmailComposeView(
                                 isBridge = isBridge,
                                 emailContent = decomposedEmailMessage!!,
-                                from = from.value
+                                from = TODO()
                             )
                         }
                         Platforms.ServiceTypes.TEXT, Platforms.ServiceTypes.TEST -> {
@@ -450,7 +453,7 @@ fun ComposerInterface(
                         Platforms.ServiceTypes.MESSAGE -> {
                             MessageComposeView(
                                 messageContent = decomposedMessageMessage!!,
-                                from = from.value
+                                from = TODO()
                             )
                         }
                     }
@@ -495,7 +498,7 @@ fun ComposerInterface(
                     },
                     onAccountSelected = { account ->
                         selectedAccount = account
-                        from.value = account.account!!
+                        from.value = TODO()
                         showSelectAccountModal = false
                     },
                     name = platformName!!
@@ -535,8 +538,6 @@ fun AccountModalPreview() {
             id= "0",
             account = "developers@relaysms.me",
             name = "gmail",
-            accessToken = "",
-            refreshToken = ""
         )
         SelectAccountModal(
             _accounts = listOf(storedPlatform),

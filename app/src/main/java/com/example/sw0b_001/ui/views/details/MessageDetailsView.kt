@@ -32,24 +32,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.sw0b_001.ui.viewModels.MessagesViewModel
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
-import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Composers
-import com.example.sw0b_001.data.models.Messages
-import com.example.sw0b_001.data.models.Platforms
+import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.ui.appbars.RelayAppBar
-import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.example.sw0b_001.ui.viewModels.MessagesViewModel
+import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageDetailsView(
-    platformsViewModel: PlatformsViewModel,
+    storedPlatformsViewModel: StoredPlatformsViewModel,
     messagesViewModel: MessagesViewModel,
     navController: NavController,
     isOnboarding: Boolean = false
@@ -73,7 +67,7 @@ fun MessageDetailsView(
 
         } catch (e: Exception) {
             e.printStackTrace()
-            fromDisplay = message.fromAccount ?: stringResource(R.string.unknown)
+//            fromDisplay = message.fromAccount ?: stringResource(R.string.unknown)
             toDisplay = stringResource(R.string.unknown)
             messageBody = stringResource(R.string.this_message_s_content_could_not_be_displayed)
             date = message.date
@@ -84,22 +78,22 @@ fun MessageDetailsView(
     Scaffold(
         topBar = {
             RelayAppBar(navController = navController, {
-                CoroutineScope(Dispatchers.Default).launch {
-                    val platform = platformsViewModel.getAvailablePlatforms(context,
-                        messagesViewModel.message!!.platformName!!)
-                    platformsViewModel.platform = platform
-                    messagesViewModel.message = message
-
-                    CoroutineScope(Dispatchers.Main).launch {
-                        navController.navigate(
-                            ComposeScreen(
-                                type = Platforms.ServiceTypes.MESSAGE,
-                                isOnboarding = isOnboarding,
-                                platformName = message?.platformName
-                            )
-                        )
-                    }
-                }
+//                CoroutineScope(Dispatchers.Default).launch {
+//                    val platform = storedPlatformsViewModel.getAvailablePlatforms(context,
+//                        messagesViewModel.message!!.platformName!!)
+//                    storedPlatformsViewModel.platform = platform
+//                    messagesViewModel.message = message
+//
+//                    CoroutineScope(Dispatchers.Main).launch {
+//                        navController.navigate(
+//                            ComposeScreen(
+//                                type = Platforms.ServiceTypes.MESSAGE,
+//                                isOnboarding = isOnboarding,
+//                                platformName = message?.platformName
+//                            )
+//                        )
+//                    }
+//                }
             }) {
                 val messagesViewModel = MessagesViewModel()
                 messagesViewModel.delete(context, messagesViewModel.message!!) {
@@ -161,23 +155,23 @@ fun MessageDetailsView(
 @Composable
 fun MessageDetailsPreview() {
     AppTheme(darkTheme = false) {
-        val message = Messages()
-        message.id = 2
-        message.type = "message"
-        message.date = System.currentTimeMillis()
-        message.platformName = "telegram"
-        message.fromAccount = "+237123456789"
-        message.gatewayClientMSISDN = "+237123456789"
-        message.body = "+123456789:+237123456789:hello Telegram"
-
-        val platformsViewModel = remember{ PlatformsViewModel() }
-        val messagesViewModel = remember{ MessagesViewModel() }
-        messagesViewModel.message = message
-
-        MessageDetailsView(
-            platformsViewModel = platformsViewModel,
-            messagesViewModel = messagesViewModel,
-            navController = NavController(LocalContext.current)
-        )
+//        val message = Messages()
+//        message.id = 2
+//        message.type = "message"
+//        message.date = System.currentTimeMillis()
+//        message.platformName = "telegram"
+//        message.fromAccount = "+237123456789"
+//        message.gatewayClientMSISDN = "+237123456789"
+//        message.body = "+123456789:+237123456789:hello Telegram"
+//
+//        val storedPlatformsViewModel = remember{ StoredPlatformsViewModel() }
+//        val messagesViewModel = remember{ MessagesViewModel() }
+//        messagesViewModel.message = message
+//
+//        MessageDetailsView(
+//            storedPlatformsViewModel = storedPlatformsViewModel,
+//            messagesViewModel = messagesViewModel,
+//            navController = NavController(LocalContext.current)
+//        )
     }
 }

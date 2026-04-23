@@ -1,7 +1,6 @@
 package com.example.sw0b_001.ui.views.details
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.util.Base64
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -21,35 +20,31 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.example.sw0b_001.data.Helpers
-import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.appbars.RelayAppBar
-import com.example.sw0b_001.ui.theme.AppTheme
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.res.stringResource
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
+import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Composers
-import com.example.sw0b_001.ui.viewModels.MessagesViewModel
-import com.example.sw0b_001.data.models.Platforms
-import com.example.sw0b_001.data.models.Messages
+import com.example.sw0b_001.data.Helpers
+import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.components.AttachImageView
-import com.example.sw0b_001.ui.navigation.ComposeScreen
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
+import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.MessagesViewModel
+import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -57,7 +52,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmailDetailsView(
-    platformsViewModel: PlatformsViewModel,
+    storedPlatformsViewModel: StoredPlatformsViewModel,
     messagesViewModel: MessagesViewModel,
     imageViewModel: ImageViewModel,
     navController: NavController,
@@ -78,35 +73,35 @@ fun EmailDetailsView(
     if (message?.body != null) {
         if (isBridge) {
             when (message.type) {
-                Platforms.ServiceTypes.BRIDGE.name -> {
-                    Composers.EmailComposeHandler
-                        .decomposeMessage(
-                            Base64.decode(message.body!!,
-                                Base64.DEFAULT),
-                            message.imageLength,
-                            message.textLength,
-                            true
-                        ).apply {
-                            from = message.fromAccount ?: "Bridge Message"
-                            to = this.to.value
-                            cc = this.cc.value
-                            bcc = this.bcc.value
-                            subject = this.subject.value
-                            body = this.body.value
-                            date = message.date
-
-                            this.image.value?.let { byteArray ->
-                                imageBitmap = BitmapFactory.decodeByteArray(
-                                    byteArray,
-                                    0,
-                                    byteArray.size
-                                )
-                            }
-                        }
-                }
-                Platforms.ServiceTypes.BRIDGE_INCOMING.name -> {
-                    TODO()
-                }
+//                Platforms.ServiceTypes.BRIDGE.name -> {
+//                    Composers.EmailComposeHandler
+//                        .decomposeMessage(
+//                            Base64.decode(message.body!!,
+//                                Base64.DEFAULT),
+//                            TODO(),
+//                            TODO(),
+//                            true
+//                        ).apply {
+//                            from = message.fromAccount ?: "Bridge Message"
+//                            to = this.to.value
+//                            cc = this.cc.value
+//                            bcc = this.bcc.value
+//                            subject = this.subject.value
+//                            body = this.body.value
+//                            date = message.date
+//
+//                            this.image.value?.let { byteArray ->
+//                                imageBitmap = BitmapFactory.decodeByteArray(
+//                                    byteArray,
+//                                    0,
+//                                    byteArray.size
+//                                )
+//                            }
+//                        }
+//                }
+////                Platforms.ServiceTypes.BRIDGE_INCOMING.name -> {
+////                    TODO()
+////                }
             }
         }
         else {
@@ -115,8 +110,8 @@ fun EmailDetailsView(
                 val decomposed = Composers.EmailComposeHandler
                     .decomposeMessage(
                         contentBytes,
-                        message.imageLength,
-                        message.textLength
+                        TODO(),
+                        TODO(),
                     )
 
                 from = message.fromAccount ?: "Email Account"
@@ -143,20 +138,20 @@ fun EmailDetailsView(
         topBar = {
             RelayAppBar(navController = navController, {
                 CoroutineScope(Dispatchers.Default).launch {
-                    val platform = if(!isBridge) platformsViewModel.getAvailablePlatforms(context,
-                        messagesViewModel.message!!.platformName!!) else null
-                    platformsViewModel.platform = platform
-
-                    CoroutineScope(Dispatchers.Main).launch {
-                        navController.navigate(
-                            ComposeScreen(
-                                type = if(platform != null)
-                                    Platforms.ServiceTypes.EMAIL
-                                else Platforms.ServiceTypes.BRIDGE,
-                                platformName = platform?.name
-                            )
-                        )
-                    }
+//                    val platform = if(!isBridge) storedPlatformsViewModel.getAvailablePlatforms(context,
+//                        messagesViewModel.message!!.platformName!!) else null
+//                    storedPlatformsViewModel.platform = platform
+//
+//                    CoroutineScope(Dispatchers.Main).launch {
+//                        navController.navigate(
+//                            ComposeScreen(
+//                                type = if(platform != null)
+//                                    Platforms.ServiceTypes.EMAIL
+//                                else Platforms.ServiceTypes.BRIDGE,
+//                                platformName = platform?.name
+//                            )
+//                        )
+//                    }
                 }
             }) {
                 val messagesViewModel = MessagesViewModel()
@@ -197,11 +192,11 @@ fun EmailDetailsView(
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     // Sender Email
-                    Text(
-                        text = if(LocalInspectionMode.current) "RelaySMS" else from,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+//                    Text(
+//                        text = if(LocalInspectionMode.current) "RelaySMS" else from,
+//                        style = MaterialTheme.typography.bodyMedium,
+//                        color = MaterialTheme.colorScheme.onBackground
+//                    )
                     // Date
                     Text(
                         text = Helpers.formatDate(context, date),
@@ -275,23 +270,23 @@ fun EmailDetailsRow(label: String, email: String) {
 @Preview
 fun EmailDetailsPreview() {
     AppTheme(darkTheme = false) {
-        val messages = Messages()
-        messages.id = 0
-        messages.type = "email"
-        messages.date = System.currentTimeMillis()
-        messages.platformName = "gmail"
-        messages.fromAccount = "developers@relaysms.me"
-        messages.gatewayClientMSISDN = "+237123456789"
-        messages.body = "reply@relaysms.me:cc@relaysms.me:bcc@relaysms.me:subject here:This is an encrypted content"
-
-        val platformsViewModel = remember{ PlatformsViewModel() }
-        val messagesViewModel = remember{ MessagesViewModel() }
-        messagesViewModel.message = messages
-        EmailDetailsView(
-            platformsViewModel=platformsViewModel,
-            messagesViewModel= messagesViewModel,
-            imageViewModel = remember{ ImageViewModel() },
-            navController = rememberNavController()
-        )
+//        val messages = Messages()
+//        messages.id = 0
+//        messages.type = "email"
+//        messages.date = System.currentTimeMillis()
+//        messages.platformName = "gmail"
+//        messages.fromAccount = "developers@relaysms.me"
+//        messages.gatewayClientMSISDN = "+237123456789"
+//        messages.body = "reply@relaysms.me:cc@relaysms.me:bcc@relaysms.me:subject here:This is an encrypted content"
+//
+//        val storedPlatformsViewModel = remember{ StoredPlatformsViewModel() }
+//        val messagesViewModel = remember{ MessagesViewModel() }
+//        messagesViewModel.message = messages
+//        EmailDetailsView(
+//            storedPlatformsViewModel=storedPlatformsViewModel,
+//            messagesViewModel= messagesViewModel,
+//            imageViewModel = remember{ ImageViewModel() },
+//            navController = rememberNavController()
+//        )
     }
 }

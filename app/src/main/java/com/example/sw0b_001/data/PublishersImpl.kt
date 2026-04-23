@@ -10,7 +10,6 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.toLittleEndianBytes
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewModel
 import com.example.sw0b_001.data.Helpers.toBytes
-import com.example.sw0b_001.data.models.AvailablePlatforms
 import com.example.sw0b_001.data.models.Messages
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.extensions.context.settingsGetDefaultGatewayClients
@@ -45,7 +44,7 @@ object PublishersImpl {
     private fun saveContent(
         context: Context,
         content: ByteArray,
-        platform: AvailablePlatforms,
+        platform: SupportedPlatforms,
         account: StoredPlatformsEntity? = null,
         imageLength: Int,
         textLength: Int
@@ -93,7 +92,7 @@ object PublishersImpl {
         context: Context,
         content: ByteArray,
         ad: ByteArray,
-        platform: AvailablePlatforms,
+        platform: SupportedPlatforms,
         imageLength: Int = 0,
         textLength: Int = 0,
         account: StoredPlatformsEntity? = null,

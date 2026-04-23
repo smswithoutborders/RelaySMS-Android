@@ -10,7 +10,7 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Composers
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.extensions.context.settingsGetDefaultGatewayClients
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.ITP_VERSION_VALUE
+import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel.Companion.ITP_VERSION_VALUE
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

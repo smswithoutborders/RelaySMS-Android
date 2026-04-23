@@ -10,7 +10,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import android.util.Log
 import com.example.sw0b_001.data.Datastore
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
+import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel
 import com.example.sw0b_001.data.VaultsGrpcImpl
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaType
@@ -42,7 +42,7 @@ class PublisherGrpcImplTest {
 
     private lateinit var datastore: Datastore
 //    private lateinit var storedTokenDao: StoredTokenDao
-    private lateinit var platformsViewModel: PlatformsViewModel
+    private lateinit var storedPlatformsViewModel: StoredPlatformsViewModel
 
     private val globalPhoneNumber = "+237123456789"
     private val globalPassword = "dummy_password"

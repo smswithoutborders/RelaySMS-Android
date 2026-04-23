@@ -35,14 +35,14 @@ import com.example.sw0b_001.ui.navigation.BridgeViewScreen
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
+import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel
 
 
 @Composable
 fun InboxView(
     _messages: List<Messages> = emptyList<Messages>(),
     messagesViewModel: MessagesViewModel,
-    platformsViewModel: PlatformsViewModel,
+    storedPlatformsViewModel: StoredPlatformsViewModel,
     navController: NavController,
 ) {
     val context = LocalContext.current
@@ -111,7 +111,7 @@ fun InboxViewEmptyPreview() {
     AppTheme {
         InboxView(
             messagesViewModel = remember { MessagesViewModel() },
-            platformsViewModel = remember { PlatformsViewModel(context) },
+            storedPlatformsViewModel = remember { StoredPlatformsViewModel(context) },
             navController = NavController(LocalContext.current),
         )
     }
@@ -138,7 +138,7 @@ fun InboxScreenMessages_Preview() {
         InboxView(
             _messages = listOf(messages, text),
             messagesViewModel = remember { MessagesViewModel() },
-            platformsViewModel = remember { PlatformsViewModel(context) },
+            storedPlatformsViewModel = remember { StoredPlatformsViewModel(context) },
             navController = rememberNavController(),
         )
     }

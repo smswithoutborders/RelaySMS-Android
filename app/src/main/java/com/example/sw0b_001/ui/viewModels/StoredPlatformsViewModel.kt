@@ -23,8 +23,8 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.Network
 import com.example.sw0b_001.data.PublisherGrpcImpl
+import com.example.sw0b_001.data.SupportedPlatforms
 import com.example.sw0b_001.data.VaultsGrpcImpl
-import com.example.sw0b_001.data.models.AvailablePlatforms
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.ui.views.BottomTabsItems
@@ -43,13 +43,12 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 
 @HiltViewModel
-class PlatformsViewModel @Inject constructor(
+class StoredPlatformsViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private var storedLiveData: LiveData<List<StoredPlatformsEntity>> = MutableLiveData()
 
-    var platform by mutableStateOf<AvailablePlatforms?>(null)
     var bottomTabsItem by mutableStateOf(BottomTabsItems.BottomBarRecentTab)
 
     // Selection mode properties
@@ -142,7 +141,7 @@ class PlatformsViewModel @Inject constructor(
 
         fun triggerAddPlatformRequest(
             context: Context,
-            platform: AvailablePlatforms,
+            platform: SupportedPlatforms,
             onCompletedCallback: () -> Unit
         ) {
             CoroutineScope(Dispatchers.Default).launch {

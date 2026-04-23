@@ -44,15 +44,15 @@ import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.PublisherGrpcImpl
+import com.example.sw0b_001.data.SupportedPlatforms
 import com.example.sw0b_001.data.VaultsGrpcImpl
-import com.example.sw0b_001.data.models.AvailablePlatforms
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.Platforms.ServiceTypes
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.triggerAddPlatformRequest
+import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel.Companion.triggerAddPlatformRequest
 import com.example.sw0b_001.ui.views.addAccounts.PNBAPhoneNumberCodeRequestView
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
@@ -67,7 +67,7 @@ fun PlatformOptionsModal(
     isActive: Boolean,
     isCompose: Boolean,
     navController: NavController,
-    platform: AvailablePlatforms?,
+    platform: SupportedPlatforms?,
     isOnboarding: Boolean = false,
     onCompleteCallback: () -> Unit= {},
     onDismissRequest: () -> Unit,
@@ -211,9 +211,7 @@ fun PlatformOptionsModal(
 
 
 @Composable
-private fun RevokeAccountLoading(
-    platform: AvailablePlatforms,
-) {
+private fun RevokeAccountLoading(platform: SupportedPlatforms) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(16.dp)
@@ -233,7 +231,7 @@ private fun RevokeAccountLoading(
 
 private fun triggerAccountRevoke(
     context: Context,
-    platform: AvailablePlatforms,
+    platform: SupportedPlatforms,
     account: StoredPlatformsEntity,
     onCompletedCallback: () -> Unit
 ) {
@@ -278,7 +276,7 @@ private fun triggerAccountRevoke(
 @Composable
 private fun AddAccountLoading(
     context: Context,
-    platform: AvailablePlatforms,
+    platform: SupportedPlatforms,
     onCompletedCallback: () -> Unit
 ) {
     Column(
@@ -389,7 +387,7 @@ private fun triggerPNBARequested(
     phoneNumber: String,
     authCode: String? = null,
     password: String? = null,
-    platform: AvailablePlatforms,
+    platform: SupportedPlatforms,
     onRequestMadeCallback: () -> Unit,
     onFailureCallback: (String?) -> Unit,
     onSuccessCallback: (Boolean, Boolean) -> Unit,
@@ -462,7 +460,7 @@ private fun triggerPNBARequested(
 
 @Composable
 private fun ComposeMessages(
-    platform: AvailablePlatforms?,
+    platform: SupportedPlatforms?,
     navController: NavController,
     subscriptionId: Long = -1L,
     isOnboarding: Boolean = false,
@@ -545,9 +543,9 @@ private fun getServiceBasedComposeDescriptions(serviceType: String, context: Con
 @Composable
 fun PlatformOptionsModalPreview() {
     AppTheme(darkTheme = false) {
-        val platform = AvailablePlatforms(
+        val platform = SupportedPlatforms(
             name = "gmail",
-            shortcode = "g",
+//            shortcode = "g",
             service_type = "email",
             protocol_type = "pnba",
             icon_png = "",

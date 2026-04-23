@@ -3,15 +3,9 @@ package com.example.sw0b_001.data
 import android.content.Context
 import android.util.Base64
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.models.AvailablePlatforms
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import publisher.v1.PublisherOuterClass
-import java.net.URL
 
 class PublisherGrpcImpl(val context: Context) {
 
@@ -26,7 +20,7 @@ class PublisherGrpcImpl(val context: Context) {
     private var oAuthRedirectUrl = "https://relay.smswithoutborders.com/android"
 
     fun getOAuthURL(
-        availablePlatforms: AvailablePlatforms,
+        availablePlatforms: SupportedPlatforms,
         autogenerateCodeVerifier: Boolean = true,
         supportsUrlScheme: Boolean = true,
         requestIdentifier: String
@@ -118,11 +112,6 @@ class PublisherGrpcImpl(val context: Context) {
     companion object {
         private const val OAUTH2_PARAMETERS_FILE = "OAUTH2_PARAMETERS_FILE"
 
-        fun getAvailablePlatforms(context: Context): ArrayList<AvailablePlatforms> {
-            val response = Network.requestGet(context.getString(R.string.get_platforms_url))
-            return Json.decodeFromString<ArrayList<AvailablePlatforms>>(response.result.get())
-        }
-
         fun fetchOauthRequestVerifier(context: Context) : String {
             val sharedPreferences = context
                 .getSharedPreferences(
@@ -145,33 +134,6 @@ class PublisherGrpcImpl(val context: Context) {
                 throw e
             }
         }
-
-        fun refreshAvailablePlatforms(
-            context: Context,
-            callback: (String?) -> Unit = {}
-        ) {
-            CoroutineScope(Dispatchers.Default).launch {
-                try {
-                    getAvailablePlatforms(context).let{ json ->
-                        json.forEach { it->
-                            if(it.icon_png?.isNotEmpty() == true) {
-                                val url = URL(it.icon_png)
-                                it.logo = url.readBytes()
-                            }
-                        }
-                        Datastore.getDatastore(context)?.availablePlatformsDao()?.clear()
-                        Datastore.getDatastore(context)?.availablePlatformsDao()
-                            ?.insertAll(json)
-
-                        callback(null)
-                    }
-                } catch(e: Exception) {
-                    e.printStackTrace()
-                    callback(e.message)
-                }
-            }
-        }
-
     }
 
 }

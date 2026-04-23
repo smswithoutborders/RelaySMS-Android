@@ -3,19 +3,15 @@ package com.example.sw0b_001.ui.modals
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.views.AvailablePlatformsView
+import com.example.sw0b_001.ui.views.SupportedPlatformsView
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,7 +41,7 @@ fun ActivePlatformsModal(
             sheetState = sheetState,
             modifier = Modifier.fillMaxWidth()
         ) {
-            AvailablePlatformsView(
+            SupportedPlatformsView(
                 navController = navController,
                 isCompose = isCompose,
                 isOnboarding = isOnboarding,

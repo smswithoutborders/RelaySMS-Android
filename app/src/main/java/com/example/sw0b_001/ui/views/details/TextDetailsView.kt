@@ -2,7 +2,6 @@ package com.example.sw0b_001.ui.views.details
 
 
 import android.util.Base64
-import com.example.sw0b_001.R
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -34,24 +33,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Composers
-import com.example.sw0b_001.ui.viewModels.MessagesViewModel
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.data.Helpers
-import com.example.sw0b_001.data.models.Messages
-import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.ui.appbars.RelayAppBar
-import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.example.sw0b_001.ui.viewModels.MessagesViewModel
+import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextDetailsView(
-    platformsViewModel: PlatformsViewModel,
+    storedPlatformsViewModel: StoredPlatformsViewModel,
     messagesViewModel: MessagesViewModel,
     navController: NavController,
     isOnboarding: Boolean = false,
@@ -75,7 +68,7 @@ fun TextDetailsView(
             text = decomposedMessage.text.value
             date = message.date
         } catch (e: Exception) {
-            from = message.fromAccount ?: "Unknown Sender"
+//            from = message.fromAccount ?: "Unknown Sender"
             text = "This message's content could not be displayed."
             date = message.date
         }
@@ -87,22 +80,22 @@ fun TextDetailsView(
             RelayAppBar(
                 navController = navController,
                 editCallback = {
-                    CoroutineScope(Dispatchers.Default).launch {
-                        val platform = platformsViewModel.getAvailablePlatforms(context,
-                            messagesViewModel.message!!.platformName!!)
-                        platformsViewModel.platform = platform
-                        messagesViewModel.message = message
-
-                        CoroutineScope(Dispatchers.Main).launch {
-                            navController.navigate(
-                                ComposeScreen(
-                                    type = Platforms.ServiceTypes.TEXT,
-                                    isOnboarding = isOnboarding,
-                                    platformName = message?.platformName
-                                )
-                            )
-                        }
-                    }
+//                    CoroutineScope(Dispatchers.Default).launch {
+//                        val platform = storedPlatformsViewModel.getAvailablePlatforms(context,
+//                            messagesViewModel.message!!.platformName!!)
+//                        storedPlatformsViewModel.platform = platform
+//                        messagesViewModel.message = message
+//
+//                        CoroutineScope(Dispatchers.Main).launch {
+//                            navController.navigate(
+//                                ComposeScreen(
+//                                    type = Platforms.ServiceTypes.TEXT,
+//                                    isOnboarding = isOnboarding,
+//                                    platformName = message?.platformName
+//                                )
+//                            )
+//                        }
+//                    }
                 }
             ) {
                 val messagesViewModel = MessagesViewModel()
@@ -159,24 +152,24 @@ fun TextDetailsView(
 @Composable
 fun TextDetailsPreview() {
     AppTheme(darkTheme = false) {
-        val text = Messages()
-        text.id = 1
-        text.type = "text"
-        text.date = System.currentTimeMillis()
-        text.platformName = "twitter"
-        text.fromAccount = "@relaysms.me"
-        text.gatewayClientMSISDN = "+237123456789"
-        text.body = "@relaysms.me:Hello world"
-
-        val platformsViewModel = remember{ PlatformsViewModel() }
-        val messagesViewModel = remember{ MessagesViewModel() }
-
-        messagesViewModel.message = text
-
-        TextDetailsView(
-            platformsViewModel = platformsViewModel,
-            messagesViewModel = messagesViewModel,
-            navController = rememberNavController()
-        )
+//        val text = Messages()
+//        text.id = 1
+//        text.type = "text"
+//        text.date = System.currentTimeMillis()
+//        text.platformName = "twitter"
+//        text.fromAccount = "@relaysms.me"
+//        text.gatewayClientMSISDN = "+237123456789"
+//        text.body = "@relaysms.me:Hello world"
+//
+//        val storedPlatformsViewModel = remember{ StoredPlatformsViewModel() }
+//        val messagesViewModel = remember{ MessagesViewModel() }
+//
+//        messagesViewModel.message = text
+//
+//        TextDetailsView(
+//            storedPlatformsViewModel = storedPlatformsViewModel,
+//            messagesViewModel = messagesViewModel,
+//            navController = rememberNavController()
+//        )
     }
 }

@@ -121,7 +121,7 @@
     <string name="publisher_grpc_url" translatable="false">publisher.smswithoutborders.com</string>
     <string name="publisher_grpc_port" translatable="false">443</string>
 
-    <string name="publisher_get_platforms_url" translatable="false">https://raw.githubusercontent.com/smswithoutborders/SMSWithoutBorders-Publisher/master/resources/platforms.json</string>
+    <string name="publisher_get_platforms_url" translatable="false"></string>
     <string name="cancel">Cancel</string>
     <string name="click_continue_to_confirm_this_action_do_not_worry_this_has_no_dangerous_effects">Click continue to confirm this action. Do not worry, this has no dangerous effects.</string>
     <string name="messaging">Messaging</string>

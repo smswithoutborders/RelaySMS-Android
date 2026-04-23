@@ -4,13 +4,8 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.database.Cursor
 import android.net.Uri
 import android.provider.ContactsContract
-import android.util.Base64
-import android.util.Log
-import android.widget.Toast
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.compose.foundation.layout.Column
@@ -23,8 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Contacts
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,45 +25,27 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDefaultSimSubscription
-import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
-import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
-import com.example.sw0b_001.data.models.AvailablePlatforms
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
-import com.example.sw0b_001.data.models.StoredPlatformsEntity
+import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Composers
-import com.example.sw0b_001.ui.modals.SelectAccountModal
-import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.verifyPhoneNumberFormat
+import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel.Companion.verifyPhoneNumberFormat
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-import java.nio.charset.StandardCharsets
 
 
 class PickPhoneNumberContract : ActivityResultContract<Unit, Uri?>() {
@@ -107,7 +82,7 @@ fun MessageComposeView(
         contract = PickPhoneNumberContract()
     ) { uri ->
         uri?.let {
-            messageContent.to.value = PlatformsViewModel.getPhoneNumberFromUri(context, it)
+            messageContent.to.value = StoredPlatformsViewModel.getPhoneNumberFromUri(context, it)
         }
     }
 

@@ -34,12 +34,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
+import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasteEncryptedTextView(
-    platformsViewModel: PlatformsViewModel,
+    storedPlatformsViewModel: StoredPlatformsViewModel,
     messagesViewModel: MessagesViewModel,
     navController: NavController
 ) {
@@ -188,7 +188,7 @@ fun PasteEncryptedTextView(
 fun PasteTextViewPreview() {
     val context = LocalContext.current
     PasteEncryptedTextView(
-        platformsViewModel = remember{ PlatformsViewModel(context) },
+        storedPlatformsViewModel = remember{ StoredPlatformsViewModel(context) },
         messagesViewModel = remember{ MessagesViewModel() },
         navController = NavController(LocalContext.current)
     )

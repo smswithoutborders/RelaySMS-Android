@@ -79,7 +79,7 @@ import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
+import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.VaultsViewModel
 import com.example.sw0b_001.ui.views.AboutView
 import com.example.sw0b_001.ui.views.CreateAccountView
@@ -111,7 +111,7 @@ class MainActivity : AppCompatActivity() {
     val threadsViewModel: ThreadsViewModel by viewModels()
     val onboardingViewModel: OnboardingViewModel by viewModels()
 
-    val platformsViewModel: PlatformsViewModel by viewModels()
+    val storedPlatformsViewModel: StoredPlatformsViewModel by viewModels()
     val messagesViewModel: MessagesViewModel by viewModels()
     val gatewayClientViewModel: GatewayClientViewModel by viewModels()
     val imageViewModel: ImageViewModel by viewModels()
@@ -247,7 +247,7 @@ class MainActivity : AppCompatActivity() {
                         showThreadsTopBar = false
                         HomepageView(
                             navController = navController,
-                            platformsViewModel = platformsViewModel,
+                            storedPlatformsViewModel = storedPlatformsViewModel,
                             messagesViewModel = messagesViewModel,
                             gatewayClientViewModel = gatewayClientViewModel,
                             imageViewModel = imageViewModel,
@@ -314,7 +314,7 @@ class MainActivity : AppCompatActivity() {
             composable<HomepageScreen> {
                 HomepageView(
                     navController = navController,
-                    platformsViewModel = platformsViewModel,
+                    storedPlatformsViewModel = storedPlatformsViewModel,
                     messagesViewModel = messagesViewModel,
                     gatewayClientViewModel = gatewayClientViewModel,
                     imageViewModel = imageViewModel,
@@ -378,7 +378,7 @@ class MainActivity : AppCompatActivity() {
             composable<EmailViewScreen> {
                 EmailDetailsView(
                     navController = navController,
-                    platformsViewModel = platformsViewModel,
+                    storedPlatformsViewModel = storedPlatformsViewModel,
                     messagesViewModel = messagesViewModel,
                     imageViewModel = imageViewModel,
                 )
@@ -386,7 +386,7 @@ class MainActivity : AppCompatActivity() {
             composable<BridgeViewScreen> {
                 EmailDetailsView(
                     navController = navController,
-                    platformsViewModel = platformsViewModel,
+                    storedPlatformsViewModel = storedPlatformsViewModel,
                     messagesViewModel = messagesViewModel,
                     imageViewModel = imageViewModel,
                     isBridge = true
@@ -396,19 +396,19 @@ class MainActivity : AppCompatActivity() {
                 TextDetailsView(
                     navController = navController,
                     messagesViewModel = messagesViewModel,
-                    platformsViewModel = platformsViewModel,
+                    storedPlatformsViewModel = storedPlatformsViewModel,
                 )
             }
             composable<MessageViewScreen> {
                 MessageDetailsView(
                     navController = navController,
                     messagesViewModel = messagesViewModel,
-                    platformsViewModel = platformsViewModel,
+                    storedPlatformsViewModel = storedPlatformsViewModel,
                 )
             }
             composable<PasteEncryptedTextScreen> {
                 PasteEncryptedTextView(
-                    platformsViewModel = platformsViewModel,
+                    storedPlatformsViewModel = storedPlatformsViewModel,
                     messagesViewModel = messagesViewModel,
                     navController = navController,
                 )

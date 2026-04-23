@@ -48,7 +48,7 @@ import androidx.compose.ui.unit.dp
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
+import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel
 import kotlinx.coroutines.launch
 
 // Data class to represent an account
@@ -75,9 +75,9 @@ fun SelectAccountModal(
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(true) }
 
-    val platformsViewModel = remember{ PlatformsViewModel(context) }
+    val storedPlatformsViewModel = remember{ StoredPlatformsViewModel(context) }
     val accounts: List<StoredPlatformsEntity> = if(LocalInspectionMode.current) _accounts
-    else platformsViewModel.getAccounts(name)
+    else storedPlatformsViewModel.getAccounts(name)
         .observeAsState(emptyList()).value
 
     if (showBottomSheet) {

@@ -46,7 +46,7 @@ import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
+import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel
 
 
 enum class BottomTabsItems {
@@ -61,7 +61,7 @@ enum class BottomTabsItems {
 fun HomepageView(
     _messages: List<Messages> = emptyList<Messages>(),
     navController: NavController,
-    platformsViewModel : PlatformsViewModel,
+    storedPlatformsViewModel : StoredPlatformsViewModel,
     messagesViewModel: MessagesViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
     imageViewModel: ImageViewModel,
@@ -103,7 +103,7 @@ fun HomepageView(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             if(showTopBar) {
-                when (platformsViewModel.bottomTabsItem) {
+                when (storedPlatformsViewModel.bottomTabsItem) {
                     BottomTabsItems.BottomBarRecentTab -> {
                         RecentAppBar(
                             navController = navController,
@@ -112,11 +112,11 @@ fun HomepageView(
                             isSearchActive = isSearchActive,
                             onToggleSearch = {},
                             onSearchDone = {},
-                            isSelectionMode = platformsViewModel.isSelectionMode,
-                            selectedCount = platformsViewModel.selectedMessagesCount,
-                            onSelectAll = platformsViewModel.onSelectAll,
-                            onDeleteSelected = platformsViewModel.onDeleteSelected,
-                            onCancelSelection = platformsViewModel.onCancelSelection,
+                            isSelectionMode = storedPlatformsViewModel.isSelectionMode,
+                            selectedCount = storedPlatformsViewModel.selectedMessagesCount,
+                            onSelectAll = storedPlatformsViewModel.onSelectAll,
+                            onDeleteSelected = storedPlatformsViewModel.onDeleteSelected,
+                            onCancelSelection = storedPlatformsViewModel.onCancelSelection,
                             onMenuClickCallback = drawerCallback
                         )
                     }
@@ -149,14 +149,14 @@ fun HomepageView(
         },
         bottomBar = {
             BottomNavBar(
-                selectedTab = platformsViewModel.bottomTabsItem,
+                selectedTab = storedPlatformsViewModel.bottomTabsItem,
                 isLoggedIn = isLoggedIn,
             ) { selectedTab ->
-                platformsViewModel.bottomTabsItem = selectedTab
+                storedPlatformsViewModel.bottomTabsItem = selectedTab
             }
         },
         floatingActionButton = {
-            when(platformsViewModel.bottomTabsItem) {
+            when(storedPlatformsViewModel.bottomTabsItem) {
                 BottomTabsItems.BottomBarRecentTab -> {
                     if(isLoggedIn) {
                         ExtendedFloatingActionButton(
@@ -228,10 +228,10 @@ fun HomepageView(
                 .padding(innerPadding)
         ) {
             GetTabViews(
-                platformsViewModel.bottomTabsItem,
+                storedPlatformsViewModel.bottomTabsItem,
                 navController = navController,
                 messagesViewModel = messagesViewModel,
-                platformsViewModel = platformsViewModel,
+                storedPlatformsViewModel = storedPlatformsViewModel,
                 gatewayClientViewModel = gatewayClientViewModel,
                 isLoggedIn = isLoggedIn,
             )
@@ -276,7 +276,7 @@ fun GetTabViews(
     bottomTabsItems: BottomTabsItems,
     navController: NavController,
     messagesViewModel: MessagesViewModel,
-    platformsViewModel: PlatformsViewModel,
+    storedPlatformsViewModel: StoredPlatformsViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
     isLoggedIn: Boolean,
 ) {
@@ -285,15 +285,15 @@ fun GetTabViews(
             RecentView(
                 navController = navController,
                 messagesViewModel = messagesViewModel,
-                platformsViewModel = platformsViewModel,
+                storedPlatformsViewModel = storedPlatformsViewModel,
                 isLoggedIn = isLoggedIn
             ) {
-                platformsViewModel.bottomTabsItem =
+                storedPlatformsViewModel.bottomTabsItem =
                     BottomTabsItems.BottomBarPlatformsTab
             }
         }
         BottomTabsItems.BottomBarPlatformsTab -> {
-            AvailablePlatformsView(
+            SupportedPlatformsView(
                 navController = navController,
             )
         }
@@ -303,7 +303,7 @@ fun GetTabViews(
         BottomTabsItems.BottomBarInboxTab -> {
             InboxView(
                 messagesViewModel = messagesViewModel,
-                platformsViewModel = platformsViewModel,
+                storedPlatformsViewModel = storedPlatformsViewModel,
                 navController = navController
             )
         }
@@ -320,7 +320,7 @@ fun HomepageView_Preview() {
     AppTheme(darkTheme = false) {
         HomepageView(
             navController = rememberNavController(),
-            platformsViewModel = remember{ PlatformsViewModel(context) },
+            storedPlatformsViewModel = remember{ StoredPlatformsViewModel(context) },
             messagesViewModel = remember{ MessagesViewModel() },
             gatewayClientViewModel = remember{ GatewayClientViewModel() },
             imageViewModel = remember{ ImageViewModel() },
@@ -337,7 +337,7 @@ fun HomepageViewLoggedIn_Preview() {
         HomepageView(
             isLoggedIn = true,
             navController = rememberNavController(),
-            platformsViewModel = remember{ PlatformsViewModel(context) },
+            storedPlatformsViewModel = remember{ StoredPlatformsViewModel(context) },
             messagesViewModel = remember{ MessagesViewModel() },
             gatewayClientViewModel = remember{ GatewayClientViewModel() },
             imageViewModel = remember{ ImageViewModel() },
@@ -362,7 +362,7 @@ fun HomepageViewLoggedInMessages_Preview() {
             _messages = listOf(messages),
             isLoggedIn = true,
             navController = rememberNavController(),
-            platformsViewModel = remember{ PlatformsViewModel(context) },
+            storedPlatformsViewModel = remember{ StoredPlatformsViewModel(context) },
             messagesViewModel = remember{ MessagesViewModel() },
             gatewayClientViewModel = remember{ GatewayClientViewModel() },
             imageViewModel = remember{ ImageViewModel() },

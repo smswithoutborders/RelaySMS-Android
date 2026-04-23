@@ -42,8 +42,8 @@ import androidx.compose.ui.unit.dp
 import com.arpitkatiyarprojects.countrypicker.CountryPickerOutlinedTextField
 import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
-import com.example.sw0b_001.data.models.AvailablePlatforms
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.SupportedPlatforms
 import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 
@@ -52,7 +52,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun PNBAPhoneNumberCodeRequestView(
     isLoading: Boolean = false,
-    platform: AvailablePlatforms? = null,
+    platform: SupportedPlatforms? = null,
     isPhoneNumberRequested: Boolean = true,
     isAuthenticationCodeRequested: Boolean,
     isPasswordRequested: Boolean,
@@ -240,9 +240,8 @@ fun PNBAPhoneNumberCodeRequestView(
 @Composable
 fun PNBAPreview() {
     AppTheme(darkTheme = false) {
-        val platform = AvailablePlatforms(
+        val platform = SupportedPlatforms(
             name = "telegram",
-            shortcode = "g",
             service_type = "email",
             protocol_type = "oauth2",
             icon_png = "",

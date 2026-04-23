@@ -240,7 +240,7 @@ fun SettingsView(
                 context.settingsSetStoreTokensOnDevice(checked ?: true)
                 storeTokensOnDevice = checked ?: true
 
-                if(checked == true && !VaultsGrpcImpl(context).isStoredOnDevice()) {
+                if(checked == true) {
                     scope.launch(Dispatchers.Default) {
                         try {
                             VaultsGrpcImpl(context).refreshStoredTokens(
@@ -317,7 +317,7 @@ fun SettingsView(
                     isLoading = true
                     scope.launch(Dispatchers.Default) {
                         try {
-                            vaultsViewModel.completeDelete(context, onFailureCallback = {}) {
+                            vaultsViewModel.completeDelete(onFailureCallback = {}) {
 
                             }
 

@@ -54,14 +54,14 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.models.AvailablePlatforms
+import com.example.sw0b_001.data.SupportedPlatforms
 import com.example.sw0b_001.extensions.context.settingsGetIsLoggedIn
 import com.example.sw0b_001.ui.theme.AppTheme
 
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun AvailablePlatformsView(
+fun SupportedPlatformsView(
     navController: NavController,
     isCompose: Boolean = false,
     isOnboarding: Boolean = false,
@@ -171,14 +171,14 @@ fun PlatformListContent(
 //
 //    val platformsViewModel = remember{ PlatformsViewModel() }
 //
-//    val platforms: List<AvailablePlatforms> by platformsViewModel
-//        .getAvailablePlatforms(context).observeAsState(emptyList())
+//    val platforms: List<SupportedPlatforms> by platformsViewModel
+//        .getSupportedPlatforms(context).observeAsState(emptyList())
 //
 //    val storedPlatforms: List<StoredPlatformsEntity> by platformsViewModel
 //        .getSaved(context).observeAsState(emptyList())
 //
 //    var showPlatformOptions by remember { mutableStateOf(false) }
-//    var clickedPlatform: AvailablePlatforms? by remember{ mutableStateOf(null)}
+//    var clickedPlatform: SupportedPlatforms? by remember{ mutableStateOf(null)}
 //
 //    Column(
 //        modifier = Modifier
@@ -291,10 +291,10 @@ fun PlatformListContent(
 fun PlatformCard(
     modifier: Modifier = Modifier,
     logo: Bitmap? = null,
-    platform: AvailablePlatforms?,
+    platform: SupportedPlatforms?,
     isActive: Boolean,
     isEnabled: Boolean,
-    onClick: (AvailablePlatforms?) -> Unit = {}
+    onClick: (SupportedPlatforms?) -> Unit = {}
 ) {
     val context = LocalContext.current
     val inPreviewMode = LocalInspectionMode.current
@@ -351,7 +351,7 @@ fun PlatformCard(
 @Composable
 fun AddPlatformsScreenPreview() {
     AppTheme(darkTheme = false) {
-        AvailablePlatformsView(
+        SupportedPlatformsView(
             navController = NavController(context = LocalContext.current),
         ){}
     }
