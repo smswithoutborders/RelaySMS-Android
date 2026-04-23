@@ -22,7 +22,7 @@ interface KeysDao {
 
     @Transaction
     fun insert(key: Keys) {
-        clear()
+        clear(key.keystoreAlias)
         _insert(key)
     }
 
@@ -38,6 +38,6 @@ interface KeysDao {
     @Query("SELECT publicKey FROM Keys WHERE keystoreAlias = :keystoreAlias")
     fun fetchPublicKey(keystoreAlias: String): ByteArray?
 
-    @Query("DELETE FROM Keys")
-    fun clear()
+    @Query("DELETE FROM Keys where keystoreAlias = :keystoreAlias")
+    fun clear(keystoreAlias: String)
 }

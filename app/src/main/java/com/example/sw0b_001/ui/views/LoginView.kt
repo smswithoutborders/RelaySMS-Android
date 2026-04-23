@@ -313,6 +313,7 @@ fun LoginView(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(8.dp),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                        enabled = !isLoading
                     )
                 }
                 else if(selectedAuthMethod == 1) {

@@ -300,7 +300,7 @@ class VaultsGrpcImpl(val context: Context) {
         var response: Vault.CreateEntityResponse? = null
         val nonce = context.generateRandomBytes(16)
 
-        var authenticationPublicKeyId = 254
+        val authenticationPublicKeyId = 254
         val authenticationPublicKey = context.getStaticKeys(authenticationPublicKeyId)
             ?: throw Exception("Could not find static keys for id")
 
@@ -328,6 +328,7 @@ class VaultsGrpcImpl(val context: Context) {
                             keystoreAlias = clientVaultHandshakeKeystoreAliasStaticKeys,
                             privateKey = staticKp.privateKey,
                             publicKey = staticKp.publicKey,
+                            authenticationPublicKeyId = authenticationPublicKeyId,
                         )
 
                         try {
@@ -342,8 +343,8 @@ class VaultsGrpcImpl(val context: Context) {
 
                         val ephemeralKeys = Keys(
                             keystoreAlias = clientVaultHandshakeKeystoreAliasEphemeralKeys,
-                            privateKey = staticKp.privateKey,
-                            publicKey = staticKp.publicKey,
+                            privateKey = ekp.privateKey!!,
+                            publicKey = ekp.publicKey,
                             nonce = nonce,
                             authenticationPublicKeyId = authenticationPublicKeyId
                         )
@@ -373,7 +374,6 @@ class VaultsGrpcImpl(val context: Context) {
         } finally {
             nonce.fill(0)
             authenticationPublicKey.fill(0)
-            authenticationPublicKeyId = -1
         }
         return response
     }
@@ -388,7 +388,7 @@ class VaultsGrpcImpl(val context: Context) {
         var response: Vault.AuthenticateEntityResponse? = null
         val nonce = context.generateRandomBytes(16)
 
-        var authenticationPublicKeyId = 254
+        val authenticationPublicKeyId = 254
         val authenticationPublicKey = context.getStaticKeys(authenticationPublicKeyId)
             ?: throw Exception("Could not find static keys for id")
 
@@ -417,7 +417,6 @@ class VaultsGrpcImpl(val context: Context) {
                             keystoreAlias = clientVaultHandshakeKeystoreAliasStaticKeys,
                             privateKey = staticKp.privateKey,
                             publicKey = staticKp.publicKey,
-                            nonce = nonce,
                             authenticationPublicKeyId = authenticationPublicKeyId,
                         )
 
@@ -433,8 +432,8 @@ class VaultsGrpcImpl(val context: Context) {
 
                         val ephemeralKeys = Keys(
                             keystoreAlias = clientVaultHandshakeKeystoreAliasEphemeralKeys,
-                            privateKey = staticKp.privateKey,
-                            publicKey = staticKp.publicKey,
+                            privateKey = ekp.privateKey!!,
+                            publicKey = ekp.publicKey,
                             nonce = nonce,
                             authenticationPublicKeyId = authenticationPublicKeyId
                         )
@@ -461,10 +460,13 @@ class VaultsGrpcImpl(val context: Context) {
                     }
                 }
             }
-        } finally {
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw e
+        }
+        finally {
             nonce.fill(0)
             authenticationPublicKey.fill(0)
-            authenticationPublicKeyId = -1
         }
         return response
     }
@@ -507,7 +509,6 @@ class VaultsGrpcImpl(val context: Context) {
                             keystoreAlias = clientVaultHandshakeKeystoreAliasStaticKeys,
                             privateKey = staticKp.privateKey,
                             publicKey = staticKp.publicKey,
-                            nonce = nonce,
                             authenticationPublicKeyId = authenticationPublicKeyId,
                         )
 
@@ -523,8 +524,8 @@ class VaultsGrpcImpl(val context: Context) {
 
                         val ephemeralKeys = Keys(
                             keystoreAlias = clientVaultHandshakeKeystoreAliasEphemeralKeys,
-                            privateKey = staticKp.privateKey,
-                            publicKey = staticKp.publicKey,
+                            privateKey = ekp.privateKey!!,
+                            publicKey = ekp.publicKey,
                             nonce = nonce,
                             authenticationPublicKeyId = authenticationPublicKeyId
                         )
