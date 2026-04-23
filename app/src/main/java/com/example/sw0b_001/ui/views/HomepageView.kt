@@ -315,10 +315,12 @@ fun GetTabViews(
 @Preview(showBackground = false)
 @Composable
 fun HomepageView_Preview() {
+
+    val context = LocalContext.current
     AppTheme(darkTheme = false) {
         HomepageView(
             navController = rememberNavController(),
-            platformsViewModel = remember{ PlatformsViewModel() },
+            platformsViewModel = remember{ PlatformsViewModel(context) },
             messagesViewModel = remember{ MessagesViewModel() },
             gatewayClientViewModel = remember{ GatewayClientViewModel() },
             imageViewModel = remember{ ImageViewModel() },
@@ -330,11 +332,12 @@ fun HomepageView_Preview() {
 @Preview(showBackground = false)
 @Composable
 fun HomepageViewLoggedIn_Preview() {
+    val context = LocalContext.current
     AppTheme(darkTheme = false) {
         HomepageView(
             isLoggedIn = true,
             navController = rememberNavController(),
-            platformsViewModel = remember{ PlatformsViewModel() },
+            platformsViewModel = remember{ PlatformsViewModel(context) },
             messagesViewModel = remember{ MessagesViewModel() },
             gatewayClientViewModel = remember{ GatewayClientViewModel() },
             imageViewModel = remember{ ImageViewModel() },
@@ -349,18 +352,17 @@ fun HomepageViewLoggedInMessages_Preview() {
     AppTheme(darkTheme = false) {
         val messages = Messages()
         messages.id = 0
-        messages.type = "email"
+        messages.type = "email".encodeToByteArray()[0]
         messages.date = System.currentTimeMillis()
-        messages.platformName = "gmail"
-        messages.fromAccount = "developers@relaysms.me"
-        messages.gatewayClientMSISDN = "+237123456789"
-        messages.body = "origin@gmail.com:dev@relaysms.me:::subject here:This is an encrypted content"
+        messages.fromAccount = "developers@relaysms.me".encodeToByteArray()
+        messages.body = "origin@gmail.com:dev@relaysms.me:::subject here:This is an encrypted content".encodeToByteArray()
+        val context = LocalContext.current
 
         HomepageView(
             _messages = listOf(messages),
             isLoggedIn = true,
             navController = rememberNavController(),
-            platformsViewModel = remember{ PlatformsViewModel() },
+            platformsViewModel = remember{ PlatformsViewModel(context) },
             messagesViewModel = remember{ MessagesViewModel() },
             gatewayClientViewModel = remember{ GatewayClientViewModel() },
             imageViewModel = remember{ ImageViewModel() },

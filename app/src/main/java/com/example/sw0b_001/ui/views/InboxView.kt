@@ -16,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -28,13 +29,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.sw0b_001.ui.viewModels.MessagesViewModel
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.Messages
 import com.example.sw0b_001.ui.navigation.BridgeViewScreen
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.MessagesViewModel
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 
 
 @Composable
@@ -106,10 +107,11 @@ fun EmptyInboxContent(onPasteNewMessageClicked: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 fun InboxViewEmptyPreview() {
+    val context = LocalContext.current
     AppTheme {
         InboxView(
-            messagesViewModel = MessagesViewModel(),
-            platformsViewModel = PlatformsViewModel(),
+            messagesViewModel = remember { MessagesViewModel() },
+            platformsViewModel = remember { PlatformsViewModel(context) },
             navController = NavController(LocalContext.current),
         )
     }
@@ -121,25 +123,22 @@ fun InboxScreenMessages_Preview() {
     AppTheme(darkTheme = false) {
         val messages = Messages()
         messages.id = 0
-        messages.type = "email"
+        messages.type = "email".encodeToByteArray()[0]
         messages.date = System.currentTimeMillis()
-        messages.platformName = "gmail"
-        messages.fromAccount = "developers@relaysms.me"
-        messages.gatewayClientMSISDN = "+237123456789"
-        messages.body = "dev@relaysms.me:::subject here:This is an encrypted content"
+        messages.fromAccount = "developers@relaysms.me".encodeToByteArray()
+        messages.body = "dev@relaysms.me:::subject here:This is an encrypted content".encodeToByteArray()
 
         val text = Messages()
         text.id = 1
-        text.type = "text"
+        text.type = "text".encodeToByteArray()[0]
         text.date = System.currentTimeMillis()
-        text.platformName = "twitter"
-        text.fromAccount = "@relaysms.me"
-        text.gatewayClientMSISDN = "+237123456789"
-        text.body = "@relaysms.me:Hello world"
+        text.fromAccount = "@relaysms.me".encodeToByteArray()
+        text.body = "@relaysms.me:Hello world".encodeToByteArray()
+        val context = LocalContext.current
         InboxView(
             _messages = listOf(messages, text),
-            messagesViewModel = MessagesViewModel(),
-            platformsViewModel = PlatformsViewModel(),
+            messagesViewModel = remember { MessagesViewModel() },
+            platformsViewModel = remember { PlatformsViewModel(context) },
             navController = rememberNavController(),
         )
     }

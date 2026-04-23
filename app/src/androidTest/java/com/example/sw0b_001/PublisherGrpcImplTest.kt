@@ -1,7 +1,7 @@
 package com.example.sw0b_001
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.sw0b_001.data.Publishers
+import com.example.sw0b_001.data.PublisherGrpcImpl
 import io.grpc.testing.GrpcCleanupRule
 import org.junit.Assert
 import org.junit.Rule
@@ -11,7 +11,7 @@ import java.nio.ByteOrder
 import android.util.Log
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
-import com.example.sw0b_001.data.Vaults
+import com.example.sw0b_001.data.VaultsGrpcImpl
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -32,13 +32,13 @@ import java.util.concurrent.TimeUnit
  */
 
 
-class PublishersTest {
+class PublisherGrpcImplTest {
     @get:Rule
     val grpcCleanup = GrpcCleanupRule()
 
 
-    private lateinit var publishers: Publishers
-    private lateinit var vault: Vaults
+    private lateinit var publisherGrpcImpl: PublisherGrpcImpl
+    private lateinit var vault: VaultsGrpcImpl
 
     private lateinit var datastore: Datastore
 //    private lateinit var storedTokenDao: StoredTokenDao

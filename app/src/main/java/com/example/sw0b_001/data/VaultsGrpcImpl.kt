@@ -22,7 +22,6 @@ import org.bouncycastle.crypto.generators.Ed25519KeyPairGenerator
 import org.bouncycastle.crypto.params.Ed25519KeyGenerationParameters
 import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters
-import org.bouncycastle.crypto.params.X25519PublicKeyParameters
 import org.bouncycastle.crypto.signers.Ed25519Signer
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import vault.v2.EntityGrpc
@@ -30,9 +29,11 @@ import vault.v2.Vault
 import java.security.SecureRandom
 import java.security.Security
 
-class Vaults(val context: Context) {
-    private val clientVaultHandshakeKeystoreAliasStaticKeys =
-        "clientVaultHandshakeKeystoreAlias_static_keys"
+class VaultsGrpcImpl(val context: Context) {
+    companion object {
+        const val clientVaultHandshakeKeystoreAliasStaticKeys =
+            "clientVaultHandshakeKeystoreAlias_static_keys"
+    }
 
     private val clientVaultHandshakeKeystoreAliasEphemeralKeys =
         "clientVaultHandshakeKeystoreAlias_ephemeral_keys"
@@ -60,17 +61,6 @@ class Vaults(val context: Context) {
     fun fetchLongLivedToken() : ByteArray? {
         return Datastore.getDatastore(context)?.keysDao()
             ?.fetchLlt(clientVaultHandshakeKeystoreAliasStaticKeys)
-    }
-
-    @Throws
-    fun isStoredOnDevice(): Boolean {
-        try {
-            val response = getStoredAccountTokens(false, )
-            return !response.storedTokensList.any { !it.isStoredOnDevice }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            throw e
-        }
     }
 
     fun refreshStoredTokens(
@@ -104,8 +94,6 @@ class Vaults(val context: Context) {
                             id = uuid,
                             account = accountTokens.accountIdentifier,
                             name = accountTokens.platform,
-                            accessToken = accessToken,
-                            refreshToken = refreshToken
                         )
                     )
                 }
@@ -160,26 +148,20 @@ class Vaults(val context: Context) {
                             publicKey = ek.publicKey,
                             privateKey = ek.privateKey
                         ),
-                        authenticationPublicKey =
-                            X25519PublicKeyParameters(authenticationPublicKey, 0),
-                        ephemeralPublicKey = X25519PublicKeyParameters(serverPublicKey, 0),
+                        authenticationPublicKey = authenticationPublicKey,
+                        ephemeralPublicKey = serverPublicKey,
                         salt = salt,
                         info = info
                     )
-                    try {
-                        nkKeys.use { nk ->
-                            RatchetStates.initialize(
-                                context = context,
-                                keystoreAlias = ratchetKeystoreAlias,
-                                authenticationPublicKey =
-                                    X25519PublicKeyParameters(authenticationPublicKey, 0),
-                                rk = nk.rk,
-                                hk = nk.hk,
-                                nhk = nk.nhk
-                            )
-                        }
-                    } finally {
-                        nkKeys.close()
+                    nkKeys.use { nk ->
+                        RatchetStates.initialize(
+                            context = context,
+                            keystoreAlias = ratchetKeystoreAlias,
+                            authenticationPublicKey = authenticationPublicKey,
+                            rk = nk.rk,
+                            hk = nk.hk,
+                            nhk = nk.nhk
+                        )
                     }
                 } finally {
                     info.fill(0)
@@ -208,7 +190,7 @@ class Vaults(val context: Context) {
         try {
             when(type) {
                 OTPCodeVerificationType.CREATE -> {
-                    val createEntityRequest = Vault.CreateEntityRequest.newBuilder().apply {
+                    val createEntityRequest = vault.v2.Vault.CreateEntityRequest.newBuilder().apply {
                         setOwnershipProofResponse(otpCode)
                         setPhoneNumber(phoneNumber)
                         setEmailAddress(email)
@@ -220,7 +202,7 @@ class Vaults(val context: Context) {
                     llt = response.longLivedToken.toByteArray()
                 }
                 OTPCodeVerificationType.AUTHENTICATE -> {
-                    val authenticateEntityRequest = Vault.AuthenticateEntityRequest.newBuilder().apply {
+                    val authenticateEntityRequest = vault.v2.Vault.AuthenticateEntityRequest.newBuilder().apply {
                         setOwnershipProofResponse(otpCode)
                         setPhoneNumber(phoneNumber)
                         setEmailAddress(email)
@@ -232,7 +214,7 @@ class Vaults(val context: Context) {
                     llt = response.longLivedToken.toByteArray()
                 }
                 OTPCodeVerificationType.RECOVER -> {
-                    val resetPasswordRequest = Vault.ResetPasswordRequest.newBuilder().apply {
+                    val resetPasswordRequest = vault.v2.Vault.ResetPasswordRequest.newBuilder().apply {
                         setOwnershipProofResponse(otpCode)
                         setPhoneNumber(phoneNumber)
                         setEmailAddress(email)
@@ -325,7 +307,7 @@ class Vaults(val context: Context) {
         try {
             protocols.generateDH().use { ekp ->
                 generateSigningKeys().use { staticKp ->
-                    val createEntityRequest = Vault.CreateEntityRequest.newBuilder().apply {
+                    val createEntityRequest = vault.v2.Vault.CreateEntityRequest.newBuilder().apply {
                         setCountryCode(countryCode)
                         setPhoneNumber(phoneNumber)
                         setPassword(password)
@@ -413,7 +395,7 @@ class Vaults(val context: Context) {
         try {
             protocols.generateDH().use { ekp ->
                 generateSigningKeys().use { staticKp ->
-                    val authenticateEntityRequest = Vault.AuthenticateEntityRequest.newBuilder()
+                    val authenticateEntityRequest = vault.v2.Vault.AuthenticateEntityRequest.newBuilder()
                         .apply {
                             setPhoneNumber(phoneNumber)
                             setPassword(password)
@@ -504,7 +486,7 @@ class Vaults(val context: Context) {
         try {
             protocols.generateDH().use { ekp ->
                 generateSigningKeys().use { staticKp ->
-                    val resetPasswordEntity = Vault.ResetPasswordRequest.newBuilder()
+                    val resetPasswordEntity = vault.v2.Vault.ResetPasswordRequest.newBuilder()
                         .apply {
                             setPhoneNumber(phoneNumber)
                             setNewPassword(newPassword)
@@ -581,7 +563,7 @@ class Vaults(val context: Context) {
     fun getStoredAccountTokens(
         migrateToDevice: Boolean
     ): Vault.ListEntityStoredTokensResponse {
-        val request = Vault.ListEntityStoredTokensRequest.newBuilder().apply {
+        val request = vault.v2.Vault.ListEntityStoredTokensRequest.newBuilder().apply {
             setMigrateToDevice(migrateToDevice)
         }.build()
 
@@ -590,7 +572,7 @@ class Vaults(val context: Context) {
     }
 
     fun deleteEntity() : Vault.DeleteEntityResponse {
-        val deleteEntityRequest = Vault.DeleteEntityRequest.newBuilder().build()
+        val deleteEntityRequest = vault.v2.Vault.DeleteEntityRequest.newBuilder().build()
         return entityStub.deleteEntity(deleteEntityRequest)
     }
 

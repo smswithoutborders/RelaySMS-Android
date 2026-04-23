@@ -1,12 +1,11 @@
 plugins {
     id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
-//    id 'org.jetbrains.kotlin.jvm' version '1.9.23'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '2.2.20'
-    id "com.google.protobuf"
+    id 'org.jetbrains.kotlin.plugin.serialization' version '2.3.20'
+    id 'com.google.protobuf'
+//    id 'com.google.protobuf' version '0.9.4' apply false
     alias(libs.plugins.compose.compiler)
-    id 'kotlin-kapt' // Add this line
-    id 'com.google.devtools.ksp' version '2.2.10-2.0.2'
+    id 'com.google.devtools.ksp' version '2.3.4'
+    id("com.google.dagger.hilt.android")
 }
 
 def versionsPropertiesFile = rootProject.file("version.properties")
@@ -14,48 +13,8 @@ def versionProperties = new Properties()
 versionProperties.load(new FileInputStream(versionsPropertiesFile))
 
 android {
-    signingConfigs {
-        def localPropertiesFile = rootProject.file("local.properties")
-
-        // 🔑 Check if the file exists before proceeding
-        if (localPropertiesFile.exists()) {
-            def localProperties = new Properties()
-
-            // Note: It's safer to use 'new FileInputStream(localPropertiesFile)' within 'try-catch'
-            // or use the file's 'withInputStream' method, but for a simple check,
-            // the 'exists()' guard is the primary requirement.
-            localProperties.load(new FileInputStream(localPropertiesFile))
-
-            if (localProperties['storeFile'] && localProperties['keyAlias'] &&
-                    localProperties['storePassword'] && localProperties['keyPassword']) {
-
-                // Configuration logic remains the same
-                debug {
-                    keyAlias = localProperties['keyAlias']
-                    storeFile = new File(localProperties['storeFile'])
-                    storePassword = localProperties['storePassword']
-                    keyPassword = localProperties['keyPassword']
-                }
-                release {
-                    keyAlias = localProperties['keyAlias']
-                    storeFile = new File(localProperties['storeFile'])
-                    storePassword = localProperties['storePassword']
-                    keyPassword = localProperties['keyPassword']
-                }
-            } else {
-                // Optional: Print a warning if the file exists but is missing required properties
-                println("⚠️ Warning: local.properties file exists, but is missing one or more required signing properties.")
-            }
-        } else {
-            // Optional: Print a warning if the file doesn't exist
-            println("⚠️ Warning: local.properties file not found. Signing configurations will not be applied.")
-        }
-    }
+    namespace 'com.example.sw0b_001'
     compileSdk 36
-
-    buildFeatures {
-        viewBinding true
-    }
 
     def _versionName = versionProperties['versionName']
     def tagVersion = Integer.parseInt(versionProperties['tagVersion'])
@@ -68,27 +27,23 @@ android {
         versionName _versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
         ksp {
             arg('room.schemaLocation', "$projectDir/schemas")
         }
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments += ["room.schemaLocation":
-                                      "$projectDir/schemas".toString()]
-            }
-        }
         resourceConfigurations += ['en', 'fr', 'fa', 'es', 'tr', 'ar', 'de', 'sw', 'zh', 'ko', 'hi', 'sn']
 
-        manifestPlaceholders =
-                ['appAuthRedirectScheme': 'oauth.afkanerd.com']
+        manifestPlaceholders = ['appAuthRedirectScheme': 'oauth.afkanerd.com']
 
-        // ...
         Properties properties = new Properties()
         if (rootProject.file("local.properties").exists()) {
             properties.load(rootProject.file("local.properties").newDataInputStream())
         }
         buildConfigField "String", "RECAPTCHA_KEY", properties.getProperty("recaptcha_key", "\"\"")
-
     }
 
     buildTypes {
@@ -107,91 +62,56 @@ android {
         }
     }
 
-    buildFeatures {
-        viewBinding true
-    }
-
     buildscript {
         ext {
             compose_compiler = '1.3.1'         //compiler
             compose_version = '1.3.0-beta02'   //compose dependencies
             compose_material3 = '1.0.0-beta02' //material3 release
         }
-        //...
     }
 
     compileOptions {
         coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
-//        kotlinCompilerExtensionVersion compose_compiler
     }
 
     lint {
         checkReleaseBuilds false
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
-    namespace 'com.example.sw0b_001'
-}
-
-//repositories {
-//	def releasePropertiesFile = rootProject.file("release.properties")
-//	def releaseProperties = new Properties()
-//	releaseProperties.load(new FileInputStream(releasePropertiesFile))
-//    maven {
-//        url = uri("https://maven.pkg.github.com/smswithoutborders/lib_signal_double_ratchet_java")
-//        credentials {
-//            username = releaseProperties['github_username']
-//            password = releaseProperties['github_token']
-//        }
-//    }
-//}
-
-
-import org.apache.tools.ant.taskdefs.condition.Os
-
-// Compatible with macOS on Apple Silicon
-def archSuffix = Os.isFamily(Os.FAMILY_MAC) ? ':osx-x86_64' : ''
-protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:4.27.0"
-    }
-
-    plugins {
-        grpc {
-            artifact = 'io.grpc:protoc-gen-grpc-java:1.64.0'
+    sourceSets {
+        main {
+            java.srcDirs += [
+                    'build/generated/java/generateDebugProto/java',
+                    'build/generated/java/generateDebugProto/grpc',
+            ]
         }
     }
+}
 
+protobuf {
+    protoc { artifact = 'com.google.protobuf:protoc:4.29.3' }
+    plugins {
+        grpc { artifact = 'io.grpc:protoc-gen-grpc-java:1.71.0' }
+    }
     generateProtoTasks {
         all().each { task ->
-            task.plugins {
-//                javalite {}
-                grpc { option 'lite' }
-            }
-            task.builtins {
-                java { option 'lite' }
-            }
+            task.builtins { java { option 'lite' } }
+            task.plugins { grpc { option 'lite' } }
         }
     }
 }
-
-configurations {
-    implementation.exclude module:'protobuf-javalite'
-}
-
 
 dependencies {
     implementation 'com.github.smswithoutborders:lib_image_android:3275ac7'
     implementation 'com.github.smswithoutborders:lib_smsmms_android:b0deb94'
-    implementation 'com.github.smswithoutborders:lib_signal_double_ratchet_java:a42dea9'
+    implementation 'com.github.smswithoutborders:lib_signal_double_ratchet_java:9678260'
 
     implementation libs.androidx.appcompat
     implementation libs.material
@@ -259,19 +179,13 @@ dependencies {
     implementation(libs.okhttp3.okhttp)
     implementation(libs.logging.interceptor)
     implementation libs.javax.annotation.api
-    implementation libs.grpc.core
-    implementation libs.grpc.stub
-    implementation libs.grpc.okhttp
-    implementation(libs.grpc.protobuf.lite) {
-        exclude module: "protobuf-lite"
-    }
-    androidTestImplementation(libs.grpc.testing)
-    androidTestImplementation(libs.grpc.inprocess)
 
-//     Add protobuf-java dependency
-    implementation libs.protobuf.java
+    implementation 'io.grpc:grpc-okhttp:1.80.0' // Default transport for Android
+    implementation 'io.grpc:grpc-protobuf-lite:1.80.0'
+    implementation 'io.grpc:grpc-stub:1.80.0'
 
-    implementation libs.fernet.java8
+
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
 
     implementation(libs.androidx.material)
 
@@ -361,7 +275,7 @@ dependencies {
     implementation(libs.coil.network.okhttp)
 
     coreLibraryDesugaring libs.desugar.jdk.libs
-    implementation(libs.protobuf.kotlin)
+//    implementation(libs.protobuf.kotlin)
     implementation(libs.bcprov.jdk15to18)
 
     implementation "androidx.security:security-crypto:1.1.0"
@@ -369,5 +283,10 @@ dependencies {
     implementation 'net.zetetic:sqlcipher-android:4.14.1@aar'
     implementation 'androidx.sqlite:sqlite:2.6.2'
     implementation "androidx.security:security-crypto:1.1.0"
+
+    implementation "com.google.dagger:hilt-android:2.59.2"
+    ksp "com.google.dagger:hilt-compiler:2.59.2"
+
+    implementation("com.google.protobuf:protobuf-kotlin:4.34.1")
 }
 

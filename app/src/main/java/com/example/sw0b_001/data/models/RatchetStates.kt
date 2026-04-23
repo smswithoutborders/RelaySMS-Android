@@ -2,11 +2,11 @@ package com.example.sw0b_001.data.models
 
 import android.content.Context
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.RatchetsHE
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.States
 import com.example.sw0b_001.data.Datastore
-import org.bouncycastle.crypto.CipherParameters
 import java.lang.AutoCloseable
 
 @Entity
@@ -15,6 +15,8 @@ data class RatchetStates (
     val keystoreAlias: String,
     val value: ByteArray
 ): AutoCloseable {
+    @Ignore
+    @Transient
     private var isClosed = false
     override fun close() {
         if(isClosed) return
@@ -37,7 +39,7 @@ data class RatchetStates (
         fun initialize(
             context: Context,
             keystoreAlias: String,
-            authenticationPublicKey: CipherParameters,
+            authenticationPublicKey: ByteArray,
             rk: ByteArray,
             hk: ByteArray,
             nhk: ByteArray,

@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.startup.Initializer
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.setDatabaseName
 import com.example.sw0b_001.data.GatewayClientsCommunications
-import com.example.sw0b_001.data.Publishers
+import com.example.sw0b_001.data.PublisherGrpcImpl
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,7 +22,7 @@ class StartupActivity : Initializer<Context>{
 
         CoroutineScope(Dispatchers.Default).launch {
             try {
-                Publishers.refreshAvailablePlatforms(context)
+                PublisherGrpcImpl.refreshAvailablePlatforms(context)
             } catch(e: Exception) {
                 e.printStackTrace()
             }

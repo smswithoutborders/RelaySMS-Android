@@ -45,10 +45,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
-import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
 import kotlinx.coroutines.launch
 
 // Data class to represent an account
@@ -75,9 +75,9 @@ fun SelectAccountModal(
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(true) }
 
-    val platformsViewModel = remember{ PlatformsViewModel() }
+    val platformsViewModel = remember{ PlatformsViewModel(context) }
     val accounts: List<StoredPlatformsEntity> = if(LocalInspectionMode.current) _accounts
-    else platformsViewModel.getAccounts(context, name)
+    else platformsViewModel.getAccounts(name)
         .observeAsState(emptyList()).value
 
     if (showBottomSheet) {
@@ -191,8 +191,6 @@ fun SelectAccountModalPreview() {
             id= "0",
             account = "developers@relaysms.me",
             name = "gmail",
-            accessToken = "",
-            refreshToken = ""
         )
         SelectAccountModal(
             _accounts = listOf(storedPlatform),

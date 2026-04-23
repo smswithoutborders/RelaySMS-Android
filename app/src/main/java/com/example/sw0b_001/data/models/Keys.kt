@@ -1,8 +1,10 @@
 package com.example.sw0b_001.data.models
 
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 
 @Entity
@@ -19,6 +21,8 @@ data class Keys(
     var llt: ByteArray? = null,
     var authenticationPublicKeyId: Int? = null,
 ) : AutoCloseable {
+    @Ignore
+    @Transient
     private var isClosed = false
 
     override fun close() {

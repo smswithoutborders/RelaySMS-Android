@@ -4,7 +4,6 @@ import android.content.Context
 import android.telephony.PhoneNumberUtils
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -58,13 +57,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.arpitkatiyarprojects.countrypicker.CountryPicker
 import com.arpitkatiyarprojects.countrypicker.CountryPickerOutlinedTextField
 import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
 import com.example.sw0b_001.BuildConfig
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
-import com.example.sw0b_001.data.Vaults
+import com.example.sw0b_001.data.VaultsGrpcImpl
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.components.CaptchaImage
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
@@ -433,15 +430,16 @@ private fun recoverPassword(
     completedCallback: () -> Unit = {},
 ) {
     CoroutineScope(Dispatchers.Default).launch{
-        val vaults = Vaults(context)
+        val vaultsGrpcImpl = VaultsGrpcImpl(context)
         try {
-            val response = vaults.recoverEntityPassword(
+            val response = vaultsGrpcImpl.recoverEntityPassword(
                 context,
                 email = email,
                 phoneNumber = phoneNumber,
                 newPassword = password,
                 recaptchaToken = recaptchaToken,
-            )
+            ) ?: throw Exception("Grpc response came back null")
+
 
             if(response.requiresOwnershipProof) {
                 otpRequiredCallback(response.nextAttemptTimestamp)
@@ -454,7 +452,7 @@ private fun recoverPassword(
             failedCallback(e.message)
         }
         finally {
-            vaults.shutdown()
+            vaultsGrpcImpl.shutdown()
             completedCallback()
         }
     }

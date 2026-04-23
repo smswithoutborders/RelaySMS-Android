@@ -13,14 +13,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class GatewayClientViewModel() : ViewModel() {
+class GatewayClientViewModel : ViewModel() {
     private var liveData: LiveData<List<GatewayClients>> = MutableLiveData()
     private val _selectedGatewayClients = MutableLiveData<GatewayClients?>()
     val selectedGatewayClients: LiveData<GatewayClients?> = _selectedGatewayClients
 
     fun get(context: Context, successRunnable: Runnable?): LiveData<List<GatewayClients>> {
         if(liveData.value.isNullOrEmpty()) {
-            liveData = Datastore.getDatastore(context).gatewayClientsDao().all
+            val db = Datastore.getDatastore(context)?.gatewayClientsDao()
+                ?: throw Exception("Could not get database")
+            liveData = db.all
             loadRemote(context, successRunnable, successRunnable)
         }
         return liveData
@@ -45,7 +47,9 @@ class GatewayClientViewModel() : ViewModel() {
     fun delete(context: Context, gatewayClients: GatewayClients) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                Datastore.getDatastore(context).gatewayClientsDao().delete(gatewayClients)
+                val db = Datastore.getDatastore(context)?.gatewayClientsDao()
+                    ?: throw Exception("Could not get database")
+                db.delete(gatewayClients)
             } catch (e: Exception) {
                 e.printStackTrace()
                 throw e
@@ -61,7 +65,9 @@ class GatewayClientViewModel() : ViewModel() {
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                Datastore.getDatastore(context).gatewayClientsDao().delete(gatewayClients)
+                val db = Datastore.getDatastore(context)?.gatewayClientsDao()
+                    ?: throw Exception("Could not get database")
+                db.delete(gatewayClients)
                 withContext(Dispatchers.Main) {
                     successRunnable.run()
                 }
@@ -82,7 +88,9 @@ class GatewayClientViewModel() : ViewModel() {
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                Datastore.getDatastore(context).gatewayClientsDao().insert(gatewayClients)
+                val db = Datastore.getDatastore(context)?.gatewayClientsDao()
+                    ?: throw Exception("Could not get database")
+                db.insert(gatewayClients)
                 withContext(Dispatchers.Main) {
                     successRunnable.run()
                 }
@@ -103,7 +111,9 @@ class GatewayClientViewModel() : ViewModel() {
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                Datastore.getDatastore(context).gatewayClientsDao().update(gatewayClients)
+                val db = Datastore.getDatastore(context)?.gatewayClientsDao()
+                    ?: throw Exception("Could not get database")
+                db.update(gatewayClients)
                 withContext(Dispatchers.Main) {
                     successRunnable.run()
                 }

@@ -24,13 +24,13 @@ class GrpcClientInterceptor(val context: Context) : ClientInterceptor{
                 val timestamp = (System.currentTimeMillis() / 1000).toString()
                 val nonce = context.generateRandomBytes(16)
                 val methodName = "/${method?.fullMethodName}"
-                val llt = String(Vaults(context).fetchLongLivedToken()!!,
+                val llt = String(VaultsGrpcImpl(context).fetchLongLivedToken()!!,
                     Charsets.UTF_8)
 
                 val requestString = methodName.encodeToByteArray() +
                         timestamp.encodeToByteArray() +
                         nonce
-                val signature = Vaults(context).signGrpcRequest(requestString)
+                val signature = VaultsGrpcImpl(context).signGrpcRequest(requestString)
 
                 val sigKey = Metadata.Key.of("X-Sig-bin", Metadata.BINARY_BYTE_MARSHALLER)
                 val tsKey = Metadata.Key.of("X-Timestamp", Metadata.ASCII_STRING_MARSHALLER)

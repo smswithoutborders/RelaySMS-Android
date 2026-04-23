@@ -1,7 +1,6 @@
 package com.example.sw0b_001.ui.viewModels
 
 import android.content.Context
-import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
 import android.provider.ContactsContract
@@ -20,46 +19,34 @@ import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.afkanerd.smswithoutborders_libsmsmms.data.ImageTransmissionProtocol
-import com.afkanerd.smswithoutborders_libsmsmms.data.data.models.SmsManager
-import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDefaultSimSubscription
-import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getThreadId
-import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
-import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewModel
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.Composers
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.Network
-import com.example.sw0b_001.data.Publishers
-import com.example.sw0b_001.data.PublishersImpl
-import com.example.sw0b_001.data.SMSHandler
-import com.example.sw0b_001.data.Vaults
+import com.example.sw0b_001.data.PublisherGrpcImpl
+import com.example.sw0b_001.data.VaultsGrpcImpl
 import com.example.sw0b_001.data.models.AvailablePlatforms
-import com.example.sw0b_001.data.models.Bridges
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
-import com.example.sw0b_001.extensions.context.settingsGetDefaultGatewayClients
 import com.example.sw0b_001.ui.views.BottomTabsItems
 import com.example.sw0b_001.ui.views.compose.GatewayClientRequest
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.grpc.StatusRuntimeException
+import jakarta.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-import java.nio.charset.StandardCharsets
-import java.util.Locale
 
-class PlatformsViewModel : ViewModel() {
+@HiltViewModel
+class PlatformsViewModel @Inject constructor(
+    @ApplicationContext private val context: Context
+) : ViewModel() {
 
-    private var availableLiveData: LiveData<List<AvailablePlatforms>> = MutableLiveData()
     private var storedLiveData: LiveData<List<StoredPlatformsEntity>> = MutableLiveData()
 
     var platform by mutableStateOf<AvailablePlatforms?>(null)
@@ -72,366 +59,20 @@ class PlatformsViewModel : ViewModel() {
     var onDeleteSelected: (() -> Unit)? = null
     var onCancelSelection: (() -> Unit)? = null
 
-    fun getAccounts(context: Context, name: String): LiveData<List<StoredPlatformsEntity>> {
-        return Datastore.getDatastore(context).storedPlatformsDao().fetchPlatform(name)
+    private val db = Datastore.getDatastore(context)?.storedPlatformsDao()
+        ?: throw Exception("Cannot open database")
+
+    fun getAccounts(name: String): LiveData<List<StoredPlatformsEntity>> {
+        return db.fetchPlatform(name)
     }
 
-    fun getSaved(context: Context): LiveData<List<StoredPlatformsEntity>> {
+    fun getSaved(): LiveData<List<StoredPlatformsEntity>> {
         if(storedLiveData.value.isNullOrEmpty()) {
-            storedLiveData = Datastore.getDatastore(context).storedPlatformsDao().fetchAll()
+            storedLiveData = db.fetchAll()
         }
         return storedLiveData
     }
 
-    fun getAvailablePlatforms(context: Context): LiveData<List<AvailablePlatforms>> {
-        if(availableLiveData.value.isNullOrEmpty()) {
-            availableLiveData = Datastore.getDatastore(context).availablePlatformsDao().fetchAll()
-        }
-        return availableLiveData
-    }
-
-    fun getAvailablePlatforms(context: Context, name: String): AvailablePlatforms? {
-        return Datastore.getDatastore(context).availablePlatformsDao().fetch(name)
-    }
-
-    fun sendPublishingForImage(
-        context: Context,
-        imageByteArray: ByteArray,
-        account: StoredPlatformsEntity? = null,
-        text: ByteArray,
-        isBridge: Boolean,
-        isLoggedIn: Boolean,
-        languageCode: String = "en",
-        onFailure: (String?) -> Unit,
-        onSuccess: (ByteArray?) -> Unit,
-    ) {
-        viewModelScope.launch(Dispatchers.IO) {
-            lateinit var payload: ByteArray
-            val subscriptionId = context.getDefaultSimSubscription()!!
-            try {
-                if(isBridge) {
-                    val random = (0..255).random()
-                    val content = Bridges.encryptContent(
-                        context,
-                        imageByteArray + text,
-                        false,
-                        imageLength = imageByteArray.size,
-                        textLength = text.size,
-                        subscriptionId = subscriptionId,
-                        isLoggedIn = isLoggedIn
-                    )
-
-                    payload = if(isLoggedIn) { Bridges.payloadOnly(content) }
-                    else {
-                        Bridges.authRequestAndPayload(
-                            content = content,
-                            serverKID = random.toUByte(),
-                            clientPublicKey = TODO()
-                        )
-                    }
-                }
-                else {
-                    val platform = Datastore.getDatastore(context).availablePlatformsDao()
-                        .fetch(account!!.name!!)
-                        ?: return@launch onFailure(
-                            context.getString(
-                                R.string.could_not_find_platform_details_for,
-                                account.name
-                            ))
-
-                    val ad = TODO()
-                    payload = PublishersImpl.compose(
-                        context = context,
-                        content = imageByteArray + text,
-                        ad = ad!!,
-                        platform = platform,
-                        account = account,
-                        languageCode = languageCode,
-                        subscriptionId = subscriptionId,
-                    )
-                }
-
-                val gatewayClients = context.settingsGetDefaultGatewayClients
-                    ?: throw Exception("No default Gateway client")
-
-                ImageTransmissionProtocol.startWorkManager(
-                    context = context,
-                    formattedPayload = Base64.encode(payload, Base64.DEFAULT),
-                    logo = R.drawable.logo,
-                    version = ITP_VERSION_VALUE,
-                    sessionId = ImageTransmissionProtocol.getItpSession(context).toByte(),
-                    imageLength = imageByteArray.size.toShort(),
-                    textLength = text.size.toShort(),
-                    address = gatewayClients.msisdn,
-                    subscriptionId = subscriptionId,
-                )
-                onSuccess(payload)
-            } catch(e: Exception) {
-                e.printStackTrace()
-                onFailure(e.message)
-            }
-
-        }
-    }
-
-    fun sendPublishingForMessaging(
-        context: Context,
-        messageContent: Composers.MessageComposeHandler.MessageContent,
-        account: StoredPlatformsEntity,
-        subscriptionId: Long,
-        smsTransmission: Boolean = true,
-        onFailure: (String?) -> Unit,
-        onSuccess: (ByteArray?) -> Unit,
-    ) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                try {
-                    val contentFormatV2Bytes = Composers.MessageComposeHandler
-                        .createMessageByteBuffer(
-                            from = messageContent.from.value!!,
-                            to = messageContent.to.value,
-                            message = messageContent.message.value,
-                        )
-
-                    val languageCode = Locale.getDefault().language.take(2).lowercase()
-                    val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
-
-                    val ad = TODO()
-
-                    val platform = Datastore.getDatastore(context).availablePlatformsDao()
-                        .fetch(account.name!!)
-                        ?: return@withContext onFailure(
-                            context.getString(
-                                R.string.could_not_find_platform_details_for,
-                                account.name
-                            ))
-
-                    val payload = PublishersImpl.compose(
-                        context = context,
-                        content = contentFormatV2Bytes,
-                        ad = ad,
-                        platform = platform,
-                        account = account,
-                        languageCode = validLanguageCode,
-                        subscriptionId = subscriptionId,
-                        smsTransmission = smsTransmission,
-                    ) {}
-                    onSuccess(payload)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    onFailure(e.message)
-                }
-            }
-        }
-    }
-
-    fun sendPublishingForEmail(
-        context: Context,
-        emailContent: Composers.EmailComposeHandler.EmailContent,
-        account: StoredPlatformsEntity?,
-        isBridge: Boolean,
-        subscriptionId: Long,
-        smsTransmission: Boolean = true,
-        onFailureCallback: (String?) -> Unit,
-        onCompleteCallback: (ByteArray?) -> Unit,
-    ) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                try {
-                    if(isBridge) { // if its a bridge message
-                        val txtTransmission = Bridges.compose(
-                            context = context,
-                            to = emailContent.to.value,
-                            cc = emailContent.cc.value,
-                            bcc = emailContent.bcc.value,
-                            subject = emailContent.subject.value,
-                            body = emailContent.body.value,
-                            imageLength = 0,
-                            textLength = 0,
-                            smsTransmission = smsTransmission,
-                            subscriptionId = subscriptionId
-                        )
-
-                        val gatewayClient = context.settingsGetDefaultGatewayClients
-                        if(gatewayClient == null) {
-                            onFailureCallback("No default Gateway Client...")
-                            return@withContext
-                        }
-
-                        if(!smsTransmission) {
-                            onCompleteCallback(Base64
-                                .decode(txtTransmission, Base64.DEFAULT))
-                        } else {
-                            if(context.isDefault()) {
-                                val smsManager = SmsManager(ConversationsViewModel())
-                                smsManager.sendSms(
-                                    context = context,
-                                    text = txtTransmission!!,
-                                    address = gatewayClient.msisdn,
-                                    subscriptionId = subscriptionId,
-                                    threadId = context.getThreadId(gatewayClient.msisdn),
-                                    callback = { conversation ->
-                                        onCompleteCallback(
-                                            Base64.decode(txtTransmission, Base64.DEFAULT))
-                                    }
-                                )
-                            }
-                            else {
-                                val intent = SMSHandler.transferToDefaultSMSApp(
-                                    context,
-                                    gatewayClient.msisdn,
-                                    txtTransmission
-                                ).apply {
-                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                                }
-                                context.startActivity(intent)
-                            }
-                            onCompleteCallback(null)
-                        }
-                    }
-                    else {
-                        if (account == null) {
-                            onFailureCallback(context.getString(R.string.account_is_required_for_v1_platform_messages))
-                            return@withContext
-                        }
-
-                        val ad = TODO()
-                        if (ad == null) {
-                            onFailureCallback(context.getString(R.string.could_not_fetch_publisher_key_cannot_encrypt_message))
-                            return@withContext
-                        }
-
-                        val contentFormatBytes = Composers.EmailComposeHandler.createEmailByteBuffer(
-                            from= account.account!!, // 'from' is from the selected account
-                            to = emailContent.to.value,
-                            cc = emailContent.cc.value,
-                            bcc = emailContent.bcc.value,
-                            subject = emailContent.subject.value,
-                            body = emailContent.body.value,
-                            accessToken = if(account.accessToken?.isNotEmpty() == true)
-                                account.accessToken else null,
-                            refreshToken =if(account.refreshToken?.isNotEmpty() == true)
-                                account.refreshToken else null,
-                            isBridge = false
-                        )
-
-                        val platform = Datastore.getDatastore(context).availablePlatformsDao()
-                            .fetch(account.name!!)
-
-                        if (platform == null) {
-                            onFailureCallback(
-                                context.getString(R.string.could_not_fetch_publisher_key))
-                            return@withContext
-                        }
-
-                        val languageCode = Locale.getDefault().language.take(2).lowercase(Locale.ROOT)
-                        val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
-
-                        val payload = PublishersImpl.compose(
-                            context = context,
-                            content = contentFormatBytes,
-                            ad = ad,
-                            platform = platform!!,
-                            account = account,
-                            languageCode = validLanguageCode,
-                            smsTransmission = smsTransmission,
-                            subscriptionId = subscriptionId,
-                        ) { }
-                        onCompleteCallback(payload)
-                    }
-                }
-                catch (e: Exception) {
-                    e.printStackTrace()
-                    onFailureCallback(e.message)
-                    CoroutineScope(Dispatchers.Main).launch {
-                        Toast.makeText(context, e.message ?: "An unknown error occurred", Toast.LENGTH_LONG).show()
-                    }
-                }
-            }
-        }
-    }
-
-    private fun createTestByteBuffer(testId: String): ByteBuffer {
-        val BYTE_SIZE_LIMIT = 255
-        val testIdBytes = testId.toByteArray(StandardCharsets.UTF_8)
-        val testIdSize = testIdBytes.size
-
-        if (testIdSize > BYTE_SIZE_LIMIT) throw IllegalArgumentException("Test ID exceeds maximum size of $BYTE_SIZE_LIMIT bytes")
-
-        val totalSize = 1 + 2 + 2 + 2 + 1 + 2 + 2 + 2 + testIdSize
-        val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
-
-        buffer.put(testIdSize.toByte()) // 1 byte for from field length (test ID)
-        buffer.putShort(0)              // 2 bytes for to length
-        buffer.putShort(0)              // 2 bytes for cc length
-        buffer.putShort(0)              // 2 bytes for bcc length
-        buffer.put(0.toByte())          // 1 byte for subject length
-        buffer.putShort(0)              // 2 bytes for body length
-        buffer.putShort(0)              // 2 bytes for access token length
-        buffer.putShort(0)              // 2 bytes for refresh token length
-
-        buffer.put(testIdBytes)
-        buffer.flip()
-        return buffer
-    }
-
-    fun sendPublishingForPost(
-        context: Context,
-        text: String,
-        account: StoredPlatformsEntity,
-        subscriptionId: Long,
-        onFailure: (String?) -> Unit,
-        onSuccess: (ByteArray?) -> Unit,
-        smsTransmission: Boolean = true
-    ) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO){
-                try {
-                    val AD = TODO()
-
-                    val contentFormatV2Bytes = Composers.TextComposeHandler.createTextByteBuffer(
-                        from = account.account!!,
-                        body = text,
-                        accessToken = account.accessToken,
-                        refreshToken = account.refreshToken
-                    )
-
-                    val platform = Datastore.getDatastore(context).availablePlatformsDao().fetch(account.name!!)
-                        ?: return@withContext onFailure("Could not find platform details for '${account.name}'.")
-
-                    val languageCode = Locale.getDefault().language.take(2).lowercase()
-                    val validLanguageCode = if (languageCode.length == 2) languageCode else "en"
-
-                    val v2PayloadBytes = PublishersImpl.compose(
-                        context = context,
-                        content = contentFormatV2Bytes,
-                        ad = AD,
-                        platform = platform,
-                        account = account,
-                        languageCode = validLanguageCode,
-                        smsTransmission = smsTransmission,
-                        subscriptionId = subscriptionId
-                    )
-
-                    if (smsTransmission) {
-                        val gatewayClient = context.settingsGetDefaultGatewayClients
-                            ?: return@withContext onFailure("No Gateway Client set.")
-                        val base64Payload = Base64.encodeToString(v2PayloadBytes, Base64.NO_WRAP)
-                        SMSHandler.transferToDefaultSMSApp(
-                            context,
-                            gatewayClient.msisdn,
-                            base64Payload
-                        )
-                    }
-                    onSuccess(v2PayloadBytes)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    onFailure(e.message)
-                }
-            }
-
-        }
-    }
 
     companion object {
         const val ITP_VERSION_VALUE: Byte = 0x04
@@ -505,21 +146,30 @@ class PlatformsViewModel : ViewModel() {
             onCompletedCallback: () -> Unit
         ) {
             CoroutineScope(Dispatchers.Default).launch {
+                val db = Datastore.getDatastore(context)?.keysDao()
+                    ?: throw Exception("Could not open database")
+
+                val publisherPublicKey = db
+                    .fetchPublicKey(VaultsGrpcImpl.clientVaultHandshakeKeystoreAliasStaticKeys)
+                    ?: throw Exception("Missing private key in credentials for signing")
                 when(platform.protocol_type) {
                     Platforms.ProtocolTypes.oauth2.name -> {
-                        val publishers = Publishers(context)
-                        val publicKeyBytes = Vaults.getIdentitySigningKey(context)
+                        val publisherGrpcImpl = PublisherGrpcImpl(context)
                         val requestIdentifier = Base64.encodeToString(
-                            publicKeyBytes, Base64.NO_WRAP)
+                            publisherPublicKey, Base64.NO_WRAP)
                         try {
-                            val response = publishers.getOAuthURL(
+                            val response = publisherGrpcImpl.getOAuthURL(
                                 availablePlatforms = platform,
                                 autogenerateCodeVerifier = true,
                                 supportsUrlScheme = platform.support_url_scheme!!,
                                 requestIdentifier = requestIdentifier
                             )
 
-                            Publishers.storeOauthRequestCodeVerifier(context, response.codeVerifier)
+                            PublisherGrpcImpl.storeOauthRequestCodeVerifier(
+                                context,
+                                platform.name,
+                                response.codeVerifier
+                            )
 
                             val intentUri = response.authorizationUrl.toUri()
                             val intent = oAuth2IntentBuilder(context)
@@ -538,7 +188,7 @@ class PlatformsViewModel : ViewModel() {
                                     .show()
                             }
                         } finally {
-                            publishers.shutdown()
+                            publisherGrpcImpl.shutdown()
                             onCompletedCallback()
                         }
                     }

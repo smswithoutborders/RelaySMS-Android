@@ -9,6 +9,7 @@ import com.example.sw0b_001.data.dao.AvailablePlatformsDao
 import com.example.sw0b_001.data.dao.GatewayClientsDao
 import com.example.sw0b_001.data.dao.KeysDao
 import com.example.sw0b_001.data.dao.MessagesDao
+import com.example.sw0b_001.data.dao.OAuthDao
 import com.example.sw0b_001.data.dao.PlatformDao
 import com.example.sw0b_001.data.dao.RatchetStatesDAO
 import com.example.sw0b_001.data.dao.StoredPlatformsDao
@@ -29,12 +30,18 @@ import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
         AvailablePlatforms::class,
         GatewayClients::class,
         StoredPlatformsEntity::class,
+        OAuth::class,
         Keys::class,
         Messages::class],
     version = 1,
+    exportSchema = true,
     autoMigrations = []
 )
 abstract class Datastore : RoomDatabase() {
+    init {
+        System.loadLibrary("sqlcipher")
+    }
+
     abstract fun platformDao(): PlatformDao?
     abstract fun availablePlatformsDao(): AvailablePlatformsDao?
     abstract fun gatewayClientsDao(): GatewayClientsDao?
@@ -42,13 +49,10 @@ abstract class Datastore : RoomDatabase() {
     abstract fun storedPlatformsDao(): StoredPlatformsDao?
     abstract fun ratchetStatesDAO(): RatchetStatesDAO?
     abstract fun keysDao(): KeysDao?
+    abstract fun oAuthDao(): OAuthDao?
 
     companion object {
         private var datastore: Datastore? = null
-
-        init {
-            System.loadLibrary("sqlcipher")
-        }
 
         fun getDatastore(context: Context): Datastore? {
             if (datastore == null) {

@@ -46,7 +46,7 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getCurrentLoc
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.setLocale
 import com.afkanerd.smswithoutborders_libsmsmms.ui.SettingsItem
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.Vaults
+import com.example.sw0b_001.data.VaultsGrpcImpl
 import com.example.sw0b_001.extensions.context.promptBiometrics
 import com.example.sw0b_001.extensions.context.settingsGetIsEmailLogin
 import com.example.sw0b_001.extensions.context.settingsGetLockDownApp
@@ -240,10 +240,10 @@ fun SettingsView(
                 context.settingsSetStoreTokensOnDevice(checked ?: true)
                 storeTokensOnDevice = checked ?: true
 
-                if(checked == true && !Vaults(context).isStoredOnDevice()) {
+                if(checked == true && !VaultsGrpcImpl(context).isStoredOnDevice()) {
                     scope.launch(Dispatchers.Default) {
                         try {
-                            Vaults(context).refreshStoredTokens(
+                            VaultsGrpcImpl(context).refreshStoredTokens(
                                 context = context,
                                 migrateToDevice = true
                             )

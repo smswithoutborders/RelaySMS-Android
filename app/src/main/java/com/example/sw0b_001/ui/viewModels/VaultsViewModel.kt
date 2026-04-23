@@ -13,14 +13,15 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.GatewayClientsCommunications.json
 import com.example.sw0b_001.data.Network
-import com.example.sw0b_001.data.Publishers
-import com.example.sw0b_001.data.Vaults
-import com.example.sw0b_001.data.models.Platforms
+import com.example.sw0b_001.data.VaultsGrpcImpl
 import com.example.sw0b_001.extensions.context.removeAllFromKeystore
 import com.example.sw0b_001.extensions.context.settingsClear
 import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
+import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,7 +30,10 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
 
-class VaultsViewModel(val context: Context) : ViewModel() {
+@HiltViewModel
+class VaultsViewModel @Inject constructor(
+    @ApplicationContext private val context: Context
+): ViewModel() {
 
     val captchaUrl = "https://captcha.smswithoutborders.com"
     var clientId: String = context.getString(R.string.recaptcha_key)
@@ -122,7 +126,7 @@ class VaultsViewModel(val context: Context) : ViewModel() {
 
     suspend fun logout(context: Context, successRunnable: Runnable) {
         context.removeAllFromKeystore()
-        Datastore.getDatastore(context).clearAllTables()
+        Datastore.getDatastore(context)?.clearAllTables()
         context.settingsClear()
 
         successRunnable.run()
@@ -130,49 +134,49 @@ class VaultsViewModel(val context: Context) : ViewModel() {
 
 
     fun completeDelete(
-        context: Context,
         onFailureCallback: (String?) -> Unit,
         onSuccessCallback: () -> Unit,
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val vaults = Vaults(context)
-            val publishers = Publishers(context)
-            try {
-                val availablePlatforms = Datastore.getDatastore(context).availablePlatformsDao()
-                    .fetchAllList()
-
-                Datastore.getDatastore(context).storedPlatformsDao().fetchAllList().forEach { platform ->
-                    availablePlatforms.filter { it.name == platform.name }.forEach {
-                        when(it.protocol_type) {
-                            Platforms.ProtocolTypes.oauth2.name -> {
-                                publishers.revokeOAuthPlatforms(
-                                    platform.name!!,
-                                    platform.account!!,
-                                )
-                            }
-                            Platforms.ProtocolTypes.pnba.name -> {
-                                publishers.revokePNBAPlatforms(
-                                    platform.name!!,
-                                    platform.account!!
-                                )
-                            }
-                        }
-                    }
-                }
-
-                val response = vaults.deleteEntity()
-                if(response.success) { logout(context) {
-                    onSuccessCallback()
-                }}
-                else onFailureCallback(null)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                onFailureCallback(e.message)
-            } finally {
-                vaults.shutdown()
-                publishers.shutdown()
-            }
-        }
+        TODO()
+//        viewModelScope.launch(Dispatchers.IO) {
+//            val vaultsGrpcImpl = VaultsGrpcImpl(context)
+//            val publisherGrpcImpl = PublisherGrpcImpl(context)
+//            try {
+//                val availablePlatforms = Datastore.getDatastore(context)?.availablePlatformsDao()
+//                    ?.fetchAllList()
+//
+//                Datastore.getDatastore(context).storedPlatformsDao().fetchAllList().forEach { platform ->
+//                    availablePlatforms.filter { it.name == platform.name }.forEach {
+//                        when(it.protocol_type) {
+//                            Platforms.ProtocolTypes.oauth2.name -> {
+//                                publisherGrpcImpl.revokeOAuthPlatforms(
+//                                    platform.name!!,
+//                                    platform.account!!,
+//                                )
+//                            }
+//                            Platforms.ProtocolTypes.pnba.name -> {
+//                                publisherGrpcImpl.revokePNBAPlatforms(
+//                                    platform.name!!,
+//                                    platform.account!!
+//                                )
+//                            }
+//                        }
+//                    }
+//                }
+//
+//                val response = vaultsGrpcImpl.deleteEntity()
+//                if(response.success) { logout(context) {
+//                    onSuccessCallback()
+//                }}
+//                else onFailureCallback(null)
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//                onFailureCallback(e.message)
+//            } finally {
+//                vaultsGrpcImpl.shutdown()
+//                publisherGrpcImpl.shutdown()
+//            }
+//        }
     }
 
     fun validateSession(
@@ -181,7 +185,7 @@ class VaultsViewModel(val context: Context) : ViewModel() {
         onSuccessCallback: () -> Unit,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            val vault = Vaults(context)
+            val vault = VaultsGrpcImpl(context)
             try {
                 vault.refreshStoredTokens(
                     context,

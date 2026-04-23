@@ -43,8 +43,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Datastore
-import com.example.sw0b_001.data.Publishers
-import com.example.sw0b_001.data.Vaults
+import com.example.sw0b_001.data.PublisherGrpcImpl
+import com.example.sw0b_001.data.VaultsGrpcImpl
 import com.example.sw0b_001.data.models.AvailablePlatforms
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.Platforms.ServiceTypes
@@ -238,25 +238,25 @@ private fun triggerAccountRevoke(
     onCompletedCallback: () -> Unit
 ) {
     CoroutineScope(Dispatchers.Default).launch {
-        val publishers = Publishers(context)
+        val publisherGrpcImpl = PublisherGrpcImpl(context)
         try {
             when(platform.protocol_type) {
                 Platforms.ProtocolTypes.oauth2.name -> {
-                    publishers.revokeOAuthPlatforms(
+                    publisherGrpcImpl.revokeOAuthPlatforms(
                         account.name!!,
                         account.account!!,
                     )
                 }
                 Platforms.ProtocolTypes.pnba.name -> {
-                    publishers.revokePNBAPlatforms(
+                    publisherGrpcImpl.revokePNBAPlatforms(
                         account.name!!,
                         account.account!!
                     )
                 }
             }
 
-            Datastore.getDatastore(context).storedPlatformsDao()
-                .delete(account.id)
+            TODO("Move to view models")
+            Datastore.getDatastore(context)?.storedPlatformsDao()?.delete(account.id)
             onCompletedCallback()
         } catch(e: StatusRuntimeException) {
             e.printStackTrace()
@@ -270,7 +270,7 @@ private fun triggerAccountRevoke(
                 Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
             }
         } finally {
-            publishers.shutdown()
+            publisherGrpcImpl.shutdown()
         }
     }
 }
@@ -337,7 +337,7 @@ private fun AddAccountLoading(
                             onSuccessCallback = {authCodeRequested, passwordRequested ->
                                 if(authCodeRequested) {
                                     try {
-                                        val vault = Vaults(context)
+                                        val vault = VaultsGrpcImpl(context)
                                         vault.refreshStoredTokens(
                                             context,
                                             context.settingsGetStoreTokensOnDevice)
@@ -365,7 +365,7 @@ private fun AddAccountLoading(
                             onFailureCallback = {},
                             onSuccessCallback = {_, _ ->
                                 try {
-                                    val vault = Vaults(context)
+                                    val vault = VaultsGrpcImpl(context)
                                     vault.refreshStoredTokens(
                                         context,
                                         context.settingsGetStoreTokensOnDevice)
@@ -397,11 +397,11 @@ private fun triggerPNBARequested(
 ) {
     onRequestMadeCallback()
     CoroutineScope(Dispatchers.Default).launch {
-        val publishers = Publishers(context)
+        val publisherGrpcImpl = PublisherGrpcImpl(context)
         try {
             when {
                 !authCode.isNullOrEmpty() && !password.isNullOrEmpty() -> {
-                    val response = publishers.phoneNumberBaseAuthenticationExchange(
+                    val response = publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
                         authorizationCode = authCode,
                         phoneNumber = phoneNumber,
                         platform = platform.name,
@@ -415,7 +415,7 @@ private fun triggerPNBARequested(
                     }
                 }
                 !authCode.isNullOrEmpty() -> {
-                    val response = publishers.phoneNumberBaseAuthenticationExchange(
+                    val response = publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
                         authorizationCode = authCode,
                         phoneNumber = phoneNumber,
                         platform = platform.name
@@ -435,7 +435,7 @@ private fun triggerPNBARequested(
                     }
                 }
                 else -> {
-                    val response = publishers.phoneNumberBaseAuthenticationRequest(
+                    val response = publisherGrpcImpl.phoneNumberBaseAuthenticationRequest(
                         phoneNumber,
                         platform.name
                     )
@@ -454,7 +454,7 @@ private fun triggerPNBARequested(
             e.printStackTrace()
             onFailureCallback(e.message)
         } finally {
-            publishers.shutdown()
+            publisherGrpcImpl.shutdown()
             onCompletedCallback()
         }
     }

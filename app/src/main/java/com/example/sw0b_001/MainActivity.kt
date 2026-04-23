@@ -46,7 +46,6 @@ import com.afkanerd.lib_image_android.ui.components.ImageRender
 import com.afkanerd.lib_image_android.ui.navigation.ImageRenderNav
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.NEW_NOTIFICATION_ACTION
-import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDatabase
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.makeE16PhoneNumber
 import com.afkanerd.smswithoutborders_libsmsmms.ui.components.NavHostControllerInstance
@@ -98,14 +97,16 @@ import com.example.sw0b_001.ui.views.details.MessageDetailsView
 import com.example.sw0b_001.ui.views.details.TextDetailsView
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavHostController
-    private lateinit var searchViewModel: SearchViewModel
+    val searchViewModel:  SearchViewModel by viewModels()
 
     val threadsViewModel: ThreadsViewModel by viewModels()
     val onboardingViewModel: OnboardingViewModel by viewModels()
@@ -129,7 +130,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         vaultViewModel = VaultsViewModel(applicationContext)
-        searchViewModel = SearchViewModel(getDatabase().threadsDao()!!)
 
         fun beginAppLifecycle() {
             lifecycleScope.launch(Dispatchers.Main) {

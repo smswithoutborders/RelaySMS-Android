@@ -1,10 +1,9 @@
 package com.example.sw0b_001
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.sw0b_001.data.Publishers
-import com.example.sw0b_001.data.Vaults
+import com.example.sw0b_001.data.PublisherGrpcImpl
+import com.example.sw0b_001.data.VaultsGrpcImpl
 import com.example.sw0b_001.data.Cryptography
-import io.grpc.StatusRuntimeException
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -41,20 +40,20 @@ class gRPCTest {
 
     private var context = InstrumentationRegistry.getInstrumentation().targetContext
 
-    private lateinit var vault: Vaults
+    private lateinit var vault: VaultsGrpcImpl
     private val device_id_keystoreAlias = "device_id_keystoreAlias"
     private val publisher_keystoreAlias = "publisher_keystoreAlias"
 
     @Before
     fun init() {
-        vault = Vaults(context)
+        vault = VaultsGrpcImpl(context)
         deviceIdPubKey = Cryptography.generateKey(context, device_id_keystoreAlias)
         publishPubKey = Cryptography.generateKey(context, publisher_keystoreAlias)
     }
 
     @Test
     fun getPlatformsTest() {
-        val response = Publishers.getAvailablePlatforms(context)
+        val response = PublisherGrpcImpl.getAvailablePlatforms(context)
         assertTrue(response.isNotEmpty())
     }
 

@@ -75,7 +75,7 @@ import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.Vaults
+import com.example.sw0b_001.data.VaultsGrpcImpl
 import com.example.sw0b_001.ui.components.CaptchaImage
 import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
@@ -532,9 +532,9 @@ private fun createAccount(
     completedCallback: () -> Unit = {},
 ) {
     CoroutineScope(Dispatchers.Default).launch{
-        val vaults = Vaults(context)
+        val vaultsGrpcImpl = VaultsGrpcImpl(context)
         try {
-            val response = vaults.createEntity(
+            val response = vaultsGrpcImpl.createEntity(
                 context = context,
                 email = email,
                 phoneNumber = phoneNumber,
@@ -543,7 +543,7 @@ private fun createAccount(
                 recaptchaToken = recaptchaToken,
             )
 
-            otpRequiredCallback(response.nextAttemptTimestamp)
+            otpRequiredCallback(response?.nextAttemptTimestamp ?: 0)
         } catch(e: StatusRuntimeException) {
             e.printStackTrace()
             failedCallback(e.message)
@@ -552,7 +552,7 @@ private fun createAccount(
             failedCallback(e.message)
         }
         finally {
-            vaults.shutdown()
+            vaultsGrpcImpl.shutdown()
             completedCallback()
         }
     }

@@ -17,11 +17,10 @@ class Bridges(val context: Context) {
     private val ratchetKeystoreAlias = "Bridge_Ratchet_KeystoreAlias"
 
     fun forSendingWithoutForwardSecrecy(plaintext: ByteArray): RatchetPayload? {
-        var authenticationPublicKeyId = (0..255).random()
+        val authenticationPublicKeyId = (0..255).random()
 
-        val authenticationPublicKey = context.getStaticKeys(authenticationPublicKeyId)?.run {
-            X25519PublicKeyParameters(this, 0)
-        } ?: throw Exception("Could not find static keys for id")
+        val authenticationPublicKey = context.getStaticKeys(authenticationPublicKeyId)
+            ?: throw Exception("Could not find static keys for id")
 
         val info = "RelaySMS C2S DR v1".encodeToByteArray()
         val headerInfo = "RelaySMS C2S DRHE v1".encodeToByteArray()
@@ -79,8 +78,7 @@ class Bridges(val context: Context) {
             e.printStackTrace()
             throw e
         } finally {
-            authenticationPublicKeyId = -1
-            authenticationPublicKey.encoded.fill(0)
+            authenticationPublicKey.fill(0)
             info.fill(0)
             headerInfo.fill(0)
 
@@ -188,10 +186,8 @@ class Bridges(val context: Context) {
         val authenticationPublicKeyId = db.fetchAuthenticationId(staticKeyAlias)
             ?: throw Exception("No authentication Id found")
 
-        val authenticationPublicKey = context
-            .getStaticKeys(authenticationPublicKeyId)?.run {
-                X25519PublicKeyParameters(this, 0)
-            } ?: throw Exception("Could not find static keys for id")
+        val authenticationPublicKey = context.getStaticKeys(authenticationPublicKeyId)
+            ?: throw Exception("Could not find static keys for id")
 
         val ephemeralKeys = db.fetch(ephemeralKeyAlias)
             ?: throw Exception("No Ephemeral keys found")
@@ -208,25 +204,20 @@ class Bridges(val context: Context) {
                         h = ephemeralKeys.h!!,
                         ck = ephemeralKeys.ck!!,
                         ephemeralKeyPair = ephemeralKeyPair,
-                        ephemeralResponderPublicKey =
-                            X25519PublicKeyParameters(ephemeralKeys.publicKey),
+                        ephemeralResponderPublicKey = ephemeralKeys.publicKey,
                         authenticationPublicKey = authenticationPublicKey,
                         info = info,
                         headerInfo = headerInfo
                     )
-                    try {
-                        keys.use { keys ->
-                            RatchetStates.initialize(
-                                context = context,
-                                keystoreAlias = ratchetKeystoreAlias,
-                                authenticationPublicKey = authenticationPublicKey,
-                                rk = keys.rk,
-                                hk = keys.hk,
-                                nhk = keys.nhk,
-                            )
-                        }
-                    } finally {
-                        keys.close()
+                    keys.use { keys ->
+                        RatchetStates.initialize(
+                            context = context,
+                            keystoreAlias = ratchetKeystoreAlias,
+                            authenticationPublicKey = authenticationPublicKey,
+                            rk = keys.rk,
+                            hk = keys.hk,
+                            nhk = keys.nhk,
+                        )
                     }
                 }
             }
@@ -236,7 +227,7 @@ class Bridges(val context: Context) {
         } finally {
             info.fill(0)
             headerInfo.fill(0)
-            authenticationPublicKey.encoded.fill(0)
+            authenticationPublicKey.fill(0)
             ephemeralKeys.close()
         }
     }

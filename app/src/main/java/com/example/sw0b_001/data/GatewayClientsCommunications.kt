@@ -4,14 +4,9 @@ import android.content.Context
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.GatewayClients
 import com.example.sw0b_001.extensions.context.getTelephonyRegion
-import com.example.sw0b_001.extensions.context.relaySmsDatastore
 import com.example.sw0b_001.extensions.context.settingsGetDefaultGatewayClients
 import com.example.sw0b_001.extensions.context.settingsSetDefaultGatewayClient
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -54,7 +49,7 @@ object GatewayClientsCommunications {
                     }
                 }
             }
-        Datastore.getDatastore(context).gatewayClientsDao().insertAll(gatewayClients)
+        Datastore.getDatastore(context)?.gatewayClientsDao()?.insertAll(gatewayClients)
     }
 
     private fun remoteCall(context: Context): ArrayList<GatewayClients> {
@@ -75,7 +70,7 @@ object GatewayClientsCommunications {
             val gatewayClients = remoteCall(context).apply {
                 forEach { it.manuallyAdded = true }
             }
-            Datastore.getDatastore(context).gatewayClientsDao().insertAll(gatewayClients)
+            Datastore.getDatastore(context)?.gatewayClientsDao()?.insertAll(gatewayClients)
         } catch (e: Exception) {
             e.printStackTrace()
         }

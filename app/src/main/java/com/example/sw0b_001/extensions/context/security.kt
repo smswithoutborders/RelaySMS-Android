@@ -14,7 +14,6 @@ import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDualSim
 import com.example.sw0b_001.BuildConfig
-import com.example.sw0b_001.data.models.Bridges.StaticKeys
 import kotlinx.serialization.json.Json
 import java.io.IOException
 import java.security.KeyStore
@@ -108,6 +107,12 @@ fun Context.promptBiometrics(
     biometricPrompt.authenticate(promptInfo)
 }
 
+data class StaticKeys(
+    val kid: Int,
+    val keypair: String,
+    val status: String,
+    val version: String
+)
 fun Context.getStaticKeys(
     kid: Int
 ) : ByteArray? {
