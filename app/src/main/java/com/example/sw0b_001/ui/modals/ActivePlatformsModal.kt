@@ -7,10 +7,8 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.views.SupportedPlatformsView
 import kotlinx.coroutines.launch
 
@@ -19,6 +17,7 @@ import kotlinx.coroutines.launch
 fun ActivePlatformsModal(
     sendNewMessageRequested: Boolean,
     navController: NavController,
+    supportedPlatformsViewModel: SupportedPlatformsViewModel,
     isLoggedIn: Boolean = false,
     isCompose: Boolean = false,
     isOnboarding: Boolean = false,
@@ -43,6 +42,7 @@ fun ActivePlatformsModal(
         ) {
             SupportedPlatformsView(
                 navController = navController,
+                supportedPlatformsViewModel = supportedPlatformsViewModel,
                 isCompose = isCompose,
                 isOnboarding = isOnboarding,
             ) {
@@ -54,14 +54,14 @@ fun ActivePlatformsModal(
 
 }
 
-@Preview(showBackground = true)
-@Composable
-fun ActivePlatformsModalPreview() {
-    AppTheme {
-        ActivePlatformsModal(
-            sendNewMessageRequested = true,
-            onDismiss = {},
-            navController = NavController(LocalContext.current)
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun ActivePlatformsModalPreview() {
+//    AppTheme {
+//        ActivePlatformsModal(
+//            sendNewMessageRequested = true,
+//            onDismiss = {},
+//            navController = NavController(LocalContext.current)
+//        )
+//    }
+//}

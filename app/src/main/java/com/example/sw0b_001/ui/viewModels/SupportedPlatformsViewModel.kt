@@ -25,9 +25,9 @@ class SupportedPlatformsViewModel @Inject constructor(
         MutableStateFlow<SupportedPlatformsUiState>(SupportedPlatformsUiState.Loading)
     val uiState: StateFlow<SupportedPlatformsUiState> = _uiState
 
-    init {
-        fetch()
-    }
+//    init {
+//        fetch()
+//    }
 
     fun fetch() {
         viewModelScope.launch {
@@ -37,6 +37,7 @@ class SupportedPlatformsViewModel @Inject constructor(
                     val supportedPlatforms = repository.getSupportedPlatforms()
                     _uiState.value = SupportedPlatformsUiState.Success(supportedPlatforms)
                 } catch (e: Exception) {
+                    e.printStackTrace()
                     _uiState.value = SupportedPlatformsUiState.Error(e.localizedMessage
                         ?: "Unknown Error")
                 }

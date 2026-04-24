@@ -10,12 +10,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.GatewayClientsCommunications.json
 import com.example.sw0b_001.data.Network
 import com.example.sw0b_001.data.VaultsGrpcImpl
-import com.example.sw0b_001.extensions.context.removeAllFromKeystore
-import com.example.sw0b_001.extensions.context.settingsClear
 import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -27,6 +24,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 
 
@@ -124,15 +122,6 @@ class VaultsViewModel @Inject constructor(
         }
     }
 
-    suspend fun logout(context: Context, successRunnable: Runnable) {
-        context.removeAllFromKeystore()
-        Datastore.getDatastore(context)?.clearAllTables()
-        context.settingsClear()
-
-        successRunnable.run()
-    }
-
-
     fun completeDelete(
         onFailureCallback: (String?) -> Unit,
         onSuccessCallback: () -> Unit,
@@ -184,26 +173,26 @@ class VaultsViewModel @Inject constructor(
         onFailureCallback: (Pair<Boolean, String?>) -> Unit,
         onSuccessCallback: () -> Unit,
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val vault = VaultsGrpcImpl(context)
-            try {
-                vault.refreshStoredTokens(
-                    context,
-                    context.settingsGetStoreTokensOnDevice)
-            } catch(e: StatusRuntimeException) {
-                e.printStackTrace()
-                if(e.status.code == Status.UNAUTHENTICATED.code) {
-                    onFailureCallback(Pair(true, e.message))
-                    return@launch
+        viewModelScope.launch {
+            withContext(Dispatchers.Default) {
+                val vault = VaultsGrpcImpl(context)
+                try {
+                    vault.refreshStoredTokens(
+                        context,
+                        context.settingsGetStoreTokensOnDevice)
+                    onSuccessCallback()
+                } catch(e: StatusRuntimeException) {
+                    e.printStackTrace()
+                    if(e.status.code == Status.UNAUTHENTICATED.code) {
+                        onFailureCallback(Pair(true, e.message))
+                    }
+                    else {
+                        onFailureCallback(Pair(false, e.message))
+                    }
+                } finally {
+                    vault.shutdown()
                 }
-                else {
-                    onFailureCallback(Pair(false, e.message))
-                    return@launch
-                }
-            } finally {
-                vault.shutdown()
             }
-            onSuccessCallback()
         }
     }
 }

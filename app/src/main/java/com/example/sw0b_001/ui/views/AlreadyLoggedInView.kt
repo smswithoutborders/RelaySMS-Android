@@ -27,12 +27,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.R
+import com.example.sw0b_001.extensions.context.settingsSetIsLoggedIn
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.VaultsViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 @Composable
 fun GetMeOutOfHere(
@@ -88,15 +86,10 @@ fun GetMeOutOfHere(
                 .fillMaxWidth()
                 .padding(bottom = 32.dp),
             onClick={
-                CoroutineScope(Dispatchers.Default).launch {
-                    vaultsViewModel.logout(context) {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            navController.navigate(HomepageScreen) {
-                                popUpTo(0) {
-                                    inclusive = true
-                                }
-                            }
-                        }
+                context.settingsSetIsLoggedIn(false)
+                navController.navigate(HomepageScreen) {
+                    popUpTo(0) {
+                        inclusive = true
                     }
                 }
             }) {

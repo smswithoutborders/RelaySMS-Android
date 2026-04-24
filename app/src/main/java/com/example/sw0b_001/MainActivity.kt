@@ -80,6 +80,7 @@ import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
 import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel
+import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.VaultsViewModel
 import com.example.sw0b_001.ui.views.AboutView
 import com.example.sw0b_001.ui.views.CreateAccountView
@@ -107,6 +108,7 @@ import kotlin.system.exitProcess
 class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavHostController
     val searchViewModel:  SearchViewModel by viewModels()
+    val supportedPlatformsViewModel: SupportedPlatformsViewModel by viewModels()
 
     val threadsViewModel: ThreadsViewModel by viewModels()
     val onboardingViewModel: OnboardingViewModel by viewModels()
@@ -251,6 +253,7 @@ class MainActivity : AppCompatActivity() {
                             messagesViewModel = messagesViewModel,
                             gatewayClientViewModel = gatewayClientViewModel,
                             imageViewModel = imageViewModel,
+                            supportedPlatformsViewModel = supportedPlatformsViewModel,
                             drawerCallback = drawerCallback
                         )
                     }
@@ -303,6 +306,7 @@ class MainActivity : AppCompatActivity() {
                 OnboardingInteractive(
                     navController,
                     onboardingViewModel,
+                    supportedPlatformsViewModel,
                 )
             }
             composable<GetMeOutScreen> {
@@ -317,6 +321,7 @@ class MainActivity : AppCompatActivity() {
                     storedPlatformsViewModel = storedPlatformsViewModel,
                     messagesViewModel = messagesViewModel,
                     gatewayClientViewModel = gatewayClientViewModel,
+                    supportedPlatformsViewModel = supportedPlatformsViewModel,
                     imageViewModel = imageViewModel,
                 )
             }

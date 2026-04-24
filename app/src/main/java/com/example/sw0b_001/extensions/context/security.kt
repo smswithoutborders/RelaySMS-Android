@@ -16,7 +16,6 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDualSim
 import com.example.sw0b_001.BuildConfig
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import java.io.IOException
 import java.security.KeyStore
 import java.security.NoSuchAlgorithmException
 import java.util.concurrent.Executor
@@ -155,21 +154,6 @@ fun Context.removeFromKeystore(keystoreAlias: String?) {
     val keyStore = KeyStore.getInstance("AndroidKeyStore")
     keyStore.load(null)
     keyStore.deleteEntry(keystoreAlias)
-}
-
-@Throws(
-    KeyStoreException::class,
-    CertificateException::class,
-    IOException::class,
-    NoSuchAlgorithmException::class
-)
-fun Context.removeAllFromKeystore() {
-    val keyStore = KeyStore.getInstance("AndroidKeyStore")
-    keyStore.load(null)
-    val aliases = keyStore.aliases()
-    if (aliases.hasMoreElements()) do {
-        keyStore.deleteEntry(aliases.nextElement())
-    } while (aliases.hasMoreElements())
 }
 
 fun Context.isAvailableInKeystore(keystoreAlias: String) : Boolean {

@@ -349,7 +349,7 @@
     <string name="drink_me_out_of_here">Drink me out of here</string>
     <string name="you_need_to_log_in_again_into_this_device">You need to log in again into this device!</string>
     <string name="you_have_logged_in_on_another_device">You have logged in on another device</string>
-    <string name="get_me_out_here">Get me out here!</string>
+    <string name="get_me_out_here">Get me out of here!</string>
     <string name="platform_logo">Platform Logo</string>
     <string name="gateway_server_url">Gateway server Url</string>
     <string name="http_request">http request</string>
@@ -447,5 +447,6 @@
     <string name="optional">" (Optional)"</string>
     <string name="email">Email</string>
     <string name="phone_number1">Phone number</string>
+    <string name="supported_platforms">Supported platforms</string>
 
 </resources>

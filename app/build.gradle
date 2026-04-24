@@ -309,5 +309,7 @@ dependencies {
 // Retrofit with Scalar Converter
     implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
     implementation("org.bouncycastle:bcprov-jdk18on:1.83")
+
+    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
 }
 

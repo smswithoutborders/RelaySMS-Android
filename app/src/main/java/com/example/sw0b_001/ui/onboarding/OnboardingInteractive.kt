@@ -65,6 +65,7 @@ import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.navigation.OnboardingSkipScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
+import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.views.makeDefault
 
 data class InteractiveOnboarding(
@@ -81,6 +82,7 @@ data class InteractiveOnboarding(
 fun OnboardingInteractive(
     navController: NavController,
     onboardingViewModel: OnboardingViewModel,
+    supportedPlatformsViewModel: SupportedPlatformsViewModel,
 ) {
     val context = LocalContext.current
     val activity = LocalActivity.current as AppCompatActivity
@@ -205,9 +207,10 @@ fun OnboardingInteractive(
                                 title = context.getString(R.string.way_to_go),
                                 description = context.getString(R.string.you_can_save_more_accounts_per_platform_at_anytime_from_inside_the_app),
                                 image = R.drawable.undraw_success_288d,
-                            ){}
+                            ) {}
                         )
-                    }
+                    },
+                    supportedPlatformsViewModel = supportedPlatformsViewModel,
                 ) { onboardingViewModel.showAddPlatformsModal = false }
             }
 
@@ -225,6 +228,7 @@ fun OnboardingInteractive(
                 OnlineActivePlatformsModal(
                     onboardingViewModel.showSendPlatformsModal,
                     navController = navController,
+                    supportedPlatformsViewModel = supportedPlatformsViewModel,
                     isCompose = true,
                     isOnboarding = true,
                     onCompleteCallback = {}
@@ -317,13 +321,13 @@ fun OnboardingScreenPreview() {
     }
 }
 
-@Preview(showBackground = true,)
-@Composable
-fun OnboardingInteractivePreview() {
-    AppTheme {
-        OnboardingInteractive(
-            rememberNavController(),
-            remember{ OnboardingViewModel() }
-        )
-    }
-}
+//@Preview(showBackground = true,)
+//@Composable
+//fun OnboardingInteractivePreview() {
+//    AppTheme {
+//        OnboardingInteractive(
+//            rememberNavController(),
+//            remember{ OnboardingViewModel() }
+//        )
+//    }
+//}

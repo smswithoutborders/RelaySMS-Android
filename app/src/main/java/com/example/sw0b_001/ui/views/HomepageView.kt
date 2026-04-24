@@ -47,6 +47,7 @@ import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel
+import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 
 
 enum class BottomTabsItems {
@@ -64,6 +65,7 @@ fun HomepageView(
     storedPlatformsViewModel : StoredPlatformsViewModel,
     messagesViewModel: MessagesViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
+    supportedPlatformsViewModel: SupportedPlatformsViewModel,
     imageViewModel: ImageViewModel,
     isLoggedIn: Boolean = false,
     showTopBar: Boolean = true,
@@ -233,6 +235,7 @@ fun HomepageView(
                 messagesViewModel = messagesViewModel,
                 storedPlatformsViewModel = storedPlatformsViewModel,
                 gatewayClientViewModel = gatewayClientViewModel,
+                supportedPlatformsViewModel = supportedPlatformsViewModel,
                 isLoggedIn = isLoggedIn,
             )
 
@@ -242,7 +245,8 @@ fun HomepageView(
                         sendNewMessageRequested = sendNewMessageRequested,
                         navController = navController,
                         isCompose = true,
-                        isLoggedIn = true
+                        isLoggedIn = true,
+                        supportedPlatformsViewModel = supportedPlatformsViewModel
                     ) {
                         sendNewMessageRequested = false
                     }
@@ -278,6 +282,7 @@ fun GetTabViews(
     messagesViewModel: MessagesViewModel,
     storedPlatformsViewModel: StoredPlatformsViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
+    supportedPlatformsViewModel: SupportedPlatformsViewModel,
     isLoggedIn: Boolean,
 ) {
     when(bottomTabsItems) {
@@ -286,6 +291,7 @@ fun GetTabViews(
                 navController = navController,
                 messagesViewModel = messagesViewModel,
                 storedPlatformsViewModel = storedPlatformsViewModel,
+                supportedPlatformsViewModel = supportedPlatformsViewModel,
                 isLoggedIn = isLoggedIn
             ) {
                 storedPlatformsViewModel.bottomTabsItem =
@@ -295,6 +301,7 @@ fun GetTabViews(
         BottomTabsItems.BottomBarPlatformsTab -> {
             SupportedPlatformsView(
                 navController = navController,
+                supportedPlatformsViewModel = supportedPlatformsViewModel
             )
         }
         BottomTabsItems.BottomBarCountriesTab -> {
@@ -312,60 +319,60 @@ fun GetTabViews(
 }
 
 
-@Preview(showBackground = false)
-@Composable
-fun HomepageView_Preview() {
-
-    val context = LocalContext.current
-    AppTheme(darkTheme = false) {
-        HomepageView(
-            navController = rememberNavController(),
-            storedPlatformsViewModel = remember{ StoredPlatformsViewModel(context) },
-            messagesViewModel = remember{ MessagesViewModel() },
-            gatewayClientViewModel = remember{ GatewayClientViewModel() },
-            imageViewModel = remember{ ImageViewModel() },
-        )
-    }
-}
-
-
-@Preview(showBackground = false)
-@Composable
-fun HomepageViewLoggedIn_Preview() {
-    val context = LocalContext.current
-    AppTheme(darkTheme = false) {
-        HomepageView(
-            isLoggedIn = true,
-            navController = rememberNavController(),
-            storedPlatformsViewModel = remember{ StoredPlatformsViewModel(context) },
-            messagesViewModel = remember{ MessagesViewModel() },
-            gatewayClientViewModel = remember{ GatewayClientViewModel() },
-            imageViewModel = remember{ ImageViewModel() },
-        )
-    }
-}
-
-
-@Preview(showBackground = false)
-@Composable
-fun HomepageViewLoggedInMessages_Preview() {
-    AppTheme(darkTheme = false) {
-        val messages = Messages()
-        messages.id = 0
-        messages.type = "email".encodeToByteArray()[0]
-        messages.date = System.currentTimeMillis()
-        messages.fromAccount = "developers@relaysms.me".encodeToByteArray()
-        messages.body = "origin@gmail.com:dev@relaysms.me:::subject here:This is an encrypted content".encodeToByteArray()
-        val context = LocalContext.current
-
-        HomepageView(
-            _messages = listOf(messages),
-            isLoggedIn = true,
-            navController = rememberNavController(),
-            storedPlatformsViewModel = remember{ StoredPlatformsViewModel(context) },
-            messagesViewModel = remember{ MessagesViewModel() },
-            gatewayClientViewModel = remember{ GatewayClientViewModel() },
-            imageViewModel = remember{ ImageViewModel() },
-        )
-    }
-}
+//@Preview(showBackground = false)
+//@Composable
+//fun HomepageView_Preview() {
+//
+//    val context = LocalContext.current
+//    AppTheme(darkTheme = false) {
+//        HomepageView(
+//            navController = rememberNavController(),
+//            storedPlatformsViewModel = remember{ StoredPlatformsViewModel(context) },
+//            messagesViewModel = remember{ MessagesViewModel() },
+//            gatewayClientViewModel = remember{ GatewayClientViewModel() },
+//            imageViewModel = remember{ ImageViewModel() },
+//        )
+//    }
+//}
+//
+//
+//@Preview(showBackground = false)
+//@Composable
+//fun HomepageViewLoggedIn_Preview() {
+//    val context = LocalContext.current
+//    AppTheme(darkTheme = false) {
+//        HomepageView(
+//            isLoggedIn = true,
+//            navController = rememberNavController(),
+//            storedPlatformsViewModel = remember{ StoredPlatformsViewModel(context) },
+//            messagesViewModel = remember{ MessagesViewModel() },
+//            gatewayClientViewModel = remember{ GatewayClientViewModel() },
+//            imageViewModel = remember{ ImageViewModel() },
+//        )
+//    }
+//}
+//
+//
+//@Preview(showBackground = false)
+//@Composable
+//fun HomepageViewLoggedInMessages_Preview() {
+//    AppTheme(darkTheme = false) {
+//        val messages = Messages()
+//        messages.id = 0
+//        messages.type = "email".encodeToByteArray()[0]
+//        messages.date = System.currentTimeMillis()
+//        messages.fromAccount = "developers@relaysms.me".encodeToByteArray()
+//        messages.body = "origin@gmail.com:dev@relaysms.me:::subject here:This is an encrypted content".encodeToByteArray()
+//        val context = LocalContext.current
+//
+//        HomepageView(
+//            _messages = listOf(messages),
+//            isLoggedIn = true,
+//            navController = rememberNavController(),
+//            storedPlatformsViewModel = remember{ StoredPlatformsViewModel(context) },
+//            messagesViewModel = remember{ MessagesViewModel() },
+//            gatewayClientViewModel = remember{ GatewayClientViewModel() },
+//            imageViewModel = remember{ ImageViewModel() },
+//        )
+//    }
+//}

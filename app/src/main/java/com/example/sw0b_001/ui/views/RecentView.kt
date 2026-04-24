@@ -28,19 +28,17 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.data.models.Messages
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
-import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel
+import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -48,6 +46,7 @@ fun RecentView(
     navController: NavController,
     messagesViewModel: MessagesViewModel,
     storedPlatformsViewModel: StoredPlatformsViewModel,
+    supportedPlatformsViewModel: SupportedPlatformsViewModel,
     isLoggedIn: Boolean = false,
     tabRequestedCallback: () -> Unit
 ) {
@@ -124,6 +123,7 @@ fun RecentView(
         if (sendNewMessageRequested) {
             ActivePlatformsModal(
                 sendNewMessageRequested = sendNewMessageRequested,
+                supportedPlatformsViewModel = supportedPlatformsViewModel,
                 navController = navController,
                 isCompose = true
             ) {
@@ -290,61 +290,61 @@ fun RecentMessageCard(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun RecentScreenPreview() {
-    AppTheme(darkTheme = false) {
-        val messages = Messages()
-        messages.id = 0
-        messages.type = "email".encodeToByteArray()[0]
-        messages.date = System.currentTimeMillis()
-        messages.fromAccount = "developers@relaysms.me".encodeToByteArray()
-        messages.body = "reply@relaysms.me:cc@relaysms.me:bcc@relaysms.me:subject here:This is an encrypted content".encodeToByteArray()
+//@Preview(showBackground = true)
+//@Composable
+//fun RecentScreenPreview() {
+//    AppTheme(darkTheme = false) {
+//        val messages = Messages()
+//        messages.id = 0
+//        messages.type = "email".encodeToByteArray()[0]
+//        messages.date = System.currentTimeMillis()
+//        messages.fromAccount = "developers@relaysms.me".encodeToByteArray()
+//        messages.body = "reply@relaysms.me:cc@relaysms.me:bcc@relaysms.me:subject here:This is an encrypted content".encodeToByteArray()
+//
+//        val context = LocalContext.current
+//        RecentView(
+//            navController = rememberNavController(),
+//            messagesViewModel = remember { MessagesViewModel() },
+//            storedPlatformsViewModel = remember { StoredPlatformsViewModel(context) },
+//            isLoggedIn = true
+//        ) {}
+//    }
+//}
+//
 
-        val context = LocalContext.current
-        RecentView(
-            navController = rememberNavController(),
-            messagesViewModel = remember { MessagesViewModel() },
-            storedPlatformsViewModel = remember { StoredPlatformsViewModel(context) },
-            isLoggedIn = true
-        ) {}
-    }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun RecentScreenMessages_Preview() {
-    AppTheme(darkTheme = false) {
-        val messages = Messages()
-        messages.id = 0
-        messages.type = "email".encodeToByteArray()[0]
-        messages.date = System.currentTimeMillis()
-        messages.fromAccount = "developers@relaysms.me".encodeToByteArray()
-        messages.body = "reply@relaysms.me:cc@relaysms.me:bcc@relaysms.me:subject here:This is an encrypted content".encodeToByteArray()
-
-        val context = LocalContext.current
-        RecentView(
-            navController = rememberNavController(),
-            messagesViewModel = remember { MessagesViewModel() },
-            storedPlatformsViewModel = remember { StoredPlatformsViewModel(context) },
-        ) {}
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun RecentsCardPreview() {
-    AppTheme(darkTheme = false) {
-        val messages = Messages()
-        messages.id = 0
-        messages.type = "email".encodeToByteArray()[0]
-        messages.date = System.currentTimeMillis()
-        messages.fromAccount = "developers@relaysms.me".encodeToByteArray()
-        messages.body = "reply@relaysms.me:cc@relaysms.me:bcc@relaysms.me:subject here:This is an encrypted content".encodeToByteArray()
-        RecentMessageCard(
-            message = messages,
-            onClickCallback = {},
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun RecentScreenMessages_Preview() {
+//    AppTheme(darkTheme = false) {
+//        val messages = Messages()
+//        messages.id = 0
+//        messages.type = "email".encodeToByteArray()[0]
+//        messages.date = System.currentTimeMillis()
+//        messages.fromAccount = "developers@relaysms.me".encodeToByteArray()
+//        messages.body = "reply@relaysms.me:cc@relaysms.me:bcc@relaysms.me:subject here:This is an encrypted content".encodeToByteArray()
+//
+//        val context = LocalContext.current
+//        RecentView(
+//            navController = rememberNavController(),
+//            messagesViewModel = remember { MessagesViewModel() },
+//            storedPlatformsViewModel = remember { StoredPlatformsViewModel(context) },
+//        ) {}
+//    }
+//}
+//
+//@Preview(showBackground = true)
+//@Composable
+//fun RecentsCardPreview() {
+//    AppTheme(darkTheme = false) {
+//        val messages = Messages()
+//        messages.id = 0
+//        messages.type = "email".encodeToByteArray()[0]
+//        messages.date = System.currentTimeMillis()
+//        messages.fromAccount = "developers@relaysms.me".encodeToByteArray()
+//        messages.body = "reply@relaysms.me:cc@relaysms.me:bcc@relaysms.me:subject here:This is an encrypted content".encodeToByteArray()
+//        RecentMessageCard(
+//            message = messages,
+//            onClickCallback = {},
+//        )
+//    }
+//}

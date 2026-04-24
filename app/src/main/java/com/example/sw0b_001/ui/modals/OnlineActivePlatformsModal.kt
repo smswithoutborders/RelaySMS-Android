@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.views.SupportedPlatformsView
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -23,6 +24,7 @@ import com.example.sw0b_001.ui.views.SupportedPlatformsView
 fun OnlineActivePlatformsModal(
     showBottomSheet: Boolean,
     navController: NavController,
+    supportedPlatformsViewModel: SupportedPlatformsViewModel,
     isCompose: Boolean,
     isOnboarding: Boolean,
     onCompleteCallback: () -> Unit,
@@ -47,6 +49,7 @@ fun OnlineActivePlatformsModal(
             ) {
                 SupportedPlatformsView(
                     navController = navController,
+                    supportedPlatformsViewModel = supportedPlatformsViewModel,
                     isCompose = isCompose,
                     isOnboarding = isOnboarding,
                     onCompleteCallback = onCompleteCallback,
@@ -58,16 +61,16 @@ fun OnlineActivePlatformsModal(
 }
 
 
-@Preview
-@Composable
-fun OnlineActivePlatformsModalPreview() {
-    AppTheme {
-        OnlineActivePlatformsModal(
-            true,
-            navController = rememberNavController(),
-            isCompose = false,
-            isOnboarding = true,
-            {},
-        ){}
-    }
-}
+//@Preview
+//@Composable
+//fun OnlineActivePlatformsModalPreview() {
+//    AppTheme {
+//        OnlineActivePlatformsModal(
+//            true,
+//            navController = rememberNavController(),
+//            isCompose = false,
+//            isOnboarding = true,
+//            {},
+//        ){}
+//    }
+//}
