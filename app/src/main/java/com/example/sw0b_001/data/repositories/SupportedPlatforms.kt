@@ -1,5 +1,7 @@
 package com.example.sw0b_001.data.repositories
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,8 +14,11 @@ import javax.inject.Qualifier
 import javax.inject.Singleton
 
 
+@Entity
 data class SupportedPlatforms(
+    @PrimaryKey
     val name: String,
+
     var service_type: String?,
     val protocol_type: String?,
     val icon_svg: String?,

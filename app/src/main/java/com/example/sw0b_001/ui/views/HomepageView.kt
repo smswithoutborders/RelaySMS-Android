@@ -28,14 +28,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.Messages
-import com.example.sw0b_001.extensions.context.settingsGetIsLoggedIn
 import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.appbars.GatewayClientsAppBar
 import com.example.sw0b_001.ui.appbars.RecentAppBar
@@ -43,10 +40,9 @@ import com.example.sw0b_001.ui.modals.ActivePlatformsModal
 import com.example.sw0b_001.ui.modals.AddGatewayClientModal
 import com.example.sw0b_001.ui.modals.GetStartedModal
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
-import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
-import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel
+import com.example.sw0b_001.ui.viewModels.AccountsViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -65,7 +61,7 @@ enum class BottomTabsItems {
 fun HomepageView(
     _messages: List<Messages> = emptyList<Messages>(),
     navController: NavController,
-    storedPlatformsViewModel : StoredPlatformsViewModel,
+    accountsViewModel : AccountsViewModel,
     messagesViewModel: MessagesViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
@@ -76,13 +72,6 @@ fun HomepageView(
 ) {
     val context = LocalContext.current
     val inspectionMode = LocalInspectionMode.current
-
-    var isLoggedIn by remember {
-        mutableStateOf(
-            if(inspectionMode) isLoggedIn else
-            context.settingsGetIsLoggedIn
-        )
-    }
 
     val inboxMessages: List<Messages> = if(LocalInspectionMode.current) _messages
     else messagesViewModel.getInboxMessages(context).observeAsState(emptyList()).value
@@ -108,7 +97,7 @@ fun HomepageView(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             if(showTopBar) {
-                when (storedPlatformsViewModel.bottomTabsItem) {
+                when (accountsViewModel.bottomTabsItem) {
                     BottomTabsItems.BottomBarRecentTab -> {
                         RecentAppBar(
                             navController = navController,
@@ -117,11 +106,11 @@ fun HomepageView(
                             isSearchActive = isSearchActive,
                             onToggleSearch = {},
                             onSearchDone = {},
-                            isSelectionMode = storedPlatformsViewModel.isSelectionMode,
-                            selectedCount = storedPlatformsViewModel.selectedMessagesCount,
-                            onSelectAll = storedPlatformsViewModel.onSelectAll,
-                            onDeleteSelected = storedPlatformsViewModel.onDeleteSelected,
-                            onCancelSelection = storedPlatformsViewModel.onCancelSelection,
+                            isSelectionMode = accountsViewModel.isSelectionMode,
+                            selectedCount = accountsViewModel.selectedMessagesCount,
+                            onSelectAll = accountsViewModel.onSelectAll,
+                            onDeleteSelected = accountsViewModel.onDeleteSelected,
+                            onCancelSelection = accountsViewModel.onCancelSelection,
                             onMenuClickCallback = drawerCallback
                         )
                     }
@@ -156,14 +145,14 @@ fun HomepageView(
         },
         bottomBar = {
             BottomNavBar(
-                selectedTab = storedPlatformsViewModel.bottomTabsItem,
+                selectedTab = accountsViewModel.bottomTabsItem,
                 isLoggedIn = isLoggedIn,
             ) { selectedTab ->
-                storedPlatformsViewModel.bottomTabsItem = selectedTab
+                accountsViewModel.bottomTabsItem = selectedTab
             }
         },
         floatingActionButton = {
-            when(storedPlatformsViewModel.bottomTabsItem) {
+            when(accountsViewModel.bottomTabsItem) {
                 BottomTabsItems.BottomBarRecentTab -> {
                     if(isLoggedIn) {
                         ExtendedFloatingActionButton(
@@ -235,10 +224,10 @@ fun HomepageView(
                 .padding(innerPadding)
         ) {
             GetTabViews(
-                storedPlatformsViewModel.bottomTabsItem,
+                accountsViewModel.bottomTabsItem,
                 navController = navController,
                 messagesViewModel = messagesViewModel,
-                storedPlatformsViewModel = storedPlatformsViewModel,
+                accountsViewModel = accountsViewModel,
                 gatewayClientViewModel = gatewayClientViewModel,
                 supportedPlatformsViewModel = supportedPlatformsViewModel,
                 isLoggedIn = isLoggedIn,
@@ -251,7 +240,8 @@ fun HomepageView(
                         navController = navController,
                         isCompose = true,
                         isLoggedIn = true,
-                        supportedPlatformsViewModel = supportedPlatformsViewModel
+                        supportedPlatformsViewModel = supportedPlatformsViewModel,
+                        accountsViewModel = accountsViewModel,
                     ) {
                         sendNewMessageRequested = false
                     }
@@ -285,7 +275,7 @@ fun GetTabViews(
     bottomTabsItems: BottomTabsItems,
     navController: NavController,
     messagesViewModel: MessagesViewModel,
-    storedPlatformsViewModel: StoredPlatformsViewModel,
+    accountsViewModel: AccountsViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
     isLoggedIn: Boolean,
@@ -295,18 +285,20 @@ fun GetTabViews(
             RecentView(
                 navController = navController,
                 messagesViewModel = messagesViewModel,
-                storedPlatformsViewModel = storedPlatformsViewModel,
+                accountsViewModel = accountsViewModel,
                 supportedPlatformsViewModel = supportedPlatformsViewModel,
                 isLoggedIn = isLoggedIn
             ) {
-                storedPlatformsViewModel.bottomTabsItem =
+                accountsViewModel.bottomTabsItem =
                     BottomTabsItems.BottomBarPlatformsTab
             }
         }
         BottomTabsItems.BottomBarPlatformsTab -> {
             SupportedPlatformsView(
                 navController = navController,
-                supportedPlatformsViewModel = supportedPlatformsViewModel
+                isLoggedIn = true,
+                supportedPlatformsViewModel = supportedPlatformsViewModel,
+                accountsViewModel = accountsViewModel,
             )
         }
         BottomTabsItems.BottomBarCountriesTab -> {
@@ -315,7 +307,7 @@ fun GetTabViews(
         BottomTabsItems.BottomBarInboxTab -> {
             InboxView(
                 messagesViewModel = messagesViewModel,
-                storedPlatformsViewModel = storedPlatformsViewModel,
+                accountsViewModel = accountsViewModel,
                 navController = navController
             )
         }

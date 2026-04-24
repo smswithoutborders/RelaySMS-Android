@@ -1,34 +1,29 @@
 package com.example.sw0b_001.ui.viewModels
 
 import android.content.Context
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.Platforms
-import com.example.sw0b_001.extensions.context.promptBiometrics
-import com.example.sw0b_001.extensions.context.settingsSetLockDownApp
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.onboarding.InteractiveOnboarding
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
-    @ApplicationContext private val activity: AppCompatActivity,
-    @ApplicationContext private val navController: NavController,
 ): ViewModel() {
 
     var showLoginSignupModal by mutableStateOf(false)
@@ -38,6 +33,12 @@ class OnboardingViewModel @Inject constructor(
 
     private val _onboardingState = MutableStateFlow<InteractiveOnboarding?>(null)
     val onboardingState: StateFlow<InteractiveOnboarding?> = _onboardingState.asStateFlow()
+
+    private val _showBiometrics = MutableSharedFlow<(()->Unit)>()
+    val showBiometrics = _showBiometrics.asSharedFlow()
+
+    private val _navigate = MutableSharedFlow<@Composable () -> Unit>()
+    val navigate = _navigate.asSharedFlow()
 
     fun setOnboarding(onboardingScreen: InteractiveOnboarding) {
         _onboardingState.value = onboardingScreen
@@ -85,13 +86,15 @@ class OnboardingViewModel @Inject constructor(
                             ){}
                         }
                     }
-                    navController.navigate(
-                        ComposeScreen(
-                            type = Platforms.ServiceTypes.BRIDGE,
-                            isOnboarding = true,
-                            platformName = null
-                        )
-                    )
+                    viewModelScope.launch {
+                        _navigate.emit {
+                            ComposeScreen(
+                                type = Platforms.ServiceTypes.BRIDGE,
+                                isOnboarding = true,
+                                platformName = null
+                            )
+                        }
+                    }
                 }
             ),
             InteractiveOnboarding(
@@ -118,18 +121,8 @@ class OnboardingViewModel @Inject constructor(
                 actionButtonText = context.getString(R.string.let_s_lock_this_down),
                 image = R.drawable.undraw_fingerprint_kdwq,
                 onClickCallToAction = {
-                    context.promptBiometrics(activity) {
-                        if(it) {
-                            context.settingsSetLockDownApp(true)
-                            next()
-                        }
-                        else {
-                            viewModelScope.launch(Dispatchers.Main) { 
-                                Toast.makeText(context,
-                                    context.getString(R.string.failed_to_set_biometric_authentication), 
-                                    Toast.LENGTH_LONG).show()
-                            }
-                        }
+                    viewModelScope.launch {
+                        _showBiometrics.emit { next() }
                     }
                 }
             ),

@@ -37,22 +37,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
-import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
+import com.example.sw0b_001.data.models.Accounts
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.Platforms.ServiceTypes
-import com.example.sw0b_001.data.models.StoredPlatformsEntity
-import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
+import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import com.example.sw0b_001.ui.navigation.ComposeScreen
-import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel.Companion.triggerAddPlatformRequest
+import com.example.sw0b_001.ui.viewModels.AccountsViewModel.Companion.triggerAddPlatformRequest
 import com.example.sw0b_001.ui.views.addAccounts.PNBAPhoneNumberCodeRequestView
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
@@ -63,10 +59,11 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlatformOptionsModal(
+    navController: NavController,
+    accounts: List<Accounts>,
     showPlatformsModal: Boolean,
     isActive: Boolean,
     isCompose: Boolean,
-    navController: NavController,
     platform: SupportedPlatforms?,
     isOnboarding: Boolean = false,
     onCompleteCallback: () -> Unit= {},
@@ -78,7 +75,7 @@ fun PlatformOptionsModal(
     var removeAccountRequested by remember { mutableStateOf(false) }
     var revokeAccountConfirmationRequested by remember { mutableStateOf(false) }
 
-    var account by remember { mutableStateOf<StoredPlatformsEntity?>(null) }
+    var account by remember { mutableStateOf<Accounts?>(null) }
 
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Expanded,
@@ -123,7 +120,7 @@ fun PlatformOptionsModal(
                 }
                 else if(removeAccountRequested) {
                     SelectAccountModal(
-                        name = platform!!.name,
+                        accounts = accounts,
                         onAccountSelected = { storedAccount ->
                             removeAccountRequested = false
                             revokeAccountConfirmationRequested = true
@@ -232,7 +229,7 @@ private fun RevokeAccountLoading(platform: SupportedPlatforms) {
 private fun triggerAccountRevoke(
     context: Context,
     platform: SupportedPlatforms,
-    account: StoredPlatformsEntity,
+    account: Accounts,
     onCompletedCallback: () -> Unit
 ) {
     CoroutineScope(Dispatchers.Default).launch {
@@ -336,9 +333,7 @@ private fun AddAccountLoading(
                                 if(authCodeRequested) {
                                     try {
                                         val vault = VaultsGrpcImpl(context)
-                                        vault.refreshStoredTokens(
-                                            context,
-                                            context.settingsGetStoreTokensOnDevice)
+                                        vault.refreshStoredTokens( context)
                                         onCompletedCallback()
                                     } catch(e: Exception) {
                                         e.printStackTrace()
@@ -364,9 +359,7 @@ private fun AddAccountLoading(
                             onSuccessCallback = {_, _ ->
                                 try {
                                     val vault = VaultsGrpcImpl(context)
-                                    vault.refreshStoredTokens(
-                                        context,
-                                        context.settingsGetStoreTokensOnDevice)
+                                    vault.refreshStoredTokens( context)
                                     onCompletedCallback()
                                 } catch(e: Exception) {
                                     e.printStackTrace()
@@ -535,31 +528,5 @@ private fun getServiceBasedComposeDescriptions(serviceType: String, context: Con
             context.getString(R.string.continue_to_make_posts_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
         }
         else ->  context.getString(R.string.your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
-@Composable
-fun PlatformOptionsModalPreview() {
-    AppTheme(darkTheme = false) {
-        val platform = SupportedPlatforms(
-            name = "gmail",
-//            shortcode = "g",
-            service_type = "email",
-            protocol_type = "pnba",
-            icon_png = "",
-            icon_svg = "",
-            support_url_scheme = true,
-            logo = null
-        )
-        PlatformOptionsModal(
-            showPlatformsModal = true,
-            isActive = true,
-            isCompose = false,
-            platform = platform,
-            onDismissRequest = {},
-            navController = rememberNavController()
-        )
     }
 }

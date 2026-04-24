@@ -33,6 +33,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
@@ -55,9 +56,9 @@ import com.afkanerd.smswithoutborders_libsmsmms.ui.requiredReadPhoneStatePermiss
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.SearchViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ThreadsViewModel
 import com.example.sw0b_001.extensions.context.promptBiometrics
-import com.example.sw0b_001.extensions.context.settingsGetIsLoggedIn
 import com.example.sw0b_001.extensions.context.settingsGetLockDownApp
 import com.example.sw0b_001.extensions.context.settingsGetOnboardedCompletely
+import com.example.sw0b_001.extensions.context.settingsSetLockDownApp
 import com.example.sw0b_001.ui.navigation.AboutScreen
 import com.example.sw0b_001.ui.navigation.BridgeViewScreen
 import com.example.sw0b_001.ui.navigation.ComposeScreen
@@ -76,10 +77,10 @@ import com.example.sw0b_001.ui.navigation.TextViewScreen
 import com.example.sw0b_001.ui.navigation.WelcomeScreen
 import com.example.sw0b_001.ui.onboarding.OnboardingInteractive
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.AccountsViewModel
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
-import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.VaultsViewModel
 import com.example.sw0b_001.ui.views.AboutView
@@ -99,7 +100,6 @@ import com.example.sw0b_001.ui.views.details.TextDetailsView
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.system.exitProcess
@@ -113,14 +113,11 @@ class MainActivity : AppCompatActivity() {
     val threadsViewModel: ThreadsViewModel by viewModels()
     val onboardingViewModel: OnboardingViewModel by viewModels()
 
-    val storedPlatformsViewModel: StoredPlatformsViewModel by viewModels()
+    val accountsViewModel: AccountsViewModel by viewModels()
     val messagesViewModel: MessagesViewModel by viewModels()
     val gatewayClientViewModel: GatewayClientViewModel by viewModels()
     val imageViewModel: ImageViewModel by viewModels()
-
-    var loggedInAlready by mutableStateOf(false)
-
-    lateinit var vaultViewModel: VaultsViewModel
+    val vaultViewModel: VaultsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -130,8 +127,27 @@ class MainActivity : AppCompatActivity() {
             // TODO: https://issuetracker.google.com/issues/298296168
             window.isNavigationBarContrastEnforced = false
         }
+        lifecycleScope.launch {
+            onboardingViewModel.showBiometrics.collect { callback ->
+                promptBiometrics(this@MainActivity) {
+                    if(it) {
+                        settingsSetLockDownApp(true)
+                        callback()
+                    }
+                    else {
+                        Toast.makeText(applicationContext,
+                            getString(R.string.failed_to_set_biometric_authentication),
+                            Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }
 
-        vaultViewModel = VaultsViewModel(applicationContext)
+        lifecycleScope.launch {
+            onboardingViewModel.navigate.collect { composable ->
+                navController.navigate( composable )
+            }
+        }
 
         fun beginAppLifecycle() {
             lifecycleScope.launch(Dispatchers.Main) {
@@ -150,18 +166,6 @@ class MainActivity : AppCompatActivity() {
 
                                 AppTheme {
                                     navController = rememberNavController()
-
-                                    LaunchedEffect(loggedInAlready) {
-                                        if(loggedInAlready) {
-                                            val route = if(isDefault()) HomeScreenNav()
-                                            else HomepageScreen
-                                            navController.navigate(GetMeOutScreen) {
-                                                popUpTo(route) {
-                                                    inclusive = true
-                                                }
-                                            }
-                                        }
-                                    }
 
                                     Surface( Modifier.fillMaxSize()) {
                                         MainNavigation(navController = navController, newLayoutInfo)
@@ -212,15 +216,26 @@ class MainActivity : AppCompatActivity() {
             defaultSmsApp = context.isDefault()
         }
 
-        var hasSeenOnboarding by remember {
-            mutableStateOf(context.settingsGetOnboardedCompletely)
+        val isLoggedIn = vaultViewModel.isLoggedIn
+            .collectAsStateWithLifecycle(false)
+
+        LaunchedEffect(isLoggedIn) {
+            if(isLoggedIn.value) {
+                if(!vaultViewModel.validateSession()) {
+                    val route = if(isDefault()) HomeScreenNav()
+                    else HomepageScreen
+                    navController.navigate(GetMeOutScreen) {
+                        popUpTo(route) {
+                            inclusive = true
+                        }
+                    }
+                }
+            }
         }
 
-        var isLoggedIn by remember {
-            mutableStateOf(
-                if(inPreview) true else
-                context.settingsGetIsLoggedIn
-            )
+
+        var hasSeenOnboarding by remember {
+            mutableStateOf(context.settingsGetOnboardedCompletely)
         }
 
         var showThreadsTopBar by remember { mutableStateOf(true) }
@@ -249,7 +264,7 @@ class MainActivity : AppCompatActivity() {
                         showThreadsTopBar = false
                         HomepageView(
                             navController = navController,
-                            storedPlatformsViewModel = storedPlatformsViewModel,
+                            accountsViewModel = accountsViewModel,
                             messagesViewModel = messagesViewModel,
                             gatewayClientViewModel = gatewayClientViewModel,
                             imageViewModel = imageViewModel,
@@ -306,6 +321,8 @@ class MainActivity : AppCompatActivity() {
                 OnboardingInteractive(
                     navController,
                     onboardingViewModel,
+                    accountsViewModel = accountsViewModel,
+                    vaultViewModel = vaultViewModel,
                     supportedPlatformsViewModel,
                 )
             }
@@ -318,7 +335,7 @@ class MainActivity : AppCompatActivity() {
             composable<HomepageScreen> {
                 HomepageView(
                     navController = navController,
-                    storedPlatformsViewModel = storedPlatformsViewModel,
+                    accountsViewModel = accountsViewModel,
                     messagesViewModel = messagesViewModel,
                     gatewayClientViewModel = gatewayClientViewModel,
                     supportedPlatformsViewModel = supportedPlatformsViewModel,
@@ -376,15 +393,16 @@ class MainActivity : AppCompatActivity() {
                     imageViewModel = imageViewModel,
                     messagesViewModel = messagesViewModel,
                     gatewayClientViewModel = gatewayClientViewModel,
-                    onSendCallback = if(composeScreenNav.isOnboarding)
+                    onSendCallback = if (composeScreenNav.isOnboarding)
                         onboardingViewModel.callback else null,
                     platformName = composeScreenNav.platformName,
+                    accountsViewModel = accountsViewModel,
                 )
             }
             composable<EmailViewScreen> {
                 EmailDetailsView(
                     navController = navController,
-                    storedPlatformsViewModel = storedPlatformsViewModel,
+                    accountsViewModel = accountsViewModel,
                     messagesViewModel = messagesViewModel,
                     imageViewModel = imageViewModel,
                 )
@@ -392,7 +410,7 @@ class MainActivity : AppCompatActivity() {
             composable<BridgeViewScreen> {
                 EmailDetailsView(
                     navController = navController,
-                    storedPlatformsViewModel = storedPlatformsViewModel,
+                    accountsViewModel = accountsViewModel,
                     messagesViewModel = messagesViewModel,
                     imageViewModel = imageViewModel,
                     isBridge = true
@@ -402,19 +420,19 @@ class MainActivity : AppCompatActivity() {
                 TextDetailsView(
                     navController = navController,
                     messagesViewModel = messagesViewModel,
-                    storedPlatformsViewModel = storedPlatformsViewModel,
+                    accountsViewModel = accountsViewModel,
                 )
             }
             composable<MessageViewScreen> {
                 MessageDetailsView(
                     navController = navController,
                     messagesViewModel = messagesViewModel,
-                    storedPlatformsViewModel = storedPlatformsViewModel,
+                    accountsViewModel = accountsViewModel,
                 )
             }
             composable<PasteEncryptedTextScreen> {
                 PasteEncryptedTextView(
-                    storedPlatformsViewModel = storedPlatformsViewModel,
+                    accountsViewModel = accountsViewModel,
                     messagesViewModel = messagesViewModel,
                     navController = navController,
                 )
@@ -440,35 +458,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         processIntent(navController)
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        CoroutineScope(Dispatchers.Default).launch {
-            if(settingsGetIsLoggedIn) {
-                vaultViewModel.validateSession(
-                    applicationContext,
-                    onFailureCallback = {
-                        val lltIsNotAuthenticated = it.first
-                        val errorMessage = it.second
-
-                        loggedInAlready = lltIsNotAuthenticated
-                        if(!loggedInAlready) {
-                            CoroutineScope(Dispatchers.Main).launch {
-                                Toast.makeText(
-                                    applicationContext,
-                                    errorMessage,
-                                    Toast.LENGTH_LONG
-                                ).show()
-                            }
-                        }
-                    }
-                ) {
-
-                }
-            }
-        }
     }
 
     private fun processIntent(navController: NavController, newIntent: Intent? = null) {

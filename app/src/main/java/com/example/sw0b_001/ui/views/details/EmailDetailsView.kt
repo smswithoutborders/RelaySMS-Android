@@ -44,7 +44,7 @@ import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.components.AttachImageView
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
-import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel
+import com.example.sw0b_001.ui.viewModels.AccountsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -52,7 +52,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmailDetailsView(
-    storedPlatformsViewModel: StoredPlatformsViewModel,
+    accountsViewModel: AccountsViewModel,
     messagesViewModel: MessagesViewModel,
     imageViewModel: ImageViewModel,
     navController: NavController,

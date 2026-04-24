@@ -12,6 +12,7 @@ import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.models.GatewayClients
 import com.example.sw0b_001.data.repositories.GatewayClientRepository
 import com.example.sw0b_001.extensions.context.settingsDefaultGatewayClientKey
+import com.example.sw0b_001.relaySmsDatastore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
@@ -24,7 +25,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 
 
-val Context.relaySmsDatastore: DataStore<Preferences> by preferencesDataStore(name = "relaysms_settings")
 sealed class GatewayClientsUiState {
     object Loading : GatewayClientsUiState()
     data class Success(val gatewayClients: List<GatewayClients>) : GatewayClientsUiState()
@@ -142,7 +142,7 @@ class GatewayClientViewModel @Inject constructor(
 
     fun updateGatewayClient(
         context: Context,
-        gatewayClients: com.example.sw0b_001.data.models.GatewayClients,
+        gatewayClients: GatewayClients,
         successRunnable: Runnable,
         failureRunnable: Runnable
     ) {

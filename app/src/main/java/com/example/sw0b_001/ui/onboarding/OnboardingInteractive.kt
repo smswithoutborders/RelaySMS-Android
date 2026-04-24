@@ -48,6 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
@@ -64,8 +65,11 @@ import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.navigation.OnboardingSkipScreen
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.AccountsViewModel
+import com.example.sw0b_001.ui.viewModels.AccountsViewModel_Factory
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
+import com.example.sw0b_001.ui.viewModels.VaultsViewModel
 import com.example.sw0b_001.ui.views.makeDefault
 
 data class InteractiveOnboarding(
@@ -82,10 +86,11 @@ data class InteractiveOnboarding(
 fun OnboardingInteractive(
     navController: NavController,
     onboardingViewModel: OnboardingViewModel,
+    accountsViewModel: AccountsViewModel,
+    vaultViewModel: VaultsViewModel,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
 ) {
     val context = LocalContext.current
-    val activity = LocalActivity.current as AppCompatActivity
     val showingOnboarding by onboardingViewModel.onboardingState.collectAsState()
 
     val defaultBehaviour = getSetDefaultBehaviour(context) {
@@ -99,6 +104,9 @@ fun OnboardingInteractive(
             }
         }
     }
+
+    val isLoggedIn by vaultViewModel.isLoggedIn
+        .collectAsStateWithLifecycle(false)
 
     Scaffold(
         topBar = {
@@ -142,7 +150,7 @@ fun OnboardingInteractive(
             Spacer(modifier = Modifier.weight(1f))
 
             if(showingOnboarding == null)
-                onboardingViewModel.first(context, activity, navController)
+                onboardingViewModel.first()
 
             showingOnboarding?.let {
                 OnboardingScreen(it)
@@ -197,8 +205,8 @@ fun OnboardingInteractive(
 
             if(onboardingViewModel.showAddPlatformsModal) {
                 OnlineActivePlatformsModal(
-                    onboardingViewModel.showAddPlatformsModal,
                     navController = navController,
+                    onboardingViewModel.showAddPlatformsModal,
                     isCompose = false,
                     isOnboarding = true,
                     onCompleteCallback = {
@@ -211,6 +219,8 @@ fun OnboardingInteractive(
                         )
                     },
                     supportedPlatformsViewModel = supportedPlatformsViewModel,
+                    accountsViewModel = accountsViewModel,
+                    isLoggedIn = isLoggedIn,
                 ) { onboardingViewModel.showAddPlatformsModal = false }
             }
 
@@ -226,12 +236,14 @@ fun OnboardingInteractive(
                 }
 
                 OnlineActivePlatformsModal(
-                    onboardingViewModel.showSendPlatformsModal,
                     navController = navController,
+                    onboardingViewModel.showSendPlatformsModal,
                     supportedPlatformsViewModel = supportedPlatformsViewModel,
+                    accountsViewModel = accountsViewModel,
                     isCompose = true,
                     isOnboarding = true,
-                    onCompleteCallback = {}
+                    onCompleteCallback = {},
+                    isLoggedIn = isLoggedIn,
                 ) { onboardingViewModel.showSendPlatformsModal = false }
             }
 

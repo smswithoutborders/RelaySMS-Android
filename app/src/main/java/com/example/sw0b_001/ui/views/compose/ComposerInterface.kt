@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,7 +38,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.afkanerd.lib_image_android.ui.navigation.ImageRenderNav
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDefaultSimSubscription
@@ -48,7 +48,7 @@ import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Composers
 import com.example.sw0b_001.data.models.Platforms
-import com.example.sw0b_001.data.models.StoredPlatformsEntity
+import com.example.sw0b_001.data.models.Accounts
 import com.example.sw0b_001.extensions.context.settingsGetNotShowChooseGatewayClient
 import com.example.sw0b_001.ui.components.AttachImageView
 import com.example.sw0b_001.ui.modals.ComposeChooseGatewayClientsModal
@@ -57,8 +57,8 @@ import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
-import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel
-import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel.Companion.verifyPhoneNumberFormat
+import com.example.sw0b_001.ui.viewModels.AccountsViewModel
+import com.example.sw0b_001.ui.viewModels.AccountsViewModel.Companion.verifyPhoneNumberFormat
 import com.example.sw0b_001.ui.views.DeveloperHTTPView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -73,6 +73,7 @@ fun ComposerInterface(
     imageViewModel: ImageViewModel,
     messagesViewModel: MessagesViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
+    accountsViewModel: AccountsViewModel,
     platformName: String?,
     onSendCallback: ((Boolean) -> Unit)? = null,
 ) {
@@ -90,6 +91,8 @@ fun ComposerInterface(
         imageViewModel.processedImage = null
         navController.popBackStack()
     }
+
+    val accounts by accountsViewModel.get().observeAsState()
 
     var isBridge by remember{ mutableStateOf(type == Platforms.ServiceTypes.BRIDGE) }
 
@@ -117,7 +120,7 @@ fun ComposerInterface(
     var isSending by remember { mutableStateOf(false) }
     var showSelectAccountModal by remember { mutableStateOf(
         type != Platforms.ServiceTypes.BRIDGE) }
-    var selectedAccount: StoredPlatformsEntity? by remember { mutableStateOf(null) }
+    var selectedAccount: Accounts? by remember { mutableStateOf(null) }
 
     var showDeveloperDialog by remember{ mutableStateOf(false) }
 
@@ -232,7 +235,7 @@ fun ComposerInterface(
         imageRenderSubModule()
     }
 
-    val storedPlatformsViewModel = remember{ StoredPlatformsViewModel(context) }
+    val accountsViewModel = remember{ AccountsViewModel(context) }
 
     fun send(
         smsTransmission: Boolean = true,
@@ -497,16 +500,18 @@ fun ComposerInterface(
                         if (selectedAccount == null) {
                             navController.popBackStack()
                         }
-                        Toast.makeText(context,
+                        Toast.makeText(
+                            context,
                             context.getString(R.string.no_account_selected),
-                            Toast.LENGTH_SHORT).show()
+                            Toast.LENGTH_SHORT
+                        ).show()
                     },
                     onAccountSelected = { account ->
                         selectedAccount = account
                         from.value = TODO()
                         showSelectAccountModal = false
                     },
-                    name = platformName!!
+                    accounts = accounts ?: emptyList()
                 )
             }
 
@@ -518,36 +523,5 @@ fun ComposerInterface(
                 }
             }
         }
-    }
-}
-
-//@Preview(showBackground = true)
-//@Composable
-//fun ComposerInterfacePreview() {
-//    AppTheme {
-//        ComposerInterface(
-//            navController = rememberNavController(),
-//            type = Platforms.ServiceTypes.BRIDGE,
-//            imageViewModel = remember{ ImageViewModel() },
-//            messagesViewModel = remember{ MessagesViewModel() },
-//            platformName = "BRIDGE"
-//        ){}
-//    }
-//}
-
-@Preview(showBackground = true)
-@Composable
-fun AccountModalPreview() {
-    AppTheme(darkTheme = false) {
-        val storedPlatform = StoredPlatformsEntity(
-            id= "0",
-            account = "developers@relaysms.me",
-            name = "gmail",
-        )
-        SelectAccountModal(
-            _accounts = listOf(storedPlatform),
-            name = "gmail",
-            onAccountSelected = {}
-        ) {}
     }
 }

@@ -38,11 +38,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel
+import com.example.sw0b_001.ui.viewModels.AccountsViewModel
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Composers
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel.Companion.verifyPhoneNumberFormat
+import com.example.sw0b_001.ui.viewModels.AccountsViewModel.Companion.verifyPhoneNumberFormat
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -82,7 +82,7 @@ fun MessageComposeView(
         contract = PickPhoneNumberContract()
     ) { uri ->
         uri?.let {
-            messageContent.to.value = StoredPlatformsViewModel.getPhoneNumberFromUri(context, it)
+            messageContent.to.value = AccountsViewModel.getPhoneNumberFromUri(context, it)
         }
     }
 

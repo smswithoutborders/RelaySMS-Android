@@ -11,7 +11,6 @@ import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
 import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
-import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -88,9 +87,7 @@ class OauthRedirectActivity : AppCompatActivity() {
             }
 
             val vaultsGrpcImpl = VaultsGrpcImpl(applicationContext)
-            vaultsGrpcImpl.refreshStoredTokens(
-                applicationContext,
-                settingsGetStoreTokensOnDevice)
+            vaultsGrpcImpl.refreshStoredTokens( applicationContext)
             vaultsGrpcImpl.shutdown()
         } catch(e: StatusRuntimeException) {
             e.printStackTrace()

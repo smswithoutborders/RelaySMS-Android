@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,7 +53,6 @@ import com.example.sw0b_001.extensions.context.settingsGetIsEmailLogin
 import com.example.sw0b_001.extensions.context.settingsGetLockDownApp
 import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
 import com.example.sw0b_001.extensions.context.settingsGetUseDeviceId
-import com.example.sw0b_001.extensions.context.settingsGetIsLoggedIn
 import com.example.sw0b_001.extensions.context.settingsSetIsLoggedIn
 import com.example.sw0b_001.extensions.context.settingsSetLockDownApp
 import com.example.sw0b_001.extensions.context.settingsSetStoreTokensOnDevice
@@ -60,6 +60,7 @@ import com.example.sw0b_001.extensions.context.settingsSetUseDeviceId
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.VaultsViewModel
 import io.grpc.StatusRuntimeException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -89,8 +90,7 @@ fun SettingsView(
 
     var isLoading by remember { mutableStateOf(false) }
 
-    val isLoggedIn by remember{ mutableStateOf(
-        inPreviewMode || context.settingsGetIsLoggedIn) }
+    val isLoggedIn by vaultsViewModel.isLoggedIn.collectAsState(false)
 
     val localeArraysValues = stringArrayResource(R.array.language_values)
     val localeArraysOptions= stringArrayResource(R.array.language_options)
@@ -244,10 +244,7 @@ fun SettingsView(
                 if(checked == true) {
                     scope.launch(Dispatchers.Default) {
                         try {
-                            VaultsGrpcImpl(context).refreshStoredTokens(
-                                context = context,
-                                migrateToDevice = true
-                            )
+                            VaultsGrpcImpl(context).refreshStoredTokens(context = context)
                         } catch(e: Exception) {
                             e.printStackTrace()
                             scope.launch(Dispatchers.Main) {
@@ -298,7 +295,9 @@ fun SettingsView(
                     itemDescription = stringResource(R.string.this_would_log_you_out_of_your_vault_account_on_this_device_you_can_log_back_in_at_anytime_with_an_internet_connection),
                     enabled = !isLoading,
                 ) {
-                    context.settingsSetIsLoggedIn(false)
+                    CoroutineScope(Dispatchers.Default).launch {
+                        context.settingsSetIsLoggedIn(false)
+                    }
                 }
 
                 SettingsItem(
@@ -308,12 +307,10 @@ fun SettingsView(
                     enabled = !isLoading,
                 ) {
                     isLoading = true
-                    context.settingsSetIsLoggedIn(false)
                     scope.launch(Dispatchers.Default) {
+                        context.settingsSetIsLoggedIn(false)
                         try {
-                            vaultsViewModel.completeDelete(onFailureCallback = {}) {
-
-                            }
+                            vaultsViewModel.completeDelete()
                         } catch(e: StatusRuntimeException) {
                             e.printStackTrace()
                             scope.launch(Dispatchers.Main){

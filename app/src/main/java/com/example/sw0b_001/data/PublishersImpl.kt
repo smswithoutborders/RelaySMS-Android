@@ -12,7 +12,7 @@ import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewM
 import com.example.sw0b_001.data.Helpers.toBytes
 import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
 import com.example.sw0b_001.data.models.Messages
-import com.example.sw0b_001.data.models.StoredPlatformsEntity
+import com.example.sw0b_001.data.models.Accounts
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import com.example.sw0b_001.extensions.context.settingsGetDefaultGatewayClients
 import com.example.sw0b_001.extensions.context.settingsGetUseDeviceId
@@ -47,7 +47,7 @@ object PublishersImpl {
         context: Context,
         content: ByteArray,
         platform: SupportedPlatforms,
-        account: StoredPlatformsEntity? = null,
+        account: Accounts? = null,
         imageLength: Int,
         textLength: Int
     ): Messages? {
@@ -97,7 +97,7 @@ object PublishersImpl {
         platform: SupportedPlatforms,
         imageLength: Int = 0,
         textLength: Int = 0,
-        account: StoredPlatformsEntity? = null,
+        account: Accounts? = null,
         subscriptionId: Long = -1,
         languageCode: String = "en",
         smsTransmission: Boolean = true,

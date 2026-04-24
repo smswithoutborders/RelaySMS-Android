@@ -12,18 +12,21 @@ import androidx.lifecycle.viewModelScope
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Network
 import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
-import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
+import com.example.sw0b_001.extensions.context.settingsIsLoggedInKey
+import com.example.sw0b_001.extensions.context.settingsSetIsLoggedIn
+import com.example.sw0b_001.relaySmsDatastore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -42,6 +45,16 @@ class VaultsViewModel @Inject constructor(
     var recaptchaAnswer by mutableStateOf("")
 
     val vault = VaultsGrpcImpl(context)
+
+    val isLoggedIn: Flow<Boolean> = context.relaySmsDatastore.data.map { settings ->
+        settings[settingsIsLoggedInKey] ?: false
+    }
+
+    fun validateSingleSession() {
+        viewModelScope.launch(Dispatchers.Default) {
+            validateSession()
+        }
+    }
 
     @Serializable
     data class CaptchaRequest(val client_id: String )
@@ -124,73 +137,34 @@ class VaultsViewModel @Inject constructor(
         }
     }
 
-    fun completeDelete(
-        onFailureCallback: (String?) -> Unit,
-        onSuccessCallback: () -> Unit,
-    ) {
-        TODO()
-//        viewModelScope.launch(Dispatchers.IO) {
-//            val vaultsGrpcImpl = VaultsGrpcImpl(context)
-//            val publisherGrpcImpl = PublisherGrpcImpl(context)
-//            try {
-//                val availablePlatforms = Datastore.getDatastore(context)?.availablePlatformsDao()
-//                    ?.fetchAllList()
-//
-//                Datastore.getDatastore(context).storedPlatformsDao().fetchAllList().forEach { platform ->
-//                    availablePlatforms.filter { it.name == platform.name }.forEach {
-//                        when(it.protocol_type) {
-//                            Platforms.ProtocolTypes.oauth2.name -> {
-//                                publisherGrpcImpl.revokeOAuthPlatforms(
-//                                    platform.name!!,
-//                                    platform.account!!,
-//                                )
-//                            }
-//                            Platforms.ProtocolTypes.pnba.name -> {
-//                                publisherGrpcImpl.revokePNBAPlatforms(
-//                                    platform.name!!,
-//                                    platform.account!!
-//                                )
-//                            }
-//                        }
-//                    }
-//                }
-//
-//                val response = vaultsGrpcImpl.deleteEntity()
-//                if(response.success) { logout(context) {
-//                    onSuccessCallback()
-//                }}
-//                else onFailureCallback(null)
-//            } catch (e: Exception) {
-//                e.printStackTrace()
-//                onFailureCallback(e.message)
-//            } finally {
-//                vaultsGrpcImpl.shutdown()
-//                publisherGrpcImpl.shutdown()
-//            }
-//        }
-    }
+    suspend fun completeDelete() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val vaultsGrpcImpl = VaultsGrpcImpl(context)
+            try {
+                AccountsViewModel(context).revokeAll()
 
-    fun validateSession(
-        onFailureCallback: (Pair<Boolean, String?>) -> Unit,
-        onSuccessCallback: () -> Unit,
-    ) {
-        viewModelScope.launch {
-            withContext(Dispatchers.Default) {
-                try {
-                    vault.refreshStoredTokens(
-                        context,
-                        context.settingsGetStoreTokensOnDevice)
-                    onSuccessCallback()
-                } catch(e: StatusRuntimeException) {
-                    e.printStackTrace()
-                    if(e.status.code == Status.UNAUTHENTICATED.code) {
-                        onFailureCallback(Pair(true, e.message))
-                    }
-                    else {
-                        onFailureCallback(Pair(false, e.message))
-                    }
+                val response = vaultsGrpcImpl.deleteEntity()
+                if(response.success) {
+                    context.settingsSetIsLoggedIn(false)
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                vaultsGrpcImpl.shutdown()
             }
         }
+    }
+
+    fun validateSession() : Boolean{
+        try {
+            vault.refreshStoredTokens( context)
+            return true
+        } catch(e: StatusRuntimeException) {
+            e.printStackTrace()
+            if(e.status.code != Status.UNAUTHENTICATED.code) {
+                throw e
+            }
+        }
+        return false
     }
 }

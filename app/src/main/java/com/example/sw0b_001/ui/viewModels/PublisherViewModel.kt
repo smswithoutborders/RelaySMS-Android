@@ -8,9 +8,9 @@ import com.afkanerd.smswithoutborders_libsmsmms.data.ImageTransmissionProtocol
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDefaultSimSubscription
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Composers
-import com.example.sw0b_001.data.models.StoredPlatformsEntity
+import com.example.sw0b_001.data.models.Accounts
 import com.example.sw0b_001.extensions.context.settingsGetDefaultGatewayClients
-import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel.Companion.ITP_VERSION_VALUE
+import com.example.sw0b_001.ui.viewModels.AccountsViewModel.Companion.ITP_VERSION_VALUE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
@@ -24,7 +24,7 @@ class PublisherViewModel @Inject constructor(
 
     fun sendPublishingForImage(
         imageByteArray: ByteArray,
-        account: StoredPlatformsEntity? = null,
+        account: Accounts? = null,
         text: ByteArray,
         isBridge: Boolean,
         isLoggedIn: Boolean,
@@ -105,7 +105,7 @@ class PublisherViewModel @Inject constructor(
 
     fun sendPublishingForMessaging(
         messageContent: Composers.MessageComposeHandler.MessageContent,
-        account: StoredPlatformsEntity,
+        account: Accounts,
         subscriptionId: Long,
         smsTransmission: Boolean = true,
         onFailure: (String?) -> Unit,
@@ -156,7 +156,7 @@ class PublisherViewModel @Inject constructor(
 
     fun sendPublishingForEmail(
         emailContent: Composers.EmailComposeHandler.EmailContent,
-        account: StoredPlatformsEntity?,
+        account: Accounts?,
         isBridge: Boolean,
         subscriptionId: Long,
         smsTransmission: Boolean = true,
@@ -282,7 +282,7 @@ class PublisherViewModel @Inject constructor(
 
     fun sendPublishingForPost(
         text: String,
-        account: StoredPlatformsEntity,
+        account: Accounts,
         subscriptionId: Long,
         onFailure: (String?) -> Unit,
         onSuccess: (ByteArray?) -> Unit,

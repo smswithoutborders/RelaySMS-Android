@@ -9,7 +9,7 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.models.Keys
 import com.example.sw0b_001.data.models.RatchetStates
-import com.example.sw0b_001.data.models.StoredPlatformsEntity
+import com.example.sw0b_001.data.models.Accounts
 import com.example.sw0b_001.extensions.context.getStaticKeys
 import com.example.sw0b_001.extensions.context.settingsSetIsEmailLogin
 import com.example.sw0b_001.extensions.context.settingsSetIsLoggedIn
@@ -66,14 +66,13 @@ class VaultsGrpcImpl(val context: Context) {
 
     fun refreshStoredTokens(
         context: Context,
-        migrateToDevice: Boolean = false,
     ) {
         try {
-            val response = getStoredAccountTokens(migrateToDevice)
+            val response = getStoredAccountTokens()
 
-            val datastore = Datastore.Companion.getDatastore(context)
+            val datastore = Datastore.getDatastore(context)
                 ?: throw Exception("Database could not be opened")
-            val platformsToSave = mutableListOf<StoredPlatformsEntity>()
+            val platformsToSave = mutableListOf<Accounts>()
 
             response.storedTokensList.forEach { accountTokens ->
                 val uuid = Base64.encodeToString(
@@ -82,22 +81,13 @@ class VaultsGrpcImpl(val context: Context) {
                         accountTokens.accountIdentifier.toByteArray()
                     ).sha256(), Base64.DEFAULT)
 
-                if(!accountTokens.isStoredOnDevice) {
-                    val accessToken = if(accountTokens.accountTokensMap.containsKey("access_token")) {
-                        accountTokens.accountTokensMap["access_token"]
-                    } else ""
-                    val refreshToken = if(accountTokens.accountTokensMap.containsKey("refresh_token")) {
-                        accountTokens.accountTokensMap["refresh_token"]
-                    } else ""
-
-                    platformsToSave.add(
-                        StoredPlatformsEntity(
-                            id = uuid,
-                            account = accountTokens.accountIdentifier,
-                            name = accountTokens.platform,
-                        )
+                platformsToSave.add(
+                    Accounts(
+                        id = uuid,
+                        account = accountTokens.accountIdentifier,
+                        name = accountTokens.platform,
                     )
-                }
+                )
             }
             datastore.storedPlatformsDao()?.insert(platformsToSave)
         } catch (e: Exception) {
@@ -177,7 +167,7 @@ class VaultsGrpcImpl(val context: Context) {
         }
     }
 
-    fun submitOTPCode(
+    suspend fun submitOTPCode(
         context: Context,
         phoneNumber: String,
         email: String,
@@ -556,21 +546,17 @@ class VaultsGrpcImpl(val context: Context) {
         } finally {
             nonce.fill(0)
             authenticationPublicKey.fill(0)
-            authenticationPublicKeyId = -1
         }
         return response
 
     }
 
     fun getStoredAccountTokens(
-        migrateToDevice: Boolean
     ): Vault.ListEntityStoredTokensResponse {
-        val request = Vault.ListEntityStoredTokensRequest.newBuilder().apply {
-            setMigrateToDevice(migrateToDevice)
-        }.build()
+        val request = Vault.ListEntityStoredTokensRequest.newBuilder()
 
         val inEntityStub = entityStub.withInterceptors(GrpcClientInterceptor(context))
-        return inEntityStub.listEntityStoredTokens(request)
+        return inEntityStub.listEntityStoredTokens(request.build())
     }
 
     fun deleteEntity() : Vault.DeleteEntityResponse {

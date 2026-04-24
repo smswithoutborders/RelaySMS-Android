@@ -7,42 +7,45 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.example.sw0b_001.data.models.StoredPlatformsEntity
+import com.example.sw0b_001.data.models.Accounts
 
 @Dao
 interface StoredPlatformsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(platforms: List<StoredPlatformsEntity>)
+    fun insertAll(platforms: List<Accounts>)
 
-    @Query("SELECT * FROM StoredPlatformsEntity")
-    fun fetchAll() : LiveData<List<StoredPlatformsEntity>>
+    @Query("SELECT * FROM Accounts")
+    fun fetchAll() : LiveData<List<Accounts>>
 
-    @Query("SELECT * FROM StoredPlatformsEntity")
-    fun fetchAllList() : List<StoredPlatformsEntity>
+    @Query("SELECT * FROM Accounts")
+    fun fetchAllList() : List<Accounts>
 
-    @Query("SELECT * FROM StoredPlatformsEntity WHERE name = :name")
-    fun fetchPlatform(name: String) : LiveData<List<StoredPlatformsEntity>>
+    @Query("SELECT * FROM Accounts where name = :platformName")
+    fun fetchAllList(platformName: String) : List<Accounts>
 
-    @Query("SELECT * FROM StoredPlatformsEntity WHERE id = :id")
-    fun fetch(id: String) : StoredPlatformsEntity
+    @Query("SELECT * FROM Accounts WHERE name = :name")
+    fun fetchPlatform(name: String) : LiveData<List<Accounts>>
 
-    @Query("SELECT * FROM StoredPlatformsEntity WHERE account = :account")
-    fun fetchAccount(account: String) : StoredPlatformsEntity?
+    @Query("SELECT * FROM Accounts WHERE id = :id")
+    fun fetch(id: String) : Accounts
+
+    @Query("SELECT * FROM Accounts WHERE account = :account")
+    fun fetchAccount(account: String) : Accounts?
 
     @Update
-    fun update(storedPlatformsEntity: StoredPlatformsEntity)
+    fun update(accounts: Accounts)
 
-    @Query("DELETE FROM StoredPlatformsEntity")
+    @Query("DELETE FROM Accounts")
     fun deleteAll()
 
-    @Query("DELETE FROM StoredPlatformsEntity WHERE id = :id")
+    @Query("DELETE FROM Accounts WHERE id = :id")
     fun delete(id: String)
 
-    @Query("SELECT id FROM StoredPlatformsEntity")
+    @Query("SELECT id FROM Accounts")
     fun getAllAccountIds(): List<String>
 
     @Transaction
-    fun insert(platforms: List<StoredPlatformsEntity>) {
+    fun insert(platforms: List<Accounts>) {
         deleteAll()
         insertAll(platforms)
     }

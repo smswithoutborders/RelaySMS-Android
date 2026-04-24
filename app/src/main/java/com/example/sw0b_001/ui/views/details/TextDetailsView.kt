@@ -39,12 +39,12 @@ import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
-import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel
+import com.example.sw0b_001.ui.viewModels.AccountsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextDetailsView(
-    storedPlatformsViewModel: StoredPlatformsViewModel,
+    accountsViewModel: AccountsViewModel,
     messagesViewModel: MessagesViewModel,
     navController: NavController,
     isOnboarding: Boolean = false,

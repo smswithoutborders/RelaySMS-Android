@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -50,17 +51,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
-import com.example.sw0b_001.extensions.context.settingsGetIsLoggedIn
-import com.example.sw0b_001.ui.components.IconLoader
 import com.example.sw0b_001.ui.modals.PlatformOptionsModal
-import com.example.sw0b_001.ui.viewModels.SupportedPlatformsUiState
+import com.example.sw0b_001.ui.viewModels.AccountsViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import java.util.Locale
 
@@ -70,6 +68,8 @@ import java.util.Locale
 fun SupportedPlatformsView(
     navController: NavController,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
+    accountsViewModel: AccountsViewModel,
+    isLoggedIn: Boolean,
     isCompose: Boolean = false,
     isOnboarding: Boolean = false,
     onCompleteCallback: () -> Unit= {},
@@ -96,10 +96,6 @@ fun SupportedPlatformsView(
                 launchSingleTop = true
             }
         }
-    }
-
-    var isLoggedIn by remember {
-        mutableStateOf( inPreviewMode || context.settingsGetIsLoggedIn )
     }
 
     Column(
@@ -157,6 +153,7 @@ fun SupportedPlatformsView(
         PlatformListContent(
             isCompose = isCompose,
             supportedPlatformsViewModel = supportedPlatformsViewModel,
+            accountsViewModel = accountsViewModel,
             isOnboarding = isOnboarding,
             navController = navController,
             onDismiss = onDismiss,
@@ -172,13 +169,16 @@ fun SupportedPlatformsView(
 fun PlatformListContent(
     navController: NavController,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
+    accountsViewModel: AccountsViewModel,
     isLoggedIn: Boolean,
     isCompose: Boolean = false,
     isOnboarding: Boolean = false,
     onCompleteCallback: () -> Unit= {},
     onDismiss: () -> Unit = {}
 ) {
-    val platformsStates by supportedPlatformsViewModel.uiState.collectAsStateWithLifecycle()
+//    val platformsStates by supportedPlatformsViewModel.uiState.collectAsStateWithLifecycle()
+    val supportedPlatforms = supportedPlatformsViewModel.get().observeAsState()
+    val accounts = accountsViewModel.get().observeAsState()
 
     var showPlatformOptions by remember { mutableStateOf(false) }
     var clickedPlatform: SupportedPlatforms? by remember{ mutableStateOf(null)}
@@ -236,42 +236,31 @@ fun PlatformListContent(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        when(val currentState = platformsStates) {
-            is SupportedPlatformsUiState.Loading -> {
-                IconLoader(
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.Center,
+            maxItemsInEachRow = 2
+        ) {
+            supportedPlatforms.value?.forEach { platform ->
+                PlatformCard(
+                    logo = if(platform.logo != null)
+                        BitmapFactory.decodeByteArray(
+                            platform.logo,
+                            0,
+                            platform.logo!!.count()
+                        ) else null,
+                    platform = platform,
                     modifier = Modifier
-                        .fillMaxWidth(),
-                )
-            }
-            is SupportedPlatformsUiState.Success -> {
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalArrangement = Arrangement.Center,
-                    maxItemsInEachRow = 2
+                        .padding(8.dp)
+                        .width(130.dp),
+                    isActive = false,
+                    isEnabled = isLoggedIn,
                 ) {
-                    currentState.supportedPlatforms.forEach { platform ->
-                        PlatformCard(
-                            logo = if(platform.logo != null)
-                                BitmapFactory.decodeByteArray(
-                                    platform.logo,
-                                    0,
-                                    platform.logo!!.count()
-                                ) else null,
-                            platform = platform,
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .width(130.dp),
-                            isActive = false,
-                            isEnabled = isLoggedIn,
-                        ) {
-                            clickedPlatform = platform
-                            showPlatformOptions = true
-                        }
-                    }
+                    clickedPlatform = platform
+                    showPlatformOptions = true
                 }
             }
-            is SupportedPlatformsUiState.Error -> {}
         }
 
         if (showPlatformOptions) {
@@ -285,6 +274,8 @@ fun PlatformListContent(
                 navController = navController,
                 isOnboarding = isOnboarding,
                 onCompleteCallback = onCompleteCallback,
+                accounts = accounts.value?.filter { it.name == clickedPlatform?.name }
+                    ?: emptyList(),
             ) {
                 showPlatformOptions = false
                 onDismiss()

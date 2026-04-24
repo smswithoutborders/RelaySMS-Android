@@ -28,7 +28,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -38,17 +37,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.models.StoredPlatformsEntity
-import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel
+import com.example.sw0b_001.data.models.Accounts
+import com.example.sw0b_001.ui.viewModels.AccountsViewModel
 import kotlinx.coroutines.launch
 
 // Data class to represent an account
@@ -62,9 +58,8 @@ data class Account(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectAccountModal(
-    _accounts: List<StoredPlatformsEntity> = emptyList(),
-    name: String,
-    onAccountSelected: (StoredPlatformsEntity) -> Unit = {},
+    accounts: List<Accounts>,
+    onAccountSelected: (Accounts) -> Unit = {},
     onDismissRequest: () -> Unit
 ) {
     val context = LocalContext.current
@@ -75,10 +70,7 @@ fun SelectAccountModal(
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(true) }
 
-    val storedPlatformsViewModel = remember{ StoredPlatformsViewModel(context) }
-    val accounts: List<StoredPlatformsEntity> = if(LocalInspectionMode.current) _accounts
-    else storedPlatformsViewModel.getAccounts(name)
-        .observeAsState(emptyList()).value
+    val accountsViewModel = remember{ AccountsViewModel(context) }
 
     if (showBottomSheet) {
         ModalBottomSheet(
@@ -143,7 +135,7 @@ fun SelectAccountModal(
 
 @Composable
 fun AccountCard(
-    account: StoredPlatformsEntity,
+    account: Accounts,
     onAccountSelected: () -> Unit
 ) {
     Card(
@@ -168,35 +160,16 @@ fun AccountCard(
             Spacer(modifier = Modifier.width(16.dp))
             Column {
                 Text(
-                    text = account.account!!,
+                    text = account.account,
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = account.name!!,
+                    text = account.name,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
-    }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun SelectAccountModalPreview() {
-    AppTheme {
-        val storedPlatform = StoredPlatformsEntity(
-            id= "0",
-            account = "developers@relaysms.me",
-            name = "gmail",
-        )
-        SelectAccountModal(
-            _accounts = listOf(storedPlatform),
-            name = "gmail",
-            onAccountSelected = {},
-            onDismissRequest = {}
-        )
     }
 }

@@ -5,7 +5,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(indices = [Index(value = ["account", "name"], unique = true)])
-data class StoredPlatformsEntity(
+data class Accounts(
     @PrimaryKey val id: String,
     val account: String,
     val name: String,

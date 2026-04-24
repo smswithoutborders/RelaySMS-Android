@@ -1,6 +1,5 @@
 package com.example.sw0b_001.ui.views
 
-import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -53,7 +52,6 @@ import kotlinx.serialization.json.Json
 fun GatewayClientView(
     viewModel: GatewayClientViewModel,
 ) {
-    val context = LocalContext.current
     val isLoading by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
@@ -133,7 +131,10 @@ fun GatewayClientView(
                 LazyColumn(
                     contentPadding = PaddingValues(bottom = 16.dp)
                 ) {
-                    items(filteredGatewayClients) { gatewayClient ->
+                    items(
+                        items = filteredGatewayClients,
+                        key = { it.msisdn }
+                    ) { gatewayClient ->
                         GatewayClientCard(
                             gatewayClients = gatewayClient,
                             gatewayClientViewModel = viewModel,
@@ -150,9 +151,9 @@ fun GatewayClientView(
                 LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
             }
             is GatewayClientsUiState.Success -> {
-                Toast.makeText(context,
-                    "Fetched ${state.gatewayClients.size} gatewayclients",
-                    Toast.LENGTH_SHORT).show()
+//                Toast.makeText(context,
+//                    "Fetched ${state.gatewayClients.size} gatewayclients",
+//                    Toast.LENGTH_SHORT).show()
             }
             is GatewayClientsUiState.Error -> {}
         }

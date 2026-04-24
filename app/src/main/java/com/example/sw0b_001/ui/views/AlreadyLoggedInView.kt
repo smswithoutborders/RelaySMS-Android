@@ -31,6 +31,9 @@ import com.example.sw0b_001.extensions.context.settingsSetIsLoggedIn
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.VaultsViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun GetMeOutOfHere(
@@ -86,10 +89,14 @@ fun GetMeOutOfHere(
                 .fillMaxWidth()
                 .padding(bottom = 32.dp),
             onClick={
-                context.settingsSetIsLoggedIn(false)
-                navController.navigate(HomepageScreen) {
-                    popUpTo(0) {
-                        inclusive = true
+                CoroutineScope(Dispatchers.Default).launch {
+                    context.settingsSetIsLoggedIn(false)
+                    CoroutineScope(Dispatchers.Main).launch {
+                        navController.navigate(HomepageScreen) {
+                            popUpTo(0) {
+                                inclusive = true
+                            }
+                        }
                     }
                 }
             }) {

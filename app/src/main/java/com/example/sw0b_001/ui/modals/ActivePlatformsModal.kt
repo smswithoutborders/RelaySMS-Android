@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
+import com.example.sw0b_001.ui.viewModels.AccountsViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.views.SupportedPlatformsView
 import kotlinx.coroutines.launch
@@ -18,6 +19,7 @@ fun ActivePlatformsModal(
     sendNewMessageRequested: Boolean,
     navController: NavController,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
+    accountsViewModel: AccountsViewModel,
     isLoggedIn: Boolean = false,
     isCompose: Boolean = false,
     isOnboarding: Boolean = false,
@@ -43,7 +45,9 @@ fun ActivePlatformsModal(
             SupportedPlatformsView(
                 navController = navController,
                 supportedPlatformsViewModel = supportedPlatformsViewModel,
+                accountsViewModel = accountsViewModel,
                 isCompose = isCompose,
+                isLoggedIn = isLoggedIn,
                 isOnboarding = isOnboarding,
             ) {
                 onDismiss()

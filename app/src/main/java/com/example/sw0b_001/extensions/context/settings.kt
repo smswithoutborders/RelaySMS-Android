@@ -2,12 +2,11 @@ package com.example.sw0b_001.extensions.context
 
 import android.content.Context
 import androidx.core.content.edit
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
 import com.example.sw0b_001.data.models.GatewayClients
-import com.example.sw0b_001.ui.viewModels.relaySmsDatastore
+import com.example.sw0b_001.relaySmsDatastore
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
@@ -22,22 +21,6 @@ object Settings {
     const val SETTINGS_STORE_TOKENS_ON_DEVICE = "SETTINGS_STORE_TOKENS_ON_DEVICE"
     const val SETTINGS_IS_EMAIL_LOGIN = "SETTINGS_IS_EMAIL_LOGIN"
     const val SETTINGS_GET_ME_OUT = "SETTINGS_IS_EMAIL_LOGIN"
-
-    const val SETTINGS_LOGGED_IN = "SETTINGS_IS_EMAIL_LOGIN"
-}
-
-val Context.settingsGetIsLoggedIn get(): Boolean {
-    val masterKey: MasterKey = MasterKey.Builder(this)
-        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-        .build()
-
-    return EncryptedSharedPreferences.create(
-        this,
-        Settings.FILENAME,
-        masterKey,
-        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-    ).getBoolean(Settings.SETTINGS_LOGGED_IN, false)
 }
 
 val Context.settingsGetIsGetMeOut get(): Boolean {
@@ -95,6 +78,12 @@ val Context.settingsGetOnboardedCompletely get(): Boolean {
         .getBoolean(Settings.SETTINGS_ONBOARDED_COMPLETELY, false)
 }
 
+val settingsIsLoggedInKey = booleanPreferencesKey("settingsIsLoggedInKey")
+suspend fun Context.settingsSetIsLoggedIn(state: Boolean) {
+    relaySmsDatastore.edit { setting ->
+        setting[settingsIsLoggedInKey] = state
+    }
+}
 
 val settingsDefaultGatewayClientKey = stringPreferencesKey("default_gateway_client")
 suspend fun Context.settingsSetDefaultGatewayClient(gatewayClients: String) {
@@ -149,23 +138,6 @@ fun Context.settingsSetOnboardedCompletely(state: Boolean) {
 fun Context.settingsSetIsEmailLogin(state: Boolean) {
     getSharedPreferences( Settings.FILENAME, Context.MODE_PRIVATE).edit {
         putBoolean(Settings.SETTINGS_IS_EMAIL_LOGIN, state)
-        apply()
-    }
-}
-
-fun Context.settingsSetIsLoggedIn(state: Boolean) {
-    val masterKey: MasterKey = MasterKey.Builder(this)
-        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-        .build()
-
-    EncryptedSharedPreferences.create(
-        this,
-        Settings.FILENAME,
-        masterKey,
-        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-    ).edit {
-        putBoolean(Settings.SETTINGS_LOGGED_IN, state)
         apply()
     }
 }

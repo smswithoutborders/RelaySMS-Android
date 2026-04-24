@@ -2,8 +2,8 @@ package com.example.sw0b_001.data
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel.Companion.MutableStateSerializer
-import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel.Companion.parseLocalImageContent
+import com.example.sw0b_001.ui.viewModels.AccountsViewModel.Companion.MutableStateSerializer
+import com.example.sw0b_001.ui.viewModels.AccountsViewModel.Companion.parseLocalImageContent
 import kotlinx.serialization.Serializable
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
