@@ -9,8 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.Helpers
-import com.example.sw0b_001.data.PublisherGrpcImpl
-import com.example.sw0b_001.data.VaultsGrpcImpl
+import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
+import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
 import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope

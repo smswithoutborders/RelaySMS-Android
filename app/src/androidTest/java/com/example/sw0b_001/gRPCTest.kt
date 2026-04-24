@@ -1,8 +1,8 @@
 package com.example.sw0b_001
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.sw0b_001.data.PublisherGrpcImpl
-import com.example.sw0b_001.data.VaultsGrpcImpl
+import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
+import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
 import com.example.sw0b_001.data.Cryptography
 import org.junit.Assert.assertTrue
 import org.junit.Before

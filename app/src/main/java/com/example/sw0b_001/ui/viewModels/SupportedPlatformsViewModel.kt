@@ -2,8 +2,8 @@ package com.example.sw0b_001.ui.viewModels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.sw0b_001.data.SupportedPlatforms
-import com.example.sw0b_001.data.SupportedPlatformsRepository
+import com.example.sw0b_001.data.repositories.SupportedPlatforms
+import com.example.sw0b_001.data.repositories.SupportedPlatformsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +18,6 @@ sealed class SupportedPlatformsUiState {
 
 @HiltViewModel
 class SupportedPlatformsViewModel @Inject constructor(
-//    @ApplicationContext private val context: Context
     private val repository: SupportedPlatformsRepository
 ): ViewModel(){
     private val _uiState =
@@ -31,16 +30,14 @@ class SupportedPlatformsViewModel @Inject constructor(
 
     fun fetch() {
         viewModelScope.launch {
-            viewModelScope.launch {
-                _uiState.value = SupportedPlatformsUiState.Loading
-                try {
-                    val supportedPlatforms = repository.getSupportedPlatforms()
-                    _uiState.value = SupportedPlatformsUiState.Success(supportedPlatforms)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    _uiState.value = SupportedPlatformsUiState.Error(e.localizedMessage
-                        ?: "Unknown Error")
-                }
+            _uiState.value = SupportedPlatformsUiState.Loading
+            try {
+                val supportedPlatforms = repository.getSupportedPlatforms()
+                _uiState.value = SupportedPlatformsUiState.Success(supportedPlatforms)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _uiState.value = SupportedPlatformsUiState.Error(e.localizedMessage
+                    ?: "Unknown Error")
             }
         }
     }

@@ -2,20 +2,16 @@ package com.example.sw0b_001.extensions.context
 
 import android.content.Context
 import androidx.core.content.edit
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.example.sw0b_001.data.models.GatewayClients
+import com.example.sw0b_001.ui.viewModels.relaySmsDatastore
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 
-
-val Context.relaySmsDatastore: DataStore<Preferences> by preferencesDataStore(name = "relaysms_settings")
 
 object Settings {
     const val FILENAME: String = "com.afkanerd.smswithoutborders.settings"

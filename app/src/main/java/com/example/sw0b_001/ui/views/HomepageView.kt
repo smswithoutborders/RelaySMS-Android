@@ -48,6 +48,9 @@ import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 enum class BottomTabsItems {
@@ -129,7 +132,9 @@ fun HomepageView(
                                 showAddGatewayClientsModal = true
                             },
                             onRefreshClicked = {
-                                gatewayClientViewModel.get(context, refreshSuccess)
+                                CoroutineScope(Dispatchers.Default).launch {
+                                    gatewayClientViewModel.fetch()
+                                }
                             }
                         )
                     }

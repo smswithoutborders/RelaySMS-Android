@@ -255,12 +255,7 @@ fun AddGatewayClientModal(
                                         alias = alias,
                                         manuallyAdded = true,
                                     )
-                                    viewModel.insertGatewayClient(
-                                        context,
-                                        newGatewayClients,
-                                        successRunnable,
-                                        failureRunnable
-                                    )
+                                    viewModel.insert( newGatewayClients )
                                 } else {
                                     gatewayClients.msisdn = phoneNumber
                                     gatewayClients.alias = alias
@@ -292,18 +287,5 @@ fun AddGatewayClientModal(
                 }
             }
         }
-    }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun AddGatewayClientModalPreview() {
-    AppTheme {
-        AddGatewayClientModal(
-            showBottomSheet = true,
-            onDismiss = {},
-            viewModel = remember{ GatewayClientViewModel() },
-        )
     }
 }

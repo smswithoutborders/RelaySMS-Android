@@ -43,9 +43,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Datastore
-import com.example.sw0b_001.data.PublisherGrpcImpl
-import com.example.sw0b_001.data.SupportedPlatforms
-import com.example.sw0b_001.data.VaultsGrpcImpl
+import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
+import com.example.sw0b_001.data.repositories.SupportedPlatforms
+import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.Platforms.ServiceTypes
 import com.example.sw0b_001.data.models.StoredPlatformsEntity

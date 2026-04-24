@@ -6,7 +6,6 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Transaction
 import androidx.room.Update
 import com.example.sw0b_001.data.models.GatewayClients
 import kotlinx.coroutines.flow.Flow
@@ -19,10 +18,10 @@ interface GatewayClientsDao {
     @Query("SELECT * FROM GatewayClients WHERE operatorCode = :operatorCode")
     fun findForOperatorCode(operatorCode: String?): MutableList<GatewayClients>?
 
-    @Insert(onConflict = OnConflictStrategy.Companion.IGNORE)
-    fun insertAll(gatewayClients: MutableList<GatewayClients>)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    fun insert(gatewayClients: List<GatewayClients>)
 
-    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(gatewayClients: GatewayClients): Long
 
     @Delete

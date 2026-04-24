@@ -70,7 +70,7 @@ import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.VaultsGrpcImpl
+import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
 import com.example.sw0b_001.ui.components.CaptchaImage
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.ForgotPasswordScreen

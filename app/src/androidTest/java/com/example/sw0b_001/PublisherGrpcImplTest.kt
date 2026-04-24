@@ -1,7 +1,7 @@
 package com.example.sw0b_001
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.sw0b_001.data.PublisherGrpcImpl
+import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
 import io.grpc.testing.GrpcCleanupRule
 import org.junit.Assert
 import org.junit.Rule
@@ -11,7 +11,7 @@ import java.nio.ByteOrder
 import android.util.Log
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel
-import com.example.sw0b_001.data.VaultsGrpcImpl
+import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient

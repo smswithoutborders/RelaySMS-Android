@@ -75,7 +75,7 @@ import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.VaultsGrpcImpl
+import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
 import com.example.sw0b_001.ui.components.CaptchaImage
 import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
@@ -258,6 +258,9 @@ fun CreateAccountView(
 
                 Spacer(modifier = Modifier.height(16.dp))
                 if(selectedAuthMethod == 0) {
+                    phoneNumber = ""
+                    password = ""
+                    reenterPassword = ""
                     OutlinedCard {
                         Row(
                             modifier = Modifier.padding(8.dp),
@@ -281,8 +284,10 @@ fun CreateAccountView(
                         }
                     }
                 }
-
                 else if(selectedAuthMethod == 1) {
+                    email = ""
+                    password = ""
+                    reenterPassword = ""
                     CountryPickerOutlinedTextField(
                         mobileNumber = phoneNumber,
                         onMobileNumberChange = { phoneNumber = it },

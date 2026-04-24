@@ -1,4 +1,4 @@
-package com.example.sw0b_001.data
+package com.example.sw0b_001.data.grpc
 
 import android.content.Context
 import android.util.Base64
@@ -6,6 +6,7 @@ import com.afkanerd.smswithoutborders.libsignal_doubleratchet.Cryptography
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.extensions.generateRandomBytes
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.Protocols
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.models.Keys
 import com.example.sw0b_001.data.models.RatchetStates
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
@@ -59,7 +60,7 @@ class VaultsGrpcImpl(val context: Context) {
     }
 
     fun fetchLongLivedToken() : ByteArray? {
-        return Datastore.getDatastore(context)?.keysDao()
+        return Datastore.Companion.getDatastore(context)?.keysDao()
             ?.fetchLlt(clientVaultHandshakeKeystoreAliasStaticKeys)
     }
 
@@ -70,7 +71,7 @@ class VaultsGrpcImpl(val context: Context) {
         try {
             val response = getStoredAccountTokens(migrateToDevice)
 
-            val datastore = Datastore.getDatastore(context)
+            val datastore = Datastore.Companion.getDatastore(context)
                 ?: throw Exception("Database could not be opened")
             val platformsToSave = mutableListOf<StoredPlatformsEntity>()
 
@@ -108,7 +109,7 @@ class VaultsGrpcImpl(val context: Context) {
     fun getDeviceId(): ByteArray {
         val message = "RelaySMS DID v1".encodeToByteArray()
 
-        val db = Datastore.getDatastore(context)?.keysDao()
+        val db = Datastore.Companion.getDatastore(context)?.keysDao()
             ?: throw Exception("Could not open database")
 
         val publicKey = db.fetchPublicKey(clientVaultHandshakeKeystoreAliasStaticKeys)
@@ -124,7 +125,7 @@ class VaultsGrpcImpl(val context: Context) {
         serverPublicKey: ByteArray,
         serverNonce: ByteArray,
     ) {
-        val db = Datastore.getDatastore(context)?.keysDao()
+        val db = Datastore.Companion.getDatastore(context)?.keysDao()
             ?: throw Exception("Could not open database")
 
         val ephemeralKeys = db.fetch(clientVaultHandshakeKeystoreAliasEphemeralKeys)
@@ -154,7 +155,7 @@ class VaultsGrpcImpl(val context: Context) {
                         info = info
                     )
                     nkKeys.use { nk ->
-                        RatchetStates.initialize(
+                        RatchetStates.Companion.initialize(
                             context = context,
                             keystoreAlias = ratchetKeystoreAlias,
                             authenticationPublicKey = authenticationPublicKey,
@@ -190,7 +191,7 @@ class VaultsGrpcImpl(val context: Context) {
         try {
             when(type) {
                 OTPCodeVerificationType.CREATE -> {
-                    val createEntityRequest = vault.v2.Vault.CreateEntityRequest.newBuilder().apply {
+                    val createEntityRequest = Vault.CreateEntityRequest.newBuilder().apply {
                         setOwnershipProofResponse(otpCode)
                         setPhoneNumber(phoneNumber)
                         setEmailAddress(email)
@@ -202,7 +203,7 @@ class VaultsGrpcImpl(val context: Context) {
                     llt = response.longLivedToken.toByteArray()
                 }
                 OTPCodeVerificationType.AUTHENTICATE -> {
-                    val authenticateEntityRequest = vault.v2.Vault.AuthenticateEntityRequest.newBuilder().apply {
+                    val authenticateEntityRequest = Vault.AuthenticateEntityRequest.newBuilder().apply {
                         setOwnershipProofResponse(otpCode)
                         setPhoneNumber(phoneNumber)
                         setEmailAddress(email)
@@ -214,7 +215,7 @@ class VaultsGrpcImpl(val context: Context) {
                     llt = response.longLivedToken.toByteArray()
                 }
                 OTPCodeVerificationType.RECOVER -> {
-                    val resetPasswordRequest = vault.v2.Vault.ResetPasswordRequest.newBuilder().apply {
+                    val resetPasswordRequest = Vault.ResetPasswordRequest.newBuilder().apply {
                         setOwnershipProofResponse(otpCode)
                         setPhoneNumber(phoneNumber)
                         setEmailAddress(email)
@@ -233,7 +234,7 @@ class VaultsGrpcImpl(val context: Context) {
                 serverNonce
             )
 
-            val db = Datastore.getDatastore(context)?.keysDao()
+            val db = Datastore.Companion.getDatastore(context)?.keysDao()
                 ?: throw Exception("Could not open database")
 
             val key = db.fetch(clientVaultHandshakeKeystoreAliasStaticKeys)
@@ -307,7 +308,7 @@ class VaultsGrpcImpl(val context: Context) {
         try {
             protocols.generateDH().use { ekp ->
                 generateSigningKeys().use { staticKp ->
-                    val createEntityRequest = vault.v2.Vault.CreateEntityRequest.newBuilder().apply {
+                    val createEntityRequest = Vault.CreateEntityRequest.newBuilder().apply {
                         setCountryCode(countryCode)
                         setPhoneNumber(phoneNumber)
                         setPassword(password)
@@ -321,7 +322,7 @@ class VaultsGrpcImpl(val context: Context) {
                     try {
                         response = entityStub.createEntity(createEntityRequest.build())
 
-                        val db = Datastore.getDatastore(context)?.keysDao()
+                        val db = Datastore.Companion.getDatastore(context)?.keysDao()
                             ?: throw Exception("Failed to open database")
 
                         val staticKeys = Keys(
@@ -395,7 +396,7 @@ class VaultsGrpcImpl(val context: Context) {
         try {
             protocols.generateDH().use { ekp ->
                 generateSigningKeys().use { staticKp ->
-                    val authenticateEntityRequest = vault.v2.Vault.AuthenticateEntityRequest.newBuilder()
+                    val authenticateEntityRequest = Vault.AuthenticateEntityRequest.newBuilder()
                         .apply {
                             setPhoneNumber(phoneNumber)
                             setPassword(password)
@@ -410,7 +411,7 @@ class VaultsGrpcImpl(val context: Context) {
                         response = entityStub
                             .authenticateEntity(authenticateEntityRequest.build())
 
-                        val db = Datastore.getDatastore(context)?.keysDao()
+                        val db = Datastore.Companion.getDatastore(context)?.keysDao()
                             ?: throw Exception("Failed to open database")
 
                         val staticKeys = Keys(
@@ -488,7 +489,7 @@ class VaultsGrpcImpl(val context: Context) {
         try {
             protocols.generateDH().use { ekp ->
                 generateSigningKeys().use { staticKp ->
-                    val resetPasswordEntity = vault.v2.Vault.ResetPasswordRequest.newBuilder()
+                    val resetPasswordEntity = Vault.ResetPasswordRequest.newBuilder()
                         .apply {
                             setPhoneNumber(phoneNumber)
                             setNewPassword(newPassword)
@@ -502,7 +503,7 @@ class VaultsGrpcImpl(val context: Context) {
                     try {
                         response = entityStub.resetPassword(resetPasswordEntity.build())
 
-                        val db = Datastore.getDatastore(context)?.keysDao()
+                        val db = Datastore.Companion.getDatastore(context)?.keysDao()
                             ?: throw Exception("Failed to open database")
 
                         val staticKeys = Keys(
@@ -564,7 +565,7 @@ class VaultsGrpcImpl(val context: Context) {
     fun getStoredAccountTokens(
         migrateToDevice: Boolean
     ): Vault.ListEntityStoredTokensResponse {
-        val request = vault.v2.Vault.ListEntityStoredTokensRequest.newBuilder().apply {
+        val request = Vault.ListEntityStoredTokensRequest.newBuilder().apply {
             setMigrateToDevice(migrateToDevice)
         }.build()
 
@@ -573,12 +574,12 @@ class VaultsGrpcImpl(val context: Context) {
     }
 
     fun deleteEntity() : Vault.DeleteEntityResponse {
-        val deleteEntityRequest = vault.v2.Vault.DeleteEntityRequest.newBuilder().build()
+        val deleteEntityRequest = Vault.DeleteEntityRequest.newBuilder().build()
         return entityStub.deleteEntity(deleteEntityRequest)
     }
 
     fun signGrpcRequest(message: ByteArray): ByteArray {
-        val db = Datastore.getDatastore(context)?.keysDao()
+        val db = Datastore.Companion.getDatastore(context)?.keysDao()
             ?: throw Exception("Could not open database")
 
         val keys = db.fetch(clientVaultHandshakeKeystoreAliasStaticKeys)

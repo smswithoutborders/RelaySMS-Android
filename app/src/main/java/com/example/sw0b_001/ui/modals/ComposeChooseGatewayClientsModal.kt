@@ -37,6 +37,7 @@ import com.example.sw0b_001.ui.views.GatewayClientView
 @Composable
 fun ComposeChooseGatewayClientsModal(
     showBottomSheet: Boolean,
+    gatewayClientViewModel: GatewayClientViewModel,
     onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -87,16 +88,8 @@ fun ComposeChooseGatewayClientsModal(
                         color = MaterialTheme.colorScheme.secondary
                     )
                 }
-                GatewayClientView(remember{ GatewayClientViewModel() })
+                GatewayClientView(gatewayClientViewModel)
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun ComposeChooseGatewayClientsPreview() {
-    AppTheme {
-        ComposeChooseGatewayClientsModal(true,) { }
     }
 }

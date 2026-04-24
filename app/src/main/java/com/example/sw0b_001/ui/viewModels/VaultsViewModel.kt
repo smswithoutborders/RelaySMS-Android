@@ -10,9 +10,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.GatewayClientsCommunications.json
 import com.example.sw0b_001.data.Network
-import com.example.sw0b_001.data.VaultsGrpcImpl
+import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
 import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -26,6 +25,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 
 @HiltViewModel
@@ -40,6 +40,8 @@ class VaultsViewModel @Inject constructor(
     val captchaImage: StateFlow<Bitmap?> = _captchaImage.asStateFlow()
 
     var recaptchaAnswer by mutableStateOf("")
+
+    val vault = VaultsGrpcImpl(context)
 
     @Serializable
     data class CaptchaRequest(val client_id: String )
@@ -65,14 +67,14 @@ class VaultsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.Default){
             try {
                 val response = Network.jsonRequestPost(url,
-                    json.encodeToString(CaptchaRequest(clientId)))
+                    Json.encodeToString(CaptchaRequest(clientId)))
 
                 val result = if(response.response.statusCode in 200..300) {
                     response.result.get()
                 } else {
                     String(response.response.data)
                 }
-                val captchaResponse = json.decodeFromString<CaptchaResponse>(result)
+                val captchaResponse = Json.decodeFromString<CaptchaResponse>(result)
                 val image = Base64.decode(captchaResponse.image, Base64.DEFAULT)
                 _captchaImage.value = BitmapFactory
                     .decodeByteArray(image, 0, image.size)
@@ -95,7 +97,7 @@ class VaultsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.Default) {
             try {
                 val response = Network.jsonRequestPost(url,
-                    json.encodeToString(
+                    Json.encodeToString(
                         CaptchaAnswerRequest(
                             clientId,
                             challengeId,
@@ -109,7 +111,7 @@ class VaultsViewModel @Inject constructor(
                 } else {
                     String(response.response.data)
                 }
-                val captchaResponse = json.decodeFromString<CaptchaAnswerResponse>(result)
+                val captchaResponse = Json.decodeFromString<CaptchaAnswerResponse>(result)
                 if(captchaResponse.success) {
                     onSuccessCallback(captchaResponse.token)
                 } else {
@@ -175,7 +177,6 @@ class VaultsViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             withContext(Dispatchers.Default) {
-                val vault = VaultsGrpcImpl(context)
                 try {
                     vault.refreshStoredTokens(
                         context,
@@ -189,8 +190,6 @@ class VaultsViewModel @Inject constructor(
                     else {
                         onFailureCallback(Pair(false, e.message))
                     }
-                } finally {
-                    vault.shutdown()
                 }
             }
         }

@@ -1,4 +1,4 @@
-package com.example.sw0b_001.data
+package com.example.sw0b_001.data.grpc
 
 import android.content.Context
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.extensions.generateRandomBytes
@@ -10,7 +10,7 @@ import io.grpc.ForwardingClientCall
 import io.grpc.Metadata
 import io.grpc.MethodDescriptor
 
-class GrpcClientInterceptor(val context: Context) : ClientInterceptor{
+class GrpcClientInterceptor(val context: Context) : ClientInterceptor {
     override fun <ReqT : Any?, RespT : Any?> interceptCall(
         method: MethodDescriptor<ReqT?, RespT?>?,
         callOptions: CallOptions?,
@@ -24,7 +24,8 @@ class GrpcClientInterceptor(val context: Context) : ClientInterceptor{
                 val timestamp = (System.currentTimeMillis() / 1000).toString()
                 val nonce = context.generateRandomBytes(16)
                 val methodName = "/${method?.fullMethodName}"
-                val llt = String(VaultsGrpcImpl(context).fetchLongLivedToken()!!,
+                val llt = String(
+                    VaultsGrpcImpl(context).fetchLongLivedToken()!!,
                     Charsets.UTF_8)
 
                 val requestString = methodName.encodeToByteArray() +

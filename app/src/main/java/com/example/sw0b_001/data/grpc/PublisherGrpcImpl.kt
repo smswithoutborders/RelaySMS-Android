@@ -1,10 +1,13 @@
-package com.example.sw0b_001.data
+package com.example.sw0b_001.data.grpc
 
 import android.content.Context
 import android.util.Base64
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.OAuth
+import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
+import publisher.v1.PublisherGrpc
 import publisher.v1.PublisherOuterClass
 
 class PublisherGrpcImpl(val context: Context) {
@@ -15,7 +18,7 @@ class PublisherGrpcImpl(val context: Context) {
         .useTransportSecurity()
         .build()
 
-    private var publisherStub = publisher.v1.PublisherGrpc.newBlockingStub(channel)
+    private var publisherStub = PublisherGrpc.newBlockingStub(channel)
 
     private var oAuthRedirectUrl = "https://relay.smswithoutborders.com/android"
 
@@ -26,10 +29,11 @@ class PublisherGrpcImpl(val context: Context) {
         requestIdentifier: String
     ) : PublisherOuterClass.GetOAuth2AuthorizationUrlResponse {
         val scheme = if (supportsUrlScheme) "true" else "false"
-        val request = publisher.v1.PublisherOuterClass
+        val request = PublisherOuterClass
             .GetOAuth2AuthorizationUrlRequest.newBuilder().apply {
                 setPlatform(availablePlatforms.name)
-                setState(Base64.encodeToString("${availablePlatforms.name},$scheme".encodeToByteArray(),
+                setState(
+                    Base64.encodeToString("${availablePlatforms.name},$scheme".encodeToByteArray(),
                     Base64.DEFAULT))
                 setRedirectUrl(oAuthRedirectUrl)
                 setAutogenerateCodeVerifier(autogenerateCodeVerifier)
@@ -40,7 +44,7 @@ class PublisherGrpcImpl(val context: Context) {
     }
 
     fun revokeOAuthPlatforms(platform: String, account: String) {
-        val request = publisher.v1.PublisherOuterClass.RevokeAndDeleteOAuth2TokenRequest.newBuilder().apply {
+        val request = PublisherOuterClass.RevokeAndDeleteOAuth2TokenRequest.newBuilder().apply {
             setPlatform(platform)
             setAccountIdentifier(account)
         }.build()
@@ -50,7 +54,7 @@ class PublisherGrpcImpl(val context: Context) {
 
     fun revokePNBAPlatforms(platform: String, account: String) :
             PublisherOuterClass.RevokeAndDeletePNBATokenResponse {
-        val request = publisher.v1.PublisherOuterClass.RevokeAndDeletePNBATokenRequest.newBuilder().apply {
+        val request = PublisherOuterClass.RevokeAndDeletePNBATokenRequest.newBuilder().apply {
             setPlatform(platform)
             setAccountIdentifier(account)
         }.build()
@@ -66,7 +70,7 @@ class PublisherGrpcImpl(val context: Context) {
         storeOnDevice: Boolean = false,
         requestIdentifier: String = ""
     ): PublisherOuterClass.ExchangeOAuth2CodeAndStoreResponse {
-        val request = publisher.v1.PublisherOuterClass.ExchangeOAuth2CodeAndStoreRequest.newBuilder().apply {
+        val request = PublisherOuterClass.ExchangeOAuth2CodeAndStoreRequest.newBuilder().apply {
             setPlatform(platform)
             setAuthorizationCode(code)
             setCodeVerifier(codeVerifier)
@@ -80,7 +84,7 @@ class PublisherGrpcImpl(val context: Context) {
 
     fun phoneNumberBaseAuthenticationRequest(phoneNumber: String, platform: String):
             PublisherOuterClass.GetPNBACodeResponse {
-        val request = publisher.v1.PublisherOuterClass.GetPNBACodeRequest.newBuilder().apply {
+        val request = PublisherOuterClass.GetPNBACodeRequest.newBuilder().apply {
             setPlatform(platform)
             setPhoneNumber(phoneNumber)
         }.build()
@@ -95,7 +99,7 @@ class PublisherGrpcImpl(val context: Context) {
         password: String = "",
     ) :
             PublisherOuterClass.ExchangePNBACodeAndStoreResponse {
-        val request = publisher.v1.PublisherOuterClass.ExchangePNBACodeAndStoreRequest.newBuilder().apply {
+        val request = PublisherOuterClass.ExchangePNBACodeAndStoreRequest.newBuilder().apply {
             setPlatform(platform)
             setAuthorizationCode(authorizationCode)
             setPassword(password)

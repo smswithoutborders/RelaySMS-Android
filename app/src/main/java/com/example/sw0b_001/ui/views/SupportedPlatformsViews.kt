@@ -56,7 +56,7 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.SupportedPlatforms
+import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import com.example.sw0b_001.extensions.context.settingsGetIsLoggedIn
 import com.example.sw0b_001.ui.components.IconLoader
 import com.example.sw0b_001.ui.modals.PlatformOptionsModal
@@ -178,8 +178,6 @@ fun PlatformListContent(
     onCompleteCallback: () -> Unit= {},
     onDismiss: () -> Unit = {}
 ) {
-    val context = LocalContext.current
-
     val platformsStates by supportedPlatformsViewModel.uiState.collectAsStateWithLifecycle()
 
     var showPlatformOptions by remember { mutableStateOf(false) }

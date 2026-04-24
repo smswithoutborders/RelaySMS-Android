@@ -55,6 +55,7 @@ import com.example.sw0b_001.ui.modals.ComposeChooseGatewayClientsModal
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel.Companion.verifyPhoneNumberFormat
@@ -71,6 +72,7 @@ fun ComposerInterface(
     type: Platforms.ServiceTypes,
     imageViewModel: ImageViewModel,
     messagesViewModel: MessagesViewModel,
+    gatewayClientViewModel: GatewayClientViewModel,
     platformName: String?,
     onSendCallback: ((Boolean) -> Unit)? = null,
 ) {
@@ -481,7 +483,10 @@ fun ComposerInterface(
                 }
             }
             if(showChooseGatewayClient) {
-                ComposeChooseGatewayClientsModal(showChooseGatewayClient) {
+                ComposeChooseGatewayClientsModal(
+                    showChooseGatewayClient,
+                    gatewayClientViewModel,
+                ) {
                     send()
                 }
             }
@@ -516,19 +521,19 @@ fun ComposerInterface(
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun ComposerInterfacePreview() {
-    AppTheme {
-        ComposerInterface(
-            navController = rememberNavController(),
-            type = Platforms.ServiceTypes.BRIDGE,
-            imageViewModel = remember{ ImageViewModel() },
-            messagesViewModel = remember{ MessagesViewModel() },
-            platformName = "BRIDGE"
-        ){}
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun ComposerInterfacePreview() {
+//    AppTheme {
+//        ComposerInterface(
+//            navController = rememberNavController(),
+//            type = Platforms.ServiceTypes.BRIDGE,
+//            imageViewModel = remember{ ImageViewModel() },
+//            messagesViewModel = remember{ MessagesViewModel() },
+//            platformName = "BRIDGE"
+//        ){}
+//    }
+//}
 
 @Preview(showBackground = true)
 @Composable

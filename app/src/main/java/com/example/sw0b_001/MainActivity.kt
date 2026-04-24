@@ -375,6 +375,7 @@ class MainActivity : AppCompatActivity() {
                     type = composeScreenNav.type,
                     imageViewModel = imageViewModel,
                     messagesViewModel = messagesViewModel,
+                    gatewayClientViewModel = gatewayClientViewModel,
                     onSendCallback = if(composeScreenNav.isOnboarding)
                         onboardingViewModel.callback else null,
                     platformName = composeScreenNav.platformName,
@@ -445,9 +446,6 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
 
         CoroutineScope(Dispatchers.Default).launch {
-            gatewayClientViewModel.get(applicationContext) {
-            }
-
             if(settingsGetIsLoggedIn) {
                 vaultViewModel.validateSession(
                     applicationContext,

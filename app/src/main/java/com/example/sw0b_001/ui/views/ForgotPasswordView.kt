@@ -61,7 +61,7 @@ import com.arpitkatiyarprojects.countrypicker.CountryPickerOutlinedTextField
 import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
 import com.example.sw0b_001.BuildConfig
-import com.example.sw0b_001.data.VaultsGrpcImpl
+import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.components.CaptchaImage
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
@@ -233,6 +233,9 @@ fun ForgotPasswordView(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 if(selectedAuthMethod == 0) {
+                    phoneNumber = ""
+                    password = ""
+                    reenterPassword = ""
                     selectedCountry = CountryDetails(
                         countryCode = "",
                         countryPhoneNumberCode = "",
@@ -252,8 +255,10 @@ fun ForgotPasswordView(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     )
                 }
-
                 else if(selectedAuthMethod == 1) {
+                    email = ""
+                    password = ""
+                    reenterPassword = ""
                     CountryPickerOutlinedTextField(
                         mobileNumber = phoneNumber,
                         onMobileNumberChange = { phoneNumber = it },
@@ -322,7 +327,7 @@ fun ForgotPasswordView(
                             style = MaterialTheme.typography.bodySmall)
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp),
+                    shape = RoundedCornerShape(12.dp),
                     visualTransformation = if (reenterPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     trailingIcon = {

@@ -43,7 +43,7 @@ import com.arpitkatiyarprojects.countrypicker.CountryPickerOutlinedTextField
 import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.SupportedPlatforms
+import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 

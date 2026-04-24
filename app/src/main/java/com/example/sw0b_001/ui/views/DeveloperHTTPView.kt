@@ -1,19 +1,12 @@
 package com.example.sw0b_001.ui.views
 
-import android.util.Base64
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -44,14 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.GatewayClientsCommunications
-import com.example.sw0b_001.data.Network
 import com.example.sw0b_001.ui.theme.AppTheme
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 
 @Composable
@@ -158,32 +144,32 @@ fun DeveloperHTTPView(
                         enabled = !isLoading,
                         onClick = {
                             isLoading = true
-                            val gatewayClientPayload = GatewayClientsCommunications
-                                .GatewayClientRequestPayload(
-                                    address = address,
-                                    text = Base64.encodeToString(payload, Base64.DEFAULT),
-                                )
-                            CoroutineScope(Dispatchers.Default).launch {
-                                try {
-                                    requestPayload = Json
-                                        .encodeToString(gatewayClientPayload)
-                                    val response = Network.jsonRequestPost(
-                                        url = url,
-                                        payload = requestPayload,
-                                    )
-                                    statusCode = response.response.statusCode
-                                    requestStatus = if(statusCode in 200..300) {
-                                        response.result.get()
-                                    } else {
-                                        String(response.response.data)
-                                    }
-                                } catch(e: Exception) {
-                                    e.printStackTrace()
-
-                                    requestStatus = e.message ?: ""
-                                }
-                                isLoading = false
-                            }
+//                            val gatewayClientPayload = GatewayClientsRepo
+//                                .GatewayClientRequestPayload(
+//                                    address = address,
+//                                    text = Base64.encodeToString(payload, Base64.DEFAULT),
+//                                )
+//                            CoroutineScope(Dispatchers.Default).launch {
+//                                try {
+//                                    requestPayload = Json
+//                                        .encodeToString(gatewayClientPayload)
+//                                    val response = Network.jsonRequestPost(
+//                                        url = url,
+//                                        payload = requestPayload,
+//                                    )
+//                                    statusCode = response.response.statusCode
+//                                    requestStatus = if(statusCode in 200..300) {
+//                                        response.result.get()
+//                                    } else {
+//                                        String(response.response.data)
+//                                    }
+//                                } catch(e: Exception) {
+//                                    e.printStackTrace()
+//
+//                                    requestStatus = e.message ?: ""
+//                                }
+//                                isLoading = false
+//                            }
                         }
                     ) {
                         Text(stringResource(R.string.http_request))
