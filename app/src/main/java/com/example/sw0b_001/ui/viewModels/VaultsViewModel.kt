@@ -171,7 +171,6 @@ class VaultsViewModel @Inject constructor(
     }
 
     fun validateSession(
-        context: Context,
         onFailureCallback: (Pair<Boolean, String?>) -> Unit,
         onSuccessCallback: () -> Unit,
     ) {

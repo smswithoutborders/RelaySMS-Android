@@ -11,13 +11,18 @@ import com.example.sw0b_001.data.Composers
 import com.example.sw0b_001.data.models.StoredPlatformsEntity
 import com.example.sw0b_001.extensions.context.settingsGetDefaultGatewayClients
 import com.example.sw0b_001.ui.viewModels.StoredPlatformsViewModel.Companion.ITP_VERSION_VALUE
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class PublisherViewModel : ViewModel() {
+@HiltViewModel
+class PublisherViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
+): ViewModel() {
 
     fun sendPublishingForImage(
-        context: Context,
         imageByteArray: ByteArray,
         account: StoredPlatformsEntity? = null,
         text: ByteArray,
@@ -99,7 +104,6 @@ class PublisherViewModel : ViewModel() {
     }
 
     fun sendPublishingForMessaging(
-        context: Context,
         messageContent: Composers.MessageComposeHandler.MessageContent,
         account: StoredPlatformsEntity,
         subscriptionId: Long,
@@ -151,7 +155,6 @@ class PublisherViewModel : ViewModel() {
     }
 
     fun sendPublishingForEmail(
-        context: Context,
         emailContent: Composers.EmailComposeHandler.EmailContent,
         account: StoredPlatformsEntity?,
         isBridge: Boolean,
@@ -278,7 +281,6 @@ class PublisherViewModel : ViewModel() {
     }
 
     fun sendPublishingForPost(
-        context: Context,
         text: String,
         account: StoredPlatformsEntity,
         subscriptionId: Long,

@@ -1,17 +1,11 @@
 package com.example.sw0b_001.ui.viewModels
 
-import android.app.role.RoleManager
 import android.content.Context
-import android.content.Intent
-import android.os.Build
-import android.provider.Telephony
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.res.stringResource
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
@@ -21,14 +15,21 @@ import com.example.sw0b_001.extensions.context.promptBiometrics
 import com.example.sw0b_001.extensions.context.settingsSetLockDownApp
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.onboarding.InteractiveOnboarding
-import kotlinx.coroutines.CoroutineScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class OnboardingViewModel : ViewModel() {
+@HiltViewModel
+class OnboardingViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
+    @ApplicationContext private val activity: AppCompatActivity,
+    @ApplicationContext private val navController: NavController,
+): ViewModel() {
 
     var showLoginSignupModal by mutableStateOf(false)
     var showAddPlatformsModal by mutableStateOf(false)
@@ -46,13 +47,9 @@ class OnboardingViewModel : ViewModel() {
 
     lateinit var screensList: List<InteractiveOnboarding>
 
-    fun first(
-        context: Context,
-        activity: AppCompatActivity,
-        navController: NavController
-    ) {
+    fun first() {
         if(!::screensList.isInitialized) {
-            screensList = getOnboardingScreens(context, activity, navController)
+            screensList = getOnboardingScreens()
         }
 
         index = 0
@@ -70,11 +67,7 @@ class OnboardingViewModel : ViewModel() {
 
     var callback: ((Boolean) -> Unit)? = null
 
-    private fun getOnboardingScreens(
-        context: Context,
-        activity: AppCompatActivity,
-        navController: NavController,
-    ) : List<InteractiveOnboarding>{
+    private fun getOnboardingScreens() : List<InteractiveOnboarding>{
         return mutableListOf(
             InteractiveOnboarding(
                 title = context.getString(R.string.sms_an_email_right_now),

@@ -44,7 +44,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -99,26 +98,6 @@ fun GetStartedView (
             .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-//        Column(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(top = 50.dp, bottom = 30.dp),
-//            horizontalAlignment = Alignment.CenterHorizontally,
-//        ) {
-//            Text(
-//                text = stringResource(R.string.get_started_with),
-//                style = MaterialTheme.typography.headlineSmall,
-//                color = MaterialTheme.colorScheme.primary,
-//            )
-//
-//            Icon(
-//                painter = painterResource(id = R.drawable.relaysms_blue),
-//                contentDescription = stringResource(R.string.relaysms_logo),
-//                modifier = Modifier.size(width=200.dp, height=50.dp),
-//                tint = MaterialTheme.colorScheme.surfaceTint
-//            )
-//        }
-
         if(!loggedIn) {
             Card(
                 elevation = CardDefaults.cardElevation(8.dp),
