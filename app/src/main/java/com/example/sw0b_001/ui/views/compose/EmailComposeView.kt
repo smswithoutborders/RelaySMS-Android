@@ -95,7 +95,7 @@ fun EmailComposeView(
                     )
                     account?.let {
                         BasicTextField(
-                            value = account.name,
+                            value = account.account,
                             onValueChange = {},
                             textStyle = TextStyle.Default.copy(
                                 color = MaterialTheme.colorScheme.onSurface,

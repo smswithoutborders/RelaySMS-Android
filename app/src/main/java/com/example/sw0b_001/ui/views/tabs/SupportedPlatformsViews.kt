@@ -218,7 +218,7 @@ fun PlatformListContent(
     }
 
 
-Column(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
@@ -329,7 +329,8 @@ Column(
             val isStored = accounts.value?.find { it.name == clickedPlatform?.name }
             PlatformOptionsModal(
                 showPlatformsModal = showPlatformOptions,
-                transportType = TransportTypes.PLATFORM,
+                transportType = if(clickedPlatform == null)
+                    TransportTypes.BRIDGE else TransportTypes.PLATFORM,
                 isActive = isStored != null,
                 isCompose = isCompose,
                 platform = clickedPlatform?.apply {

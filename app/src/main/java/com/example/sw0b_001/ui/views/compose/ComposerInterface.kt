@@ -133,15 +133,15 @@ fun ComposerInterface(
         )
     }
 
-    var showChooseGatewayClient by remember { mutableStateOf(
+    var showChooseGatewayClient by remember { mutableStateOf(false) }
+
+    var isSending by remember { mutableStateOf(false) }
+    var showSelectAccountModal by remember { mutableStateOf(
         when(transportType) {
             TransportTypes.PLATFORM -> true
             else -> false
         }
     ) }
-
-    var isSending by remember { mutableStateOf(false) }
-    var showSelectAccountModal by remember { mutableStateOf(true) }
     var selectedAccount: Accounts? by remember { mutableStateOf(null) }
 
     var showDeveloperDialog by remember{ mutableStateOf(false) }
@@ -274,7 +274,7 @@ fun ComposerInterface(
                 }
             }
 
-            if (showSelectAccountModal && !LocalInspectionMode.current) {
+            if (showSelectAccountModal) {
                 SelectAccountModal(
                     onDismissRequest = {
                         if (selectedAccount == null) {
@@ -290,7 +290,7 @@ fun ComposerInterface(
                         selectedAccount = account
                         showSelectAccountModal = false
                     },
-                    accounts = accounts ?: emptyList()
+                    accounts = accounts?.filter{ it.name == platformName } ?: emptyList()
                 )
             }
 
