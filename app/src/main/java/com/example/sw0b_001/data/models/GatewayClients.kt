@@ -3,8 +3,12 @@ package com.example.sw0b_001.data.models
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 
+@OptIn(ExperimentalSerializationApi::class)
+@JsonIgnoreUnknownKeys
 @Serializable
 @Entity(indices = [Index(value = ["msisdn"], unique = true)])
 data class GatewayClients(

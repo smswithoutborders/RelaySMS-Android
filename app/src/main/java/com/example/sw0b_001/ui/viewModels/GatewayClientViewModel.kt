@@ -1,9 +1,6 @@
 package com.example.sw0b_001.ui.viewModels
 
 import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,7 +8,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.models.GatewayClients
 import com.example.sw0b_001.data.repositories.GatewayClientRepository
+import com.example.sw0b_001.extensions.context.getTelephonyRegion
 import com.example.sw0b_001.extensions.context.settingsDefaultGatewayClientKey
+import com.example.sw0b_001.extensions.context.settingsGetDefaultGatewayClients
+import com.example.sw0b_001.extensions.context.settingsSetDefaultGatewayClient
 import com.example.sw0b_001.relaySmsDatastore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -23,6 +23,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 
 sealed class GatewayClientsUiState {
@@ -52,6 +54,14 @@ class GatewayClientViewModel @Inject constructor(
             Json.decodeFromString<GatewayClients>(currentValue)
         }
 
+    init {
+        try {
+            populateDefaults()
+        } catch(e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
 
     fun get(): LiveData<List<GatewayClients>> {
         if(liveData.value.isNullOrEmpty()) {
@@ -75,6 +85,39 @@ class GatewayClientViewModel @Inject constructor(
                 _uiState.value = GatewayClientsUiState.Error(e.localizedMessage
                     ?: "Unknown Error")
             }
+        }
+    }
+
+    private fun populateDefaults() {
+        viewModelScope.launch {
+            val inputStream = context.assets.open("gateway_clients.json")
+            val buffer = BufferedReader(InputStreamReader(inputStream))
+            val rawGatewayClients = buffer.use { it.readText() }
+
+            val region = context.getTelephonyRegion()
+            val gatewayClients = Json
+                .decodeFromString<ArrayList<GatewayClients>>(rawGatewayClients).apply {
+                    if (context.settingsGetDefaultGatewayClients == null) {
+                        when (region) {
+                            "Africa", "Asia" -> {
+                                firstOrNull { gwc -> gwc.region == region && gwc.isDefault }?.let {
+                                    context.settingsSetDefaultGatewayClient(
+                                        Json.encodeToString(it)
+                                    )
+                                }
+                            }
+
+                            else -> {
+                                firstOrNull { gwc -> gwc.region != "Africa" && gwc.isDefault }?.let {
+                                    context.settingsSetDefaultGatewayClient(
+                                        Json.encodeToString(it)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            insert(gatewayClients)
         }
     }
 
