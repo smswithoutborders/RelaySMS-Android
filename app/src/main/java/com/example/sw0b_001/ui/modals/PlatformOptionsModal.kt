@@ -40,8 +40,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.Accounts
-import com.example.sw0b_001.data.models.Platforms.ServiceTypes
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
+import com.example.sw0b_001.data.repositories.TransportTypes
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.viewModels.AccountUiState
 
@@ -54,6 +54,7 @@ fun PlatformOptionsModal(
     showPlatformsModal: Boolean,
     isActive: Boolean,
     isCompose: Boolean,
+    transportType: TransportTypes,
     platform: SupportedPlatforms?,
     isOnboarding: Boolean = false,
     isRevoking: AccountUiState = AccountUiState.Success(null),
@@ -135,12 +136,13 @@ fun PlatformOptionsModal(
                     Text(
                         text = if (isCompose) {
                             getServiceBasedComposeDescriptions(
-                                platform?.service_type ?: "",
-                                context)
+                                context,
+                                platform?.service_type ?: "")
                         } else {
                             getServiceBasedAvailableDescription(
-                                platform?.service_type ?: "",
-                                context)
+                                context,
+                                platform?.service_type ?: ""
+                            )
                         },
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center
@@ -152,6 +154,7 @@ fun PlatformOptionsModal(
                             platform = platform,
                             navController = navController,
                             isOnboarding = isOnboarding,
+                            transportTypes = transportType,
                         ) {
                             onDismissRequest()
                         }
@@ -215,6 +218,7 @@ private fun RevokeAccountLoading(platform: SupportedPlatforms) {
 
 @Composable
 private fun ComposeMessages(
+    transportTypes: TransportTypes,
     platform: SupportedPlatforms?,
     navController: NavController,
     subscriptionId: Long = -1L,
@@ -225,10 +229,10 @@ private fun ComposeMessages(
         onClick = {
             onDismissRequest()
             navController.navigate(ComposeScreen(
-                type = if(platform != null) ServiceTypes.valueOf(platform.service_type!!)
-                    else ServiceTypes.BRIDGE,
+                transportType = transportTypes,
+                platformName = platform?.name,
                 isOnboarding = isOnboarding,
-                platformName = platform?.name ?: ServiceTypes.BRIDGE.name
+                messageId = null
             ))
         },
         modifier = Modifier.fillMaxWidth()
@@ -263,30 +267,36 @@ private fun ManageAccounts(
     }
 }
 
-private fun getServiceBasedAvailableDescription(serviceType: String, context: Context) : String {
+private fun getServiceBasedAvailableDescription(
+    context: Context,
+    serviceType: String,
+) : String {
     return when(serviceType) {
-        ServiceTypes.EMAIL.name -> {
+        "email" -> {
             context.getString(R.string.adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported)
         }
-        ServiceTypes.MESSAGE.name -> {
+        "message" -> {
             context.getString(R.string.adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported)
         }
-        ServiceTypes.TEXT.name, ServiceTypes.TEST.name -> {
+        "text" -> {
             return context.getString(R.string.adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported)
         }
         else -> context.getString(R.string.your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias)
     }
 }
 
-private fun getServiceBasedComposeDescriptions(serviceType: String, context: Context) : String {
+private fun getServiceBasedComposeDescriptions(
+    context: Context,
+    serviceType: String,
+) : String {
     return when(serviceType) {
-        ServiceTypes.EMAIL.name -> {
+        "email" -> {
             context.getString(R.string.continue_to_send_an_email_from_your_saved_email_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
         }
-        ServiceTypes.MESSAGE.name -> {
+        "message" -> {
             context.getString(R.string.continue_to_send_messages_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
         }
-        ServiceTypes.TEXT.name, ServiceTypes.TEST.name -> {
+        "text" -> {
             context.getString(R.string.continue_to_make_posts_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
         }
         else ->  context.getString(R.string.your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)

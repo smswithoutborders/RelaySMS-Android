@@ -9,7 +9,6 @@ import com.example.sw0b_001.data.dao.GatewayClientsDao
 import com.example.sw0b_001.data.dao.KeysDao
 import com.example.sw0b_001.data.dao.MessagesDao
 import com.example.sw0b_001.data.dao.OAuthDao
-import com.example.sw0b_001.data.dao.PlatformDao
 import com.example.sw0b_001.data.dao.RatchetStatesDAO
 import com.example.sw0b_001.data.dao.StoredPlatformsDao
 import com.example.sw0b_001.data.dao.SupportedPlatformCacheDao
@@ -17,7 +16,6 @@ import com.example.sw0b_001.data.models.Accounts
 import com.example.sw0b_001.data.models.GatewayClients
 import com.example.sw0b_001.data.models.Keys
 import com.example.sw0b_001.data.models.Messages
-import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.RatchetStates
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
@@ -26,7 +24,6 @@ import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 @Database(
     entities = [
         RatchetStates::class,
-        Platforms::class,
         GatewayClients::class,
         Accounts::class,
         SupportedPlatforms::class,
@@ -42,9 +39,8 @@ abstract class Datastore : RoomDatabase() {
         System.loadLibrary("sqlcipher")
     }
 
-    abstract fun platformDao(): PlatformDao?
     abstract fun gatewayClientsDao(): GatewayClientsDao?
-    abstract fun encryptedContentDAO(): MessagesDao?
+    abstract fun messagesDao(): MessagesDao?
     abstract fun storedPlatformsDao(): StoredPlatformsDao?
     abstract fun supportedPlatformsCacheDao(): SupportedPlatformCacheDao?
     abstract fun ratchetStatesDAO(): RatchetStatesDAO?

@@ -37,7 +37,7 @@ class SupportedPlatformsViewModel @Inject constructor(
 
     private var cache: LiveData<List<SupportedPlatforms>> = MutableLiveData()
 
-    fun get():  LiveData<List<SupportedPlatforms>>{
+    fun get(): LiveData<List<SupportedPlatforms>>{
         if(cache.value == null) {
             cache = db.fetch()
         }

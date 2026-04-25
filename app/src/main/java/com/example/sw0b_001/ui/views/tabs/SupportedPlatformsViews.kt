@@ -1,4 +1,4 @@
-package com.example.sw0b_001.ui.views
+package com.example.sw0b_001.ui.views.tabs
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -59,15 +59,16 @@ import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.Accounts
-import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
+import com.example.sw0b_001.data.repositories.TransportTypes
 import com.example.sw0b_001.ui.modals.PlatformOptionsModal
 import com.example.sw0b_001.ui.viewModels.AccountUiState
 import com.example.sw0b_001.ui.viewModels.AccountsViewModel
 import com.example.sw0b_001.ui.viewModels.AccountsViewModel.Companion.oAuth2IntentBuilder
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsUiState
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
-import com.example.sw0b_001.ui.views.addAccounts.PNBAPhoneNumberCodeRequestView
+import com.example.sw0b_001.ui.views.platformAccounts.PNBAPhoneNumberCodeRequestView
+import com.example.sw0b_001.ui.views.threads.makeDefault
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -308,10 +309,10 @@ Column(
 
         val storeCallback : () -> Unit = {
             CoroutineScope(Dispatchers.Default).launch {
-                if(clickedPlatform?.protocol_type == Platforms.ProtocolTypes.oauth2.name) {
+                if(clickedPlatform?.protocol_type == "oauth2") {
                     accountsViewModel.store(clickedPlatform!!)
                 }
-                else if(clickedPlatform?.protocol_type == Platforms.ProtocolTypes.pnba.name) {
+                else if(clickedPlatform?.protocol_type == "pnba") {
                     showPlatformOptions = false
                     storePnbaRequested = true
                 }
@@ -328,6 +329,7 @@ Column(
             val isStored = accounts.value?.find { it.name == clickedPlatform?.name }
             PlatformOptionsModal(
                 showPlatformsModal = showPlatformOptions,
+                transportType = TransportTypes.PLATFORM,
                 isActive = isStored != null,
                 isCompose = isCompose,
                 platform = clickedPlatform?.apply {

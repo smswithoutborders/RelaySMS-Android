@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.views.BottomTabsItems
+import com.example.sw0b_001.ui.views.tabs.BottomTabsItems
 
 @Composable
 fun BottomNavBar(

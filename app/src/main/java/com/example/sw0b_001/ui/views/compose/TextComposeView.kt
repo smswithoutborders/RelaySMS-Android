@@ -9,31 +9,35 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Composers
+import com.example.sw0b_001.data.models.Accounts
+import com.example.sw0b_001.data.models.Messages
 import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.serialization.Serializable
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TextComposeView(
-    textContent: Composers.TextComposeHandler.TextContent,
-    serviceType: Platforms.ServiceTypes,
-) {
+fun TextComposeView( message: Messages? = null, ) {
+    var body by remember{ mutableStateOf(message?.body?.toUtf8String() ?: "") }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
         OutlinedTextField(
-            value = textContent.text.value,
-            onValueChange = { textContent.text.value = it },
+            value = body,
+            onValueChange = { body = it },
             label = {
                 Text(stringResource(R.string.what_s_happening),
                     style = MaterialTheme.typography.bodyMedium)
@@ -60,13 +64,13 @@ data class ReliabilityTestResponsePayload(
     val test_start_time: Int,
 )
 
-@Preview(showBackground = true)
-@Composable
-fun TextComposePreview() {
-    AppTheme(darkTheme = false) {
-        TextComposeView(
-            textContent = Composers.TextComposeHandler.TextContent(),
-            serviceType = Platforms.ServiceTypes.TEXT
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun TextComposePreview() {
+//    AppTheme(darkTheme = false) {
+//        TextComposeView(
+//            textContent = Composers.TextComposeHandler.TextContent(),
+//            serviceType = Platforms.ServiceTypes.TEXT
+//        )
+//    }
+//}

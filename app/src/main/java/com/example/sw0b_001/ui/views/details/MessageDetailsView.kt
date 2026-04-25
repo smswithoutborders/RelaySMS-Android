@@ -1,6 +1,5 @@
 package com.example.sw0b_001.ui.views.details
 
-import android.util.Base64
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -31,22 +31,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.Composers
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.AccountsViewModel
+import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageDetailsView(
+    navController: NavController,
     accountsViewModel: AccountsViewModel,
     messagesViewModel: MessagesViewModel,
-    navController: NavController,
-    isOnboarding: Boolean = false
+    isOnboarding: Boolean = false,
+    messageId: Long? = null
 ) {
     val context = LocalContext.current
     var fromDisplay by remember { mutableStateOf("") }
@@ -54,26 +55,12 @@ fun MessageDetailsView(
     var messageBody by remember { mutableStateOf("") }
     var date by remember { mutableLongStateOf(0L) }
 
-    val message = messagesViewModel.message
-    if (message?.body != null) {
-        try {
-            val contentBytes = Base64.decode(message.body, Base64.DEFAULT)
-            val decomposed = Composers.MessageComposeHandler.decomposeMessage(contentBytes)
-
-            fromDisplay = decomposed.from.value!!
-            toDisplay = decomposed.to.value
-            messageBody = decomposed.message.value
-            date = message.date
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-//            fromDisplay = message.fromAccount ?: stringResource(R.string.unknown)
-            toDisplay = stringResource(R.string.unknown)
-            messageBody = stringResource(R.string.this_message_s_content_could_not_be_displayed)
-            date = message.date
+    val message by messagesViewModel.message.collectAsStateWithLifecycle()
+    LaunchedEffect(Unit) {
+        messageId?.let {
+            messagesViewModel.get(messageId)
         }
     }
-
 
     Scaffold(
         topBar = {
@@ -95,10 +82,8 @@ fun MessageDetailsView(
 //                    }
 //                }
             }) {
-                val messagesViewModel = MessagesViewModel()
-                messagesViewModel.delete(context, messagesViewModel.message!!) {
-                    navController.popBackStack()
-                }
+                messagesViewModel.delete(message!!)
+                navController.popBackStack()
             }
         }
     ) { innerPadding ->

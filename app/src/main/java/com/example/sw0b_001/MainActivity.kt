@@ -60,7 +60,6 @@ import com.example.sw0b_001.extensions.context.settingsGetLockDownApp
 import com.example.sw0b_001.extensions.context.settingsGetOnboardedCompletely
 import com.example.sw0b_001.extensions.context.settingsSetLockDownApp
 import com.example.sw0b_001.ui.navigation.AboutScreen
-import com.example.sw0b_001.ui.navigation.BridgeViewScreen
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.EmailViewScreen
@@ -84,14 +83,14 @@ import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.VaultsViewModel
 import com.example.sw0b_001.ui.views.AboutView
-import com.example.sw0b_001.ui.views.CreateAccountView
-import com.example.sw0b_001.ui.views.ForgotPasswordView
-import com.example.sw0b_001.ui.views.GetMeOutOfHere
-import com.example.sw0b_001.ui.views.HomepageView
-import com.example.sw0b_001.ui.views.LoginView
-import com.example.sw0b_001.ui.views.OtpCodeVerificationView
-import com.example.sw0b_001.ui.views.PasteEncryptedTextView
-import com.example.sw0b_001.ui.views.SettingsView
+import com.example.sw0b_001.ui.views.accounts.CreateAccountView
+import com.example.sw0b_001.ui.views.accounts.ForgotPasswordView
+import com.example.sw0b_001.ui.views.threads.GetMeOutOfHere
+import com.example.sw0b_001.ui.views.tabs.HomepageView
+import com.example.sw0b_001.ui.views.accounts.LoginView
+import com.example.sw0b_001.ui.views.accounts.OtpCodeVerificationView
+import com.example.sw0b_001.ui.views.incoming.PasteEncryptedTextView
+import com.example.sw0b_001.ui.views.settings.SettingsView
 import com.example.sw0b_001.ui.views.WelcomeMainView
 import com.example.sw0b_001.ui.views.compose.ComposerInterface
 import com.example.sw0b_001.ui.views.details.EmailDetailsView
@@ -393,38 +392,34 @@ class MainActivity : AppCompatActivity() {
                 val composeScreenNav: ComposeScreen = backEntry.toRoute()
                 ComposerInterface(
                     navController = navController,
-                    type = composeScreenNav.type,
+                    transportType = composeScreenNav.transportType,
                     imageViewModel = imageViewModel,
-                    messagesViewModel = messagesViewModel,
                     gatewayClientViewModel = gatewayClientViewModel,
-                    onSendCallback = if (composeScreenNav.isOnboarding)
-                        onboardingViewModel.callback else null,
+                    accountsViewModel = accountsViewModel,
                     platformName = composeScreenNav.platformName,
-                    accountsViewModel = accountsViewModel,
+                    supportedPlatformsViewModel = supportedPlatformsViewModel,
+                    messageId = composeScreenNav.messageId,
+                    messagesViewModel = messagesViewModel,
                 )
             }
-            composable<EmailViewScreen> {
+            composable<EmailViewScreen> { backEntry ->
+                val emailScreenNav: EmailViewScreen = backEntry.toRoute()
                 EmailDetailsView(
                     navController = navController,
                     accountsViewModel = accountsViewModel,
                     messagesViewModel = messagesViewModel,
                     imageViewModel = imageViewModel,
+                    transportTypes = emailScreenNav.transportTypes,
+                    messageId = emailScreenNav.messageId
                 )
             }
-            composable<BridgeViewScreen> {
-                EmailDetailsView(
-                    navController = navController,
-                    accountsViewModel = accountsViewModel,
-                    messagesViewModel = messagesViewModel,
-                    imageViewModel = imageViewModel,
-                    isBridge = true
-                )
-            }
-            composable<TextViewScreen> {
+            composable<TextViewScreen> { backEntry ->
+                val textScreenView: TextViewScreen = backEntry.toRoute()
                 TextDetailsView(
                     navController = navController,
+                    platformName = textScreenView.platformName,
                     messagesViewModel = messagesViewModel,
-                    accountsViewModel = accountsViewModel,
+                    messageId = textScreenView.messageId
                 )
             }
             composable<MessageViewScreen> {

@@ -1,4 +1,4 @@
-package com.example.sw0b_001.ui.views
+package com.example.sw0b_001.ui.views.tabs
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,6 +41,8 @@ import com.example.sw0b_001.ui.viewModels.AccountsViewModel
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
+import com.example.sw0b_001.ui.views.threads.InboxView
+import com.example.sw0b_001.ui.views.threads.RecentView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -66,11 +68,10 @@ fun HomepageView(
     drawerCallback: (() -> Unit)? = {},
 ) {
     val context = LocalContext.current
-    val inspectionMode = LocalInspectionMode.current
+    val inboxMessages = messagesViewModel.getInboxMessages()
+        .observeAsState(emptyList())
 
-    val inboxMessages = messagesViewModel.getInboxMessages(context).observeAsState(emptyList()).value
-
-    val messagesPagingSource = messagesViewModel.getMessages(context = context)
+    val messagesPagingSource = messagesViewModel.get()
     val messages = messagesPagingSource.collectAsLazyPagingItems()
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -181,7 +182,7 @@ fun HomepageView(
                     }
                 }
                 BottomTabsItems.BottomBarInboxTab -> {
-                    if (inboxMessages.isNotEmpty()) {
+                    if (inboxMessages.value.isNotEmpty()) {
                         ExtendedFloatingActionButton(
                             onClick = {
                                 navController.navigate(PasteEncryptedTextScreen)
@@ -291,7 +292,7 @@ fun GetTabViews(
             )
         }
         BottomTabsItems.BottomBarCountriesTab -> {
-            GatewayClientView( viewModel = gatewayClientViewModel )
+            GatewayClientView(viewModel = gatewayClientViewModel)
         }
         BottomTabsItems.BottomBarInboxTab -> {
             InboxView(

@@ -23,9 +23,8 @@ import com.example.sw0b_001.data.Network
 import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
 import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
 import com.example.sw0b_001.data.models.Accounts
-import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
-import com.example.sw0b_001.ui.views.BottomTabsItems
+import com.example.sw0b_001.ui.views.tabs.BottomTabsItems
 import com.example.sw0b_001.ui.views.compose.GatewayClientRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -92,13 +91,13 @@ class AccountsViewModel @Inject constructor(
         db.fetchAllList().forEach { sp ->
             val cachedPlatform = cache.fetch(sp.name)
             when(cachedPlatform?.protocol_type) {
-                Platforms.ProtocolTypes.oauth2.name -> {
+                "oauth2" -> {
                     publisherGrpcImpl.revokeOAuthPlatforms(
                         sp.name,
                         sp.account,
                     )
                 }
-                Platforms.ProtocolTypes.pnba.name -> {
+                "pnba" -> {
                     publisherGrpcImpl.revokePNBAPlatforms(
                         sp.name,
                         sp.account
@@ -190,13 +189,13 @@ class AccountsViewModel @Inject constructor(
                 _isRevokingUiState.value = AccountUiState.Loading
                 try {
                     when(platform.protocol_type) {
-                        Platforms.ProtocolTypes.oauth2.name -> {
+                        "oauth2" -> {
                             publisherGrpcImpl.revokeOAuthPlatforms(
                                 account.name,
                                 account.account,
                             )
                         }
-                        Platforms.ProtocolTypes.pnba.name -> {
+                        "pnba" -> {
                             publisherGrpcImpl.revokePNBAPlatforms(
                                 account.name,
                                 account.account
@@ -222,10 +221,10 @@ class AccountsViewModel @Inject constructor(
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             _isStoringUiState.value = AccountUiState.Loading
-            if(platform.protocol_type == Platforms.ProtocolTypes.oauth2.name) {
+            if(platform.protocol_type == "oauth2") {
                 triggerOAuthRequested(platform)
             }
-            else if (platform.protocol_type == Platforms.ProtocolTypes.pnba.name) {
+            else if (platform.protocol_type == "pnba") {
                 triggerPNBARequested(
                     phoneNumber = phoneNumber!!,
                     platform = platform,

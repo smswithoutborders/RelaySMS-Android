@@ -1,4 +1,4 @@
-package com.example.sw0b_001.ui.views
+package com.example.sw0b_001.ui.views.threads
 
 import android.app.role.RoleManager
 import android.content.Context
@@ -57,7 +57,7 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.models.Platforms
+import com.example.sw0b_001.data.repositories.TransportTypes
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.LoginScreen
@@ -201,9 +201,10 @@ fun GetStartedView (
                     onClick = {
                         navController.navigate(
                             ComposeScreen(
-                                type = Platforms.ServiceTypes.BRIDGE,
+                                transportType = TransportTypes.BRIDGE,
                                 isOnboarding = true,
-                                platformName = null
+                                platformName = null,
+                                messageId = null
                             )
                         )},
                     colors = ButtonDefaults

@@ -1,4 +1,4 @@
-package com.example.sw0b_001.ui.views
+package com.example.sw0b_001.ui.views.accounts
 
 import android.content.Context
 import android.content.Intent

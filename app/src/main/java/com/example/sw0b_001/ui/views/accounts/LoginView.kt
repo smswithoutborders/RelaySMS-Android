@@ -1,10 +1,12 @@
-package com.example.sw0b_001.ui.views
+package com.example.sw0b_001.ui.views.accounts
 
 import android.content.Context
 import android.telephony.PhoneNumberUtils
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,6 +39,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -48,11 +51,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -61,10 +69,13 @@ import com.arpitkatiyarprojects.countrypicker.CountryPickerOutlinedTextField
 import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
 import com.example.sw0b_001.BuildConfig
-import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
 import com.example.sw0b_001.ui.components.CaptchaImage
+import com.example.sw0b_001.ui.navigation.CreateAccountScreen
+import com.example.sw0b_001.ui.navigation.ForgotPasswordScreen
 import com.example.sw0b_001.ui.navigation.OTPCodeScreen
+import com.example.sw0b_001.ui.navigation.OnboardingInteractiveScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.VaultsViewModel
 import io.grpc.StatusRuntimeException
@@ -74,10 +85,10 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ForgotPasswordView(
+fun LoginView(
     navController: NavController = rememberNavController(),
-    vaultsViewModel: VaultsViewModel,
-    isOnboarding: Boolean = false
+    vaultViewModel: VaultsViewModel,
+    isOnboarding: Boolean = false,
 ) {
     val context = LocalContext.current
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
@@ -86,31 +97,36 @@ fun ForgotPasswordView(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    var reenterPassword by remember { mutableStateOf("") }
+    var challengeId by remember { mutableStateOf("") }
+    var showCaptcha by remember { mutableStateOf(false) }
+    val captchaImage = vaultViewModel.captchaImage.collectAsState()
+
+
     var passwordVisible by remember { mutableStateOf(false) }
-    var reenterPasswordVisible by remember { mutableStateOf (false) }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     var isLoading by remember { mutableStateOf(false) }
 
-    var challengeId by remember { mutableStateOf("") }
-    var showCaptcha by remember { mutableStateOf(false) }
-    val captchaImage = vaultsViewModel.captchaImage.collectAsState()
-
     var selectedAuthMethod by remember { mutableIntStateOf(0) }
-    val authOptions = listOf(
-        stringResource(R.string.email),
-        stringResource(R.string.phone_number1)
-    )
+    val authOptions = listOf(stringResource(R.string.email), stringResource(R.string.phone_number1))
+
+    LaunchedEffect(selectedAuthMethod) {
+        if(BuildConfig.DEBUG) {
+            if(selectedAuthMethod == 0) {
+                email = "developers@afkanerd.com"
+                phoneNumber = ""
+                password = "dMd2Kmo9#"
+            } else {
+                email = ""
+                phoneNumber = "1123579"
+                password = "dMd2Kmo9#"
+            }
+        }
+    }
 
     BackHandler {
         navController.popBackStack()
-    }
-    if(BuildConfig.DEBUG) {
-        phoneNumber = "1123579"
-        password = "dMd2Kmo9#"
-        reenterPassword = "dMd2Kmo9#"
     }
 
     Scaffold(
@@ -136,22 +152,27 @@ fun ForgotPasswordView(
         if(showCaptcha && captchaImage.value != null) {
             CaptchaImage(captchaImage.value!!, {
                 showCaptcha = false
-                vaultsViewModel.resetCaptchaImage()
-            }) { answer ->
+                vaultViewModel.resetCaptchaImage()
+            }) {
                 showCaptcha = false
-
-                val phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
-                vaultsViewModel.executeRecaptcha(
-                    answer = answer,
+                isLoading = true
+                vaultViewModel.recaptchaAnswer = it
+                vaultViewModel.executeRecaptcha(
+                    answer = it,
                     challengeId = challengeId,
                     onFailureCallback = {
                         isLoading = false
-                    }) {recaptchaToken ->
-                    recoverPassword(
+                    }) { recaptchaToken ->
+
+                    val phoneNumber = if(selectedAuthMethod == 0 ) "" else if(phoneNumber.isNotEmpty())
+                        selectedCountry!!.countryPhoneNumberCode + phoneNumber else ""
+
+                    vaultViewModel.recaptchaAnswer = recaptchaToken
+                    login(
                         context = context,
                         phoneNumber = phoneNumber,
                         password = password,
-                        otpRequiredCallback = {
+                        otpRequiredCallback = { nextAttemptTimestamp ->
                             CoroutineScope(Dispatchers.Main).launch {
                                 navController.navigate(
                                     OTPCodeScreen(
@@ -159,18 +180,36 @@ fun ForgotPasswordView(
                                         loginSignupPhoneNumber = phoneNumber,
                                         loginSignupPassword = password,
                                         countryCode = selectedCountry!!.countryCode,
-                                        otpRequestType = OTPCodeVerificationType.RECOVER,
-                                        nextAttemptTimestamp = it,
+                                        otpRequestType = OTPCodeVerificationType.AUTHENTICATE,
+                                        nextAttemptTimestamp = nextAttemptTimestamp,
                                         isOnboarding = isOnboarding,
-                                        recaptcha = answer
+                                        recaptcha = recaptchaToken
+                                    )
+                                ) {
+                                    if (isOnboarding) {
+                                        popUpTo(OnboardingInteractiveScreen) {
+                                            inclusive = false
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        passwordRequiredCallback = {
+                            CoroutineScope(Dispatchers.Main).launch {
+                                navController.navigate(
+                                    ForgotPasswordScreen(
+                                        isOnboarding = isOnboarding
                                     )
                                 )
                             }
                         },
-                        failedCallback = {
+                        failedCallback = { msg ->
                             isLoading = false
                             CoroutineScope(Dispatchers.Main).launch {
-                                Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                                Toast.makeText(
+                                    context, msg,
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
                         },
                         recaptchaToken = recaptchaToken,
@@ -181,6 +220,7 @@ fun ForgotPasswordView(
                 }
             }
         }
+
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -197,7 +237,7 @@ fun ForgotPasswordView(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = stringResource(R.string.forgot_password_),
+                    text = stringResource(R.string.log_into_relaysms),
                     style = MaterialTheme.typography.headlineMedium,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.primary,
@@ -205,19 +245,42 @@ fun ForgotPasswordView(
                 )
 
                 Text(
-                    text = stringResource(R.string.enter_your_phone_number_and_new_password_and_we_would_send_you_a_code_via_sms_to_reset_your_password),
+                    text = buildAnnotatedString {
+                        append(stringResource(R.string.log_into_your_account_and))
+                        pushStringAnnotation(tag = "save_platforms", annotation = "save_platforms")
+                        withStyle(
+                            style = SpanStyle(
+                                color = MaterialTheme.colorScheme.tertiary,
+                                textDecoration = TextDecoration.Underline
+                            )
+                        ) {
+                            append(stringResource(R.string.save_platforms))
+                        }
+                        pop()
+                        append(stringResource(R.string.for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline_))
+                    },
                     style = MaterialTheme.typography.bodySmall,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .padding(top = 0.dp),
+                        .padding(top = 0.dp)
+                        .apply {
+                            if(!LocalInspectionMode.current) {
+                                this.clickable {
+                                    // Handle click on "save platforms"
+                                }
+                            }
+                        },
                     color = MaterialTheme.colorScheme.onBackground
                 )
             }
 
             Column(
                 modifier = Modifier
+                    .imePadding()
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
                 SingleChoiceSegmentedButtonRow( Modifier.fillMaxWidth() ) {
                     authOptions.forEachIndexed { index, label ->
@@ -233,9 +296,6 @@ fun ForgotPasswordView(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 if(selectedAuthMethod == 0) {
-                    phoneNumber = ""
-                    password = ""
-                    reenterPassword = ""
                     selectedCountry = CountryDetails(
                         countryCode = "",
                         countryPhoneNumberCode = "",
@@ -253,12 +313,10 @@ fun ForgotPasswordView(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(8.dp),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                        enabled = !isLoading
                     )
                 }
                 else if(selectedAuthMethod == 1) {
-                    email = ""
-                    password = ""
-                    reenterPassword = ""
                     CountryPickerOutlinedTextField(
                         mobileNumber = phoneNumber,
                         onMobileNumberChange = { phoneNumber = it },
@@ -280,16 +338,26 @@ fun ForgotPasswordView(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    TextButton(
+                        onClick = {
+                            navController.navigate(ForgotPasswordScreen())
+                        }
+                    ) {
+                        Text(stringResource(R.string.forgot_password))
+                    }
+                }
 
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
                     label = {
-                        Text(
-                            text = stringResource(R.string.new_password),
-                            style = MaterialTheme.typography.bodySmall
-                        )
+                        Text(text = stringResource(R.string.password),
+                            style = MaterialTheme.typography.bodySmall)
                     },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
@@ -300,10 +368,7 @@ fun ForgotPasswordView(
                             Icons.Filled.Visibility
                         else Icons.Filled.VisibilityOff
 
-                        val description =
-                            if (passwordVisible) stringResource(R.string.hide_password) else stringResource(
-                                R.string.show_password
-                            )
+                        val description = if (passwordVisible) stringResource(R.string.hide_password) else stringResource(R.string.show_password)
 
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
                             Icon(imageVector = image, description)
@@ -318,48 +383,18 @@ fun ForgotPasswordView(
                     ),
                     enabled = !isLoading
                 )
-
-                OutlinedTextField(
-                    value = reenterPassword,
-                    onValueChange = { reenterPassword = it },
-                    label = {
-                        Text(text = stringResource(R.string.re_enter_password),
-                            style = MaterialTheme.typography.bodySmall)
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    visualTransformation = if (reenterPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    trailingIcon = {
-                        val image = if (reenterPasswordVisible)
-                            Icons.Filled.Visibility
-                        else Icons.Filled.VisibilityOff
-
-                        val description = if (reenterPasswordVisible) stringResource(R.string.hide_password) else stringResource(R.string.show_password)
-
-                        IconButton(onClick = { reenterPasswordVisible = !reenterPasswordVisible }) {
-                            Icon(imageVector = image, description)
-                        }
-                    },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        disabledContainerColor = Color.Transparent,
-                        focusedBorderColor = MaterialTheme.colorScheme.outline,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                    )
-                )
-
-
             }
-            Spacer(modifier = Modifier.height(24.dp))
 
-            Button(
-                onClick = {
-                    if (password == reenterPassword) {
+            Spacer(modifier = Modifier.weight(1f))
+
+            Column(
+                modifier = Modifier.padding(bottom = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Button(
+                    onClick = {
                         isLoading = true
-
-                        vaultsViewModel.initiateCaptchaRequest({
+                        vaultViewModel.initiateCaptchaRequest({
                             isLoading = false
                             CoroutineScope(Dispatchers.Main).launch {
                                 Toast.makeText(context, it, Toast.LENGTH_LONG).show()
@@ -367,86 +402,106 @@ fun ForgotPasswordView(
                         }) {
                             showCaptcha = true
                             challengeId = it
+                            isLoading = false
                         }
-                    } else {
-                        CoroutineScope(Dispatchers.Main).launch {
-                            Toast.makeText(context,
-                                context.getString(R.string.passwords_do_not_match), Toast.LENGTH_LONG).show()
-                        }
+                    },
+                    enabled = password.isNotEmpty() && !isLoading && when(selectedAuthMethod) {
+                        0 -> email.isNotEmpty()
+                        1 -> PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
+                        else -> false
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp)
+                        .align(Alignment.CenterHorizontally),
+                ) {
+                    if(isLoading) {
+                        CircularProgressIndicator(
+                            color = MaterialTheme.colorScheme.secondary,
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                        )
                     }
-                },
-                enabled = !isLoading && password.isNotEmpty()
-                        && reenterPassword.isNotEmpty() && when(selectedAuthMethod) {
-                    0 -> email.isNotEmpty()
-                    1 -> PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
-                    else -> false },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 16.dp)
-                    .align(Alignment.CenterHorizontally),
-            ) {
-                if(isLoading) {
-                    CircularProgressIndicator(
-                        color = MaterialTheme.colorScheme.secondary,
-                        trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                    else {
+                        Text(stringResource(R.string.log_in))
+                    }
+                }
+
+                TextButton(
+                    onClick = {
+                        isLoading = true
+                        navController.navigate(OTPCodeScreen(
+                            email = email,
+                            loginSignupPhoneNumber = phoneNumber,
+                            loginSignupPassword = password,
+                            countryCode = selectedCountry!!.countryCode,
+                            otpRequestType = OTPCodeVerificationType.AUTHENTICATE,
+                            isOnboarding = isOnboarding,
+                            recaptcha = vaultViewModel.recaptchaAnswer
+                        ))
+                    },
+                    enabled = password.isNotEmpty() && !isLoading && when(selectedAuthMethod) {
+                        0 -> email.isNotEmpty()
+                        1 -> PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
+                        else -> false
+                    },
+                    modifier = Modifier.padding(bottom=16.dp)) {
+                    Text(stringResource(R.string.already_got_code))
+                }
+
+                TextButton(
+                    onClick = { navController
+                        .navigate(CreateAccountScreen(isOnboarding = isOnboarding))
+                    }
+                ) {
+                    Text(
+                        text = buildAnnotatedString {
+                            append(stringResource(R.string.do_not_have_an_account))
+                            pushStringAnnotation(tag = "signup", annotation = "signup")
+                            withStyle(
+                                style = SpanStyle(
+                                    color = MaterialTheme.colorScheme.tertiary,
+                                    textDecoration = TextDecoration.Underline
+                                )
+                            ) {
+                                append(stringResource(R.string.create_account))
+                            }
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 }
-                else {
-                    Text(stringResource(R.string.reset_password))
-                }
-            }
-
-            TextButton(
-                onClick = {
-                    val phoneNumber = if(selectedAuthMethod == 0 ) "" else if(phoneNumber.isNotEmpty())
-                        selectedCountry!!.countryPhoneNumberCode + phoneNumber else ""
-
-                    navController.navigate(OTPCodeScreen(
-                        email = email,
-                        loginSignupPhoneNumber = phoneNumber,
-                        loginSignupPassword = password,
-                        countryCode = selectedCountry!!.countryCode,
-                        otpRequestType = OTPCodeVerificationType.AUTHENTICATE,
-                        isOnboarding = isOnboarding,
-                        recaptcha = vaultsViewModel.recaptchaAnswer,
-                    ))
-                },
-                enabled = !isLoading && password.isNotEmpty()
-                        && reenterPassword.isNotEmpty() && when(selectedAuthMethod) {
-                    0 -> email.isNotEmpty()
-                    1 -> PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber)
-                    else -> false },
-                modifier = Modifier.padding(bottom=16.dp)) {
-                Text(stringResource(R.string.already_got_code))
             }
         }
     }
 }
 
 
-private fun recoverPassword(
+private fun login(
     context: Context,
     email: String,
     phoneNumber: String,
     password: String,
     recaptchaToken: String,
     otpRequiredCallback: (Int) -> Unit,
+    passwordRequiredCallback: () -> Unit = {},
     failedCallback: (String?) -> Unit = {},
     completedCallback: () -> Unit = {},
 ) {
     CoroutineScope(Dispatchers.Default).launch{
         val vaultsGrpcImpl = VaultsGrpcImpl(context)
         try {
-            val response = vaultsGrpcImpl.recoverEntityPassword(
+            val response = vaultsGrpcImpl.authenticateEntity(
                 context,
                 email = email,
                 phoneNumber = phoneNumber,
-                newPassword = password,
-                recaptchaToken = recaptchaToken,
-            ) ?: throw Exception("Grpc response came back null")
+                password = password,
+                recaptchaToken = recaptchaToken
+            ) ?: throw Exception("Response came back null")
 
-
-            if(response.requiresOwnershipProof) {
+            if (response.requiresPasswordReset) {
+                passwordRequiredCallback()
+            } else if(response.requiresOwnershipProof) {
                 otpRequiredCallback(response.nextAttemptTimestamp)
             }
         } catch(e: StatusRuntimeException) {
@@ -461,14 +516,17 @@ private fun recoverPassword(
             completedCallback()
         }
     }
+
 }
 
 @Preview(showBackground = true)
 @Composable
-fun ForgotPasswordPreview() {
+fun LoginViewPreview() {
     val context = LocalContext.current
     AppTheme(darkTheme = false) {
-        ForgotPasswordView(rememberNavController(),
-            remember{ VaultsViewModel(context)})
+        LoginView(rememberNavController(),
+            remember{ VaultsViewModel(context) })
+
     }
 }
+

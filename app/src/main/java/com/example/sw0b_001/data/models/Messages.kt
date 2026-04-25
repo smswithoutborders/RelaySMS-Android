@@ -4,12 +4,17 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-class Messages {
+data class Messages(
     @PrimaryKey(autoGenerate = true)
-    var id: Long = 0
-    var platformLetter: Byte? = null
-    var type: Byte? = null
-    var fromAccount: ByteArray? = null
-    var date: Long = 0
-    var body: ByteArray? = null
-}
+    var id: Long = 0,
+    var accountId: Int,
+    var type: Byte,
+    var date: Long,
+    var to: ByteArray,
+    var platformId: Int? = null,
+    var cc: ByteArray? = null,
+    var bcc: ByteArray? = null,
+    var subject: ByteArray? = null,
+    var body: ByteArray? = null,
+    var image: ByteArray? = null
+)

@@ -1,7 +1,6 @@
 package com.example.sw0b_001.ui.views.details
 
 import android.graphics.Bitmap
-import android.util.Base64
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -35,16 +35,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.Composers
 import com.example.sw0b_001.data.Helpers
+import com.example.sw0b_001.data.models.Accounts
+import com.example.sw0b_001.data.repositories.TransportTypes
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.components.AttachImageView
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.AccountsViewModel
+import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -52,15 +54,16 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmailDetailsView(
+    navController: NavController,
+    transportTypes: TransportTypes,
     accountsViewModel: AccountsViewModel,
     messagesViewModel: MessagesViewModel,
     imageViewModel: ImageViewModel,
-    navController: NavController,
-    isBridge: Boolean = false
+    account: Accounts? = null,
+    messageId: Long? = null
 ) {
     val context = LocalContext.current
-    var from by remember{ mutableStateOf(
-        messagesViewModel.message?.fromAccount ?: "RelaySMS account") }
+    var from by remember{ mutableStateOf( account?.name ) }
     var to by remember{ mutableStateOf("") }
     var cc by remember{ mutableStateOf("") }
     var bcc by remember{ mutableStateOf("") }
@@ -69,66 +72,10 @@ fun EmailDetailsView(
     var date by remember{ mutableLongStateOf(0L) }
     var imageBitmap by remember{ mutableStateOf<Bitmap?>(null) }
 
-    val message = messagesViewModel.message
-    if (message?.body != null) {
-        if (isBridge) {
-            when (message.type) {
-//                Platforms.ServiceTypes.BRIDGE.name -> {
-//                    Composers.EmailComposeHandler
-//                        .decomposeMessage(
-//                            Base64.decode(message.body!!,
-//                                Base64.DEFAULT),
-//                            TODO(),
-//                            TODO(),
-//                            true
-//                        ).apply {
-//                            from = message.fromAccount ?: "Bridge Message"
-//                            to = this.to.value
-//                            cc = this.cc.value
-//                            bcc = this.bcc.value
-//                            subject = this.subject.value
-//                            body = this.body.value
-//                            date = message.date
-//
-//                            this.image.value?.let { byteArray ->
-//                                imageBitmap = BitmapFactory.decodeByteArray(
-//                                    byteArray,
-//                                    0,
-//                                    byteArray.size
-//                                )
-//                            }
-//                        }
-//                }
-////                Platforms.ServiceTypes.BRIDGE_INCOMING.name -> {
-////                    TODO()
-////                }
-            }
-        }
-        else {
-            try {
-                val contentBytes = Base64.decode(message.body!!, Base64.DEFAULT)
-                val decomposed = Composers.EmailComposeHandler
-                    .decomposeMessage(
-                        contentBytes,
-                        TODO(),
-                        TODO(),
-                    )
-
-                from = message.fromAccount ?: "Email Account"
-                to = decomposed.to.value
-                cc = decomposed.cc.value
-                bcc = decomposed.bcc.value
-                subject = decomposed.subject.value
-                body = decomposed.body.value
-                date = message.date
-
-            } catch (e: Exception) {
-                e.printStackTrace()
-                from = message.fromAccount ?: "Email Account"
-                subject = "Error"
-                body = "This message's content could not be displayed."
-                date = message.date
-            }
+    val message by messagesViewModel.message.collectAsStateWithLifecycle()
+    LaunchedEffect(Unit) {
+        messageId?.let {
+            messagesViewModel.get(messageId)
         }
     }
 
@@ -154,10 +101,8 @@ fun EmailDetailsView(
 //                    }
                 }
             }) {
-                val messagesViewModel = MessagesViewModel()
-                messagesViewModel.delete(context, messagesViewModel.message!!) {
-                    navController.popBackStack()
-                }
+                messagesViewModel.delete(message!!)
+                navController.popBackStack()
             }
         }
     ) { innerPadding ->

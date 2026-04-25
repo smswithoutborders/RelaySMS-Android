@@ -35,29 +35,25 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.Composers
-import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.data.models.Accounts
+import com.example.sw0b_001.data.models.Messages
+import com.example.sw0b_001.data.repositories.TransportTypes
 import kotlinx.coroutines.launch
-import kotlinx.serialization.Serializable
 
-@Serializable
-data class GatewayClientRequest(
-    val address: String,
-    val text: String,
-    val date: String,
-    val date_sent: String
-)
+
+fun ByteArray.toUtf8String(): String {
+    return String(this, Charsets.UTF_8)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmailComposeView(
-    isBridge: Boolean,
-    emailContent: Composers.EmailComposeHandler.EmailContent,
-    from: String? = null,
+    type: TransportTypes,
+    account: Accounts? = null,
+    message: Messages? = null,
 ) {
     val inPreviewMode = LocalInspectionMode.current
 
@@ -66,6 +62,14 @@ fun EmailComposeView(
     val coroutineScope = rememberCoroutineScope()
 
     val scrollState = rememberScrollState()
+
+    var from: String? by remember{ mutableStateOf(account?.name) }
+    var to: String by remember{ mutableStateOf(message?.to?.toUtf8String() ?: "") }
+    var cc: String by remember{ mutableStateOf(message?.cc?.toUtf8String() ?: "") }
+    var bcc: String by remember{ mutableStateOf(message?.bcc?.toUtf8String() ?: "") }
+    var subject: String by remember{ mutableStateOf(message?.subject?.toUtf8String() ?: "") }
+    var body: String by remember{ mutableStateOf(message?.body?.toUtf8String() ?: "") }
+    var image by remember{ mutableStateOf(message?.image) }
 
     Column(
         modifier = Modifier
@@ -78,7 +82,7 @@ fun EmailComposeView(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            if(!isBridge) {
+            if(type == TransportTypes.PLATFORM) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
@@ -88,11 +92,10 @@ fun EmailComposeView(
                         text = stringResource(R.string.from),
                         modifier = Modifier.padding(end = 24.dp),
                         fontWeight = FontWeight.Medium
-
                     )
-                    from?.let {
+                    account?.let {
                         BasicTextField(
-                            value = it,
+                            value = account.name,
                             onValueChange = {},
                             textStyle = TextStyle.Default.copy(
                                 color = MaterialTheme.colorScheme.onSurface,
@@ -125,9 +128,9 @@ fun EmailComposeView(
                         fontWeight = FontWeight.Medium
                     )
                     BasicTextField(
-                        value = emailContent.to.value,
+                        value = to,
                         onValueChange = {
-                            emailContent.to.value = it
+                            to = it
                         },
                         textStyle = TextStyle.Default.copy(
                             color = MaterialTheme.colorScheme.onSurface,
@@ -167,10 +170,9 @@ fun EmailComposeView(
                             fontWeight = FontWeight.Medium
                         )
                         BasicTextField(
-                            value = emailContent.cc.value,
+                            value = cc,
                             onValueChange = {
-//                                cc = it
-                                emailContent.cc.value = it
+                                cc = it
                             },
                             textStyle = TextStyle.Default.copy(
                                 color = MaterialTheme.colorScheme.onSurface,
@@ -203,10 +205,9 @@ fun EmailComposeView(
                             fontWeight = FontWeight.Medium
                         )
                         BasicTextField(
-                            value = emailContent.bcc.value,
+                            value = bcc,
                             onValueChange = {
-//                                bcc = it
-                                emailContent.bcc.value = it
+                                bcc = it
                             },
                             textStyle = TextStyle.Default.copy(
                                 color = MaterialTheme.colorScheme.onSurface,
@@ -237,10 +238,9 @@ fun EmailComposeView(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 BasicTextField(
-                    value = emailContent.subject.value,
+                    value = subject,
                     onValueChange = {
-//                        subject = it
-                        emailContent.subject.value = it
+                        subject = it
                     },
                     textStyle = TextStyle.Default.copy(
                         color = MaterialTheme.colorScheme.onSurface,
@@ -250,7 +250,7 @@ fun EmailComposeView(
                     modifier = Modifier
                         .weight(1f),
                     decorationBox = { innerTextField ->
-                        if (emailContent.subject.value.isEmpty()) {
+                        if (subject.isEmpty()) {
                             Text(
                                 text = stringResource(R.string.subject),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -272,10 +272,9 @@ fun EmailComposeView(
             )
 
             BasicTextField(
-                value = emailContent.body.value,
+                value = body,
                 onValueChange = { newValue ->
-//                    body = newValue
-                    emailContent.body.value = newValue
+                    body = newValue
 
                     val lines = newValue.lines()
                     val lineCount = lines.size
@@ -301,7 +300,7 @@ fun EmailComposeView(
                     .fillMaxWidth()
                     .fillMaxHeight(),
                 decorationBox = { innerTextField ->
-                    if (emailContent.body.value.isEmpty()) {
+                    if (body.isEmpty()) {
                         Text(
                             text = stringResource(R.string.compose_email),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -314,19 +313,4 @@ fun EmailComposeView(
             )
         }
     }
-
 }
-
-@Preview(showBackground = true)
-@Composable
-fun EmailComposePreview() {
-    AppTheme(darkTheme = false) {
-        val emailContent = Composers.EmailComposeHandler.EmailContent()
-        EmailComposeView(
-            isBridge = false,
-            emailContent = emailContent,
-            from = ""
-        )
-    }
-}
-

@@ -1,4 +1,4 @@
-package com.example.sw0b_001.ui.views
+package com.example.sw0b_001.ui.views.settings
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -39,7 +39,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.modals.ConfirmationModal
 import com.example.sw0b_001.ui.theme.AppTheme
 

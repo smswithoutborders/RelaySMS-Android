@@ -1,4 +1,4 @@
-package com.example.sw0b_001.ui.views
+package com.example.sw0b_001.ui.views.threads
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -15,39 +15,31 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.models.Messages
-import com.example.sw0b_001.ui.navigation.BridgeViewScreen
+import com.example.sw0b_001.data.repositories.TransportTypes
+import com.example.sw0b_001.ui.navigation.EmailViewScreen
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
-import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.AccountsViewModel
+import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 
 
 @Composable
 fun InboxView(
-    _messages: List<Messages> = emptyList<Messages>(),
+    navController: NavController,
     messagesViewModel: MessagesViewModel,
     accountsViewModel: AccountsViewModel,
-    navController: NavController,
 ) {
-    val context = LocalContext.current
-    val messages: List<Messages> = if(LocalInspectionMode.current) _messages
-    else messagesViewModel.getInboxMessages(context).observeAsState(emptyList()).value
+    val messages by messagesViewModel.getInboxMessages().observeAsState(emptyList())
 
     Box(
         modifier = Modifier
@@ -66,8 +58,12 @@ fun InboxView(
                     RecentMessageCard(
                         message,
                         onClickCallback = {
-                            messagesViewModel.message = message
-                            navController.navigate(BridgeViewScreen)
+                            navController.navigate(
+                                EmailViewScreen(
+                                    transportTypes = TransportTypes.BRIDGE,
+                                    messageId = message.id
+                                )
+                            )
                         },
                     )
                 }
@@ -103,44 +99,3 @@ fun EmptyInboxContent(onPasteNewMessageClicked: () -> Unit) {
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun InboxViewEmptyPreview() {
-    val context = LocalContext.current
-    AppTheme {
-        InboxView(
-            messagesViewModel = remember { MessagesViewModel() },
-            accountsViewModel = remember { AccountsViewModel(context) },
-            navController = NavController(LocalContext.current),
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun InboxScreenMessages_Preview() {
-    AppTheme(darkTheme = false) {
-        val messages = Messages()
-        messages.id = 0
-        messages.type = "email".encodeToByteArray()[0]
-        messages.date = System.currentTimeMillis()
-        messages.fromAccount = "developers@relaysms.me".encodeToByteArray()
-        messages.body = "dev@relaysms.me:::subject here:This is an encrypted content".encodeToByteArray()
-
-        val text = Messages()
-        text.id = 1
-        text.type = "text".encodeToByteArray()[0]
-        text.date = System.currentTimeMillis()
-        text.fromAccount = "@relaysms.me".encodeToByteArray()
-        text.body = "@relaysms.me:Hello world".encodeToByteArray()
-        val context = LocalContext.current
-        InboxView(
-            _messages = listOf(messages, text),
-            messagesViewModel = remember { MessagesViewModel() },
-            accountsViewModel = remember { AccountsViewModel(context) },
-            navController = rememberNavController(),
-        )
-    }
-}
-

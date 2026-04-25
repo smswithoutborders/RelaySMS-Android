@@ -1,7 +1,7 @@
 package com.example.sw0b_001.ui.navigation
 
-import com.example.sw0b_001.data.models.Platforms
-import com.example.sw0b_001.ui.views.OTPCodeVerificationType
+import com.example.sw0b_001.data.repositories.TransportTypes
+import com.example.sw0b_001.ui.views.accounts.OTPCodeVerificationType
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -48,12 +48,6 @@ data class OTPCodeScreen(
 object AboutScreen
 
 @Serializable
-object BridgeViewScreen
-@Serializable
-object EmailViewScreen
-@Serializable
-object TextViewScreen
-@Serializable
 object MessageViewScreen
 
 @Serializable
@@ -69,8 +63,19 @@ data class ForgotPasswordScreen(
 
 @Serializable
 data class ComposeScreen(
-    val type: Platforms.ServiceTypes,
+    val transportType: TransportTypes,
     val platformName: String?,
     val isOnboarding: Boolean = false,
+    val messageId: Long?,
 )
 
+@Serializable
+data class EmailViewScreen(
+    val transportTypes: TransportTypes,
+    val messageId: Long? = null
+)
+@Serializable
+data class TextViewScreen(
+    val platformName: String,
+    val messageId: Long
+)

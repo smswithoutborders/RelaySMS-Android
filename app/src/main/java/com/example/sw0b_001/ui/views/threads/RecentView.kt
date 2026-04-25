@@ -1,4 +1,4 @@
-package com.example.sw0b_001.ui.views
+package com.example.sw0b_001.ui.views.threads
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -16,7 +16,6 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,19 +49,10 @@ fun RecentView(
     isLoggedIn: Boolean = false,
     tabRequestedCallback: () -> Unit
 ) {
-    val context = LocalContext.current
-
-    SideEffect{
-        messagesViewModel.message = null
-    }
-
     var sendNewMessageRequested by remember { mutableStateOf(false) }
 
-    val messagesPagingSource = messagesViewModel.getMessages(context = context)
+    val messagesPagingSource = messagesViewModel.get()
     val messages = messagesPagingSource.collectAsLazyPagingItems()
-
-//    val platforms = storedPlatformsViewModel.getAvailablePlatforms(context)
-//    val platformsList by platforms.observeAsState(initial = emptyList())
 
     val listState = rememberLazyListState()
     Box(Modifier.fillMaxSize()
@@ -87,7 +77,6 @@ fun RecentView(
                         message = message, 
 //                        logo = logo,
                         onClickCallback = { clickedMessage ->
-                            messagesViewModel.message = clickedMessage
                             TODO()
 //                            when (clickedMessage.type?.uppercase()) {
 //                                Platforms.ServiceTypes.EMAIL.name -> {

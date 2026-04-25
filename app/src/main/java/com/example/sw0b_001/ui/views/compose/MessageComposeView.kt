@@ -25,24 +25,22 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.Composers
+import com.example.sw0b_001.data.models.Messages
 import com.example.sw0b_001.extensions.context.getPhoneNumberFromUri
-import com.example.sw0b_001.ui.theme.AppTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -70,19 +68,18 @@ private fun getRecipientFieldInfo(): RecipientFieldInfo {
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
-fun MessageComposeView(
-    messageContent: Composers.MessageComposeHandler.MessageContent,
-    from: String?= null
-) {
-
+fun MessageComposeView(message: Messages? = null) {
     val context = LocalContext.current
     val fieldInfo = getRecipientFieldInfo()
+
+    var to: String by remember { mutableStateOf(message?.to?.toUtf8String() ?: "")}
+    var body: String by remember { mutableStateOf(message?.body?.toUtf8String() ?: "")}
 
     val launcher = rememberLauncherForActivityResult(
         contract = PickPhoneNumberContract()
     ) { uri ->
         uri?.let {
-            messageContent.to.value = context.getPhoneNumberFromUri(it)
+            to = context.getPhoneNumberFromUri(it)
         }
     }
 
@@ -93,35 +90,16 @@ fun MessageComposeView(
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        OutlinedTextField(
-            value = messageContent.from.value ?: "",
-            onValueChange = { messageContent.from.value = it },
-            label = { Text(stringResource(R.string.sender)) },
-            enabled = false,
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                disabledBorderColor = MaterialTheme.colorScheme.outline,
-                disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-        // Recipient Number
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             OutlinedTextField(
-                value = messageContent.to.value,
-                onValueChange = { messageContent.to.value = it },
+                value = to,
+                onValueChange = { to = it },
                 label = { Text(fieldInfo.label, style = MaterialTheme.typography.bodyMedium) },
                 modifier = Modifier.weight(1f),
-                isError = messageContent.to.value.isNotEmpty() &&
-                        !PhoneNumberUtils.isGlobalPhoneNumber(messageContent.to.value),
+                isError = to.isNotEmpty() && !PhoneNumberUtils.isGlobalPhoneNumber(to),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Phone,
                     imeAction = ImeAction.Next
@@ -153,13 +131,11 @@ fun MessageComposeView(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
-
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Message Body
         OutlinedTextField(
-            value = messageContent.message.value,
-            onValueChange = { messageContent.message.value = it },
+            value = body,
+            onValueChange = { body = it },
             label = { Text(
                 stringResource(R.string.message),
                 style = MaterialTheme.typography.bodyMedium) },
@@ -170,25 +146,6 @@ fun MessageComposeView(
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Done
             )
-        )
-    }
-}
-
-
-
-
-@Preview(showBackground = false)
-@Composable
-fun MessageComposePreview() {
-    AppTheme(darkTheme = false) {
-
-        val messageContent by remember{ mutableStateOf(
-            Composers.MessageComposeHandler.MessageContent()
-        )
-        }
-        MessageComposeView(
-            messageContent = messageContent,
-            from = ""
         )
     }
 }

@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import com.example.sw0b_001.ui.viewModels.AccountsViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
-import com.example.sw0b_001.ui.views.SupportedPlatformsView
+import com.example.sw0b_001.ui.views.tabs.SupportedPlatformsView
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)

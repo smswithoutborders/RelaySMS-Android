@@ -1,4 +1,4 @@
-package com.example.sw0b_001.ui.views
+package com.example.sw0b_001.ui.views.threads
 
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity

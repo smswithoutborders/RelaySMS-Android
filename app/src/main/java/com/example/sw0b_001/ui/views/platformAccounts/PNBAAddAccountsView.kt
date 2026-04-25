@@ -1,4 +1,4 @@
-package com.example.sw0b_001.ui.views.addAccounts
+package com.example.sw0b_001.ui.views.platformAccounts
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background

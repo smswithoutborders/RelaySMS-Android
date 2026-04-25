@@ -14,7 +14,7 @@ import com.example.sw0b_001.extensions.context.getStaticKeys
 import com.example.sw0b_001.extensions.context.settingsSetIsEmailLogin
 import com.example.sw0b_001.extensions.context.settingsSetIsLoggedIn
 import com.example.sw0b_001.extensions.sha256
-import com.example.sw0b_001.ui.views.OTPCodeVerificationType
+import com.example.sw0b_001.ui.views.accounts.OTPCodeVerificationType
 import com.google.protobuf.kotlin.toByteString
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder

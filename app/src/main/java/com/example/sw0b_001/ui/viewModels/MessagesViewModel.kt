@@ -10,42 +10,47 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.models.Messages
-import com.example.sw0b_001.data.models.Platforms
+import com.example.sw0b_001.data.repositories.TransportTypes
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class MessagesViewModel : ViewModel() {
-//    var message by mutableStateOf<EncryptedContent?>(null)
-    var message: Messages? = null
+@HiltViewModel
+class MessagesViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
+): ViewModel() {
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    private lateinit var messagesList: LiveData<MutableList<Messages>>
+    private val _message = MutableStateFlow<Messages?>(null)
+    val message: StateFlow<Messages?> = _message
+
     private lateinit var inboxMessageList: LiveData<MutableList<Messages>>
-
-    var pageSize: Int = 50
-    var prefetchDistance: Int = 3 * pageSize
-    var enablePlaceholder: Boolean = true
-    var initialLoadSize: Int = 2 * pageSize
-    var maxSize: Int = PagingConfig.Companion.MAX_SIZE_UNBOUNDED
-
 
     private var conversationsPager: Flow<PagingData<Messages>>? = null
 
-    fun getMessage( context: Context, messageId: Long?): LiveData<Messages>? {
-        if(messageId == null) return null
-        val db = Datastore.getDatastore(context)?.encryptedContentDAO()
-            ?: throw Exception("Could not open database")
-        return db.getLiveData(messageId)
+    val db = Datastore.getDatastore(context)?.messagesDao()
+        ?: throw Exception("Could not open database")
+
+    fun get(messageId: Long){
+        viewModelScope.launch(Dispatchers.IO) {
+            _message.value = db.get(messageId)
+        }
     }
 
-    fun getMessages(context: Context): Flow<PagingData<Messages>> {
+    fun get(): Flow<PagingData<Messages>> {
         if(conversationsPager == null) {
-            val db = Datastore.getDatastore(context)?.encryptedContentDAO()
+            val pageSize = 50
+            val prefetchDistance = 3 * pageSize
+            val enablePlaceholder = true
+            val initialLoadSize: Int = 2 * pageSize
+            val maxSize: Int = PagingConfig.MAX_SIZE_UNBOUNDED
+            val db = Datastore.getDatastore(context)?.messagesDao()
                 ?: throw Exception("Could not open database")
             conversationsPager = Pager(
                 config = PagingConfig(
@@ -63,15 +68,14 @@ class MessagesViewModel : ViewModel() {
         return conversationsPager!!
     }
 
-    fun getInboxMessages(context: Context): LiveData<MutableList<Messages>> {
+    fun getInboxMessages(): LiveData<MutableList<Messages>> {
         viewModelScope.launch {
             if (!::inboxMessageList.isInitialized) {
                 _isLoading.value = true
 
-                val db = Datastore.getDatastore(context)?.encryptedContentDAO()
+                val db = Datastore.getDatastore(context)?.messagesDao()
                     ?: throw Exception("Could not open database")
-                inboxMessageList = db.inbox(Platforms.ServiceTypes.BRIDGE_INCOMING.name)
-                delay(50)
+                inboxMessageList = db.inbox(TransportTypes.BRIDGE.type)
                 _isLoading.value = false
             }
         }
@@ -79,19 +83,16 @@ class MessagesViewModel : ViewModel() {
     }
 
     fun insert(context: Context, messages: Messages) : Long {
-        val db = Datastore.getDatastore(context)?.encryptedContentDAO()
+        val db = Datastore.getDatastore(context)?.messagesDao()
             ?: throw Exception("Could not open database")
         return db.insert(messages)
     }
 
-    fun delete(context: Context, message: Messages, onCompleteCallback: () -> Unit) {
-        viewModelScope.launch(Dispatchers.Default) {
-            val db = Datastore.getDatastore(context)?.encryptedContentDAO()
+    fun delete(message: Messages) {
+        viewModelScope.launch{
+            val db = Datastore.getDatastore(context)?.messagesDao()
                 ?: throw Exception("Could not open database")
             db.delete(message)
-            launch(Dispatchers.Main) {
-                onCompleteCallback()
-            }
         }
     }
 

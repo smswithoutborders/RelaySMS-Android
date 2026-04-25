@@ -1,7 +1,6 @@
 package com.example.sw0b_001.ui.views.details
 
 
-import android.util.Base64
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -32,22 +32,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.Composers
 import com.example.sw0b_001.data.Helpers
+import com.example.sw0b_001.data.repositories.TransportTypes
 import com.example.sw0b_001.ui.appbars.RelayAppBar
+import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
-import com.example.sw0b_001.ui.viewModels.AccountsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextDetailsView(
-    accountsViewModel: AccountsViewModel,
-    messagesViewModel: MessagesViewModel,
     navController: NavController,
-    isOnboarding: Boolean = false,
+    platformName: String,
+    messagesViewModel: MessagesViewModel,
+    messageId: Long,
 ) {
     val context = LocalContext.current
 
@@ -56,23 +57,9 @@ fun TextDetailsView(
     var text by remember { mutableStateOf("") }
     var date by remember { mutableLongStateOf(0L) }
 
-    // Decompose the message content when the view is composed
-    val message = messagesViewModel.message
-    if (message?.body != null) {
-        try {
-            val contentBytes = Base64.decode(message.body, Base64.DEFAULT)
-            val decomposedMessage = Composers.TextComposeHandler
-                .decomposeMessage(contentBytes)
-
-            from = decomposedMessage.from.value!!
-            text = decomposedMessage.text.value
-            date = message.date
-        } catch (e: Exception) {
-//            from = message.fromAccount ?: "Unknown Sender"
-            text = "This message's content could not be displayed."
-            date = message.date
-        }
-
+    val message by messagesViewModel.message.collectAsStateWithLifecycle()
+    LaunchedEffect(Unit) {
+        messagesViewModel.get(messageId)
     }
 
     Scaffold(
@@ -80,28 +67,18 @@ fun TextDetailsView(
             RelayAppBar(
                 navController = navController,
                 editCallback = {
-//                    CoroutineScope(Dispatchers.Default).launch {
-//                        val platform = storedPlatformsViewModel.getAvailablePlatforms(context,
-//                            messagesViewModel.message!!.platformName!!)
-//                        storedPlatformsViewModel.platform = platform
-//                        messagesViewModel.message = message
-//
-//                        CoroutineScope(Dispatchers.Main).launch {
-//                            navController.navigate(
-//                                ComposeScreen(
-//                                    type = Platforms.ServiceTypes.TEXT,
-//                                    isOnboarding = isOnboarding,
-//                                    platformName = message?.platformName
-//                                )
-//                            )
-//                        }
-//                    }
+                    navController.navigate(
+                        ComposeScreen(
+                            transportType = TransportTypes.PLATFORM,
+                            platformName = platformName,
+                            isOnboarding = false,
+                            messageId = messageId
+                        )
+                    )
                 }
             ) {
-                val messagesViewModel = MessagesViewModel()
-                messagesViewModel.delete(context, messagesViewModel.message!!) {
-                    navController.popBackStack()
-                }
+                messagesViewModel.delete(message!!)
+                navController.popBackStack()
             }
         }
     ) { innerPadding ->

@@ -1,4 +1,4 @@
-package com.example.sw0b_001.ui.views
+package com.example.sw0b_001.ui.views.accounts
 
 import android.app.Activity.RESULT_OK
 import android.content.ActivityNotFoundException

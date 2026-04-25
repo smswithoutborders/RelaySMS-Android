@@ -19,7 +19,7 @@ import androidx.navigation.NavController
 import com.example.sw0b_001.ui.viewModels.AccountUiState
 import com.example.sw0b_001.ui.viewModels.AccountsViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
-import com.example.sw0b_001.ui.views.SupportedPlatformsView
+import com.example.sw0b_001.ui.views.tabs.SupportedPlatformsView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -1,4 +1,4 @@
-package com.example.sw0b_001.ui.views
+package com.example.sw0b_001.ui.views.incoming
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -29,12 +29,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.AccountsViewModel
+import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -181,15 +180,4 @@ fun PasteEncryptedTextView(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PasteTextViewPreview() {
-    val context = LocalContext.current
-    PasteEncryptedTextView(
-        accountsViewModel = remember{ AccountsViewModel(context) },
-        messagesViewModel = remember{ MessagesViewModel() },
-        navController = NavController(LocalContext.current)
-    )
 }

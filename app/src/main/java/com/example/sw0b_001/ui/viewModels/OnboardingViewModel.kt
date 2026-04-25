@@ -8,7 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.models.Platforms
+import com.example.sw0b_001.data.repositories.TransportTypes
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.onboarding.InteractiveOnboarding
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -89,9 +89,10 @@ class OnboardingViewModel @Inject constructor(
                     viewModelScope.launch {
                         _navigate.emit {
                             ComposeScreen(
-                                type = Platforms.ServiceTypes.BRIDGE,
+                                transportType = TransportTypes.BRIDGE,
                                 isOnboarding = true,
-                                platformName = null
+                                platformName = null,
+                                messageId = null,
                             )
                         }
                     }

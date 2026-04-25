@@ -20,7 +20,7 @@ interface MessagesDao {
     fun all(type: String): LiveData<MutableList<Messages>>
 
     @Query("SELECT * FROM Messages WHERE type = :type ORDER BY date DESC")
-    fun inbox(type: String): LiveData<MutableList<Messages>>
+    fun inbox(type: Byte): LiveData<MutableList<Messages>>
 
     @Query("DELETE FROM Messages")
     fun deleteAll()
@@ -34,8 +34,8 @@ interface MessagesDao {
     @Delete
     fun deleteMultiple(messages: List<Messages>)
 
-    @Query("SELECT * FROM Messages WHERE id=:encryptedContentId")
-    fun get(encryptedContentId: Long): Messages
+    @Query("SELECT * FROM Messages WHERE id=:id")
+    fun get(id: Long): Messages?
 
     @Query("SELECT * FROM Messages WHERE id=:encryptedContentId")
     fun getLiveData(encryptedContentId: Long): LiveData<Messages>
