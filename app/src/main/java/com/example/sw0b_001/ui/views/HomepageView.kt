@@ -1,6 +1,5 @@
 package com.example.sw0b_001.ui.views
 
-import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -30,9 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.models.Messages
 import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.appbars.GatewayClientsAppBar
 import com.example.sw0b_001.ui.appbars.RecentAppBar
@@ -40,9 +37,9 @@ import com.example.sw0b_001.ui.modals.ActivePlatformsModal
 import com.example.sw0b_001.ui.modals.AddGatewayClientModal
 import com.example.sw0b_001.ui.modals.GetStartedModal
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
+import com.example.sw0b_001.ui.viewModels.AccountsViewModel
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
-import com.example.sw0b_001.ui.viewModels.AccountsViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -59,13 +56,11 @@ enum class BottomTabsItems {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomepageView(
-    _messages: List<Messages> = emptyList<Messages>(),
     navController: NavController,
     accountsViewModel : AccountsViewModel,
     messagesViewModel: MessagesViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
-    imageViewModel: ImageViewModel,
     isLoggedIn: Boolean,
     showTopBar: Boolean = true,
     drawerCallback: (() -> Unit)? = {},
@@ -73,8 +68,7 @@ fun HomepageView(
     val context = LocalContext.current
     val inspectionMode = LocalInspectionMode.current
 
-    val inboxMessages: List<Messages> = if(LocalInspectionMode.current) _messages
-    else messagesViewModel.getInboxMessages(context).observeAsState(emptyList()).value
+    val inboxMessages = messagesViewModel.getInboxMessages(context).observeAsState(emptyList()).value
 
     val messagesPagingSource = messagesViewModel.getMessages(context = context)
     val messages = messagesPagingSource.collectAsLazyPagingItems()
@@ -82,11 +76,6 @@ fun HomepageView(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     var showAddGatewayClientsModal by remember { mutableStateOf(false) }
-
-    val refreshSuccess = Runnable {
-        Toast.makeText(context,
-            context.getString(R.string.gateway_clients_refreshed_successfully), Toast.LENGTH_SHORT).show()
-    }
 
     var sendNewMessageRequested by remember { mutableStateOf(false)}
 

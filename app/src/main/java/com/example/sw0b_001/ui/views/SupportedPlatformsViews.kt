@@ -253,6 +253,8 @@ fun PlatformListContent(
             maxItemsInEachRow = 2
         ) {
             supportedPlatforms.value?.forEach { platform ->
+                val isStored = accounts.value?.find { it.name == platform.name }
+
                 PlatformCard(
                     logo = if(platform.logo != null)
                         BitmapFactory.decodeByteArray(
@@ -264,7 +266,7 @@ fun PlatformListContent(
                     modifier = Modifier
                         .padding(8.dp)
                         .width(130.dp),
-                    isActive = false,
+                    isActive = isStored != null,
                     isEnabled = isLoggedIn,
                 ) {
                     clickedPlatform = platform
@@ -343,7 +345,7 @@ fun PlatformCard(
                 )
             }
             Text(
-                text = platform?.name ?: "RelaySMS",
+                text = platform?.name?.replaceFirstChar { it.uppercase() } ?: "RelaySMS",
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
