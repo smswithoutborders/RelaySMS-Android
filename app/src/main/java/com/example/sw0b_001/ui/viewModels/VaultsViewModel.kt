@@ -162,10 +162,9 @@ class VaultsViewModel @Inject constructor(
                     return@withContext
                 } catch(e: StatusRuntimeException) {
                     e.printStackTrace()
-                    if(e.status.code != Status.UNAUTHENTICATED.code) {
-                        throw e
+                    if(e.status.code == Status.UNAUTHENTICATED.code) {
+                        failedCallback()
                     }
-                    failedCallback()
                 }
             }
         }

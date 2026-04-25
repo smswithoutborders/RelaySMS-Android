@@ -47,6 +47,16 @@ android {
     }
 
     buildTypes {
+        profiling {
+            // This copies the configuration from the release build
+            initWith release
+
+            // Uses debug keys so you can deploy easily from Android Studio
+            signingConfig signingConfigs.debug
+
+            // Ensures dependencies that only have release/debug versions still work
+            matchingFallbacks = ['release']
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -97,6 +107,7 @@ android {
     packagingOptions {
         pickFirst 'META-INF/androidx.localbroadcastmanager_localbroadcastmanager.version'
     }
+
 }
 
 protobuf {

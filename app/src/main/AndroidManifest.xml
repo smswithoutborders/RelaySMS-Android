@@ -35,6 +35,7 @@
         android:theme="@style/Theme.main"
         android:usesCleartextTraffic="false"
         tools:replace="android:label">
+
         <activity
             android:name=".EntryActivity"
             android:exported="false" />

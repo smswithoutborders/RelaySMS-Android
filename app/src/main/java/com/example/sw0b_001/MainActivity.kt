@@ -221,14 +221,18 @@ class MainActivity : AppCompatActivity() {
 
         LaunchedEffect(isLoggedIn) {
             if(isLoggedIn) {
-                vaultViewModel.validateSession {
-                    val route = if(isDefault()) HomeScreenNav()
-                    else HomepageScreen
-                    navController.navigate(GetMeOutScreen) {
-                        popUpTo(route) {
-                            inclusive = true
+                try {
+                    vaultViewModel.validateSession {
+                        val route = if(isDefault()) HomeScreenNav()
+                        else HomepageScreen
+                        navController.navigate(GetMeOutScreen) {
+                            popUpTo(route) {
+                                inclusive = true
+                            }
                         }
                     }
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
             }
         }
