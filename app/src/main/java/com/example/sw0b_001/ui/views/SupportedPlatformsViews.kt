@@ -29,6 +29,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -51,6 +52,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
@@ -59,6 +61,7 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import com.example.sw0b_001.ui.modals.PlatformOptionsModal
 import com.example.sw0b_001.ui.viewModels.AccountsViewModel
+import com.example.sw0b_001.ui.viewModels.SupportedPlatformsUiState
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import java.util.Locale
 
@@ -176,7 +179,7 @@ fun PlatformListContent(
     onCompleteCallback: () -> Unit= {},
     onDismiss: () -> Unit = {}
 ) {
-//    val platformsStates by supportedPlatformsViewModel.uiState.collectAsStateWithLifecycle()
+    val states by supportedPlatformsViewModel.uiState.collectAsStateWithLifecycle()
     val supportedPlatforms = supportedPlatformsViewModel.get().observeAsState()
     val accounts = accountsViewModel.get().observeAsState()
 
@@ -225,6 +228,13 @@ fun PlatformListContent(
         )
 
         Spacer(modifier = Modifier.padding(8.dp))
+
+        when(val state = states) {
+            is SupportedPlatformsUiState.Loading -> {
+                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+            }
+            else -> {}
+        }
 
         if(LocalInspectionMode.current || !isLoggedIn) {
             Text(

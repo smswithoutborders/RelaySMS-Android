@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room.databaseBuilder
 import androidx.room.RoomDatabase
 import com.afkanerd.smswithoutborders_libsmsmms.data.Cryptography.getDatabasePassword
+import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.data.dao.GatewayClientsDao
 import com.example.sw0b_001.data.dao.KeysDao
 import com.example.sw0b_001.data.dao.MessagesDao
@@ -13,12 +14,12 @@ import com.example.sw0b_001.data.dao.PlatformDao
 import com.example.sw0b_001.data.dao.RatchetStatesDAO
 import com.example.sw0b_001.data.dao.StoredPlatformsDao
 import com.example.sw0b_001.data.dao.SupportedPlatformCacheDao
+import com.example.sw0b_001.data.models.Accounts
 import com.example.sw0b_001.data.models.GatewayClients
 import com.example.sw0b_001.data.models.Keys
 import com.example.sw0b_001.data.models.Messages
 import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.RatchetStates
-import com.example.sw0b_001.data.models.Accounts
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 
@@ -68,7 +69,11 @@ abstract class Datastore : RoomDatabase() {
                             klass = Datastore::class.java,
                             databaseFile.absolutePath,
                         )
-                            .openHelperFactory(SupportOpenHelperFactory(rawBytes))
+                            .also {
+                                if(!BuildConfig.DEBUG)
+                                    it.openHelperFactory(
+                                        SupportOpenHelperFactory(rawBytes))
+                            }
                             .fallbackToDestructiveMigration(false)
                             .build()
                     }
