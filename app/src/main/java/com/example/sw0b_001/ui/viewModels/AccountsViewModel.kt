@@ -1,11 +1,8 @@
 package com.example.sw0b_001.ui.viewModels
 
 import android.content.Context
-import android.database.Cursor
 import android.net.Uri
-import android.provider.ContactsContract
 import android.util.Base64
-import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
@@ -19,6 +16,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.Network
@@ -31,16 +29,22 @@ import com.example.sw0b_001.ui.views.BottomTabsItems
 import com.example.sw0b_001.ui.views.compose.GatewayClientRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.grpc.StatusRuntimeException
 import jakarta.inject.Inject
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
+
+sealed class AccountUiState {
+    object Loading: AccountUiState()
+    data class Success(val url: Uri?): AccountUiState()
+    data class Error(val exception: Throwable): AccountUiState()
+}
 
 @HiltViewModel
 class AccountsViewModel @Inject constructor(
@@ -50,6 +54,14 @@ class AccountsViewModel @Inject constructor(
     private var storedLiveData: LiveData<List<Accounts>> = MutableLiveData()
 
     var bottomTabsItem by mutableStateOf(BottomTabsItems.BottomBarRecentTab)
+
+    private val _isStoringUiState =
+        MutableStateFlow<AccountUiState>(AccountUiState.Success(null))
+    val isStoringUiState: StateFlow<AccountUiState> = _isStoringUiState
+
+    private val _isRevokingUiState =
+        MutableStateFlow<AccountUiState>(AccountUiState.Success(null))
+    val isRevokingUiState: StateFlow<AccountUiState> = _isRevokingUiState
 
     // Selection mode properties
     var isSelectionMode by mutableStateOf(false)
@@ -111,39 +123,6 @@ class AccountsViewModel @Inject constructor(
             return Pair(image, text)
         }
 
-        fun verifyPhoneNumberFormat(phoneNumber: String): Boolean {
-            val newPhoneNumber = phoneNumber
-                .replace("[\\s-]".toRegex(), "")
-            return newPhoneNumber.matches("^\\+[1-9]\\d{1,14}$".toRegex())
-        }
-
-        fun getPhoneNumberFromUri(context: Context, uri: Uri): String {
-            var phoneNumber: String? = null
-            val projection: Array<String> = arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER)
-
-            try {
-                val cursor: Cursor? = context.contentResolver.query(
-                    uri,
-                    projection,
-                    null,
-                    null,
-                    null
-                )
-                cursor?.use {
-                    if (it.moveToFirst()) {
-                        val numberIndex = it.getColumnIndex(ContactsContract.Contacts.CONTENT_URI.toString())
-                        if (numberIndex >= 0) {
-                            phoneNumber = it.getString(numberIndex)
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                throw e
-            }
-
-            return phoneNumber ?: ""
-        }
 
         fun networkRequest(
             url: String,
@@ -160,64 +139,7 @@ class AccountsViewModel @Inject constructor(
             }
         }
 
-        fun triggerAddPlatformRequest(
-            context: Context,
-            platform: SupportedPlatforms,
-            onCompletedCallback: () -> Unit
-        ) {
-            CoroutineScope(Dispatchers.Default).launch {
-                val db = Datastore.getDatastore(context)?.keysDao()
-                    ?: throw Exception("Could not open database")
-
-                val publisherPublicKey = db
-                    .fetchPublicKey(VaultsGrpcImpl.clientVaultHandshakeKeystoreAliasStaticKeys)
-                    ?: throw Exception("Missing private key in credentials for signing")
-                when(platform.protocol_type) {
-                    Platforms.ProtocolTypes.oauth2.name -> {
-                        PublisherGrpcImpl(context).use { publisherGrpcImpl ->
-                            val requestIdentifier = Base64.encodeToString(
-                                publisherPublicKey, Base64.NO_WRAP)
-                            try {
-                                val response = publisherGrpcImpl.getOAuthURL(
-                                    availablePlatforms = platform,
-                                    autogenerateCodeVerifier = true,
-                                    supportsUrlScheme = platform.support_url_scheme!!,
-                                    requestIdentifier = requestIdentifier
-                                )
-
-                                PublisherGrpcImpl.storeOauthRequestCodeVerifier(
-                                    context,
-                                    platform.name,
-                                    response.codeVerifier.toByteArray()
-                                )
-
-                                val intentUri = response.authorizationUrl.toUri()
-                                val intent = oAuth2IntentBuilder(context)
-                                intent.launchUrl(context, intentUri)
-                            } catch(e: StatusRuntimeException) {
-                                e.printStackTrace()
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    e.status.description?.let {
-                                        Toast.makeText(context, e.status.description,
-                                            Toast.LENGTH_SHORT).show()
-                                    }
-                                }
-                            } catch(e: Exception) {
-                                CoroutineScope(Dispatchers.Main).launch {
-                                    Toast.makeText(context, e.message, Toast.LENGTH_SHORT)
-                                        .show()
-                                }
-                            } finally {
-                                onCompletedCallback()
-                            }
-                        }
-                    }
-                }
-            }
-
-        }
-
-        private fun oAuth2IntentBuilder(context: Context): CustomTabsIntent {
+        fun oAuth2IntentBuilder(context: Context): CustomTabsIntent {
             // get the current toolbar background color (this might work differently in your app)
             @ColorInt val colorPrimaryLight = ContextCompat.getColor( context,
                 R.color.md_theme_primary)
@@ -254,4 +176,79 @@ class AccountsViewModel @Inject constructor(
             }
         }
     }
+
+    fun revoke(
+        platform: SupportedPlatforms,
+        account: Accounts,
+    ) {
+        viewModelScope.launch {
+            PublisherGrpcImpl(context).use { publisherGrpcImpl ->
+                _isRevokingUiState.value = AccountUiState.Loading
+                try {
+                    when(platform.protocol_type) {
+                        Platforms.ProtocolTypes.oauth2.name -> {
+                            publisherGrpcImpl.revokeOAuthPlatforms(
+                                account.name,
+                                account.account,
+                            )
+                        }
+                        Platforms.ProtocolTypes.pnba.name -> {
+                            publisherGrpcImpl.revokePNBAPlatforms(
+                                account.name,
+                                account.account
+                            )
+                        }
+                    }
+
+                    db.delete(account.id)
+                    _isRevokingUiState.value = AccountUiState.Success(null)
+                } catch(e: Exception) {
+                    e.printStackTrace()
+                    _isRevokingUiState.value = AccountUiState.Error(e)
+                }
+            }
+        }
+    }
+
+    fun store(platform: SupportedPlatforms) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val db = Datastore.getDatastore(context)?.keysDao()
+                ?: throw Exception("Could not open database")
+
+            val publisherPublicKey = db
+                .fetchPublicKey(VaultsGrpcImpl.clientVaultHandshakeKeystoreAliasStaticKeys)
+                ?: throw Exception("Missing private key in credentials for signing")
+
+            _isStoringUiState.value = AccountUiState.Loading
+            if(platform.protocol_type == Platforms.ProtocolTypes.oauth2.name) {
+                PublisherGrpcImpl(context).use { publisherGrpcImpl ->
+                    val requestIdentifier = Base64.encodeToString(
+                        publisherPublicKey, Base64.NO_WRAP)
+                    try {
+                        val response = publisherGrpcImpl.getOAuthURL(
+                            availablePlatforms = platform,
+                            autogenerateCodeVerifier = true,
+                            supportsUrlScheme = platform.support_url_scheme!!,
+                            requestIdentifier = requestIdentifier
+                        )
+
+                        PublisherGrpcImpl.storeOauthRequestCodeVerifier(
+                            context,
+                            platform.name,
+                            response.codeVerifier.toByteArray()
+                        )
+
+                        val intentUri = response.authorizationUrl.toUri()
+                        _isStoringUiState.value = AccountUiState.Success(intentUri)
+                    } catch(e: Exception) {
+                        e.printStackTrace()
+                        _isStoringUiState.value = AccountUiState.Error(e)
+                    }
+                }
+            }
+        }
+
+    }
+
+
 }

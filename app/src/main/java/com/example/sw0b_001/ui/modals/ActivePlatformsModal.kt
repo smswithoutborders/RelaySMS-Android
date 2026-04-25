@@ -16,18 +16,16 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivePlatformsModal(
-    sendNewMessageRequested: Boolean,
     navController: NavController,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
     accountsViewModel: AccountsViewModel,
+    sendNewMessageRequested: Boolean,
     isLoggedIn: Boolean = false,
     isCompose: Boolean = false,
     isOnboarding: Boolean = false,
     onDismiss: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(
-//        initialValue = SheetValue.Expanded,
-//        skipHiddenState = false,
         skipPartiallyExpanded = isLoggedIn
     )
     val scope = rememberCoroutineScope()
@@ -49,23 +47,9 @@ fun ActivePlatformsModal(
                 isCompose = isCompose,
                 isLoggedIn = isLoggedIn,
                 isOnboarding = isOnboarding,
-            ) {
-                onDismiss()
-            }
+            )
         }
 
     }
 
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun ActivePlatformsModalPreview() {
-//    AppTheme {
-//        ActivePlatformsModal(
-//            sendNewMessageRequested = true,
-//            onDismiss = {},
-//            navController = NavController(LocalContext.current)
-//        )
-//    }
-//}

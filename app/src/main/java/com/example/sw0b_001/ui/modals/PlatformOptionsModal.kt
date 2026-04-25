@@ -2,7 +2,6 @@ package com.example.sw0b_001.ui.modals
 
 import android.content.Context
 import android.graphics.BitmapFactory
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -40,7 +39,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
 import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
 import com.example.sw0b_001.data.models.Accounts
@@ -48,7 +46,7 @@ import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.Platforms.ServiceTypes
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import com.example.sw0b_001.ui.navigation.ComposeScreen
-import com.example.sw0b_001.ui.viewModels.AccountsViewModel.Companion.triggerAddPlatformRequest
+import com.example.sw0b_001.ui.viewModels.AccountUiState
 import com.example.sw0b_001.ui.views.addAccounts.PNBAPhoneNumberCodeRequestView
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
@@ -66,16 +64,17 @@ fun PlatformOptionsModal(
     isCompose: Boolean,
     platform: SupportedPlatforms?,
     isOnboarding: Boolean = false,
-    onCompleteCallback: () -> Unit= {},
+    isRevoking: AccountUiState = AccountUiState.Success(null),
+    isStoring: AccountUiState = AccountUiState.Success(null),
+    revokeCallback: (Accounts) -> Unit,
+    storeCallback: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     val context = LocalContext.current
-    var isAddLoading by remember { mutableStateOf(false) }
-    var isRevokeLoading by remember { mutableStateOf(false) }
     var removeAccountRequested by remember { mutableStateOf(false) }
     var revokeAccountConfirmationRequested by remember { mutableStateOf(false) }
 
-    var account by remember { mutableStateOf<Accounts?>(null) }
+    var selectedAccount: Accounts? by remember { mutableStateOf(null) }
 
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Expanded,
@@ -94,7 +93,7 @@ fun PlatformOptionsModal(
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if(isRevokeLoading) {
+                if(isRevoking == AccountUiState.Loading) {
                     RevokeAccountLoading(platform!!)
                 }
                 else if(revokeAccountConfirmationRequested) {
@@ -102,16 +101,7 @@ fun PlatformOptionsModal(
                         showBottomSheet = revokeAccountConfirmationRequested,
                         onContinue = {
                             revokeAccountConfirmationRequested = false
-                            isRevokeLoading = true
-                            triggerAccountRevoke(
-                                context = context,
-                                platform = platform!!,
-                                account = account!!,
-                                onCompletedCallback = {
-                                    isRevokeLoading = false
-                                    account = null
-                                }
-                            )
+                            revokeCallback(selectedAccount!!)
                         }
                     ) {
                         revokeAccountConfirmationRequested = false
@@ -124,13 +114,13 @@ fun PlatformOptionsModal(
                         onAccountSelected = { storedAccount ->
                             removeAccountRequested = false
                             revokeAccountConfirmationRequested = true
-                            account = storedAccount
+                            selectedAccount = storedAccount
                         }
                     ) {
                         removeAccountRequested = false
                     }
                 }
-                else if(isAddLoading) {
+                else if(isStoring == AccountUiState.Loading) {
                     AddAccountLoading(
                         context,
                         platform!!
@@ -182,20 +172,8 @@ fun PlatformOptionsModal(
                         ManageAccounts(
                             isActive,
                             isOnboarding = isOnboarding,
-                            addAccountsCallback = {
-                                isAddLoading = true
-                                triggerAddPlatformRequest(
-                                    context = context,
-                                    platform = platform
-                                ) {
-                                    isAddLoading = false
-                                    onDismissRequest()
-                                    onCompleteCallback()
-                                }
-                            },
-                            removeAccountsCallback = {
-                                removeAccountRequested = true
-                            }
+                            addAccountsCallback = storeCallback,
+                            removeAccountsCallback = { removeAccountRequested = true }
                         )
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -223,50 +201,6 @@ private fun RevokeAccountLoading(platform: SupportedPlatforms) {
             color = MaterialTheme.colorScheme.secondary,
             trackColor = MaterialTheme.colorScheme.surfaceVariant,
         )
-    }
-}
-
-private fun triggerAccountRevoke(
-    context: Context,
-    platform: SupportedPlatforms,
-    account: Accounts,
-    onCompletedCallback: () -> Unit
-) {
-    CoroutineScope(Dispatchers.Default).launch {
-        val publisherGrpcImpl = PublisherGrpcImpl(context)
-        try {
-            when(platform.protocol_type) {
-                Platforms.ProtocolTypes.oauth2.name -> {
-                    publisherGrpcImpl.revokeOAuthPlatforms(
-                        account.name!!,
-                        account.account!!,
-                    )
-                }
-                Platforms.ProtocolTypes.pnba.name -> {
-                    publisherGrpcImpl.revokePNBAPlatforms(
-                        account.name!!,
-                        account.account!!
-                    )
-                }
-            }
-
-            TODO("Move to view models")
-            Datastore.getDatastore(context)?.storedPlatformsDao()?.delete(account.id)
-            onCompletedCallback()
-        } catch(e: StatusRuntimeException) {
-            e.printStackTrace()
-
-            CoroutineScope(Dispatchers.Main).launch {
-                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
-            }
-        } catch(e: Exception) {
-            e.printStackTrace()
-            CoroutineScope(Dispatchers.Main).launch {
-                Toast.makeText(context, e.message, Toast.LENGTH_SHORT).show()
-            }
-        } finally {
-            publisherGrpcImpl.shutdown()
-        }
     }
 }
 

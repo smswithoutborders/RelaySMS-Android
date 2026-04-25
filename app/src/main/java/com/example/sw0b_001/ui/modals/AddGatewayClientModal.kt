@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.ContactsContract
+import android.telephony.PhoneNumberUtils
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -49,7 +50,6 @@ import androidx.core.content.ContextCompat
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.GatewayClients
-import com.example.sw0b_001.ui.viewModels.AccountsViewModel.Companion.verifyPhoneNumberFormat
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -227,7 +227,8 @@ fun AddGatewayClientModal(
                 // Save Button
                 Button(
                     onClick = {
-                        if (phoneNumber.isBlank() || !verifyPhoneNumberFormat(phoneNumber)) {
+                        if (phoneNumber.isBlank() ||
+                            !PhoneNumberUtils.isGlobalPhoneNumber(phoneNumber)) {
                             isError = true
                             return@Button
                         }

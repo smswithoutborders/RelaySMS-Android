@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.ContactsContract
+import android.telephony.PhoneNumberUtils
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.compose.foundation.layout.Column
@@ -38,11 +39,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.sw0b_001.ui.viewModels.AccountsViewModel
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Composers
+import com.example.sw0b_001.extensions.context.getPhoneNumberFromUri
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.AccountsViewModel.Companion.verifyPhoneNumberFormat
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -82,7 +82,7 @@ fun MessageComposeView(
         contract = PickPhoneNumberContract()
     ) { uri ->
         uri?.let {
-            messageContent.to.value = AccountsViewModel.getPhoneNumberFromUri(context, it)
+            messageContent.to.value = context.getPhoneNumberFromUri(it)
         }
     }
 
@@ -121,7 +121,7 @@ fun MessageComposeView(
                 label = { Text(fieldInfo.label, style = MaterialTheme.typography.bodyMedium) },
                 modifier = Modifier.weight(1f),
                 isError = messageContent.to.value.isNotEmpty() &&
-                        !verifyPhoneNumberFormat(messageContent.to.value),
+                        !PhoneNumberUtils.isGlobalPhoneNumber(messageContent.to.value),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Phone,
                     imeAction = ImeAction.Next

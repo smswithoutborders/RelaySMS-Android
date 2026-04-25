@@ -9,10 +9,14 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.sw0b_001.ui.viewModels.AccountUiState
 import com.example.sw0b_001.ui.viewModels.AccountsViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.views.SupportedPlatformsView
@@ -35,6 +39,14 @@ fun OnlineActivePlatformsModal(
         skipHiddenState = false
     )
 
+    val isStoredUiState by accountsViewModel.isStoringUiState.collectAsState()
+
+    LaunchedEffect(isStoredUiState) {
+        if(isStoredUiState is AccountUiState.Success) {
+            onCompleteCallback()
+        }
+    }
+
     if (showBottomSheet) {
         ModalBottomSheet(
             onDismissRequest = onDismiss,
@@ -53,9 +65,7 @@ fun OnlineActivePlatformsModal(
                     accountsViewModel = accountsViewModel,
                     isCompose = isCompose,
                     isOnboarding = isOnboarding,
-                    onCompleteCallback = onCompleteCallback,
                     isLoggedIn = isLoggedIn,
-                    onDismiss = onDismiss,
                 )
             }
         }

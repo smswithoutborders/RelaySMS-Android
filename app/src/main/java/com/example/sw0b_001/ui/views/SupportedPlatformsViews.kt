@@ -58,11 +58,17 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.models.Accounts
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import com.example.sw0b_001.ui.modals.PlatformOptionsModal
+import com.example.sw0b_001.ui.viewModels.AccountUiState
 import com.example.sw0b_001.ui.viewModels.AccountsViewModel
+import com.example.sw0b_001.ui.viewModels.AccountsViewModel.Companion.oAuth2IntentBuilder
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsUiState
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 
@@ -75,8 +81,6 @@ fun SupportedPlatformsView(
     isLoggedIn: Boolean,
     isCompose: Boolean = false,
     isOnboarding: Boolean = false,
-    onCompleteCallback: () -> Unit= {},
-    onDismiss: () -> Unit = {}
 ) {
     val context = LocalContext.current
 
@@ -159,8 +163,6 @@ fun SupportedPlatformsView(
             accountsViewModel = accountsViewModel,
             isOnboarding = isOnboarding,
             navController = navController,
-            onDismiss = onDismiss,
-            onCompleteCallback = onCompleteCallback,
             isLoggedIn = isLoggedIn,
         )
     }
@@ -176,12 +178,14 @@ fun PlatformListContent(
     isLoggedIn: Boolean,
     isCompose: Boolean = false,
     isOnboarding: Boolean = false,
-    onCompleteCallback: () -> Unit= {},
-    onDismiss: () -> Unit = {}
 ) {
+    val context = LocalContext.current
     val states by supportedPlatformsViewModel.uiState.collectAsStateWithLifecycle()
     val supportedPlatforms = supportedPlatformsViewModel.get().observeAsState()
+
     val accounts = accountsViewModel.get().observeAsState()
+    val revokingUiState by accountsViewModel.isRevokingUiState.collectAsStateWithLifecycle()
+    val storingUiState by accountsViewModel.isStoringUiState.collectAsStateWithLifecycle()
 
     var showPlatformOptions by remember { mutableStateOf(false) }
     var clickedPlatform: SupportedPlatforms? by remember{ mutableStateOf(null)}
@@ -275,6 +279,26 @@ fun PlatformListContent(
             }
         }
 
+        val storeCallback : () -> Unit = {
+            CoroutineScope(Dispatchers.Default).launch {
+                accountsViewModel.store(clickedPlatform!!)
+            }
+        }
+
+        val revokeCallback: (Accounts) -> Unit = { account ->
+            CoroutineScope(Dispatchers.Default).launch {
+                accountsViewModel.revoke(clickedPlatform!!, account)
+            }
+        }
+
+        LaunchedEffect(storingUiState) {
+            val state = storingUiState
+            if(state is AccountUiState.Success && state.url != null) {
+                val intent = oAuth2IntentBuilder(context)
+                intent.launchUrl(context, state.url)
+            }
+        }
+
         if (showPlatformOptions) {
             PlatformOptionsModal(
                 showPlatformsModal = showPlatformOptions,
@@ -285,12 +309,14 @@ fun PlatformListContent(
                 },
                 navController = navController,
                 isOnboarding = isOnboarding,
-                onCompleteCallback = onCompleteCallback,
+                isStoring = storingUiState,
+                isRevoking = revokingUiState,
+                storeCallback = storeCallback,
+                revokeCallback = revokeCallback,
                 accounts = accounts.value?.filter { it.name == clickedPlatform?.name }
                     ?: emptyList(),
             ) {
                 showPlatformOptions = false
-                onDismiss()
             }
         }
     }

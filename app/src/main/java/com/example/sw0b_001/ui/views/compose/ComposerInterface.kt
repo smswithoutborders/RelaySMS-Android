@@ -3,6 +3,7 @@ package com.example.sw0b_001.ui.views.compose
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.telephony.PhoneNumberUtils
 import android.util.Base64
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
@@ -58,7 +59,6 @@ import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.AccountsViewModel
-import com.example.sw0b_001.ui.viewModels.AccountsViewModel.Companion.verifyPhoneNumberFormat
 import com.example.sw0b_001.ui.views.DeveloperHTTPView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -213,7 +213,7 @@ fun ComposerInterface(
                     !isSending &&
                             decomposedMessageMessage?.to?.value?.isNotEmpty() == true &&
                             decomposedMessageMessage.message.value.isNotEmpty() &&
-                            verifyPhoneNumberFormat(decomposedMessageMessage.to.value)
+                            PhoneNumberUtils.isGlobalPhoneNumber(decomposedMessageMessage.to.value)
                 }
                 else -> false
             }
