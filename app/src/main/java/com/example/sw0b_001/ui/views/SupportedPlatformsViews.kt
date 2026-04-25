@@ -59,6 +59,7 @@ import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.Accounts
+import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import com.example.sw0b_001.ui.modals.PlatformOptionsModal
 import com.example.sw0b_001.ui.viewModels.AccountUiState
@@ -66,6 +67,7 @@ import com.example.sw0b_001.ui.viewModels.AccountsViewModel
 import com.example.sw0b_001.ui.viewModels.AccountsViewModel.Companion.oAuth2IntentBuilder
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsUiState
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
+import com.example.sw0b_001.ui.views.addAccounts.PNBAPhoneNumberCodeRequestView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -188,9 +190,33 @@ fun PlatformListContent(
     val storingUiState by accountsViewModel.isStoringUiState.collectAsStateWithLifecycle()
 
     var showPlatformOptions by remember { mutableStateOf(false) }
+    var storePnbaRequested by remember { mutableStateOf(false) }
     var clickedPlatform: SupportedPlatforms? by remember{ mutableStateOf(null)}
 
-    Column(
+    var pnbaAuthenticationCodeRequested by remember{ mutableStateOf(false) }
+    var pnbaPasswordRequested by remember{ mutableStateOf(false) }
+
+    LaunchedEffect(storingUiState) {
+        val state = storingUiState
+        if(state is AccountUiState.Success) {
+            if(storePnbaRequested) {
+                if(!state.pnbaAuthRequired && !state.pnbaPasswordRequired) {
+                    storePnbaRequested = false
+                }
+                else {
+                    pnbaAuthenticationCodeRequested = state.pnbaAuthRequired
+                    pnbaPasswordRequested = state.pnbaPasswordRequired
+                }
+            }
+            else if(state.url != null) {
+                val intent = oAuth2IntentBuilder(context)
+                intent.launchUrl(context, state.url)
+            }
+        }
+    }
+
+
+Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
@@ -281,7 +307,13 @@ fun PlatformListContent(
 
         val storeCallback : () -> Unit = {
             CoroutineScope(Dispatchers.Default).launch {
-                accountsViewModel.store(clickedPlatform!!)
+                if(clickedPlatform?.protocol_type == Platforms.ProtocolTypes.oauth2.name) {
+                    accountsViewModel.store(clickedPlatform!!)
+                }
+                else if(clickedPlatform?.protocol_type == Platforms.ProtocolTypes.pnba.name) {
+                    showPlatformOptions = false
+                    storePnbaRequested = true
+                }
             }
         }
 
@@ -291,18 +323,11 @@ fun PlatformListContent(
             }
         }
 
-        LaunchedEffect(storingUiState) {
-            val state = storingUiState
-            if(state is AccountUiState.Success && state.url != null) {
-                val intent = oAuth2IntentBuilder(context)
-                intent.launchUrl(context, state.url)
-            }
-        }
-
         if (showPlatformOptions) {
+            val isStored = accounts.value?.find { it.name == clickedPlatform?.name }
             PlatformOptionsModal(
                 showPlatformsModal = showPlatformOptions,
-                isActive = false,
+                isActive = isStored != null,
                 isCompose = isCompose,
                 platform = clickedPlatform?.apply {
                     this.service_type = this.service_type?.uppercase(Locale.getDefault())
@@ -317,6 +342,39 @@ fun PlatformListContent(
                     ?: emptyList(),
             ) {
                 showPlatformOptions = false
+            }
+        }
+
+        if(storePnbaRequested) {
+            PNBAPhoneNumberCodeRequestView(
+                showModal = storePnbaRequested,
+                isLoading = storingUiState == AccountUiState.Loading,
+                platform = clickedPlatform,
+                isAuthenticationCodeRequested = pnbaAuthenticationCodeRequested,
+                isPasswordRequested = pnbaPasswordRequested,
+                phoneNumberRequestedCallback = { phoneNumber ->
+                    accountsViewModel.store(
+                        platform = clickedPlatform!!,
+                        phoneNumber = phoneNumber,
+                    )
+                },
+                codeRequestedCallback = { phoneNumber, authCode ->
+                    accountsViewModel.store(
+                        platform = clickedPlatform!!,
+                        phoneNumber = phoneNumber,
+                        authCode = authCode
+                    )
+                },
+                passwordRequestedCallback = { phoneNumber, authCode, password ->
+                    accountsViewModel.store(
+                        platform = clickedPlatform!!,
+                        phoneNumber = phoneNumber,
+                        authCode = authCode,
+                        password = password
+                    )
+                }
+            ) {
+                storePnbaRequested = false
             }
         }
     }

@@ -42,7 +42,11 @@ import kotlinx.serialization.json.Json
 
 sealed class AccountUiState {
     object Loading: AccountUiState()
-    data class Success(val url: Uri?): AccountUiState()
+    data class Success(
+        val url: Uri?,
+        val pnbaAuthRequired: Boolean = false,
+        val pnbaPasswordRequired: Boolean = false,
+    ): AccountUiState()
     data class Error(val exception: Throwable): AccountUiState()
 }
 
@@ -210,45 +214,113 @@ class AccountsViewModel @Inject constructor(
         }
     }
 
-    fun store(platform: SupportedPlatforms) {
+    fun store(
+        platform: SupportedPlatforms,
+        phoneNumber: String? = null,
+        authCode: String? = null,
+        password: String? = null,
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
-            val db = Datastore.getDatastore(context)?.keysDao()
-                ?: throw Exception("Could not open database")
-
-            val publisherPublicKey = db
-                .fetchPublicKey(VaultsGrpcImpl.clientVaultHandshakeKeystoreAliasStaticKeys)
-                ?: throw Exception("Missing private key in credentials for signing")
-
             _isStoringUiState.value = AccountUiState.Loading
             if(platform.protocol_type == Platforms.ProtocolTypes.oauth2.name) {
-                PublisherGrpcImpl(context).use { publisherGrpcImpl ->
-                    val requestIdentifier = Base64.encodeToString(
-                        publisherPublicKey, Base64.NO_WRAP)
-                    try {
-                        val response = publisherGrpcImpl.getOAuthURL(
-                            availablePlatforms = platform,
-                            autogenerateCodeVerifier = true,
-                            supportsUrlScheme = platform.support_url_scheme!!,
-                            requestIdentifier = requestIdentifier
-                        )
-
-                        PublisherGrpcImpl.storeOauthRequestCodeVerifier(
-                            context,
-                            platform.name,
-                            response.codeVerifier.toByteArray()
-                        )
-
-                        val intentUri = response.authorizationUrl.toUri()
-                        _isStoringUiState.value = AccountUiState.Success(intentUri)
-                    } catch(e: Exception) {
-                        e.printStackTrace()
-                        _isStoringUiState.value = AccountUiState.Error(e)
-                    }
-                }
+                triggerOAuthRequested(platform)
+            }
+            else if (platform.protocol_type == Platforms.ProtocolTypes.pnba.name) {
+                triggerPNBARequested(
+                    phoneNumber = phoneNumber!!,
+                    platform = platform,
+                    authCode = authCode,
+                    password = password
+                )
             }
         }
-
     }
 
+    private fun triggerOAuthRequested(
+        platform: SupportedPlatforms,
+    ) {
+        val db = Datastore.getDatastore(context)?.keysDao()
+            ?: throw Exception("Could not open database")
 
+        val publisherPublicKey = db
+            .fetchPublicKey(VaultsGrpcImpl.clientVaultHandshakeKeystoreAliasStaticKeys)
+            ?: throw Exception("Missing private key in credentials for signing")
+
+        PublisherGrpcImpl(context).use { publisherGrpcImpl ->
+            val requestIdentifier = Base64.encodeToString(
+                publisherPublicKey, Base64.NO_WRAP)
+            try {
+                val response = publisherGrpcImpl.getOAuthURL(
+                    availablePlatforms = platform,
+                    autogenerateCodeVerifier = true,
+                    supportsUrlScheme = platform.support_url_scheme!!,
+                    requestIdentifier = requestIdentifier
+                )
+
+                PublisherGrpcImpl.storeOauthRequestCodeVerifier(
+                    context,
+                    platform.name,
+                    response.codeVerifier.toByteArray()
+                )
+
+                val intentUri = response.authorizationUrl.toUri()
+                _isStoringUiState.value = AccountUiState.Success(intentUri)
+            } catch(e: Exception) {
+                e.printStackTrace()
+                _isStoringUiState.value = AccountUiState.Error(e)
+            }
+        }
+    }
+
+    private fun triggerPNBARequested(
+        phoneNumber: String,
+        platform: SupportedPlatforms,
+        authCode: String? = null,
+        password: String? = null,
+    ) {
+        PublisherGrpcImpl(context).use { publisherGrpcImpl ->
+            try {
+                when {
+                    !authCode.isNullOrEmpty() && !password.isNullOrEmpty() -> {
+                        val response = publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
+                            authorizationCode = authCode,
+                            phoneNumber = phoneNumber,
+                            platform = platform.name,
+                            password = password
+                        )
+                        if(response.success) {
+                            _isStoringUiState.value = AccountUiState.Success(null)
+                        }
+                    }
+                    !authCode.isNullOrEmpty() -> {
+                        val response = publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
+                            authorizationCode = authCode,
+                            phoneNumber = phoneNumber,
+                            platform = platform.name
+                        )
+                        if(response.success) {
+                            _isStoringUiState.value = AccountUiState.Success(
+                                null,
+                                pnbaPasswordRequired = response.twoStepVerificationEnabled,
+                            )
+                        }
+                    }
+                    else -> {
+                        val response = publisherGrpcImpl.phoneNumberBaseAuthenticationRequest(
+                            phoneNumber,
+                            platform.name
+                        )
+                        if(response.success) {
+                            _isStoringUiState.value = AccountUiState.Success(
+                                null ,
+                                pnbaAuthRequired = true
+                            )
+                        }
+                    }
+                }
+            } catch(e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 }

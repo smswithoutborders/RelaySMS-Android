@@ -17,6 +17,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -48,17 +49,20 @@ class GatewayClientViewModel @Inject constructor(
         MutableStateFlow<GatewayClientsUiState>(GatewayClientsUiState.Loading)
     val uiState: StateFlow<GatewayClientsUiState> = _uiState
 
-    val defaultGatewayClients  = context
-        .relaySmsDatastore.data.map { settings ->
-            val currentValue = settings[settingsDefaultGatewayClientKey] ?: return@map null
-            Json.decodeFromString<GatewayClients>(currentValue)
-        }
+    lateinit var defaultGatewayClients: Flow<GatewayClients?>
 
     init {
-        try {
-            populateDefaults()
-        } catch(e: Exception) {
-            e.printStackTrace()
+        viewModelScope.launch {
+            try {
+                populateDefaults()
+            } catch(e: Exception) {
+                e.printStackTrace()
+            }
+
+            defaultGatewayClients = context.relaySmsDatastore.data.map { settings ->
+                val currentValue = settings[settingsDefaultGatewayClientKey] ?: return@map null
+                Json.decodeFromString<GatewayClients>(currentValue)
+            }
         }
     }
 
@@ -89,7 +93,7 @@ class GatewayClientViewModel @Inject constructor(
     }
 
     private fun populateDefaults() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val inputStream = context.assets.open("gateway_clients.json")
             val buffer = BufferedReader(InputStreamReader(inputStream))
             val rawGatewayClients = buffer.use { it.readText() }

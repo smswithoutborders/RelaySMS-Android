@@ -7,11 +7,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -39,19 +36,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
-import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
 import com.example.sw0b_001.data.models.Accounts
-import com.example.sw0b_001.data.models.Platforms
 import com.example.sw0b_001.data.models.Platforms.ServiceTypes
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.viewModels.AccountUiState
-import com.example.sw0b_001.ui.views.addAccounts.PNBAPhoneNumberCodeRequestView
-import io.grpc.StatusRuntimeException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -121,12 +110,10 @@ fun PlatformOptionsModal(
                     }
                 }
                 else if(isStoring == AccountUiState.Loading) {
-                    AddAccountLoading(
-                        context,
-                        platform!!
-                    ) {
-                        onDismissRequest()
-                    }
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.secondary,
+                        trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                    )
                 }
                 else {
                     Image(
@@ -201,187 +188,6 @@ private fun RevokeAccountLoading(platform: SupportedPlatforms) {
             color = MaterialTheme.colorScheme.secondary,
             trackColor = MaterialTheme.colorScheme.surfaceVariant,
         )
-    }
-}
-
-@Composable
-private fun AddAccountLoading(
-    context: Context,
-    platform: SupportedPlatforms,
-    onCompletedCallback: () -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxWidth()
-            .verticalScroll(rememberScrollState())
-            .imePadding()
-    ){
-        var isAuthenticationCodeRequested by remember { mutableStateOf(false) }
-        var isPasswordRequested by remember { mutableStateOf(false) }
-
-        var isLoading by remember { mutableStateOf(false) }
-
-        Text(
-            text= stringResource(R.string.adding_account_for, platform.name),
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom=16.dp)
-        )
-
-        when(platform.protocol_type) {
-            Platforms.ProtocolTypes.oauth2.name -> {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.secondary,
-                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                )
-            }
-            Platforms.ProtocolTypes.pnba.name -> {
-                PNBAPhoneNumberCodeRequestView(
-                    isLoading = isLoading,
-                    platform = platform,
-                    isAuthenticationCodeRequested = isAuthenticationCodeRequested,
-                    isPasswordRequested = isPasswordRequested,
-                    phoneNumberRequestedCallback = {phoneNumber ->
-                        triggerPNBARequested(
-                            context = context,
-                            phoneNumber = phoneNumber,
-                            platform = platform,
-                            onRequestMadeCallback = {isLoading = true},
-                            onFailureCallback = {},
-                            onSuccessCallback = { authCodeRequested, _ ->
-                                isAuthenticationCodeRequested = authCodeRequested
-                            }
-                        ) {
-                            isLoading = false
-                        }
-                    },
-                    codeRequestedCallback = {phoneNumber, authCode ->
-                        triggerPNBARequested(
-                            context = context,
-                            phoneNumber = phoneNumber,
-                            authCode = authCode,
-                            platform = platform,
-                            onRequestMadeCallback = {isLoading = true},
-                            onFailureCallback = {},
-                            onSuccessCallback = {authCodeRequested, passwordRequested ->
-                                if(authCodeRequested) {
-                                    try {
-                                        val vault = VaultsGrpcImpl(context)
-                                        vault.refreshStoredTokens( context)
-                                        onCompletedCallback()
-                                    } catch(e: Exception) {
-                                        e.printStackTrace()
-                                    }
-                                }
-                                else {
-                                    isPasswordRequested = passwordRequested
-                                }
-                            }
-                        ) {
-                            isLoading = false
-                        }
-                    },
-                    passwordRequestedCallback = {phoneNumber, authCode, password ->
-                        triggerPNBARequested(
-                            context = context,
-                            phoneNumber = phoneNumber,
-                            authCode = authCode,
-                            password = password,
-                            platform = platform,
-                            onRequestMadeCallback = {isLoading = true},
-                            onFailureCallback = {},
-                            onSuccessCallback = {_, _ ->
-                                try {
-                                    val vault = VaultsGrpcImpl(context)
-                                    vault.refreshStoredTokens( context)
-                                    onCompletedCallback()
-                                } catch(e: Exception) {
-                                    e.printStackTrace()
-                                }
-                            }
-                        ) {
-                            isLoading = false
-                        }
-                    }
-                )
-            }
-        }
-    }
-}
-
-private fun triggerPNBARequested(
-    context: Context,
-    phoneNumber: String,
-    authCode: String? = null,
-    password: String? = null,
-    platform: SupportedPlatforms,
-    onRequestMadeCallback: () -> Unit,
-    onFailureCallback: (String?) -> Unit,
-    onSuccessCallback: (Boolean, Boolean) -> Unit,
-    onCompletedCallback: () -> Unit,
-) {
-    onRequestMadeCallback()
-    CoroutineScope(Dispatchers.Default).launch {
-        val publisherGrpcImpl = PublisherGrpcImpl(context)
-        try {
-            when {
-                !authCode.isNullOrEmpty() && !password.isNullOrEmpty() -> {
-                    val response = publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
-                        authorizationCode = authCode,
-                        phoneNumber = phoneNumber,
-                        platform = platform.name,
-                        password = password
-                    )
-                    if(response.success) {
-                        onSuccessCallback(
-                            true,
-                            true
-                        )
-                    }
-                }
-                !authCode.isNullOrEmpty() -> {
-                    val response = publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
-                        authorizationCode = authCode,
-                        phoneNumber = phoneNumber,
-                        platform = platform.name
-                    )
-                    if(response.success) {
-                        if(response.twoStepVerificationEnabled) {
-                            onSuccessCallback(
-                                false,
-                                true
-                            )
-                        } else {
-                            onSuccessCallback(
-                                true,
-                                true
-                            )
-                        }
-                    }
-                }
-                else -> {
-                    val response = publisherGrpcImpl.phoneNumberBaseAuthenticationRequest(
-                        phoneNumber,
-                        platform.name
-                    )
-                    if(response.success) {
-                        onSuccessCallback(
-                            true,
-                            false
-                        )
-                    }
-                }
-            }
-        } catch(e: StatusRuntimeException) {
-            e.printStackTrace()
-            onFailureCallback(e.message)
-        } catch(e: Exception) {
-            e.printStackTrace()
-            onFailureCallback(e.message)
-        } finally {
-            publisherGrpcImpl.shutdown()
-            onCompletedCallback()
-        }
     }
 }
 
