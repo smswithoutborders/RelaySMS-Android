@@ -185,7 +185,7 @@ class AccountsViewModel @Inject constructor(
         platform: SupportedPlatforms,
         account: Accounts,
     ) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             PublisherGrpcImpl(context).use { publisherGrpcImpl ->
                 _isRevokingUiState.value = AccountUiState.Loading
                 try {

@@ -7,8 +7,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -110,10 +113,7 @@ fun PlatformOptionsModal(
                     }
                 }
                 else if(isStoring == AccountUiState.Loading) {
-                    CircularProgressIndicator(
-                        color = MaterialTheme.colorScheme.secondary,
-                        trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                    )
+                    AddAccountLoading(platform!!)
                 }
                 else {
                     Image(
@@ -170,6 +170,28 @@ fun PlatformOptionsModal(
     }
 }
 
+@Composable
+private fun AddAccountLoading( platform: SupportedPlatforms, ) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+            .imePadding()
+    ) {
+        Text(
+            text = stringResource(R.string.adding_account_for, platform.name),
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        CircularProgressIndicator(
+            color = MaterialTheme.colorScheme.secondary,
+            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+        )
+    }
+}
+
 
 
 @Composable
@@ -223,7 +245,7 @@ private fun ManageAccounts(
     removeAccountsCallback: () -> Unit
 ) {
     Button(
-        onClick = { addAccountsCallback() },
+        onClick = addAccountsCallback,
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(stringResource(R.string.add_account))
@@ -232,7 +254,7 @@ private fun ManageAccounts(
 
     if (LocalInspectionMode.current ||  (isActive && !isOnboarding)) {
         TextButton(
-            onClick = {removeAccountsCallback()},
+            onClick = removeAccountsCallback,
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)
         ) {

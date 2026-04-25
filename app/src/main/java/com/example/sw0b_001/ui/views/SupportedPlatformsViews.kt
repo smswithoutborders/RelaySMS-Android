@@ -211,6 +211,7 @@ fun PlatformListContent(
             else if(state.url != null) {
                 val intent = oAuth2IntentBuilder(context)
                 intent.launchUrl(context, state.url)
+                showPlatformOptions = false
             }
         }
     }
