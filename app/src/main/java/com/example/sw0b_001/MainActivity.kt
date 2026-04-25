@@ -216,12 +216,12 @@ class MainActivity : AppCompatActivity() {
             defaultSmsApp = context.isDefault()
         }
 
-        val isLoggedIn = vaultViewModel.isLoggedIn
+        val isLoggedIn by vaultViewModel.isLoggedIn
             .collectAsStateWithLifecycle(false)
 
         LaunchedEffect(isLoggedIn) {
-            if(isLoggedIn.value) {
-                if(!vaultViewModel.validateSession()) {
+            if(isLoggedIn) {
+                vaultViewModel.validateSession {
                     val route = if(isDefault()) HomeScreenNav()
                     else HomepageScreen
                     navController.navigate(GetMeOutScreen) {
@@ -269,6 +269,7 @@ class MainActivity : AppCompatActivity() {
                             gatewayClientViewModel = gatewayClientViewModel,
                             imageViewModel = imageViewModel,
                             supportedPlatformsViewModel = supportedPlatformsViewModel,
+                            isLoggedIn = isLoggedIn,
                             drawerCallback = drawerCallback
                         )
                     }
@@ -339,6 +340,7 @@ class MainActivity : AppCompatActivity() {
                     messagesViewModel = messagesViewModel,
                     gatewayClientViewModel = gatewayClientViewModel,
                     supportedPlatformsViewModel = supportedPlatformsViewModel,
+                    isLoggedIn = isLoggedIn,
                     imageViewModel = imageViewModel,
                 )
             }
@@ -497,5 +499,10 @@ class MainActivity : AppCompatActivity() {
         super.onNewIntent(intent)
         if(::navController.isInitialized)
             processIntent(navController, intent)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        vaultViewModel.shutdown()
     }
 }

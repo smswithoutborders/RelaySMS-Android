@@ -3,14 +3,15 @@ package com.example.sw0b_001.data.grpc
 import android.content.Context
 import android.util.Base64
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.OAuth
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
-import publisher.v1.PublisherGrpc
-import publisher.v1.PublisherOuterClass
+import publisher.v2.PublisherGrpc
+import publisher.v2.PublisherOuterClass
 
-class PublisherGrpcImpl(val context: Context) {
+class PublisherGrpcImpl(val context: Context) : AutoCloseable{
 
     private var channel: ManagedChannel = ManagedChannelBuilder
         .forAddress(context.getString(R.string.publisher_grpc_url),
@@ -18,7 +19,9 @@ class PublisherGrpcImpl(val context: Context) {
         .useTransportSecurity()
         .build()
 
+    val vaultService = VaultsGrpcImpl(context)
     private var publisherStub = PublisherGrpc.newBlockingStub(channel)
+        .withInterceptors(GrpcClientInterceptor(vaultService))
 
     private var oAuthRedirectUrl = "https://relay.smswithoutborders.com/android"
 
@@ -66,8 +69,6 @@ class PublisherGrpcImpl(val context: Context) {
         platform: String,
         code: String,
         codeVerifier: String,
-        supportsUrlScheme: Boolean,
-        storeOnDevice: Boolean = false,
         requestIdentifier: String = ""
     ): PublisherOuterClass.ExchangeOAuth2CodeAndStoreResponse {
         val request = PublisherOuterClass.ExchangeOAuth2CodeAndStoreRequest.newBuilder().apply {
@@ -75,7 +76,7 @@ class PublisherGrpcImpl(val context: Context) {
             setAuthorizationCode(code)
             setCodeVerifier(codeVerifier)
             setRedirectUrl(oAuthRedirectUrl)
-            setStoreOnDevice(storeOnDevice)
+            setStoreOnDevice(false)
             setRequestIdentifier(requestIdentifier)
         }.build()
 
@@ -109,25 +110,21 @@ class PublisherGrpcImpl(val context: Context) {
         return publisherStub.exchangePNBACodeAndStore(request)
     }
 
-    fun shutdown() {
-        channel.shutdown()
-    }
-
     companion object {
-        private const val OAUTH2_PARAMETERS_FILE = "OAUTH2_PARAMETERS_FILE"
-
-        fun fetchOauthRequestVerifier(context: Context) : String {
-            val sharedPreferences = context
-                .getSharedPreferences(
-                    OAUTH2_PARAMETERS_FILE, Context.MODE_PRIVATE)
-
-            return sharedPreferences.getString("code_verifier", "")!!
+        fun fetchOauthRequestVerifier(context: Context, platformName: String) : String {
+            val db = Datastore.getDatastore(context)?.oAuthDao()
+                ?: throw Exception("Could not open database")
+            val oauth = db.fetch(platformName)
+                ?: throw Exception("Could not find oauth for platform")
+            oauth.use {
+                return String(it.codeVerifier)
+            }
         }
 
         fun storeOauthRequestCodeVerifier(
             context: Context,
             platformName: String,
-            codeVerifier: String
+            codeVerifier: ByteArray
         ) {
             try {
                 OAuth(
@@ -137,6 +134,19 @@ class PublisherGrpcImpl(val context: Context) {
             } catch (e: Exception) {
                 throw e
             }
+        }
+    }
+
+    fun shutdown() {
+        if(!channel.isShutdown) {
+            channel.shutdown()
+        }
+    }
+
+    override fun close() {
+        vaultService.shutdown()
+        if(!channel.isShutdown) {
+            channel.shutdown()
         }
     }
 

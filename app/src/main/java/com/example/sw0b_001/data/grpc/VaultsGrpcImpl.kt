@@ -7,9 +7,9 @@ import com.afkanerd.smswithoutborders.libsignal_doubleratchet.extensions.generat
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.Protocols
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Datastore
+import com.example.sw0b_001.data.models.Accounts
 import com.example.sw0b_001.data.models.Keys
 import com.example.sw0b_001.data.models.RatchetStates
-import com.example.sw0b_001.data.models.Accounts
 import com.example.sw0b_001.extensions.context.getStaticKeys
 import com.example.sw0b_001.extensions.context.settingsSetIsEmailLogin
 import com.example.sw0b_001.extensions.context.settingsSetIsLoggedIn
@@ -30,7 +30,7 @@ import vault.v2.Vault
 import java.security.SecureRandom
 import java.security.Security
 
-class VaultsGrpcImpl(val context: Context) {
+class VaultsGrpcImpl(val context: Context) : AutoCloseable {
     companion object {
         const val clientVaultHandshakeKeystoreAliasStaticKeys =
             "clientVaultHandshakeKeystoreAlias_static_keys"
@@ -40,10 +40,6 @@ class VaultsGrpcImpl(val context: Context) {
         "clientVaultHandshakeKeystoreAlias_ephemeral_keys"
     private val ratchetKeystoreAlias = "Vault_Ratchet_KeystoreAlias"
 
-    init {
-        Security.removeProvider("BC")
-        Security.insertProviderAt(BouncyCastleProvider(), 1)
-    }
 
     private var channel: ManagedChannel = ManagedChannelBuilder
         .forAddress(context.getString(R.string.vault_grpc_url),
@@ -54,13 +50,19 @@ class VaultsGrpcImpl(val context: Context) {
     val protocols = Protocols(context)
 
     private var entityStub: EntityGrpc.EntityBlockingStub = EntityGrpc.newBlockingStub(channel)
+        .withInterceptors(GrpcClientInterceptor(this))
+
+    init {
+        Security.removeProvider("BC")
+        Security.insertProviderAt(BouncyCastleProvider(), 1)
+    }
 
     fun shutdown() {
         channel.shutdown()
     }
 
     fun fetchLongLivedToken() : ByteArray? {
-        return Datastore.Companion.getDatastore(context)?.keysDao()
+        return Datastore.getDatastore(context)?.keysDao()
             ?.fetchLlt(clientVaultHandshakeKeystoreAliasStaticKeys)
     }
 
@@ -312,7 +314,7 @@ class VaultsGrpcImpl(val context: Context) {
                     try {
                         response = entityStub.createEntity(createEntityRequest.build())
 
-                        val db = Datastore.Companion.getDatastore(context)?.keysDao()
+                        val db = Datastore.getDatastore(context)?.keysDao()
                             ?: throw Exception("Failed to open database")
 
                         val staticKeys = Keys(
@@ -401,7 +403,7 @@ class VaultsGrpcImpl(val context: Context) {
                         response = entityStub
                             .authenticateEntity(authenticateEntityRequest.build())
 
-                        val db = Datastore.Companion.getDatastore(context)?.keysDao()
+                        val db = Datastore.getDatastore(context)?.keysDao()
                             ?: throw Exception("Failed to open database")
 
                         val staticKeys = Keys(
@@ -555,8 +557,7 @@ class VaultsGrpcImpl(val context: Context) {
     ): Vault.ListEntityStoredTokensResponse {
         val request = Vault.ListEntityStoredTokensRequest.newBuilder()
 
-        val inEntityStub = entityStub.withInterceptors(GrpcClientInterceptor(context))
-        return inEntityStub.listEntityStoredTokens(request.build())
+        return entityStub.listEntityStoredTokens(request.build())
     }
 
     fun deleteEntity() : Vault.DeleteEntityResponse {
@@ -564,12 +565,12 @@ class VaultsGrpcImpl(val context: Context) {
         return entityStub.deleteEntity(deleteEntityRequest)
     }
 
-    fun signGrpcRequest(message: ByteArray): ByteArray {
-        val db = Datastore.Companion.getDatastore(context)?.keysDao()
+    fun signGrpcRequest(message: ByteArray): ByteArray? {
+        val db = Datastore.getDatastore(context)?.keysDao()
             ?: throw Exception("Could not open database")
 
         val keys = db.fetch(clientVaultHandshakeKeystoreAliasStaticKeys)
-            ?: throw Exception("Missing private key in credentials for signing")
+            ?: return null
 
         keys.use { k ->
             val signer = Ed25519Signer()
@@ -577,6 +578,12 @@ class VaultsGrpcImpl(val context: Context) {
             signer.update(message, 0, message.size)
 
             return signer.generateSignature()
+        }
+    }
+
+    override fun close() {
+        if(!channel.isShutdown) {
+            channel.shutdown()
         }
     }
 }

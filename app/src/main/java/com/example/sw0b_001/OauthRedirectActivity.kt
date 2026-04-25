@@ -6,7 +6,6 @@ import android.util.Base64
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.preference.PreferenceManager
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
@@ -42,7 +41,7 @@ class OauthRedirectActivity : AppCompatActivity() {
         val scope = CoroutineScope(Dispatchers.Default)
         scope.launch {
             sendAuthCode(
-                platform = platform,
+                platformName = platform,
                 code = code,
                 supportsUrlScheme = supportsUrlScheme
             )
@@ -50,7 +49,7 @@ class OauthRedirectActivity : AppCompatActivity() {
     }
 
     fun sendAuthCode(
-        platform: String,
+        platformName: String,
         code: String,
         supportsUrlScheme: Boolean,
     ) {
@@ -59,49 +58,34 @@ class OauthRedirectActivity : AppCompatActivity() {
 
         val publisherPublicKey = db.fetchPublicKey(VaultsGrpcImpl.clientVaultHandshakeKeystoreAliasStaticKeys)
             ?: throw Exception("Missing private key in credentials for signing")
-        val publisherGrpcImpl = PublisherGrpcImpl(applicationContext)
-        try {
-            val codeVerifier = PublisherGrpcImpl.fetchOauthRequestVerifier(applicationContext)
-            val requestIdentifier = Base64.encodeToString(publisherPublicKey, Base64.NO_WRAP)
+        PublisherGrpcImpl(applicationContext).use { publisherGrpcImpl ->
+            try {
+                val codeVerifier = PublisherGrpcImpl
+                    .fetchOauthRequestVerifier(applicationContext, platformName)
+                val requestIdentifier = Base64.encodeToString(publisherPublicKey, Base64.NO_WRAP)
 
-            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-            val storeTokensOnDevice = sharedPreferences.getBoolean("store_tokens_on_device", false)
-
-            if (storeTokensOnDevice) {
                 publisherGrpcImpl.sendOAuthAuthorizationCode(
-                    platform,
-                    code,
-                    codeVerifier,
-                    supportsUrlScheme,
-                    false,
-                    requestIdentifier
-                )
-            } else {
-                publisherGrpcImpl.sendOAuthAuthorizationCode(
-                    platform,
-                    code,
-                    codeVerifier,
-                    supportsUrlScheme,
+                    platform = platformName,
+                    code = code,
+                    codeVerifier = codeVerifier,
                     requestIdentifier = requestIdentifier
                 )
-            }
 
-            val vaultsGrpcImpl = VaultsGrpcImpl(applicationContext)
-            vaultsGrpcImpl.refreshStoredTokens( applicationContext)
-            vaultsGrpcImpl.shutdown()
-        } catch(e: StatusRuntimeException) {
-            e.printStackTrace()
-            runOnUiThread {
-                Toast.makeText(applicationContext, e.status.description, Toast.LENGTH_LONG).show()
+                VaultsGrpcImpl(applicationContext).use { vaultsGrpcImpl ->
+                    vaultsGrpcImpl.refreshStoredTokens( applicationContext)
+                }
+            } catch(e: StatusRuntimeException) {
+                e.printStackTrace()
+                runOnUiThread {
+                    Toast.makeText(applicationContext, e.status.description, Toast.LENGTH_LONG).show()
+                }
             }
-        }
-        catch(e: Exception) {
-            e.printStackTrace()
-            runOnUiThread {
-                Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
+            catch(e: Exception) {
+                e.printStackTrace()
+                runOnUiThread {
+                    Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
+                }
             }
-        } finally {
-            publisherGrpcImpl.shutdown()
         }
 
         runOnUiThread {

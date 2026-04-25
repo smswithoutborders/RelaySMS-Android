@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -50,10 +51,8 @@ class VaultsViewModel @Inject constructor(
         settings[settingsIsLoggedInKey] ?: false
     }
 
-    fun validateSingleSession() {
-        viewModelScope.launch(Dispatchers.Default) {
-            validateSession()
-        }
+    fun shutdown() {
+        vault.shutdown()
     }
 
     @Serializable
@@ -155,16 +154,20 @@ class VaultsViewModel @Inject constructor(
         }
     }
 
-    fun validateSession() : Boolean{
-        try {
-            vault.refreshStoredTokens( context)
-            return true
-        } catch(e: StatusRuntimeException) {
-            e.printStackTrace()
-            if(e.status.code != Status.UNAUTHENTICATED.code) {
-                throw e
+    fun validateSession(failedCallback: () -> Unit){
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    vault.refreshStoredTokens( context)
+                    return@withContext
+                } catch(e: StatusRuntimeException) {
+                    e.printStackTrace()
+                    if(e.status.code != Status.UNAUTHENTICATED.code) {
+                        throw e
+                    }
+                    failedCallback()
+                }
             }
         }
-        return false
     }
 }

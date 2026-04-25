@@ -5,7 +5,6 @@ import androidx.room.Database
 import androidx.room.Room.databaseBuilder
 import androidx.room.RoomDatabase
 import com.afkanerd.smswithoutborders_libsmsmms.data.Cryptography.getDatabasePassword
-import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.data.dao.GatewayClientsDao
 import com.example.sw0b_001.data.dao.KeysDao
 import com.example.sw0b_001.data.dao.MessagesDao
@@ -69,12 +68,8 @@ abstract class Datastore : RoomDatabase() {
                             klass = Datastore::class.java,
                             databaseFile.absolutePath,
                         )
-                            .also {
-                                if(!BuildConfig.DEBUG)
-                                    it.openHelperFactory(
-                                        SupportOpenHelperFactory(rawBytes))
-                            }
-                            .fallbackToDestructiveMigration(false)
+                            .openHelperFactory(SupportOpenHelperFactory(rawBytes))
+                            .fallbackToDestructiveMigration(true)
                             .build()
                     }
                 }

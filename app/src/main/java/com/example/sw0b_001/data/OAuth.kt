@@ -3,14 +3,15 @@ package com.example.sw0b_001.data
 import android.content.Context
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.lang.AutoCloseable
 
 @Entity
 data class OAuth(
     @PrimaryKey(autoGenerate = true)
     val id : Int = 0,
     val platformName: String,
-    val codeVerifier: String
-) {
+    val codeVerifier: ByteArray
+) : AutoCloseable{
     fun save(context: Context) {
         val db = Datastore.getDatastore(context)?.oAuthDao()
             ?: throw Exception("Cannot find database")
@@ -18,6 +19,15 @@ data class OAuth(
             db.insert(this)
         } catch (e: Exception) {
             throw e
+        }
+    }
+
+    @Transient
+    private var isClosed = false
+    override fun close() {
+        if(!isClosed) {
+            codeVerifier.fill(0)
+            isClosed = true
         }
     }
 }

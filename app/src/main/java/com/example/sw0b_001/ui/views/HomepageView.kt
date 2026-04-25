@@ -66,7 +66,7 @@ fun HomepageView(
     gatewayClientViewModel: GatewayClientViewModel,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
     imageViewModel: ImageViewModel,
-    isLoggedIn: Boolean = false,
+    isLoggedIn: Boolean,
     showTopBar: Boolean = true,
     drawerCallback: (() -> Unit)? = {},
 ) {

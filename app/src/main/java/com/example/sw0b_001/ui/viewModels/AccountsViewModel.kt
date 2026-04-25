@@ -174,42 +174,42 @@ class AccountsViewModel @Inject constructor(
                     ?: throw Exception("Missing private key in credentials for signing")
                 when(platform.protocol_type) {
                     Platforms.ProtocolTypes.oauth2.name -> {
-                        val publisherGrpcImpl = PublisherGrpcImpl(context)
-                        val requestIdentifier = Base64.encodeToString(
-                            publisherPublicKey, Base64.NO_WRAP)
-                        try {
-                            val response = publisherGrpcImpl.getOAuthURL(
-                                availablePlatforms = platform,
-                                autogenerateCodeVerifier = true,
-                                supportsUrlScheme = platform.support_url_scheme!!,
-                                requestIdentifier = requestIdentifier
-                            )
+                        PublisherGrpcImpl(context).use { publisherGrpcImpl ->
+                            val requestIdentifier = Base64.encodeToString(
+                                publisherPublicKey, Base64.NO_WRAP)
+                            try {
+                                val response = publisherGrpcImpl.getOAuthURL(
+                                    availablePlatforms = platform,
+                                    autogenerateCodeVerifier = true,
+                                    supportsUrlScheme = platform.support_url_scheme!!,
+                                    requestIdentifier = requestIdentifier
+                                )
 
-                            PublisherGrpcImpl.storeOauthRequestCodeVerifier(
-                                context,
-                                platform.name,
-                                response.codeVerifier
-                            )
+                                PublisherGrpcImpl.storeOauthRequestCodeVerifier(
+                                    context,
+                                    platform.name,
+                                    response.codeVerifier.toByteArray()
+                                )
 
-                            val intentUri = response.authorizationUrl.toUri()
-                            val intent = oAuth2IntentBuilder(context)
-                            intent.launchUrl(context, intentUri)
-                        } catch(e: StatusRuntimeException) {
-                            e.printStackTrace()
-                            CoroutineScope(Dispatchers.Main).launch {
-                                e.status.description?.let {
-                                    Toast.makeText(context, e.status.description,
-                                        Toast.LENGTH_SHORT).show()
+                                val intentUri = response.authorizationUrl.toUri()
+                                val intent = oAuth2IntentBuilder(context)
+                                intent.launchUrl(context, intentUri)
+                            } catch(e: StatusRuntimeException) {
+                                e.printStackTrace()
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    e.status.description?.let {
+                                        Toast.makeText(context, e.status.description,
+                                            Toast.LENGTH_SHORT).show()
+                                    }
                                 }
+                            } catch(e: Exception) {
+                                CoroutineScope(Dispatchers.Main).launch {
+                                    Toast.makeText(context, e.message, Toast.LENGTH_SHORT)
+                                        .show()
+                                }
+                            } finally {
+                                onCompletedCallback()
                             }
-                        } catch(e: Exception) {
-                            CoroutineScope(Dispatchers.Main).launch {
-                                Toast.makeText(context, e.message, Toast.LENGTH_SHORT)
-                                    .show()
-                            }
-                        } finally {
-                            publisherGrpcImpl.shutdown()
-                            onCompletedCallback()
                         }
                     }
                 }
