@@ -227,13 +227,13 @@ private fun ComposeMessages(
 ) {
     Button(
         onClick = {
-            onDismissRequest()
             navController.navigate(ComposeScreen(
                 transportType = transportTypes,
                 platformName = platform?.name,
                 isOnboarding = isOnboarding,
-                messageId = null
+                messageId = null,
             ))
+            onDismissRequest()
         },
         modifier = Modifier.fillMaxWidth()
     ) {

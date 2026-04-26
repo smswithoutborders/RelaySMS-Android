@@ -6,7 +6,8 @@ import androidx.room.PrimaryKey
 
 @Entity(indices = [Index(value = ["account", "name"], unique = true)])
 data class Accounts(
-    @PrimaryKey val id: String,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
     val account: String,
     val name: String,
 )

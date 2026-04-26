@@ -77,15 +77,8 @@ class VaultsGrpcImpl(val context: Context) : AutoCloseable {
             val platformsToSave = mutableListOf<Accounts>()
 
             response.storedTokensList.forEach { accountTokens ->
-                val uuid = Base64.encodeToString(
-                    (
-                        accountTokens.platform.toByteArray() +
-                        accountTokens.accountIdentifier.toByteArray()
-                    ).sha256(), Base64.DEFAULT)
-
                 platformsToSave.add(
                     Accounts(
-                        id = uuid,
                         account = accountTokens.accountIdentifier,
                         name = accountTokens.platform,
                     )

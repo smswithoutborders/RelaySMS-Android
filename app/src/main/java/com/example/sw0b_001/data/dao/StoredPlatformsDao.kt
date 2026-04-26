@@ -27,7 +27,7 @@ interface StoredPlatformsDao {
     fun fetchPlatform(name: String) : LiveData<List<Accounts>>
 
     @Query("SELECT * FROM Accounts WHERE id = :id")
-    fun fetch(id: String) : Accounts
+    fun fetch(id: Int) : Accounts
 
     @Query("SELECT * FROM Accounts WHERE account = :account")
     fun fetchAccount(account: String) : Accounts?
@@ -39,10 +39,7 @@ interface StoredPlatformsDao {
     fun deleteAll()
 
     @Query("DELETE FROM Accounts WHERE id = :id")
-    fun delete(id: String)
-
-    @Query("SELECT id FROM Accounts")
-    fun getAllAccountIds(): List<String>
+    fun delete(id: Int)
 
     @Transaction
     fun insert(platforms: List<Accounts>) {

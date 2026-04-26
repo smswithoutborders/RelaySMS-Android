@@ -394,7 +394,6 @@ fun PlatformCard(
     onClick: (SupportedPlatforms?) -> Unit = {}
 ) {
     val context = LocalContext.current
-    val inPreviewMode = LocalInspectionMode.current
 
     Card(
         onClick = { onClick(platform) },
@@ -443,15 +442,3 @@ fun PlatformCard(
         }
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun AddPlatformsScreenPreview() {
-//    AppTheme(darkTheme = false) {
-//        SupportedPlatformsView(
-//            navController = NavController(context = LocalContext.current),
-//            supportedPlatformsViewModel = remember{ SupportedPlatformsViewModel(
-//                SupportedPlatformsRepository(SupportedPlatformsApiService::class.java))},
-//        ){}
-//    }
-//}

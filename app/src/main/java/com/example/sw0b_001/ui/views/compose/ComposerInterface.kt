@@ -1,11 +1,8 @@
 package com.example.sw0b_001.ui.views.compose
 
-import android.R.id.message
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.telephony.PhoneNumberUtils
-import android.util.Base64
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
@@ -18,7 +15,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AttachFile
-import androidx.compose.material.icons.filled.DeveloperMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,9 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.app.PendingIntentCompat.send
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.afkanerd.lib_image_android.ui.navigation.ImageRenderNav
@@ -48,30 +42,19 @@ import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDefaultSimSubscription
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.components.mmsImagePicker
-import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
-import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.Composers
 import com.example.sw0b_001.data.models.Accounts
-import com.example.sw0b_001.data.models.Messages
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import com.example.sw0b_001.data.repositories.TransportTypes
-import com.example.sw0b_001.extensions.context.settingsGetNotShowChooseGatewayClient
 import com.example.sw0b_001.ui.components.AttachImageView
 import com.example.sw0b_001.ui.modals.ComposeChooseGatewayClientsModal
 import com.example.sw0b_001.ui.modals.SelectAccountModal
-import com.example.sw0b_001.ui.navigation.HomepageScreen
-import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.AccountsViewModel
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
-import com.example.sw0b_001.ui.viewModels.AccountsViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.views.DeveloperHTTPView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import kotlin.text.isNotEmpty
 
 
 @Serializable
@@ -109,10 +92,8 @@ fun ComposerInterface(
     }
 
     val supportedPlatforms by supportedPlatformsViewModel.get().observeAsState()
-    var platform: SupportedPlatforms? = null
-    LaunchedEffect(supportedPlatforms) {
-        platform = supportedPlatforms?.find{ it.name == platformName }
-    }
+    var platform: SupportedPlatforms? by remember(supportedPlatforms) {
+        mutableStateOf(supportedPlatforms?.find{ it.name == platformName })}
 
     val message by messagesViewModel.message.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
@@ -120,8 +101,6 @@ fun ComposerInterface(
             messagesViewModel.get(messageId)
         }
     }
-
-    val accounts by accountsViewModel.get().observeAsState()
 
     var processedImage by remember{ mutableStateOf(imageViewModel.processedImage) }
     var imageBitmap: Bitmap? by remember {
@@ -136,13 +115,6 @@ fun ComposerInterface(
     var showChooseGatewayClient by remember { mutableStateOf(false) }
 
     var isSending by remember { mutableStateOf(false) }
-    var showSelectAccountModal by remember { mutableStateOf(
-        when(transportType) {
-            TransportTypes.PLATFORM -> true
-            else -> false
-        }
-    ) }
-    var selectedAccount: Accounts? by remember { mutableStateOf(null) }
 
     var showDeveloperDialog by remember{ mutableStateOf(false) }
 
@@ -159,13 +131,23 @@ fun ComposerInterface(
         imageUri = uri
         imageRenderSubModule()
     }
-    var from: String? by remember{ mutableStateOf(selectedAccount?.name) }
+
+    val accounts by accountsViewModel.get().observeAsState()
+    var selectedAccount: Accounts? by remember(accounts, message) {
+        mutableStateOf(accounts?.find{ it.id == message?.accountId }) }
+
+    var from: String? by remember(selectedAccount){
+        mutableStateOf(selectedAccount?.account) }
     var to: String by remember{ mutableStateOf(message?.to?.toUtf8String() ?: "") }
     var cc: String by remember{ mutableStateOf(message?.cc?.toUtf8String() ?: "") }
     var bcc: String by remember{ mutableStateOf(message?.bcc?.toUtf8String() ?: "") }
     var subject: String by remember{ mutableStateOf(message?.subject?.toUtf8String() ?: "") }
     var body: String by remember{ mutableStateOf(message?.body?.toUtf8String() ?: "") }
     var image by remember{ mutableStateOf(message?.image) }
+
+    var showSelectAccountModal by remember(selectedAccount) { mutableStateOf(
+        transportType == TransportTypes.PLATFORM && selectedAccount == null
+    ) }
 
     Scaffold(
         topBar = {
@@ -236,7 +218,7 @@ fun ComposerInterface(
                         when(platform!!.service_type) {
                             "email"-> EmailComposeView(
                                 TransportTypes.PLATFORM,
-                                account = selectedAccount,
+                                from = from,
                                 to = to,
                                 cc = cc,
                                 bcc = bcc,
@@ -254,7 +236,7 @@ fun ComposerInterface(
                     } else if(transportType == TransportTypes.BRIDGE) {
                         EmailComposeView(
                             TransportTypes.BRIDGE,
-                            account = selectedAccount,
+                            from = from,
                             to = to,
                             cc = cc,
                             bcc = bcc,

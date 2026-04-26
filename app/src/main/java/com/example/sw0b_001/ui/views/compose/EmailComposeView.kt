@@ -38,7 +38,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.models.Accounts
 import com.example.sw0b_001.data.repositories.TransportTypes
 import kotlinx.coroutines.launch
 
@@ -51,7 +50,7 @@ fun ByteArray.toUtf8String(): String {
 @Composable
 fun EmailComposeView(
     type: TransportTypes,
-    account: Accounts? = null,
+    from: String? = null,
     to: String,
     cc: String,
     bcc: String,
@@ -70,8 +69,6 @@ fun EmailComposeView(
     val coroutineScope = rememberCoroutineScope()
 
     val scrollState = rememberScrollState()
-
-    var from: String by remember{ mutableStateOf(account?.account ?: "") }
 
     Column(
         modifier = Modifier
@@ -95,7 +92,7 @@ fun EmailComposeView(
                         modifier = Modifier.padding(end = 24.dp),
                         fontWeight = FontWeight.Medium
                     )
-                    account?.let {
+                    from?.let {
                         BasicTextField(
                             value = from,
                             onValueChange = {},
