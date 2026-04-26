@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.Accounts
-import com.example.sw0b_001.data.models.Messages
 import com.example.sw0b_001.data.repositories.TransportTypes
 import kotlinx.coroutines.launch
 
@@ -53,7 +52,16 @@ fun ByteArray.toUtf8String(): String {
 fun EmailComposeView(
     type: TransportTypes,
     account: Accounts? = null,
-    message: Messages? = null,
+    to: String,
+    cc: String,
+    bcc: String,
+    subject: String,
+    body: String,
+    toCallback: (String) -> Unit,
+    ccCallback: (String) -> Unit,
+    bccCallback: (String) -> Unit,
+    subjectCallback: (String) -> Unit,
+    bodyCallback: (String) -> Unit,
 ) {
     val inPreviewMode = LocalInspectionMode.current
 
@@ -63,13 +71,7 @@ fun EmailComposeView(
 
     val scrollState = rememberScrollState()
 
-    var from: String? by remember{ mutableStateOf(account?.name) }
-    var to: String by remember{ mutableStateOf(message?.to?.toUtf8String() ?: "") }
-    var cc: String by remember{ mutableStateOf(message?.cc?.toUtf8String() ?: "") }
-    var bcc: String by remember{ mutableStateOf(message?.bcc?.toUtf8String() ?: "") }
-    var subject: String by remember{ mutableStateOf(message?.subject?.toUtf8String() ?: "") }
-    var body: String by remember{ mutableStateOf(message?.body?.toUtf8String() ?: "") }
-    var image by remember{ mutableStateOf(message?.image) }
+    var from: String by remember{ mutableStateOf(account?.account ?: "") }
 
     Column(
         modifier = Modifier
@@ -95,7 +97,7 @@ fun EmailComposeView(
                     )
                     account?.let {
                         BasicTextField(
-                            value = account.account,
+                            value = from,
                             onValueChange = {},
                             textStyle = TextStyle.Default.copy(
                                 color = MaterialTheme.colorScheme.onSurface,
@@ -129,9 +131,7 @@ fun EmailComposeView(
                     )
                     BasicTextField(
                         value = to,
-                        onValueChange = {
-                            to = it
-                        },
+                        onValueChange = toCallback,
                         textStyle = TextStyle.Default.copy(
                             color = MaterialTheme.colorScheme.onSurface,
                             fontSize = 16.sp,
@@ -171,9 +171,7 @@ fun EmailComposeView(
                         )
                         BasicTextField(
                             value = cc,
-                            onValueChange = {
-                                cc = it
-                            },
+                            onValueChange = ccCallback,
                             textStyle = TextStyle.Default.copy(
                                 color = MaterialTheme.colorScheme.onSurface,
                                 fontSize = 16.sp
@@ -206,9 +204,7 @@ fun EmailComposeView(
                         )
                         BasicTextField(
                             value = bcc,
-                            onValueChange = {
-                                bcc = it
-                            },
+                            onValueChange = bccCallback,
                             textStyle = TextStyle.Default.copy(
                                 color = MaterialTheme.colorScheme.onSurface,
                                 fontSize = 16.sp
@@ -239,9 +235,7 @@ fun EmailComposeView(
             ) {
                 BasicTextField(
                     value = subject,
-                    onValueChange = {
-                        subject = it
-                    },
+                    onValueChange = subjectCallback,
                     textStyle = TextStyle.Default.copy(
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 16.sp
@@ -274,7 +268,7 @@ fun EmailComposeView(
             BasicTextField(
                 value = body,
                 onValueChange = { newValue ->
-                    body = newValue
+                    bodyCallback(newValue)
 
                     val lines = newValue.lines()
                     val lineCount = lines.size

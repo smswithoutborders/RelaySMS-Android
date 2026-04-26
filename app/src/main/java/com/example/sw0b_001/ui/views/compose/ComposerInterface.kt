@@ -159,6 +159,13 @@ fun ComposerInterface(
         imageUri = uri
         imageRenderSubModule()
     }
+    var from: String? by remember{ mutableStateOf(selectedAccount?.name) }
+    var to: String by remember{ mutableStateOf(message?.to?.toUtf8String() ?: "") }
+    var cc: String by remember{ mutableStateOf(message?.cc?.toUtf8String() ?: "") }
+    var bcc: String by remember{ mutableStateOf(message?.bcc?.toUtf8String() ?: "") }
+    var subject: String by remember{ mutableStateOf(message?.subject?.toUtf8String() ?: "") }
+    var body: String by remember{ mutableStateOf(message?.body?.toUtf8String() ?: "") }
+    var image by remember{ mutableStateOf(message?.image) }
 
     Scaffold(
         topBar = {
@@ -207,7 +214,6 @@ fun ComposerInterface(
                     IconButton(
                         enabled = !isSending,
                         onClick = {
-                            TODO()
                         }
                     ) {
                         Icon(Icons.AutoMirrored.Filled.Send,
@@ -231,16 +237,34 @@ fun ComposerInterface(
                             "email"-> EmailComposeView(
                                 TransportTypes.PLATFORM,
                                 account = selectedAccount,
-                                message = message
+                                to = to,
+                                cc = cc,
+                                bcc = bcc,
+                                subject = subject,
+                                body = body,
+                                toCallback = { to = it },
+                                ccCallback = { cc = it },
+                                bccCallback = {bcc = it },
+                                subjectCallback = { subject = it },
+                                bodyCallback = { body = it }
                             )
-                            "text" -> TextComposeView(message)
-                            "message" -> MessageComposeView(message)
+//                            "text" -> TextComposeView(messagesViewModel.message)
+//                            "message" -> MessageComposeView(messagesViewModel.message)
                         }
                     } else if(transportType == TransportTypes.BRIDGE) {
                         EmailComposeView(
                             TransportTypes.BRIDGE,
                             account = selectedAccount,
-                            message = message
+                            to = to,
+                            cc = cc,
+                            bcc = bcc,
+                            subject = subject,
+                            body = body,
+                            toCallback = { to = it },
+                            ccCallback = { cc = it },
+                            bccCallback = {bcc = it },
+                            subjectCallback = { subject = it },
+                            bodyCallback = { body = it }
                         )
                     }
 
