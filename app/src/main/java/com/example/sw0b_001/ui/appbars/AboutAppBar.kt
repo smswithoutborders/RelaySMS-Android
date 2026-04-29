@@ -3,6 +3,7 @@ package com.example.sw0b_001.ui.appbars
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -42,11 +43,13 @@ fun AboutAppBar(
             Text(
                 text = stringResource(R.string.about),
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.SemiBold
             )
         },
         navigationIcon = {
-            IconButton(onClick = { navController.popBackStack() }) {
+            IconButton(
+                onClick = { navController.popBackStack() }
+            ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.back)
@@ -54,27 +57,39 @@ fun AboutAppBar(
             }
         },
         actions = {
+
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .padding(end = 16.dp)
+                    .padding(end = 12.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                        shape = MaterialTheme.shapes.large
+                    )
                     .clickable { sendBugReportEmail(context) }
+                    .padding(horizontal = 12.dp, vertical = 6.dp)
             ) {
-                Text(
-                    text = stringResource(R.string.bug_report),
-                    style = MaterialTheme.typography.bodySmall,
-                )
-                Spacer(modifier = Modifier.width(4.dp))
+
                 Icon(
                     imageVector = Icons.Default.Email,
-                    contentDescription = stringResource(R.string.report_bug_feedback)
+                    contentDescription = stringResource(R.string.report_bug_feedback),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+
+                Spacer(modifier = Modifier.width(6.dp))
+
+                Text(
+                    text = stringResource(R.string.bug_report),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         },
-        colors = TopAppBarDefaults.topAppBarColors()
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     )
 }
-
 private fun sendBugReportEmail(context: Context) {
     val emailIntent = Intent(Intent.ACTION_SENDTO).apply {
         data = Uri.parse("mailto:")
