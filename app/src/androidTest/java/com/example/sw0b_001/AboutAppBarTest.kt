@@ -25,17 +25,16 @@ class AboutAppBarTest {
             }
         }
 
-        // 🧠 Title
         composeTestRule
             .onNodeWithText("About")
             .assertExists()
 
-        // 🔙 Back button
+
         composeTestRule
             .onNodeWithContentDescription("Back")
             .assertExists()
 
-        // 📧 Bug report button (stable via testTag)
+
         composeTestRule
             .onNodeWithTag("bug_report_button")
             .assertExists()
