@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.theme.AppTheme
+import androidx.compose.ui.platform.testTag
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,6 +69,7 @@ fun AboutAppBar(
                     )
                     .clickable { sendBugReportEmail(context) }
                     .padding(horizontal = 12.dp, vertical = 6.dp)
+                    .testTag("bug_report_button")
             ) {
 
                 Icon(
