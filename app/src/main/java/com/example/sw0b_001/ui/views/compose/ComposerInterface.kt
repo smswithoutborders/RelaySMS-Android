@@ -41,6 +41,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.afkanerd.lib_image_android.ui.ImageRender
 import com.afkanerd.lib_image_android.ui.navigation.ImageRenderNav
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDefaultSimSubscription
@@ -86,7 +87,7 @@ fun ComposerInterface(
     val context = LocalContext.current
     val inPreviewMode = LocalInspectionMode.current
 
-    val processedImage by imageViewModel.processedImageUiState.collectAsState()
+    val processedImage by imageViewModel.processedImage.collectAsState()
 
     val subscriptionId by remember{
         mutableLongStateOf(
@@ -108,7 +109,7 @@ fun ComposerInterface(
         }
     }
 
-    var imageBitmap: Bitmap? by remember {
+    var imageBitmap: Bitmap? by remember(processedImage) {
         mutableStateOf(
             if(inPreviewMode) {
                 BitmapFactory.decodeResource(context.resources,
@@ -125,10 +126,8 @@ fun ComposerInterface(
 
     var sendRequestPayload by remember{ mutableStateOf<ByteArray?>(null) }
 
-    var imageUri by remember{ mutableStateOf<Uri?>(null) }
     val imagePicker = mmsImagePicker { uri ->
-        imageUri = uri
-        navController.navigate(ImageRenderNav(imageUri.toString()))
+        navController.navigate(ImageRenderNav(uri.toString()))
     }
 
     val accounts by accountsViewModel.get().observeAsState()
@@ -268,10 +267,12 @@ fun ComposerInterface(
                         AttachImageView(
                             it,
                             onCancelCallback = {
-                                imageViewModel.setProcessedImage(null)
+                                imageViewModel.reset()
                             }
                         ) {
-                            TODO()
+                            processedImage?.uri.let { uri ->
+                                navController.navigate(ImageRenderNav(uri.toString()))
+                            }
                         }
                     }
                 }

@@ -444,16 +444,16 @@ class MainActivity : BindActivity() {
                     navController = navController,
                     imageViewModel = imageViewModel,
                     smsCountPaddingValue = imageRenderNav.smsCountPadding,
-                    uri = imageRenderNav.uri.toUri(),
+                    uri = imageRenderNav.uri?.toUri(),
                     imageService = imageTransmissionService,
                     imageTransmissionCallback = {
                         TODO()
                     },
                     onApplyCallback = {
-                        TODO()
+                        navController.popBackStack()
                     },
                     backActionCallback = {
-                        TODO()
+                        navController.popBackStack()
                     }
                 )
             }

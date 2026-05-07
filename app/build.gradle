@@ -137,7 +137,7 @@ configurations.configureEach {
 }
 
 dependencies {
-    implementation 'com.github.smswithoutborders:lib_image_android:3b50b8d'
+    implementation 'com.github.smswithoutborders:lib_image_android:0bbf4d7'
     implementation 'com.github.smswithoutborders:lib_smsmms_android:dfe4676'
     implementation 'com.github.smswithoutborders:lib_signal_double_ratchet_java:c4a12f8'
 
