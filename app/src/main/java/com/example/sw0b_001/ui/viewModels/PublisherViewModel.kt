@@ -1,16 +1,10 @@
 package com.example.sw0b_001.ui.viewModels
 
 import android.content.Context
-import android.util.Base64
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.afkanerd.smswithoutborders_libsmsmms.data.ImageTransmissionProtocol
-import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDefaultSimSubscription
-import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Composers
 import com.example.sw0b_001.data.models.Accounts
-import com.example.sw0b_001.extensions.context.settingsGetDefaultGatewayClients
-import com.example.sw0b_001.ui.viewModels.AccountsViewModel.Companion.ITP_VERSION_VALUE
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
@@ -33,73 +27,74 @@ class PublisherViewModel @Inject constructor(
         onSuccess: (ByteArray?) -> Unit,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            lateinit var payload: ByteArray
-            val subscriptionId = context.getDefaultSimSubscription()!!
-            try {
-                if(isBridge) {
-                    TODO()
-//                    val random = (0..255).random()
-//                    val content = Bridges.encryptContent(
-//                        context,
-//                        imageByteArray + text,
-//                        false,
-//                        imageLength = imageByteArray.size,
-//                        textLength = text.size,
-//                        subscriptionId = subscriptionId,
-//                        isLoggedIn = isLoggedIn
-//                    )
+//            lateinit var payload: ByteArray
+//            val subscriptionId = context.getDefaultSimSubscription()!!
+//            try {
+//                if(isBridge) {
+//                    TODO()
+////                    val random = (0..255).random()
+////                    val content = Bridges.encryptContent(
+////                        context,
+////                        imageByteArray + text,
+////                        false,
+////                        imageLength = imageByteArray.size,
+////                        textLength = text.size,
+////                        subscriptionId = subscriptionId,
+////                        isLoggedIn = isLoggedIn
+////                    )
+////
+////                    payload = if(isLoggedIn) { Bridges.payloadOnly(content) }
+////                    else {
+////                        Bridges.authRequestAndPayload(
+////                            content = content,
+////                            serverKID = random.toUByte(),
+////                            clientPublicKey = TODO()
+////                        )
+////                    }
+//                }
+//                else {
+//                    TODO()
+////                    val platform = Datastore.getDatastore(context).availablePlatformsDao()
+////                        .fetch(account!!.name!!)
+////                        ?: return@launch onFailure(
+////                            context.getString(
+////                                R.string.could_not_find_platform_details_for,
+////                                account.name
+////                            ))
+////
+////                    val ad = TODO()
+////                    payload = PublishersImpl.compose(
+////                        context = context,
+////                        content = imageByteArray + text,
+////                        ad = ad!!,
+////                        platform = platform,
+////                        account = account,
+////                        languageCode = languageCode,
+////                        subscriptionId = subscriptionId,
+////                    )
+//                }
 //
-//                    payload = if(isLoggedIn) { Bridges.payloadOnly(content) }
-//                    else {
-//                        Bridges.authRequestAndPayload(
-//                            content = content,
-//                            serverKID = random.toUByte(),
-//                            clientPublicKey = TODO()
-//                        )
-//                    }
-                }
-                else {
-                    TODO()
-//                    val platform = Datastore.getDatastore(context).availablePlatformsDao()
-//                        .fetch(account!!.name!!)
-//                        ?: return@launch onFailure(
-//                            context.getString(
-//                                R.string.could_not_find_platform_details_for,
-//                                account.name
-//                            ))
+////                val gatewayClients = context.settingsGetDefaultGatewayClients
+////                    ?: throw Exception("No default Gateway client")
+////
+////                ImageTransmissionProtocol.startWorkManager(
+////                    context = context,
+////                    formattedPayload = Base64.encode(payload, Base64.DEFAULT),
+////                    logo = R.drawable.logo,
+////                    version = ITP_VERSION_VALUE,
+////                    sessionId = ImageTransmissionProtocol.getItpSession(context).toByte(),
+////                    imageLength = imageByteArray.size.toShort(),
+////                    textLength = text.size.toShort(),
+////                    address = gatewayClients.msisdn,
+////                    subscriptionId = subscriptionId,
+////                )
+////                onSuccess(payload)
+////            } catch(e: Exception) {
+////                e.printStackTrace()
+////                onFailure(e.message)
+////            }
 //
-//                    val ad = TODO()
-//                    payload = PublishersImpl.compose(
-//                        context = context,
-//                        content = imageByteArray + text,
-//                        ad = ad!!,
-//                        platform = platform,
-//                        account = account,
-//                        languageCode = languageCode,
-//                        subscriptionId = subscriptionId,
-//                    )
-                }
-
-                val gatewayClients = context.settingsGetDefaultGatewayClients
-                    ?: throw Exception("No default Gateway client")
-
-                ImageTransmissionProtocol.startWorkManager(
-                    context = context,
-                    formattedPayload = Base64.encode(payload, Base64.DEFAULT),
-                    logo = R.drawable.logo,
-                    version = ITP_VERSION_VALUE,
-                    sessionId = ImageTransmissionProtocol.getItpSession(context).toByte(),
-                    imageLength = imageByteArray.size.toShort(),
-                    textLength = text.size.toShort(),
-                    address = gatewayClients.msisdn,
-                    subscriptionId = subscriptionId,
-                )
-                onSuccess(payload)
-            } catch(e: Exception) {
-                e.printStackTrace()
-                onFailure(e.message)
-            }
-
+//        }
         }
     }
 

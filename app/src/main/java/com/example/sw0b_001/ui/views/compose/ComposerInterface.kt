@@ -1,10 +1,13 @@
 package com.example.sw0b_001.ui.views.compose
 
+import android.app.Activity
+import android.app.ProgressDialog.show
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableLongStateOf
@@ -65,6 +69,7 @@ data class GatewayClientRequest(
     val date_sent: String
 )
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ComposerInterface(
@@ -81,13 +86,14 @@ fun ComposerInterface(
     val context = LocalContext.current
     val inPreviewMode = LocalInspectionMode.current
 
+    val processedImage by imageViewModel.processedImageUiState.collectAsState()
+
     val subscriptionId by remember{
         mutableLongStateOf(
             if(inPreviewMode) -1 else
             if(context.isDefault()) context.getDefaultSimSubscription() ?: -1L else -1L)
     }
     BackHandler {
-        imageViewModel.processedImage = null
         navController.popBackStack()
     }
 
@@ -102,7 +108,6 @@ fun ComposerInterface(
         }
     }
 
-    var processedImage by remember{ mutableStateOf(imageViewModel.processedImage) }
     var imageBitmap: Bitmap? by remember {
         mutableStateOf(
             if(inPreviewMode) {
@@ -121,15 +126,9 @@ fun ComposerInterface(
     var sendRequestPayload by remember{ mutableStateOf<ByteArray?>(null) }
 
     var imageUri by remember{ mutableStateOf<Uri?>(null) }
-    fun imageRenderSubModule() {
-        imageViewModel.processedImage = null
-        processedImage = null
-        imageBitmap = null
-        navController.navigate(ImageRenderNav(imageUri.toString()))
-    }
     val imagePicker = mmsImagePicker { uri ->
         imageUri = uri
-        imageRenderSubModule()
+        navController.navigate(ImageRenderNav(imageUri.toString()))
     }
 
     val accounts by accountsViewModel.get().observeAsState()
@@ -172,7 +171,6 @@ fun ComposerInterface(
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-                        imageViewModel.processedImage = null
                         navController.popBackStack()
                     }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack,
@@ -196,6 +194,7 @@ fun ComposerInterface(
                     IconButton(
                         enabled = !isSending,
                         onClick = {
+                            showChooseGatewayClient = true
                         }
                     ) {
                         Icon(Icons.AutoMirrored.Filled.Send,
@@ -230,8 +229,16 @@ fun ComposerInterface(
                                 subjectCallback = { subject = it },
                                 bodyCallback = { body = it }
                             )
-//                            "text" -> TextComposeView(messagesViewModel.message)
-//                            "message" -> MessageComposeView(messagesViewModel.message)
+                            "text" -> TextComposeView(
+                                body = body,
+                                bodyCallback = { body = it }
+                            )
+                            "message" -> MessageComposeView(
+                                to = to,
+                                body = body,
+                                toCallback = { to = it },
+                                bodyCallback = { body = it }
+                            )
                         }
                     } else if(transportType == TransportTypes.BRIDGE) {
                         EmailComposeView(
@@ -261,9 +268,7 @@ fun ComposerInterface(
                         AttachImageView(
                             it,
                             onCancelCallback = {
-                                processedImage = null
-                                imageViewModel.processedImage = null
-                                imageBitmap = null
+                                imageViewModel.setProcessedImage(null)
                             }
                         ) {
                             TODO()
@@ -276,7 +281,9 @@ fun ComposerInterface(
                     showChooseGatewayClient,
                     gatewayClientViewModel,
                 ) {
-                    TODO()
+                    // get encrypted payload
+                    // trigger sms launcher
+                    // save if sms message sent
                 }
             }
 

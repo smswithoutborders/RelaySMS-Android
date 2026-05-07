@@ -9,27 +9,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.Composers
-import com.example.sw0b_001.data.models.Accounts
-import com.example.sw0b_001.data.models.Messages
-import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.serialization.Serializable
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TextComposeView( message: Messages? = null, ) {
-    var body by remember{ mutableStateOf(message?.body?.toUtf8String() ?: "") }
-
+fun TextComposeView(
+    body: String,
+    bodyCallback: (String) -> Unit,
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -37,7 +29,7 @@ fun TextComposeView( message: Messages? = null, ) {
     ) {
         OutlinedTextField(
             value = body,
-            onValueChange = { body = it },
+            onValueChange = bodyCallback,
             label = {
                 Text(stringResource(R.string.what_s_happening),
                     style = MaterialTheme.typography.bodyMedium)
@@ -45,10 +37,6 @@ fun TextComposeView( message: Messages? = null, ) {
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
-//            keyboardOptions = KeyboardOptions(
-//                keyboardType = KeyboardType.Text,
-////                    imeAction = ImeAction.Done
-//            )
         )
     }
 }

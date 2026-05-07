@@ -6,8 +6,8 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -43,7 +43,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.window.layout.WindowInfoTracker
 import androidx.window.layout.WindowLayoutInfo
-import com.afkanerd.lib_image_android.ui.components.ImageRender
+import com.afkanerd.lib_image_android.ui.BindActivity
+import com.afkanerd.lib_image_android.ui.ImageRender
 import com.afkanerd.lib_image_android.ui.navigation.ImageRenderNav
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.NEW_NOTIFICATION_ACTION
@@ -83,28 +84,27 @@ import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.VaultsViewModel
 import com.example.sw0b_001.ui.views.AboutView
+import com.example.sw0b_001.ui.views.WelcomeMainView
 import com.example.sw0b_001.ui.views.accounts.CreateAccountView
 import com.example.sw0b_001.ui.views.accounts.ForgotPasswordView
-import com.example.sw0b_001.ui.views.threads.GetMeOutOfHere
-import com.example.sw0b_001.ui.views.tabs.HomepageView
 import com.example.sw0b_001.ui.views.accounts.LoginView
 import com.example.sw0b_001.ui.views.accounts.OtpCodeVerificationView
-import com.example.sw0b_001.ui.views.incoming.PasteEncryptedTextView
-import com.example.sw0b_001.ui.views.settings.SettingsView
-import com.example.sw0b_001.ui.views.WelcomeMainView
 import com.example.sw0b_001.ui.views.compose.ComposerInterface
 import com.example.sw0b_001.ui.views.details.EmailDetailsView
 import com.example.sw0b_001.ui.views.details.MessageDetailsView
 import com.example.sw0b_001.ui.views.details.TextDetailsView
+import com.example.sw0b_001.ui.views.incoming.PasteEncryptedTextView
+import com.example.sw0b_001.ui.views.settings.SettingsView
+import com.example.sw0b_001.ui.views.tabs.HomepageView
+import com.example.sw0b_001.ui.views.threads.GetMeOutOfHere
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlin.system.exitProcess
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : BindActivity() {
     private lateinit var navController: NavHostController
     val searchViewModel:  SearchViewModel by viewModels()
     val supportedPlatformsViewModel: SupportedPlatformsViewModel by viewModels()
@@ -187,14 +187,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun securityChecks(callback: () -> Unit) {
         if(settingsGetLockDownApp) {
-            promptBiometrics(this) {
-                if(!it) {
-                    finish()
-                    exitProcess(0)
-                } else {
-                    callback()
-                }
-            }
+            TODO()
+//            promptBiometrics(this) {
+//                if(!it) {
+//                    finish()
+//                    exitProcess(0)
+//                } else {
+//                    callback()
+//                }
+//            }
         } else {
             callback()
         }
@@ -443,14 +444,23 @@ class MainActivity : AppCompatActivity() {
                     navController = navController,
                     imageViewModel = imageViewModel,
                     smsCountPaddingValue = imageRenderNav.smsCountPadding,
-                    uri = imageRenderNav.uri.toUri()
+                    uri = imageRenderNav.uri.toUri(),
+                    imageService = imageTransmissionService,
+                    imageTransmissionCallback = {
+                        TODO()
+                    },
+                    onApplyCallback = {
+                        TODO()
+                    },
+                    backActionCallback = {
+                        TODO()
+                    }
                 )
             }
 
             composable<SettingsScreen> {
                 SettingsView(
                     navController = navController,
-                    activity = this@MainActivity,
                     vaultsViewModel = vaultViewModel
                 )
             }
@@ -501,5 +511,17 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         vaultViewModel.shutdown()
+    }
+
+    val smsLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            // Handle success
+            val data = result.data
+            // Process the returned intent data here
+        } else {
+            // Handle failure or cancellation
+        }
     }
 }

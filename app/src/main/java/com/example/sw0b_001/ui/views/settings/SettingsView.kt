@@ -1,8 +1,11 @@
 package com.example.sw0b_001.ui.views.settings
 
 
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.res.Configuration
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.Column
@@ -43,11 +46,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getActivity
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getCurrentLocale
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.setLocale
 import com.afkanerd.smswithoutborders_libsmsmms.ui.SettingsItem
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
+import com.example.sw0b_001.extensions.context.getAppCompatActivity
 import com.example.sw0b_001.extensions.context.promptBiometrics
 import com.example.sw0b_001.extensions.context.settingsGetIsEmailLogin
 import com.example.sw0b_001.extensions.context.settingsGetLockDownApp
@@ -68,7 +73,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingsView(
     navController: NavController,
-    activity: AppCompatActivity,
     vaultsViewModel: VaultsViewModel,
 ) {
     val context = LocalContext.current
@@ -274,7 +278,7 @@ fun SettingsView(
                 enabled = !isLoading,
                 horizontalDivide = false
             ) { checked ->
-                context.promptBiometrics(activity) {
+                context.promptBiometrics(context.getAppCompatActivity()!!) {
                     if(it) {
                         context.settingsSetLockDownApp(checked!!)
                         setLockDownApp = checked
@@ -331,19 +335,5 @@ fun SettingsView(
                 }
             }
         }
-    }
-
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SettingsScreenPreview() {
-    AppTheme {
-        val context = LocalContext.current
-        SettingsView(
-            navController = rememberNavController(),
-            activity = AppCompatActivity(),
-            remember{ VaultsViewModel(context) }
-        )
     }
 }

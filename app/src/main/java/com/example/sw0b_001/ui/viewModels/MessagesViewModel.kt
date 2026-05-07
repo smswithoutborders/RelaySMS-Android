@@ -82,9 +82,7 @@ class MessagesViewModel @Inject constructor(
         return inboxMessageList
     }
 
-    fun insert(context: Context, messages: Messages) : Long {
-        val db = Datastore.getDatastore(context)?.messagesDao()
-            ?: throw Exception("Could not open database")
+    private fun insert(messages: Messages) : Long {
         return db.insert(messages)
     }
 
@@ -93,6 +91,20 @@ class MessagesViewModel @Inject constructor(
             val db = Datastore.getDatastore(context)?.messagesDao()
                 ?: throw Exception("Could not open database")
             db.delete(message)
+        }
+    }
+
+    fun encrypt(
+        message: Messages,
+        transportType: TransportTypes,
+    ): ByteArray? {
+        when(transportType) {
+            TransportTypes.BRIDGE -> {
+                TODO()
+            }
+            TransportTypes.PLATFORM -> {
+                TODO()
+            }
         }
     }
 

@@ -39,7 +39,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.models.Messages
 import com.example.sw0b_001.extensions.context.getPhoneNumberFromUri
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -68,12 +67,16 @@ private fun getRecipientFieldInfo(): RecipientFieldInfo {
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
-fun MessageComposeView(message: Messages? = null) {
+fun MessageComposeView(
+    to: String,
+    body: String,
+    toCallback: (String) -> Unit,
+    bodyCallback: (String) -> Unit,
+) {
     val context = LocalContext.current
     val fieldInfo = getRecipientFieldInfo()
 
-    var to: String by remember { mutableStateOf(message?.to?.toUtf8String() ?: "")}
-    var body: String by remember { mutableStateOf(message?.body?.toUtf8String() ?: "")}
+    var to by remember { mutableStateOf(to) }
 
     val launcher = rememberLauncherForActivityResult(
         contract = PickPhoneNumberContract()
@@ -96,7 +99,7 @@ fun MessageComposeView(message: Messages? = null) {
         ) {
             OutlinedTextField(
                 value = to,
-                onValueChange = { to = it },
+                onValueChange = toCallback,
                 label = { Text(fieldInfo.label, style = MaterialTheme.typography.bodyMedium) },
                 modifier = Modifier.weight(1f),
                 isError = to.isNotEmpty() && !PhoneNumberUtils.isGlobalPhoneNumber(to),
@@ -135,7 +138,7 @@ fun MessageComposeView(message: Messages? = null) {
 
         OutlinedTextField(
             value = body,
-            onValueChange = { body = it },
+            onValueChange = bodyCallback,
             label = { Text(
                 stringResource(R.string.message),
                 style = MaterialTheme.typography.bodyMedium) },

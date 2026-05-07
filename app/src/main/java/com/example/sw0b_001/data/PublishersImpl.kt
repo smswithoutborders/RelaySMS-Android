@@ -3,16 +3,16 @@ package com.example.sw0b_001.data
 import android.content.Context
 import android.content.Intent
 import android.util.Base64
+import com.afkanerd.lib_image_android.ui.extensions.toLittleEndianBytes
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.States
 import com.afkanerd.smswithoutborders_libsmsmms.data.data.models.SmsManager
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getThreadId
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
-import com.afkanerd.smswithoutborders_libsmsmms.extensions.toLittleEndianBytes
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewModel
 import com.example.sw0b_001.data.Helpers.toBytes
 import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
-import com.example.sw0b_001.data.models.Messages
 import com.example.sw0b_001.data.models.Accounts
+import com.example.sw0b_001.data.models.Messages
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import com.example.sw0b_001.extensions.context.settingsGetDefaultGatewayClients
 import com.example.sw0b_001.extensions.context.settingsGetUseDeviceId
@@ -54,12 +54,10 @@ object PublishersImpl {
         return null
     }
 
-    private fun sendSms(
+
+    fun sendSms(
         context: Context,
         payload: String,
-        address: String,
-        subscriptionId: Long,
-        messages: Messages,
         onSuccessRunnable: (Messages) -> Unit
     ) {
         val gatewayClient = context.settingsGetDefaultGatewayClients
@@ -70,10 +68,10 @@ object PublishersImpl {
                 smsManager.sendSms(
                     context = context,
                     text = payload,
-                    address = address,
-                    subscriptionId = subscriptionId,
+                    address = gatewayClient.msisdn,
+                    subscriptionId = -1,
                     threadId = context.getThreadId(gatewayClient.msisdn),
-                    callback = { conversation -> onSuccessRunnable(messages) }
+                    callback = {}
                 )
             }
             else {
@@ -84,7 +82,6 @@ object PublishersImpl {
                 ).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 }
-                context.startActivity(intent)
             }
         }
     }
