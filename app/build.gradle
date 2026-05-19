@@ -117,29 +117,54 @@ protobuf {
     }
     generateProtoTasks {
         all().each { task ->
-            task.builtins { java { option 'lite' } }
+            task.builtins {
+                java { option 'lite' }
+                kotlin { option 'lite' }
+            }
             task.plugins { grpc { option 'lite' } }
         }
     }
 }
 
+//configurations.configureEach {
+//    resolutionStrategy {
+//        // Fix Protobuf/gRPC stalemate
+//        // We use 4.29.3 to match your protoc version defined in the protobuf block
+//        force 'com.google.protobuf:protobuf-javalite:4.29.3'
+//        force 'com.google.protobuf:protobuf-kotlin-lite:4.29.3'
+//
+//        force 'androidx.test.ext:junit:1.3.0'
+//        force 'androidx.test.espresso:espresso-core:3.7.0'
+//        force 'androidx.test:runner:1.6.0'
+//        force 'androidx.test:rules:1.6.0'
+//
+//        dependencySubstitution {
+//            substitute module('com.google.protobuf:protobuf-java') using module('com.google.protobuf:protobuf-javalite:4.29.3')
+//        }
+//    }
+//}
+
 configurations.configureEach {
     resolutionStrategy {
-        // Fix Protobuf/gRPC stalemate
-        // We use 4.29.3 to match your protoc version defined in the protobuf block
+        // Force uniform matching versions across your active variants
         force 'com.google.protobuf:protobuf-javalite:4.29.3'
         force 'com.google.protobuf:protobuf-kotlin-lite:4.29.3'
 
-        dependencySubstitution {
-            substitute module('com.google.protobuf:protobuf-java') using module('com.google.protobuf:protobuf-javalite:4.29.3')
-        }
+        force 'androidx.test.ext:junit:1.3.0'
+        force 'androidx.test.espresso:espresso-core:3.7.0'
+        force 'androidx.test:runner:1.6.0'
+        force 'androidx.test:rules:1.6.0'
+
+        // REMOVED the global dependencySubstitution that was breaking Android Test orchestration.
     }
 }
+
 
 dependencies {
     implementation 'com.github.smswithoutborders:lib_image_android:0bbf4d7'
     implementation 'com.github.smswithoutborders:lib_smsmms_android:dfe4676'
     implementation 'com.github.smswithoutborders:lib_signal_double_ratchet_java:c4a12f8'
+    implementation("net.java.dev.jna:jna:5.18.1@aar")
 
     implementation libs.androidx.appcompat
     implementation libs.material
@@ -211,6 +236,7 @@ dependencies {
     implementation libs.grpc.okhttp // Default transport for Android
     implementation libs.grpc.protobuf.lite
     implementation libs.grpc.stub
+//    implementation("com.google.protobuf:protobuf-kotlin-lite:4.29.3")
 
 
     implementation 'javax.annotation:javax.annotation-api:1.3.2'
@@ -313,7 +339,8 @@ dependencies {
     implementation "com.google.dagger:hilt-android:2.59.2"
     ksp "com.google.dagger:hilt-compiler:2.59.2"
 
-    implementation("com.google.protobuf:protobuf-kotlin:4.34.1")
+//    implementation("com.google.protobuf:protobuf-kotlin:4.34.1")
+    implementation("com.google.protobuf:protobuf-kotlin-lite:4.29.3")
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")

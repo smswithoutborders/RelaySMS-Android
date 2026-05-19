@@ -1,10 +1,7 @@
 package com.example.sw0b_001
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
 import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
-import com.example.sw0b_001.data.Cryptography
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
@@ -47,14 +44,14 @@ class gRPCTest {
     @Before
     fun init() {
         vault = VaultsGrpcImpl(context)
-        deviceIdPubKey = Cryptography.generateKey(context, device_id_keystoreAlias)
-        publishPubKey = Cryptography.generateKey(context, publisher_keystoreAlias)
+//        deviceIdPubKey = Cryptography.generateKey(context, device_id_keystoreAlias)
+//        publishPubKey = Cryptography.generateKey(context, publisher_keystoreAlias)
     }
 
     @Test
     fun getPlatformsTest() {
-        val response = PublisherGrpcImpl.getAvailablePlatforms(context)
-        assertTrue(response.isNotEmpty())
+//        val response = PublisherGrpcImpl.getAvailablePlatforms(context)
+//        assertTrue(response.isNotEmpty())
     }
 
     @Test

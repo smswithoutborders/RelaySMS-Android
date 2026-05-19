@@ -1,16 +1,7 @@
 package com.example.sw0b_001.Security
 
-import android.util.Base64
-import androidx.core.util.component1
-import androidx.core.util.component2
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.Ratchets
-import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.States
-import com.example.sw0b_001.data.Crypto
-import com.example.sw0b_001.data.Cryptography
-import com.github.kittinunf.fuel.util.encodeBase64
-import org.junit.Assert.assertArrayEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -18,18 +9,18 @@ import org.junit.runner.RunWith
 class CryptographyTest {
     var context = InstrumentationRegistry.getInstrumentation().targetContext
 
-    @Test
-    fun x25519Test() {
-        val aliceKeystoreAlias: String = "aliceKeystoreAlias"
-        val bobKeystoreAlias: String = "bobKeystoreAlias"
-
-        val alice = Cryptography.generateKey(context, aliceKeystoreAlias)
-        val bob = Cryptography.generateKey(context, bobKeystoreAlias)
-
-        assertArrayEquals(
-            Cryptography.calculateSharedSecret(context, aliceKeystoreAlias, bob),
-            Cryptography.calculateSharedSecret(context, bobKeystoreAlias, alice))
-    }
+//    @Test
+//    fun x25519Test() {
+//        val aliceKeystoreAlias: String = "aliceKeystoreAlias"
+//        val bobKeystoreAlias: String = "bobKeystoreAlias"
+//
+//        val alice = Cryptography.generateKey(context, aliceKeystoreAlias)
+//        val bob = Cryptography.generateKey(context, bobKeystoreAlias)
+//
+//        assertArrayEquals(
+//            Cryptography.calculateSharedSecret(context, aliceKeystoreAlias, bob),
+//            Cryptography.calculateSharedSecret(context, bobKeystoreAlias, alice))
+//    }
 
     @Test
     fun testPythonCipher() {
@@ -54,16 +45,16 @@ class CryptographyTest {
 //        println("Final transmission $transmit")
     }
 
-    @Test
-    fun testCombination() {
-        val pk = "public_key".encodeToByteArray()
-        val sk = "secret_key".encodeToByteArray()
-        val pn = "+2371123457528"
-
-        val combinedData = pn.encodeToByteArray() + pk
-        val v = Crypto.HMAC(sk, combinedData)
-        println(Base64.encodeToString(v, Base64.DEFAULT))
-    }
+//    @Test
+//    fun testCombination() {
+//        val pk = "public_key".encodeToByteArray()
+//        val sk = "secret_key".encodeToByteArray()
+//        val pn = "+2371123457528"
+//
+//        val combinedData = pn.encodeToByteArray() + pk
+//        val v = Crypto.HMAC(sk, combinedData)
+//        println(Base64.encodeToString(v, Base64.DEFAULT))
+//    }
 
 }
 

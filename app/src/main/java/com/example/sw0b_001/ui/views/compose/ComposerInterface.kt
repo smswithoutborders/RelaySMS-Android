@@ -127,6 +127,7 @@ fun ComposerInterface(
     var sendRequestPayload by remember{ mutableStateOf<ByteArray?>(null) }
 
     val imagePicker = mmsImagePicker { uri ->
+        imageViewModel.reset()
         navController.navigate(ImageRenderNav(uri.toString()))
     }
 

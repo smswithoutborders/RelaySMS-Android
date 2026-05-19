@@ -15,6 +15,11 @@ import kotlinx.coroutines.launch
 class PublisherViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
 ): ViewModel() {
+    companion object {
+        init {
+            System.loadLibrary("librelaysms_spec_payload")
+        }
+    }
 
     fun sendPublishingForImage(
         imageByteArray: ByteArray,

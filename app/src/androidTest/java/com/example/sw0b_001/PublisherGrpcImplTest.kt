@@ -1,17 +1,11 @@
 package com.example.sw0b_001
 
-import androidx.test.platform.app.InstrumentationRegistry
-import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
-import io.grpc.testing.GrpcCleanupRule
-import org.junit.Assert
-import org.junit.Rule
-import org.junit.Test
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
 import android.util.Log
+import androidx.test.platform.app.InstrumentationRegistry
 import com.example.sw0b_001.data.Datastore
-import com.example.sw0b_001.ui.viewModels.AccountsViewModel
+import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
 import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
+import com.example.sw0b_001.ui.viewModels.AccountsViewModel
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -19,6 +13,10 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import org.json.JSONObject
+import org.junit.Assert
+import org.junit.Test
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import java.nio.charset.StandardCharsets
 import java.util.concurrent.TimeUnit
 
@@ -33,8 +31,8 @@ import java.util.concurrent.TimeUnit
 
 
 class PublisherGrpcImplTest {
-    @get:Rule
-    val grpcCleanup = GrpcCleanupRule()
+//    @get:Rule
+//    val grpcCleanup = GrpcCleanupRule()
 
 
     private lateinit var publisherGrpcImpl: PublisherGrpcImpl
