@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.sw0b_001.extensions.context.generateSecureRandom
+import com.example.sw0b_001.extensions.context.settingsGetDbPassword
+import com.example.sw0b_001.extensions.context.settingsSetDbPassword
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,5 +32,21 @@ class SecurityExtensionsTest {
         val second = context.generateSecureRandom()
 
         assertFalse(first.contentEquals(second))
+    }
+
+    @Test
+    fun settingsSetDbPassword_savesAndReturnsPassword() {
+
+        val context = ApplicationProvider.getApplicationContext<Context>()
+
+        val password = "my_secret_password".toByteArray()
+
+        context.settingsSetDbPassword(password)
+
+        val savedPassword = context.settingsGetDbPassword
+
+        assertNotNull(savedPassword)
+
+        assertArrayEquals(password, savedPassword)
     }
 }
