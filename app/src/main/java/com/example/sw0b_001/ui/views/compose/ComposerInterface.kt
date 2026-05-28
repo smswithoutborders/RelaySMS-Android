@@ -138,8 +138,6 @@ fun ComposerInterface(
     var from: String? by remember(selectedAccount){
         mutableStateOf(selectedAccount?.account) }
     var to: String by remember{ mutableStateOf(message?.to?.toUtf8String() ?: "") }
-    var cc: String by remember{ mutableStateOf(message?.cc?.toUtf8String() ?: "") }
-    var bcc: String by remember{ mutableStateOf(message?.bcc?.toUtf8String() ?: "") }
     var subject: String by remember{ mutableStateOf(message?.subject?.toUtf8String() ?: "") }
     var body: String by remember{ mutableStateOf(message?.body?.toUtf8String() ?: "") }
     var image by remember{ mutableStateOf(message?.image) }
@@ -219,13 +217,9 @@ fun ComposerInterface(
                                 TransportTypes.PLATFORM,
                                 from = from,
                                 to = to,
-                                cc = cc,
-                                bcc = bcc,
                                 subject = subject,
                                 body = body,
                                 toCallback = { to = it },
-                                ccCallback = { cc = it },
-                                bccCallback = {bcc = it },
                                 subjectCallback = { subject = it },
                                 bodyCallback = { body = it }
                             )
@@ -245,13 +239,9 @@ fun ComposerInterface(
                             TransportTypes.BRIDGE,
                             from = from,
                             to = to,
-                            cc = cc,
-                            bcc = bcc,
                             subject = subject,
                             body = body,
                             toCallback = { to = it },
-                            ccCallback = { cc = it },
-                            bccCallback = {bcc = it },
                             subjectCallback = { subject = it },
                             bodyCallback = { body = it }
                         )
@@ -283,9 +273,7 @@ fun ComposerInterface(
                     showChooseGatewayClient,
                     gatewayClientViewModel,
                 ) {
-                    // get encrypted payload
-                    // trigger sms launcher
-                    // save if sms message sent
+                    TODO()
                 }
             }
 

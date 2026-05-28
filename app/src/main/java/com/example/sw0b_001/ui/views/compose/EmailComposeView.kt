@@ -52,13 +52,9 @@ fun EmailComposeView(
     type: TransportTypes,
     from: String? = null,
     to: String,
-    cc: String,
-    bcc: String,
     subject: String,
     body: String,
     toCallback: (String) -> Unit,
-    ccCallback: (String) -> Unit,
-    bccCallback: (String) -> Unit,
     subjectCallback: (String) -> Unit,
     bodyCallback: (String) -> Unit,
 ) {
@@ -158,30 +154,6 @@ fun EmailComposeView(
                             .padding(top = 16.dp, bottom = 16.dp),
                         thickness = 0.5.dp
                     )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(R.string.cc),
-                            modifier = Modifier.padding(end = 24.dp),
-                            fontWeight = FontWeight.Medium
-                        )
-                        BasicTextField(
-                            value = cc,
-                            onValueChange = ccCallback,
-                            textStyle = TextStyle.Default.copy(
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontSize = 16.sp
-                            ),
-                            modifier = Modifier.fillMaxWidth(),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Email,
-                                imeAction = ImeAction.Next
-                            ),
-                            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
-                        )
-                    }
-
                     Divider(
                         color = MaterialTheme.colorScheme.outline,
                         modifier = Modifier
@@ -189,32 +161,6 @@ fun EmailComposeView(
                             .padding(top = 16.dp, bottom = 16.dp),
                         thickness = 0.5.dp
                     )
-
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(R.string.bcc),
-                            modifier = Modifier.padding(end = 24.dp),
-                            fontWeight = FontWeight.Medium
-                        )
-                        BasicTextField(
-                            value = bcc,
-                            onValueChange = bccCallback,
-                            textStyle = TextStyle.Default.copy(
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontSize = 16.sp
-                            ),
-                            modifier = Modifier.fillMaxWidth(),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Email,
-                                imeAction = ImeAction.Next
-                            ),
-                            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface)
-                        )
-                    }
-
                 }
             }
 
