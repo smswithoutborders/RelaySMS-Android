@@ -1,6 +1,7 @@
 package com.example.sw0b_001.data.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
@@ -17,6 +18,8 @@ interface OAuthDao {
         _insert(oAuth)
     }
 
+    @Delete
+    fun remove(oAuth: OAuth)
     @Query("delete from OAuth")
     fun clear()
 

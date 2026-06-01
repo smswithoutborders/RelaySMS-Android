@@ -10,6 +10,7 @@ import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
 import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
+import com.example.sw0b_001.data.models.Keys
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,12 +30,14 @@ class OauthRedirectActivity : AppCompatActivity() {
         }
 
         val parameters = Helpers.extractParameters(intentUrl!!)
-        val decoded = String(Base64.decode(URLDecoder.decode(parameters["state"]!!, "UTF-8"),
-            Base64.DEFAULT), Charsets.UTF_8)
+        val decoded = String(
+            Base64.decode(
+                URLDecoder.decode(parameters["state"]!!, "UTF-8"),
+                Base64.DEFAULT
+            ), Charsets.UTF_8)
 
         val values = decoded.split(",")
         val platform = values[0]
-        val supportsUrlScheme = values[1] == "true"
         val code: String = URLDecoder.decode(parameters["code"]!!, "UTF-8")
 
 
@@ -43,7 +46,6 @@ class OauthRedirectActivity : AppCompatActivity() {
             sendAuthCode(
                 platformName = platform,
                 code = code,
-                supportsUrlScheme = supportsUrlScheme
             )
         }
     }
@@ -51,28 +53,34 @@ class OauthRedirectActivity : AppCompatActivity() {
     fun sendAuthCode(
         platformName: String,
         code: String,
-        supportsUrlScheme: Boolean,
     ) {
-        val db = Datastore.getDatastore(applicationContext)?.keysDao()
-            ?: throw Exception("Could not open database")
-
-        val publisherPublicKey = db.fetchPublicKey(VaultsGrpcImpl.clientVaultHandshakeKeystoreAliasStaticKeys)
-            ?: throw Exception("Missing private key in credentials for signing")
         PublisherGrpcImpl(applicationContext).use { publisherGrpcImpl ->
             try {
-                val codeVerifier = PublisherGrpcImpl
+                val oAuth = PublisherGrpcImpl
                     .fetchOauthRequestVerifier(applicationContext, platformName)
-                val requestIdentifier = Base64.encodeToString(publisherPublicKey, Base64.NO_WRAP)
-
-                publisherGrpcImpl.sendOAuthAuthorizationCode(
-                    platform = platformName,
-                    code = code,
-                    codeVerifier = codeVerifier,
-                    requestIdentifier = requestIdentifier
-                )
-
-                VaultsGrpcImpl(applicationContext).use { vaultsGrpcImpl ->
-                    vaultsGrpcImpl.refreshStoredTokens( applicationContext)
+                oAuth.use { oa ->
+                    try {
+                        val response = publisherGrpcImpl.sendOAuthAuthorizationCode(
+                            platform = platformName,
+                            code = code,
+                            codeVerifier = String(oa.codeVerifier),
+                            requestIdentifier = Base64
+                                .encodeToString(oa.requestId, Base64.NO_WRAP)
+                        )
+                        val tokenHash = TODO("Get token Hash from here")
+                        VaultsGrpcImpl(applicationContext).use { vaultsGrpcImpl ->
+                            try {
+                                val (tokenId, keys) = vaultsGrpcImpl.uploadKeys(tokenHash)
+                                Keys.save(applicationContext, tokenHash, keys, tokenId)
+                            } catch(e: Exception) {
+                                throw e;
+                            } finally {
+                                tokenHash.fill(0)
+                            }
+                        }
+                    } finally {
+                        oAuth.clear(applicationContext)
+                    }
                 }
             } catch(e: StatusRuntimeException) {
                 e.printStackTrace()

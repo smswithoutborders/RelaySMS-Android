@@ -17,15 +17,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.afkanerd.smswithoutborders.libsignal_doubleratchet.extensions.generateRandomBytes
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.Network
 import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
-import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
 import com.example.sw0b_001.data.models.Accounts
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
-import com.example.sw0b_001.ui.views.tabs.BottomTabsItems
 import com.example.sw0b_001.ui.views.compose.GatewayClientRequest
+import com.example.sw0b_001.ui.views.tabs.BottomTabsItems
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
@@ -238,16 +238,10 @@ class AccountsViewModel @Inject constructor(
     private fun triggerOAuthRequested(
         platform: SupportedPlatforms,
     ) {
-        val db = Datastore.getDatastore(context)?.keysDao()
-            ?: throw Exception("Could not open database")
-
-        val publisherPublicKey = db
-            .fetchPublicKey(VaultsGrpcImpl.clientVaultHandshakeKeystoreAliasStaticKeys)
-            ?: throw Exception("Missing private key in credentials for signing")
-
         PublisherGrpcImpl(context).use { publisherGrpcImpl ->
+            val requestId = context.generateRandomBytes(32);
             val requestIdentifier = Base64.encodeToString(
-                publisherPublicKey, Base64.NO_WRAP)
+                requestId, Base64.NO_WRAP)
             try {
                 val response = publisherGrpcImpl.getOAuthURL(
                     availablePlatforms = platform,
@@ -259,7 +253,8 @@ class AccountsViewModel @Inject constructor(
                 PublisherGrpcImpl.storeOauthRequestCodeVerifier(
                     context,
                     platform.name,
-                    response.codeVerifier.toByteArray()
+                    response.codeVerifier.toByteArray(),
+                    requestId
                 )
 
                 val intentUri = response.authorizationUrl.toUri()
@@ -267,6 +262,8 @@ class AccountsViewModel @Inject constructor(
             } catch(e: Exception) {
                 e.printStackTrace()
                 _isStoringUiState.value = AccountUiState.Error(e)
+            } finally {
+                requestId.fill(0)
             }
         }
     }
