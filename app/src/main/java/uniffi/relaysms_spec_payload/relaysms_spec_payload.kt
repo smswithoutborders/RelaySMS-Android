@@ -613,50 +613,38 @@ internal open class UniffiForeignFutureResultVoid(
 internal interface UniffiForeignFutureCompleteVoid : com.sun.jna.Callback {
     fun callback(`callbackData`: Long,`result`: UniffiForeignFutureResultVoid.UniffiByValue,)
 }
-internal interface UniffiCallbackInterfaceContentsMethod0 : com.sun.jna.Callback {
+internal interface UniffiCallbackInterfaceV1ContentsMethod0 : com.sun.jna.Callback {
     fun callback(`uniffiHandle`: Long,`uniffiOutReturn`: RustBuffer,uniffiCallStatus: UniffiRustCallStatus,)
 }
-internal interface UniffiCallbackInterfaceContentsMethod1 : com.sun.jna.Callback {
+internal interface UniffiCallbackInterfaceV1ContentsMethod1 : com.sun.jna.Callback {
     fun callback(`uniffiHandle`: Long,`uniffiOutReturn`: ByteByReference,uniffiCallStatus: UniffiRustCallStatus,)
 }
-internal interface UniffiCallbackInterfaceContentsMethod2 : com.sun.jna.Callback {
+internal interface UniffiCallbackInterfaceV1ContentsMethod2 : com.sun.jna.Callback {
     fun callback(`uniffiHandle`: Long,`other`: Long,`uniffiOutReturn`: ByteByReference,uniffiCallStatus: UniffiRustCallStatus,)
 }
-internal interface UniffiCallbackInterfacePayloadsMethod0 : com.sun.jna.Callback {
+internal interface UniffiCallbackInterfaceV1PayloadsMethod0 : com.sun.jna.Callback {
     fun callback(`uniffiHandle`: Long,`uniffiOutReturn`: RustBuffer,uniffiCallStatus: UniffiRustCallStatus,)
 }
-internal interface UniffiCallbackInterfacePayloadsMethod1 : com.sun.jna.Callback {
-    fun callback(`uniffiHandle`: Long,`other`: Long,`uniffiOutReturn`: ByteByReference,uniffiCallStatus: UniffiRustCallStatus,)
-}
-internal interface UniffiCallbackInterfacePayloadsWithAttachmentsMethod0 : com.sun.jna.Callback {
-    fun callback(`uniffiHandle`: Long,`uniffiOutReturn`: RustBuffer,uniffiCallStatus: UniffiRustCallStatus,)
-}
-internal interface UniffiCallbackInterfacePayloadsWithAttachmentsMethod1 : com.sun.jna.Callback {
-    fun callback(`uniffiHandle`: Long,`other`: Long,`uniffiOutReturn`: ByteByReference,uniffiCallStatus: UniffiRustCallStatus,)
-}
-internal interface UniffiCallbackInterfacePayloadsWithoutAttachmentsMethod0 : com.sun.jna.Callback {
-    fun callback(`uniffiHandle`: Long,`uniffiOutReturn`: RustBuffer,uniffiCallStatus: UniffiRustCallStatus,)
-}
-internal interface UniffiCallbackInterfacePayloadsWithoutAttachmentsMethod1 : com.sun.jna.Callback {
+internal interface UniffiCallbackInterfaceV1PayloadsMethod1 : com.sun.jna.Callback {
     fun callback(`uniffiHandle`: Long,`other`: Long,`uniffiOutReturn`: ByteByReference,uniffiCallStatus: UniffiRustCallStatus,)
 }
 @Structure.FieldOrder("uniffiFree", "uniffiClone", "serialize", "getCatId", "equals")
-internal open class UniffiVTableCallbackInterfaceContents(
+internal open class UniffiVTableCallbackInterfaceV1Contents(
     @JvmField internal var `uniffiFree`: UniffiCallbackInterfaceFree? = null,
     @JvmField internal var `uniffiClone`: UniffiCallbackInterfaceClone? = null,
-    @JvmField internal var `serialize`: UniffiCallbackInterfaceContentsMethod0? = null,
-    @JvmField internal var `getCatId`: UniffiCallbackInterfaceContentsMethod1? = null,
-    @JvmField internal var `equals`: UniffiCallbackInterfaceContentsMethod2? = null,
+    @JvmField internal var `serialize`: UniffiCallbackInterfaceV1ContentsMethod0? = null,
+    @JvmField internal var `getCatId`: UniffiCallbackInterfaceV1ContentsMethod1? = null,
+    @JvmField internal var `equals`: UniffiCallbackInterfaceV1ContentsMethod2? = null,
 ) : Structure() {
     class UniffiByValue(
         `uniffiFree`: UniffiCallbackInterfaceFree? = null,
         `uniffiClone`: UniffiCallbackInterfaceClone? = null,
-        `serialize`: UniffiCallbackInterfaceContentsMethod0? = null,
-        `getCatId`: UniffiCallbackInterfaceContentsMethod1? = null,
-        `equals`: UniffiCallbackInterfaceContentsMethod2? = null,
-    ): UniffiVTableCallbackInterfaceContents(`uniffiFree`,`uniffiClone`,`serialize`,`getCatId`,`equals`,), Structure.ByValue
+        `serialize`: UniffiCallbackInterfaceV1ContentsMethod0? = null,
+        `getCatId`: UniffiCallbackInterfaceV1ContentsMethod1? = null,
+        `equals`: UniffiCallbackInterfaceV1ContentsMethod2? = null,
+    ): UniffiVTableCallbackInterfaceV1Contents(`uniffiFree`,`uniffiClone`,`serialize`,`getCatId`,`equals`,), Structure.ByValue
 
-   internal fun uniffiSetValue(other: UniffiVTableCallbackInterfaceContents) {
+   internal fun uniffiSetValue(other: UniffiVTableCallbackInterfaceV1Contents) {
         `uniffiFree` = other.`uniffiFree`
         `uniffiClone` = other.`uniffiClone`
         `serialize` = other.`serialize`
@@ -666,64 +654,20 @@ internal open class UniffiVTableCallbackInterfaceContents(
 
 }
 @Structure.FieldOrder("uniffiFree", "uniffiClone", "serialize", "equals")
-internal open class UniffiVTableCallbackInterfacePayloads(
+internal open class UniffiVTableCallbackInterfaceV1Payloads(
     @JvmField internal var `uniffiFree`: UniffiCallbackInterfaceFree? = null,
     @JvmField internal var `uniffiClone`: UniffiCallbackInterfaceClone? = null,
-    @JvmField internal var `serialize`: UniffiCallbackInterfacePayloadsMethod0? = null,
-    @JvmField internal var `equals`: UniffiCallbackInterfacePayloadsMethod1? = null,
+    @JvmField internal var `serialize`: UniffiCallbackInterfaceV1PayloadsMethod0? = null,
+    @JvmField internal var `equals`: UniffiCallbackInterfaceV1PayloadsMethod1? = null,
 ) : Structure() {
     class UniffiByValue(
         `uniffiFree`: UniffiCallbackInterfaceFree? = null,
         `uniffiClone`: UniffiCallbackInterfaceClone? = null,
-        `serialize`: UniffiCallbackInterfacePayloadsMethod0? = null,
-        `equals`: UniffiCallbackInterfacePayloadsMethod1? = null,
-    ): UniffiVTableCallbackInterfacePayloads(`uniffiFree`,`uniffiClone`,`serialize`,`equals`,), Structure.ByValue
+        `serialize`: UniffiCallbackInterfaceV1PayloadsMethod0? = null,
+        `equals`: UniffiCallbackInterfaceV1PayloadsMethod1? = null,
+    ): UniffiVTableCallbackInterfaceV1Payloads(`uniffiFree`,`uniffiClone`,`serialize`,`equals`,), Structure.ByValue
 
-   internal fun uniffiSetValue(other: UniffiVTableCallbackInterfacePayloads) {
-        `uniffiFree` = other.`uniffiFree`
-        `uniffiClone` = other.`uniffiClone`
-        `serialize` = other.`serialize`
-        `equals` = other.`equals`
-    }
-
-}
-@Structure.FieldOrder("uniffiFree", "uniffiClone", "serialize", "equals")
-internal open class UniffiVTableCallbackInterfacePayloadsWithAttachments(
-    @JvmField internal var `uniffiFree`: UniffiCallbackInterfaceFree? = null,
-    @JvmField internal var `uniffiClone`: UniffiCallbackInterfaceClone? = null,
-    @JvmField internal var `serialize`: UniffiCallbackInterfacePayloadsWithAttachmentsMethod0? = null,
-    @JvmField internal var `equals`: UniffiCallbackInterfacePayloadsWithAttachmentsMethod1? = null,
-) : Structure() {
-    class UniffiByValue(
-        `uniffiFree`: UniffiCallbackInterfaceFree? = null,
-        `uniffiClone`: UniffiCallbackInterfaceClone? = null,
-        `serialize`: UniffiCallbackInterfacePayloadsWithAttachmentsMethod0? = null,
-        `equals`: UniffiCallbackInterfacePayloadsWithAttachmentsMethod1? = null,
-    ): UniffiVTableCallbackInterfacePayloadsWithAttachments(`uniffiFree`,`uniffiClone`,`serialize`,`equals`,), Structure.ByValue
-
-   internal fun uniffiSetValue(other: UniffiVTableCallbackInterfacePayloadsWithAttachments) {
-        `uniffiFree` = other.`uniffiFree`
-        `uniffiClone` = other.`uniffiClone`
-        `serialize` = other.`serialize`
-        `equals` = other.`equals`
-    }
-
-}
-@Structure.FieldOrder("uniffiFree", "uniffiClone", "serialize", "equals")
-internal open class UniffiVTableCallbackInterfacePayloadsWithoutAttachments(
-    @JvmField internal var `uniffiFree`: UniffiCallbackInterfaceFree? = null,
-    @JvmField internal var `uniffiClone`: UniffiCallbackInterfaceClone? = null,
-    @JvmField internal var `serialize`: UniffiCallbackInterfacePayloadsWithoutAttachmentsMethod0? = null,
-    @JvmField internal var `equals`: UniffiCallbackInterfacePayloadsWithoutAttachmentsMethod1? = null,
-) : Structure() {
-    class UniffiByValue(
-        `uniffiFree`: UniffiCallbackInterfaceFree? = null,
-        `uniffiClone`: UniffiCallbackInterfaceClone? = null,
-        `serialize`: UniffiCallbackInterfacePayloadsWithoutAttachmentsMethod0? = null,
-        `equals`: UniffiCallbackInterfacePayloadsWithoutAttachmentsMethod1? = null,
-    ): UniffiVTableCallbackInterfacePayloadsWithoutAttachments(`uniffiFree`,`uniffiClone`,`serialize`,`equals`,), Structure.ByValue
-
-   internal fun uniffiSetValue(other: UniffiVTableCallbackInterfacePayloadsWithoutAttachments) {
+   internal fun uniffiSetValue(other: UniffiVTableCallbackInterfaceV1Payloads) {
         `uniffiFree` = other.`uniffiFree`
         `uniffiClone` = other.`uniffiClone`
         `serialize` = other.`serialize`
@@ -756,117 +700,107 @@ internal object IntegrityCheckingUniffiLib {
     }
     external fun uniffi_relaysms_spec_payload_checksum_func_add_rust(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_func_get_version(
+    external fun uniffi_relaysms_spec_payload_checksum_func_v1_content_category_from_u8(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_func_content_category_from_u8(
+    external fun uniffi_relaysms_spec_payload_checksum_func_v1_platform_publisher(
+    ): Short
+    external fun uniffi_relaysms_spec_payload_checksum_func_v1_token_derivation(
     ): Short
     external fun uniffi_relaysms_spec_payload_checksum_func_deserialize_payload_with_attachments(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_func_deserialize_payload_without_attachments(
+    external fun uniffi_relaysms_spec_payload_checksum_func_v1_deserialize_payload_without_attachments(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_contents_serialize(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1contents_serialize(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_contents_get_cat_id(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1contents_get_cat_id(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_contents_equals(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1contents_equals(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_contentscontainer_instance(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1contentscontainer_instance(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_emails_equals(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1emails_equals(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_emails_get_body(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1emails_get_body(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_emails_get_cat_id(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1emails_get_cat_id(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_emails_get_i_sub(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1emails_get_i_sub(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_emails_get_len_subject(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1emails_get_len_subject(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_emails_get_len_to(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1emails_get_len_to(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_emails_get_subject(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1emails_get_subject(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_emails_get_to(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1emails_get_to(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_emails_serialize(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1emails_serialize(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloads_serialize(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloads_serialize(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloads_equals(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloads_equals(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadswithattachments_serialize(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_calculate_segments(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadswithattachments_equals(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_equals(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadswithoutattachments_serialize(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_i_att(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadswithoutattachments_equals(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_k_id(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_calculate_segments(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_len_att(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_equals(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_payload_content(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_get_e_id(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_seg_num(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_get_i_att(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_sess_id(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_get_k_id(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_t_id(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_get_len_att(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_version(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_get_payload_content(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_serialize(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_get_seg_num(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_split(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_get_sess_id(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachmentsnoheader_deserialize(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_get_t_id(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachmentsnoheader_equals(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_get_version(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachmentsnoheader_get_payload(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_serialize(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachmentsnoheader_get_seg_num(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_split(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachmentsnoheader_get_sess_id(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithattachmentsnoheader_deserialize(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachmentsnoheader_serialize(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithattachmentsnoheader_equals(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithoutattachments_equals(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithattachmentsnoheader_get_payload(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithoutattachments_get_k_id(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithattachmentsnoheader_get_seg_num(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithoutattachments_get_payload_content(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithattachmentsnoheader_get_sess_id(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithoutattachments_get_t_id(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithattachmentsnoheader_serialize(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithoutattachments_get_version(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithoutattachments_equals(
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithoutattachments_serialize(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithoutattachments_get_e_id(
+    external fun uniffi_relaysms_spec_payload_checksum_constructor_v1contentscontainer_new(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithoutattachments_get_k_id(
+    external fun uniffi_relaysms_spec_payload_checksum_constructor_v1emails_new(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithoutattachments_get_payload_content(
+    external fun uniffi_relaysms_spec_payload_checksum_constructor_v1payloadwithattachments_new(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithoutattachments_get_t_id(
+    external fun uniffi_relaysms_spec_payload_checksum_constructor_v1payloadwithattachments_new_segment(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithoutattachments_get_version(
+    external fun uniffi_relaysms_spec_payload_checksum_constructor_v1payloadwithattachmentsnoheader_instance(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_method_payloadwithoutattachments_serialize(
+    external fun uniffi_relaysms_spec_payload_checksum_constructor_v1payloadwithattachmentsnoheader_new(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_constructor_contentscontainer_new(
-    ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_constructor_emails_new(
-    ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_constructor_payloadwithattachments_new(
-    ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_constructor_payloadwithattachments_new_segment(
-    ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_constructor_payloadwithattachmentsnoheader_instance(
-    ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_constructor_payloadwithattachmentsnoheader_new(
-    ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_constructor_payloadwithoutattachments_new(
+    external fun uniffi_relaysms_spec_payload_checksum_constructor_v1payloadwithoutattachments_new(
     ): Short
     external fun ffi_relaysms_spec_payload_uniffi_contract_version(
     ): Int
@@ -884,171 +818,147 @@ internal object UniffiLib {
 
     init {
         Native.register(UniffiLib::class.java, findLibraryName(componentName = "relaysms_spec_payload"))
-        uniffiCallbackInterfaceContents.register(this)
-        uniffiCallbackInterfacePayloads.register(this)
-        uniffiCallbackInterfacePayloadsWithAttachments.register(this)
-        uniffiCallbackInterfacePayloadsWithoutAttachments.register(this)
+        uniffiCallbackInterfaceV1Contents.register(this)
+        uniffiCallbackInterfaceV1Payloads.register(this)
         
     }
-    external fun uniffi_relaysms_spec_payload_fn_clone_contents(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+    external fun uniffi_relaysms_spec_payload_fn_clone_v1contents(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
-external fun uniffi_relaysms_spec_payload_fn_free_contents(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_free_v1contents(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Unit
-external fun uniffi_relaysms_spec_payload_fn_init_callback_vtable_contents(`vtable`: UniffiVTableCallbackInterfaceContents,
+external fun uniffi_relaysms_spec_payload_fn_init_callback_vtable_v1contents(`vtable`: UniffiVTableCallbackInterfaceV1Contents,
 ): Unit
-external fun uniffi_relaysms_spec_payload_fn_method_contents_serialize(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1contents_serialize(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
-external fun uniffi_relaysms_spec_payload_fn_method_contents_get_cat_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1contents_get_cat_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
-external fun uniffi_relaysms_spec_payload_fn_method_contents_equals(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1contents_equals(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
-external fun uniffi_relaysms_spec_payload_fn_clone_contentscontainer(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_clone_v1contentscontainer(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
-external fun uniffi_relaysms_spec_payload_fn_free_contentscontainer(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_free_v1contentscontainer(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Unit
-external fun uniffi_relaysms_spec_payload_fn_constructor_contentscontainer_new(`catId`: RustBuffer.ByValue,`body`: RustBuffer.ByValue,`to`: RustBuffer.ByValue,`subject`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_constructor_v1contentscontainer_new(`catId`: RustBuffer.ByValue,`body`: RustBuffer.ByValue,`to`: RustBuffer.ByValue,`subject`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
-external fun uniffi_relaysms_spec_payload_fn_method_contentscontainer_instance(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1contentscontainer_instance(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
-external fun uniffi_relaysms_spec_payload_fn_clone_emails(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_clone_v1emails(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
-external fun uniffi_relaysms_spec_payload_fn_free_emails(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_free_v1emails(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Unit
-external fun uniffi_relaysms_spec_payload_fn_constructor_emails_new(`to`: RustBuffer.ByValue,`body`: RustBuffer.ByValue,`subject`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_constructor_v1emails_new(`to`: RustBuffer.ByValue,`body`: RustBuffer.ByValue,`subject`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
-external fun uniffi_relaysms_spec_payload_fn_method_emails_equals(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1emails_equals(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
-external fun uniffi_relaysms_spec_payload_fn_method_emails_get_body(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1emails_get_body(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
-external fun uniffi_relaysms_spec_payload_fn_method_emails_get_cat_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1emails_get_cat_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
-external fun uniffi_relaysms_spec_payload_fn_method_emails_get_i_sub(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1emails_get_i_sub(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
-external fun uniffi_relaysms_spec_payload_fn_method_emails_get_len_subject(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1emails_get_len_subject(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
-external fun uniffi_relaysms_spec_payload_fn_method_emails_get_len_to(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1emails_get_len_to(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
-external fun uniffi_relaysms_spec_payload_fn_method_emails_get_subject(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1emails_get_subject(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
-external fun uniffi_relaysms_spec_payload_fn_method_emails_get_to(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1emails_get_to(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
-external fun uniffi_relaysms_spec_payload_fn_method_emails_serialize(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1emails_serialize(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
-external fun uniffi_relaysms_spec_payload_fn_clone_payloads(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_clone_v1payloads(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
-external fun uniffi_relaysms_spec_payload_fn_free_payloads(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_free_v1payloads(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Unit
-external fun uniffi_relaysms_spec_payload_fn_init_callback_vtable_payloads(`vtable`: UniffiVTableCallbackInterfacePayloads,
+external fun uniffi_relaysms_spec_payload_fn_init_callback_vtable_v1payloads(`vtable`: UniffiVTableCallbackInterfaceV1Payloads,
 ): Unit
-external fun uniffi_relaysms_spec_payload_fn_method_payloads_serialize(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloads_serialize(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
-external fun uniffi_relaysms_spec_payload_fn_method_payloads_equals(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloads_equals(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
-external fun uniffi_relaysms_spec_payload_fn_clone_payloadswithattachments(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_clone_v1payloadwithattachments(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
-external fun uniffi_relaysms_spec_payload_fn_free_payloadswithattachments(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_free_v1payloadwithattachments(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Unit
-external fun uniffi_relaysms_spec_payload_fn_init_callback_vtable_payloadswithattachments(`vtable`: UniffiVTableCallbackInterfacePayloadsWithAttachments,
-): Unit
-external fun uniffi_relaysms_spec_payload_fn_method_payloadswithattachments_serialize(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
-): RustBuffer.ByValue
-external fun uniffi_relaysms_spec_payload_fn_method_payloadswithattachments_equals(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus, 
-): Byte
-external fun uniffi_relaysms_spec_payload_fn_clone_payloadswithoutattachments(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_constructor_v1payloadwithattachments_new(`sessId`: Byte,`kId`: Byte,`tId`: Int,`lenAtt`: Short,`payload`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
-external fun uniffi_relaysms_spec_payload_fn_free_payloadswithoutattachments(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
-): Unit
-external fun uniffi_relaysms_spec_payload_fn_init_callback_vtable_payloadswithoutattachments(`vtable`: UniffiVTableCallbackInterfacePayloadsWithoutAttachments,
-): Unit
-external fun uniffi_relaysms_spec_payload_fn_method_payloadswithoutattachments_serialize(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
-): RustBuffer.ByValue
-external fun uniffi_relaysms_spec_payload_fn_method_payloadswithoutattachments_equals(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus, 
-): Byte
-external fun uniffi_relaysms_spec_payload_fn_clone_payloadwithattachments(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_constructor_v1payloadwithattachments_new_segment(`segNum`: Byte,`sessId`: Byte,`kId`: Byte,`tId`: Int,`lenAtt`: Short,`payload`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
-external fun uniffi_relaysms_spec_payload_fn_free_payloadwithattachments(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
-): Unit
-external fun uniffi_relaysms_spec_payload_fn_constructor_payloadwithattachments_new(`version`: Byte,`sessId`: Byte,`eId`: Byte,`kId`: Byte,`tId`: Int,`lenAtt`: Short,`payload`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
-): Long
-external fun uniffi_relaysms_spec_payload_fn_constructor_payloadwithattachments_new_segment(`version`: Byte,`segNum`: Byte,`sessId`: Byte,`kId`: Byte,`eId`: Byte,`tId`: Int,`lenAtt`: Short,`payload`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
-): Long
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_calculate_segments(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_calculate_segments(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Int
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_equals(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_equals(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_get_e_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get_i_att(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_get_i_att(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get_k_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_get_k_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
-): Byte
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_get_len_att(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get_len_att(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Short
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_get_payload_content(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get_payload_content(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_get_seg_num(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get_seg_num(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_get_sess_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get_sess_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_get_t_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get_t_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Int
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_get_version(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get_version(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_serialize(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_serialize(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_split(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_split(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
-external fun uniffi_relaysms_spec_payload_fn_clone_payloadwithattachmentsnoheader(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_clone_v1payloadwithattachmentsnoheader(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
-external fun uniffi_relaysms_spec_payload_fn_free_payloadwithattachmentsnoheader(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_free_v1payloadwithattachmentsnoheader(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Unit
-external fun uniffi_relaysms_spec_payload_fn_constructor_payloadwithattachmentsnoheader_instance(uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_constructor_v1payloadwithattachmentsnoheader_instance(uniffi_out_err: UniffiRustCallStatus, 
 ): Long
-external fun uniffi_relaysms_spec_payload_fn_constructor_payloadwithattachmentsnoheader_new(`segNum`: Byte,`sessId`: Byte,`payload`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_constructor_v1payloadwithattachmentsnoheader_new(`segNum`: Byte,`sessId`: Byte,`payload`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithattachmentsnoheader_deserialize(`ptr`: Long,`data`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachmentsnoheader_deserialize(`ptr`: Long,`data`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithattachmentsnoheader_equals(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachmentsnoheader_equals(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithattachmentsnoheader_get_payload(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachmentsnoheader_get_payload(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithattachmentsnoheader_get_seg_num(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachmentsnoheader_get_seg_num(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithattachmentsnoheader_get_sess_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachmentsnoheader_get_sess_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithattachmentsnoheader_serialize(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachmentsnoheader_serialize(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
-external fun uniffi_relaysms_spec_payload_fn_clone_payloadwithoutattachments(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_clone_v1payloadwithoutattachments(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
-external fun uniffi_relaysms_spec_payload_fn_free_payloadwithoutattachments(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_free_v1payloadwithoutattachments(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Unit
-external fun uniffi_relaysms_spec_payload_fn_constructor_payloadwithoutattachments_new(`version`: Byte,`eId`: Byte,`kId`: Byte,`tId`: Int,`payload`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_constructor_v1payloadwithoutattachments_new(`kId`: Byte,`tId`: Int,`payload`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithoutattachments_equals(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithoutattachments_equals(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithoutattachments_get_e_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithoutattachments_get_k_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithoutattachments_get_k_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
-): Byte
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithoutattachments_get_payload_content(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithoutattachments_get_payload_content(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithoutattachments_get_t_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithoutattachments_get_t_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Int
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithoutattachments_get_version(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithoutattachments_get_version(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
-external fun uniffi_relaysms_spec_payload_fn_method_payloadwithoutattachments_serialize(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithoutattachments_serialize(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
-external fun uniffi_relaysms_spec_payload_fn_method_contentcategories_raw_values(`ptr`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_method_v1contentcategories_raw_values(`ptr`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
 external fun uniffi_relaysms_spec_payload_fn_func_add_rust(`left`: Long,`right`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
-external fun uniffi_relaysms_spec_payload_fn_func_get_version(uniffi_out_err: UniffiRustCallStatus, 
-): Byte
-external fun uniffi_relaysms_spec_payload_fn_func_content_category_from_u8(`value`: Byte,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_func_v1_content_category_from_u8(`value`: Byte,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+external fun uniffi_relaysms_spec_payload_fn_func_v1_platform_publisher(`ecKid`: RustBuffer.ByValue,`ecPkKid`: RustBuffer.ByValue,`ssPkKid`: RustBuffer.ByValue,`esPkKid`: RustBuffer.ByValue,`keyId`: RustBuffer.ByValue,`plaintext`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+external fun uniffi_relaysms_spec_payload_fn_func_v1_token_derivation(`ecKid`: RustBuffer.ByValue,`ecPkKid`: RustBuffer.ByValue,`ssPkKid`: RustBuffer.ByValue,`esPkKid`: RustBuffer.ByValue,`methodName`: RustBuffer.ByValue,`keyId`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 external fun uniffi_relaysms_spec_payload_fn_func_deserialize_payload_with_attachments(`data`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
-external fun uniffi_relaysms_spec_payload_fn_func_deserialize_payload_without_attachments(`data`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_func_v1_deserialize_payload_without_attachments(`data`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
 external fun ffi_relaysms_spec_payload_rustbuffer_alloc(`size`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
@@ -1172,172 +1082,157 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_relaysms_spec_payload_checksum_func_add_rust() != 30957.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_func_get_version() != 24073.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_content_category_from_u8() != 47150.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_func_content_category_from_u8() != 11245.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_platform_publisher() != 15189.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_func_deserialize_payload_with_attachments() != 36147.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_token_derivation() != 56646.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_func_deserialize_payload_without_attachments() != 27882.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_func_deserialize_payload_with_attachments() != 31402.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_contents_serialize() != 17006.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_deserialize_payload_without_attachments() != 36313.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_contents_get_cat_id() != 45644.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1contents_serialize() != 24413.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_contents_equals() != 10271.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1contents_get_cat_id() != 34380.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_contentscontainer_instance() != 10190.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1contents_equals() != 35770.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_emails_equals() != 55550.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1contentscontainer_instance() != 21454.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_emails_get_body() != 4770.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1emails_equals() != 41240.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_emails_get_cat_id() != 42398.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1emails_get_body() != 38987.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_emails_get_i_sub() != 40079.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1emails_get_cat_id() != 62418.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_emails_get_len_subject() != 2067.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1emails_get_i_sub() != 40132.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_emails_get_len_to() != 11010.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1emails_get_len_subject() != 22073.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_emails_get_subject() != 22930.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1emails_get_len_to() != 14918.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_emails_get_to() != 44138.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1emails_get_subject() != 13440.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_emails_serialize() != 28743.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1emails_get_to() != 16737.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloads_serialize() != 9710.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1emails_serialize() != 58431.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloads_equals() != 48660.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloads_serialize() != 5831.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadswithattachments_serialize() != 19168.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloads_equals() != 65243.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadswithattachments_equals() != 41324.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_calculate_segments() != 39842.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadswithoutattachments_serialize() != 54486.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_equals() != 58434.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadswithoutattachments_equals() != 46620.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_i_att() != 50149.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_calculate_segments() != 60593.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_k_id() != 58561.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_equals() != 63582.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_len_att() != 19644.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_get_e_id() != 53576.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_payload_content() != 3443.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_get_i_att() != 11418.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_seg_num() != 62085.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_get_k_id() != 31691.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_sess_id() != 58360.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_get_len_att() != 52438.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_t_id() != 13699.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_get_payload_content() != 52582.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_version() != 57687.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_get_seg_num() != 61954.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_serialize() != 13045.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_get_sess_id() != 6268.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_split() != 10355.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_get_t_id() != 15578.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachmentsnoheader_deserialize() != 45970.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_get_version() != 61973.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachmentsnoheader_equals() != 5126.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_serialize() != 8887.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachmentsnoheader_get_payload() != 2105.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithattachments_split() != 17025.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachmentsnoheader_get_seg_num() != 758.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithattachmentsnoheader_deserialize() != 18582.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachmentsnoheader_get_sess_id() != 24570.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithattachmentsnoheader_equals() != 15820.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachmentsnoheader_serialize() != 62948.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithattachmentsnoheader_get_payload() != 45817.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithoutattachments_equals() != 41155.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithattachmentsnoheader_get_seg_num() != 12181.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithoutattachments_get_k_id() != 7660.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithattachmentsnoheader_get_sess_id() != 11304.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithoutattachments_get_payload_content() != 40014.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithattachmentsnoheader_serialize() != 60516.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithoutattachments_get_t_id() != 56035.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithoutattachments_equals() != 63897.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithoutattachments_get_version() != 54420.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithoutattachments_get_e_id() != 3151.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithoutattachments_serialize() != 43769.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithoutattachments_get_k_id() != 29418.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_v1contentscontainer_new() != 9406.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithoutattachments_get_payload_content() != 63213.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_v1emails_new() != 856.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithoutattachments_get_t_id() != 28211.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_v1payloadwithattachments_new() != 24702.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithoutattachments_get_version() != 53418.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_v1payloadwithattachments_new_segment() != 41003.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_payloadwithoutattachments_serialize() != 36669.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_v1payloadwithattachmentsnoheader_instance() != 35860.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_contentscontainer_new() != 63671.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_v1payloadwithattachmentsnoheader_new() != 2376.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_emails_new() != 7629.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_payloadwithattachments_new() != 59945.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_payloadwithattachments_new_segment() != 7907.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_payloadwithattachmentsnoheader_instance() != 13252.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_payloadwithattachmentsnoheader_new() != 56545.toShort()) {
-        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
-    }
-    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_payloadwithoutattachments_new() != 20592.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_v1payloadwithoutattachments_new() != 10349.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
 }
@@ -1838,18 +1733,18 @@ public object FfiConverterByteArray: FfiConverterRustBuffer<ByteArray> {
 //
 
 
-public interface Contents {
+public interface V1Contents {
     
     fun `serialize`(): kotlin.ByteArray
     
     fun `getCatId`(): kotlin.UByte
     
-    fun `equals`(`other`: Contents): kotlin.Boolean
+    fun `equals`(`other`: V1Contents): kotlin.Boolean
     
     companion object
 }
 
-open class ContentsImpl: Disposable, AutoCloseable, Contents
+open class V1ContentsImpl: Disposable, AutoCloseable, V1Contents
 {
 
     @Suppress("UNUSED_PARAMETER")
@@ -1928,7 +1823,7 @@ open class ContentsImpl: Disposable, AutoCloseable, Contents
                 return;
             }
             uniffiRustCall { status ->
-                UniffiLib.uniffi_relaysms_spec_payload_fn_free_contents(handle, status)
+                UniffiLib.uniffi_relaysms_spec_payload_fn_free_v1contents(handle, status)
             }
         }
     }
@@ -1941,16 +1836,16 @@ open class ContentsImpl: Disposable, AutoCloseable, Contents
             throw InternalException("uniffiCloneHandle() called on NoHandle object");
         }
         return uniffiRustCall() { status ->
-            UniffiLib.uniffi_relaysms_spec_payload_fn_clone_contents(handle, status)
+            UniffiLib.uniffi_relaysms_spec_payload_fn_clone_v1contents(handle, status)
         }
     }
 
     
-    @Throws(ContentException::class)override fun `serialize`(): kotlin.ByteArray {
+    @Throws(V1ContentException::class)override fun `serialize`(): kotlin.ByteArray {
             return FfiConverterByteArray.lift(
     callWithHandle {
-    uniffiRustCallWithError(ContentException) { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_contents_serialize(
+    uniffiRustCallWithError(V1ContentException) { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1contents_serialize(
         it,
         _status)
 }
@@ -1963,7 +1858,7 @@ open class ContentsImpl: Disposable, AutoCloseable, Contents
             return FfiConverterUByte.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_contents_get_cat_id(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1contents_get_cat_id(
         it,
         _status)
 }
@@ -1972,13 +1867,13 @@ open class ContentsImpl: Disposable, AutoCloseable, Contents
     }
     
 
-    override fun `equals`(`other`: Contents): kotlin.Boolean {
+    override fun `equals`(`other`: V1Contents): kotlin.Boolean {
             return FfiConverterBoolean.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_contents_equals(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1contents_equals(
         it,
-        FfiConverterTypeContents.lower(`other`),_status)
+        FfiConverterTypeV1Contents.lower(`other`),_status)
 }
     }
     )
@@ -2002,10 +1897,10 @@ open class ContentsImpl: Disposable, AutoCloseable, Contents
 
 
 // Put the implementation in an object so we don't pollute the top-level namespace
-internal object uniffiCallbackInterfaceContents {
-    internal object `serialize`: UniffiCallbackInterfaceContentsMethod0 {
+internal object uniffiCallbackInterfaceV1Contents {
+    internal object `serialize`: UniffiCallbackInterfaceV1ContentsMethod0 {
         override fun callback(`uniffiHandle`: Long,`uniffiOutReturn`: RustBuffer,uniffiCallStatus: UniffiRustCallStatus,) {
-            val uniffiObj = FfiConverterTypeContents.handleMap.get(uniffiHandle)
+            val uniffiObj = FfiConverterTypeV1Contents.handleMap.get(uniffiHandle)
             val makeCall = { ->
                 uniffiObj.`serialize`(
                 )
@@ -2015,13 +1910,13 @@ internal object uniffiCallbackInterfaceContents {
                 uniffiCallStatus,
                 makeCall,
                 writeReturn,
-                { e: ContentException -> FfiConverterTypeContentError.lower(e) }
+                { e: V1ContentException -> FfiConverterTypeV1ContentError.lower(e) }
             )
         }
     }
-    internal object `getCatId`: UniffiCallbackInterfaceContentsMethod1 {
+    internal object `getCatId`: UniffiCallbackInterfaceV1ContentsMethod1 {
         override fun callback(`uniffiHandle`: Long,`uniffiOutReturn`: ByteByReference,uniffiCallStatus: UniffiRustCallStatus,) {
-            val uniffiObj = FfiConverterTypeContents.handleMap.get(uniffiHandle)
+            val uniffiObj = FfiConverterTypeV1Contents.handleMap.get(uniffiHandle)
             val makeCall = { ->
                 uniffiObj.`getCatId`(
                 )
@@ -2030,12 +1925,12 @@ internal object uniffiCallbackInterfaceContents {
             uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
         }
     }
-    internal object `equals`: UniffiCallbackInterfaceContentsMethod2 {
+    internal object `equals`: UniffiCallbackInterfaceV1ContentsMethod2 {
         override fun callback(`uniffiHandle`: Long,`other`: Long,`uniffiOutReturn`: ByteByReference,uniffiCallStatus: UniffiRustCallStatus,) {
-            val uniffiObj = FfiConverterTypeContents.handleMap.get(uniffiHandle)
+            val uniffiObj = FfiConverterTypeV1Contents.handleMap.get(uniffiHandle)
             val makeCall = { ->
                 uniffiObj.`equals`(
-                    FfiConverterTypeContents.lift(`other`),
+                    FfiConverterTypeV1Contents.lift(`other`),
                 )
             }
             val writeReturn = { value: kotlin.Boolean -> uniffiOutReturn.setValue(FfiConverterBoolean.lower(value)) }
@@ -2045,17 +1940,17 @@ internal object uniffiCallbackInterfaceContents {
 
     internal object uniffiFree: UniffiCallbackInterfaceFree {
         override fun callback(handle: Long) {
-            FfiConverterTypeContents.handleMap.remove(handle)
+            FfiConverterTypeV1Contents.handleMap.remove(handle)
         }
     }
 
     internal object uniffiClone: UniffiCallbackInterfaceClone {
         override fun callback(handle: Long): Long {
-            return FfiConverterTypeContents.handleMap.clone(handle)
+            return FfiConverterTypeV1Contents.handleMap.clone(handle)
         }
     }
 
-    internal var vtable = UniffiVTableCallbackInterfaceContents.UniffiByValue(
+    internal var vtable = UniffiVTableCallbackInterfaceV1Contents.UniffiByValue(
         uniffiFree,
         uniffiClone,
         `serialize`,
@@ -2066,18 +1961,18 @@ internal object uniffiCallbackInterfaceContents {
     // Registers the foreign callback with the Rust side.
     // This method is generated for each callback interface.
     internal fun register(lib: UniffiLib) {
-        lib.uniffi_relaysms_spec_payload_fn_init_callback_vtable_contents(vtable)
+        lib.uniffi_relaysms_spec_payload_fn_init_callback_vtable_v1contents(vtable)
     }
 }
 
 /**
  * @suppress
  */
-public object FfiConverterTypeContents: FfiConverter<Contents, Long> {
-    internal val handleMap = UniffiHandleMap<Contents>()
+public object FfiConverterTypeV1Contents: FfiConverter<V1Contents, Long> {
+    internal val handleMap = UniffiHandleMap<V1Contents>()
 
-    override fun lower(value: Contents): Long {
-        if (value is ContentsImpl) {
+    override fun lower(value: V1Contents): Long {
+        if (value is V1ContentsImpl) {
              // Rust-implemented object.  Clone the handle and return it
             return value.uniffiCloneHandle()
          } else {
@@ -2086,24 +1981,24 @@ public object FfiConverterTypeContents: FfiConverter<Contents, Long> {
          }
     }
 
-    override fun lift(value: Long): Contents {
+    override fun lift(value: Long): V1Contents {
         if ((value and 1.toLong()) == 0.toLong()) {
             // Rust-generated handle, construct a new class that uses the handle to implement the
             // interface
-            return ContentsImpl(UniffiWithHandle, value)
+            return V1ContentsImpl(UniffiWithHandle, value)
         } else {
             // Kotlin-generated handle, get the object from the handle map
             return handleMap.remove(value)
         }
     }
 
-    override fun read(buf: ByteBuffer): Contents {
+    override fun read(buf: ByteBuffer): V1Contents {
         return lift(buf.getLong())
     }
 
-    override fun allocationSize(value: Contents) = 8UL
+    override fun allocationSize(value: V1Contents) = 8UL
 
-    override fun write(value: Contents, buf: ByteBuffer) {
+    override fun write(value: V1Contents, buf: ByteBuffer) {
         buf.putLong(lower(value))
     }
 }
@@ -2204,14 +2099,14 @@ public object FfiConverterTypeContents: FfiConverter<Contents, Long> {
 //
 
 
-public interface ContentsContainerInterface {
+public interface V1ContentsContainerInterface {
     
-    fun `instance`(): Contents
+    fun `instance`(): V1Contents
     
     companion object
 }
 
-open class ContentsContainer: Disposable, AutoCloseable, ContentsContainerInterface
+open class V1ContentsContainer: Disposable, AutoCloseable, V1ContentsContainerInterface
 {
 
     @Suppress("UNUSED_PARAMETER")
@@ -2235,12 +2130,12 @@ open class ContentsContainer: Disposable, AutoCloseable, ContentsContainerInterf
         this.handle = 0
         this.cleanable = null
     }
-    constructor(`catId`: ContentCategories, `body`: kotlin.String, `to`: kotlin.String?, `subject`: kotlin.String?) :
+    constructor(`catId`: V1ContentCategories, `body`: kotlin.String, `to`: kotlin.String?, `subject`: kotlin.String?) :
         this(UniffiWithHandle, 
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_constructor_contentscontainer_new(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_constructor_v1contentscontainer_new(
     
-        FfiConverterTypeContentCategories.lower(`catId`),FfiConverterString.lower(`body`),FfiConverterOptionalString.lower(`to`),FfiConverterOptionalString.lower(`subject`),_status)
+        FfiConverterTypeV1ContentCategories.lower(`catId`),FfiConverterString.lower(`body`),FfiConverterOptionalString.lower(`to`),FfiConverterOptionalString.lower(`subject`),_status)
 }
     )
 
@@ -2298,7 +2193,7 @@ open class ContentsContainer: Disposable, AutoCloseable, ContentsContainerInterf
                 return;
             }
             uniffiRustCall { status ->
-                UniffiLib.uniffi_relaysms_spec_payload_fn_free_contentscontainer(handle, status)
+                UniffiLib.uniffi_relaysms_spec_payload_fn_free_v1contentscontainer(handle, status)
             }
         }
     }
@@ -2311,16 +2206,16 @@ open class ContentsContainer: Disposable, AutoCloseable, ContentsContainerInterf
             throw InternalException("uniffiCloneHandle() called on NoHandle object");
         }
         return uniffiRustCall() { status ->
-            UniffiLib.uniffi_relaysms_spec_payload_fn_clone_contentscontainer(handle, status)
+            UniffiLib.uniffi_relaysms_spec_payload_fn_clone_v1contentscontainer(handle, status)
         }
     }
 
     
-    @Throws(ContentException::class)override fun `instance`(): Contents {
-            return FfiConverterTypeContents.lift(
+    @Throws(V1ContentException::class)override fun `instance`(): V1Contents {
+            return FfiConverterTypeV1Contents.lift(
     callWithHandle {
-    uniffiRustCallWithError(ContentException) { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_contentscontainer_instance(
+    uniffiRustCallWithError(V1ContentException) { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1contentscontainer_instance(
         it,
         _status)
 }
@@ -2347,22 +2242,22 @@ open class ContentsContainer: Disposable, AutoCloseable, ContentsContainerInterf
 /**
  * @suppress
  */
-public object FfiConverterTypeContentsContainer: FfiConverter<ContentsContainer, Long> {
-    override fun lower(value: ContentsContainer): Long {
+public object FfiConverterTypeV1ContentsContainer: FfiConverter<V1ContentsContainer, Long> {
+    override fun lower(value: V1ContentsContainer): Long {
         return value.uniffiCloneHandle()
     }
 
-    override fun lift(value: Long): ContentsContainer {
-        return ContentsContainer(UniffiWithHandle, value)
+    override fun lift(value: Long): V1ContentsContainer {
+        return V1ContentsContainer(UniffiWithHandle, value)
     }
 
-    override fun read(buf: ByteBuffer): ContentsContainer {
+    override fun read(buf: ByteBuffer): V1ContentsContainer {
         return lift(buf.getLong())
     }
 
-    override fun allocationSize(value: ContentsContainer) = 8UL
+    override fun allocationSize(value: V1ContentsContainer) = 8UL
 
-    override fun write(value: ContentsContainer, buf: ByteBuffer) {
+    override fun write(value: V1ContentsContainer, buf: ByteBuffer) {
         buf.putLong(lower(value))
     }
 }
@@ -2463,9 +2358,9 @@ public object FfiConverterTypeContentsContainer: FfiConverter<ContentsContainer,
 //
 
 
-public interface EmailsInterface {
+public interface V1EmailsInterface {
     
-    fun `equals`(`other`: Contents): kotlin.Boolean
+    fun `equals`(`other`: V1Contents): kotlin.Boolean
     
     fun `getBody`(): kotlin.String
     
@@ -2486,8 +2381,8 @@ public interface EmailsInterface {
     companion object
 }
 
-open class Emails: Disposable, AutoCloseable, EmailsInterface
-, Contents
+open class V1Emails: Disposable, AutoCloseable, V1EmailsInterface
+, V1Contents
 
 {
 
@@ -2514,8 +2409,8 @@ open class Emails: Disposable, AutoCloseable, EmailsInterface
     }
     constructor(`to`: kotlin.String, `body`: kotlin.String, `subject`: kotlin.String?) :
         this(UniffiWithHandle, 
-    uniffiRustCallWithError(ContentException) { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_constructor_emails_new(
+    uniffiRustCallWithError(V1ContentException) { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_constructor_v1emails_new(
     
         FfiConverterString.lower(`to`),FfiConverterString.lower(`body`),FfiConverterOptionalString.lower(`subject`),_status)
 }
@@ -2575,7 +2470,7 @@ open class Emails: Disposable, AutoCloseable, EmailsInterface
                 return;
             }
             uniffiRustCall { status ->
-                UniffiLib.uniffi_relaysms_spec_payload_fn_free_emails(handle, status)
+                UniffiLib.uniffi_relaysms_spec_payload_fn_free_v1emails(handle, status)
             }
         }
     }
@@ -2588,17 +2483,17 @@ open class Emails: Disposable, AutoCloseable, EmailsInterface
             throw InternalException("uniffiCloneHandle() called on NoHandle object");
         }
         return uniffiRustCall() { status ->
-            UniffiLib.uniffi_relaysms_spec_payload_fn_clone_emails(handle, status)
+            UniffiLib.uniffi_relaysms_spec_payload_fn_clone_v1emails(handle, status)
         }
     }
 
-    override fun `equals`(`other`: Contents): kotlin.Boolean {
+    override fun `equals`(`other`: V1Contents): kotlin.Boolean {
             return FfiConverterBoolean.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_emails_equals(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1emails_equals(
         it,
-        FfiConverterTypeContents.lower(`other`),_status)
+        FfiConverterTypeV1Contents.lower(`other`),_status)
 }
     }
     )
@@ -2609,7 +2504,7 @@ open class Emails: Disposable, AutoCloseable, EmailsInterface
             return FfiConverterString.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_emails_get_body(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1emails_get_body(
         it,
         _status)
 }
@@ -2622,7 +2517,7 @@ open class Emails: Disposable, AutoCloseable, EmailsInterface
             return FfiConverterUByte.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_emails_get_cat_id(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1emails_get_cat_id(
         it,
         _status)
 }
@@ -2635,7 +2530,7 @@ open class Emails: Disposable, AutoCloseable, EmailsInterface
             return FfiConverterBoolean.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_emails_get_i_sub(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1emails_get_i_sub(
         it,
         _status)
 }
@@ -2648,7 +2543,7 @@ open class Emails: Disposable, AutoCloseable, EmailsInterface
             return FfiConverterUByte.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_emails_get_len_subject(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1emails_get_len_subject(
         it,
         _status)
 }
@@ -2661,7 +2556,7 @@ open class Emails: Disposable, AutoCloseable, EmailsInterface
             return FfiConverterUByte.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_emails_get_len_to(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1emails_get_len_to(
         it,
         _status)
 }
@@ -2674,7 +2569,7 @@ open class Emails: Disposable, AutoCloseable, EmailsInterface
             return FfiConverterOptionalString.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_emails_get_subject(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1emails_get_subject(
         it,
         _status)
 }
@@ -2687,7 +2582,7 @@ open class Emails: Disposable, AutoCloseable, EmailsInterface
             return FfiConverterString.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_emails_get_to(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1emails_get_to(
         it,
         _status)
 }
@@ -2697,11 +2592,11 @@ open class Emails: Disposable, AutoCloseable, EmailsInterface
     
 
     
-    @Throws(ContentException::class)override fun `serialize`(): kotlin.ByteArray {
+    @Throws(V1ContentException::class)override fun `serialize`(): kotlin.ByteArray {
             return FfiConverterByteArray.lift(
     callWithHandle {
-    uniffiRustCallWithError(ContentException) { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_emails_serialize(
+    uniffiRustCallWithError(V1ContentException) { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1emails_serialize(
         it,
         _status)
 }
@@ -2728,22 +2623,22 @@ open class Emails: Disposable, AutoCloseable, EmailsInterface
 /**
  * @suppress
  */
-public object FfiConverterTypeEmails: FfiConverter<Emails, Long> {
-    override fun lower(value: Emails): Long {
+public object FfiConverterTypeV1Emails: FfiConverter<V1Emails, Long> {
+    override fun lower(value: V1Emails): Long {
         return value.uniffiCloneHandle()
     }
 
-    override fun lift(value: Long): Emails {
-        return Emails(UniffiWithHandle, value)
+    override fun lift(value: Long): V1Emails {
+        return V1Emails(UniffiWithHandle, value)
     }
 
-    override fun read(buf: ByteBuffer): Emails {
+    override fun read(buf: ByteBuffer): V1Emails {
         return lift(buf.getLong())
     }
 
-    override fun allocationSize(value: Emails) = 8UL
+    override fun allocationSize(value: V1Emails) = 8UL
 
-    override fun write(value: Emails, buf: ByteBuffer) {
+    override fun write(value: V1Emails, buf: ByteBuffer) {
         buf.putLong(lower(value))
     }
 }
@@ -2844,13 +2739,11 @@ public object FfiConverterTypeEmails: FfiConverter<Emails, Long> {
 //
 
 
-public interface PayloadWithAttachmentsInterface {
+public interface V1PayloadWithAttachmentsInterface {
     
     fun `calculateSegments`(): kotlin.UInt
     
-    fun `equals`(`other`: Payloads): kotlin.Boolean
-    
-    fun `getEId`(): kotlin.UByte
+    fun `equals`(`other`: V1Payloads): kotlin.Boolean
     
     fun `getIAtt`(): kotlin.Boolean
     
@@ -2874,13 +2767,13 @@ public interface PayloadWithAttachmentsInterface {
      * Assumption, payload already processed just needs splitting for transmission
      *     *
      */
-    fun `split`(): List<Payloads>
+    fun `split`(): List<V1Payloads>
     
     companion object
 }
 
-open class PayloadWithAttachments: Disposable, AutoCloseable, PayloadWithAttachmentsInterface
-, Payloads
+open class V1PayloadWithAttachments: Disposable, AutoCloseable, V1PayloadWithAttachmentsInterface
+, V1Payloads
 
 {
 
@@ -2905,12 +2798,12 @@ open class PayloadWithAttachments: Disposable, AutoCloseable, PayloadWithAttachm
         this.handle = 0
         this.cleanable = null
     }
-    constructor(`version`: kotlin.UByte, `sessId`: kotlin.UByte, `eId`: kotlin.UByte, `kId`: kotlin.UByte, `tId`: kotlin.UInt, `lenAtt`: kotlin.UShort, `payload`: kotlin.ByteArray) :
+    constructor(`sessId`: kotlin.UByte, `kId`: kotlin.UByte, `tId`: kotlin.UInt, `lenAtt`: kotlin.UShort, `payload`: kotlin.ByteArray) :
         this(UniffiWithHandle, 
-    uniffiRustCallWithError(PayloadsException) { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_constructor_payloadwithattachments_new(
+    uniffiRustCallWithError(V1PayloadsException) { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_constructor_v1payloadwithattachments_new(
     
-        FfiConverterUByte.lower(`version`),FfiConverterUByte.lower(`sessId`),FfiConverterUByte.lower(`eId`),FfiConverterUByte.lower(`kId`),FfiConverterUInt.lower(`tId`),FfiConverterUShort.lower(`lenAtt`),FfiConverterByteArray.lower(`payload`),_status)
+        FfiConverterUByte.lower(`sessId`),FfiConverterUByte.lower(`kId`),FfiConverterUInt.lower(`tId`),FfiConverterUShort.lower(`lenAtt`),FfiConverterByteArray.lower(`payload`),_status)
 }
     )
 
@@ -2968,7 +2861,7 @@ open class PayloadWithAttachments: Disposable, AutoCloseable, PayloadWithAttachm
                 return;
             }
             uniffiRustCall { status ->
-                UniffiLib.uniffi_relaysms_spec_payload_fn_free_payloadwithattachments(handle, status)
+                UniffiLib.uniffi_relaysms_spec_payload_fn_free_v1payloadwithattachments(handle, status)
             }
         }
     }
@@ -2981,7 +2874,7 @@ open class PayloadWithAttachments: Disposable, AutoCloseable, PayloadWithAttachm
             throw InternalException("uniffiCloneHandle() called on NoHandle object");
         }
         return uniffiRustCall() { status ->
-            UniffiLib.uniffi_relaysms_spec_payload_fn_clone_payloadwithattachments(handle, status)
+            UniffiLib.uniffi_relaysms_spec_payload_fn_clone_v1payloadwithattachments(handle, status)
         }
     }
 
@@ -2989,7 +2882,7 @@ open class PayloadWithAttachments: Disposable, AutoCloseable, PayloadWithAttachm
             return FfiConverterUInt.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_calculate_segments(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_calculate_segments(
         it,
         _status)
 }
@@ -2998,26 +2891,13 @@ open class PayloadWithAttachments: Disposable, AutoCloseable, PayloadWithAttachm
     }
     
 
-    override fun `equals`(`other`: Payloads): kotlin.Boolean {
+    override fun `equals`(`other`: V1Payloads): kotlin.Boolean {
             return FfiConverterBoolean.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_equals(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_equals(
         it,
-        FfiConverterTypePayloads.lower(`other`),_status)
-}
-    }
-    )
-    }
-    
-
-    override fun `getEId`(): kotlin.UByte {
-            return FfiConverterUByte.lift(
-    callWithHandle {
-    uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_get_e_id(
-        it,
-        _status)
+        FfiConverterTypeV1Payloads.lower(`other`),_status)
 }
     }
     )
@@ -3028,7 +2908,7 @@ open class PayloadWithAttachments: Disposable, AutoCloseable, PayloadWithAttachm
             return FfiConverterBoolean.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_get_i_att(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get_i_att(
         it,
         _status)
 }
@@ -3041,7 +2921,7 @@ open class PayloadWithAttachments: Disposable, AutoCloseable, PayloadWithAttachm
             return FfiConverterUByte.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_get_k_id(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get_k_id(
         it,
         _status)
 }
@@ -3054,7 +2934,7 @@ open class PayloadWithAttachments: Disposable, AutoCloseable, PayloadWithAttachm
             return FfiConverterUShort.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_get_len_att(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get_len_att(
         it,
         _status)
 }
@@ -3067,7 +2947,7 @@ open class PayloadWithAttachments: Disposable, AutoCloseable, PayloadWithAttachm
             return FfiConverterByteArray.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_get_payload_content(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get_payload_content(
         it,
         _status)
 }
@@ -3080,7 +2960,7 @@ open class PayloadWithAttachments: Disposable, AutoCloseable, PayloadWithAttachm
             return FfiConverterUByte.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_get_seg_num(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get_seg_num(
         it,
         _status)
 }
@@ -3093,7 +2973,7 @@ open class PayloadWithAttachments: Disposable, AutoCloseable, PayloadWithAttachm
             return FfiConverterUByte.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_get_sess_id(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get_sess_id(
         it,
         _status)
 }
@@ -3106,7 +2986,7 @@ open class PayloadWithAttachments: Disposable, AutoCloseable, PayloadWithAttachm
             return FfiConverterUInt.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_get_t_id(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get_t_id(
         it,
         _status)
 }
@@ -3119,7 +2999,7 @@ open class PayloadWithAttachments: Disposable, AutoCloseable, PayloadWithAttachm
             return FfiConverterUByte.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_get_version(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get_version(
         it,
         _status)
 }
@@ -3129,11 +3009,11 @@ open class PayloadWithAttachments: Disposable, AutoCloseable, PayloadWithAttachm
     
 
     
-    @Throws(PayloadsException::class)override fun `serialize`(): kotlin.ByteArray {
+    @Throws(V1PayloadsException::class)override fun `serialize`(): kotlin.ByteArray {
             return FfiConverterByteArray.lift(
     callWithHandle {
-    uniffiRustCallWithError(PayloadsException) { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_serialize(
+    uniffiRustCallWithError(V1PayloadsException) { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_serialize(
         it,
         _status)
 }
@@ -3147,11 +3027,11 @@ open class PayloadWithAttachments: Disposable, AutoCloseable, PayloadWithAttachm
      * Assumption, payload already processed just needs splitting for transmission
      *     *
      */
-    @Throws(PayloadsException::class)override fun `split`(): List<Payloads> {
-            return FfiConverterSequenceTypePayloads.lift(
+    @Throws(V1PayloadsException::class)override fun `split`(): List<V1Payloads> {
+            return FfiConverterSequenceTypeV1Payloads.lift(
     callWithHandle {
-    uniffiRustCallWithError(PayloadsException) { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithattachments_split(
+    uniffiRustCallWithError(V1PayloadsException) { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_split(
         it,
         _status)
 }
@@ -3168,12 +3048,12 @@ open class PayloadWithAttachments: Disposable, AutoCloseable, PayloadWithAttachm
     
     companion object {
         
-    @Throws(PayloadsException::class) fun `newSegment`(`version`: kotlin.UByte, `segNum`: kotlin.UByte, `sessId`: kotlin.UByte, `kId`: kotlin.UByte, `eId`: kotlin.UByte, `tId`: kotlin.UInt, `lenAtt`: kotlin.UShort, `payload`: kotlin.ByteArray): PayloadWithAttachments {
-            return FfiConverterTypePayloadWithAttachments.lift(
-    uniffiRustCallWithError(PayloadsException) { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_constructor_payloadwithattachments_new_segment(
+    @Throws(V1PayloadsException::class) fun `newSegment`(`segNum`: kotlin.UByte, `sessId`: kotlin.UByte, `kId`: kotlin.UByte, `tId`: kotlin.UInt, `lenAtt`: kotlin.UShort, `payload`: kotlin.ByteArray): V1PayloadWithAttachments {
+            return FfiConverterTypeV1PayloadWithAttachments.lift(
+    uniffiRustCallWithError(V1PayloadsException) { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_constructor_v1payloadwithattachments_new_segment(
     
-        FfiConverterUByte.lower(`version`),FfiConverterUByte.lower(`segNum`),FfiConverterUByte.lower(`sessId`),FfiConverterUByte.lower(`kId`),FfiConverterUByte.lower(`eId`),FfiConverterUInt.lower(`tId`),FfiConverterUShort.lower(`lenAtt`),FfiConverterByteArray.lower(`payload`),_status)
+        FfiConverterUByte.lower(`segNum`),FfiConverterUByte.lower(`sessId`),FfiConverterUByte.lower(`kId`),FfiConverterUInt.lower(`tId`),FfiConverterUShort.lower(`lenAtt`),FfiConverterByteArray.lower(`payload`),_status)
 }
     )
     }
@@ -3188,22 +3068,22 @@ open class PayloadWithAttachments: Disposable, AutoCloseable, PayloadWithAttachm
 /**
  * @suppress
  */
-public object FfiConverterTypePayloadWithAttachments: FfiConverter<PayloadWithAttachments, Long> {
-    override fun lower(value: PayloadWithAttachments): Long {
+public object FfiConverterTypeV1PayloadWithAttachments: FfiConverter<V1PayloadWithAttachments, Long> {
+    override fun lower(value: V1PayloadWithAttachments): Long {
         return value.uniffiCloneHandle()
     }
 
-    override fun lift(value: Long): PayloadWithAttachments {
-        return PayloadWithAttachments(UniffiWithHandle, value)
+    override fun lift(value: Long): V1PayloadWithAttachments {
+        return V1PayloadWithAttachments(UniffiWithHandle, value)
     }
 
-    override fun read(buf: ByteBuffer): PayloadWithAttachments {
+    override fun read(buf: ByteBuffer): V1PayloadWithAttachments {
         return lift(buf.getLong())
     }
 
-    override fun allocationSize(value: PayloadWithAttachments) = 8UL
+    override fun allocationSize(value: V1PayloadWithAttachments) = 8UL
 
-    override fun write(value: PayloadWithAttachments, buf: ByteBuffer) {
+    override fun write(value: V1PayloadWithAttachments, buf: ByteBuffer) {
         buf.putLong(lower(value))
     }
 }
@@ -3304,11 +3184,11 @@ public object FfiConverterTypePayloadWithAttachments: FfiConverter<PayloadWithAt
 //
 
 
-public interface PayloadWithAttachmentsNoHeaderInterface {
+public interface V1PayloadWithAttachmentsNoHeaderInterface {
     
-    fun `deserialize`(`data`: kotlin.ByteArray): PayloadWithAttachmentsNoHeader
+    fun `deserialize`(`data`: kotlin.ByteArray): V1PayloadWithAttachmentsNoHeader
     
-    fun `equals`(`other`: Payloads): kotlin.Boolean
+    fun `equals`(`other`: V1Payloads): kotlin.Boolean
     
     fun `getPayload`(): kotlin.ByteArray
     
@@ -3321,8 +3201,8 @@ public interface PayloadWithAttachmentsNoHeaderInterface {
     companion object
 }
 
-open class PayloadWithAttachmentsNoHeader: Disposable, AutoCloseable, PayloadWithAttachmentsNoHeaderInterface
-, Payloads
+open class V1PayloadWithAttachmentsNoHeader: Disposable, AutoCloseable, V1PayloadWithAttachmentsNoHeaderInterface
+, V1Payloads
 
 {
 
@@ -3349,8 +3229,8 @@ open class PayloadWithAttachmentsNoHeader: Disposable, AutoCloseable, PayloadWit
     }
     constructor(`segNum`: kotlin.UByte, `sessId`: kotlin.UByte, `payload`: kotlin.ByteArray) :
         this(UniffiWithHandle, 
-    uniffiRustCallWithError(PayloadsException) { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_constructor_payloadwithattachmentsnoheader_new(
+    uniffiRustCallWithError(V1PayloadsException) { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_constructor_v1payloadwithattachmentsnoheader_new(
     
         FfiConverterUByte.lower(`segNum`),FfiConverterUByte.lower(`sessId`),FfiConverterByteArray.lower(`payload`),_status)
 }
@@ -3410,7 +3290,7 @@ open class PayloadWithAttachmentsNoHeader: Disposable, AutoCloseable, PayloadWit
                 return;
             }
             uniffiRustCall { status ->
-                UniffiLib.uniffi_relaysms_spec_payload_fn_free_payloadwithattachmentsnoheader(handle, status)
+                UniffiLib.uniffi_relaysms_spec_payload_fn_free_v1payloadwithattachmentsnoheader(handle, status)
             }
         }
     }
@@ -3423,16 +3303,16 @@ open class PayloadWithAttachmentsNoHeader: Disposable, AutoCloseable, PayloadWit
             throw InternalException("uniffiCloneHandle() called on NoHandle object");
         }
         return uniffiRustCall() { status ->
-            UniffiLib.uniffi_relaysms_spec_payload_fn_clone_payloadwithattachmentsnoheader(handle, status)
+            UniffiLib.uniffi_relaysms_spec_payload_fn_clone_v1payloadwithattachmentsnoheader(handle, status)
         }
     }
 
     
-    @Throws(PayloadsException::class)override fun `deserialize`(`data`: kotlin.ByteArray): PayloadWithAttachmentsNoHeader {
-            return FfiConverterTypePayloadWithAttachmentsNoHeader.lift(
+    @Throws(V1PayloadsException::class)override fun `deserialize`(`data`: kotlin.ByteArray): V1PayloadWithAttachmentsNoHeader {
+            return FfiConverterTypeV1PayloadWithAttachmentsNoHeader.lift(
     callWithHandle {
-    uniffiRustCallWithError(PayloadsException) { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithattachmentsnoheader_deserialize(
+    uniffiRustCallWithError(V1PayloadsException) { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachmentsnoheader_deserialize(
         it,
         FfiConverterByteArray.lower(`data`),_status)
 }
@@ -3441,13 +3321,13 @@ open class PayloadWithAttachmentsNoHeader: Disposable, AutoCloseable, PayloadWit
     }
     
 
-    override fun `equals`(`other`: Payloads): kotlin.Boolean {
+    override fun `equals`(`other`: V1Payloads): kotlin.Boolean {
             return FfiConverterBoolean.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithattachmentsnoheader_equals(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachmentsnoheader_equals(
         it,
-        FfiConverterTypePayloads.lower(`other`),_status)
+        FfiConverterTypeV1Payloads.lower(`other`),_status)
 }
     }
     )
@@ -3458,7 +3338,7 @@ open class PayloadWithAttachmentsNoHeader: Disposable, AutoCloseable, PayloadWit
             return FfiConverterByteArray.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithattachmentsnoheader_get_payload(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachmentsnoheader_get_payload(
         it,
         _status)
 }
@@ -3471,7 +3351,7 @@ open class PayloadWithAttachmentsNoHeader: Disposable, AutoCloseable, PayloadWit
             return FfiConverterUByte.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithattachmentsnoheader_get_seg_num(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachmentsnoheader_get_seg_num(
         it,
         _status)
 }
@@ -3484,7 +3364,7 @@ open class PayloadWithAttachmentsNoHeader: Disposable, AutoCloseable, PayloadWit
             return FfiConverterUByte.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithattachmentsnoheader_get_sess_id(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachmentsnoheader_get_sess_id(
         it,
         _status)
 }
@@ -3494,11 +3374,11 @@ open class PayloadWithAttachmentsNoHeader: Disposable, AutoCloseable, PayloadWit
     
 
     
-    @Throws(PayloadsException::class)override fun `serialize`(): kotlin.ByteArray {
+    @Throws(V1PayloadsException::class)override fun `serialize`(): kotlin.ByteArray {
             return FfiConverterByteArray.lift(
     callWithHandle {
-    uniffiRustCallWithError(PayloadsException) { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithattachmentsnoheader_serialize(
+    uniffiRustCallWithError(V1PayloadsException) { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachmentsnoheader_serialize(
         it,
         _status)
 }
@@ -3515,10 +3395,10 @@ open class PayloadWithAttachmentsNoHeader: Disposable, AutoCloseable, PayloadWit
     
     companion object {
         
-    @Throws(PayloadsException::class) fun `instance`(): PayloadWithAttachmentsNoHeader {
-            return FfiConverterTypePayloadWithAttachmentsNoHeader.lift(
-    uniffiRustCallWithError(PayloadsException) { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_constructor_payloadwithattachmentsnoheader_instance(
+    @Throws(V1PayloadsException::class) fun `instance`(): V1PayloadWithAttachmentsNoHeader {
+            return FfiConverterTypeV1PayloadWithAttachmentsNoHeader.lift(
+    uniffiRustCallWithError(V1PayloadsException) { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_constructor_v1payloadwithattachmentsnoheader_instance(
     
         _status)
 }
@@ -3535,22 +3415,22 @@ open class PayloadWithAttachmentsNoHeader: Disposable, AutoCloseable, PayloadWit
 /**
  * @suppress
  */
-public object FfiConverterTypePayloadWithAttachmentsNoHeader: FfiConverter<PayloadWithAttachmentsNoHeader, Long> {
-    override fun lower(value: PayloadWithAttachmentsNoHeader): Long {
+public object FfiConverterTypeV1PayloadWithAttachmentsNoHeader: FfiConverter<V1PayloadWithAttachmentsNoHeader, Long> {
+    override fun lower(value: V1PayloadWithAttachmentsNoHeader): Long {
         return value.uniffiCloneHandle()
     }
 
-    override fun lift(value: Long): PayloadWithAttachmentsNoHeader {
-        return PayloadWithAttachmentsNoHeader(UniffiWithHandle, value)
+    override fun lift(value: Long): V1PayloadWithAttachmentsNoHeader {
+        return V1PayloadWithAttachmentsNoHeader(UniffiWithHandle, value)
     }
 
-    override fun read(buf: ByteBuffer): PayloadWithAttachmentsNoHeader {
+    override fun read(buf: ByteBuffer): V1PayloadWithAttachmentsNoHeader {
         return lift(buf.getLong())
     }
 
-    override fun allocationSize(value: PayloadWithAttachmentsNoHeader) = 8UL
+    override fun allocationSize(value: V1PayloadWithAttachmentsNoHeader) = 8UL
 
-    override fun write(value: PayloadWithAttachmentsNoHeader, buf: ByteBuffer) {
+    override fun write(value: V1PayloadWithAttachmentsNoHeader, buf: ByteBuffer) {
         buf.putLong(lower(value))
     }
 }
@@ -3651,15 +3531,13 @@ public object FfiConverterTypePayloadWithAttachmentsNoHeader: FfiConverter<Paylo
 //
 
 
-public interface PayloadWithoutAttachmentsInterface {
+public interface V1PayloadWithoutAttachmentsInterface {
     
-    fun `equals`(`other`: Payloads): kotlin.Boolean
-    
-    fun `getEId`(): kotlin.UByte
+    fun `equals`(`other`: V1Payloads): kotlin.Boolean
     
     fun `getKId`(): kotlin.UByte
     
-    fun `getPayloadContent`(): Contents?
+    fun `getPayloadContent`(): kotlin.ByteArray
     
     fun `getTId`(): kotlin.UInt
     
@@ -3670,8 +3548,8 @@ public interface PayloadWithoutAttachmentsInterface {
     companion object
 }
 
-open class PayloadWithoutAttachments: Disposable, AutoCloseable, PayloadWithoutAttachmentsInterface
-, Payloads
+open class V1PayloadWithoutAttachments: Disposable, AutoCloseable, V1PayloadWithoutAttachmentsInterface
+, V1Payloads
 
 {
 
@@ -3696,12 +3574,12 @@ open class PayloadWithoutAttachments: Disposable, AutoCloseable, PayloadWithoutA
         this.handle = 0
         this.cleanable = null
     }
-    constructor(`version`: kotlin.UByte, `eId`: kotlin.UByte, `kId`: kotlin.UByte, `tId`: kotlin.UInt, `payload`: Contents?) :
+    constructor(`kId`: kotlin.UByte, `tId`: kotlin.UInt, `payload`: kotlin.ByteArray) :
         this(UniffiWithHandle, 
-    uniffiRustCallWithError(PayloadsException) { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_constructor_payloadwithoutattachments_new(
+    uniffiRustCallWithError(V1PayloadsException) { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_constructor_v1payloadwithoutattachments_new(
     
-        FfiConverterUByte.lower(`version`),FfiConverterUByte.lower(`eId`),FfiConverterUByte.lower(`kId`),FfiConverterUInt.lower(`tId`),FfiConverterOptionalTypeContents.lower(`payload`),_status)
+        FfiConverterUByte.lower(`kId`),FfiConverterUInt.lower(`tId`),FfiConverterByteArray.lower(`payload`),_status)
 }
     )
 
@@ -3759,7 +3637,7 @@ open class PayloadWithoutAttachments: Disposable, AutoCloseable, PayloadWithoutA
                 return;
             }
             uniffiRustCall { status ->
-                UniffiLib.uniffi_relaysms_spec_payload_fn_free_payloadwithoutattachments(handle, status)
+                UniffiLib.uniffi_relaysms_spec_payload_fn_free_v1payloadwithoutattachments(handle, status)
             }
         }
     }
@@ -3772,30 +3650,17 @@ open class PayloadWithoutAttachments: Disposable, AutoCloseable, PayloadWithoutA
             throw InternalException("uniffiCloneHandle() called on NoHandle object");
         }
         return uniffiRustCall() { status ->
-            UniffiLib.uniffi_relaysms_spec_payload_fn_clone_payloadwithoutattachments(handle, status)
+            UniffiLib.uniffi_relaysms_spec_payload_fn_clone_v1payloadwithoutattachments(handle, status)
         }
     }
 
-    override fun `equals`(`other`: Payloads): kotlin.Boolean {
+    override fun `equals`(`other`: V1Payloads): kotlin.Boolean {
             return FfiConverterBoolean.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithoutattachments_equals(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithoutattachments_equals(
         it,
-        FfiConverterTypePayloads.lower(`other`),_status)
-}
-    }
-    )
-    }
-    
-
-    override fun `getEId`(): kotlin.UByte {
-            return FfiConverterUByte.lift(
-    callWithHandle {
-    uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithoutattachments_get_e_id(
-        it,
-        _status)
+        FfiConverterTypeV1Payloads.lower(`other`),_status)
 }
     }
     )
@@ -3806,7 +3671,7 @@ open class PayloadWithoutAttachments: Disposable, AutoCloseable, PayloadWithoutA
             return FfiConverterUByte.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithoutattachments_get_k_id(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithoutattachments_get_k_id(
         it,
         _status)
 }
@@ -3815,11 +3680,11 @@ open class PayloadWithoutAttachments: Disposable, AutoCloseable, PayloadWithoutA
     }
     
 
-    override fun `getPayloadContent`(): Contents? {
-            return FfiConverterOptionalTypeContents.lift(
+    override fun `getPayloadContent`(): kotlin.ByteArray {
+            return FfiConverterByteArray.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithoutattachments_get_payload_content(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithoutattachments_get_payload_content(
         it,
         _status)
 }
@@ -3832,7 +3697,7 @@ open class PayloadWithoutAttachments: Disposable, AutoCloseable, PayloadWithoutA
             return FfiConverterUInt.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithoutattachments_get_t_id(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithoutattachments_get_t_id(
         it,
         _status)
 }
@@ -3845,7 +3710,7 @@ open class PayloadWithoutAttachments: Disposable, AutoCloseable, PayloadWithoutA
             return FfiConverterUByte.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithoutattachments_get_version(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithoutattachments_get_version(
         it,
         _status)
 }
@@ -3855,11 +3720,11 @@ open class PayloadWithoutAttachments: Disposable, AutoCloseable, PayloadWithoutA
     
 
     
-    @Throws(PayloadsException::class)override fun `serialize`(): kotlin.ByteArray {
+    @Throws(V1PayloadsException::class)override fun `serialize`(): kotlin.ByteArray {
             return FfiConverterByteArray.lift(
     callWithHandle {
-    uniffiRustCallWithError(PayloadsException) { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadwithoutattachments_serialize(
+    uniffiRustCallWithError(V1PayloadsException) { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithoutattachments_serialize(
         it,
         _status)
 }
@@ -3886,22 +3751,22 @@ open class PayloadWithoutAttachments: Disposable, AutoCloseable, PayloadWithoutA
 /**
  * @suppress
  */
-public object FfiConverterTypePayloadWithoutAttachments: FfiConverter<PayloadWithoutAttachments, Long> {
-    override fun lower(value: PayloadWithoutAttachments): Long {
+public object FfiConverterTypeV1PayloadWithoutAttachments: FfiConverter<V1PayloadWithoutAttachments, Long> {
+    override fun lower(value: V1PayloadWithoutAttachments): Long {
         return value.uniffiCloneHandle()
     }
 
-    override fun lift(value: Long): PayloadWithoutAttachments {
-        return PayloadWithoutAttachments(UniffiWithHandle, value)
+    override fun lift(value: Long): V1PayloadWithoutAttachments {
+        return V1PayloadWithoutAttachments(UniffiWithHandle, value)
     }
 
-    override fun read(buf: ByteBuffer): PayloadWithoutAttachments {
+    override fun read(buf: ByteBuffer): V1PayloadWithoutAttachments {
         return lift(buf.getLong())
     }
 
-    override fun allocationSize(value: PayloadWithoutAttachments) = 8UL
+    override fun allocationSize(value: V1PayloadWithoutAttachments) = 8UL
 
-    override fun write(value: PayloadWithoutAttachments, buf: ByteBuffer) {
+    override fun write(value: V1PayloadWithoutAttachments, buf: ByteBuffer) {
         buf.putLong(lower(value))
     }
 }
@@ -4002,16 +3867,16 @@ public object FfiConverterTypePayloadWithoutAttachments: FfiConverter<PayloadWit
 //
 
 
-public interface Payloads {
+public interface V1Payloads {
     
     fun `serialize`(): kotlin.ByteArray
     
-    fun `equals`(`other`: Payloads): kotlin.Boolean
+    fun `equals`(`other`: V1Payloads): kotlin.Boolean
     
     companion object
 }
 
-open class PayloadsImpl: Disposable, AutoCloseable, Payloads
+open class V1PayloadsImpl: Disposable, AutoCloseable, V1Payloads
 {
 
     @Suppress("UNUSED_PARAMETER")
@@ -4090,7 +3955,7 @@ open class PayloadsImpl: Disposable, AutoCloseable, Payloads
                 return;
             }
             uniffiRustCall { status ->
-                UniffiLib.uniffi_relaysms_spec_payload_fn_free_payloads(handle, status)
+                UniffiLib.uniffi_relaysms_spec_payload_fn_free_v1payloads(handle, status)
             }
         }
     }
@@ -4103,16 +3968,16 @@ open class PayloadsImpl: Disposable, AutoCloseable, Payloads
             throw InternalException("uniffiCloneHandle() called on NoHandle object");
         }
         return uniffiRustCall() { status ->
-            UniffiLib.uniffi_relaysms_spec_payload_fn_clone_payloads(handle, status)
+            UniffiLib.uniffi_relaysms_spec_payload_fn_clone_v1payloads(handle, status)
         }
     }
 
     
-    @Throws(PayloadsException::class)override fun `serialize`(): kotlin.ByteArray {
+    @Throws(V1PayloadsException::class)override fun `serialize`(): kotlin.ByteArray {
             return FfiConverterByteArray.lift(
     callWithHandle {
-    uniffiRustCallWithError(PayloadsException) { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloads_serialize(
+    uniffiRustCallWithError(V1PayloadsException) { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloads_serialize(
         it,
         _status)
 }
@@ -4121,13 +3986,13 @@ open class PayloadsImpl: Disposable, AutoCloseable, Payloads
     }
     
 
-    override fun `equals`(`other`: Payloads): kotlin.Boolean {
+    override fun `equals`(`other`: V1Payloads): kotlin.Boolean {
             return FfiConverterBoolean.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloads_equals(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloads_equals(
         it,
-        FfiConverterTypePayloads.lower(`other`),_status)
+        FfiConverterTypeV1Payloads.lower(`other`),_status)
 }
     }
     )
@@ -4151,10 +4016,10 @@ open class PayloadsImpl: Disposable, AutoCloseable, Payloads
 
 
 // Put the implementation in an object so we don't pollute the top-level namespace
-internal object uniffiCallbackInterfacePayloads {
-    internal object `serialize`: UniffiCallbackInterfacePayloadsMethod0 {
+internal object uniffiCallbackInterfaceV1Payloads {
+    internal object `serialize`: UniffiCallbackInterfaceV1PayloadsMethod0 {
         override fun callback(`uniffiHandle`: Long,`uniffiOutReturn`: RustBuffer,uniffiCallStatus: UniffiRustCallStatus,) {
-            val uniffiObj = FfiConverterTypePayloads.handleMap.get(uniffiHandle)
+            val uniffiObj = FfiConverterTypeV1Payloads.handleMap.get(uniffiHandle)
             val makeCall = { ->
                 uniffiObj.`serialize`(
                 )
@@ -4164,16 +4029,16 @@ internal object uniffiCallbackInterfacePayloads {
                 uniffiCallStatus,
                 makeCall,
                 writeReturn,
-                { e: PayloadsException -> FfiConverterTypePayloadsError.lower(e) }
+                { e: V1PayloadsException -> FfiConverterTypeV1PayloadsError.lower(e) }
             )
         }
     }
-    internal object `equals`: UniffiCallbackInterfacePayloadsMethod1 {
+    internal object `equals`: UniffiCallbackInterfaceV1PayloadsMethod1 {
         override fun callback(`uniffiHandle`: Long,`other`: Long,`uniffiOutReturn`: ByteByReference,uniffiCallStatus: UniffiRustCallStatus,) {
-            val uniffiObj = FfiConverterTypePayloads.handleMap.get(uniffiHandle)
+            val uniffiObj = FfiConverterTypeV1Payloads.handleMap.get(uniffiHandle)
             val makeCall = { ->
                 uniffiObj.`equals`(
-                    FfiConverterTypePayloads.lift(`other`),
+                    FfiConverterTypeV1Payloads.lift(`other`),
                 )
             }
             val writeReturn = { value: kotlin.Boolean -> uniffiOutReturn.setValue(FfiConverterBoolean.lower(value)) }
@@ -4183,17 +4048,17 @@ internal object uniffiCallbackInterfacePayloads {
 
     internal object uniffiFree: UniffiCallbackInterfaceFree {
         override fun callback(handle: Long) {
-            FfiConverterTypePayloads.handleMap.remove(handle)
+            FfiConverterTypeV1Payloads.handleMap.remove(handle)
         }
     }
 
     internal object uniffiClone: UniffiCallbackInterfaceClone {
         override fun callback(handle: Long): Long {
-            return FfiConverterTypePayloads.handleMap.clone(handle)
+            return FfiConverterTypeV1Payloads.handleMap.clone(handle)
         }
     }
 
-    internal var vtable = UniffiVTableCallbackInterfacePayloads.UniffiByValue(
+    internal var vtable = UniffiVTableCallbackInterfaceV1Payloads.UniffiByValue(
         uniffiFree,
         uniffiClone,
         `serialize`,
@@ -4203,18 +4068,18 @@ internal object uniffiCallbackInterfacePayloads {
     // Registers the foreign callback with the Rust side.
     // This method is generated for each callback interface.
     internal fun register(lib: UniffiLib) {
-        lib.uniffi_relaysms_spec_payload_fn_init_callback_vtable_payloads(vtable)
+        lib.uniffi_relaysms_spec_payload_fn_init_callback_vtable_v1payloads(vtable)
     }
 }
 
 /**
  * @suppress
  */
-public object FfiConverterTypePayloads: FfiConverter<Payloads, Long> {
-    internal val handleMap = UniffiHandleMap<Payloads>()
+public object FfiConverterTypeV1Payloads: FfiConverter<V1Payloads, Long> {
+    internal val handleMap = UniffiHandleMap<V1Payloads>()
 
-    override fun lower(value: Payloads): Long {
-        if (value is PayloadsImpl) {
+    override fun lower(value: V1Payloads): Long {
+        if (value is V1PayloadsImpl) {
              // Rust-implemented object.  Clone the handle and return it
             return value.uniffiCloneHandle()
          } else {
@@ -4223,702 +4088,24 @@ public object FfiConverterTypePayloads: FfiConverter<Payloads, Long> {
          }
     }
 
-    override fun lift(value: Long): Payloads {
+    override fun lift(value: Long): V1Payloads {
         if ((value and 1.toLong()) == 0.toLong()) {
             // Rust-generated handle, construct a new class that uses the handle to implement the
             // interface
-            return PayloadsImpl(UniffiWithHandle, value)
+            return V1PayloadsImpl(UniffiWithHandle, value)
         } else {
             // Kotlin-generated handle, get the object from the handle map
             return handleMap.remove(value)
         }
     }
 
-    override fun read(buf: ByteBuffer): Payloads {
+    override fun read(buf: ByteBuffer): V1Payloads {
         return lift(buf.getLong())
     }
 
-    override fun allocationSize(value: Payloads) = 8UL
+    override fun allocationSize(value: V1Payloads) = 8UL
 
-    override fun write(value: Payloads, buf: ByteBuffer) {
-        buf.putLong(lower(value))
-    }
-}
-
-
-// This template implements a class for working with a Rust struct via a handle
-// to the live Rust struct on the other side of the FFI.
-//
-// There's some subtlety here, because we have to be careful not to operate on a Rust
-// struct after it has been dropped, and because we must expose a public API for freeing
-// theq Kotlin wrapper object in lieu of reliable finalizers. The core requirements are:
-//
-//   * Each instance holds an opaque handle to the underlying Rust struct.
-//     Method calls need to read this handle from the object's state and pass it in to
-//     the Rust FFI.
-//
-//   * When an instance is no longer needed, its handle should be passed to a
-//     special destructor function provided by the Rust FFI, which will drop the
-//     underlying Rust struct.
-//
-//   * Given an instance, calling code is expected to call the special
-//     `destroy` method in order to free it after use, either by calling it explicitly
-//     or by using a higher-level helper like the `use` method. Failing to do so risks
-//     leaking the underlying Rust struct.
-//
-//   * We can't assume that calling code will do the right thing, and must be prepared
-//     to handle Kotlin method calls executing concurrently with or even after a call to
-//     `destroy`, and to handle multiple (possibly concurrent!) calls to `destroy`.
-//
-//   * We must never allow Rust code to operate on the underlying Rust struct after
-//     the destructor has been called, and must never call the destructor more than once.
-//     Doing so may trigger memory unsafety.
-//
-//   * To mitigate many of the risks of leaking memory and use-after-free unsafety, a `Cleaner`
-//     is implemented to call the destructor when the Kotlin object becomes unreachable.
-//     This is done in a background thread. This is not a panacea, and client code should be aware that
-//      1. the thread may starve if some there are objects that have poorly performing
-//     `drop` methods or do significant work in their `drop` methods.
-//      2. the thread is shared across the whole library. This can be tuned by using `android_cleaner = true`,
-//         or `android = true` in the [`kotlin` section of the `uniffi.toml` file](https://mozilla.github.io/uniffi-rs/kotlin/configuration.html).
-//
-// If we try to implement this with mutual exclusion on access to the handle, there is the
-// possibility of a race between a method call and a concurrent call to `destroy`:
-//
-//    * Thread A starts a method call, reads the value of the handle, but is interrupted
-//      before it can pass the handle over the FFI to Rust.
-//    * Thread B calls `destroy` and frees the underlying Rust struct.
-//    * Thread A resumes, passing the already-read handle value to Rust and triggering
-//      a use-after-free.
-//
-// One possible solution would be to use a `ReadWriteLock`, with each method call taking
-// a read lock (and thus allowed to run concurrently) and the special `destroy` method
-// taking a write lock (and thus blocking on live method calls). However, we aim not to
-// generate methods with any hidden blocking semantics, and a `destroy` method that might
-// block if called incorrectly seems to meet that bar.
-//
-// So, we achieve our goals by giving each instance an associated `AtomicLong` counter to track
-// the number of in-flight method calls, and an `AtomicBoolean` flag to indicate whether `destroy`
-// has been called. These are updated according to the following rules:
-//
-//    * The initial value of the counter is 1, indicating a live object with no in-flight calls.
-//      The initial value for the flag is false.
-//
-//    * At the start of each method call, we atomically check the counter.
-//      If it is 0 then the underlying Rust struct has already been destroyed and the call is aborted.
-//      If it is nonzero them we atomically increment it by 1 and proceed with the method call.
-//
-//    * At the end of each method call, we atomically decrement and check the counter.
-//      If it has reached zero then we destroy the underlying Rust struct.
-//
-//    * When `destroy` is called, we atomically flip the flag from false to true.
-//      If the flag was already true we silently fail.
-//      Otherwise we atomically decrement and check the counter.
-//      If it has reached zero then we destroy the underlying Rust struct.
-//
-// Astute readers may observe that this all sounds very similar to the way that Rust's `Arc<T>` works,
-// and indeed it is, with the addition of a flag to guard against multiple calls to `destroy`.
-//
-// The overall effect is that the underlying Rust struct is destroyed only when `destroy` has been
-// called *and* all in-flight method calls have completed, avoiding violating any of the expectations
-// of the underlying Rust code.
-//
-// This makes a cleaner a better alternative to _not_ calling `destroy()` as
-// and when the object is finished with, but the abstraction is not perfect: if the Rust object's `drop`
-// method is slow, and/or there are many objects to cleanup, and it's on a low end Android device, then the cleaner
-// thread may be starved, and the app will leak memory.
-//
-// In this case, `destroy`ing manually may be a better solution.
-//
-// The cleaner can live side by side with the manual calling of `destroy`. In the order of responsiveness, uniffi objects
-// with Rust peers are reclaimed:
-//
-// 1. By calling the `destroy` method of the object, which calls `rustObject.free()`. If that doesn't happen:
-// 2. When the object becomes unreachable, AND the Cleaner thread gets to call `rustObject.free()`. If the thread is starved then:
-// 3. The memory is reclaimed when the process terminates.
-//
-// [1] https://stackoverflow.com/questions/24376768/can-java-finalize-an-object-when-it-is-still-in-scope/24380219
-//
-
-
-public interface PayloadsWithAttachments {
-    
-    fun `serialize`(): kotlin.ByteArray
-    
-    fun `equals`(`other`: PayloadsWithAttachments): kotlin.Boolean
-    
-    companion object
-}
-
-open class PayloadsWithAttachmentsImpl: Disposable, AutoCloseable, PayloadsWithAttachments
-{
-
-    @Suppress("UNUSED_PARAMETER")
-    /**
-     * @suppress
-     */
-    constructor(withHandle: UniffiWithHandle, handle: Long) {
-        this.handle = handle
-        this.cleanable = UniffiLib.CLEANER.register(this, UniffiCleanAction(handle))
-    }
-
-    /**
-     * @suppress
-     *
-     * This constructor can be used to instantiate a fake object. Only used for tests. Any
-     * attempt to actually use an object constructed this way will fail as there is no
-     * connected Rust object.
-     */
-    @Suppress("UNUSED_PARAMETER")
-    constructor(noHandle: NoHandle) {
-        this.handle = 0
-        this.cleanable = null
-    }
-
-    protected val handle: Long
-    protected val cleanable: UniffiCleaner.Cleanable?
-
-    private val wasDestroyed = AtomicBoolean(false)
-    private val callCounter = AtomicLong(1)
-
-    override fun destroy() {
-        // Only allow a single call to this method.
-        // TODO: maybe we should log a warning if called more than once?
-        if (this.wasDestroyed.compareAndSet(false, true)) {
-            // This decrement always matches the initial count of 1 given at creation time.
-            if (this.callCounter.decrementAndGet() == 0L) {
-                cleanable?.clean()
-            }
-        }
-    }
-
-    @Synchronized
-    override fun close() {
-        this.destroy()
-    }
-
-    internal inline fun <R> callWithHandle(block: (handle: Long) -> R): R {
-        // Check and increment the call counter, to keep the object alive.
-        // This needs a compare-and-set retry loop in case of concurrent updates.
-        do {
-            val c = this.callCounter.get()
-            if (c == 0L) {
-                throw IllegalStateException("${this.javaClass.simpleName} object has already been destroyed")
-            }
-            if (c == Long.MAX_VALUE) {
-                throw IllegalStateException("${this.javaClass.simpleName} call counter would overflow")
-            }
-        } while (! this.callCounter.compareAndSet(c, c + 1L))
-        // Now we can safely do the method call without the handle being freed concurrently.
-        try {
-            return block(this.uniffiCloneHandle())
-        } finally {
-            // This decrement always matches the increment we performed above.
-            if (this.callCounter.decrementAndGet() == 0L) {
-                cleanable?.clean()
-            }
-        }
-    }
-
-    // Use a static inner class instead of a closure so as not to accidentally
-    // capture `this` as part of the cleanable's action.
-    private class UniffiCleanAction(private val handle: Long) : Runnable {
-        override fun run() {
-            if (handle == 0.toLong()) {
-                // Fake object created with `NoHandle`, don't try to free.
-                return;
-            }
-            uniffiRustCall { status ->
-                UniffiLib.uniffi_relaysms_spec_payload_fn_free_payloadswithattachments(handle, status)
-            }
-        }
-    }
-
-    /**
-     * @suppress
-     */
-    fun uniffiCloneHandle(): Long {
-        if (handle == 0.toLong()) {
-            throw InternalException("uniffiCloneHandle() called on NoHandle object");
-        }
-        return uniffiRustCall() { status ->
-            UniffiLib.uniffi_relaysms_spec_payload_fn_clone_payloadswithattachments(handle, status)
-        }
-    }
-
-    
-    @Throws(PayloadsException::class)override fun `serialize`(): kotlin.ByteArray {
-            return FfiConverterByteArray.lift(
-    callWithHandle {
-    uniffiRustCallWithError(PayloadsException) { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadswithattachments_serialize(
-        it,
-        _status)
-}
-    }
-    )
-    }
-    
-
-    override fun `equals`(`other`: PayloadsWithAttachments): kotlin.Boolean {
-            return FfiConverterBoolean.lift(
-    callWithHandle {
-    uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadswithattachments_equals(
-        it,
-        FfiConverterTypePayloadsWithAttachments.lower(`other`),_status)
-}
-    }
-    )
-    }
-    
-
-    
-
-    
-
-
-    
-    
-    /**
-     * @suppress
-     */
-    companion object
-    
-}
-
-
-
-// Put the implementation in an object so we don't pollute the top-level namespace
-internal object uniffiCallbackInterfacePayloadsWithAttachments {
-    internal object `serialize`: UniffiCallbackInterfacePayloadsWithAttachmentsMethod0 {
-        override fun callback(`uniffiHandle`: Long,`uniffiOutReturn`: RustBuffer,uniffiCallStatus: UniffiRustCallStatus,) {
-            val uniffiObj = FfiConverterTypePayloadsWithAttachments.handleMap.get(uniffiHandle)
-            val makeCall = { ->
-                uniffiObj.`serialize`(
-                )
-            }
-            val writeReturn = { value: kotlin.ByteArray -> uniffiOutReturn.setValue(FfiConverterByteArray.lower(value)) }
-            uniffiTraitInterfaceCallWithError(
-                uniffiCallStatus,
-                makeCall,
-                writeReturn,
-                { e: PayloadsException -> FfiConverterTypePayloadsError.lower(e) }
-            )
-        }
-    }
-    internal object `equals`: UniffiCallbackInterfacePayloadsWithAttachmentsMethod1 {
-        override fun callback(`uniffiHandle`: Long,`other`: Long,`uniffiOutReturn`: ByteByReference,uniffiCallStatus: UniffiRustCallStatus,) {
-            val uniffiObj = FfiConverterTypePayloadsWithAttachments.handleMap.get(uniffiHandle)
-            val makeCall = { ->
-                uniffiObj.`equals`(
-                    FfiConverterTypePayloadsWithAttachments.lift(`other`),
-                )
-            }
-            val writeReturn = { value: kotlin.Boolean -> uniffiOutReturn.setValue(FfiConverterBoolean.lower(value)) }
-            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
-        }
-    }
-
-    internal object uniffiFree: UniffiCallbackInterfaceFree {
-        override fun callback(handle: Long) {
-            FfiConverterTypePayloadsWithAttachments.handleMap.remove(handle)
-        }
-    }
-
-    internal object uniffiClone: UniffiCallbackInterfaceClone {
-        override fun callback(handle: Long): Long {
-            return FfiConverterTypePayloadsWithAttachments.handleMap.clone(handle)
-        }
-    }
-
-    internal var vtable = UniffiVTableCallbackInterfacePayloadsWithAttachments.UniffiByValue(
-        uniffiFree,
-        uniffiClone,
-        `serialize`,
-        `equals`,
-    )
-
-    // Registers the foreign callback with the Rust side.
-    // This method is generated for each callback interface.
-    internal fun register(lib: UniffiLib) {
-        lib.uniffi_relaysms_spec_payload_fn_init_callback_vtable_payloadswithattachments(vtable)
-    }
-}
-
-/**
- * @suppress
- */
-public object FfiConverterTypePayloadsWithAttachments: FfiConverter<PayloadsWithAttachments, Long> {
-    internal val handleMap = UniffiHandleMap<PayloadsWithAttachments>()
-
-    override fun lower(value: PayloadsWithAttachments): Long {
-        if (value is PayloadsWithAttachmentsImpl) {
-             // Rust-implemented object.  Clone the handle and return it
-            return value.uniffiCloneHandle()
-         } else {
-            // Kotlin object, generate a new vtable handle and return that.
-            return handleMap.insert(value)
-         }
-    }
-
-    override fun lift(value: Long): PayloadsWithAttachments {
-        if ((value and 1.toLong()) == 0.toLong()) {
-            // Rust-generated handle, construct a new class that uses the handle to implement the
-            // interface
-            return PayloadsWithAttachmentsImpl(UniffiWithHandle, value)
-        } else {
-            // Kotlin-generated handle, get the object from the handle map
-            return handleMap.remove(value)
-        }
-    }
-
-    override fun read(buf: ByteBuffer): PayloadsWithAttachments {
-        return lift(buf.getLong())
-    }
-
-    override fun allocationSize(value: PayloadsWithAttachments) = 8UL
-
-    override fun write(value: PayloadsWithAttachments, buf: ByteBuffer) {
-        buf.putLong(lower(value))
-    }
-}
-
-
-// This template implements a class for working with a Rust struct via a handle
-// to the live Rust struct on the other side of the FFI.
-//
-// There's some subtlety here, because we have to be careful not to operate on a Rust
-// struct after it has been dropped, and because we must expose a public API for freeing
-// theq Kotlin wrapper object in lieu of reliable finalizers. The core requirements are:
-//
-//   * Each instance holds an opaque handle to the underlying Rust struct.
-//     Method calls need to read this handle from the object's state and pass it in to
-//     the Rust FFI.
-//
-//   * When an instance is no longer needed, its handle should be passed to a
-//     special destructor function provided by the Rust FFI, which will drop the
-//     underlying Rust struct.
-//
-//   * Given an instance, calling code is expected to call the special
-//     `destroy` method in order to free it after use, either by calling it explicitly
-//     or by using a higher-level helper like the `use` method. Failing to do so risks
-//     leaking the underlying Rust struct.
-//
-//   * We can't assume that calling code will do the right thing, and must be prepared
-//     to handle Kotlin method calls executing concurrently with or even after a call to
-//     `destroy`, and to handle multiple (possibly concurrent!) calls to `destroy`.
-//
-//   * We must never allow Rust code to operate on the underlying Rust struct after
-//     the destructor has been called, and must never call the destructor more than once.
-//     Doing so may trigger memory unsafety.
-//
-//   * To mitigate many of the risks of leaking memory and use-after-free unsafety, a `Cleaner`
-//     is implemented to call the destructor when the Kotlin object becomes unreachable.
-//     This is done in a background thread. This is not a panacea, and client code should be aware that
-//      1. the thread may starve if some there are objects that have poorly performing
-//     `drop` methods or do significant work in their `drop` methods.
-//      2. the thread is shared across the whole library. This can be tuned by using `android_cleaner = true`,
-//         or `android = true` in the [`kotlin` section of the `uniffi.toml` file](https://mozilla.github.io/uniffi-rs/kotlin/configuration.html).
-//
-// If we try to implement this with mutual exclusion on access to the handle, there is the
-// possibility of a race between a method call and a concurrent call to `destroy`:
-//
-//    * Thread A starts a method call, reads the value of the handle, but is interrupted
-//      before it can pass the handle over the FFI to Rust.
-//    * Thread B calls `destroy` and frees the underlying Rust struct.
-//    * Thread A resumes, passing the already-read handle value to Rust and triggering
-//      a use-after-free.
-//
-// One possible solution would be to use a `ReadWriteLock`, with each method call taking
-// a read lock (and thus allowed to run concurrently) and the special `destroy` method
-// taking a write lock (and thus blocking on live method calls). However, we aim not to
-// generate methods with any hidden blocking semantics, and a `destroy` method that might
-// block if called incorrectly seems to meet that bar.
-//
-// So, we achieve our goals by giving each instance an associated `AtomicLong` counter to track
-// the number of in-flight method calls, and an `AtomicBoolean` flag to indicate whether `destroy`
-// has been called. These are updated according to the following rules:
-//
-//    * The initial value of the counter is 1, indicating a live object with no in-flight calls.
-//      The initial value for the flag is false.
-//
-//    * At the start of each method call, we atomically check the counter.
-//      If it is 0 then the underlying Rust struct has already been destroyed and the call is aborted.
-//      If it is nonzero them we atomically increment it by 1 and proceed with the method call.
-//
-//    * At the end of each method call, we atomically decrement and check the counter.
-//      If it has reached zero then we destroy the underlying Rust struct.
-//
-//    * When `destroy` is called, we atomically flip the flag from false to true.
-//      If the flag was already true we silently fail.
-//      Otherwise we atomically decrement and check the counter.
-//      If it has reached zero then we destroy the underlying Rust struct.
-//
-// Astute readers may observe that this all sounds very similar to the way that Rust's `Arc<T>` works,
-// and indeed it is, with the addition of a flag to guard against multiple calls to `destroy`.
-//
-// The overall effect is that the underlying Rust struct is destroyed only when `destroy` has been
-// called *and* all in-flight method calls have completed, avoiding violating any of the expectations
-// of the underlying Rust code.
-//
-// This makes a cleaner a better alternative to _not_ calling `destroy()` as
-// and when the object is finished with, but the abstraction is not perfect: if the Rust object's `drop`
-// method is slow, and/or there are many objects to cleanup, and it's on a low end Android device, then the cleaner
-// thread may be starved, and the app will leak memory.
-//
-// In this case, `destroy`ing manually may be a better solution.
-//
-// The cleaner can live side by side with the manual calling of `destroy`. In the order of responsiveness, uniffi objects
-// with Rust peers are reclaimed:
-//
-// 1. By calling the `destroy` method of the object, which calls `rustObject.free()`. If that doesn't happen:
-// 2. When the object becomes unreachable, AND the Cleaner thread gets to call `rustObject.free()`. If the thread is starved then:
-// 3. The memory is reclaimed when the process terminates.
-//
-// [1] https://stackoverflow.com/questions/24376768/can-java-finalize-an-object-when-it-is-still-in-scope/24380219
-//
-
-
-public interface PayloadsWithoutAttachments {
-    
-    fun `serialize`(): kotlin.ByteArray
-    
-    fun `equals`(`other`: PayloadsWithoutAttachments): kotlin.Boolean
-    
-    companion object
-}
-
-open class PayloadsWithoutAttachmentsImpl: Disposable, AutoCloseable, PayloadsWithoutAttachments
-{
-
-    @Suppress("UNUSED_PARAMETER")
-    /**
-     * @suppress
-     */
-    constructor(withHandle: UniffiWithHandle, handle: Long) {
-        this.handle = handle
-        this.cleanable = UniffiLib.CLEANER.register(this, UniffiCleanAction(handle))
-    }
-
-    /**
-     * @suppress
-     *
-     * This constructor can be used to instantiate a fake object. Only used for tests. Any
-     * attempt to actually use an object constructed this way will fail as there is no
-     * connected Rust object.
-     */
-    @Suppress("UNUSED_PARAMETER")
-    constructor(noHandle: NoHandle) {
-        this.handle = 0
-        this.cleanable = null
-    }
-
-    protected val handle: Long
-    protected val cleanable: UniffiCleaner.Cleanable?
-
-    private val wasDestroyed = AtomicBoolean(false)
-    private val callCounter = AtomicLong(1)
-
-    override fun destroy() {
-        // Only allow a single call to this method.
-        // TODO: maybe we should log a warning if called more than once?
-        if (this.wasDestroyed.compareAndSet(false, true)) {
-            // This decrement always matches the initial count of 1 given at creation time.
-            if (this.callCounter.decrementAndGet() == 0L) {
-                cleanable?.clean()
-            }
-        }
-    }
-
-    @Synchronized
-    override fun close() {
-        this.destroy()
-    }
-
-    internal inline fun <R> callWithHandle(block: (handle: Long) -> R): R {
-        // Check and increment the call counter, to keep the object alive.
-        // This needs a compare-and-set retry loop in case of concurrent updates.
-        do {
-            val c = this.callCounter.get()
-            if (c == 0L) {
-                throw IllegalStateException("${this.javaClass.simpleName} object has already been destroyed")
-            }
-            if (c == Long.MAX_VALUE) {
-                throw IllegalStateException("${this.javaClass.simpleName} call counter would overflow")
-            }
-        } while (! this.callCounter.compareAndSet(c, c + 1L))
-        // Now we can safely do the method call without the handle being freed concurrently.
-        try {
-            return block(this.uniffiCloneHandle())
-        } finally {
-            // This decrement always matches the increment we performed above.
-            if (this.callCounter.decrementAndGet() == 0L) {
-                cleanable?.clean()
-            }
-        }
-    }
-
-    // Use a static inner class instead of a closure so as not to accidentally
-    // capture `this` as part of the cleanable's action.
-    private class UniffiCleanAction(private val handle: Long) : Runnable {
-        override fun run() {
-            if (handle == 0.toLong()) {
-                // Fake object created with `NoHandle`, don't try to free.
-                return;
-            }
-            uniffiRustCall { status ->
-                UniffiLib.uniffi_relaysms_spec_payload_fn_free_payloadswithoutattachments(handle, status)
-            }
-        }
-    }
-
-    /**
-     * @suppress
-     */
-    fun uniffiCloneHandle(): Long {
-        if (handle == 0.toLong()) {
-            throw InternalException("uniffiCloneHandle() called on NoHandle object");
-        }
-        return uniffiRustCall() { status ->
-            UniffiLib.uniffi_relaysms_spec_payload_fn_clone_payloadswithoutattachments(handle, status)
-        }
-    }
-
-    
-    @Throws(PayloadsException::class)override fun `serialize`(): kotlin.ByteArray {
-            return FfiConverterByteArray.lift(
-    callWithHandle {
-    uniffiRustCallWithError(PayloadsException) { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadswithoutattachments_serialize(
-        it,
-        _status)
-}
-    }
-    )
-    }
-    
-
-    override fun `equals`(`other`: PayloadsWithoutAttachments): kotlin.Boolean {
-            return FfiConverterBoolean.lift(
-    callWithHandle {
-    uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_payloadswithoutattachments_equals(
-        it,
-        FfiConverterTypePayloadsWithoutAttachments.lower(`other`),_status)
-}
-    }
-    )
-    }
-    
-
-    
-
-    
-
-
-    
-    
-    /**
-     * @suppress
-     */
-    companion object
-    
-}
-
-
-
-// Put the implementation in an object so we don't pollute the top-level namespace
-internal object uniffiCallbackInterfacePayloadsWithoutAttachments {
-    internal object `serialize`: UniffiCallbackInterfacePayloadsWithoutAttachmentsMethod0 {
-        override fun callback(`uniffiHandle`: Long,`uniffiOutReturn`: RustBuffer,uniffiCallStatus: UniffiRustCallStatus,) {
-            val uniffiObj = FfiConverterTypePayloadsWithoutAttachments.handleMap.get(uniffiHandle)
-            val makeCall = { ->
-                uniffiObj.`serialize`(
-                )
-            }
-            val writeReturn = { value: kotlin.ByteArray -> uniffiOutReturn.setValue(FfiConverterByteArray.lower(value)) }
-            uniffiTraitInterfaceCallWithError(
-                uniffiCallStatus,
-                makeCall,
-                writeReturn,
-                { e: PayloadsException -> FfiConverterTypePayloadsError.lower(e) }
-            )
-        }
-    }
-    internal object `equals`: UniffiCallbackInterfacePayloadsWithoutAttachmentsMethod1 {
-        override fun callback(`uniffiHandle`: Long,`other`: Long,`uniffiOutReturn`: ByteByReference,uniffiCallStatus: UniffiRustCallStatus,) {
-            val uniffiObj = FfiConverterTypePayloadsWithoutAttachments.handleMap.get(uniffiHandle)
-            val makeCall = { ->
-                uniffiObj.`equals`(
-                    FfiConverterTypePayloadsWithoutAttachments.lift(`other`),
-                )
-            }
-            val writeReturn = { value: kotlin.Boolean -> uniffiOutReturn.setValue(FfiConverterBoolean.lower(value)) }
-            uniffiTraitInterfaceCall(uniffiCallStatus, makeCall, writeReturn)
-        }
-    }
-
-    internal object uniffiFree: UniffiCallbackInterfaceFree {
-        override fun callback(handle: Long) {
-            FfiConverterTypePayloadsWithoutAttachments.handleMap.remove(handle)
-        }
-    }
-
-    internal object uniffiClone: UniffiCallbackInterfaceClone {
-        override fun callback(handle: Long): Long {
-            return FfiConverterTypePayloadsWithoutAttachments.handleMap.clone(handle)
-        }
-    }
-
-    internal var vtable = UniffiVTableCallbackInterfacePayloadsWithoutAttachments.UniffiByValue(
-        uniffiFree,
-        uniffiClone,
-        `serialize`,
-        `equals`,
-    )
-
-    // Registers the foreign callback with the Rust side.
-    // This method is generated for each callback interface.
-    internal fun register(lib: UniffiLib) {
-        lib.uniffi_relaysms_spec_payload_fn_init_callback_vtable_payloadswithoutattachments(vtable)
-    }
-}
-
-/**
- * @suppress
- */
-public object FfiConverterTypePayloadsWithoutAttachments: FfiConverter<PayloadsWithoutAttachments, Long> {
-    internal val handleMap = UniffiHandleMap<PayloadsWithoutAttachments>()
-
-    override fun lower(value: PayloadsWithoutAttachments): Long {
-        if (value is PayloadsWithoutAttachmentsImpl) {
-             // Rust-implemented object.  Clone the handle and return it
-            return value.uniffiCloneHandle()
-         } else {
-            // Kotlin object, generate a new vtable handle and return that.
-            return handleMap.insert(value)
-         }
-    }
-
-    override fun lift(value: Long): PayloadsWithoutAttachments {
-        if ((value and 1.toLong()) == 0.toLong()) {
-            // Rust-generated handle, construct a new class that uses the handle to implement the
-            // interface
-            return PayloadsWithoutAttachmentsImpl(UniffiWithHandle, value)
-        } else {
-            // Kotlin-generated handle, get the object from the handle map
-            return handleMap.remove(value)
-        }
-    }
-
-    override fun read(buf: ByteBuffer): PayloadsWithoutAttachments {
-        return lift(buf.getLong())
-    }
-
-    override fun allocationSize(value: PayloadsWithoutAttachments) = 8UL
-
-    override fun write(value: PayloadsWithoutAttachments, buf: ByteBuffer) {
+    override fun write(value: V1Payloads, buf: ByteBuffer) {
         buf.putLong(lower(value))
     }
 }
@@ -4997,7 +4184,7 @@ public object FfiConverterTypeBitParsingError : FfiConverterRustBuffer<BitParsin
 
 
 
-enum class ContentCategories(val value: kotlin.UByte) {
+enum class V1ContentCategories(val value: kotlin.UByte) {
     
     EMAIL(0u),
     MESSAGE(1u),
@@ -5007,7 +4194,7 @@ enum class ContentCategories(val value: kotlin.UByte) {
      fun `rawValues`(): kotlin.UByte {
             return FfiConverterUByte.lift(
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_method_contentcategories_raw_values(FfiConverterTypeContentCategories.lower(this),
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1contentcategories_raw_values(FfiConverterTypeV1ContentCategories.lower(this),
         _status)
 }
     )
@@ -5024,16 +4211,16 @@ enum class ContentCategories(val value: kotlin.UByte) {
 /**
  * @suppress
  */
-public object FfiConverterTypeContentCategories: FfiConverterRustBuffer<ContentCategories> {
+public object FfiConverterTypeV1ContentCategories: FfiConverterRustBuffer<V1ContentCategories> {
     override fun read(buf: ByteBuffer) = try {
-        ContentCategories.values()[buf.getInt() - 1]
+        V1ContentCategories.values()[buf.getInt() - 1]
     } catch (e: IndexOutOfBoundsException) {
         throw RuntimeException("invalid enum value, something is very wrong!!", e)
     }
 
-    override fun allocationSize(value: ContentCategories) = 4UL
+    override fun allocationSize(value: V1ContentCategories) = 4UL
 
-    override fun write(value: ContentCategories, buf: ByteBuffer) {
+    override fun write(value: V1ContentCategories, buf: ByteBuffer) {
         buf.putInt(value.ordinal + 1)
     }
 }
@@ -5044,58 +4231,58 @@ public object FfiConverterTypeContentCategories: FfiConverterRustBuffer<ContentC
 
 
 
-sealed class ContentException: kotlin.Exception() {
+sealed class V1ContentException: kotlin.Exception() {
     
     class InconsistentSubjectIndicator(
-        ) : ContentException() {
+        ) : V1ContentException() {
         override val message
             get() = ""
     }
     
     class FromIdTooLarge(
-        ) : ContentException() {
+        ) : V1ContentException() {
         override val message
             get() = ""
     }
     
     class SubjectLenTooLarge(
-        ) : ContentException() {
+        ) : V1ContentException() {
         override val message
             get() = ""
     }
     
     class ToTooLarge(
-        ) : ContentException() {
+        ) : V1ContentException() {
         override val message
             get() = ""
     }
     
     class BitParsingException(
-        ) : ContentException() {
+        ) : V1ContentException() {
         override val message
             get() = ""
     }
     
     class InvalidUtf8(
-        ) : ContentException() {
+        ) : V1ContentException() {
         override val message
             get() = ""
     }
     
     class InvalidCategoryId(
-        ) : ContentException() {
+        ) : V1ContentException() {
         override val message
             get() = ""
     }
     
     class MissingTo(
-        ) : ContentException() {
+        ) : V1ContentException() {
         override val message
             get() = ""
     }
     
     class EmptyBody(
-        ) : ContentException() {
+        ) : V1ContentException() {
         override val message
             get() = ""
     }
@@ -5104,8 +4291,8 @@ sealed class ContentException: kotlin.Exception() {
     
 
 
-    companion object ErrorHandler : UniffiRustCallStatusErrorHandler<ContentException> {
-        override fun lift(error_buf: RustBuffer.ByValue): ContentException = FfiConverterTypeContentError.lift(error_buf)
+    companion object ErrorHandler : UniffiRustCallStatusErrorHandler<V1ContentException> {
+        override fun lift(error_buf: RustBuffer.ByValue): V1ContentException = FfiConverterTypeV1ContentError.lift(error_buf)
     }
 
     
@@ -5114,100 +4301,100 @@ sealed class ContentException: kotlin.Exception() {
 /**
  * @suppress
  */
-public object FfiConverterTypeContentError : FfiConverterRustBuffer<ContentException> {
-    override fun read(buf: ByteBuffer): ContentException {
+public object FfiConverterTypeV1ContentError : FfiConverterRustBuffer<V1ContentException> {
+    override fun read(buf: ByteBuffer): V1ContentException {
         
 
         return when(buf.getInt()) {
-            1 -> ContentException.InconsistentSubjectIndicator()
-            2 -> ContentException.FromIdTooLarge()
-            3 -> ContentException.SubjectLenTooLarge()
-            4 -> ContentException.ToTooLarge()
-            5 -> ContentException.BitParsingException()
-            6 -> ContentException.InvalidUtf8()
-            7 -> ContentException.InvalidCategoryId()
-            8 -> ContentException.MissingTo()
-            9 -> ContentException.EmptyBody()
+            1 -> V1ContentException.InconsistentSubjectIndicator()
+            2 -> V1ContentException.FromIdTooLarge()
+            3 -> V1ContentException.SubjectLenTooLarge()
+            4 -> V1ContentException.ToTooLarge()
+            5 -> V1ContentException.BitParsingException()
+            6 -> V1ContentException.InvalidUtf8()
+            7 -> V1ContentException.InvalidCategoryId()
+            8 -> V1ContentException.MissingTo()
+            9 -> V1ContentException.EmptyBody()
             else -> throw RuntimeException("invalid error enum value, something is very wrong!!")
         }
     }
 
-    override fun allocationSize(value: ContentException): ULong {
+    override fun allocationSize(value: V1ContentException): ULong {
         return when(value) {
-            is ContentException.InconsistentSubjectIndicator -> (
+            is V1ContentException.InconsistentSubjectIndicator -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
-            is ContentException.FromIdTooLarge -> (
+            is V1ContentException.FromIdTooLarge -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
-            is ContentException.SubjectLenTooLarge -> (
+            is V1ContentException.SubjectLenTooLarge -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
-            is ContentException.ToTooLarge -> (
+            is V1ContentException.ToTooLarge -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
-            is ContentException.BitParsingException -> (
+            is V1ContentException.BitParsingException -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
-            is ContentException.InvalidUtf8 -> (
+            is V1ContentException.InvalidUtf8 -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
-            is ContentException.InvalidCategoryId -> (
+            is V1ContentException.InvalidCategoryId -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
-            is ContentException.MissingTo -> (
+            is V1ContentException.MissingTo -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
-            is ContentException.EmptyBody -> (
+            is V1ContentException.EmptyBody -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
         }
     }
 
-    override fun write(value: ContentException, buf: ByteBuffer) {
+    override fun write(value: V1ContentException, buf: ByteBuffer) {
         when(value) {
-            is ContentException.InconsistentSubjectIndicator -> {
+            is V1ContentException.InconsistentSubjectIndicator -> {
                 buf.putInt(1)
                 Unit
             }
-            is ContentException.FromIdTooLarge -> {
+            is V1ContentException.FromIdTooLarge -> {
                 buf.putInt(2)
                 Unit
             }
-            is ContentException.SubjectLenTooLarge -> {
+            is V1ContentException.SubjectLenTooLarge -> {
                 buf.putInt(3)
                 Unit
             }
-            is ContentException.ToTooLarge -> {
+            is V1ContentException.ToTooLarge -> {
                 buf.putInt(4)
                 Unit
             }
-            is ContentException.BitParsingException -> {
+            is V1ContentException.BitParsingException -> {
                 buf.putInt(5)
                 Unit
             }
-            is ContentException.InvalidUtf8 -> {
+            is V1ContentException.InvalidUtf8 -> {
                 buf.putInt(6)
                 Unit
             }
-            is ContentException.InvalidCategoryId -> {
+            is V1ContentException.InvalidCategoryId -> {
                 buf.putInt(7)
                 Unit
             }
-            is ContentException.MissingTo -> {
+            is V1ContentException.MissingTo -> {
                 buf.putInt(8)
                 Unit
             }
-            is ContentException.EmptyBody -> {
+            is V1ContentException.EmptyBody -> {
                 buf.putInt(9)
                 Unit
             }
@@ -5220,52 +4407,46 @@ public object FfiConverterTypeContentError : FfiConverterRustBuffer<ContentExcep
 
 
 
-sealed class PayloadsException: kotlin.Exception() {
+sealed class V1PayloadsException: kotlin.Exception() {
     
     class VersionTooLarge(
-        ) : PayloadsException() {
-        override val message
-            get() = ""
-    }
-    
-    class EncryptionIdTooLarge(
-        ) : PayloadsException() {
+        ) : V1PayloadsException() {
         override val message
             get() = ""
     }
     
     class SegmentLessThanOne(
-        ) : PayloadsException() {
+        ) : V1PayloadsException() {
         override val message
             get() = ""
     }
     
     class SessionIdTooLarge(
-        ) : PayloadsException() {
+        ) : V1PayloadsException() {
         override val message
             get() = ""
     }
     
     class KeyIdTooLarge(
-        ) : PayloadsException() {
+        ) : V1PayloadsException() {
         override val message
             get() = ""
     }
     
     class CategoryIdTooLarge(
-        ) : PayloadsException() {
+        ) : V1PayloadsException() {
         override val message
             get() = ""
     }
     
     class DeviceIdTooLarge(
-        ) : PayloadsException() {
+        ) : V1PayloadsException() {
         override val message
             get() = ""
     }
     
     class EmptyPayload(
-        ) : PayloadsException() {
+        ) : V1PayloadsException() {
         override val message
             get() = ""
     }
@@ -5273,31 +4454,31 @@ sealed class PayloadsException: kotlin.Exception() {
     class ErrorParsingBits(
         
         val `error`: BitParsingException
-        ) : PayloadsException() {
+        ) : V1PayloadsException() {
         override val message
             get() = "error=${ `error` }"
     }
     
     class ContentDeserializationException(
-        ) : PayloadsException() {
+        ) : V1PayloadsException() {
         override val message
             get() = ""
     }
     
     class ContentSerializationException(
-        ) : PayloadsException() {
+        ) : V1PayloadsException() {
         override val message
             get() = ""
     }
     
     class MissingDeviceId(
-        ) : PayloadsException() {
+        ) : V1PayloadsException() {
         override val message
             get() = ""
     }
     
     class MissingPayload(
-        ) : PayloadsException() {
+        ) : V1PayloadsException() {
         override val message
             get() = ""
     }
@@ -5307,7 +4488,7 @@ sealed class PayloadsException: kotlin.Exception() {
         val `current`: kotlin.Int, 
         
         val `max`: kotlin.UByte
-        ) : PayloadsException() {
+        ) : V1PayloadsException() {
         override val message
             get() = "current=${ `current` }, max=${ `max` }"
     }
@@ -5317,7 +4498,7 @@ sealed class PayloadsException: kotlin.Exception() {
         val `current`: kotlin.Int, 
         
         val `max`: kotlin.UByte
-        ) : PayloadsException() {
+        ) : V1PayloadsException() {
         override val message
             get() = "current=${ `current` }, max=${ `max` }"
     }
@@ -5329,7 +4510,7 @@ sealed class PayloadsException: kotlin.Exception() {
         val `current`: kotlin.Int, 
         
         val `max`: kotlin.UByte
-        ) : PayloadsException() {
+        ) : V1PayloadsException() {
         override val message
             get() = "segment=${ `segment` }, current=${ `current` }, max=${ `max` }"
     }
@@ -5338,8 +4519,8 @@ sealed class PayloadsException: kotlin.Exception() {
     
 
 
-    companion object ErrorHandler : UniffiRustCallStatusErrorHandler<PayloadsException> {
-        override fun lift(error_buf: RustBuffer.ByValue): PayloadsException = FfiConverterTypePayloadsError.lift(error_buf)
+    companion object ErrorHandler : UniffiRustCallStatusErrorHandler<V1PayloadsException> {
+        override fun lift(error_buf: RustBuffer.ByValue): V1PayloadsException = FfiConverterTypeV1PayloadsError.lift(error_buf)
     }
 
     
@@ -5348,35 +4529,34 @@ sealed class PayloadsException: kotlin.Exception() {
 /**
  * @suppress
  */
-public object FfiConverterTypePayloadsError : FfiConverterRustBuffer<PayloadsException> {
-    override fun read(buf: ByteBuffer): PayloadsException {
+public object FfiConverterTypeV1PayloadsError : FfiConverterRustBuffer<V1PayloadsException> {
+    override fun read(buf: ByteBuffer): V1PayloadsException {
         
 
         return when(buf.getInt()) {
-            1 -> PayloadsException.VersionTooLarge()
-            2 -> PayloadsException.EncryptionIdTooLarge()
-            3 -> PayloadsException.SegmentLessThanOne()
-            4 -> PayloadsException.SessionIdTooLarge()
-            5 -> PayloadsException.KeyIdTooLarge()
-            6 -> PayloadsException.CategoryIdTooLarge()
-            7 -> PayloadsException.DeviceIdTooLarge()
-            8 -> PayloadsException.EmptyPayload()
-            9 -> PayloadsException.ErrorParsingBits(
+            1 -> V1PayloadsException.VersionTooLarge()
+            2 -> V1PayloadsException.SegmentLessThanOne()
+            3 -> V1PayloadsException.SessionIdTooLarge()
+            4 -> V1PayloadsException.KeyIdTooLarge()
+            5 -> V1PayloadsException.CategoryIdTooLarge()
+            6 -> V1PayloadsException.DeviceIdTooLarge()
+            7 -> V1PayloadsException.EmptyPayload()
+            8 -> V1PayloadsException.ErrorParsingBits(
                 FfiConverterTypeBitParsingError.read(buf),
                 )
-            10 -> PayloadsException.ContentDeserializationException()
-            11 -> PayloadsException.ContentSerializationException()
-            12 -> PayloadsException.MissingDeviceId()
-            13 -> PayloadsException.MissingPayload()
-            14 -> PayloadsException.PayloadTooLarge(
+            9 -> V1PayloadsException.ContentDeserializationException()
+            10 -> V1PayloadsException.ContentSerializationException()
+            11 -> V1PayloadsException.MissingDeviceId()
+            12 -> V1PayloadsException.MissingPayload()
+            13 -> V1PayloadsException.PayloadTooLarge(
                 FfiConverterInt.read(buf),
                 FfiConverterUByte.read(buf),
                 )
-            15 -> PayloadsException.HeaderTooLarge(
+            14 -> V1PayloadsException.HeaderTooLarge(
                 FfiConverterInt.read(buf),
                 FfiConverterUByte.read(buf),
                 )
-            16 -> PayloadsException.NHeaderTooLarge(
+            15 -> V1PayloadsException.NHeaderTooLarge(
                 FfiConverterUByte.read(buf),
                 FfiConverterInt.read(buf),
                 FfiConverterUByte.read(buf),
@@ -5385,74 +4565,70 @@ public object FfiConverterTypePayloadsError : FfiConverterRustBuffer<PayloadsExc
         }
     }
 
-    override fun allocationSize(value: PayloadsException): ULong {
+    override fun allocationSize(value: V1PayloadsException): ULong {
         return when(value) {
-            is PayloadsException.VersionTooLarge -> (
+            is V1PayloadsException.VersionTooLarge -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
-            is PayloadsException.EncryptionIdTooLarge -> (
+            is V1PayloadsException.SegmentLessThanOne -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
-            is PayloadsException.SegmentLessThanOne -> (
+            is V1PayloadsException.SessionIdTooLarge -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
-            is PayloadsException.SessionIdTooLarge -> (
+            is V1PayloadsException.KeyIdTooLarge -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
-            is PayloadsException.KeyIdTooLarge -> (
+            is V1PayloadsException.CategoryIdTooLarge -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
-            is PayloadsException.CategoryIdTooLarge -> (
+            is V1PayloadsException.DeviceIdTooLarge -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
-            is PayloadsException.DeviceIdTooLarge -> (
+            is V1PayloadsException.EmptyPayload -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
-            is PayloadsException.EmptyPayload -> (
-                // Add the size for the Int that specifies the variant plus the size needed for all fields
-                4UL
-            )
-            is PayloadsException.ErrorParsingBits -> (
+            is V1PayloadsException.ErrorParsingBits -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
                 + FfiConverterTypeBitParsingError.allocationSize(value.`error`)
             )
-            is PayloadsException.ContentDeserializationException -> (
+            is V1PayloadsException.ContentDeserializationException -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
-            is PayloadsException.ContentSerializationException -> (
+            is V1PayloadsException.ContentSerializationException -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
-            is PayloadsException.MissingDeviceId -> (
+            is V1PayloadsException.MissingDeviceId -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
-            is PayloadsException.MissingPayload -> (
+            is V1PayloadsException.MissingPayload -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
-            is PayloadsException.PayloadTooLarge -> (
-                // Add the size for the Int that specifies the variant plus the size needed for all fields
-                4UL
-                + FfiConverterInt.allocationSize(value.`current`)
-                + FfiConverterUByte.allocationSize(value.`max`)
-            )
-            is PayloadsException.HeaderTooLarge -> (
+            is V1PayloadsException.PayloadTooLarge -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
                 + FfiConverterInt.allocationSize(value.`current`)
                 + FfiConverterUByte.allocationSize(value.`max`)
             )
-            is PayloadsException.NHeaderTooLarge -> (
+            is V1PayloadsException.HeaderTooLarge -> (
+                // Add the size for the Int that specifies the variant plus the size needed for all fields
+                4UL
+                + FfiConverterInt.allocationSize(value.`current`)
+                + FfiConverterUByte.allocationSize(value.`max`)
+            )
+            is V1PayloadsException.NHeaderTooLarge -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
                 + FfiConverterUByte.allocationSize(value.`segment`)
@@ -5462,75 +4638,71 @@ public object FfiConverterTypePayloadsError : FfiConverterRustBuffer<PayloadsExc
         }
     }
 
-    override fun write(value: PayloadsException, buf: ByteBuffer) {
+    override fun write(value: V1PayloadsException, buf: ByteBuffer) {
         when(value) {
-            is PayloadsException.VersionTooLarge -> {
+            is V1PayloadsException.VersionTooLarge -> {
                 buf.putInt(1)
                 Unit
             }
-            is PayloadsException.EncryptionIdTooLarge -> {
+            is V1PayloadsException.SegmentLessThanOne -> {
                 buf.putInt(2)
                 Unit
             }
-            is PayloadsException.SegmentLessThanOne -> {
+            is V1PayloadsException.SessionIdTooLarge -> {
                 buf.putInt(3)
                 Unit
             }
-            is PayloadsException.SessionIdTooLarge -> {
+            is V1PayloadsException.KeyIdTooLarge -> {
                 buf.putInt(4)
                 Unit
             }
-            is PayloadsException.KeyIdTooLarge -> {
+            is V1PayloadsException.CategoryIdTooLarge -> {
                 buf.putInt(5)
                 Unit
             }
-            is PayloadsException.CategoryIdTooLarge -> {
+            is V1PayloadsException.DeviceIdTooLarge -> {
                 buf.putInt(6)
                 Unit
             }
-            is PayloadsException.DeviceIdTooLarge -> {
+            is V1PayloadsException.EmptyPayload -> {
                 buf.putInt(7)
                 Unit
             }
-            is PayloadsException.EmptyPayload -> {
+            is V1PayloadsException.ErrorParsingBits -> {
                 buf.putInt(8)
-                Unit
-            }
-            is PayloadsException.ErrorParsingBits -> {
-                buf.putInt(9)
                 FfiConverterTypeBitParsingError.write(value.`error`, buf)
                 Unit
             }
-            is PayloadsException.ContentDeserializationException -> {
+            is V1PayloadsException.ContentDeserializationException -> {
+                buf.putInt(9)
+                Unit
+            }
+            is V1PayloadsException.ContentSerializationException -> {
                 buf.putInt(10)
                 Unit
             }
-            is PayloadsException.ContentSerializationException -> {
+            is V1PayloadsException.MissingDeviceId -> {
                 buf.putInt(11)
                 Unit
             }
-            is PayloadsException.MissingDeviceId -> {
+            is V1PayloadsException.MissingPayload -> {
                 buf.putInt(12)
                 Unit
             }
-            is PayloadsException.MissingPayload -> {
+            is V1PayloadsException.PayloadTooLarge -> {
                 buf.putInt(13)
+                FfiConverterInt.write(value.`current`, buf)
+                FfiConverterUByte.write(value.`max`, buf)
                 Unit
             }
-            is PayloadsException.PayloadTooLarge -> {
+            is V1PayloadsException.HeaderTooLarge -> {
                 buf.putInt(14)
                 FfiConverterInt.write(value.`current`, buf)
                 FfiConverterUByte.write(value.`max`, buf)
                 Unit
             }
-            is PayloadsException.HeaderTooLarge -> {
+            is V1PayloadsException.NHeaderTooLarge -> {
                 buf.putInt(15)
-                FfiConverterInt.write(value.`current`, buf)
-                FfiConverterUByte.write(value.`max`, buf)
-                Unit
-            }
-            is PayloadsException.NHeaderTooLarge -> {
-                buf.putInt(16)
                 FfiConverterUByte.write(value.`segment`, buf)
                 FfiConverterInt.write(value.`current`, buf)
                 FfiConverterUByte.write(value.`max`, buf)
@@ -5579,56 +4751,24 @@ public object FfiConverterOptionalString: FfiConverterRustBuffer<kotlin.String?>
 /**
  * @suppress
  */
-public object FfiConverterOptionalTypeContents: FfiConverterRustBuffer<Contents?> {
-    override fun read(buf: ByteBuffer): Contents? {
-        if (buf.get().toInt() == 0) {
-            return null
-        }
-        return FfiConverterTypeContents.read(buf)
-    }
-
-    override fun allocationSize(value: Contents?): ULong {
-        if (value == null) {
-            return 1UL
-        } else {
-            return 1UL + FfiConverterTypeContents.allocationSize(value)
-        }
-    }
-
-    override fun write(value: Contents?, buf: ByteBuffer) {
-        if (value == null) {
-            buf.put(0)
-        } else {
-            buf.put(1)
-            FfiConverterTypeContents.write(value, buf)
-        }
-    }
-}
-
-
-
-
-/**
- * @suppress
- */
-public object FfiConverterSequenceTypePayloads: FfiConverterRustBuffer<List<Payloads>> {
-    override fun read(buf: ByteBuffer): List<Payloads> {
+public object FfiConverterSequenceTypeV1Payloads: FfiConverterRustBuffer<List<V1Payloads>> {
+    override fun read(buf: ByteBuffer): List<V1Payloads> {
         val len = buf.getInt()
-        return List<Payloads>(len) {
-            FfiConverterTypePayloads.read(buf)
+        return List<V1Payloads>(len) {
+            FfiConverterTypeV1Payloads.read(buf)
         }
     }
 
-    override fun allocationSize(value: List<Payloads>): ULong {
+    override fun allocationSize(value: List<V1Payloads>): ULong {
         val sizeForLength = 4UL
-        val sizeForItems = value.map { FfiConverterTypePayloads.allocationSize(it) }.sum()
+        val sizeForItems = value.map { FfiConverterTypeV1Payloads.allocationSize(it) }.sum()
         return sizeForLength + sizeForItems
     }
 
-    override fun write(value: List<Payloads>, buf: ByteBuffer) {
+    override fun write(value: List<V1Payloads>, buf: ByteBuffer) {
         buf.putInt(value.size)
         value.iterator().forEach {
-            FfiConverterTypePayloads.write(it, buf)
+            FfiConverterTypeV1Payloads.write(it, buf)
         }
     }
 } fun `addRust`(`left`: kotlin.ULong, `right`: kotlin.ULong): kotlin.ULong {
@@ -5641,30 +4781,40 @@ public object FfiConverterSequenceTypePayloads: FfiConverterRustBuffer<List<Payl
     )
     }
     
- fun `getVersion`(): kotlin.UByte {
-            return FfiConverterUByte.lift(
+ fun `v1ContentCategoryFromU8`(`value`: kotlin.UByte): V1ContentCategories {
+            return FfiConverterTypeV1ContentCategories.lift(
     uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_func_get_version(
-    
-        _status)
-}
-    )
-    }
-    
- fun `contentCategoryFromU8`(`value`: kotlin.UByte): ContentCategories {
-            return FfiConverterTypeContentCategories.lift(
-    uniffiRustCall() { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_func_content_category_from_u8(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_func_v1_content_category_from_u8(
     
         FfiConverterUByte.lower(`value`),_status)
 }
     )
     }
     
+ fun `v1PlatformPublisher`(`ecKid`: kotlin.ByteArray, `ecPkKid`: kotlin.ByteArray, `ssPkKid`: kotlin.ByteArray, `esPkKid`: kotlin.ByteArray, `keyId`: kotlin.ByteArray, `plaintext`: kotlin.ByteArray): kotlin.ByteArray {
+            return FfiConverterByteArray.lift(
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_func_v1_platform_publisher(
+    
+        FfiConverterByteArray.lower(`ecKid`),FfiConverterByteArray.lower(`ecPkKid`),FfiConverterByteArray.lower(`ssPkKid`),FfiConverterByteArray.lower(`esPkKid`),FfiConverterByteArray.lower(`keyId`),FfiConverterByteArray.lower(`plaintext`),_status)
+}
+    )
+    }
+    
+ fun `v1TokenDerivation`(`ecKid`: kotlin.ByteArray, `ecPkKid`: kotlin.ByteArray, `ssPkKid`: kotlin.ByteArray, `esPkKid`: kotlin.ByteArray, `methodName`: kotlin.ByteArray, `keyId`: kotlin.ByteArray): kotlin.ByteArray {
+            return FfiConverterByteArray.lift(
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_func_v1_token_derivation(
+    
+        FfiConverterByteArray.lower(`ecKid`),FfiConverterByteArray.lower(`ecPkKid`),FfiConverterByteArray.lower(`ssPkKid`),FfiConverterByteArray.lower(`esPkKid`),FfiConverterByteArray.lower(`methodName`),FfiConverterByteArray.lower(`keyId`),_status)
+}
+    )
+    }
+    
 
-    @Throws(PayloadsException::class) fun `deserializePayloadWithAttachments`(`data`: kotlin.ByteArray): PayloadWithAttachments {
-            return FfiConverterTypePayloadWithAttachments.lift(
-    uniffiRustCallWithError(PayloadsException) { _status ->
+    @Throws(V1PayloadsException::class) fun `deserializePayloadWithAttachments`(`data`: kotlin.ByteArray): V1PayloadWithAttachments {
+            return FfiConverterTypeV1PayloadWithAttachments.lift(
+    uniffiRustCallWithError(V1PayloadsException) { _status ->
     UniffiLib.uniffi_relaysms_spec_payload_fn_func_deserialize_payload_with_attachments(
     
         FfiConverterByteArray.lower(`data`),_status)
@@ -5673,10 +4823,10 @@ public object FfiConverterSequenceTypePayloads: FfiConverterRustBuffer<List<Payl
     }
     
 
-    @Throws(PayloadsException::class) fun `deserializePayloadWithoutAttachments`(`data`: kotlin.ByteArray): PayloadWithoutAttachments {
-            return FfiConverterTypePayloadWithoutAttachments.lift(
-    uniffiRustCallWithError(PayloadsException) { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_func_deserialize_payload_without_attachments(
+    @Throws(V1PayloadsException::class) fun `v1DeserializePayloadWithoutAttachments`(`data`: kotlin.ByteArray): V1PayloadWithoutAttachments {
+            return FfiConverterTypeV1PayloadWithoutAttachments.lift(
+    uniffiRustCallWithError(V1PayloadsException) { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_func_v1_deserialize_payload_without_attachments(
     
         FfiConverterByteArray.lower(`data`),_status)
 }

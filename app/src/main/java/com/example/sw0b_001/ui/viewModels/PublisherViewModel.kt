@@ -4,16 +4,18 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.afkanerd.lib_image_android.ui.extensions.toIntLittleEndian
+import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import uniffi.relaysms_spec_payload.ContentCategories
-import uniffi.relaysms_spec_payload.ContentsContainer
-import uniffi.relaysms_spec_payload.PayloadWithAttachments
-import uniffi.relaysms_spec_payload.getVersion
+import uniffi.relaysms_spec_payload.V1ContentCategories
+import uniffi.relaysms_spec_payload.V1ContentsContainer
+import uniffi.relaysms_spec_payload.V1PayloadWithAttachments
+import uniffi.relaysms_spec_payload.V1PayloadWithoutAttachments
+import uniffi.relaysms_spec_payload.V1Payloads
 
 @HiltViewModel
 class PublisherViewModel @Inject constructor(
@@ -26,54 +28,58 @@ class PublisherViewModel @Inject constructor(
     }
 
     fun publish(
-        catId: UByte,
+        catId: V1ContentCategories,
         body: String,
-        fromId: UByte,
+        tokenId: ByteArray,
         to: String?,
         subject: String?,
-        attachment: ByteArray?,
+        attachment: ImageViewModel.ProcessedImage?,
+        onFailureCallback: (String) -> Unit,
+        onCompleteCallback: () -> Unit,
     ) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                if(attachment != null) {
-                    publishWithAttachment(
-                        catId,
-                        body,
-                        fromId,
-                        to,
-                        subject,
-                        attachment
-                    )
-                } else {
-                    publishWithoutAttachment(
-                        catId,
-                        body,
-                        fromId,
-                        to,
-                        subject,
-                    )
+                try {
+                    if(attachment != null) {
+                        publishWithAttachment(
+                            catId,
+                            body,
+                            tokenId,
+                            to,
+                            subject,
+                            attachment.rawBytes!!
+                        )
+                    } else {
+                        publishWithoutAttachment(
+                            catId,
+                            body,
+                            tokenId,
+                            to,
+                            subject,
+                        )
+                    }
+
+                    onCompleteCallback()
+                } catch (e: Exception) {
+                    onFailureCallback(e.message ?: "")
                 }
             }
         }
     }
 
     private fun publishWithAttachment(
-        catId: UByte,
+        catId: V1ContentCategories,
         body: String,
-        fromId: UByte,
+        tokenId: ByteArray,
         to: String?,
         subject: String?,
         attachment: ByteArray,
     ) {
         val sessionId: UByte = 0u // TODO("Session ID")
-        val encryptionId: UByte = 0u // TODO("Encryption ID")
         val keyId: UByte = 0u // TODO("Encryption ID")
 
-        val deviceId = ByteArray(16) // TODO("Device ID")
-        val tokenId = ByteArray(4) // TODO("Device ID")
-
-        val contentContainer = ContentsContainer(
-            catId = ContentCategories.EMAIL,
+        val contentContainer = V1ContentsContainer(
+            catId = catId,
             body = body,
             to = to,
             subject = subject
@@ -82,26 +88,61 @@ class PublisherViewModel @Inject constructor(
             .instance()
             .serialize()
 
-        val payload = attachment + content // TODO("Encrypt")
+        val payload = encrypt(
+            keyId = keyId,
+            payload = attachment + content
+        )
 
-        val payloads = PayloadWithAttachments(
-            version = getVersion(),
+        val payloads = V1PayloadWithAttachments(
             sessId = sessionId,
-            eId = encryptionId,
             kId = keyId,
             lenAtt = attachment.size.toUShort(),
             payload = payload,
             tId = tokenId.toIntLittleEndian().toUInt()
         )
+        moveToService(payloads.split())
     }
 
     private fun publishWithoutAttachment(
-        catId: UByte,
+        catId: V1ContentCategories,
         body: String,
-        fromId: UByte,
+        tokenId: ByteArray,
         to: String?,
         subject: String?,
     ) {
-        TODO("Implement publishing without attachments")
+        val keyId: UByte = 0u // TODO("Encryption ID")
+
+        val contentContainer = V1ContentsContainer(
+            catId = catId,
+            body = body,
+            to = to,
+            subject = subject
+        )
+        val content = contentContainer
+            .instance()
+            .serialize()
+
+        val payload = encrypt(
+            keyId = keyId,
+            payload = content
+        )
+        val payloads = V1PayloadWithoutAttachments(
+            kId = keyId,
+            tId = tokenId.toIntLittleEndian().toUInt(),
+            payload = payload
+        )
+
+        TODO("Payload can be transmitted immediately")
+    }
+
+    private fun encrypt(
+        keyId: UByte,
+        payload: ByteArray,
+    ) : ByteArray {
+        TODO("Perform encryption")
+    }
+
+    private fun moveToService( payloads: List<V1Payloads>) {
+        TODO("Perform service work")
     }
 }
