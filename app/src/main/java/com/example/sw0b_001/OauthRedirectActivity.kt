@@ -67,7 +67,11 @@ class OauthRedirectActivity : AppCompatActivity() {
                             requestIdentifier = Base64
                                 .encodeToString(oa.requestId, Base64.NO_WRAP)
                         )
+
                         val tokenHash = TODO("Get token Hash from here")
+                        val serverEphemeralKeys = TODO("Get token Hash from here")
+                        TODO("Store the server's ephemeral keys")
+
                         VaultsGrpcImpl(applicationContext).use { vaultsGrpcImpl ->
                             try {
                                 val (tokenId, keys) = vaultsGrpcImpl.uploadKeys(tokenHash)

@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class Messages(
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0,
-    var accountId: Int,
+    var tokenId: Long,
     var type: Byte,
     var date: Long,
     var to: ByteArray,

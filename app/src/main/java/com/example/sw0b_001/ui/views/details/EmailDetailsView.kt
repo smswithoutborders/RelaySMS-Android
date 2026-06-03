@@ -40,12 +40,12 @@ import androidx.navigation.NavController
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Helpers
-import com.example.sw0b_001.data.models.Accounts
+import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.data.repositories.TransportTypes
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.components.AttachImageView
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.AccountsViewModel
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -56,14 +56,14 @@ import kotlinx.coroutines.launch
 fun EmailDetailsView(
     navController: NavController,
     transportTypes: TransportTypes,
-    accountsViewModel: AccountsViewModel,
+    tokensViewModel: TokensViewModel,
     messagesViewModel: MessagesViewModel,
     imageViewModel: ImageViewModel,
-    account: Accounts? = null,
+    account: Tokens? = null,
     messageId: Long? = null
 ) {
     val context = LocalContext.current
-    var from by remember{ mutableStateOf( account?.name ) }
+    var from by remember{ mutableStateOf( account?.platformName ) }
     var to by remember{ mutableStateOf("") }
     var cc by remember{ mutableStateOf("") }
     var bcc by remember{ mutableStateOf("") }

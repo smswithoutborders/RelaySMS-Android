@@ -37,14 +37,14 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.AccountsViewModel
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageDetailsView(
     navController: NavController,
-    accountsViewModel: AccountsViewModel,
+    tokensViewModel: TokensViewModel,
     messagesViewModel: MessagesViewModel,
     isOnboarding: Boolean = false,
     messageId: Long? = null

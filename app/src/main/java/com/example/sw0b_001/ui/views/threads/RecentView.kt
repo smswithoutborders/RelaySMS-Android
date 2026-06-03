@@ -35,7 +35,7 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.data.models.Messages
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
-import com.example.sw0b_001.ui.viewModels.AccountsViewModel
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 
@@ -44,7 +44,7 @@ import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 fun RecentView(
     navController: NavController,
     messagesViewModel: MessagesViewModel,
-    accountsViewModel: AccountsViewModel,
+    tokensViewModel: TokensViewModel,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
     isLoggedIn: Boolean = false,
     tabRequestedCallback: () -> Unit
@@ -115,7 +115,7 @@ fun RecentView(
                 supportedPlatformsViewModel = supportedPlatformsViewModel,
                 navController = navController,
                 isCompose = true,
-                accountsViewModel = accountsViewModel,
+                tokensViewModel = tokensViewModel,
                 isLoggedIn = isLoggedIn,
             ) {
                 sendNewMessageRequested = false

@@ -43,8 +43,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.models.Accounts
-import com.example.sw0b_001.ui.viewModels.AccountsViewModel
+import com.example.sw0b_001.data.models.Tokens
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import kotlinx.coroutines.launch
 
 // Data class to represent an account
@@ -58,8 +58,8 @@ data class Account(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectAccountModal(
-    accounts: List<Accounts>,
-    onAccountSelected: (Accounts) -> Unit = {},
+    accounts: List<Tokens>,
+    onAccountSelected: (Tokens) -> Unit = {},
     onDismissRequest: () -> Unit
 ) {
     val context = LocalContext.current
@@ -70,7 +70,7 @@ fun SelectAccountModal(
     val scope = rememberCoroutineScope()
     var showBottomSheet by remember { mutableStateOf(true) }
 
-    val accountsViewModel = remember{ AccountsViewModel(context) }
+    val tokensViewModel = remember{ TokensViewModel(context) }
 
     if (showBottomSheet) {
         ModalBottomSheet(
@@ -135,7 +135,7 @@ fun SelectAccountModal(
 
 @Composable
 fun AccountCard(
-    account: Accounts,
+    account: Tokens,
     onAccountSelected: () -> Unit
 ) {
     Card(
@@ -165,7 +165,7 @@ fun AccountCard(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = account.name,
+                    text = account.platformName,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

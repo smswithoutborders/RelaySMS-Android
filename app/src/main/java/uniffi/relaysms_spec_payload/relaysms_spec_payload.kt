@@ -748,6 +748,8 @@ internal object IntegrityCheckingUniffiLib {
     ): Short
     external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_i_att(
     ): Short
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_i_tid(
+    ): Short
     external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_k_id(
     ): Short
     external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_len_att(
@@ -779,6 +781,10 @@ internal object IntegrityCheckingUniffiLib {
     external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachmentsnoheader_serialize(
     ): Short
     external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithoutattachments_equals(
+    ): Short
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithoutattachments_get_i_att(
+    ): Short
+    external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithoutattachments_get_i_tid(
     ): Short
     external fun uniffi_relaysms_spec_payload_checksum_method_v1payloadwithoutattachments_get_k_id(
     ): Short
@@ -882,15 +888,17 @@ external fun uniffi_relaysms_spec_payload_fn_clone_v1payloadwithattachments(`han
 ): Long
 external fun uniffi_relaysms_spec_payload_fn_free_v1payloadwithattachments(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Unit
-external fun uniffi_relaysms_spec_payload_fn_constructor_v1payloadwithattachments_new(`sessId`: Byte,`kId`: Byte,`tId`: Int,`lenAtt`: Short,`payload`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_constructor_v1payloadwithattachments_new(`sessId`: Byte,`kId`: Byte,`tId`: RustBuffer.ByValue,`lenAtt`: Short,`payload`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
-external fun uniffi_relaysms_spec_payload_fn_constructor_v1payloadwithattachments_new_segment(`segNum`: Byte,`sessId`: Byte,`kId`: Byte,`tId`: Int,`lenAtt`: Short,`payload`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_constructor_v1payloadwithattachments_new_segment(`segNum`: Byte,`sessId`: Byte,`kId`: Byte,`tId`: RustBuffer.ByValue,`lenAtt`: Short,`payload`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
 external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_calculate_segments(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Int
 external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_equals(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
 external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get_i_att(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+): Byte
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get_i_tid(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
 external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get_k_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
@@ -903,7 +911,7 @@ external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get
 external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get_sess_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
 external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get_t_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
-): Int
+): RustBuffer.ByValue
 external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get_version(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
 external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_serialize(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
@@ -934,16 +942,20 @@ external fun uniffi_relaysms_spec_payload_fn_clone_v1payloadwithoutattachments(`
 ): Long
 external fun uniffi_relaysms_spec_payload_fn_free_v1payloadwithoutattachments(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Unit
-external fun uniffi_relaysms_spec_payload_fn_constructor_v1payloadwithoutattachments_new(`kId`: Byte,`tId`: Int,`payload`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_constructor_v1payloadwithoutattachments_new(`kId`: Byte,`tId`: RustBuffer.ByValue,`payload`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
 external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithoutattachments_equals(`ptr`: Long,`other`: Long,uniffi_out_err: UniffiRustCallStatus, 
+): Byte
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithoutattachments_get_i_att(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+): Byte
+external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithoutattachments_get_i_tid(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
 external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithoutattachments_get_k_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
 external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithoutattachments_get_payload_content(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithoutattachments_get_t_id(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
-): Int
+): RustBuffer.ByValue
 external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithoutattachments_get_version(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
 external fun uniffi_relaysms_spec_payload_fn_method_v1payloadwithoutattachments_serialize(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
@@ -954,11 +966,11 @@ external fun uniffi_relaysms_spec_payload_fn_func_add_rust(`left`: Long,`right`:
 ): Long
 external fun uniffi_relaysms_spec_payload_fn_func_v1_content_category_from_u8(`value`: Byte,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
-external fun uniffi_relaysms_spec_payload_fn_func_v1_platform_publisher(`ecKid`: RustBuffer.ByValue,`ecKidPk`: RustBuffer.ByValue,`ssKidPk`: RustBuffer.ByValue,`esKidPk`: RustBuffer.ByValue,`keyId`: RustBuffer.ByValue,`plaintext`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_func_v1_platform_publisher(`ecKid`: RustBuffer.ByValue,`ssKidPk`: RustBuffer.ByValue,`esKidPk`: RustBuffer.ByValue,`keyId`: Byte,`plaintext`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 external fun uniffi_relaysms_spec_payload_fn_func_v1_token_decrypt(`ecKidPk`: RustBuffer.ByValue,`esKidPk`: RustBuffer.ByValue,`ssKid`: RustBuffer.ByValue,`esKid`: RustBuffer.ByValue,`keyId`: Byte,`receivedPayload`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
-external fun uniffi_relaysms_spec_payload_fn_func_v1_token_encrypt(`ecKid`: RustBuffer.ByValue,`ssKidPk`: RustBuffer.ByValue,`esKidPk`: RustBuffer.ByValue,`methodName`: RustBuffer.ByValue,`keyId`: Byte,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_func_v1_token_encrypt(`ecKid`: RustBuffer.ByValue,`ssKidPk`: RustBuffer.ByValue,`esKidPk`: RustBuffer.ByValue,`methodName`: RustBuffer.ByValue,`tokenHash`: RustBuffer.ByValue,`keyId`: Byte,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 external fun uniffi_relaysms_spec_payload_fn_func_deserialize_payload_with_attachments(`data`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
@@ -1089,13 +1101,13 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_content_category_from_u8() != 47150.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_platform_publisher() != 52872.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_platform_publisher() != 6338.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_token_decrypt() != 53344.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_token_encrypt() != 56273.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_token_encrypt() != 61614.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_relaysms_spec_payload_checksum_func_deserialize_payload_with_attachments() != 31402.toShort()) {
@@ -1158,6 +1170,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_i_att() != 50149.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_i_tid() != 218.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_k_id() != 58561.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
@@ -1173,7 +1188,7 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_sess_id() != 58360.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_t_id() != 13699.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_t_id() != 18786.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithattachments_get_version() != 57687.toShort()) {
@@ -1206,13 +1221,19 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithoutattachments_equals() != 41155.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithoutattachments_get_i_att() != 23294.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithoutattachments_get_i_tid() != 33752.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithoutattachments_get_k_id() != 7660.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithoutattachments_get_payload_content() != 40014.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithoutattachments_get_t_id() != 56035.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithoutattachments_get_t_id() != 31682.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_relaysms_spec_payload_checksum_method_v1payloadwithoutattachments_get_version() != 54420.toShort()) {
@@ -1227,10 +1248,10 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_relaysms_spec_payload_checksum_constructor_v1emails_new() != 856.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_v1payloadwithattachments_new() != 24702.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_v1payloadwithattachments_new() != 1708.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_v1payloadwithattachments_new_segment() != 41003.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_v1payloadwithattachments_new_segment() != 7650.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_relaysms_spec_payload_checksum_constructor_v1payloadwithattachmentsnoheader_instance() != 35860.toShort()) {
@@ -1239,7 +1260,7 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_relaysms_spec_payload_checksum_constructor_v1payloadwithattachmentsnoheader_new() != 2376.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_v1payloadwithoutattachments_new() != 10349.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_v1payloadwithoutattachments_new() != 43822.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
 }
@@ -2754,6 +2775,8 @@ public interface V1PayloadWithAttachmentsInterface {
     
     fun `getIAtt`(): kotlin.Boolean
     
+    fun `getITid`(): kotlin.Boolean
+    
     fun `getKId`(): kotlin.UByte
     
     fun `getLenAtt`(): kotlin.UShort
@@ -2764,7 +2787,7 @@ public interface V1PayloadWithAttachmentsInterface {
     
     fun `getSessId`(): kotlin.UByte
     
-    fun `getTId`(): kotlin.UInt
+    fun `getTId`(): kotlin.UInt?
     
     fun `getVersion`(): kotlin.UByte
     
@@ -2805,12 +2828,12 @@ open class V1PayloadWithAttachments: Disposable, AutoCloseable, V1PayloadWithAtt
         this.handle = 0
         this.cleanable = null
     }
-    constructor(`sessId`: kotlin.UByte, `kId`: kotlin.UByte, `tId`: kotlin.UInt, `lenAtt`: kotlin.UShort, `payload`: kotlin.ByteArray) :
+    constructor(`sessId`: kotlin.UByte, `kId`: kotlin.UByte, `tId`: kotlin.UInt?, `lenAtt`: kotlin.UShort, `payload`: kotlin.ByteArray) :
         this(UniffiWithHandle, 
     uniffiRustCallWithError(V1PayloadsException) { _status ->
     UniffiLib.uniffi_relaysms_spec_payload_fn_constructor_v1payloadwithattachments_new(
     
-        FfiConverterUByte.lower(`sessId`),FfiConverterUByte.lower(`kId`),FfiConverterUInt.lower(`tId`),FfiConverterUShort.lower(`lenAtt`),FfiConverterByteArray.lower(`payload`),_status)
+        FfiConverterUByte.lower(`sessId`),FfiConverterUByte.lower(`kId`),FfiConverterOptionalUInt.lower(`tId`),FfiConverterUShort.lower(`lenAtt`),FfiConverterByteArray.lower(`payload`),_status)
 }
     )
 
@@ -2924,6 +2947,19 @@ open class V1PayloadWithAttachments: Disposable, AutoCloseable, V1PayloadWithAtt
     }
     
 
+    override fun `getITid`(): kotlin.Boolean {
+            return FfiConverterBoolean.lift(
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get_i_tid(
+        it,
+        _status)
+}
+    }
+    )
+    }
+    
+
     override fun `getKId`(): kotlin.UByte {
             return FfiConverterUByte.lift(
     callWithHandle {
@@ -2989,8 +3025,8 @@ open class V1PayloadWithAttachments: Disposable, AutoCloseable, V1PayloadWithAtt
     }
     
 
-    override fun `getTId`(): kotlin.UInt {
-            return FfiConverterUInt.lift(
+    override fun `getTId`(): kotlin.UInt? {
+            return FfiConverterOptionalUInt.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithattachments_get_t_id(
@@ -3055,12 +3091,12 @@ open class V1PayloadWithAttachments: Disposable, AutoCloseable, V1PayloadWithAtt
     
     companion object {
         
-    @Throws(V1PayloadsException::class) fun `newSegment`(`segNum`: kotlin.UByte, `sessId`: kotlin.UByte, `kId`: kotlin.UByte, `tId`: kotlin.UInt, `lenAtt`: kotlin.UShort, `payload`: kotlin.ByteArray): V1PayloadWithAttachments {
+    @Throws(V1PayloadsException::class) fun `newSegment`(`segNum`: kotlin.UByte, `sessId`: kotlin.UByte, `kId`: kotlin.UByte, `tId`: kotlin.UInt?, `lenAtt`: kotlin.UShort, `payload`: kotlin.ByteArray): V1PayloadWithAttachments {
             return FfiConverterTypeV1PayloadWithAttachments.lift(
     uniffiRustCallWithError(V1PayloadsException) { _status ->
     UniffiLib.uniffi_relaysms_spec_payload_fn_constructor_v1payloadwithattachments_new_segment(
     
-        FfiConverterUByte.lower(`segNum`),FfiConverterUByte.lower(`sessId`),FfiConverterUByte.lower(`kId`),FfiConverterUInt.lower(`tId`),FfiConverterUShort.lower(`lenAtt`),FfiConverterByteArray.lower(`payload`),_status)
+        FfiConverterUByte.lower(`segNum`),FfiConverterUByte.lower(`sessId`),FfiConverterUByte.lower(`kId`),FfiConverterOptionalUInt.lower(`tId`),FfiConverterUShort.lower(`lenAtt`),FfiConverterByteArray.lower(`payload`),_status)
 }
     )
     }
@@ -3542,11 +3578,15 @@ public interface V1PayloadWithoutAttachmentsInterface {
     
     fun `equals`(`other`: V1Payloads): kotlin.Boolean
     
+    fun `getIAtt`(): kotlin.Boolean
+    
+    fun `getITid`(): kotlin.Boolean
+    
     fun `getKId`(): kotlin.UByte
     
     fun `getPayloadContent`(): kotlin.ByteArray
     
-    fun `getTId`(): kotlin.UInt
+    fun `getTId`(): kotlin.UInt?
     
     fun `getVersion`(): kotlin.UByte
     
@@ -3581,12 +3621,12 @@ open class V1PayloadWithoutAttachments: Disposable, AutoCloseable, V1PayloadWith
         this.handle = 0
         this.cleanable = null
     }
-    constructor(`kId`: kotlin.UByte, `tId`: kotlin.UInt, `payload`: kotlin.ByteArray) :
+    constructor(`kId`: kotlin.UByte, `tId`: kotlin.UInt?, `payload`: kotlin.ByteArray) :
         this(UniffiWithHandle, 
     uniffiRustCallWithError(V1PayloadsException) { _status ->
     UniffiLib.uniffi_relaysms_spec_payload_fn_constructor_v1payloadwithoutattachments_new(
     
-        FfiConverterUByte.lower(`kId`),FfiConverterUInt.lower(`tId`),FfiConverterByteArray.lower(`payload`),_status)
+        FfiConverterUByte.lower(`kId`),FfiConverterOptionalUInt.lower(`tId`),FfiConverterByteArray.lower(`payload`),_status)
 }
     )
 
@@ -3674,6 +3714,32 @@ open class V1PayloadWithoutAttachments: Disposable, AutoCloseable, V1PayloadWith
     }
     
 
+    override fun `getIAtt`(): kotlin.Boolean {
+            return FfiConverterBoolean.lift(
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithoutattachments_get_i_att(
+        it,
+        _status)
+}
+    }
+    )
+    }
+    
+
+    override fun `getITid`(): kotlin.Boolean {
+            return FfiConverterBoolean.lift(
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithoutattachments_get_i_tid(
+        it,
+        _status)
+}
+    }
+    )
+    }
+    
+
     override fun `getKId`(): kotlin.UByte {
             return FfiConverterUByte.lift(
     callWithHandle {
@@ -3700,8 +3766,8 @@ open class V1PayloadWithoutAttachments: Disposable, AutoCloseable, V1PayloadWith
     }
     
 
-    override fun `getTId`(): kotlin.UInt {
-            return FfiConverterUInt.lift(
+    override fun `getTId`(): kotlin.UInt? {
+            return FfiConverterOptionalUInt.lift(
     callWithHandle {
     uniffiRustCall() { _status ->
     UniffiLib.uniffi_relaysms_spec_payload_fn_method_v1payloadwithoutattachments_get_t_id(
@@ -4809,6 +4875,38 @@ public object FfiConverterTypeV1PayloadsError : FfiConverterRustBuffer<V1Payload
 /**
  * @suppress
  */
+public object FfiConverterOptionalUInt: FfiConverterRustBuffer<kotlin.UInt?> {
+    override fun read(buf: ByteBuffer): kotlin.UInt? {
+        if (buf.get().toInt() == 0) {
+            return null
+        }
+        return FfiConverterUInt.read(buf)
+    }
+
+    override fun allocationSize(value: kotlin.UInt?): ULong {
+        if (value == null) {
+            return 1UL
+        } else {
+            return 1UL + FfiConverterUInt.allocationSize(value)
+        }
+    }
+
+    override fun write(value: kotlin.UInt?, buf: ByteBuffer) {
+        if (value == null) {
+            buf.put(0)
+        } else {
+            buf.put(1)
+            FfiConverterUInt.write(value, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
 public object FfiConverterOptionalString: FfiConverterRustBuffer<kotlin.String?> {
     override fun read(buf: ByteBuffer): kotlin.String? {
         if (buf.get().toInt() == 0) {
@@ -4882,12 +4980,12 @@ public object FfiConverterSequenceTypeV1Payloads: FfiConverterRustBuffer<List<V1
     }
     
 
-    @Throws(V1CryptographicException::class) fun `v1PlatformPublisher`(`ecKid`: kotlin.ByteArray, `ecKidPk`: kotlin.ByteArray, `ssKidPk`: kotlin.ByteArray, `esKidPk`: kotlin.ByteArray, `keyId`: kotlin.ByteArray, `plaintext`: kotlin.ByteArray): kotlin.ByteArray {
+    @Throws(V1CryptographicException::class) fun `v1PlatformPublisher`(`ecKid`: kotlin.ByteArray, `ssKidPk`: kotlin.ByteArray, `esKidPk`: kotlin.ByteArray, `keyId`: kotlin.UByte, `plaintext`: kotlin.ByteArray): kotlin.ByteArray {
             return FfiConverterByteArray.lift(
     uniffiRustCallWithError(V1CryptographicException) { _status ->
     UniffiLib.uniffi_relaysms_spec_payload_fn_func_v1_platform_publisher(
     
-        FfiConverterByteArray.lower(`ecKid`),FfiConverterByteArray.lower(`ecKidPk`),FfiConverterByteArray.lower(`ssKidPk`),FfiConverterByteArray.lower(`esKidPk`),FfiConverterByteArray.lower(`keyId`),FfiConverterByteArray.lower(`plaintext`),_status)
+        FfiConverterByteArray.lower(`ecKid`),FfiConverterByteArray.lower(`ssKidPk`),FfiConverterByteArray.lower(`esKidPk`),FfiConverterUByte.lower(`keyId`),FfiConverterByteArray.lower(`plaintext`),_status)
 }
     )
     }
@@ -4904,12 +5002,12 @@ public object FfiConverterSequenceTypeV1Payloads: FfiConverterRustBuffer<List<V1
     }
     
 
-    @Throws(V1CryptographicException::class) fun `v1TokenEncrypt`(`ecKid`: kotlin.ByteArray, `ssKidPk`: kotlin.ByteArray, `esKidPk`: kotlin.ByteArray, `methodName`: kotlin.ByteArray, `keyId`: kotlin.UByte): kotlin.ByteArray {
+    @Throws(V1CryptographicException::class) fun `v1TokenEncrypt`(`ecKid`: kotlin.ByteArray, `ssKidPk`: kotlin.ByteArray, `esKidPk`: kotlin.ByteArray, `methodName`: kotlin.ByteArray, `tokenHash`: kotlin.ByteArray, `keyId`: kotlin.UByte): kotlin.ByteArray {
             return FfiConverterByteArray.lift(
     uniffiRustCallWithError(V1CryptographicException) { _status ->
     UniffiLib.uniffi_relaysms_spec_payload_fn_func_v1_token_encrypt(
     
-        FfiConverterByteArray.lower(`ecKid`),FfiConverterByteArray.lower(`ssKidPk`),FfiConverterByteArray.lower(`esKidPk`),FfiConverterByteArray.lower(`methodName`),FfiConverterUByte.lower(`keyId`),_status)
+        FfiConverterByteArray.lower(`ecKid`),FfiConverterByteArray.lower(`ssKidPk`),FfiConverterByteArray.lower(`esKidPk`),FfiConverterByteArray.lower(`methodName`),FfiConverterByteArray.lower(`tokenHash`),FfiConverterUByte.lower(`keyId`),_status)
 }
     )
     }

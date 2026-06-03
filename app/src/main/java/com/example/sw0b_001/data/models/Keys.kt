@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.Protocols
 import com.example.sw0b_001.data.Datastore
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -20,6 +19,7 @@ data class Keys(
     val publicKey: ByteArray,
     var tokenId: Int? = null,
     var tokenHash: ByteArray? = null,
+    var isOwn: Boolean = true
 ) : AutoCloseable {
     @Ignore
     @Transient
@@ -33,34 +33,18 @@ data class Keys(
     }
 
     companion object {
-        fun getKey(context: Context, tokenHash: ByteArray, keyId: UByte) : Keys {
+        fun getOwnKey(context: Context, tokenHash: ByteArray, keyId: UByte) : Keys {
             val db = Datastore.getDatastore(context)?.keysDao()
                 ?: throw Exception("Failed to get database")
             return db.fetch(tokenHash, keyId) ?: throw Exception("No key found")
         }
 
-        fun generate(context: Context, quantity: UByte): List<Keys>{
-            val keys = mutableListOf<Keys>()
-            val protocols = Protocols(context)
-
-            for(i in 0..quantity.toInt()) {
-                try {
-                    protocols.generateDH().use { kp ->
-                        keys.add(Keys(
-                            keyId = i.toUByte(),
-                            privateKey = kp.privateKey?.copyOf()
-                                ?: throw Exception("No Private key found"),
-                            publicKey = kp.publicKey.copyOf()
-                        ))
-                    }
-                } catch (e: Exception) {
-                    throw e
-                }
-            }
-            return keys
-        }
-
-        fun save(context: Context, tokenHash: ByteArray, keys: List<Keys>, tokenId: Int) {
+        fun save(
+            context: Context,
+            tokenHash: ByteArray,
+            keys: List<Keys>,
+            tokenId: Int,
+        ) {
             val db = Datastore.getDatastore(context)?.keysDao()
                 ?: throw Exception("Failed to get database")
 

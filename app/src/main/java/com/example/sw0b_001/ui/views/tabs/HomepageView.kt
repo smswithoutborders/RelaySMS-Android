@@ -37,7 +37,7 @@ import com.example.sw0b_001.ui.modals.ActivePlatformsModal
 import com.example.sw0b_001.ui.modals.AddGatewayClientModal
 import com.example.sw0b_001.ui.modals.GetStartedModal
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
-import com.example.sw0b_001.ui.viewModels.AccountsViewModel
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
@@ -59,7 +59,7 @@ enum class BottomTabsItems {
 @Composable
 fun HomepageView(
     navController: NavController,
-    accountsViewModel : AccountsViewModel,
+    tokensViewModel : TokensViewModel,
     messagesViewModel: MessagesViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
@@ -87,7 +87,7 @@ fun HomepageView(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             if(showTopBar) {
-                when (accountsViewModel.bottomTabsItem) {
+                when (tokensViewModel.bottomTabsItem) {
                     BottomTabsItems.BottomBarRecentTab -> {
                         RecentAppBar(
                             navController = navController,
@@ -96,11 +96,11 @@ fun HomepageView(
                             isSearchActive = isSearchActive,
                             onToggleSearch = {},
                             onSearchDone = {},
-                            isSelectionMode = accountsViewModel.isSelectionMode,
-                            selectedCount = accountsViewModel.selectedMessagesCount,
-                            onSelectAll = accountsViewModel.onSelectAll,
-                            onDeleteSelected = accountsViewModel.onDeleteSelected,
-                            onCancelSelection = accountsViewModel.onCancelSelection,
+                            isSelectionMode = tokensViewModel.isSelectionMode,
+                            selectedCount = tokensViewModel.selectedMessagesCount,
+                            onSelectAll = tokensViewModel.onSelectAll,
+                            onDeleteSelected = tokensViewModel.onDeleteSelected,
+                            onCancelSelection = tokensViewModel.onCancelSelection,
                             onMenuClickCallback = drawerCallback
                         )
                     }
@@ -135,14 +135,14 @@ fun HomepageView(
         },
         bottomBar = {
             BottomNavBar(
-                selectedTab = accountsViewModel.bottomTabsItem,
+                selectedTab = tokensViewModel.bottomTabsItem,
                 isLoggedIn = isLoggedIn,
             ) { selectedTab ->
-                accountsViewModel.bottomTabsItem = selectedTab
+                tokensViewModel.bottomTabsItem = selectedTab
             }
         },
         floatingActionButton = {
-            when(accountsViewModel.bottomTabsItem) {
+            when(tokensViewModel.bottomTabsItem) {
                 BottomTabsItems.BottomBarRecentTab -> {
                     if(isLoggedIn) {
                         ExtendedFloatingActionButton(
@@ -214,10 +214,10 @@ fun HomepageView(
                 .padding(innerPadding)
         ) {
             GetTabViews(
-                accountsViewModel.bottomTabsItem,
+                tokensViewModel.bottomTabsItem,
                 navController = navController,
                 messagesViewModel = messagesViewModel,
-                accountsViewModel = accountsViewModel,
+                tokensViewModel = tokensViewModel,
                 gatewayClientViewModel = gatewayClientViewModel,
                 supportedPlatformsViewModel = supportedPlatformsViewModel,
                 isLoggedIn = isLoggedIn,
@@ -231,7 +231,7 @@ fun HomepageView(
                         isCompose = true,
                         isLoggedIn = true,
                         supportedPlatformsViewModel = supportedPlatformsViewModel,
-                        accountsViewModel = accountsViewModel,
+                        tokensViewModel = tokensViewModel,
                     ) {
                         sendNewMessageRequested = false
                     }
@@ -265,7 +265,7 @@ fun GetTabViews(
     bottomTabsItems: BottomTabsItems,
     navController: NavController,
     messagesViewModel: MessagesViewModel,
-    accountsViewModel: AccountsViewModel,
+    tokensViewModel: TokensViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
     isLoggedIn: Boolean,
@@ -275,11 +275,11 @@ fun GetTabViews(
             RecentView(
                 navController = navController,
                 messagesViewModel = messagesViewModel,
-                accountsViewModel = accountsViewModel,
+                tokensViewModel = tokensViewModel,
                 supportedPlatformsViewModel = supportedPlatformsViewModel,
                 isLoggedIn = isLoggedIn
             ) {
-                accountsViewModel.bottomTabsItem =
+                tokensViewModel.bottomTabsItem =
                     BottomTabsItems.BottomBarPlatformsTab
             }
         }
@@ -288,7 +288,7 @@ fun GetTabViews(
                 navController = navController,
                 isLoggedIn = true,
                 supportedPlatformsViewModel = supportedPlatformsViewModel,
-                accountsViewModel = accountsViewModel,
+                tokensViewModel = tokensViewModel,
             )
         }
         BottomTabsItems.BottomBarCountriesTab -> {
@@ -297,7 +297,7 @@ fun GetTabViews(
         BottomTabsItems.BottomBarInboxTab -> {
             InboxView(
                 messagesViewModel = messagesViewModel,
-                accountsViewModel = accountsViewModel,
+                tokensViewModel = tokensViewModel,
                 navController = navController
             )
         }

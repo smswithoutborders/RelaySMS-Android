@@ -22,7 +22,7 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.Network
 import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
-import com.example.sw0b_001.data.models.Accounts
+import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import com.example.sw0b_001.ui.views.compose.GatewayClientRequest
 import com.example.sw0b_001.ui.views.tabs.BottomTabsItems
@@ -39,32 +39,32 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 
-sealed class AccountUiState {
-    object Loading: AccountUiState()
+sealed class TokensUiState {
+    object Loading: TokensUiState()
     data class Success(
         val url: Uri?,
         val pnbaAuthRequired: Boolean = false,
         val pnbaPasswordRequired: Boolean = false,
-    ): AccountUiState()
-    data class Error(val exception: Throwable): AccountUiState()
+    ): TokensUiState()
+    data class Error(val exception: Throwable): TokensUiState()
 }
 
 @HiltViewModel
-class AccountsViewModel @Inject constructor(
+class TokensViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    private var storedLiveData: LiveData<List<Accounts>> = MutableLiveData()
+    private var storedLiveData: LiveData<List<Tokens>> = MutableLiveData()
 
     var bottomTabsItem by mutableStateOf(BottomTabsItems.BottomBarRecentTab)
 
     private val _isStoringUiState =
-        MutableStateFlow<AccountUiState>(AccountUiState.Success(null))
-    val isStoringUiState: StateFlow<AccountUiState> = _isStoringUiState
+        MutableStateFlow<TokensUiState>(TokensUiState.Success(null))
+    val isStoringUiState: StateFlow<TokensUiState> = _isStoringUiState
 
     private val _isRevokingUiState =
-        MutableStateFlow<AccountUiState>(AccountUiState.Success(null))
-    val isRevokingUiState: StateFlow<AccountUiState> = _isRevokingUiState
+        MutableStateFlow<TokensUiState>(TokensUiState.Success(null))
+    val isRevokingUiState: StateFlow<TokensUiState> = _isRevokingUiState
 
     // Selection mode properties
     var isSelectionMode by mutableStateOf(false)
@@ -73,13 +73,13 @@ class AccountsViewModel @Inject constructor(
     var onDeleteSelected: (() -> Unit)? = null
     var onCancelSelection: (() -> Unit)? = null
 
-    private val db = Datastore.getDatastore(context)?.storedPlatformsDao()
+    private val db = Datastore.getDatastore(context)?.tokensDao()
         ?: throw Exception("Cannot open database")
 
     private val cache = Datastore.getDatastore(context)?.supportedPlatformsCacheDao()
         ?: throw Exception("Cannot open database")
 
-    fun get(): LiveData<List<Accounts>> {
+    fun get(): LiveData<List<Tokens>> {
         if(storedLiveData.value.isNullOrEmpty()) {
             storedLiveData = db.fetchAll()
         }
@@ -89,17 +89,17 @@ class AccountsViewModel @Inject constructor(
     suspend fun revokeAll() {
         val publisherGrpcImpl = PublisherGrpcImpl(context)
         db.fetchAllList().forEach { sp ->
-            val cachedPlatform = cache.fetch(sp.name)
+            val cachedPlatform = cache.fetch(sp.platformName)
             when(cachedPlatform?.protocol_type) {
                 "oauth2" -> {
                     publisherGrpcImpl.revokeOAuthPlatforms(
-                        sp.name,
+                        sp.platformName,
                         sp.account,
                     )
                 }
                 "pnba" -> {
                     publisherGrpcImpl.revokePNBAPlatforms(
-                        sp.name,
+                        sp.platformName,
                         sp.account
                     )
                 }
@@ -182,32 +182,32 @@ class AccountsViewModel @Inject constructor(
 
     fun revoke(
         platform: SupportedPlatforms,
-        account: Accounts,
+        account: Tokens,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             PublisherGrpcImpl(context).use { publisherGrpcImpl ->
-                _isRevokingUiState.value = AccountUiState.Loading
+                _isRevokingUiState.value = TokensUiState.Loading
                 try {
                     when(platform.protocol_type) {
                         "oauth2" -> {
                             publisherGrpcImpl.revokeOAuthPlatforms(
-                                account.name,
+                                account.platformName,
                                 account.account,
                             )
                         }
                         "pnba" -> {
                             publisherGrpcImpl.revokePNBAPlatforms(
-                                account.name,
+                                account.platformName,
                                 account.account
                             )
                         }
                     }
 
                     db.delete(account.id)
-                    _isRevokingUiState.value = AccountUiState.Success(null)
+                    _isRevokingUiState.value = TokensUiState.Success(null)
                 } catch(e: Exception) {
                     e.printStackTrace()
-                    _isRevokingUiState.value = AccountUiState.Error(e)
+                    _isRevokingUiState.value = TokensUiState.Error(e)
                 }
             }
         }
@@ -220,7 +220,7 @@ class AccountsViewModel @Inject constructor(
         password: String? = null,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            _isStoringUiState.value = AccountUiState.Loading
+            _isStoringUiState.value = TokensUiState.Loading
             if(platform.protocol_type == "oauth2") {
                 triggerOAuthRequested(platform)
             }
@@ -258,10 +258,10 @@ class AccountsViewModel @Inject constructor(
                 )
 
                 val intentUri = response.authorizationUrl.toUri()
-                _isStoringUiState.value = AccountUiState.Success(intentUri)
+                _isStoringUiState.value = TokensUiState.Success(intentUri)
             } catch(e: Exception) {
                 e.printStackTrace()
-                _isStoringUiState.value = AccountUiState.Error(e)
+                _isStoringUiState.value = TokensUiState.Error(e)
             } finally {
                 requestId.fill(0)
             }
@@ -285,7 +285,7 @@ class AccountsViewModel @Inject constructor(
                             password = password
                         )
                         if(response.success) {
-                            _isStoringUiState.value = AccountUiState.Success(null)
+                            _isStoringUiState.value = TokensUiState.Success(null)
                         }
                     }
                     !authCode.isNullOrEmpty() -> {
@@ -295,7 +295,7 @@ class AccountsViewModel @Inject constructor(
                             platform = platform.name
                         )
                         if(response.success) {
-                            _isStoringUiState.value = AccountUiState.Success(
+                            _isStoringUiState.value = TokensUiState.Success(
                                 null,
                                 pnbaPasswordRequired = response.twoStepVerificationEnabled,
                             )
@@ -307,7 +307,7 @@ class AccountsViewModel @Inject constructor(
                             platform.name
                         )
                         if(response.success) {
-                            _isStoringUiState.value = AccountUiState.Success(
+                            _isStoringUiState.value = TokensUiState.Success(
                                 null ,
                                 pnbaAuthRequired = true
                             )

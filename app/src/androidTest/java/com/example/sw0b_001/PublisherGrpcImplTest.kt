@@ -5,7 +5,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
 import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
-import com.example.sw0b_001.ui.viewModels.AccountsViewModel
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -40,7 +40,7 @@ class PublisherGrpcImplTest {
 
     private lateinit var datastore: Datastore
 //    private lateinit var storedTokenDao: StoredTokenDao
-    private lateinit var accountsViewModel: AccountsViewModel
+    private lateinit var tokensViewModel: TokensViewModel
 
     private val globalPhoneNumber = "+237123456789"
     private val globalPassword = "dummy_password"

@@ -11,7 +11,7 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewModel
 import com.example.sw0b_001.data.Helpers.toBytes
 import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
-import com.example.sw0b_001.data.models.Accounts
+import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.data.models.Messages
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import com.example.sw0b_001.extensions.context.settingsGetDefaultGatewayClients
@@ -47,7 +47,7 @@ object PublishersImpl {
         context: Context,
         content: ByteArray,
         platform: SupportedPlatforms,
-        account: Accounts? = null,
+        account: Tokens? = null,
         imageLength: Int,
         textLength: Int
     ): Messages? {
@@ -94,7 +94,7 @@ object PublishersImpl {
         platform: SupportedPlatforms,
         imageLength: Int = 0,
         textLength: Int = 0,
-        account: Accounts? = null,
+        account: Tokens? = null,
         subscriptionId: Long = -1,
         languageCode: String = "en",
         smsTransmission: Boolean = true,

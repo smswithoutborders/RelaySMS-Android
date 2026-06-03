@@ -10,13 +10,13 @@ import com.example.sw0b_001.data.dao.KeysDao
 import com.example.sw0b_001.data.dao.MessagesDao
 import com.example.sw0b_001.data.dao.OAuthDao
 import com.example.sw0b_001.data.dao.RatchetStatesDAO
-import com.example.sw0b_001.data.dao.StoredPlatformsDao
 import com.example.sw0b_001.data.dao.SupportedPlatformCacheDao
-import com.example.sw0b_001.data.models.Accounts
+import com.example.sw0b_001.data.dao.TokensDao
 import com.example.sw0b_001.data.models.GatewayClients
 import com.example.sw0b_001.data.models.Keys
 import com.example.sw0b_001.data.models.Messages
 import com.example.sw0b_001.data.models.RatchetStates
+import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 
@@ -25,7 +25,7 @@ import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
     entities = [
         RatchetStates::class,
         GatewayClients::class,
-        Accounts::class,
+        Tokens::class,
         SupportedPlatforms::class,
         OAuth::class,
         Keys::class,
@@ -41,7 +41,7 @@ abstract class Datastore : RoomDatabase() {
 
     abstract fun gatewayClientsDao(): GatewayClientsDao?
     abstract fun messagesDao(): MessagesDao?
-    abstract fun storedPlatformsDao(): StoredPlatformsDao?
+    abstract fun tokensDao(): TokensDao?
     abstract fun supportedPlatformsCacheDao(): SupportedPlatformCacheDao?
     abstract fun ratchetStatesDAO(): RatchetStatesDAO?
     abstract fun keysDao(): KeysDao?

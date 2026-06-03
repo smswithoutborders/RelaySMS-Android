@@ -29,7 +29,7 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.data.repositories.TransportTypes
 import com.example.sw0b_001.ui.navigation.EmailViewScreen
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
-import com.example.sw0b_001.ui.viewModels.AccountsViewModel
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 
 
@@ -37,7 +37,7 @@ import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 fun InboxView(
     navController: NavController,
     messagesViewModel: MessagesViewModel,
-    accountsViewModel: AccountsViewModel,
+    tokensViewModel: TokensViewModel,
 ) {
     val messages by messagesViewModel.getInboxMessages().observeAsState(emptyList())
 

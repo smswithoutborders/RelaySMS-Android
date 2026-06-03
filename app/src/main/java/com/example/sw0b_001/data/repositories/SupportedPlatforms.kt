@@ -27,11 +27,6 @@ data class SupportedPlatforms(
     var logo: ByteArray? = null
 )
 
-enum class TransportTypes(val type: Byte) {
-    PLATFORM(0x0),
-    BRIDGE(0x1)
-}
-
 
 private const val BASE_URL = "https://raw.githubusercontent.com/"
 

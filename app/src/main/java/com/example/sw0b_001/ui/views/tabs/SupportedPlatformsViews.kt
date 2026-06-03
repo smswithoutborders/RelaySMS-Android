@@ -58,13 +58,13 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.models.Accounts
+import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import com.example.sw0b_001.data.repositories.TransportTypes
 import com.example.sw0b_001.ui.modals.PlatformOptionsModal
-import com.example.sw0b_001.ui.viewModels.AccountUiState
-import com.example.sw0b_001.ui.viewModels.AccountsViewModel
-import com.example.sw0b_001.ui.viewModels.AccountsViewModel.Companion.oAuth2IntentBuilder
+import com.example.sw0b_001.ui.viewModels.TokensUiState
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
+import com.example.sw0b_001.ui.viewModels.TokensViewModel.Companion.oAuth2IntentBuilder
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsUiState
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.views.platformAccounts.PNBAPhoneNumberCodeRequestView
@@ -80,7 +80,7 @@ import java.util.Locale
 fun SupportedPlatformsView(
     navController: NavController,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
-    accountsViewModel: AccountsViewModel,
+    tokensViewModel: TokensViewModel,
     isLoggedIn: Boolean,
     isCompose: Boolean = false,
     isOnboarding: Boolean = false,
@@ -163,7 +163,7 @@ fun SupportedPlatformsView(
         PlatformListContent(
             isCompose = isCompose,
             supportedPlatformsViewModel = supportedPlatformsViewModel,
-            accountsViewModel = accountsViewModel,
+            tokensViewModel = tokensViewModel,
             isOnboarding = isOnboarding,
             navController = navController,
             isLoggedIn = isLoggedIn,
@@ -177,7 +177,7 @@ fun SupportedPlatformsView(
 fun PlatformListContent(
     navController: NavController,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
-    accountsViewModel: AccountsViewModel,
+    tokensViewModel: TokensViewModel,
     isLoggedIn: Boolean,
     isCompose: Boolean = false,
     isOnboarding: Boolean = false,
@@ -186,9 +186,9 @@ fun PlatformListContent(
     val states by supportedPlatformsViewModel.uiState.collectAsStateWithLifecycle()
     val supportedPlatforms = supportedPlatformsViewModel.get().observeAsState()
 
-    val accounts = accountsViewModel.get().observeAsState()
-    val revokingUiState by accountsViewModel.isRevokingUiState.collectAsStateWithLifecycle()
-    val storingUiState by accountsViewModel.isStoringUiState.collectAsStateWithLifecycle()
+    val accounts = tokensViewModel.get().observeAsState()
+    val revokingUiState by tokensViewModel.isRevokingUiState.collectAsStateWithLifecycle()
+    val storingUiState by tokensViewModel.isStoringUiState.collectAsStateWithLifecycle()
 
     var showPlatformOptions by remember { mutableStateOf(false) }
     var storePnbaRequested by remember { mutableStateOf(false) }
@@ -199,7 +199,7 @@ fun PlatformListContent(
 
     LaunchedEffect(storingUiState) {
         val state = storingUiState
-        if(state is AccountUiState.Success) {
+        if(state is TokensUiState.Success) {
             if(storePnbaRequested) {
                 if(!state.pnbaAuthRequired && !state.pnbaPasswordRequired) {
                     storePnbaRequested = false
@@ -285,7 +285,7 @@ fun PlatformListContent(
             maxItemsInEachRow = 2
         ) {
             supportedPlatforms.value?.forEach { platform ->
-                val isStored = accounts.value?.find { it.name == platform.name }
+                val isStored = accounts.value?.find { it.platformName == platform.name }
 
                 PlatformCard(
                     logo = if(platform.logo != null)
@@ -310,7 +310,7 @@ fun PlatformListContent(
         val storeCallback : () -> Unit = {
             CoroutineScope(Dispatchers.Default).launch {
                 if(clickedPlatform?.protocol_type == "oauth2") {
-                    accountsViewModel.store(clickedPlatform!!)
+                    tokensViewModel.store(clickedPlatform!!)
                 }
                 else if(clickedPlatform?.protocol_type == "pnba") {
                     showPlatformOptions = false
@@ -319,14 +319,14 @@ fun PlatformListContent(
             }
         }
 
-        val revokeCallback: (Accounts) -> Unit = { account ->
+        val revokeCallback: (Tokens) -> Unit = { account ->
             CoroutineScope(Dispatchers.Default).launch {
-                accountsViewModel.revoke(clickedPlatform!!, account)
+                tokensViewModel.revoke(clickedPlatform!!, account)
             }
         }
 
         if (showPlatformOptions) {
-            val isStored = accounts.value?.find { it.name == clickedPlatform?.name }
+            val isStored = accounts.value?.find { it.platformName == clickedPlatform?.name }
             PlatformOptionsModal(
                 showPlatformsModal = showPlatformOptions,
                 transportType = if(clickedPlatform == null)
@@ -342,7 +342,7 @@ fun PlatformListContent(
                 isRevoking = revokingUiState,
                 storeCallback = storeCallback,
                 revokeCallback = revokeCallback,
-                accounts = accounts.value?.filter { it.name == clickedPlatform?.name }
+                accounts = accounts.value?.filter { it.platformName == clickedPlatform?.name }
                     ?: emptyList(),
             ) {
                 showPlatformOptions = false
@@ -352,25 +352,25 @@ fun PlatformListContent(
         if(storePnbaRequested) {
             PNBAPhoneNumberCodeRequestView(
                 showModal = storePnbaRequested,
-                isLoading = storingUiState == AccountUiState.Loading,
+                isLoading = storingUiState == TokensUiState.Loading,
                 platform = clickedPlatform,
                 isAuthenticationCodeRequested = pnbaAuthenticationCodeRequested,
                 isPasswordRequested = pnbaPasswordRequested,
                 phoneNumberRequestedCallback = { phoneNumber ->
-                    accountsViewModel.store(
+                    tokensViewModel.store(
                         platform = clickedPlatform!!,
                         phoneNumber = phoneNumber,
                     )
                 },
                 codeRequestedCallback = { phoneNumber, authCode ->
-                    accountsViewModel.store(
+                    tokensViewModel.store(
                         platform = clickedPlatform!!,
                         phoneNumber = phoneNumber,
                         authCode = authCode
                     )
                 },
                 passwordRequestedCallback = { phoneNumber, authCode, password ->
-                    accountsViewModel.store(
+                    tokensViewModel.store(
                         platform = clickedPlatform!!,
                         phoneNumber = phoneNumber,
                         authCode = authCode,

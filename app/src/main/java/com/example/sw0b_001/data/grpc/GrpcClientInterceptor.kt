@@ -30,7 +30,7 @@ class GrpcClientInterceptor(
                 val authenticationPublicKey = service.getContext()
                     .getStaticKeys(keyId)
                     ?: throw Exception("Could not find static keys for id")
-                val ecKid = Keys.getKey(
+                val ecKid = Keys.getOwnKey(
                     service.getContext(),
                     tokenHash,
                     keyId.toUByte()
@@ -41,6 +41,7 @@ class GrpcClientInterceptor(
                         ssKidPk = authenticationPublicKey,
                         esKidPk = ecKid.publicKey,
                         methodName = methodName.encodeToByteArray(),
+                        tokenHash = tokenHash,
                         keyId = keyId.toUByte(),
                     )
                     try {

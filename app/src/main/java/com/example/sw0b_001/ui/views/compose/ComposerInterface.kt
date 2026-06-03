@@ -1,13 +1,9 @@
 package com.example.sw0b_001.ui.views.compose
 
-import android.app.Activity
-import android.app.ProgressDialog.show
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -41,25 +37,25 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.afkanerd.lib_image_android.ui.ImageRender
 import com.afkanerd.lib_image_android.ui.navigation.ImageRenderNav
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDefaultSimSubscription
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.components.mmsImagePicker
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.models.Accounts
+import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
-import com.example.sw0b_001.data.repositories.TransportTypes
 import com.example.sw0b_001.ui.components.AttachImageView
 import com.example.sw0b_001.ui.modals.ComposeChooseGatewayClientsModal
 import com.example.sw0b_001.ui.modals.SelectAccountModal
-import com.example.sw0b_001.ui.viewModels.AccountsViewModel
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
+import com.example.sw0b_001.ui.viewModels.PublisherViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.views.DeveloperHTTPView
 import kotlinx.serialization.Serializable
+import uniffi.relaysms_spec_payload.V1ContentCategories
 
 
 @Serializable
@@ -75,13 +71,13 @@ data class GatewayClientRequest(
 @Composable
 fun ComposerInterface(
     navController: NavController,
-    transportType: TransportTypes,
     imageViewModel: ImageViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
-    accountsViewModel: AccountsViewModel,
+    tokensViewModel: TokensViewModel,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
     messagesViewModel: MessagesViewModel,
-    platformName: String? = null,
+    publisherViewModel: PublisherViewModel,
+    platformName: String,
     messageId: Long? = null,
 ) {
     val context = LocalContext.current
@@ -131,19 +127,19 @@ fun ComposerInterface(
         navController.navigate(ImageRenderNav(uri.toString()))
     }
 
-    val accounts by accountsViewModel.get().observeAsState()
-    var selectedAccount: Accounts? by remember(accounts, message) {
-        mutableStateOf(accounts?.find{ it.id == message?.accountId }) }
+    val tokens by tokensViewModel.get().observeAsState()
+    var selectedToken: Tokens? by remember(tokens, message) {
+        mutableStateOf(tokens?.find{ it.id == message?.tokenId }) }
 
-    var from: String? by remember(selectedAccount){
-        mutableStateOf(selectedAccount?.account) }
+    var from: String? by remember(selectedToken){
+        mutableStateOf(selectedToken?.account) }
     var to: String by remember{ mutableStateOf(message?.to?.toUtf8String() ?: "") }
     var subject: String by remember{ mutableStateOf(message?.subject?.toUtf8String() ?: "") }
     var body: String by remember{ mutableStateOf(message?.body?.toUtf8String() ?: "") }
     var image by remember{ mutableStateOf(message?.image) }
 
-    var showSelectAccountModal by remember(selectedAccount) { mutableStateOf(
-        transportType == TransportTypes.PLATFORM && selectedAccount == null
+    var showSelectAccountModal by remember(selectedToken) { mutableStateOf(
+        selectedToken?.let { it.catId != V1ContentCategories.BRIDGE } ?: false
     ) }
 
     Scaffold(
@@ -151,19 +147,19 @@ fun ComposerInterface(
             TopAppBar(
                 title = {
                     if(platform != null) {
-                        when(platform!!.service_type) {
-                            "email" -> {
+                        when(selectedToken?.catId) {
+                            V1ContentCategories.EMAIL -> {
                                 Text(stringResource(R.string.compose_email))
                             }
-                            "text" -> {
+                            V1ContentCategories.TEXT -> {
                                 Text(stringResource(R.string.new_post))
                             }
-                            "message" -> {
+                            V1ContentCategories.MESSAGE -> {
                                 Text(stringResource(R.string.new_message))
                             }
                             else -> {}
                         }
-                    } else if(transportType == TransportTypes.BRIDGE){
+                    } else if(selectedToken?.catId == V1ContentCategories.BRIDGE){
                         Text(stringResource(R.string.compose_email))
                     }
                 },
@@ -212,9 +208,9 @@ fun ComposerInterface(
                 }
                 Column {
                     if(platform != null) {
-                        when(platform!!.service_type) {
-                            "email"-> EmailComposeView(
-                                TransportTypes.PLATFORM,
+                        when(selectedToken?.catId) {
+                            V1ContentCategories.EMAIL -> EmailComposeView(
+                                selectedToken!!.catId,
                                 from = from,
                                 to = to,
                                 subject = subject,
@@ -223,20 +219,22 @@ fun ComposerInterface(
                                 subjectCallback = { subject = it },
                                 bodyCallback = { body = it }
                             )
-                            "text" -> TextComposeView(
+                            V1ContentCategories.TEXT -> TextComposeView(
                                 body = body,
                                 bodyCallback = { body = it }
                             )
-                            "message" -> MessageComposeView(
+                            V1ContentCategories.MESSAGE -> MessageComposeView(
                                 to = to,
                                 body = body,
                                 toCallback = { to = it },
                                 bodyCallback = { body = it }
                             )
+
+                            else -> {}
                         }
-                    } else if(transportType == TransportTypes.BRIDGE) {
+                    } else if(selectedToken?.catId == V1ContentCategories.BRIDGE) {
                         EmailComposeView(
-                            TransportTypes.BRIDGE,
+                            selectedToken!!.catId,
                             from = from,
                             to = to,
                             subject = subject,
@@ -273,14 +271,24 @@ fun ComposerInterface(
                     showChooseGatewayClient,
                     gatewayClientViewModel,
                 ) {
-                    TODO()
+                    publisherViewModel.publish(
+                        catId = selectedToken?.catId ?: V1ContentCategories.BRIDGE,
+                        body = body,
+                        tokenId = selectedToken?.tokenId,
+                        to = to,
+                        subject = subject,
+                        attachment = processedImage,
+                        onFailureCallback = {},
+                    ) {
+                        TODO("Implement finish journey here")
+                    }
                 }
             }
 
             if (showSelectAccountModal) {
                 SelectAccountModal(
                     onDismissRequest = {
-                        if (selectedAccount == null) {
+                        if (selectedToken == null) {
                             navController.popBackStack()
                         }
                         Toast.makeText(
@@ -290,10 +298,10 @@ fun ComposerInterface(
                         ).show()
                     },
                     onAccountSelected = { account ->
-                        selectedAccount = account
+                        selectedToken = account
                         showSelectAccountModal = false
                     },
-                    accounts = accounts?.filter{ it.name == platformName } ?: emptyList()
+                    accounts = tokens?.filter{ it.platformName == platformName } ?: emptyList()
                 )
             }
 

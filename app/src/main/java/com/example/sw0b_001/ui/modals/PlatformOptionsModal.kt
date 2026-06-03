@@ -39,27 +39,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.models.Accounts
+import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import com.example.sw0b_001.data.repositories.TransportTypes
 import com.example.sw0b_001.ui.navigation.ComposeScreen
-import com.example.sw0b_001.ui.viewModels.AccountUiState
+import com.example.sw0b_001.ui.viewModels.TokensUiState
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlatformOptionsModal(
     navController: NavController,
-    accounts: List<Accounts>,
+    accounts: List<Tokens>,
     showPlatformsModal: Boolean,
     isActive: Boolean,
     isCompose: Boolean,
     transportType: TransportTypes,
     platform: SupportedPlatforms?,
     isOnboarding: Boolean = false,
-    isRevoking: AccountUiState = AccountUiState.Success(null),
-    isStoring: AccountUiState = AccountUiState.Success(null),
-    revokeCallback: (Accounts) -> Unit,
+    isRevoking: TokensUiState = TokensUiState.Success(null),
+    isStoring: TokensUiState = TokensUiState.Success(null),
+    revokeCallback: (Tokens) -> Unit,
     storeCallback: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
@@ -67,7 +67,7 @@ fun PlatformOptionsModal(
     var removeAccountRequested by remember { mutableStateOf(false) }
     var revokeAccountConfirmationRequested by remember { mutableStateOf(false) }
 
-    var selectedAccount: Accounts? by remember { mutableStateOf(null) }
+    var selectedAccount: Tokens? by remember { mutableStateOf(null) }
 
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Expanded,
@@ -86,7 +86,7 @@ fun PlatformOptionsModal(
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                if(isRevoking == AccountUiState.Loading) {
+                if(isRevoking == TokensUiState.Loading) {
                     RevokeAccountLoading(platform!!)
                 }
                 else if(revokeAccountConfirmationRequested) {
@@ -113,7 +113,7 @@ fun PlatformOptionsModal(
                         removeAccountRequested = false
                     }
                 }
-                else if(isStoring == AccountUiState.Loading) {
+                else if(isStoring == TokensUiState.Loading) {
                     AddAccountLoading(platform!!)
                 }
                 else {

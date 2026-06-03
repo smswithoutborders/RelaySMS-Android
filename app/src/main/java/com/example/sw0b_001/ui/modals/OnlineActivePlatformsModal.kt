@@ -16,8 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.sw0b_001.ui.viewModels.AccountUiState
-import com.example.sw0b_001.ui.viewModels.AccountsViewModel
+import com.example.sw0b_001.ui.viewModels.TokensUiState
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.views.tabs.SupportedPlatformsView
 
@@ -27,7 +27,7 @@ fun OnlineActivePlatformsModal(
     navController: NavController,
     showBottomSheet: Boolean,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
-    accountsViewModel: AccountsViewModel,
+    tokensViewModel: TokensViewModel,
     isCompose: Boolean,
     isOnboarding: Boolean,
     isLoggedIn: Boolean,
@@ -39,10 +39,10 @@ fun OnlineActivePlatformsModal(
         skipHiddenState = false
     )
 
-    val isStoredUiState by accountsViewModel.isStoringUiState.collectAsState()
+    val isStoredUiState by tokensViewModel.isStoringUiState.collectAsState()
 
     LaunchedEffect(isStoredUiState) {
-        if(isStoredUiState is AccountUiState.Success) {
+        if(isStoredUiState is TokensUiState.Success) {
             onCompleteCallback()
         }
     }
@@ -62,7 +62,7 @@ fun OnlineActivePlatformsModal(
                 SupportedPlatformsView(
                     navController = navController,
                     supportedPlatformsViewModel = supportedPlatformsViewModel,
-                    accountsViewModel = accountsViewModel,
+                    tokensViewModel = tokensViewModel,
                     isCompose = isCompose,
                     isOnboarding = isOnboarding,
                     isLoggedIn = isLoggedIn,

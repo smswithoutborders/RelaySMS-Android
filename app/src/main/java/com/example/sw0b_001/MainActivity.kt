@@ -77,7 +77,7 @@ import com.example.sw0b_001.ui.navigation.TextViewScreen
 import com.example.sw0b_001.ui.navigation.WelcomeScreen
 import com.example.sw0b_001.ui.onboarding.OnboardingInteractive
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.AccountsViewModel
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
@@ -112,7 +112,7 @@ class MainActivity : BindActivity() {
     val threadsViewModel: ThreadsViewModel by viewModels()
     val onboardingViewModel: OnboardingViewModel by viewModels()
 
-    val accountsViewModel: AccountsViewModel by viewModels()
+    val tokensViewModel: TokensViewModel by viewModels()
     val messagesViewModel: MessagesViewModel by viewModels()
     val gatewayClientViewModel: GatewayClientViewModel by viewModels()
     val imageViewModel: ImageViewModel by viewModels()
@@ -268,7 +268,7 @@ class MainActivity : BindActivity() {
                         showThreadsTopBar = false
                         HomepageView(
                             navController = navController,
-                            accountsViewModel = accountsViewModel,
+                            tokensViewModel = tokensViewModel,
                             messagesViewModel = messagesViewModel,
                             gatewayClientViewModel = gatewayClientViewModel,
                             supportedPlatformsViewModel = supportedPlatformsViewModel,
@@ -325,7 +325,7 @@ class MainActivity : BindActivity() {
                 OnboardingInteractive(
                     navController,
                     onboardingViewModel,
-                    accountsViewModel = accountsViewModel,
+                    tokensViewModel = tokensViewModel,
                     vaultViewModel = vaultViewModel,
                     supportedPlatformsViewModel,
                 )
@@ -339,7 +339,7 @@ class MainActivity : BindActivity() {
             composable<HomepageScreen> {
                 HomepageView(
                     navController = navController,
-                    accountsViewModel = accountsViewModel,
+                    tokensViewModel = tokensViewModel,
                     messagesViewModel = messagesViewModel,
                     gatewayClientViewModel = gatewayClientViewModel,
                     supportedPlatformsViewModel = supportedPlatformsViewModel,
@@ -396,7 +396,7 @@ class MainActivity : BindActivity() {
                     transportType = composeScreenNav.transportType,
                     imageViewModel = imageViewModel,
                     gatewayClientViewModel = gatewayClientViewModel,
-                    accountsViewModel = accountsViewModel,
+                    tokensViewModel = tokensViewModel,
                     platformName = composeScreenNav.platformName,
                     supportedPlatformsViewModel = supportedPlatformsViewModel,
                     messageId = composeScreenNav.messageId,
@@ -407,7 +407,7 @@ class MainActivity : BindActivity() {
                 val emailScreenNav: EmailViewScreen = backEntry.toRoute()
                 EmailDetailsView(
                     navController = navController,
-                    accountsViewModel = accountsViewModel,
+                    tokensViewModel = tokensViewModel,
                     messagesViewModel = messagesViewModel,
                     imageViewModel = imageViewModel,
                     transportTypes = emailScreenNav.transportTypes,
@@ -427,12 +427,12 @@ class MainActivity : BindActivity() {
                 MessageDetailsView(
                     navController = navController,
                     messagesViewModel = messagesViewModel,
-                    accountsViewModel = accountsViewModel,
+                    tokensViewModel = tokensViewModel,
                 )
             }
             composable<PasteEncryptedTextScreen> {
                 PasteEncryptedTextView(
-                    accountsViewModel = accountsViewModel,
+                    tokensViewModel = tokensViewModel,
                     messagesViewModel = messagesViewModel,
                     navController = navController,
                 )

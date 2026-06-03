@@ -46,7 +46,7 @@ import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.AccountsViewModel
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.VaultsViewModel
@@ -66,7 +66,7 @@ data class InteractiveOnboarding(
 fun OnboardingInteractive(
     navController: NavController,
     onboardingViewModel: OnboardingViewModel,
-    accountsViewModel: AccountsViewModel,
+    tokensViewModel: TokensViewModel,
     vaultViewModel: VaultsViewModel,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
 ) {
@@ -199,7 +199,7 @@ fun OnboardingInteractive(
                         )
                     },
                     supportedPlatformsViewModel = supportedPlatformsViewModel,
-                    accountsViewModel = accountsViewModel,
+                    tokensViewModel = tokensViewModel,
                     isLoggedIn = isLoggedIn,
                 ) { onboardingViewModel.showAddPlatformsModal = false }
             }
@@ -219,7 +219,7 @@ fun OnboardingInteractive(
                     navController = navController,
                     onboardingViewModel.showSendPlatformsModal,
                     supportedPlatformsViewModel = supportedPlatformsViewModel,
-                    accountsViewModel = accountsViewModel,
+                    tokensViewModel = tokensViewModel,
                     isCompose = true,
                     isOnboarding = true,
                     onCompleteCallback = {},

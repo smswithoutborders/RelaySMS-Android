@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import com.example.sw0b_001.ui.viewModels.AccountsViewModel
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.views.tabs.SupportedPlatformsView
 import kotlinx.coroutines.launch
@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 fun ActivePlatformsModal(
     navController: NavController,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
-    accountsViewModel: AccountsViewModel,
+    tokensViewModel: TokensViewModel,
     sendNewMessageRequested: Boolean,
     isLoggedIn: Boolean = false,
     isCompose: Boolean = false,
@@ -43,7 +43,7 @@ fun ActivePlatformsModal(
             SupportedPlatformsView(
                 navController = navController,
                 supportedPlatformsViewModel = supportedPlatformsViewModel,
-                accountsViewModel = accountsViewModel,
+                tokensViewModel = tokensViewModel,
                 isCompose = isCompose,
                 isLoggedIn = isLoggedIn,
                 isOnboarding = isOnboarding,

@@ -38,8 +38,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.repositories.TransportTypes
 import kotlinx.coroutines.launch
+import uniffi.relaysms_spec_payload.V1ContentCategories
 
 
 fun ByteArray.toUtf8String(): String {
@@ -49,7 +49,7 @@ fun ByteArray.toUtf8String(): String {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmailComposeView(
-    type: TransportTypes,
+    cat: V1ContentCategories,
     from: String? = null,
     to: String,
     subject: String,
@@ -77,7 +77,7 @@ fun EmailComposeView(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            if(type == TransportTypes.PLATFORM) {
+            if(cat != V1ContentCategories.BRIDGE) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),

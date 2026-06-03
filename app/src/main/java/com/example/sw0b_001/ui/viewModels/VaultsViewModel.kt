@@ -140,7 +140,7 @@ class VaultsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val vaultsGrpcImpl = VaultsGrpcImpl(context)
             try {
-                AccountsViewModel(context).revokeAll()
+                TokensViewModel(context).revokeAll()
 
                 val response = vaultsGrpcImpl.deleteEntity()
                 if(response.success) {
