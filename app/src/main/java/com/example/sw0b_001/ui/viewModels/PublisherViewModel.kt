@@ -24,7 +24,7 @@ class PublisherViewModel @Inject constructor(
 ): ViewModel() {
     companion object {
         init {
-            System.loadLibrary("librelaysms_spec_payload")
+            System.loadLibrary("relaysms_spec_payload")
         }
     }
 

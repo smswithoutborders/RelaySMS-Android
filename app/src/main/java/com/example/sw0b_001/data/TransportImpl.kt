@@ -48,7 +48,7 @@ object TransportImpl {
         TODO("move to service")
     }
 
-    suspend fun publishWithoutAttachment(
+    fun publishWithoutAttachment(
         catId: V1ContentCategories,
         body: String,
         tokenId: Int?,

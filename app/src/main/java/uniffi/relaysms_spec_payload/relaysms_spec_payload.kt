@@ -1098,7 +1098,7 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_relaysms_spec_payload_checksum_func_add_rust() != 30957.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_content_category_from_u8() != 47150.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_content_category_from_u8() != 52001.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_platform_publisher() != 6338.toShort()) {
@@ -4360,6 +4360,12 @@ sealed class V1ContentException: kotlin.Exception() {
             get() = ""
     }
     
+    class InvalidCategory(
+        ) : V1ContentException() {
+        override val message
+            get() = ""
+    }
+    
 
     
 
@@ -4388,6 +4394,7 @@ public object FfiConverterTypeV1ContentError : FfiConverterRustBuffer<V1ContentE
             7 -> V1ContentException.InvalidCategoryId()
             8 -> V1ContentException.MissingTo()
             9 -> V1ContentException.EmptyBody()
+            10 -> V1ContentException.InvalidCategory()
             else -> throw RuntimeException("invalid error enum value, something is very wrong!!")
         }
     }
@@ -4430,6 +4437,10 @@ public object FfiConverterTypeV1ContentError : FfiConverterRustBuffer<V1ContentE
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
+            is V1ContentException.InvalidCategory -> (
+                // Add the size for the Int that specifies the variant plus the size needed for all fields
+                4UL
+            )
         }
     }
 
@@ -4469,6 +4480,10 @@ public object FfiConverterTypeV1ContentError : FfiConverterRustBuffer<V1ContentE
             }
             is V1ContentException.EmptyBody -> {
                 buf.putInt(9)
+                Unit
+            }
+            is V1ContentException.InvalidCategory -> {
+                buf.putInt(10)
                 Unit
             }
         }.let { /* this makes the `when` an expression, which ensures it is exhaustive */ }
@@ -4969,9 +4984,10 @@ public object FfiConverterSequenceTypeV1Payloads: FfiConverterRustBuffer<List<V1
     )
     }
     
- fun `v1ContentCategoryFromU8`(`value`: kotlin.UByte): V1ContentCategories {
+
+    @Throws(V1ContentException::class) fun `v1ContentCategoryFromU8`(`value`: kotlin.UByte): V1ContentCategories {
             return FfiConverterTypeV1ContentCategories.lift(
-    uniffiRustCall() { _status ->
+    uniffiRustCallWithError(V1ContentException) { _status ->
     UniffiLib.uniffi_relaysms_spec_payload_fn_func_v1_content_category_from_u8(
     
         FfiConverterUByte.lower(`value`),_status)

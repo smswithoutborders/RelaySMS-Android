@@ -20,7 +20,7 @@ class BridgesViewModel @Inject constructor(
 ): ViewModel() {
     companion object {
         init {
-            System.loadLibrary("librelaysms_spec_payload")
+            System.loadLibrary("relaysms_spec_payload")
         }
     }
 
@@ -45,7 +45,7 @@ class BridgesViewModel @Inject constructor(
                             subject,
                             attachment.rawBytes!!
                         ) { payload ->
-                            encrypt(tokenId!!, payload)
+                            encrypt(payload)
                         }
                     } else {
                         publishWithoutAttachment(
@@ -55,22 +55,20 @@ class BridgesViewModel @Inject constructor(
                             to,
                             subject,
                         ) { payload ->
-                            encrypt(tokenId!!, payload)
+                            encrypt(payload)
                         }
                     }
 
                     onCompleteCallback()
                 } catch (e: Exception) {
+                    e.printStackTrace()
                     onFailureCallback(e.message ?: "")
                 }
             }
         }
     }
 
-    private fun encrypt(
-        tokenId: Int,
-        plaintext: ByteArray,
-    ) : Pair<ByteArray, Int> {
+    private fun encrypt(plaintext: ByteArray) : Pair<ByteArray, Int> {
         TODO()
     }
 }

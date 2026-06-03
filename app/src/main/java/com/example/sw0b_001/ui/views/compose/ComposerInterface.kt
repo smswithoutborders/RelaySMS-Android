@@ -234,9 +234,10 @@ fun ComposerInterface(
 
                             else -> {}
                         }
-                    } else if(selectedToken?.catId == V1ContentCategories.BRIDGE) {
+                    } else {
+                        // would expand this the more non platforms keep being added
                         EmailComposeView(
-                            selectedToken!!.catId,
+                            V1ContentCategories.BRIDGE,
                             from = from,
                             to = to,
                             subject = subject,
