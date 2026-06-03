@@ -48,6 +48,7 @@ import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import com.example.sw0b_001.ui.components.AttachImageView
 import com.example.sw0b_001.ui.modals.ComposeChooseGatewayClientsModal
 import com.example.sw0b_001.ui.modals.SelectAccountModal
+import com.example.sw0b_001.ui.viewModels.BridgesViewModel
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.PublisherViewModel
@@ -77,7 +78,8 @@ fun ComposerInterface(
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
     messagesViewModel: MessagesViewModel,
     publisherViewModel: PublisherViewModel,
-    platformName: String,
+    bridgesViewModel: BridgesViewModel,
+    platformName: String?,
     messageId: Long? = null,
 ) {
     val context = LocalContext.current
@@ -271,16 +273,29 @@ fun ComposerInterface(
                     showChooseGatewayClient,
                     gatewayClientViewModel,
                 ) {
-                    publisherViewModel.publish(
-                        catId = selectedToken?.catId ?: V1ContentCategories.BRIDGE,
-                        body = body,
-                        tokenId = selectedToken?.tokenId,
-                        to = to,
-                        subject = subject,
-                        attachment = processedImage,
-                        onFailureCallback = {},
-                    ) {
-                        TODO("Implement finish journey here")
+                    if(selectedToken != null) {
+                        publisherViewModel.publish(
+                            catId = selectedToken?.catId ?: V1ContentCategories.BRIDGE,
+                            body = body,
+                            tokenId = selectedToken?.tokenId,
+                            to = to,
+                            subject = subject,
+                            attachment = processedImage,
+                            onFailureCallback = {},
+                        ) {
+                            TODO("Implement finish journey here")
+                        }
+                    } else {
+                        bridgesViewModel.publish(
+                            body = body,
+                            tokenId = null,
+                            to = to,
+                            subject = subject,
+                            attachment = processedImage,
+                            onFailureCallback = {},
+                        ) {
+                            TODO("Implement finish journey here")
+                        }
                     }
                 }
             }

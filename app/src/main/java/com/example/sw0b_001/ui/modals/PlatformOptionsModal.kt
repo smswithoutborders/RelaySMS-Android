@@ -41,9 +41,10 @@ import androidx.navigation.NavController
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
-import com.example.sw0b_001.data.repositories.TransportTypes
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.viewModels.TokensUiState
+import uniffi.relaysms_spec_payload.V1ContentCategories
+import uniffi.relaysms_spec_payload.v1ContentCategoryFromU8
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,7 +55,7 @@ fun PlatformOptionsModal(
     showPlatformsModal: Boolean,
     isActive: Boolean,
     isCompose: Boolean,
-    transportType: TransportTypes,
+    cat: V1ContentCategories,
     platform: SupportedPlatforms?,
     isOnboarding: Boolean = false,
     isRevoking: TokensUiState = TokensUiState.Success(null),
@@ -137,11 +138,16 @@ fun PlatformOptionsModal(
                         text = if (isCompose) {
                             getServiceBasedComposeDescriptions(
                                 context,
-                                platform?.service_type ?: "")
+                                if(platform?.service_type == null) V1ContentCategories.BRIDGE
+                                        else v1ContentCategoryFromU8(
+                                    platform.service_type.toUByte())
+                            )
                         } else {
                             getServiceBasedAvailableDescription(
                                 context,
-                                platform?.service_type ?: ""
+                                if(platform?.service_type == null) V1ContentCategories.BRIDGE
+                                else v1ContentCategoryFromU8(
+                                    platform.service_type.toUByte())
                             )
                         },
                         style = MaterialTheme.typography.bodyMedium,
@@ -154,7 +160,7 @@ fun PlatformOptionsModal(
                             platform = platform,
                             navController = navController,
                             isOnboarding = isOnboarding,
-                            transportTypes = transportType,
+                            cat = cat,
                         ) {
                             onDismissRequest()
                         }
@@ -218,7 +224,7 @@ private fun RevokeAccountLoading(platform: SupportedPlatforms) {
 
 @Composable
 private fun ComposeMessages(
-    transportTypes: TransportTypes,
+    cat: V1ContentCategories,
     platform: SupportedPlatforms?,
     navController: NavController,
     subscriptionId: Long = -1L,
@@ -228,7 +234,7 @@ private fun ComposeMessages(
     Button(
         onClick = {
             navController.navigate(ComposeScreen(
-                transportType = transportTypes,
+                cat = cat,
                 platformName = platform?.name,
                 isOnboarding = isOnboarding,
                 messageId = null,
@@ -269,36 +275,36 @@ private fun ManageAccounts(
 
 private fun getServiceBasedAvailableDescription(
     context: Context,
-    serviceType: String,
+    cat: V1ContentCategories,
 ) : String {
-    return when(serviceType) {
-        "email" -> {
+    return when(cat) {
+        V1ContentCategories.EMAIL -> {
             context.getString(R.string.adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported)
         }
-        "message" -> {
+        V1ContentCategories.MESSAGE -> {
             context.getString(R.string.adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported)
         }
-        "text" -> {
+        V1ContentCategories.TEXT -> {
             return context.getString(R.string.adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported)
         }
-        else -> context.getString(R.string.your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias)
+        V1ContentCategories.BRIDGE -> context.getString(R.string.your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias)
     }
 }
 
 private fun getServiceBasedComposeDescriptions(
     context: Context,
-    serviceType: String,
+    cat: V1ContentCategories,
 ) : String {
-    return when(serviceType) {
-        "email" -> {
+    return when(cat) {
+        V1ContentCategories.EMAIL -> {
             context.getString(R.string.continue_to_send_an_email_from_your_saved_email_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
         }
-        "message" -> {
+        V1ContentCategories.TEXT -> {
             context.getString(R.string.continue_to_send_messages_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
         }
-        "text" -> {
+        V1ContentCategories.MESSAGE -> {
             context.getString(R.string.continue_to_make_posts_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
         }
-        else ->  context.getString(R.string.your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
+        V1ContentCategories.BRIDGE ->  context.getString(R.string.your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
     }
 }

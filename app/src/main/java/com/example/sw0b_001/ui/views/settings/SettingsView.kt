@@ -235,32 +235,6 @@ fun SettingsView(
                 useDeviceId = it ?: true
             }
 
-            SettingsItem(
-                itemTitle = stringResource(R.string.store_tokens_on_device),
-                itemDescription = stringResource(R.string.this_would_migrate_your_tokens_stored_on_the_vault_to_your_device_this_would_send_the_token_alongside_every_time_you_send_the_message_potentially_increasing_the_size_of_messages),
-                checked = storeTokensOnDevice,
-                enabled = !isLoading,
-            ) { checked ->
-                isLoading = true
-                context.settingsSetStoreTokensOnDevice(checked ?: true)
-                storeTokensOnDevice = checked ?: true
-
-                if(checked == true) {
-                    scope.launch(Dispatchers.Default) {
-                        try {
-                            VaultsGrpcImpl(context).refreshStoredTokens(context = context)
-                        } catch(e: Exception) {
-                            e.printStackTrace()
-                            scope.launch(Dispatchers.Main) {
-                                Toast.makeText(context, e.message, Toast.LENGTH_LONG)
-                                    .show()
-                            }
-                        } finally {
-                            isLoading = false
-                        }
-                    }
-                } else { isLoading = false }
-            }
             Spacer(Modifier.padding(8.dp))
 
             Text(

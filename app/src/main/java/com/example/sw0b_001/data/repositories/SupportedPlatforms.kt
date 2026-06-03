@@ -18,8 +18,7 @@ import javax.inject.Singleton
 data class SupportedPlatforms(
     @PrimaryKey
     val name: String,
-
-    var service_type: String?,
+    var service_type: Int, // TODO("Change to cat ID")
     val protocol_type: String?,
     val icon_svg: String?,
     val icon_png: String?,

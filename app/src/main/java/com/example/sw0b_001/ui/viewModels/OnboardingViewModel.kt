@@ -8,7 +8,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.repositories.TransportTypes
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.onboarding.InteractiveOnboarding
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import uniffi.relaysms_spec_payload.V1ContentCategories
 
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
@@ -89,7 +89,7 @@ class OnboardingViewModel @Inject constructor(
                     viewModelScope.launch {
                         _navigate.emit {
                             ComposeScreen(
-                                transportType = TransportTypes.BRIDGE,
+                                cat = V1ContentCategories.BRIDGE,
                                 isOnboarding = true,
                                 platformName = null,
                                 messageId = null,

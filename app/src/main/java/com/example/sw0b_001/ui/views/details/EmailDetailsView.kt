@@ -41,21 +41,21 @@ import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.data.models.Tokens
-import com.example.sw0b_001.data.repositories.TransportTypes
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.components.AttachImageView
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import uniffi.relaysms_spec_payload.V1ContentCategories
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmailDetailsView(
     navController: NavController,
-    transportTypes: TransportTypes,
+    cat: V1ContentCategories,
     tokensViewModel: TokensViewModel,
     messagesViewModel: MessagesViewModel,
     imageViewModel: ImageViewModel,

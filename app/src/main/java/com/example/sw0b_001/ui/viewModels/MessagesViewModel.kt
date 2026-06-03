@@ -10,7 +10,6 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.models.Messages
-import com.example.sw0b_001.data.repositories.TransportTypes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
@@ -19,6 +18,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import uniffi.relaysms_spec_payload.V1ContentCategories
 
 @HiltViewModel
 class MessagesViewModel @Inject constructor(
@@ -75,7 +75,7 @@ class MessagesViewModel @Inject constructor(
 
                 val db = Datastore.getDatastore(context)?.messagesDao()
                     ?: throw Exception("Could not open database")
-                inboxMessageList = db.inbox(TransportTypes.BRIDGE.type)
+                inboxMessageList = db.inbox(V1ContentCategories.BRIDGE)
                 _isLoading.value = false
             }
         }
@@ -91,20 +91,6 @@ class MessagesViewModel @Inject constructor(
             val db = Datastore.getDatastore(context)?.messagesDao()
                 ?: throw Exception("Could not open database")
             db.delete(message)
-        }
-    }
-
-    fun encrypt(
-        message: Messages,
-        transportType: TransportTypes,
-    ): ByteArray? {
-        when(transportType) {
-            TransportTypes.BRIDGE -> {
-                TODO()
-            }
-            TransportTypes.PLATFORM -> {
-                TODO()
-            }
         }
     }
 

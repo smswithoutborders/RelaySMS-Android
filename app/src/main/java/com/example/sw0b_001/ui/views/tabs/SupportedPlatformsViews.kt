@@ -60,19 +60,19 @@ import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
-import com.example.sw0b_001.data.repositories.TransportTypes
 import com.example.sw0b_001.ui.modals.PlatformOptionsModal
+import com.example.sw0b_001.ui.viewModels.SupportedPlatformsUiState
+import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensUiState
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel.Companion.oAuth2IntentBuilder
-import com.example.sw0b_001.ui.viewModels.SupportedPlatformsUiState
-import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.views.platformAccounts.PNBAPhoneNumberCodeRequestView
 import com.example.sw0b_001.ui.views.threads.makeDefault
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.Locale
+import uniffi.relaysms_spec_payload.V1ContentCategories
+import uniffi.relaysms_spec_payload.v1ContentCategoryFromU8
 
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
@@ -329,13 +329,12 @@ fun PlatformListContent(
             val isStored = accounts.value?.find { it.platformName == clickedPlatform?.name }
             PlatformOptionsModal(
                 showPlatformsModal = showPlatformOptions,
-                transportType = if(clickedPlatform == null)
-                    TransportTypes.BRIDGE else TransportTypes.PLATFORM,
+                cat = if(clickedPlatform == null)
+                    V1ContentCategories.BRIDGE
+                else v1ContentCategoryFromU8(clickedPlatform!!.service_type.toUByte()),
                 isActive = isStored != null,
                 isCompose = isCompose,
-                platform = clickedPlatform?.apply {
-                    this.service_type = this.service_type?.uppercase(Locale.getDefault())
-                },
+                platform = clickedPlatform,
                 navController = navController,
                 isOnboarding = isOnboarding,
                 isStoring = storingUiState,

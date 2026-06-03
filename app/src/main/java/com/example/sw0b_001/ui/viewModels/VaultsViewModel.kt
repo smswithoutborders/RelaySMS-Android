@@ -17,8 +17,6 @@ import com.example.sw0b_001.extensions.context.settingsSetIsLoggedIn
 import com.example.sw0b_001.relaySmsDatastore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.grpc.Status
-import io.grpc.StatusRuntimeException
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +25,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
@@ -49,10 +46,6 @@ class VaultsViewModel @Inject constructor(
 
     val isLoggedIn: Flow<Boolean> = context.relaySmsDatastore.data.map { settings ->
         settings[settingsIsLoggedInKey] ?: false
-    }
-
-    fun shutdown() {
-        vault.shutdown()
     }
 
     @Serializable
@@ -136,35 +129,19 @@ class VaultsViewModel @Inject constructor(
         }
     }
 
-    suspend fun completeDelete() {
+    fun completeDelete() {
         viewModelScope.launch(Dispatchers.IO) {
             val vaultsGrpcImpl = VaultsGrpcImpl(context)
-            try {
-                TokensViewModel(context).revokeAll()
-
-                val response = vaultsGrpcImpl.deleteEntity()
-                if(response.success) {
-                    context.settingsSetIsLoggedIn(false)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            } finally {
-                vaultsGrpcImpl.shutdown()
-            }
-        }
-    }
-
-    fun validateSession(failedCallback: () -> Unit){
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
+            vaultsGrpcImpl.use {
                 try {
-                    vault.refreshStoredTokens( context)
-                    return@withContext
-                } catch(e: StatusRuntimeException) {
-                    e.printStackTrace()
-                    if(e.status.code == Status.UNAUTHENTICATED.code) {
-                        failedCallback()
+                    TokensViewModel(context).revokeAll()
+
+                    val response = vaultsGrpcImpl.deleteEntity()
+                    if(response.success) {
+                        context.settingsSetIsLoggedIn(false)
                     }
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
             }
         }

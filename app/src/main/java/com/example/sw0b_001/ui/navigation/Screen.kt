@@ -1,8 +1,7 @@
 package com.example.sw0b_001.ui.navigation
 
-import com.example.sw0b_001.data.repositories.TransportTypes
-import com.example.sw0b_001.ui.views.accounts.OTPCodeVerificationType
 import kotlinx.serialization.Serializable
+import uniffi.relaysms_spec_payload.V1ContentCategories
 
 @Serializable
 object WelcomeScreen
@@ -33,18 +32,6 @@ data class CreateAccountScreen(
 )
 
 @Serializable
-data class OTPCodeScreen(
-    val email: String,
-    val loginSignupPhoneNumber: String,
-    val loginSignupPassword: String,
-    val countryCode: String,
-    val recaptcha: String,
-    val otpRequestType: OTPCodeVerificationType = OTPCodeVerificationType.AUTHENTICATE,
-    val nextAttemptTimestamp: Int? = null,
-    val isOnboarding: Boolean = false
-)
-
-@Serializable
 object AboutScreen
 
 @Serializable
@@ -63,7 +50,7 @@ data class ForgotPasswordScreen(
 
 @Serializable
 data class ComposeScreen(
-    val transportType: TransportTypes,
+    val cat: V1ContentCategories,
     val platformName: String?,
     val isOnboarding: Boolean = false,
     val messageId: Long?,
@@ -71,7 +58,7 @@ data class ComposeScreen(
 
 @Serializable
 data class EmailViewScreen(
-    val transportTypes: TransportTypes,
+    val cat: V1ContentCategories,
     val messageId: Long? = null
 )
 @Serializable

@@ -203,7 +203,8 @@ class TokensViewModel @Inject constructor(
                         }
                     }
 
-                    db.delete(account.id)
+                    TODO()
+//                    db.delete(account.id)
                     _isRevokingUiState.value = TokensUiState.Success(null)
                 } catch(e: Exception) {
                     e.printStackTrace()

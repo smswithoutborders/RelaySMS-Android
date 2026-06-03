@@ -28,21 +28,21 @@ interface KeysDao {
     fun fetchTokenId(tokenId: Int): List<Keys>?
 
     @Query("SELECT * FROM Keys WHERE tokenId = :tokenId AND keyId = :keyId")
-    suspend fun _fetch(tokenId: Int, keyId: UByte): Keys?
+    fun _fetch(tokenId: Int, keyId: Int): Keys?
 
     @Transaction
-    suspend fun fetch(tokenId: Int, keyId: UByte): Keys? {
+    fun fetch(tokenId: Int, keyId: Int): Keys? {
         val key = _fetch(tokenId, keyId)
         key?.let { remove(key) }
         return key
     }
 
     @Query("SELECT * FROM Keys WHERE tokenId = :tokenId AND keyId = :keyId AND NOT isOwn")
-    suspend fun fetchOthers(tokenId: Int, keyId: UByte): Keys?
+    fun fetchOthers(tokenId: Int, keyId: Int): Keys?
 
     @Query("DELETE FROM Keys WHERE tokenId = :tokenId")
     suspend fun clear(tokenId: Int)
 
     @Delete
-    suspend fun remove(key: Keys)
+    fun remove(key: Keys)
 }

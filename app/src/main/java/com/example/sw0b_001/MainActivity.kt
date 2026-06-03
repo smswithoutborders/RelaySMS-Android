@@ -62,14 +62,10 @@ import com.example.sw0b_001.extensions.context.settingsGetOnboardedCompletely
 import com.example.sw0b_001.extensions.context.settingsSetLockDownApp
 import com.example.sw0b_001.ui.navigation.AboutScreen
 import com.example.sw0b_001.ui.navigation.ComposeScreen
-import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.EmailViewScreen
-import com.example.sw0b_001.ui.navigation.ForgotPasswordScreen
 import com.example.sw0b_001.ui.navigation.GetMeOutScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
-import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.navigation.MessageViewScreen
-import com.example.sw0b_001.ui.navigation.OTPCodeScreen
 import com.example.sw0b_001.ui.navigation.OnboardingInteractiveScreen
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.navigation.SettingsScreen
@@ -77,18 +73,16 @@ import com.example.sw0b_001.ui.navigation.TextViewScreen
 import com.example.sw0b_001.ui.navigation.WelcomeScreen
 import com.example.sw0b_001.ui.onboarding.OnboardingInteractive
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.TokensViewModel
+import com.example.sw0b_001.ui.viewModels.BridgesViewModel
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
+import com.example.sw0b_001.ui.viewModels.PublisherViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.viewModels.VaultsViewModel
 import com.example.sw0b_001.ui.views.AboutView
 import com.example.sw0b_001.ui.views.WelcomeMainView
-import com.example.sw0b_001.ui.views.accounts.CreateAccountView
-import com.example.sw0b_001.ui.views.accounts.ForgotPasswordView
-import com.example.sw0b_001.ui.views.accounts.LoginView
-import com.example.sw0b_001.ui.views.accounts.OtpCodeVerificationView
 import com.example.sw0b_001.ui.views.compose.ComposerInterface
 import com.example.sw0b_001.ui.views.details.EmailDetailsView
 import com.example.sw0b_001.ui.views.details.MessageDetailsView
@@ -117,6 +111,8 @@ class MainActivity : BindActivity() {
     val gatewayClientViewModel: GatewayClientViewModel by viewModels()
     val imageViewModel: ImageViewModel by viewModels()
     val vaultViewModel: VaultsViewModel by viewModels()
+    val publisherViewModel: PublisherViewModel by viewModels()
+    val bridgesViewModel: BridgesViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -218,25 +214,6 @@ class MainActivity : BindActivity() {
 
         val isLoggedIn by vaultViewModel.isLoggedIn
             .collectAsStateWithLifecycle(false)
-
-        LaunchedEffect(isLoggedIn) {
-            if(isLoggedIn) {
-                try {
-                    vaultViewModel.validateSession {
-                        val route = if(isDefault()) HomeScreenNav()
-                        else HomepageScreen
-                        navController.navigate(GetMeOutScreen) {
-                            popUpTo(route) {
-                                inclusive = true
-                            }
-                        }
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-        }
-
 
         var hasSeenOnboarding by remember {
             mutableStateOf(context.settingsGetOnboardedCompletely)
@@ -346,45 +323,6 @@ class MainActivity : BindActivity() {
                     isLoggedIn = isLoggedIn,
                 )
             }
-            composable<LoginScreen> { backEntry ->
-                val loginNav: LoginScreen = backEntry.toRoute()
-                LoginView(
-                    navController = navController,
-                    vaultViewModel = vaultViewModel,
-                    isOnboarding = loginNav.isOnboarding,
-                )
-            }
-            composable<ForgotPasswordScreen> { backEntry ->
-                val forgotPasswordNav: ForgotPasswordScreen = backEntry.toRoute()
-                ForgotPasswordView(
-                    navController = navController,
-                    vaultsViewModel = vaultViewModel,
-                    isOnboarding = forgotPasswordNav.isOnboarding,
-                )
-            }
-            composable<CreateAccountScreen> { backEntry ->
-                val createAccountNav: ForgotPasswordScreen = backEntry.toRoute()
-                CreateAccountView(
-                    navController = navController,
-                    vaultsViewModel = vaultViewModel,
-                    isOnboarding = createAccountNav.isOnboarding,
-                )
-            }
-            composable<OTPCodeScreen> { backEntry ->
-                val otpCodeNav: OTPCodeScreen = backEntry.toRoute()
-                OtpCodeVerificationView(
-                    navController = navController,
-                    email = otpCodeNav.email,
-                    loginSignupPhoneNumber = otpCodeNav.loginSignupPhoneNumber,
-                    loginSignupPassword = otpCodeNav.loginSignupPassword,
-                    countryCode = otpCodeNav.countryCode,
-                    otpRequestType = otpCodeNav.otpRequestType,
-                    recaptcha = otpCodeNav.recaptcha,
-                    nextAttemptTimestamp = otpCodeNav.nextAttemptTimestamp,
-                    onCompleteCallback = if(otpCodeNav.isOnboarding)
-                        onboardingViewModel.callback else null,
-                )
-            }
             composable<AboutScreen> {
                 AboutView(navController = navController)
             }
@@ -393,7 +331,6 @@ class MainActivity : BindActivity() {
                 val composeScreenNav: ComposeScreen = backEntry.toRoute()
                 ComposerInterface(
                     navController = navController,
-                    transportType = composeScreenNav.transportType,
                     imageViewModel = imageViewModel,
                     gatewayClientViewModel = gatewayClientViewModel,
                     tokensViewModel = tokensViewModel,
@@ -401,6 +338,8 @@ class MainActivity : BindActivity() {
                     supportedPlatformsViewModel = supportedPlatformsViewModel,
                     messageId = composeScreenNav.messageId,
                     messagesViewModel = messagesViewModel,
+                    publisherViewModel = publisherViewModel,
+                    bridgesViewModel = bridgesViewModel,
                 )
             }
             composable<EmailViewScreen> { backEntry ->
@@ -410,7 +349,7 @@ class MainActivity : BindActivity() {
                     tokensViewModel = tokensViewModel,
                     messagesViewModel = messagesViewModel,
                     imageViewModel = imageViewModel,
-                    transportTypes = emailScreenNav.transportTypes,
+                    cat = emailScreenNav.cat,
                     messageId = emailScreenNav.messageId
                 )
             }
@@ -506,11 +445,6 @@ class MainActivity : BindActivity() {
         super.onNewIntent(intent)
         if(::navController.isInitialized)
             processIntent(navController, intent)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        vaultViewModel.shutdown()
     }
 
     val smsLauncher = registerForActivityResult(

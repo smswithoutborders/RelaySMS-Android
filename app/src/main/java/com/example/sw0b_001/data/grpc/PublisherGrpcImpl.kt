@@ -11,7 +11,7 @@ import io.grpc.ManagedChannelBuilder
 import publisher.v2.PublisherGrpc
 import publisher.v2.PublisherOuterClass
 
-class PublisherGrpcImpl(val context: Context) : AutoCloseable, GrpcInterface{
+class PublisherGrpcImpl(val context: Context) : AutoCloseable {
 
     private var channel: ManagedChannel = ManagedChannelBuilder
         .forAddress(context.getString(R.string.publisher_grpc_url),
@@ -139,10 +139,6 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable, GrpcInterface{
         if(!channel.isShutdown) {
             channel.shutdown()
         }
-    }
-
-    override fun getContext(): Context {
-        return context
     }
 
 }

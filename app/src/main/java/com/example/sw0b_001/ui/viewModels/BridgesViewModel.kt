@@ -4,10 +4,8 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
-import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.TransportImpl.publishWithAttachment
 import com.example.sw0b_001.data.TransportImpl.publishWithoutAttachment
-import com.example.sw0b_001.extensions.context.getStaticKeys
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
@@ -15,11 +13,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uniffi.relaysms_spec_payload.V1ContentCategories
-import uniffi.relaysms_spec_payload.V1Payloads
-import uniffi.relaysms_spec_payload.v1PlatformPublisher
 
 @HiltViewModel
-class PublisherViewModel @Inject constructor(
+class BridgesViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
 ): ViewModel() {
     companion object {
@@ -29,7 +25,6 @@ class PublisherViewModel @Inject constructor(
     }
 
     fun publish(
-        catId: V1ContentCategories,
         body: String,
         tokenId: Int?,
         to: String?,
@@ -43,7 +38,7 @@ class PublisherViewModel @Inject constructor(
                 try {
                     if(attachment != null) {
                         publishWithAttachment(
-                            catId,
+                            V1ContentCategories.BRIDGE,
                             body,
                             tokenId,
                             to,
@@ -54,7 +49,7 @@ class PublisherViewModel @Inject constructor(
                         }
                     } else {
                         publishWithoutAttachment(
-                            catId,
+                            V1ContentCategories.BRIDGE,
                             body,
                             tokenId,
                             to,
@@ -76,28 +71,6 @@ class PublisherViewModel @Inject constructor(
         tokenId: Int,
         plaintext: ByteArray,
     ) : Pair<ByteArray, Int> {
-        val keyId = (0 until 256).random()
-        val db = Datastore.getDatastore(context)?.keysDao()
-        val authenticationPublicKey = context.getStaticKeys(keyId)
-            ?: throw Exception("Could not find static keys for id")
-
-        val othersKeys = db?.fetchOthers(tokenId, keyId)
-            ?: throw Exception("Could not open database")
-        val keys = db.fetch(tokenId, keyId) ?: throw Exception("Could not open database")
-        keys.use { k ->
-            val ciphertext = v1PlatformPublisher(
-                ecKid = k.privateKey,
-                ssKidPk = authenticationPublicKey,
-                esKidPk = othersKeys.publicKey,
-                keyId = keyId.toUByte(),
-                plaintext = plaintext
-            )
-
-            return Pair(ciphertext, keyId)
-        }
-    }
-
-    private fun moveToService( payloads: List<V1Payloads>) {
-        TODO("Perform service work")
+        TODO()
     }
 }

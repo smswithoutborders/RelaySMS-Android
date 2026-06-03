@@ -2,7 +2,6 @@ package com.example.sw0b_001.data.grpc
 
 import android.content.Context
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.models.Keys
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
 import org.bouncycastle.jce.provider.BouncyCastleProvider
@@ -10,7 +9,7 @@ import vault.v2.EntityGrpc
 import vault.v2.Vault
 import java.security.Security
 
-class VaultsGrpcImpl(val context: Context) : AutoCloseable, GrpcInterface {
+class VaultsGrpcImpl(val context: Context) : AutoCloseable {
     companion object {
         const val clientVaultHandshakeKeystoreAliasStaticKeys =
             "clientVaultHandshakeKeystoreAlias_static_keys"
@@ -35,19 +34,9 @@ class VaultsGrpcImpl(val context: Context) : AutoCloseable, GrpcInterface {
             .deleteEntity(deleteEntityRequest)
     }
 
-    fun uploadKeys(tokenHash: ByteArray ): List<Keys>{
-        val entityStub = EntityGrpc.newBlockingStub(channel)
-            .withInterceptors(GrpcClientInterceptor(this, tokenHash))
-        TODO("Implement upload keys")
-    }
-
     override fun close() {
         if(!channel.isShutdown) {
             channel.shutdown()
         }
-    }
-
-    override fun getContext(): Context {
-        return context
     }
 }

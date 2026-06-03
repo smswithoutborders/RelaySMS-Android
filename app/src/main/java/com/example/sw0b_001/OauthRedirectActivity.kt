@@ -6,11 +6,8 @@ import android.util.Base64
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
-import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
-import com.example.sw0b_001.data.models.Keys
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -72,16 +69,16 @@ class OauthRedirectActivity : AppCompatActivity() {
                         val serverEphemeralKeys = TODO("Get token Hash from here")
                         TODO("Store the server's ephemeral keys")
 
-                        VaultsGrpcImpl(applicationContext).use { vaultsGrpcImpl ->
-                            try {
-                                val (tokenId, keys) = vaultsGrpcImpl.uploadKeys(tokenHash)
-                                Keys.save(applicationContext, tokenHash, keys, tokenId)
-                            } catch(e: Exception) {
-                                throw e;
-                            } finally {
-                                tokenHash.fill(0)
-                            }
-                        }
+//                        VaultsGrpcImpl(applicationContext).use { vaultsGrpcImpl ->
+//                            try {
+//                                val (tokenId, keys) = vaultsGrpcImpl.uploadKeys(tokenHash)
+//                                Keys.save(applicationContext, tokenHash, keys, tokenId)
+//                            } catch(e: Exception) {
+//                                throw e;
+//                            } finally {
+//                                tokenHash.fill(0)
+//                            }
+//                        }
                     } finally {
                         oAuth.clear(applicationContext)
                     }

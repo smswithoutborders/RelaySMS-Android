@@ -36,11 +36,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Helpers
-import com.example.sw0b_001.data.repositories.TransportTypes
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
+import uniffi.relaysms_spec_payload.V1ContentCategories
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,7 +69,7 @@ fun TextDetailsView(
                 editCallback = {
                     navController.navigate(
                         ComposeScreen(
-                            transportType = TransportTypes.PLATFORM,
+                            cat = V1ContentCategories.TEXT,
                             platformName = platformName,
                             isOnboarding = false,
                             messageId = messageId

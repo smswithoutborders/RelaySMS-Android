@@ -57,11 +57,11 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.repositories.TransportTypes
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.theme.AppTheme
+import uniffi.relaysms_spec_payload.V1ContentCategories
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -201,7 +201,7 @@ fun GetStartedView (
                     onClick = {
                         navController.navigate(
                             ComposeScreen(
-                                transportType = TransportTypes.BRIDGE,
+                                V1ContentCategories.BRIDGE,
                                 isOnboarding = true,
                                 platformName = null,
                                 messageId = null

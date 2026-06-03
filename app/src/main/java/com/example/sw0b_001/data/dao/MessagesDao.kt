@@ -7,6 +7,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.example.sw0b_001.data.models.Messages
+import uniffi.relaysms_spec_payload.V1ContentCategories
 
 @Dao
 interface MessagesDao {
@@ -20,7 +21,7 @@ interface MessagesDao {
     fun all(type: String): LiveData<MutableList<Messages>>
 
     @Query("SELECT * FROM Messages WHERE type = :type ORDER BY date DESC")
-    fun inbox(type: Byte): LiveData<MutableList<Messages>>
+    fun inbox(type: V1ContentCategories): LiveData<MutableList<Messages>>
 
     @Query("DELETE FROM Messages")
     fun deleteAll()

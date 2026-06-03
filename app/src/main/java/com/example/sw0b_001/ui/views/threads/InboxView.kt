@@ -26,11 +26,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.repositories.TransportTypes
 import com.example.sw0b_001.ui.navigation.EmailViewScreen
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
-import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
+import uniffi.relaysms_spec_payload.V1ContentCategories
 
 
 @Composable
@@ -60,7 +60,7 @@ fun InboxView(
                         onClickCallback = {
                             navController.navigate(
                                 EmailViewScreen(
-                                    transportTypes = TransportTypes.BRIDGE,
+                                    V1ContentCategories.BRIDGE,
                                     messageId = message.id
                                 )
                             )

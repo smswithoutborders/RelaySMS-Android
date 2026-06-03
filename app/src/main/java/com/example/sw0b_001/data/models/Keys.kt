@@ -14,7 +14,7 @@ import kotlinx.serialization.Transient
 data class Keys(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val keyId: UByte,
+    val keyId: Int,
     val privateKey: ByteArray,
     val publicKey: ByteArray,
     var tokenId: Int? = null,
@@ -33,13 +33,18 @@ data class Keys(
     }
 
     companion object {
-        fun getOwnKey(context: Context, tokenHash: ByteArray, keyId: UByte) : Keys {
+        fun getOwnKey(context: Context, tokenId: Int, keyId: Int) : Keys {
             val db = Datastore.getDatastore(context)?.keysDao()
                 ?: throw Exception("Failed to get database")
-            return db.fetch(tokenHash, keyId) ?: throw Exception("No key found")
+            return db.fetch(tokenId, keyId) ?: throw Exception("No key found")
         }
+//        suspend fun getOwnKey(context: Context, tokenHash: ByteArray, keyId: UByte) : Keys {
+//            val db = Datastore.getDatastore(context)?.keysDao()
+//                ?: throw Exception("Failed to get database")
+//            return db.fetch(tokenHash, keyId) ?: throw Exception("No key found")
+//        }
 
-        fun save(
+        suspend fun save(
             context: Context,
             tokenHash: ByteArray,
             keys: List<Keys>,

@@ -1,5 +1,6 @@
 package com.example.sw0b_001.data.grpc
 
+import android.content.Context
 import com.example.sw0b_001.data.models.Keys
 import com.example.sw0b_001.extensions.context.getStaticKeys
 import io.grpc.CallOptions
@@ -12,8 +13,8 @@ import io.grpc.MethodDescriptor
 import uniffi.relaysms_spec_payload.v1TokenEncrypt
 
 class GrpcClientInterceptor(
-    private val service: GrpcInterface,
-    private val tokenHash: ByteArray
+    private val context: Context,
+    private val tokenId: Int
 ): ClientInterceptor {
     override fun <ReqT : Any?, RespT : Any?> interceptCall(
         method: MethodDescriptor<ReqT?, RespT?>?,
@@ -27,13 +28,12 @@ class GrpcClientInterceptor(
             override fun start(responseListener: Listener<RespT?>?, headers: Metadata?) {
                 val methodName = "/${method?.fullMethodName}"
                 val keyId = (0 until 256).random()
-                val authenticationPublicKey = service.getContext()
-                    .getStaticKeys(keyId)
+                val authenticationPublicKey = context.getStaticKeys(keyId)
                     ?: throw Exception("Could not find static keys for id")
                 val ecKid = Keys.getOwnKey(
-                    service.getContext(),
-                    tokenHash,
-                    keyId.toUByte()
+                    context,
+                    tokenId,
+                    keyId
                 )
                 ecKid.use { ecKid ->
                     val token = v1TokenEncrypt(
@@ -41,7 +41,7 @@ class GrpcClientInterceptor(
                         ssKidPk = authenticationPublicKey,
                         esKidPk = ecKid.publicKey,
                         methodName = methodName.encodeToByteArray(),
-                        tokenHash = tokenHash,
+                        tokenHash = ecKid.tokenHash!!,
                         keyId = keyId.toUByte(),
                     )
                     try {
