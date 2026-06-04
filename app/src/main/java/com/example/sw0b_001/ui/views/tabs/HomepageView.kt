@@ -37,10 +37,10 @@ import com.example.sw0b_001.ui.modals.ActivePlatformsModal
 import com.example.sw0b_001.ui.modals.AddGatewayClientModal
 import com.example.sw0b_001.ui.modals.GetStartedModal
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
-import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.views.threads.InboxView
 import com.example.sw0b_001.ui.views.threads.RecentView
 import kotlinx.coroutines.CoroutineScope
@@ -134,10 +134,7 @@ fun HomepageView(
             }
         },
         bottomBar = {
-            BottomNavBar(
-                selectedTab = tokensViewModel.bottomTabsItem,
-                isLoggedIn = isLoggedIn,
-            ) { selectedTab ->
+            BottomNavBar( selectedTab = tokensViewModel.bottomTabsItem ) { selectedTab ->
                 tokensViewModel.bottomTabsItem = selectedTab
             }
         },

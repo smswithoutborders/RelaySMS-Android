@@ -17,11 +17,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Login
 import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -29,11 +26,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,7 +35,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
@@ -58,20 +51,12 @@ import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.ComposeScreen
-import com.example.sw0b_001.ui.navigation.CreateAccountScreen
-import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import uniffi.relaysms_spec_payload.V1ContentCategories
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GetStartedView (
-    navController: NavController,
-    loggedIn: Boolean,
-) {
-    var showLoginBottomSheet by remember { mutableStateOf(false) }
-    var showCreateAccountBottomSheet by remember { mutableStateOf(false) }
-
+fun GetStartedView (navController: NavController) {
     val context = LocalContext.current
     val previewMode = LocalInspectionMode.current
 
@@ -90,7 +75,6 @@ fun GetStartedView (
         }
     }
 
-
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
@@ -98,92 +82,6 @@ fun GetStartedView (
             .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        if(!loggedIn) {
-            Card(
-                elevation = CardDefaults.cardElevation(8.dp),
-                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.background),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        stringResource(R.string.your_account),
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.padding(top=16.dp)
-                    )
-
-                    Text(
-                        stringResource(R.string.log_in_or_sign_up_to_save_your_online_accounts),
-                        style = MaterialTheme.typography.labelMedium,
-                        modifier = Modifier.padding(16.dp)
-                    )
-
-                    Button(
-                        onClick = { showCreateAccountBottomSheet = true },
-                        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(8.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.PersonAdd,
-                                contentDescription = stringResource(R.string.create_account),
-                            )
-
-                            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-
-                            Text(
-                                stringResource(R.string.create_account),
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.padding(8.dp))
-
-                    Button(
-                        onClick = { showLoginBottomSheet = true },
-                        colors = ButtonDefaults
-                            .buttonColors(MaterialTheme.colorScheme.secondary),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(8.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.Login,
-                                contentDescription = stringResource(R.string.login),
-                            )
-
-                            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-
-                            Text(
-                                stringResource(R.string.login),
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        Spacer(Modifier.padding(8.dp))
-
         Card(
             elevation = CardDefaults.cardElevation(4.dp),
             colors = CardDefaults.cardColors(MaterialTheme.colorScheme.background),
@@ -290,103 +188,9 @@ fun GetStartedView (
                 }
             }
         }
-
-        if (showLoginBottomSheet) {
-            LoginCreateInfoModal(
-                showModal = showLoginBottomSheet,
-                onDismissCallback = {
-                    showLoginBottomSheet = false
-                },
-                title = stringResource(R.string.login)
-            ) {
-                navController.navigate(LoginScreen(false))
-                showLoginBottomSheet = false
-            }
-        }
-
-        if (showCreateAccountBottomSheet) {
-            LoginCreateInfoModal(
-                showModal = showCreateAccountBottomSheet,
-                onDismissCallback = {
-                    showCreateAccountBottomSheet = false
-                },
-                title = stringResource(R.string.create_account)
-            ) {
-                navController.navigate(CreateAccountScreen(false))
-                showCreateAccountBottomSheet = false
-            }
-        }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun LoginCreateInfoModal(
-    showModal: Boolean = false,
-    title: String,
-    onDismissCallback: () -> Unit = {},
-    onContinueCallback: () -> Unit = {}
-) {
-    var showModal by remember { mutableStateOf(showModal) }
-    val sheetState = rememberStandardBottomSheetState(
-        initialValue = SheetValue.Expanded,
-        skipHiddenState = false
-    )
-    if (showModal) {
-        ModalBottomSheet(
-            onDismissRequest = {
-                showModal = false
-                onDismissCallback()
-            },
-            sheetState = sheetState,
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Person,
-                    contentDescription = stringResource(R.string.person_icon),
-                    modifier = Modifier.size(48.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.size(16.dp))
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(modifier = Modifier.size(8.dp))
-                Text(
-                    text = stringResource(R.string.access_your_account_to_save_or_use_your_online_platforms_without_an_internet_connection),
-                    style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(modifier = Modifier.size(24.dp))
-                Button(
-                    onClick = {
-                        onContinueCallback()
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(R.string.continue_text))
-                }
-                Spacer(modifier = Modifier.size(16.dp))
-                Text(
-                    text = stringResource(R.string.an_sms_would_be_sent_to_your_phone_number_to_verify_you_own_the_number),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(modifier = Modifier.size(16.dp))
-            }
-        }
-    }
-}
 
 fun makeDefault(context: Context): Intent {
     // TODO: replace this with checking other permissions - since this gives null in level 35
@@ -404,35 +208,8 @@ fun makeDefault(context: Context): Intent {
 
 @Preview(showBackground = true)
 @Composable
-fun GetStartedPreview() {
-    AppTheme (darkTheme = false) {
-        GetStartedView(
-            navController = NavController(LocalContext.current),
-            false
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
 fun GetStartedPreviewLoggedIn() {
     AppTheme (darkTheme = false) {
-        GetStartedView(
-            navController = NavController(LocalContext.current),
-            true
-        )
-    }
-}
-
-@Preview
-@Composable
-fun LoginCreateInfoModalPreview() {
-    AppTheme {
-        LoginCreateInfoModal(
-            showModal = true,
-            title = "Login",
-            onDismissCallback = {},
-            onContinueCallback = {}
-        )
+        GetStartedView( navController = NavController(LocalContext.current))
     }
 }

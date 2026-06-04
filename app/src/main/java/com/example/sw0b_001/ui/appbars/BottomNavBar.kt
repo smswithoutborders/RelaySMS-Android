@@ -26,7 +26,6 @@ import com.example.sw0b_001.ui.views.tabs.BottomTabsItems
 @Composable
 fun BottomNavBar(
     selectedTab: BottomTabsItems,
-    isLoggedIn: Boolean = true,
     onChangeTab: (BottomTabsItems) -> Unit = {},
 ) {
     val context = LocalContext.current
@@ -41,8 +40,7 @@ fun BottomNavBar(
             ) },
             label = {
                 Text(
-                    text = if(isLoggedIn) stringResource(R.string.recents_text)
-                    else stringResource( R.string.get_started_text ),
+                    text = stringResource(R.string.recents_text),
                     style = MaterialTheme.typography.labelSmall
                 )
             },
@@ -52,23 +50,21 @@ fun BottomNavBar(
             },
         )
 
-        if(isLoggedIn) {
-            NavigationBarItem(
-                icon = { Icon(
-                    Icons.Filled.PhoneAndroid,
-                    contentDescription = stringResource(R.string.platforms),
-                    modifier = Modifier.size(20.dp)
-                ) },
-                label = { Text(
-                    text = stringResource(R.string.platforms),
-                    style = MaterialTheme.typography.labelSmall
-                ) },
-                selected = selectedTab == BottomTabsItems.BottomBarPlatformsTab,
-                onClick = {
-                    onChangeTab(BottomTabsItems.BottomBarPlatformsTab,)
-                },
-            )
-        }
+        NavigationBarItem(
+            icon = { Icon(
+                Icons.Filled.PhoneAndroid,
+                contentDescription = stringResource(R.string.platforms),
+                modifier = Modifier.size(20.dp)
+            ) },
+            label = { Text(
+                text = stringResource(R.string.platforms),
+                style = MaterialTheme.typography.labelSmall
+            ) },
+            selected = selectedTab == BottomTabsItems.BottomBarPlatformsTab,
+            onClick = {
+                onChangeTab(BottomTabsItems.BottomBarPlatformsTab,)
+            },
+        )
 
         NavigationBarItem(
             icon = { Icon(

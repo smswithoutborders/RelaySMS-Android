@@ -331,7 +331,7 @@ fun PlatformListContent(
                 showPlatformsModal = showPlatformOptions,
                 cat = if(clickedPlatform == null)
                     V1ContentCategories.BRIDGE
-                else v1ContentCategoryFromU8(clickedPlatform!!.service_type.toUByte()),
+                else v1ContentCategoryFromU8(clickedPlatform!!.cat_id.toUByte()),
                 isActive = isStored != null,
                 isCompose = isCompose,
                 platform = clickedPlatform,

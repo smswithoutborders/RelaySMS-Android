@@ -35,9 +35,9 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.data.models.Messages
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
-import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -103,10 +103,7 @@ fun RecentView(
             }
         }
         else if(messages.loadState.isIdle || LocalInspectionMode.current) {
-            GetStartedView(
-                navController = navController,
-                loggedIn = isLoggedIn
-            )
+            GetStartedView( navController = navController, )
         }
 
         if (sendNewMessageRequested) {

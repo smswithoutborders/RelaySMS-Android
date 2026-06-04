@@ -138,16 +138,16 @@ fun PlatformOptionsModal(
                         text = if (isCompose) {
                             getServiceBasedComposeDescriptions(
                                 context,
-                                if(platform?.service_type == null) V1ContentCategories.BRIDGE
+                                if(platform?.cat_id == null) V1ContentCategories.BRIDGE
                                         else v1ContentCategoryFromU8(
-                                    platform.service_type.toUByte())
+                                    platform.cat_id.toUByte())
                             )
                         } else {
                             getServiceBasedAvailableDescription(
                                 context,
-                                if(platform?.service_type == null) V1ContentCategories.BRIDGE
+                                if(platform?.cat_id == null) V1ContentCategories.BRIDGE
                                 else v1ContentCategoryFromU8(
-                                    platform.service_type.toUByte())
+                                    platform.cat_id.toUByte())
                             )
                         },
                         style = MaterialTheme.typography.bodyMedium,

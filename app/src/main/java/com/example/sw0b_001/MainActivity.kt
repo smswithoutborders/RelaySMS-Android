@@ -63,7 +63,6 @@ import com.example.sw0b_001.extensions.context.settingsSetLockDownApp
 import com.example.sw0b_001.ui.navigation.AboutScreen
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.navigation.EmailViewScreen
-import com.example.sw0b_001.ui.navigation.GetMeOutScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.MessageViewScreen
 import com.example.sw0b_001.ui.navigation.OnboardingInteractiveScreen
@@ -90,7 +89,6 @@ import com.example.sw0b_001.ui.views.details.TextDetailsView
 import com.example.sw0b_001.ui.views.incoming.PasteEncryptedTextView
 import com.example.sw0b_001.ui.views.settings.SettingsView
 import com.example.sw0b_001.ui.views.tabs.HomepageView
-import com.example.sw0b_001.ui.views.threads.GetMeOutOfHere
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import dagger.hilt.android.AndroidEntryPoint
@@ -99,6 +97,12 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : BindActivity() {
+    companion object {
+        init {
+            System.loadLibrary("relaysms_spec_payload")
+        }
+    }
+
     private lateinit var navController: NavHostController
     val searchViewModel:  SearchViewModel by viewModels()
     val supportedPlatformsViewModel: SupportedPlatformsViewModel by viewModels()
@@ -305,12 +309,6 @@ class MainActivity : BindActivity() {
                     tokensViewModel = tokensViewModel,
                     vaultViewModel = vaultViewModel,
                     supportedPlatformsViewModel,
-                )
-            }
-            composable<GetMeOutScreen> {
-                GetMeOutOfHere(
-                    navController,
-                    vaultViewModel
                 )
             }
             composable<HomepageScreen> {

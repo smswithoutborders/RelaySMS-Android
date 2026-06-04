@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import uniffi.relaysms_spec_payload.V1ContentCategories
 
 sealed class SupportedPlatformsUiState {
     object Loading : SupportedPlatformsUiState()
@@ -51,7 +52,15 @@ class SupportedPlatformsViewModel @Inject constructor(
                 val supportedPlatforms = repository.getSupportedPlatforms()
                 val platforms = SupportedPlatformsUiState.Success(supportedPlatforms)
                 withContext(Dispatchers.IO) {
-                    cache(platforms.supportedPlatforms)
+                    cache(platforms.supportedPlatforms.apply {
+                        forEach { platform ->
+                            when(platform.service_type) {
+                                "email" -> platform.cat_id = V1ContentCategories.EMAIL.value.toInt()
+                                "text" -> platform.cat_id = V1ContentCategories.TEXT.value.toInt()
+                                "message" -> platform.cat_id = V1ContentCategories.MESSAGE.value.toInt()
+                            }
+                        }
+                    })
                 }
                 _uiState.value = platforms
             } catch (e: Exception) {

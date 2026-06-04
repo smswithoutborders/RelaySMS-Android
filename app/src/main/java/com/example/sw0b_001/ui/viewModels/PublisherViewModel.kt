@@ -16,18 +16,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uniffi.relaysms_spec_payload.V1ContentCategories
 import uniffi.relaysms_spec_payload.V1Payloads
-import uniffi.relaysms_spec_payload.v1PlatformPublisher
+import uniffi.relaysms_spec_payload.v1PlatformPublisherEncrypt
 
 @HiltViewModel
 class PublisherViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
 ): ViewModel() {
-    companion object {
-        init {
-            System.loadLibrary("relaysms_spec_payload")
-        }
-    }
-
     fun publish(
         catId: V1ContentCategories,
         body: String,
@@ -76,7 +70,7 @@ class PublisherViewModel @Inject constructor(
         tokenId: Int,
         plaintext: ByteArray,
     ) : Pair<ByteArray, Int> {
-        val keyId = (0 until 256).random()
+        val keyId = (0 until 16).random()
         val db = Datastore.getDatastore(context)?.keysDao()
         val authenticationPublicKey = context.getStaticKeys(keyId)
             ?: throw Exception("Could not find static keys for id")
@@ -85,7 +79,7 @@ class PublisherViewModel @Inject constructor(
             ?: throw Exception("Could not open database")
         val keys = db.fetch(tokenId, keyId) ?: throw Exception("Could not open database")
         keys.use { k ->
-            val ciphertext = v1PlatformPublisher(
+            val ciphertext = v1PlatformPublisherEncrypt(
                 ecKid = k.privateKey,
                 ssKidPk = authenticationPublicKey,
                 esKidPk = othersKeys.publicKey,
