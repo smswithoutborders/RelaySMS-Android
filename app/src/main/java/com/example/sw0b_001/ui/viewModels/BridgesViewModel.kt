@@ -28,26 +28,30 @@ class BridgesViewModel @Inject constructor(
         tokenId: Int?,
         to: String?,
         subject: String?,
-        attachment: ImageViewModel.ProcessedImage?,
+        imageViewModel: ImageViewModel,
         onFailureCallback: (String) -> Unit,
         onCompleteCallback: () -> Unit,
     ) {
+        val attachment = imageViewModel.processedImage.value?.rawBytes
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
                     if(attachment != null) {
                         publishWithAttachment(
+                            context,
                             V1ContentCategories.BRIDGE,
                             body,
                             tokenId,
                             to,
                             subject,
-                            attachment.rawBytes!!
+                            attachment,
+                            imageViewModel
                         ) { payload ->
                             encrypt(payload, tokenId)
                         }
                     } else {
                         publishWithoutAttachment(
+                            context,
                             V1ContentCategories.BRIDGE,
                             body,
                             tokenId,
@@ -58,7 +62,9 @@ class BridgesViewModel @Inject constructor(
                         }
                     }
 
-                    onCompleteCallback()
+                    withContext(Dispatchers.Main) {
+                        onCompleteCallback()
+                    }
                 } catch (e: Exception) {
                     e.printStackTrace()
                     onFailureCallback(e.message ?: "")

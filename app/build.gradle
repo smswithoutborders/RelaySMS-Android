@@ -14,7 +14,7 @@ versionProperties.load(new FileInputStream(versionsPropertiesFile))
 
 android {
     namespace 'com.example.sw0b_001'
-    compileSdk 36
+    compileSdk 37
 
     def _versionName = versionProperties['versionName']
     def tagVersion = Integer.parseInt(versionProperties['tagVersion'])
@@ -22,7 +22,7 @@ android {
     defaultConfig {
         applicationId "com.afkanerd.sw0b"
         minSdk 24
-        targetSdk 36
+        targetSdk 37
         versionCode tagVersion
         versionName _versionName
 
@@ -161,7 +161,7 @@ configurations.configureEach {
 
 
 dependencies {
-    implementation 'com.github.smswithoutborders:lib_image_android:0bbf4d7'
+    implementation 'com.github.smswithoutborders:lib_image_android:d9ed400'
     implementation 'com.github.smswithoutborders:lib_smsmms_android:dfe4676'
     implementation 'com.github.smswithoutborders:lib_signal_double_ratchet_java:c4a12f8'
     implementation("net.java.dev.jna:jna:5.18.1@aar")

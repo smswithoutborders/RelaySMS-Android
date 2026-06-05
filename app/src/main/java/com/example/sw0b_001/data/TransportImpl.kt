@@ -2,6 +2,9 @@ package com.example.sw0b_001.data
 
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
+import android.util.Base64
+import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.data.data.models.SmsManager
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getThreadId
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
@@ -14,13 +17,15 @@ import uniffi.relaysms_spec_payload.V1PayloadWithAttachments
 import uniffi.relaysms_spec_payload.V1PayloadWithoutAttachments
 
 object TransportImpl {
-    suspend fun publishWithAttachment(
+    fun publishWithAttachment(
+        context: Context,
         catId: V1ContentCategories,
         body: String,
         tokenId: Int?,
         to: String?,
         subject: String?,
         attachment: ByteArray,
+        imageViewModel: ImageViewModel,
         encrypt: (ByteArray) -> Pair<ByteArray, Int>
     ) {
         val sessionId: UByte = 0u // TODO("Session ID")
@@ -44,11 +49,20 @@ object TransportImpl {
             payload = payload,
             tId = tokenId?.toUInt()
         )
+        val splitPayloads = payloads.split().map {
+            Base64.encodeToString(it.serialize(), Base64.DEFAULT)
+        }
 
-        TODO("move to service")
+        val intentFilter = "com.afkanerd.deku.SMS_SENT_BROADCAST_INTENT"
+        imageViewModel.startWorkManager(
+            context = context,
+            notificationFilter = intentFilter,
+            payload = splitPayloads,
+        )
     }
 
     fun publishWithoutAttachment(
+        context: Context,
         catId: V1ContentCategories,
         body: String,
         tokenId: Int?,
@@ -66,18 +80,23 @@ object TransportImpl {
             .instance()
             .serialize()
 
-        val (payload, keyId) = encrypt(content)
+        val (ciphertext, keyId) = encrypt(content)
         val payloads = V1PayloadWithoutAttachments(
             kId = keyId.toUByte(),
             tId = tokenId?.toUInt(),
-            payload = payload
-        )
+            payload = ciphertext
+        ).serialize()
 
-        TODO("Payload can be transmitted immediately")
+        val payload = Base64.encodeToString(payloads, Base64.DEFAULT)
+        sendSms(context, payload) {
+
+        }
     }
+
     fun sendSms(
         context: Context,
         payload: String,
+        bundle: Bundle = Bundle(),
         onSuccessRunnable: (Messages) -> Unit
     ) {
         val gatewayClient = context.settingsGetDefaultGatewayClients
@@ -91,8 +110,10 @@ object TransportImpl {
                     address = gatewayClient.msisdn,
                     subscriptionId = -1,
                     threadId = context.getThreadId(gatewayClient.msisdn),
-                    callback = {}
-                )
+                    bundle = bundle
+                ) {
+
+                }
             }
             else {
                 val intent = SMSHandler.transferToDefaultSMSApp(
@@ -102,6 +123,7 @@ object TransportImpl {
                 ).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 }
+                context.startActivity(intent)
             }
         }
     }

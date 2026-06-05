@@ -1,10 +1,14 @@
 package com.example.sw0b_001.ui.viewModels
 
 import android.content.Context
+import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.afkanerd.lib_image_android.ui.data.SmsWorkManager
+import com.afkanerd.lib_image_android.ui.services.ImageTransmissionService
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.example.sw0b_001.data.Datastore
+import com.example.sw0b_001.data.TransportImpl
 import com.example.sw0b_001.data.TransportImpl.publishWithAttachment
 import com.example.sw0b_001.data.TransportImpl.publishWithoutAttachment
 import com.example.sw0b_001.extensions.context.getStaticKeys
@@ -15,7 +19,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uniffi.relaysms_spec_payload.V1ContentCategories
-import uniffi.relaysms_spec_payload.V1Payloads
 import uniffi.relaysms_spec_payload.v1PlatformPublisherEncrypt
 
 @HiltViewModel
@@ -28,26 +31,31 @@ class PublisherViewModel @Inject constructor(
         tokenId: Int?,
         to: String?,
         subject: String?,
-        attachment: ImageViewModel.ProcessedImage?,
+        imageViewModel: ImageViewModel,
+        imageService: ImageTransmissionService,
         onFailureCallback: (String) -> Unit,
         onCompleteCallback: () -> Unit,
     ) {
+        val attachment = imageViewModel.processedImage.value?.rawBytes
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 try {
                     if(attachment != null) {
                         publishWithAttachment(
+                            context,
                             catId,
                             body,
                             tokenId,
                             to,
                             subject,
-                            attachment.rawBytes!!
+                            attachment,
+                            imageViewModel
                         ) { payload ->
                             encrypt(tokenId!!, payload)
                         }
                     } else {
                         publishWithoutAttachment(
+                            context,
                             catId,
                             body,
                             tokenId,
@@ -58,7 +66,9 @@ class PublisherViewModel @Inject constructor(
                         }
                     }
 
-                    onCompleteCallback()
+                    withContext(Dispatchers.Main) {
+                        onCompleteCallback()
+                    }
                 } catch (e: Exception) {
                     onFailureCallback(e.message ?: "")
                 }
@@ -91,7 +101,17 @@ class PublisherViewModel @Inject constructor(
         }
     }
 
-    private fun moveToService( payloads: List<V1Payloads>) {
-        TODO("Perform service work")
+    fun attachmentExecutor(payload: String) {
+        viewModelScope.launch {
+            val bundle = Bundle()
+            bundle.putBoolean(SmsWorkManager.ITP_TRANSMISSION_REQUEST, true)
+            TransportImpl.sendSms(
+                context = context,
+                payload = payload,
+                bundle = bundle,
+            ) {
+
+            }
+        }
     }
 }

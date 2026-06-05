@@ -21,6 +21,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionServices
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -38,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.afkanerd.lib_image_android.ui.navigation.ImageRenderNav
+import com.afkanerd.lib_image_android.ui.services.ImageTransmissionService
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDefaultSimSubscription
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
@@ -79,6 +81,7 @@ fun ComposerInterface(
     messagesViewModel: MessagesViewModel,
     publisherViewModel: PublisherViewModel,
     bridgesViewModel: BridgesViewModel,
+    imageService: ImageTransmissionService,
     platformName: String?,
     messageId: Long? = null,
 ) {
@@ -281,10 +284,11 @@ fun ComposerInterface(
                             tokenId = selectedToken?.tokenId,
                             to = to,
                             subject = subject,
-                            attachment = processedImage,
+                            imageService = imageService,
+                            imageViewModel = imageViewModel,
                             onFailureCallback = {},
                         ) {
-                            TODO("Implement finish journey here")
+                            navController.popBackStack()
                         }
                     } else {
                         bridgesViewModel.publish(
@@ -292,10 +296,10 @@ fun ComposerInterface(
                             tokenId = null,
                             to = to,
                             subject = subject,
-                            attachment = processedImage,
+                            imageViewModel = imageViewModel,
                             onFailureCallback = {},
                         ) {
-                            TODO("Implement finish journey here")
+                            navController.popBackStack()
                         }
                     }
                 }

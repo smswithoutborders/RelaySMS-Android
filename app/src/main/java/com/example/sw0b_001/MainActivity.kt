@@ -104,7 +104,7 @@ class MainActivity : BindActivity() {
     }
 
     private lateinit var navController: NavHostController
-    val searchViewModel:  SearchViewModel by viewModels()
+    val searchViewModel: SearchViewModel by viewModels()
     val supportedPlatformsViewModel: SupportedPlatformsViewModel by viewModels()
 
     val threadsViewModel: ThreadsViewModel by viewModels()
@@ -126,6 +126,9 @@ class MainActivity : BindActivity() {
             // TODO: https://issuetracker.google.com/issues/298296168
             window.isNavigationBarContrastEnforced = false
         }
+
+        imageTransmissionCallback()
+
         lifecycleScope.launch {
             onboardingViewModel.showBiometrics.collect { callback ->
                 promptBiometrics(this@MainActivity) {
@@ -338,6 +341,7 @@ class MainActivity : BindActivity() {
                     messagesViewModel = messagesViewModel,
                     publisherViewModel = publisherViewModel,
                     bridgesViewModel = bridgesViewModel,
+                    imageService = imageTransmissionService
                 )
             }
             composable<EmailViewScreen> { backEntry ->
@@ -383,9 +387,6 @@ class MainActivity : BindActivity() {
                     smsCountPaddingValue = imageRenderNav.smsCountPadding,
                     uri = imageRenderNav.uri?.toUri(),
                     imageService = imageTransmissionService,
-                    imageTransmissionCallback = {
-                        TODO()
-                    },
                     onApplyCallback = {
                         navController.popBackStack()
                     },
@@ -404,6 +405,12 @@ class MainActivity : BindActivity() {
         }
 
         processIntent(navController)
+    }
+
+    private fun imageTransmissionCallback() {
+        setRemoteExecutionCallback { payload ->
+            publisherViewModel.attachmentExecutor(payload)
+        }
     }
 
     private fun processIntent(navController: NavController, newIntent: Intent? = null) {
