@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Base64
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.data.data.models.SmsManager
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDefaultSimSubscription
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getThreadId
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewModel
@@ -103,12 +104,14 @@ object TransportImpl {
 
         gatewayClient?.let {
             if(context.isDefault()) {
+                val subId = context.getDefaultSimSubscription()
+                    ?: throw Exception("No available sim card subscription found")
                 val smsManager = SmsManager(ConversationsViewModel())
                 smsManager.sendSms(
                     context = context,
                     text = payload,
                     address = gatewayClient.msisdn,
-                    subscriptionId = -1,
+                    subscriptionId = subId,
                     threadId = context.getThreadId(gatewayClient.msisdn),
                     bundle = bundle
                 ) {
