@@ -10,12 +10,12 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDefaultSim
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getThreadId
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewModel
-import com.example.sw0b_001.data.models.Messages
+import com.example.sw0b_001.data.models.Payloads
 import com.example.sw0b_001.extensions.context.settingsGetDefaultGatewayClients
+import uniffi.relaysms_spec_payload.Transports
 import uniffi.relaysms_spec_payload.V1ContentCategories
 import uniffi.relaysms_spec_payload.V1ContentsContainer
-import uniffi.relaysms_spec_payload.V1PayloadWithAttachments
-import uniffi.relaysms_spec_payload.V1PayloadWithoutAttachments
+import uniffi.relaysms_spec_payload.V1Payloads
 
 object TransportImpl {
     fun publishWithAttachment(
@@ -27,31 +27,30 @@ object TransportImpl {
         subject: String?,
         attachment: ByteArray,
         imageViewModel: ImageViewModel,
+        sessionId: UByte,
         encrypt: (ByteArray) -> Pair<ByteArray, Int>
-    ) {
-        val sessionId: UByte = 0u // TODO("Session ID")
+    ) : V1Payloads {
 
         val contentContainer = V1ContentsContainer(
             catId = catId,
-            body = body,
-            to = to,
-            subject = subject
+            body = body.encodeToByteArray(),
+            to = to?.encodeToByteArray(),
+            subject = subject?.encodeToByteArray(),
+            attachment = attachment
         )
-        val content = contentContainer
-            .instance()
-            .serialize()
 
-        val (payload, keyId) = encrypt(content + attachment)
+        val content = contentContainer.serialize()
+        val (ciphertext, keyId) = encrypt(content)
 
-        val payloads = V1PayloadWithAttachments(
-            sessId = sessionId,
+        val payloads = V1Payloads(
+            contents = ciphertext,
             kId = keyId.toUByte(),
             lenAtt = attachment.size.toUShort(),
-            payload = payload,
-            tId = tokenId?.toUInt()
+            tId = tokenId?.toUInt(),
+            sessId = sessionId,
         )
-        val splitPayloads = payloads.split().map {
-            Base64.encodeToString(it.serialize(), Base64.DEFAULT)
+        val splitPayloads = payloads.split(Transports.SMS).map {
+            Base64.encodeToString(it, Base64.DEFAULT)
         }
 
         val intentFilter = "com.afkanerd.deku.SMS_SENT_BROADCAST_INTENT"
@@ -59,6 +58,14 @@ object TransportImpl {
             context = context,
             notificationFilter = intentFilter,
             payload = splitPayloads,
+        )
+
+        return V1Payloads(
+            contents = content,
+            kId = keyId.toUByte(),
+            lenAtt = attachment.size.toUShort(),
+            tId = tokenId?.toUInt(),
+            sessId = sessionId
         )
     }
 
@@ -70,35 +77,44 @@ object TransportImpl {
         to: String?,
         subject: String?,
         encrypt: (ByteArray) -> Pair<ByteArray, Int>
-    ) {
+    ) : V1Payloads {
         val contentContainer = V1ContentsContainer(
             catId = catId,
-            body = body,
-            to = to,
-            subject = subject
+            body = body.encodeToByteArray(),
+            to = to?.encodeToByteArray(),
+            subject = subject?.encodeToByteArray(),
+            attachment = null
         )
-        val content = contentContainer
-            .instance()
-            .serialize()
+
+        val content = contentContainer.serialize()
 
         val (ciphertext, keyId) = encrypt(content)
-        val payloads = V1PayloadWithoutAttachments(
+        val payloads = V1Payloads(
+            contents = ciphertext,
             kId = keyId.toUByte(),
+            lenAtt = 0u,
             tId = tokenId?.toUInt(),
-            payload = ciphertext
-        ).serialize()
+            sessId = null
+        )
 
-        val payload = Base64.encodeToString(payloads, Base64.DEFAULT)
+        val payload = Base64.encodeToString(payloads.serialize(), Base64.DEFAULT)
         sendSms(context, payload) {
 
         }
+        return V1Payloads(
+            contents = content,
+            kId = keyId.toUByte(),
+            lenAtt = 0u,
+            tId = tokenId?.toUInt(),
+            sessId = null
+        )
     }
 
     fun sendSms(
         context: Context,
         payload: String,
         bundle: Bundle = Bundle(),
-        onSuccessRunnable: (Messages) -> Unit
+        onSuccessRunnable: (Payloads) -> Unit
     ) {
         val gatewayClient = context.settingsGetDefaultGatewayClients
 

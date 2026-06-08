@@ -74,8 +74,8 @@ import com.example.sw0b_001.ui.onboarding.OnboardingInteractive
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.BridgesViewModel
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
-import com.example.sw0b_001.ui.viewModels.MessagesViewModel
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
+import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.PublisherViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
@@ -111,7 +111,7 @@ class MainActivity : BindActivity() {
     val onboardingViewModel: OnboardingViewModel by viewModels()
 
     val tokensViewModel: TokensViewModel by viewModels()
-    val messagesViewModel: MessagesViewModel by viewModels()
+    val payloadsViewModel: PayloadsViewModel by viewModels()
     val gatewayClientViewModel: GatewayClientViewModel by viewModels()
     val imageViewModel: ImageViewModel by viewModels()
     val vaultViewModel: VaultsViewModel by viewModels()
@@ -253,7 +253,7 @@ class MainActivity : BindActivity() {
                         HomepageView(
                             navController = navController,
                             tokensViewModel = tokensViewModel,
-                            messagesViewModel = messagesViewModel,
+                            payloadsViewModel = payloadsViewModel,
                             gatewayClientViewModel = gatewayClientViewModel,
                             supportedPlatformsViewModel = supportedPlatformsViewModel,
                             isLoggedIn = isLoggedIn,
@@ -318,7 +318,7 @@ class MainActivity : BindActivity() {
                 HomepageView(
                     navController = navController,
                     tokensViewModel = tokensViewModel,
-                    messagesViewModel = messagesViewModel,
+                    payloadsViewModel = payloadsViewModel,
                     gatewayClientViewModel = gatewayClientViewModel,
                     supportedPlatformsViewModel = supportedPlatformsViewModel,
                     isLoggedIn = isLoggedIn,
@@ -336,12 +336,11 @@ class MainActivity : BindActivity() {
                     gatewayClientViewModel = gatewayClientViewModel,
                     tokensViewModel = tokensViewModel,
                     platformName = composeScreenNav.platformName,
-                    supportedPlatformsViewModel = supportedPlatformsViewModel,
                     messageId = composeScreenNav.messageId,
-                    messagesViewModel = messagesViewModel,
+                    payloadsViewModel = payloadsViewModel,
                     publisherViewModel = publisherViewModel,
                     bridgesViewModel = bridgesViewModel,
-                    imageService = imageTransmissionService
+                    catId = composeScreenNav.cat
                 )
             }
             composable<EmailViewScreen> { backEntry ->
@@ -349,7 +348,7 @@ class MainActivity : BindActivity() {
                 EmailDetailsView(
                     navController = navController,
                     tokensViewModel = tokensViewModel,
-                    messagesViewModel = messagesViewModel,
+                    payloadsViewModel = payloadsViewModel,
                     imageViewModel = imageViewModel,
                     cat = emailScreenNav.cat,
                     messageId = emailScreenNav.messageId
@@ -360,21 +359,21 @@ class MainActivity : BindActivity() {
                 TextDetailsView(
                     navController = navController,
                     platformName = textScreenView.platformName,
-                    messagesViewModel = messagesViewModel,
+                    payloadsViewModel = payloadsViewModel,
                     messageId = textScreenView.messageId
                 )
             }
             composable<MessageViewScreen> {
                 MessageDetailsView(
                     navController = navController,
-                    messagesViewModel = messagesViewModel,
+                    payloadsViewModel = payloadsViewModel,
                     tokensViewModel = tokensViewModel,
                 )
             }
             composable<PasteEncryptedTextScreen> {
                 PasteEncryptedTextView(
                     tokensViewModel = tokensViewModel,
-                    messagesViewModel = messagesViewModel,
+                    payloadsViewModel = payloadsViewModel,
                     navController = navController,
                 )
             }

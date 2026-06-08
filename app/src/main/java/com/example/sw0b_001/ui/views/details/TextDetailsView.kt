@@ -39,7 +39,7 @@ import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.MessagesViewModel
+import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import uniffi.relaysms_spec_payload.V1ContentCategories
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,7 +47,7 @@ import uniffi.relaysms_spec_payload.V1ContentCategories
 fun TextDetailsView(
     navController: NavController,
     platformName: String,
-    messagesViewModel: MessagesViewModel,
+    payloadsViewModel: PayloadsViewModel,
     messageId: Long,
 ) {
     val context = LocalContext.current
@@ -57,9 +57,9 @@ fun TextDetailsView(
     var text by remember { mutableStateOf("") }
     var date by remember { mutableLongStateOf(0L) }
 
-    val message by messagesViewModel.message.collectAsStateWithLifecycle()
+    val message by payloadsViewModel.message.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
-        messagesViewModel.get(messageId)
+        payloadsViewModel.get(messageId, V1ContentCategories.TEXT)
     }
 
     Scaffold(
@@ -77,8 +77,7 @@ fun TextDetailsView(
                     )
                 }
             ) {
-                messagesViewModel.delete(message!!)
-                navController.popBackStack()
+                TODO()
             }
         }
     ) { innerPadding ->

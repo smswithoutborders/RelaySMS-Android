@@ -7,14 +7,14 @@ import androidx.room.RoomDatabase
 import com.afkanerd.smswithoutborders_libsmsmms.data.Cryptography.getDatabasePassword
 import com.example.sw0b_001.data.dao.GatewayClientsDao
 import com.example.sw0b_001.data.dao.KeysDao
-import com.example.sw0b_001.data.dao.MessagesDao
+import com.example.sw0b_001.data.dao.PayloadsDao
 import com.example.sw0b_001.data.dao.OAuthDao
 import com.example.sw0b_001.data.dao.RatchetStatesDAO
 import com.example.sw0b_001.data.dao.SupportedPlatformCacheDao
 import com.example.sw0b_001.data.dao.TokensDao
 import com.example.sw0b_001.data.models.GatewayClients
 import com.example.sw0b_001.data.models.Keys
-import com.example.sw0b_001.data.models.Messages
+import com.example.sw0b_001.data.models.Payloads
 import com.example.sw0b_001.data.models.RatchetStates
 import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
@@ -29,7 +29,7 @@ import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
         SupportedPlatforms::class,
         OAuth::class,
         Keys::class,
-        Messages::class],
+        Payloads::class],
     version = 1,
     exportSchema = true,
     autoMigrations = []
@@ -40,7 +40,7 @@ abstract class Datastore : RoomDatabase() {
     }
 
     abstract fun gatewayClientsDao(): GatewayClientsDao?
-    abstract fun messagesDao(): MessagesDao?
+    abstract fun messagesDao(): PayloadsDao?
     abstract fun tokensDao(): TokensDao?
     abstract fun supportedPlatformsCacheDao(): SupportedPlatformCacheDao?
     abstract fun ratchetStatesDAO(): RatchetStatesDAO?

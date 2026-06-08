@@ -28,7 +28,7 @@ import androidx.navigation.NavController
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.EmailViewScreen
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
-import com.example.sw0b_001.ui.viewModels.MessagesViewModel
+import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import uniffi.relaysms_spec_payload.V1ContentCategories
 
@@ -36,10 +36,10 @@ import uniffi.relaysms_spec_payload.V1ContentCategories
 @Composable
 fun InboxView(
     navController: NavController,
-    messagesViewModel: MessagesViewModel,
+    payloadsViewModel: PayloadsViewModel,
     tokensViewModel: TokensViewModel,
 ) {
-    val messages by messagesViewModel.getInboxMessages().observeAsState(emptyList())
+    val messages by payloadsViewModel.getInboxMessages().observeAsState(emptyList())
 
     Box(
         modifier = Modifier

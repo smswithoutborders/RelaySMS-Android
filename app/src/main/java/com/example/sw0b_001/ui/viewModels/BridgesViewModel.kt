@@ -30,14 +30,16 @@ class BridgesViewModel @Inject constructor(
         subject: String?,
         imageViewModel: ImageViewModel,
         onFailureCallback: (String) -> Unit,
-        onCompleteCallback: () -> Unit,
+        onCompleteCallback: (ByteArray) -> Unit,
     ) {
         val attachment = imageViewModel.processedImage.value?.rawBytes
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
+                var serializedPayload: ByteArray?
                 try {
                     if(attachment != null) {
-                        publishWithAttachment(
+                        val sessionId = imageViewModel.getSessionId(context)
+                        val payloads = publishWithAttachment(
                             context,
                             V1ContentCategories.BRIDGE,
                             body,
@@ -45,12 +47,14 @@ class BridgesViewModel @Inject constructor(
                             to,
                             subject,
                             attachment,
-                            imageViewModel
+                            imageViewModel,
+                            sessionId = sessionId
                         ) { payload ->
                             encrypt(payload, tokenId)
                         }
+                        serializedPayload = payloads.serializeForStorage()
                     } else {
-                        publishWithoutAttachment(
+                        val payloads = publishWithoutAttachment(
                             context,
                             V1ContentCategories.BRIDGE,
                             body,
@@ -60,10 +64,11 @@ class BridgesViewModel @Inject constructor(
                         ) { payload ->
                             encrypt(payload, tokenId)
                         }
+                        serializedPayload = payloads.serialize()
                     }
 
                     withContext(Dispatchers.Main) {
-                        onCompleteCallback()
+                        onCompleteCallback(serializedPayload)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()

@@ -13,8 +13,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.extensions.generateRandomBytes
@@ -38,6 +36,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
+import uniffi.relaysms_spec_payload.V1ContentCategories
 
 sealed class TokensUiState {
     object Loading: TokensUiState()
@@ -54,7 +53,8 @@ class TokensViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
-    private var storedLiveData: LiveData<List<Tokens>> = MutableLiveData()
+    private val _storedTokensUiState = MutableStateFlow<List<Tokens>>(emptyList())
+    val storedTokensUiState: StateFlow<List<Tokens>> = _storedTokensUiState
 
     var bottomTabsItem by mutableStateOf(BottomTabsItems.BottomBarRecentTab)
 
@@ -79,11 +79,20 @@ class TokensViewModel @Inject constructor(
     private val cache = Datastore.getDatastore(context)?.supportedPlatformsCacheDao()
         ?: throw Exception("Cannot open database")
 
-    fun get(): LiveData<List<Tokens>> {
-        if(storedLiveData.value.isNullOrEmpty()) {
-            storedLiveData = db.fetchAll()
+    fun get() {
+        viewModelScope.launch(Dispatchers.IO) {
+            db.fetchAll().collect { tokens ->
+                _storedTokensUiState.value = tokens
+            }
         }
-        return storedLiveData
+    }
+
+    fun fetchTokensByCatId(catId: V1ContentCategories) {
+        viewModelScope.launch(Dispatchers.IO) {
+            db.fetchCatId(catId).collect { tokens ->
+                _storedTokensUiState.value = tokens
+            }
+        }
     }
 
     suspend fun revokeAll() {

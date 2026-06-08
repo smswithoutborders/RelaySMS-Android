@@ -33,13 +33,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
-import com.example.sw0b_001.ui.viewModels.MessagesViewModel
+import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasteEncryptedTextView(
     tokensViewModel: TokensViewModel,
-    messagesViewModel: MessagesViewModel,
+    payloadsViewModel: PayloadsViewModel,
     navController: NavController
 ) {
     val context = LocalContext.current

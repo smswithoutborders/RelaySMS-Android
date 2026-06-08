@@ -72,7 +72,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import uniffi.relaysms_spec_payload.V1ContentCategories
-import uniffi.relaysms_spec_payload.v1ContentCategoryFromU8
 
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
@@ -186,7 +185,10 @@ fun PlatformListContent(
     val states by supportedPlatformsViewModel.uiState.collectAsStateWithLifecycle()
     val supportedPlatforms = supportedPlatformsViewModel.get().observeAsState()
 
-    val accounts = tokensViewModel.get().observeAsState()
+    val tokens by tokensViewModel.storedTokensUiState.collectAsStateWithLifecycle()
+    LaunchedEffect(Unit) {
+        tokensViewModel.get()
+    }
     val revokingUiState by tokensViewModel.isRevokingUiState.collectAsStateWithLifecycle()
     val storingUiState by tokensViewModel.isStoringUiState.collectAsStateWithLifecycle()
 
@@ -285,7 +287,7 @@ fun PlatformListContent(
             maxItemsInEachRow = 2
         ) {
             supportedPlatforms.value?.forEach { platform ->
-                val isStored = accounts.value?.find { it.platformName == platform.name }
+                val isStored = tokens.find { it.platformName == platform.name }
 
                 PlatformCard(
                     logo = if(platform.logo != null)
@@ -326,12 +328,12 @@ fun PlatformListContent(
         }
 
         if (showPlatformOptions) {
-            val isStored = accounts.value?.find { it.platformName == clickedPlatform?.name }
+            val isStored = tokens.find { it.platformName == clickedPlatform?.name }
             PlatformOptionsModal(
                 showPlatformsModal = showPlatformOptions,
                 cat = if(clickedPlatform == null)
                     V1ContentCategories.BRIDGE
-                else v1ContentCategoryFromU8(clickedPlatform!!.cat_id.toUByte()),
+                else clickedPlatform!!.cat_id,
                 isActive = isStored != null,
                 isCompose = isCompose,
                 platform = clickedPlatform,
@@ -341,8 +343,7 @@ fun PlatformListContent(
                 isRevoking = revokingUiState,
                 storeCallback = storeCallback,
                 revokeCallback = revokeCallback,
-                accounts = accounts.value?.filter { it.platformName == clickedPlatform?.name }
-                    ?: emptyList(),
+                accounts = tokens.filter { it.platformName == clickedPlatform?.name }
             ) {
                 showPlatformOptions = false
             }

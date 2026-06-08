@@ -37,15 +37,16 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
-import com.example.sw0b_001.ui.viewModels.MessagesViewModel
+import uniffi.relaysms_spec_payload.V1ContentCategories
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageDetailsView(
     navController: NavController,
     tokensViewModel: TokensViewModel,
-    messagesViewModel: MessagesViewModel,
+    payloadsViewModel: PayloadsViewModel,
     isOnboarding: Boolean = false,
     messageId: Long? = null
 ) {
@@ -55,10 +56,10 @@ fun MessageDetailsView(
     var messageBody by remember { mutableStateOf("") }
     var date by remember { mutableLongStateOf(0L) }
 
-    val message by messagesViewModel.message.collectAsStateWithLifecycle()
+    val message by payloadsViewModel.message.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
         messageId?.let {
-            messagesViewModel.get(messageId)
+            payloadsViewModel.get(messageId, V1ContentCategories.MESSAGE)
         }
     }
 
@@ -82,8 +83,7 @@ fun MessageDetailsView(
 //                    }
 //                }
             }) {
-                messagesViewModel.delete(message!!)
-                navController.popBackStack()
+                TODO()
             }
         }
     ) { innerPadding ->

@@ -44,7 +44,7 @@ import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.components.AttachImageView
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.MessagesViewModel
+import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -57,7 +57,7 @@ fun EmailDetailsView(
     navController: NavController,
     cat: V1ContentCategories,
     tokensViewModel: TokensViewModel,
-    messagesViewModel: MessagesViewModel,
+    payloadsViewModel: PayloadsViewModel,
     imageViewModel: ImageViewModel,
     account: Tokens? = null,
     messageId: Long? = null
@@ -72,10 +72,10 @@ fun EmailDetailsView(
     var date by remember{ mutableLongStateOf(0L) }
     var imageBitmap by remember{ mutableStateOf<Bitmap?>(null) }
 
-    val message by messagesViewModel.message.collectAsStateWithLifecycle()
+    val message by payloadsViewModel.message.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
         messageId?.let {
-            messagesViewModel.get(messageId)
+            payloadsViewModel.get(messageId, cat)
         }
     }
 
@@ -101,8 +101,9 @@ fun EmailDetailsView(
 //                    }
                 }
             }) {
-                messagesViewModel.delete(message!!)
-                navController.popBackStack()
+                TODO()
+//                payloadsViewModel.delete(message!!)
+//                navController.popBackStack()
             }
         }
     ) { innerPadding ->

@@ -33,9 +33,9 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Helpers
-import com.example.sw0b_001.data.models.Messages
+import com.example.sw0b_001.data.models.Payloads
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
-import com.example.sw0b_001.ui.viewModels.MessagesViewModel
+import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 
@@ -43,7 +43,7 @@ import com.example.sw0b_001.ui.viewModels.TokensViewModel
 @Composable
 fun RecentView(
     navController: NavController,
-    messagesViewModel: MessagesViewModel,
+    payloadsViewModel: PayloadsViewModel,
     tokensViewModel: TokensViewModel,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
     isLoggedIn: Boolean = false,
@@ -51,8 +51,7 @@ fun RecentView(
 ) {
     var sendNewMessageRequested by remember { mutableStateOf(false) }
 
-    val messagesPagingSource = messagesViewModel.get()
-    val messages = messagesPagingSource.collectAsLazyPagingItems()
+    val messages = payloadsViewModel.get().collectAsLazyPagingItems()
 
     val listState = rememberLazyListState()
     Box(Modifier.fillMaxSize()
@@ -123,7 +122,6 @@ fun RecentView(
 
 @Composable
 fun GetMessageAvatar(logo: Bitmap? = null) {
-    val context = LocalContext.current
     val imageSize = 38.dp
     if(LocalInspectionMode.current || logo == null) {
         Image(
@@ -145,9 +143,9 @@ fun GetMessageAvatar(logo: Bitmap? = null) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RecentMessageCard(
-    message: Messages,
+    message: Payloads,
     logo: Bitmap? = null,
-    onClickCallback: (Messages) -> Unit,
+    onClickCallback: (Payloads) -> Unit,
 ) {
     var text by remember { mutableStateOf("" ) }
     var heading by remember { mutableStateOf( "") }

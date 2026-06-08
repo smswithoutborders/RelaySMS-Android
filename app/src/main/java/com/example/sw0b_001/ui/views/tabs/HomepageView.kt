@@ -38,7 +38,7 @@ import com.example.sw0b_001.ui.modals.AddGatewayClientModal
 import com.example.sw0b_001.ui.modals.GetStartedModal
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
-import com.example.sw0b_001.ui.viewModels.MessagesViewModel
+import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.views.threads.InboxView
@@ -60,7 +60,7 @@ enum class BottomTabsItems {
 fun HomepageView(
     navController: NavController,
     tokensViewModel : TokensViewModel,
-    messagesViewModel: MessagesViewModel,
+    payloadsViewModel: PayloadsViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
     isLoggedIn: Boolean,
@@ -68,10 +68,10 @@ fun HomepageView(
     drawerCallback: (() -> Unit)? = {},
 ) {
     val context = LocalContext.current
-    val inboxMessages = messagesViewModel.getInboxMessages()
+    val inboxMessages = payloadsViewModel.getInboxMessages()
         .observeAsState(emptyList())
 
-    val messagesPagingSource = messagesViewModel.get()
+    val messagesPagingSource = payloadsViewModel.get()
     val messages = messagesPagingSource.collectAsLazyPagingItems()
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -213,7 +213,7 @@ fun HomepageView(
             GetTabViews(
                 tokensViewModel.bottomTabsItem,
                 navController = navController,
-                messagesViewModel = messagesViewModel,
+                payloadsViewModel = payloadsViewModel,
                 tokensViewModel = tokensViewModel,
                 gatewayClientViewModel = gatewayClientViewModel,
                 supportedPlatformsViewModel = supportedPlatformsViewModel,
@@ -261,7 +261,7 @@ fun HomepageView(
 fun GetTabViews(
     bottomTabsItems: BottomTabsItems,
     navController: NavController,
-    messagesViewModel: MessagesViewModel,
+    payloadsViewModel: PayloadsViewModel,
     tokensViewModel: TokensViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
@@ -271,7 +271,7 @@ fun GetTabViews(
         BottomTabsItems.BottomBarRecentTab -> {
             RecentView(
                 navController = navController,
-                messagesViewModel = messagesViewModel,
+                payloadsViewModel = payloadsViewModel,
                 tokensViewModel = tokensViewModel,
                 supportedPlatformsViewModel = supportedPlatformsViewModel,
                 isLoggedIn = isLoggedIn
@@ -293,7 +293,7 @@ fun GetTabViews(
         }
         BottomTabsItems.BottomBarInboxTab -> {
             InboxView(
-                messagesViewModel = messagesViewModel,
+                payloadsViewModel = payloadsViewModel,
                 tokensViewModel = tokensViewModel,
                 navController = navController
             )

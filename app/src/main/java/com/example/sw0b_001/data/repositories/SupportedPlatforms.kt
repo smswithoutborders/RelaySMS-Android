@@ -9,6 +9,7 @@ import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import uniffi.relaysms_spec_payload.V1ContentCategories
 import javax.inject.Inject
 import javax.inject.Qualifier
 import javax.inject.Singleton
@@ -18,7 +19,7 @@ import javax.inject.Singleton
 data class SupportedPlatforms(
     @PrimaryKey
     val name: String,
-    var cat_id: Int, // TODO("Change to cat ID")
+    var cat_id: V1ContentCategories,
     var service_type: String,
     val protocol_type: String?,
     val icon_svg: String?,

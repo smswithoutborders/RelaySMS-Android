@@ -55,9 +55,9 @@ class SupportedPlatformsViewModel @Inject constructor(
                     cache(platforms.supportedPlatforms.apply {
                         forEach { platform ->
                             when(platform.service_type) {
-                                "email" -> platform.cat_id = V1ContentCategories.EMAIL.value.toInt()
-                                "text" -> platform.cat_id = V1ContentCategories.TEXT.value.toInt()
-                                "message" -> platform.cat_id = V1ContentCategories.MESSAGE.value.toInt()
+                                "email" -> platform.cat_id = V1ContentCategories.EMAIL
+                                "text" -> platform.cat_id = V1ContentCategories.TEXT
+                                "message" -> platform.cat_id = V1ContentCategories.MESSAGE
                             }
                         }
                     })

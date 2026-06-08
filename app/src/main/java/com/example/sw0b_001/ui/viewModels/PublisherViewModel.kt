@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.afkanerd.lib_image_android.ui.data.SmsWorkManager
-import com.afkanerd.lib_image_android.ui.services.ImageTransmissionService
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.TransportImpl
@@ -32,16 +31,17 @@ class PublisherViewModel @Inject constructor(
         to: String?,
         subject: String?,
         imageViewModel: ImageViewModel,
-        imageService: ImageTransmissionService,
         onFailureCallback: (String) -> Unit,
-        onCompleteCallback: () -> Unit,
+        onCompleteCallback: (ByteArray) -> Unit,
     ) {
         val attachment = imageViewModel.processedImage.value?.rawBytes
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
+                var serializedPayload: ByteArray?
                 try {
                     if(attachment != null) {
-                        publishWithAttachment(
+                        val sessionId = imageViewModel.getSessionId(context)
+                        val payload = publishWithAttachment(
                             context,
                             catId,
                             body,
@@ -49,12 +49,14 @@ class PublisherViewModel @Inject constructor(
                             to,
                             subject,
                             attachment,
-                            imageViewModel
+                            imageViewModel,
+                            sessionId
                         ) { payload ->
                             encrypt(tokenId!!, payload)
                         }
+                        serializedPayload = payload.serializeForStorage();
                     } else {
-                        publishWithoutAttachment(
+                        val payload = publishWithoutAttachment(
                             context,
                             catId,
                             body,
@@ -64,10 +66,11 @@ class PublisherViewModel @Inject constructor(
                         ) { payload ->
                             encrypt(tokenId!!, payload)
                         }
+                        serializedPayload = payload.serialize();
                     }
 
                     withContext(Dispatchers.Main) {
-                        onCompleteCallback()
+                        onCompleteCallback(serializedPayload)
                     }
                 } catch (e: Exception) {
                     onFailureCallback(e.message ?: "")
