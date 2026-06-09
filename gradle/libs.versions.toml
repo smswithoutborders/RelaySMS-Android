@@ -43,6 +43,8 @@ lifecycleViewmodelCompose = "2.10.0"
 lifecycleViewmodelKtx = "2.10.0"
 material = "1.13.0"
 material3 = "1.4.0"
+materialIconsCore = "1.7.8"
+materialIconsExtended = "1.7.8"
 materialVersion = "1.10.1"
 navigationCompose = "2.9.6"
 okhttp = "2.7.5"
@@ -87,6 +89,8 @@ androidx-baselibrary = { module = "androidx.databinding:baseLibrary", version.re
 androidx-biometric = { module = "androidx.biometric:biometric", version.ref = "biometric" }
 androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "composeBom" }
+androidx-compose-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "materialIconsCore" }
+androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 androidx-compose-material-material = { module = "androidx.compose.material:material" }
 androidx-compose-material3-adaptive-adaptive = { module = "androidx.compose.material3.adaptive:adaptive", version.ref = "adaptiveVersion" }
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }

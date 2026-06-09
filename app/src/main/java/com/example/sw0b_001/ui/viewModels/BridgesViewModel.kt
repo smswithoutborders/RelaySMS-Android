@@ -16,7 +16,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uniffi.relaysms_spec_payload.V1ContentCategories
-import uniffi.relaysms_spec_payload.V1Payloads
 import uniffi.relaysms_spec_payload.v1BridgeOfflineFirstPublisherEncrypt
 import uniffi.relaysms_spec_payload.v1BridgeOnlineFirstPublisherEncrypt
 
@@ -36,12 +35,12 @@ class BridgesViewModel @Inject constructor(
         val attachment = imageViewModel.processedImage.value?.rawBytes
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                var payload: V1Payloads?
+                val serializeData: ByteArray?
                 val isAttachment = attachment != null
                 try {
                     if(isAttachment) {
                         val sessionId = imageViewModel.getSessionId(context)
-                        payload = publishWithAttachment(
+                        val payload = publishWithAttachment(
                             context,
                             V1ContentCategories.BRIDGE,
                             body,
@@ -54,8 +53,9 @@ class BridgesViewModel @Inject constructor(
                         ) { payload ->
                             encrypt(payload, tokenId)
                         }
+                        serializeData = payload.serializeForStorage()
                     } else {
-                        payload = publishWithoutAttachment(
+                        val payload = publishWithoutAttachment(
                             context,
                             V1ContentCategories.BRIDGE,
                             body,
@@ -65,10 +65,11 @@ class BridgesViewModel @Inject constructor(
                         ) { p ->
                             encrypt(p, tokenId)
                         }
+                        serializeData = payload.serialize()
                     }
 
                     withContext(Dispatchers.Main) {
-                        onCompleteCallback(payload.serialize(), isAttachment)
+                        onCompleteCallback(serializeData, isAttachment)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()

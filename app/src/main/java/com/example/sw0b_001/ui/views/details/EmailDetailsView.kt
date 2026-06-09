@@ -1,6 +1,6 @@
 package com.example.sw0b_001.ui.views.details
 
-import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -74,7 +74,13 @@ fun EmailDetailsView(
     var body by remember(message) {
         mutableStateOf(message?.content?.getBody()?.toUtf8String() ?: "") }
     var date by remember(message) { mutableLongStateOf(message?.date ?: 0L) }
-    var imageBitmap by remember{ mutableStateOf<Bitmap?>(null) }
+    var imageBitmap by remember(message) { mutableStateOf( if(message?.content != null) {
+        val attachment = message!!.content.getAttachment()
+        if(attachment != null) {
+            BitmapFactory.decodeByteArray(attachment, 0, attachment.size)
+        } else null
+        } else null
+    )}
 
 
     val scrollState = rememberScrollState() // Remember the scroll state
@@ -163,7 +169,7 @@ fun EmailDetailsView(
                 ) {
                     AttachImageView(
                         it,
-                        onCancelCallback = {}
+                        onCancelCallback = null
                     ) { }
                 }
             }
