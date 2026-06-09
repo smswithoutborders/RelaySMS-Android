@@ -335,7 +335,6 @@ class MainActivity : BindActivity() {
                     imageViewModel = imageViewModel,
                     gatewayClientViewModel = gatewayClientViewModel,
                     tokensViewModel = tokensViewModel,
-                    platformName = composeScreenNav.platformName,
                     messageId = composeScreenNav.messageId,
                     payloadsViewModel = payloadsViewModel,
                     publisherViewModel = publisherViewModel,
@@ -358,16 +357,17 @@ class MainActivity : BindActivity() {
                 val textScreenView: TextViewScreen = backEntry.toRoute()
                 TextDetailsView(
                     navController = navController,
-                    platformName = textScreenView.platformName,
                     payloadsViewModel = payloadsViewModel,
                     messageId = textScreenView.messageId
                 )
             }
-            composable<MessageViewScreen> {
+            composable<MessageViewScreen> { backEntry ->
+                val messageScreenNav: MessageViewScreen = backEntry.toRoute()
                 MessageDetailsView(
                     navController = navController,
                     payloadsViewModel = payloadsViewModel,
                     tokensViewModel = tokensViewModel,
+                    messageId = messageScreenNav.messageId,
                 )
             }
             composable<PasteEncryptedTextScreen> {

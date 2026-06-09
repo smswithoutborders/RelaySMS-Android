@@ -27,19 +27,21 @@ class PublisherViewModel @Inject constructor(
     fun publish(
         catId: V1ContentCategories,
         body: String,
-        tokenId: Int?,
+        tokenId: ByteArray?,
         to: String?,
         subject: String?,
         imageViewModel: ImageViewModel,
         onFailureCallback: (String) -> Unit,
-        onCompleteCallback: (ByteArray) -> Unit,
+        onCompleteCallback: (ByteArray, Boolean) -> Unit,
     ) {
         val attachment = imageViewModel.processedImage.value?.rawBytes
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 var serializedPayload: ByteArray?
+                val isAttachment = attachment != null
+
                 try {
-                    if(attachment != null) {
+                    if(isAttachment) {
                         val sessionId = imageViewModel.getSessionId(context)
                         val payload = publishWithAttachment(
                             context,
@@ -70,7 +72,7 @@ class PublisherViewModel @Inject constructor(
                     }
 
                     withContext(Dispatchers.Main) {
-                        onCompleteCallback(serializedPayload)
+                        onCompleteCallback(serializedPayload, isAttachment)
                     }
                 } catch (e: Exception) {
                     onFailureCallback(e.message ?: "")
@@ -80,7 +82,7 @@ class PublisherViewModel @Inject constructor(
     }
 
     private fun encrypt(
-        tokenId: Int,
+        tokenId: ByteArray,
         plaintext: ByteArray,
     ) : Pair<ByteArray, Int> {
         val keyId = (0 until 16).random()

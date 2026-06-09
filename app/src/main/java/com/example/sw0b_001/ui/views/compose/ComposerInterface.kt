@@ -76,7 +76,6 @@ fun ComposerInterface(
     payloadsViewModel: PayloadsViewModel,
     publisherViewModel: PublisherViewModel,
     bridgesViewModel: BridgesViewModel,
-    platformName: String?,
     catId: V1ContentCategories,
     messageId: Long? = null,
 ) {
@@ -93,10 +92,6 @@ fun ComposerInterface(
     BackHandler {
         navController.popBackStack()
     }
-
-//    val supportedPlatforms by supportedPlatformsViewModel.get().observeAsState()
-//    var platform: SupportedPlatforms? by remember(supportedPlatforms) {
-//        mutableStateOf(supportedPlatforms?.find{ it.name == platformName })}
 
     val message by payloadsViewModel.message.collectAsStateWithLifecycle()
     val tokens by tokensViewModel.storedTokensUiState.collectAsStateWithLifecycle()
@@ -130,11 +125,13 @@ fun ComposerInterface(
         navController.navigate(ImageRenderNav(uri.toString()))
     }
 
-    var to: String by remember{ mutableStateOf( message?.getTo()?.toUtf8String() ?: "") }
+    var to: String by remember{
+        mutableStateOf( message?.content?.getTo()?.toUtf8String() ?: "") }
     var subject: String by remember{ mutableStateOf(
-        message?.getSubject()?.toUtf8String() ?: "") }
-    var body: String by remember{ mutableStateOf(message?.getBody()?.toUtf8String() ?: "") }
-    var image by remember{ mutableStateOf(message?.getAttachment()) }
+        message?.content?.getSubject()?.toUtf8String() ?: "") }
+    var body: String by remember{
+        mutableStateOf(message?.content?.getBody()?.toUtf8String() ?: "") }
+    var image by remember{ mutableStateOf(message?.content?.getAttachment()) }
 
     var showSelectAccountModal by remember { mutableStateOf(
         catId != V1ContentCategories.BRIDGE ) }
@@ -262,11 +259,12 @@ fun ComposerInterface(
                             subject = subject,
                             imageViewModel = imageViewModel,
                             onFailureCallback = {},
-                        ) { ser ->
+                        ) { ser, isAttachment ->
                             try {
                                 val payload = Payloads(
                                     payload = ser,
-                                    catId = selectedToken!!.catId
+                                    catId = selectedToken!!.catId,
+                                    isAttachment = isAttachment
                                 )
                                 payloadsViewModel.insert(payload)
                                 navController.popBackStack()
@@ -284,11 +282,12 @@ fun ComposerInterface(
                             subject = subject,
                             imageViewModel = imageViewModel,
                             onFailureCallback = {},
-                        ) { ser ->
+                        ) { ser, isAttachment ->
                             try {
                                 val payload = Payloads(
                                     payload = ser,
-                                    catId = V1ContentCategories.BRIDGE
+                                    catId = V1ContentCategories.BRIDGE,
+                                    isAttachment = isAttachment
                                 )
                                 payloadsViewModel.insert(payload)
                                 navController.popBackStack()

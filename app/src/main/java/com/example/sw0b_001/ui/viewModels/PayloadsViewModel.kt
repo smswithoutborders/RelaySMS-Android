@@ -22,6 +22,11 @@ import uniffi.relaysms_spec_payload.V1ContentCategories
 import uniffi.relaysms_spec_payload.V1ContentsContainer
 import uniffi.relaysms_spec_payload.V1Payloads
 
+data class Messages(
+    val content: V1ContentsContainer,
+    val date: Long
+)
+
 @HiltViewModel
 class PayloadsViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -29,8 +34,8 @@ class PayloadsViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    private val _message = MutableStateFlow<V1ContentsContainer?>(null)
-    val message: StateFlow<V1ContentsContainer?> = _message
+    private val _message = MutableStateFlow<Messages?>(null)
+    val message: StateFlow<Messages?> = _message
 
     private lateinit var inboxMessageList: LiveData<MutableList<Payloads>>
 
@@ -43,13 +48,19 @@ class PayloadsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.value = true
             db.get(messageId)?.let { payload ->
-                val message = V1Payloads.deserialize(payload.payload)
+                val deserialized = if(payload.isAttachment)
+                    V1Payloads.deserializeFromStorage(payload.payload)
+                else V1Payloads.deserialize(payload.payload)
                 val content = V1ContentsContainer.deserialize(
-                    data = message.getPayload(),
+                    data = deserialized.getPayload(),
                     catId = catId,
-                    lenAtt = message.getLenAtt()
+                    lenAtt = if(payload.isAttachment) deserialized.getLenAtt() else 0u
                 )
-                _message.value = content
+                val message = Messages(
+                    content = content,
+                    date = payload.date
+                )
+                _message.value = message
             }
             _isLoading.value = false
         }
@@ -100,11 +111,11 @@ class PayloadsViewModel @Inject constructor(
         }
     }
 
-    fun delete(message: Payloads) {
-        viewModelScope.launch{
+    fun delete(messageId: Long) {
+        viewModelScope.launch(Dispatchers.IO){
             val db = Datastore.getDatastore(context)?.messagesDao()
                 ?: throw Exception("Could not open database")
-            db.delete(message)
+            db.delete(messageId)
         }
     }
 

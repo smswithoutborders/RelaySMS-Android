@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "03b0f2ca116a91b070160e8c24ff18d7",
+    "identityHash": "0fd5e4061776c4f8bfc55d3fc8ef97be",
     "entities": [
       {
         "tableName": "RatchetStates",
@@ -121,7 +121,7 @@
       },
       {
         "tableName": "Tokens",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tokenId` INTEGER NOT NULL, `catId` TEXT NOT NULL, `account` TEXT NOT NULL, `platformName` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tokenId` BLOB NOT NULL, `catId` TEXT NOT NULL, `account` TEXT NOT NULL, `platformName` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -132,7 +132,7 @@
           {
             "fieldPath": "tokenId",
             "columnName": "tokenId",
-            "affinity": "INTEGER",
+            "affinity": "BLOB",
             "notNull": true
           },
           {
@@ -265,7 +265,7 @@
       },
       {
         "tableName": "Keys",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `keyId` INTEGER NOT NULL, `privateKey` BLOB NOT NULL, `publicKey` BLOB NOT NULL, `tokenId` INTEGER, `tokenHash` BLOB, `isOwn` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `keyId` INTEGER NOT NULL, `privateKey` BLOB NOT NULL, `publicKey` BLOB NOT NULL, `tokenId` BLOB, `tokenHash` BLOB, `isOwn` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -294,7 +294,7 @@
           {
             "fieldPath": "tokenId",
             "columnName": "tokenId",
-            "affinity": "INTEGER"
+            "affinity": "BLOB"
           },
           {
             "fieldPath": "tokenHash",
@@ -317,7 +317,7 @@
       },
       {
         "tableName": "Payloads",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `catId` TEXT NOT NULL, `payload` BLOB NOT NULL, `date` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `catId` TEXT NOT NULL, `payload` BLOB NOT NULL, `isAttachment` INTEGER NOT NULL, `date` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -338,6 +338,12 @@
             "notNull": true
           },
           {
+            "fieldPath": "isAttachment",
+            "columnName": "isAttachment",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
             "fieldPath": "date",
             "columnName": "date",
             "affinity": "INTEGER",
@@ -354,7 +360,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '03b0f2ca116a91b070160e8c24ff18d7')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0fd5e4061776c4f8bfc55d3fc8ef97be')"
     ]
   }
 }

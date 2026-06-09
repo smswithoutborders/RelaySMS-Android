@@ -154,7 +154,6 @@ fun PlatformOptionsModal(
 
                     if (isCompose || platform == null) {
                         ComposeMessages(
-                            platform = platform,
                             navController = navController,
                             isOnboarding = isOnboarding,
                             cat = cat,
@@ -222,9 +221,7 @@ private fun RevokeAccountLoading(platform: SupportedPlatforms) {
 @Composable
 private fun ComposeMessages(
     cat: V1ContentCategories,
-    platform: SupportedPlatforms?,
     navController: NavController,
-    subscriptionId: Long = -1L,
     isOnboarding: Boolean = false,
     onDismissRequest: () -> Unit
 ) {
@@ -232,8 +229,6 @@ private fun ComposeMessages(
         onClick = {
             navController.navigate(ComposeScreen(
                 cat = cat,
-                platformName = platform?.name,
-                isOnboarding = isOnboarding,
                 messageId = null,
             ))
             onDismissRequest()

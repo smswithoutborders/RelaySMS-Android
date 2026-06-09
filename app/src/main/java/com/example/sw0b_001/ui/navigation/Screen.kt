@@ -35,9 +35,6 @@ data class CreateAccountScreen(
 object AboutScreen
 
 @Serializable
-object MessageViewScreen
-
-@Serializable
 object PasteEncryptedTextScreen
 
 @Serializable
@@ -51,18 +48,20 @@ data class ForgotPasswordScreen(
 @Serializable
 data class ComposeScreen(
     val cat: V1ContentCategories,
-    val platformName: String?,
-    val isOnboarding: Boolean = false,
     val messageId: Long?,
 )
 
 @Serializable
 data class EmailViewScreen(
     val cat: V1ContentCategories,
-    val messageId: Long? = null
+    val messageId: Long
 )
 @Serializable
 data class TextViewScreen(
-    val platformName: String,
+    val messageId: Long
+)
+
+@Serializable
+data class MessageViewScreen(
     val messageId: Long
 )

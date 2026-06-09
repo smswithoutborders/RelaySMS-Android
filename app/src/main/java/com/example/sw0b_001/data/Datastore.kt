@@ -7,8 +7,8 @@ import androidx.room.RoomDatabase
 import com.afkanerd.smswithoutborders_libsmsmms.data.Cryptography.getDatabasePassword
 import com.example.sw0b_001.data.dao.GatewayClientsDao
 import com.example.sw0b_001.data.dao.KeysDao
-import com.example.sw0b_001.data.dao.PayloadsDao
 import com.example.sw0b_001.data.dao.OAuthDao
+import com.example.sw0b_001.data.dao.PayloadsDao
 import com.example.sw0b_001.data.dao.RatchetStatesDAO
 import com.example.sw0b_001.data.dao.SupportedPlatformCacheDao
 import com.example.sw0b_001.data.dao.TokensDao
@@ -32,7 +32,7 @@ import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
         Payloads::class],
     version = 1,
     exportSchema = true,
-    autoMigrations = []
+//    autoMigrations = []
 )
 abstract class Datastore : RoomDatabase() {
     init {

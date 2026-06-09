@@ -15,7 +15,7 @@ interface KeysDao {
     suspend fun _insert(key: List<Keys>)
 
     @Transaction
-    suspend fun insert(keys: List<Keys>, tokenId: Int, tokenHash: ByteArray) {
+    suspend fun insert(keys: List<Keys>, tokenId: ByteArray, tokenHash: ByteArray) {
         clear(tokenId)
         keys.forEach {
             it.tokenId = tokenId
@@ -25,23 +25,23 @@ interface KeysDao {
     }
 
     @Query("SELECT * FROM Keys WHERE tokenId = :tokenId")
-    fun fetchTokenId(tokenId: Int): List<Keys>?
+    fun fetchTokenId(tokenId: ByteArray): List<Keys>?
 
     @Query("SELECT * FROM Keys WHERE tokenId = :tokenId AND keyId = :keyId")
-    fun _fetch(tokenId: Int, keyId: Int): Keys?
+    fun _fetch(tokenId: ByteArray, keyId: Int): Keys?
 
     @Transaction
-    fun fetch(tokenId: Int, keyId: Int): Keys? {
+    fun fetch(tokenId: ByteArray, keyId: Int): Keys? {
         val key = _fetch(tokenId, keyId)
         key?.let { remove(key) }
         return key
     }
 
     @Query("SELECT * FROM Keys WHERE tokenId = :tokenId AND keyId = :keyId AND NOT isOwn")
-    fun fetchOthers(tokenId: Int, keyId: Int): Keys?
+    fun fetchOthers(tokenId: ByteArray, keyId: Int): Keys?
 
     @Query("DELETE FROM Keys WHERE tokenId = :tokenId")
-    suspend fun clear(tokenId: Int)
+    suspend fun clear(tokenId: ByteArray)
 
     @Delete
     fun remove(key: Keys)

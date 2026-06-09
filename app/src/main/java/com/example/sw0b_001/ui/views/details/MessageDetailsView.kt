@@ -1,5 +1,6 @@
 package com.example.sw0b_001.ui.views.details
 
+import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,6 +40,7 @@ import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
+import com.example.sw0b_001.ui.views.compose.toUtf8String
 import uniffi.relaysms_spec_payload.V1ContentCategories
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,20 +50,21 @@ fun MessageDetailsView(
     tokensViewModel: TokensViewModel,
     payloadsViewModel: PayloadsViewModel,
     isOnboarding: Boolean = false,
-    messageId: Long? = null
+    messageId: Long
 ) {
     val context = LocalContext.current
-    var fromDisplay by remember { mutableStateOf("") }
-    var toDisplay by remember { mutableStateOf("") }
-    var messageBody by remember { mutableStateOf("") }
-    var date by remember { mutableLongStateOf(0L) }
-
     val message by payloadsViewModel.message.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
-        messageId?.let {
-            payloadsViewModel.get(messageId, V1ContentCategories.MESSAGE)
-        }
+        payloadsViewModel.get(messageId, V1ContentCategories.MESSAGE)
     }
+
+//    var from by remember { mutableStateOf( account?.platformName ) }
+    var to by remember(message) {
+        mutableStateOf( message?.content?.getTo()?.toUtf8String() ?: "") }
+    var body by remember(message) {
+        mutableStateOf(message?.content?.getBody()?.toUtf8String() ?: "") }
+    var date by remember(message) { mutableLongStateOf(message?.date ?: 0L) }
+    var imageBitmap by remember{ mutableStateOf<Bitmap?>(null) }
 
     Scaffold(
         topBar = {
@@ -104,14 +107,14 @@ fun MessageDetailsView(
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
-                        text = fromDisplay,
+                        text = "",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     // Recipient Number
                     Text(
-                        text = "${stringResource(R.string.to)}: $toDisplay",
+                        text = "${stringResource(R.string.to)}: $to",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onBackground
                     )
@@ -128,7 +131,7 @@ fun MessageDetailsView(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = messageBody,
+                text = body,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onBackground
             )

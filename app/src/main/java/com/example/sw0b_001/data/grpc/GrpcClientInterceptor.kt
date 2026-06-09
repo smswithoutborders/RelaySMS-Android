@@ -1,6 +1,7 @@
 package com.example.sw0b_001.data.grpc
 
 import android.content.Context
+import android.util.Base64
 import com.example.sw0b_001.data.models.Keys
 import com.example.sw0b_001.extensions.context.getStaticKeys
 import io.grpc.CallOptions
@@ -14,7 +15,7 @@ import uniffi.relaysms_spec_payload.v1TokenEncrypt
 
 class GrpcClientInterceptor(
     private val context: Context,
-    private val tokenId: Int
+    private val tokenId: ByteArray
 ): ClientInterceptor {
     override fun <ReqT : Any?, RespT : Any?> interceptCall(
         method: MethodDescriptor<ReqT?, RespT?>?,
@@ -48,7 +49,7 @@ class GrpcClientInterceptor(
                         val xKeyId = Metadata.Key.of("X-Key-id", Metadata.ASCII_STRING_MARSHALLER)
                         val bearer = Metadata.Key.of("Authorization", Metadata.ASCII_STRING_MARSHALLER)
 
-                        headers?.put(bearer, "Bearer $token")
+                        headers?.put(bearer, "Bearer ${Base64.encodeToString(token, Base64.URL_SAFE)}")
                         headers?.put(xKeyId, keyId.toString())
                         super.start(responseListener, headers)
                     } finally {

@@ -40,27 +40,27 @@ import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
+import com.example.sw0b_001.ui.views.compose.toUtf8String
 import uniffi.relaysms_spec_payload.V1ContentCategories
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextDetailsView(
     navController: NavController,
-    platformName: String,
     payloadsViewModel: PayloadsViewModel,
     messageId: Long,
 ) {
     val context = LocalContext.current
 
-    // Define state variables for the UI
-    var from by remember { mutableStateOf("") }
-    var text by remember { mutableStateOf("") }
-    var date by remember { mutableLongStateOf(0L) }
-
     val message by payloadsViewModel.message.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
         payloadsViewModel.get(messageId, V1ContentCategories.TEXT)
     }
+
+//    var from by remember { mutableStateOf( account?.platformName ) }
+    var body by remember(message) {
+        mutableStateOf(message?.content?.getBody()?.toUtf8String() ?: "") }
+    var date by remember(message) { mutableLongStateOf(message?.date ?: 0L) }
 
     Scaffold(
         topBar = {
@@ -70,8 +70,6 @@ fun TextDetailsView(
                     navController.navigate(
                         ComposeScreen(
                             cat = V1ContentCategories.TEXT,
-                            platformName = platformName,
-                            isOnboarding = false,
                             messageId = messageId
                         )
                     )
@@ -98,7 +96,7 @@ fun TextDetailsView(
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     Text(
-                        text = from,
+                        text = "",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground
@@ -116,7 +114,7 @@ fun TextDetailsView(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = text,
+                text = body,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onBackground
             )

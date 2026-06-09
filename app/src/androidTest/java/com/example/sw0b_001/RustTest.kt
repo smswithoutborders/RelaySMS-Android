@@ -100,7 +100,7 @@ class RustTest {
     fun test_payloads_without_attachments() {
         val keyId: UByte = 9u // TODO("Encryption ID")
         val tokenId = ByteArray(4) // TODO("Device ID")
-        val catId = V1ContentCategories.EMAIL
+        val catId = V1ContentCategories.BRIDGE
 
         val body = "body"
         val to = "to@example.com"
@@ -120,7 +120,8 @@ class RustTest {
             sessId = null,
             kId = keyId,
             lenAtt = 0u,
-            tId = tokenId.toIntLittleEndian().toUInt(),
+//            tId = tokenId.toIntLittleEndian().toUInt(),
+            tId = null,
             contents = content,
         )
 
@@ -128,5 +129,9 @@ class RustTest {
         val output = V1Payloads.deserialize(payload)
 
         assertArrayEquals(payload, output.serialize())
+
+        val contentContainer1 = V1ContentsContainer.deserialize(
+            output.getPayload(), catId, output.getLenAtt())
+        assertArrayEquals(content, contentContainer1.serialize())
     }
 }

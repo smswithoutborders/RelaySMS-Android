@@ -35,9 +35,13 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.data.models.Payloads
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
+import com.example.sw0b_001.ui.navigation.EmailViewScreen
+import com.example.sw0b_001.ui.navigation.MessageViewScreen
+import com.example.sw0b_001.ui.navigation.TextViewScreen
 import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
+import uniffi.relaysms_spec_payload.V1ContentCategories
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -66,36 +70,30 @@ fun RecentView(
                     key = messages.itemKey { it.id }
                 ) { index ->
                     val message = messages[index]!!
-//
-//                    val platform = platformsList.find { it.name == message.platformName }
-//                    val logo =
-//                        platform?.logo?.let { BitmapFactory
-//                            .decodeByteArray(it, 0, it.size) }
-//
+
                     RecentMessageCard(
                         message = message, 
 //                        logo = logo,
                         onClickCallback = { clickedMessage ->
-                            TODO()
-//                            when (clickedMessage.type?.uppercase()) {
-//                                Platforms.ServiceTypes.EMAIL.name -> {
-//                                    navController.navigate(EmailViewScreen)
-//                                }
-//                                Platforms.ServiceTypes.BRIDGE.name -> {
-//                                    navController.navigate(BridgeViewScreen)
-//                                }
-//                                Platforms.ServiceTypes.TEXT.name -> {
-//                                    navController.navigate(TextViewScreen)
-//                                }
-//                                Platforms.ServiceTypes.MESSAGE.name -> {
-//                                    navController.navigate(MessageViewScreen)
-//                                }
-//                                else -> {
-//                                    Toast.makeText(context,
-//                                        context.getString(R.string.something_went_wrong),
-//                                        Toast.LENGTH_SHORT).show()
-//                                }
-//                            }
+                            when (clickedMessage.catId) {
+                                V1ContentCategories.BRIDGE,
+                                V1ContentCategories.EMAIL -> {
+                                    navController.navigate(EmailViewScreen(
+                                        cat = clickedMessage.catId,
+                                        messageId = message.id
+                                    ))
+                                }
+                                V1ContentCategories.TEXT -> {
+                                    navController.navigate(TextViewScreen(
+                                        messageId = message.id
+                                    ))
+                                }
+                                V1ContentCategories.MESSAGE -> {
+                                    navController.navigate(MessageViewScreen(
+                                        messageId = message.id
+                                    ))
+                                }
+                            }
                         },
                     )
                 }

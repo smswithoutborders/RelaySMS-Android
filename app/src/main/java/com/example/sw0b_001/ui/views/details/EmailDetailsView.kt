@@ -40,15 +40,13 @@ import androidx.navigation.NavController
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Helpers
-import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.components.AttachImageView
+import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.example.sw0b_001.ui.views.compose.toUtf8String
 import uniffi.relaysms_spec_payload.V1ContentCategories
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,51 +57,40 @@ fun EmailDetailsView(
     tokensViewModel: TokensViewModel,
     payloadsViewModel: PayloadsViewModel,
     imageViewModel: ImageViewModel,
-    account: Tokens? = null,
-    messageId: Long? = null
+    messageId: Long
 ) {
     val context = LocalContext.current
-    var from by remember{ mutableStateOf( account?.platformName ) }
-    var to by remember{ mutableStateOf("") }
-    var cc by remember{ mutableStateOf("") }
-    var bcc by remember{ mutableStateOf("") }
-    var subject by remember{ mutableStateOf("") }
-    var body by remember{ mutableStateOf("") }
-    var date by remember{ mutableLongStateOf(0L) }
-    var imageBitmap by remember{ mutableStateOf<Bitmap?>(null) }
 
     val message by payloadsViewModel.message.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
-        messageId?.let {
-            payloadsViewModel.get(messageId, cat)
-        }
+        payloadsViewModel.get(messageId, cat)
     }
+
+    var from by remember { mutableStateOf("") }
+    var to by remember(message) {
+        mutableStateOf( message?.content?.getTo()?.toUtf8String() ?: "") }
+    var subject by remember(message) { mutableStateOf(
+        message?.content?.getSubject()?.toUtf8String() ?: "") }
+    var body by remember(message) {
+        mutableStateOf(message?.content?.getBody()?.toUtf8String() ?: "") }
+    var date by remember(message) { mutableLongStateOf(message?.date ?: 0L) }
+    var imageBitmap by remember{ mutableStateOf<Bitmap?>(null) }
+
 
     val scrollState = rememberScrollState() // Remember the scroll state
 
     Scaffold(
         topBar = {
             RelayAppBar(navController = navController, {
-                CoroutineScope(Dispatchers.Default).launch {
-//                    val platform = if(!isBridge) storedPlatformsViewModel.getAvailablePlatforms(context,
-//                        messagesViewModel.message!!.platformName!!) else null
-//                    storedPlatformsViewModel.platform = platform
-//
-//                    CoroutineScope(Dispatchers.Main).launch {
-//                        navController.navigate(
-//                            ComposeScreen(
-//                                type = if(platform != null)
-//                                    Platforms.ServiceTypes.EMAIL
-//                                else Platforms.ServiceTypes.BRIDGE,
-//                                platformName = platform?.name
-//                            )
-//                        )
-//                    }
-                }
+                navController.navigate(
+                    ComposeScreen(
+                        cat = cat,
+                        messageId = messageId
+                    )
+                )
             }) {
-                TODO()
-//                payloadsViewModel.delete(message!!)
-//                navController.popBackStack()
+                payloadsViewModel.delete(messageId)
+                navController.popBackStack()
             }
         }
     ) { innerPadding ->
@@ -138,11 +125,11 @@ fun EmailDetailsView(
                 Spacer(modifier = Modifier.width(16.dp))
                 Column {
                     // Sender Email
-//                    Text(
-//                        text = if(LocalInspectionMode.current) "RelaySMS" else from,
-//                        style = MaterialTheme.typography.bodyMedium,
-//                        color = MaterialTheme.colorScheme.onBackground
-//                    )
+                    Text(
+                        text = from ?: "",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
                     // Date
                     Text(
                         text = Helpers.formatDate(context, date),
@@ -157,14 +144,6 @@ fun EmailDetailsView(
             Spacer(modifier = Modifier.height(16.dp))
 
             EmailDetailsRow(label = stringResource(R.string.to), email = to)
-
-            if (cc.isNotEmpty()) {
-                EmailDetailsRow(label = stringResource(R.string.cc), email = cc)
-            }
-
-            if (bcc.isNotEmpty()) {
-                EmailDetailsRow(label = stringResource(R.string.bcc), email = bcc)
-            }
 
             Spacer(modifier = Modifier.height(16.dp))
             HorizontalDivider(color = MaterialTheme.colorScheme.outline)

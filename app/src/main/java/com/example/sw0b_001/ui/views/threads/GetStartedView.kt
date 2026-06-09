@@ -100,8 +100,6 @@ fun GetStartedView (navController: NavController) {
                         navController.navigate(
                             ComposeScreen(
                                 V1ContentCategories.BRIDGE,
-                                isOnboarding = true,
-                                platformName = null,
                                 messageId = null
                             )
                         )},

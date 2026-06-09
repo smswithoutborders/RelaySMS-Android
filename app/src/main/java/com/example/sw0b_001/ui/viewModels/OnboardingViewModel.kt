@@ -90,8 +90,6 @@ class OnboardingViewModel @Inject constructor(
                         _navigate.emit {
                             ComposeScreen(
                                 cat = V1ContentCategories.BRIDGE,
-                                isOnboarding = true,
-                                platformName = null,
                                 messageId = null,
                             )
                         }

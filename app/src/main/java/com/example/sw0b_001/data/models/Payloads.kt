@@ -10,6 +10,7 @@ data class Payloads(
     val id: Long = 0,
     val catId: V1ContentCategories,
     val payload: ByteArray,
+    val isAttachment: Boolean,
     val date: Long = System.currentTimeMillis(),
 ): AutoCloseable {
     override fun close() {

@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uniffi.relaysms_spec_payload.V1ContentCategories
+import uniffi.relaysms_spec_payload.V1Payloads
 import uniffi.relaysms_spec_payload.v1BridgeOfflineFirstPublisherEncrypt
 import uniffi.relaysms_spec_payload.v1BridgeOnlineFirstPublisherEncrypt
 
@@ -25,21 +26,22 @@ class BridgesViewModel @Inject constructor(
 ): ViewModel() {
     fun publish(
         body: String,
-        tokenId: Int?,
+        tokenId: ByteArray?,
         to: String?,
         subject: String?,
         imageViewModel: ImageViewModel,
         onFailureCallback: (String) -> Unit,
-        onCompleteCallback: (ByteArray) -> Unit,
+        onCompleteCallback: (ByteArray, Boolean) -> Unit,
     ) {
         val attachment = imageViewModel.processedImage.value?.rawBytes
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                var serializedPayload: ByteArray?
+                var payload: V1Payloads?
+                val isAttachment = attachment != null
                 try {
-                    if(attachment != null) {
+                    if(isAttachment) {
                         val sessionId = imageViewModel.getSessionId(context)
-                        val payloads = publishWithAttachment(
+                        payload = publishWithAttachment(
                             context,
                             V1ContentCategories.BRIDGE,
                             body,
@@ -52,23 +54,21 @@ class BridgesViewModel @Inject constructor(
                         ) { payload ->
                             encrypt(payload, tokenId)
                         }
-                        serializedPayload = payloads.serializeForStorage()
                     } else {
-                        val payloads = publishWithoutAttachment(
+                        payload = publishWithoutAttachment(
                             context,
                             V1ContentCategories.BRIDGE,
                             body,
                             tokenId,
                             to,
                             subject,
-                        ) { payload ->
-                            encrypt(payload, tokenId)
+                        ) { p ->
+                            encrypt(p, tokenId)
                         }
-                        serializedPayload = payloads.serialize()
                     }
 
                     withContext(Dispatchers.Main) {
-                        onCompleteCallback(serializedPayload)
+                        onCompleteCallback(payload.serialize(), isAttachment)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -80,7 +80,7 @@ class BridgesViewModel @Inject constructor(
 
     private fun encrypt(
         plaintext: ByteArray,
-        tokenId: Int?,
+        tokenId: ByteArray?,
     ) : Pair<ByteArray, Int> {
         val keyId = (0 until 16).random()
         val db = Datastore.getDatastore(context)?.keysDao()
