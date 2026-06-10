@@ -32,18 +32,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Helpers
+import com.example.sw0b_001.data.models.Payloads
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.Messages
 import com.example.sw0b_001.ui.views.compose.toUtf8String
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TextDetailsView(message: Messages?) {
+fun TextDetailsView(message: Payloads?) {
     val context = LocalContext.current
 
 //    var from by remember { mutableStateOf( account?.platformName ) }
     var body by remember(message) {
-        mutableStateOf(message?.content?.getBody()?.toUtf8String() ?: "") }
+        mutableStateOf(message?.contents?.getBody()?.toUtf8String() ?: "") }
     var date by remember(message) { mutableLongStateOf(message?.date ?: 0L) }
 
     Column(

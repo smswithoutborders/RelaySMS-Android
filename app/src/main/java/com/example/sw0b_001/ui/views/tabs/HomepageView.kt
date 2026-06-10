@@ -24,11 +24,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.appbars.GatewayClientsAppBar
@@ -71,8 +70,7 @@ fun HomepageView(
     val inboxMessages = payloadsViewModel.getInboxMessages()
         .observeAsState(emptyList())
 
-    val messagesPagingSource = payloadsViewModel.get()
-    val messages = messagesPagingSource.collectAsLazyPagingItems()
+    val messages by payloadsViewModel.messages.collectAsStateWithLifecycle()
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -159,9 +157,7 @@ fun HomepageView(
                             }
                         )
                     }
-                    else if (LocalInspectionMode.current ||
-                        (messages.loadState.isIdle && messages.itemCount > 0)
-                    ) {
+                    else if (messages?.isNotEmpty() == true) {
                         ExtendedFloatingActionButton(
                             onClick = { sendNewMessageRequested = true },
                             icon = {

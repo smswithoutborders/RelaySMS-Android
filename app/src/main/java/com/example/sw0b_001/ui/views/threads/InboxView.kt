@@ -26,11 +26,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.navigation.DetailsInterfaceScreen
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
-import uniffi.relaysms_spec_payload.V1ContentCategories
 
 
 @Composable
@@ -55,17 +53,17 @@ fun InboxView(
                 contentPadding = PaddingValues(8.dp),
             ) {
                 items(messages) { message ->
-                    RecentMessageCard(
-                        message,
-                        onClickCallback = {
-                            navController.navigate(
-                                DetailsInterfaceScreen(
-                                    V1ContentCategories.BRIDGE,
-                                    messageId = message.id
-                                )
-                            )
-                        },
-                    )
+//                    RecentMessageCard(
+//                        message,
+//                        onClickCallback = {
+//                            navController.navigate(
+//                                DetailsInterfaceScreen(
+//                                    V1ContentCategories.BRIDGE,
+//                                    messageId = message.id
+//                                )
+//                            )
+//                        },
+//                    )
                 }
             }
         }

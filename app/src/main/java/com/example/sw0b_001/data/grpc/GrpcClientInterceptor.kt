@@ -41,8 +41,7 @@ class GrpcClientInterceptor(
                         ecKid = ecKid.privateKey,
                         ssKidPk = authenticationPublicKey,
                         esKidPk = ecKid.publicKey,
-                        methodName = methodName.encodeToByteArray(),
-                        tokenHash = ecKid.tokenHash!!,
+                        token = ecKid.tokenHash!!,
                         keyId = keyId.toUByte(),
                     )
                     try {

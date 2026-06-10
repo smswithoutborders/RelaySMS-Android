@@ -97,7 +97,7 @@ fun ComposerInterface(
     val tokens by tokensViewModel.storedTokensUiState.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
         if(messageId != null) {
-            payloadsViewModel.get(messageId, catId)
+            payloadsViewModel.get(messageId)
         } else {
             tokensViewModel.fetchTokensByCatId(catId)
         }
@@ -126,12 +126,12 @@ fun ComposerInterface(
     }
 
     var to: String by remember{
-        mutableStateOf( message?.content?.getTo()?.toUtf8String() ?: "") }
+        mutableStateOf( message?.contents?.getTo()?.toUtf8String() ?: "") }
     var subject: String by remember{ mutableStateOf(
-        message?.content?.getSubject()?.toUtf8String() ?: "") }
+        message?.contents?.getSubject()?.toUtf8String() ?: "") }
     var body: String by remember{
-        mutableStateOf(message?.content?.getBody()?.toUtf8String() ?: "") }
-    var image by remember{ mutableStateOf(message?.content?.getAttachment()) }
+        mutableStateOf(message?.contents?.getBody()?.toUtf8String() ?: "") }
+    var image by remember{ mutableStateOf(message?.contents?.getAttachment()) }
 
     var showSelectAccountModal by remember { mutableStateOf(
         catId != V1ContentCategories.BRIDGE ) }

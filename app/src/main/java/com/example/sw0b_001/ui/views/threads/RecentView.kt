@@ -10,12 +10,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,11 +28,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemKey
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.data.models.Payloads
@@ -39,6 +41,8 @@ import com.example.sw0b_001.ui.navigation.DetailsInterfaceScreen
 import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
+import com.example.sw0b_001.ui.views.compose.toUtf8String
+import uniffi.relaysms_spec_payload.V1ContentCategories
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -52,28 +56,27 @@ fun RecentView(
 ) {
     var sendNewMessageRequested by remember { mutableStateOf(false) }
 
-    val messages = payloadsViewModel.get().collectAsLazyPagingItems()
+    val payloads by payloadsViewModel.messages.collectAsStateWithLifecycle()
+    LaunchedEffect(Unit) {
+        payloadsViewModel.get()
+    }
 
     val listState = rememberLazyListState()
-    Box(Modifier.fillMaxSize()
-    ) {
-        if ((LocalInspectionMode.current || messages.loadState.isIdle) && messages.itemCount > 0) {
+    Box(Modifier.fillMaxSize()) {
+        if (payloads?.isNotEmpty() == true) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 state = listState
             ) {
-                items(
-                    count = messages.itemCount,
-                    key = messages.itemKey { it.id }
-                ) { index ->
-                    val message = messages[index]!!
-
+                items(items = payloads ?: emptyList()) { message ->
                     RecentMessageCard(
-                        message = message, 
+                        cat = message.contents!!.getCatId(),
+                        payload = message,
 //                        logo = logo,
                         onClickCallback = { clickedMessage ->
-                            navController.navigate(DetailsInterfaceScreen(
-                                    cat = clickedMessage.catId,
+                            navController.navigate(
+                                DetailsInterfaceScreen(
+                                    cat = clickedMessage.contents!!.getCatId(),
                                     messageId = message.id
                                 )
                             )
@@ -82,7 +85,7 @@ fun RecentView(
                 }
             }
         }
-        else if(messages.loadState.isIdle || LocalInspectionMode.current) {
+        else {
             GetStartedView( navController = navController, )
         }
 
@@ -124,84 +127,14 @@ fun GetMessageAvatar(logo: Bitmap? = null) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RecentMessageCard(
-    message: Payloads,
+    cat: V1ContentCategories,
+    payload: Payloads,
     logo: Bitmap? = null,
     onClickCallback: (Payloads) -> Unit,
 ) {
-    var text by remember { mutableStateOf("" ) }
-    var heading by remember { mutableStateOf( "") }
-    var subHeading by remember { mutableStateOf( "") }
-
-//    when(message.type?.uppercase(Locale.getDefault())) {
-//        Platforms.ServiceTypes.EMAIL.name -> {
-//            val contentBytes = Base64.decode(message.body!!, Base64.DEFAULT)
-////            val decomposed = Composers.EmailComposeHandler
-////                .decomposeMessage(
-////                    contentBytes,
-////                    imageLength = message.imageLength,
-////                    textLength = message.textLength,
-////                    isBridge = message.type == Platforms.ServiceTypes.BRIDGE.name
-////                )
-////            heading = message.fromAccount ?: "Email"
-////            subHeading = decomposed.subject.value
-////            text = decomposed.body.value
-//        }
-//        Platforms.ServiceTypes.BRIDGE_INCOMING.name -> {
-//            TODO()
-////            val decomposed = TODO()
-////            heading = message.fromAccount ?: "RelaySMS"
-////            subHeading = decomposed.subject
-////            text = decomposed.body
-//        }
-//        Platforms.ServiceTypes.BRIDGE.name -> {
-////            val decomposed = Composers.EmailComposeHandler.decomposeMessage(
-////                Base64.decode(message.body, Base64.DEFAULT),
-////                message.imageLength,
-////                message.textLength,
-////                true
-////            )
-//////            heading = message.fromAccount ?: "RelaySMS"
-////            subHeading = decomposed.subject.value
-////            text = decomposed.body.value
-//        }
-//        Platforms.ServiceTypes.TEXT.name -> {
-//            try {
-//                val contentBytes = Base64.decode(message.body!!,
-//                    Base64.DEFAULT)
-//                val decomposed = Composers.TextComposeHandler
-//                    .decomposeMessage(contentBytes)
-//                heading = decomposed.from.value ?: ""
-//                subHeading = ""
-//                text = decomposed.text.value
-//            } catch (e: Exception) {
-//                e.printStackTrace()
-////                heading = message.fromAccount ?: stringResource(R.string.text_message)
-//                subHeading = ""
-//                text = stringResource(R.string.message_content_could_not_be_displayed)
-//            }
-//        }
-//        Platforms.ServiceTypes.MESSAGE.name -> {
-//            try {
-//                val contentBytes = Base64.decode(message.body!!,
-//                    Base64.DEFAULT)
-//                val decomposed = Composers.MessageComposeHandler
-//                    .decomposeMessage(contentBytes)
-//
-////                if (message.fromAccount == decomposed.from.value) {
-////                    heading = decomposed.to.value
-////                } else {
-////                    heading = decomposed.from.value ?: "RelaySMS"
-////                }
-//                subHeading = ""
-//                text = decomposed.message.value
-//            } catch (e: Exception) {
-//                e.printStackTrace()
-////                heading = message.fromAccount ?: stringResource(R.string.message_)
-//                subHeading = ""
-//                text = stringResource(R.string.message_content_could_not_be_displayed)
-//            }
-//        }
-//    }
+    var text by remember { mutableStateOf(payload.contents!!.getBody().toUtf8String()) }
+    var heading by remember { mutableStateOf(payload.contents!!.getSubject()?.toUtf8String() ?: "") }
+    var subHeading by remember { mutableStateOf(payload.contents!!.getTo()?.toUtf8String() ?: "" ) }
 
     Column {
         ListItem(
@@ -209,7 +142,7 @@ fun RecentMessageCard(
                 .combinedClickable(
                     hapticFeedbackEnabled = true,
                     onLongClick = {},
-                    onClick = { onClickCallback(message) }
+                    onClick = { onClickCallback(payload) }
                 )
                 .fillMaxWidth(),
             headlineContent = {
@@ -224,11 +157,11 @@ fun RecentMessageCard(
             overlineContent = {
                 Text(
                     heading,
-//                    style = if (message.type == Platforms.ServiceTypes.TEXT.name) {
-//                        MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-//                    } else {
-//                        MaterialTheme.typography.bodyLarge
-//                    },
+                    style = if (cat == V1ContentCategories.TEXT) {
+                        MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                    } else {
+                        MaterialTheme.typography.bodyLarge
+                    },
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -248,7 +181,8 @@ fun RecentMessageCard(
             },
             trailingContent = {
                 Text(
-                    text = Helpers.formatDate(LocalContext.current, message.date),
+                    text = Helpers.formatDate(LocalContext.current,
+                        payload.date),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -256,62 +190,3 @@ fun RecentMessageCard(
         )
     }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun RecentScreenPreview() {
-//    AppTheme(darkTheme = false) {
-//        val messages = Messages()
-//        messages.id = 0
-//        messages.type = "email".encodeToByteArray()[0]
-//        messages.date = System.currentTimeMillis()
-//        messages.fromAccount = "developers@relaysms.me".encodeToByteArray()
-//        messages.body = "reply@relaysms.me:cc@relaysms.me:bcc@relaysms.me:subject here:This is an encrypted content".encodeToByteArray()
-//
-//        val context = LocalContext.current
-//        RecentView(
-//            navController = rememberNavController(),
-//            messagesViewModel = remember { MessagesViewModel() },
-//            storedPlatformsViewModel = remember { StoredPlatformsViewModel(context) },
-//            isLoggedIn = true
-//        ) {}
-//    }
-//}
-//
-
-//@Preview(showBackground = true)
-//@Composable
-//fun RecentScreenMessages_Preview() {
-//    AppTheme(darkTheme = false) {
-//        val messages = Messages()
-//        messages.id = 0
-//        messages.type = "email".encodeToByteArray()[0]
-//        messages.date = System.currentTimeMillis()
-//        messages.fromAccount = "developers@relaysms.me".encodeToByteArray()
-//        messages.body = "reply@relaysms.me:cc@relaysms.me:bcc@relaysms.me:subject here:This is an encrypted content".encodeToByteArray()
-//
-//        val context = LocalContext.current
-//        RecentView(
-//            navController = rememberNavController(),
-//            messagesViewModel = remember { MessagesViewModel() },
-//            storedPlatformsViewModel = remember { StoredPlatformsViewModel(context) },
-//        ) {}
-//    }
-//}
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun RecentsCardPreview() {
-//    AppTheme(darkTheme = false) {
-//        val messages = Messages()
-//        messages.id = 0
-//        messages.type = "email".encodeToByteArray()[0]
-//        messages.date = System.currentTimeMillis()
-//        messages.fromAccount = "developers@relaysms.me".encodeToByteArray()
-//        messages.body = "reply@relaysms.me:cc@relaysms.me:bcc@relaysms.me:subject here:This is an encrypted content".encodeToByteArray()
-//        RecentMessageCard(
-//            message = messages,
-//            onClickCallback = {},
-//        )
-//    }
-//}

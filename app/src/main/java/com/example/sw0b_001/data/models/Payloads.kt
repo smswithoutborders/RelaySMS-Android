@@ -1,8 +1,10 @@
 package com.example.sw0b_001.data.models
 
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import uniffi.relaysms_spec_payload.V1ContentCategories
+import uniffi.relaysms_spec_payload.V1ContentsContainer
 
 @Entity
 data class Payloads(
@@ -16,4 +18,6 @@ data class Payloads(
     override fun close() {
         payload.fill(0)
     }
+    @Ignore
+    var contents: V1ContentsContainer? = null
 }

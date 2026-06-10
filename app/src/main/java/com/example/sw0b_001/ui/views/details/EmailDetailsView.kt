@@ -32,25 +32,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Helpers
+import com.example.sw0b_001.data.models.Payloads
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.Messages
 import com.example.sw0b_001.ui.views.compose.toUtf8String
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EmailDetailsView(message: Messages?) {
+fun EmailDetailsView(message: Payloads?) {
     val context = LocalContext.current
 
     var from by remember { mutableStateOf("") }
 
     var to by remember(message) {
-        mutableStateOf( message?.content?.getTo()?.toUtf8String() ?: "") }
+        mutableStateOf( message?.contents?.getTo()?.toUtf8String() ?: "") }
 
     var subject by remember(message) { mutableStateOf(
-        message?.content?.getSubject()?.toUtf8String() ?: "") }
+        message?.contents?.getSubject()?.toUtf8String() ?: "") }
 
     var body by remember(message) {
-        mutableStateOf(message?.content?.getBody()?.toUtf8String() ?: "") }
+        mutableStateOf(message?.contents?.getBody()?.toUtf8String() ?: "") }
 
     var date by remember(message) { mutableLongStateOf(message?.date ?: 0L) }
 
@@ -148,7 +148,7 @@ fun EmailDetailsPreview() {
 //        messages.platformName = "gmail"
 //        messages.fromAccount = "developers@relaysms.me"
 //        messages.gatewayClientMSISDN = "+237123456789"
-//        messages.body = "reply@relaysms.me:cc@relaysms.me:bcc@relaysms.me:subject here:This is an encrypted content"
+//        messages.body = "reply@relaysms.me:cc@relaysms.me:bcc@relaysms.me:subject here:This is an encrypted contents"
 //
 //        val storedPlatformsViewModel = remember{ StoredPlatformsViewModel() }
 //        val messagesViewModel = remember{ MessagesViewModel() }

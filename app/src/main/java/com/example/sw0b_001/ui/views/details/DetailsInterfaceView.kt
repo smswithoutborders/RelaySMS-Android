@@ -41,14 +41,15 @@ fun DetailsInterfaceView(
 
     val message by payloadsViewModel.message.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
-        payloadsViewModel.get(messageId, cat)
+        payloadsViewModel.get(messageId)
     }
 
-    var imageBitmap by remember(message) { mutableStateOf( if(message?.content != null) {
-        val attachment = message!!.content.getAttachment()
-        if(attachment != null) {
-            BitmapFactory.decodeByteArray(attachment, 0, attachment.size)
-        } else null
+    var imageBitmap by remember(message) { mutableStateOf(
+        if(message?.contents != null) {
+            val attachment = message!!.contents!!.getAttachment()
+            if(attachment != null) {
+                BitmapFactory.decodeByteArray(attachment, 0, attachment.size)
+            } else null
         } else null
     )}
 

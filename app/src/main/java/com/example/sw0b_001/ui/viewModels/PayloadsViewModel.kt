@@ -4,10 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.paging.cachedIn
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.models.Payloads
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,11 +19,6 @@ import uniffi.relaysms_spec_payload.V1ContentCategories
 import uniffi.relaysms_spec_payload.V1ContentsContainer
 import uniffi.relaysms_spec_payload.V1Payloads
 
-data class Messages(
-    val content: V1ContentsContainer,
-    val date: Long
-)
-
 @HiltViewModel
 class PayloadsViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -34,8 +26,12 @@ class PayloadsViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    private val _message = MutableStateFlow<Messages?>(null)
-    val message: StateFlow<Messages?> = _message
+    private val _messageUiState = MutableStateFlow<Payloads?>(null)
+    val message: StateFlow<Payloads?> = _messageUiState
+
+    private val _messagesUiState = MutableStateFlow<List<Payloads>?>(null)
+    val messages: StateFlow<List<Payloads>?> = _messagesUiState
+
 
     private lateinit var inboxMessageList: LiveData<MutableList<Payloads>>
 
@@ -44,7 +40,32 @@ class PayloadsViewModel @Inject constructor(
     val db = Datastore.getDatastore(context)?.messagesDao()
         ?: throw Exception("Could not open database")
 
-    fun get(messageId: Long, catId: V1ContentCategories){
+    fun get() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _isLoading.value = true
+            db.get()?.let {
+                it.collect { items ->
+                    val payloads = mutableListOf<Payloads>()
+                    items.forEach { payload ->
+                        val deserialized = if(payload.isAttachment)
+                            V1Payloads.deserializeFromStorage(payload.payload)
+                        else V1Payloads.deserialize(payload.payload)
+                        val content = V1ContentsContainer.deserialize(
+                            data = deserialized.getPayload(),
+                            catId = payload.catId,
+                            lenAtt = if(payload.isAttachment) deserialized.getLenAtt() else 0u
+                        )
+                        payload.contents = content
+                        payloads.add(payload)
+                    }
+                    _messagesUiState.value = payloads
+                    _isLoading.value = false
+                }
+            }
+        }
+    }
+
+    fun get(messageId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.value = true
             db.get(messageId)?.let { payload ->
@@ -53,43 +74,38 @@ class PayloadsViewModel @Inject constructor(
                 else V1Payloads.deserialize(payload.payload)
                 val content = V1ContentsContainer.deserialize(
                     data = deserialized.getPayload(),
-                    catId = catId,
+                    catId = payload.catId,
                     lenAtt = if(payload.isAttachment) deserialized.getLenAtt() else 0u
                 )
-                val message = Messages(
-                    content = content,
-                    date = payload.date
-                )
-                _message.value = message
+                payload.contents = content
+                _messageUiState.value = payload
             }
             _isLoading.value = false
         }
     }
 
-    fun get(): Flow<PagingData<Payloads>> {
-        if(conversationsPager == null) {
-            val pageSize = 50
-            val prefetchDistance = 3 * pageSize
-            val enablePlaceholder = true
-            val initialLoadSize: Int = 2 * pageSize
-            val maxSize: Int = PagingConfig.MAX_SIZE_UNBOUNDED
-            val db = Datastore.getDatastore(context)?.messagesDao()
-                ?: throw Exception("Could not open database")
-            conversationsPager = Pager(
-                config = PagingConfig(
-                    pageSize,
-                    prefetchDistance,
-                    enablePlaceholder,
-                    initialLoadSize,
-                    maxSize
-                ),
-                pagingSourceFactory = {
-                    db.all()
-                }
-            ).flow.cachedIn(viewModelScope)
-        }
-        return conversationsPager!!
-    }
+//    fun get(): Flow<PagingData<Payloads>> {
+//        if (conversationsPager == null) {
+//            val pageSize = 50
+//            val prefetchDistance = 3 * pageSize
+//            val enablePlaceholder = true
+//            val initialLoadSize: Int = 2 * pageSize
+//            val maxSize: Int = PagingConfig.MAX_SIZE_UNBOUNDED
+//            val db = Datastore.getDatastore(context)?.messagesDao()
+//                ?: throw Exception("Could not open database")
+//            conversationsPager = Pager(
+//                config = PagingConfig(
+//                    pageSize,
+//                    prefetchDistance,
+//                    enablePlaceholder,
+//                    initialLoadSize,
+//                    maxSize
+//                ),
+//                pagingSourceFactory = { db.all() }
+//            ).flow.cachedIn(viewModelScope)
+//        }
+//        return conversationsPager!!
+//    }
 
     fun getInboxMessages(): LiveData<MutableList<Payloads>> {
         viewModelScope.launch {
