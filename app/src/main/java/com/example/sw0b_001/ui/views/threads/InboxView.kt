@@ -26,7 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.navigation.EmailViewScreen
+import com.example.sw0b_001.ui.navigation.DetailsInterfaceScreen
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
@@ -59,7 +59,7 @@ fun InboxView(
                         message,
                         onClickCallback = {
                             navController.navigate(
-                                EmailViewScreen(
+                                DetailsInterfaceScreen(
                                     V1ContentCategories.BRIDGE,
                                     messageId = message.id
                                 )

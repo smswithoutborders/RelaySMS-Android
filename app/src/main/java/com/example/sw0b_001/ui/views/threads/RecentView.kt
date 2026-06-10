@@ -35,13 +35,10 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.data.models.Payloads
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
-import com.example.sw0b_001.ui.navigation.EmailViewScreen
-import com.example.sw0b_001.ui.navigation.MessageViewScreen
-import com.example.sw0b_001.ui.navigation.TextViewScreen
+import com.example.sw0b_001.ui.navigation.DetailsInterfaceScreen
 import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
-import uniffi.relaysms_spec_payload.V1ContentCategories
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -75,25 +72,11 @@ fun RecentView(
                         message = message, 
 //                        logo = logo,
                         onClickCallback = { clickedMessage ->
-                            when (clickedMessage.catId) {
-                                V1ContentCategories.BRIDGE,
-                                V1ContentCategories.EMAIL -> {
-                                    navController.navigate(EmailViewScreen(
-                                        cat = clickedMessage.catId,
-                                        messageId = message.id
-                                    ))
-                                }
-                                V1ContentCategories.TEXT -> {
-                                    navController.navigate(TextViewScreen(
-                                        messageId = message.id
-                                    ))
-                                }
-                                V1ContentCategories.MESSAGE -> {
-                                    navController.navigate(MessageViewScreen(
-                                        messageId = message.id
-                                    ))
-                                }
-                            }
+                            navController.navigate(DetailsInterfaceScreen(
+                                    cat = clickedMessage.catId,
+                                    messageId = message.id
+                                )
+                            )
                         },
                     )
                 }

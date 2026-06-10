@@ -52,16 +52,7 @@ data class ComposeScreen(
 )
 
 @Serializable
-data class EmailViewScreen(
+data class DetailsInterfaceScreen(
     val cat: V1ContentCategories,
-    val messageId: Long
-)
-@Serializable
-data class TextViewScreen(
-    val messageId: Long
-)
-
-@Serializable
-data class MessageViewScreen(
     val messageId: Long
 )
