@@ -99,20 +99,20 @@ class TokensViewModel @Inject constructor(
         val publisherGrpcImpl = PublisherGrpcImpl(context)
         db.fetchAllList().forEach { sp ->
             val cachedPlatform = cache.fetch(sp.platformName)
-            when(cachedPlatform?.protocol_type) {
-                "oauth2" -> {
-                    publisherGrpcImpl.revokeOAuthPlatforms(
-                        sp.platformName,
-                        sp.account,
-                    )
-                }
-                "pnba" -> {
-                    publisherGrpcImpl.revokePNBAPlatforms(
-                        sp.platformName,
-                        sp.account
-                    )
-                }
-            }
+//            when(cachedPlatform?.protocol_type) {
+//                "oauth2" -> {
+//                    publisherGrpcImpl.revokeOAuthPlatforms(
+//                        sp.platformName,
+//                        sp.account,
+//                    )
+//                }
+//                "pnba" -> {
+//                    publisherGrpcImpl.revokePNBAPlatforms(
+//                        sp.platformName,
+//                        sp.account
+//                    )
+//                }
+//            }
         }
 
     }
@@ -197,20 +197,20 @@ class TokensViewModel @Inject constructor(
             PublisherGrpcImpl(context).use { publisherGrpcImpl ->
                 _isRevokingUiState.value = TokensUiState.Loading
                 try {
-                    when(platform.protocol_type) {
-                        "oauth2" -> {
-                            publisherGrpcImpl.revokeOAuthPlatforms(
-                                account.platformName,
-                                account.account,
-                            )
-                        }
-                        "pnba" -> {
-                            publisherGrpcImpl.revokePNBAPlatforms(
-                                account.platformName,
-                                account.account
-                            )
-                        }
-                    }
+//                    when(platform.protocol_type) {
+//                        "oauth2" -> {
+//                            publisherGrpcImpl.revokeOAuthPlatforms(
+//                                account.platformName,
+//                                account.account,
+//                            )
+//                        }
+//                        "pnba" -> {
+//                            publisherGrpcImpl.revokePNBAPlatforms(
+//                                account.platformName,
+//                                account.account
+//                            )
+//                        }
+//                    }
 
                     TODO()
 //                    db.delete(account.id)
@@ -287,42 +287,42 @@ class TokensViewModel @Inject constructor(
         PublisherGrpcImpl(context).use { publisherGrpcImpl ->
             try {
                 when {
-                    !authCode.isNullOrEmpty() && !password.isNullOrEmpty() -> {
-                        val response = publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
-                            authorizationCode = authCode,
-                            phoneNumber = phoneNumber,
-                            platform = platform.name,
-                            password = password
-                        )
-                        if(response.success) {
-                            _isStoringUiState.value = TokensUiState.Success(null)
-                        }
-                    }
-                    !authCode.isNullOrEmpty() -> {
-                        val response = publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
-                            authorizationCode = authCode,
-                            phoneNumber = phoneNumber,
-                            platform = platform.name
-                        )
-                        if(response.success) {
-                            _isStoringUiState.value = TokensUiState.Success(
-                                null,
-                                pnbaPasswordRequired = response.twoStepVerificationEnabled,
-                            )
-                        }
-                    }
-                    else -> {
-                        val response = publisherGrpcImpl.phoneNumberBaseAuthenticationRequest(
-                            phoneNumber,
-                            platform.name
-                        )
-                        if(response.success) {
-                            _isStoringUiState.value = TokensUiState.Success(
-                                null ,
-                                pnbaAuthRequired = true
-                            )
-                        }
-                    }
+//                    !authCode.isNullOrEmpty() && !password.isNullOrEmpty() -> {
+//                        val response = publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
+//                            authorizationCode = authCode,
+//                            phoneNumber = phoneNumber,
+//                            platform = platform.name,
+//                            password = password
+//                        )
+//                        if(response.success) {
+//                            _isStoringUiState.value = TokensUiState.Success(null)
+//                        }
+//                    }
+//                    !authCode.isNullOrEmpty() -> {
+//                        val response = publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
+//                            authorizationCode = authCode,
+//                            phoneNumber = phoneNumber,
+//                            platform = platform.name
+//                        )
+//                        if(response.success) {
+//                            _isStoringUiState.value = TokensUiState.Success(
+//                                null,
+//                                pnbaPasswordRequired = response.twoStepVerificationEnabled,
+//                            )
+//                        }
+//                    }
+//                    else -> {
+//                        val response = publisherGrpcImpl.phoneNumberBaseAuthenticationRequest(
+//                            phoneNumber,
+//                            platform.name
+//                        )
+//                        if(response.success) {
+//                            _isStoringUiState.value = TokensUiState.Success(
+//                                null ,
+//                                pnbaAuthRequired = true
+//                            )
+//                        }
+//                    }
                 }
             } catch(e: Exception) {
                 e.printStackTrace()

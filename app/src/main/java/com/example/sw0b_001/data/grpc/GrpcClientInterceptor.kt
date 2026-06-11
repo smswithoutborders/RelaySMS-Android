@@ -1,8 +1,7 @@
 package com.example.sw0b_001.data.grpc
 
 import android.content.Context
-import android.util.Base64
-import com.example.sw0b_001.data.models.Keys
+import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.Protocols
 import com.example.sw0b_001.extensions.context.getStaticKeys
 import io.grpc.CallOptions
 import io.grpc.Channel
@@ -11,12 +10,9 @@ import io.grpc.ClientInterceptor
 import io.grpc.ForwardingClientCall
 import io.grpc.Metadata
 import io.grpc.MethodDescriptor
-import uniffi.relaysms_spec_payload.v1TokenEncrypt
+import uniffi.relaysms_spec_payload.v1RequestsEncrypt
 
-class GrpcClientInterceptor(
-    private val context: Context,
-    private val tokenId: ByteArray
-): ClientInterceptor {
+class GrpcClientInterceptor(private val context: Context): ClientInterceptor {
     override fun <ReqT : Any?, RespT : Any?> interceptCall(
         method: MethodDescriptor<ReqT?, RespT?>?,
         callOptions: CallOptions?,
@@ -28,32 +24,43 @@ class GrpcClientInterceptor(
         ) {
             override fun start(responseListener: Listener<RespT?>?, headers: Metadata?) {
                 val methodName = "/${method?.fullMethodName}"
-                val keyId = (0 until 256).random()
-                val authenticationPublicKey = context.getStaticKeys(keyId)
-                    ?: throw Exception("Could not find static keys for id")
-                val ecKid = Keys.getOwnKey(
-                    context,
-                    tokenId,
-                    keyId
-                )
-                ecKid.use { ecKid ->
-                    val token = v1TokenEncrypt(
-                        ecKid = ecKid.privateKey,
-                        ssKidPk = authenticationPublicKey,
-                        esKidPk = ecKid.publicKey,
-                        token = ecKid.tokenHash!!,
-                        keyId = keyId.toUByte(),
-                    )
-                    try {
-                        val xKeyId = Metadata.Key.of("X-Key-id", Metadata.ASCII_STRING_MARSHALLER)
-                        val bearer = Metadata.Key.of("Authorization", Metadata.ASCII_STRING_MARSHALLER)
 
-                        headers?.put(bearer, "Bearer ${Base64.encodeToString(token, Base64.URL_SAFE)}")
-                        headers?.put(xKeyId, keyId.toString())
-                        super.start(responseListener, headers)
-                    } finally {
-                        token.fill(0)
-                    }
+                val protocol = Protocols(context)
+                protocol.generateDH().use { key ->
+                    val keyId = (0 until 256).random()
+                    val authenticationPublicKey = context.getStaticKeys(keyId)
+                        ?: throw Exception("Could not find static keys for id")
+                    val ciphertext = v1RequestsEncrypt(
+                        ec = key.privateKey!!,
+                        ssKidPk = authenticationPublicKey,
+                        methodName = methodName.toByteArray(),
+                        payload = null
+                    )
+
+                    /**
+                     * X-Payload-bin: <ciphertext>
+                     * X-Public-Key-bin: <eC_pk>
+                     * X-Key-ID: <Key-ID>
+                     * X-Nonce: <Nonce>
+                     * X-Timestamp: <Timestamp>
+                     */
+                    val xPayloadBin = Metadata.Key.of("X-Payload-bin",
+                        Metadata.BINARY_BYTE_MARSHALLER)
+                    val xPublicKeyBin = Metadata.Key.of("X-Public-Key-bin",
+                        Metadata.BINARY_BYTE_MARSHALLER)
+                    val xKeyId = Metadata.Key.of("X-Key-ID",
+                        Metadata.ASCII_STRING_MARSHALLER)
+                    val xNonce = Metadata.Key.of("X-Nonce",
+                        Metadata.BINARY_BYTE_MARSHALLER)
+                    val xTimestamp = Metadata.Key.of("X-Timestamp",
+                        Metadata.ASCII_STRING_MARSHALLER)
+                    headers?.put(xPayloadBin, ciphertext.ciphertext)
+                    headers?.put(xPublicKeyBin, key.publicKey)
+                    headers?.put(xKeyId, keyId.toString())
+                    headers?.put(xNonce, ciphertext.nonce)
+                    headers?.put(xTimestamp, ciphertext.timestamp.toString())
+
+                    super.start(responseListener, headers)
                 }
             }
         }

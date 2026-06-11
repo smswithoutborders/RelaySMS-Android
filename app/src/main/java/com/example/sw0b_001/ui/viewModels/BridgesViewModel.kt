@@ -102,7 +102,7 @@ class BridgesViewModel @Inject constructor(
             val keys = db.fetch(tokenId, keyId) ?: throw Exception("Could not open database")
             keys.use { ec ->
                 val ciphertext = v1BridgeOnlineFirstPublisherEncrypt(
-                    ecKid = ec.privateKey,
+                    ecKid = ec.privateKey!!,
                     ssKidPk = authenticationPublicKey,
                     esKidPk = othersKeys.publicKey,
                     keyId = keyId.toUByte(),

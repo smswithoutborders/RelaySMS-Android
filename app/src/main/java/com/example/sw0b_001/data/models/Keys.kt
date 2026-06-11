@@ -15,7 +15,7 @@ data class Keys(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val keyId: Int,
-    val privateKey: ByteArray,
+    val privateKey: ByteArray?,
     val publicKey: ByteArray,
     var tokenId: ByteArray?,
     var tokenHash: ByteArray? = null,
@@ -26,7 +26,7 @@ data class Keys(
     private var isClosed = false
 
     override fun close() {
-        privateKey.fill(0)
+        privateKey?.fill(0)
         publicKey.fill(0)
         tokenHash?.fill(0)
         tokenId?.fill(0)
@@ -44,24 +44,6 @@ data class Keys(
 //                ?: throw Exception("Failed to get database")
 //            return db.fetch(tokenHash, keyId) ?: throw Exception("No key found")
 //        }
-
-        suspend fun save(
-            context: Context,
-            tokenHash: ByteArray,
-            keys: List<Keys>,
-            tokenId: ByteArray,
-        ) {
-            val db = Datastore.getDatastore(context)?.keysDao()
-                ?: throw Exception("Failed to get database")
-
-            try {
-                db.insert(keys, tokenId, tokenHash)
-            } catch(e: Exception) {
-                throw e;
-            } finally {
-                keys.forEach { it.close() }
-            }
-        }
 
     }
 

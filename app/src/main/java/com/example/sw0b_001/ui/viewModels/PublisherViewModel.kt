@@ -103,7 +103,7 @@ class PublisherViewModel @Inject constructor(
         val keys = db.fetch(tokenId, keyId) ?: throw Exception("Could not open database")
         keys.use { k ->
             val ciphertext = v1PlatformPublisherEncrypt(
-                ecKid = k.privateKey,
+                ecKid = k.privateKey!!,
                 ssKidPk = authenticationPublicKey,
                 esKidPk = othersKeys.publicKey,
                 keyId = keyId.toUByte(),

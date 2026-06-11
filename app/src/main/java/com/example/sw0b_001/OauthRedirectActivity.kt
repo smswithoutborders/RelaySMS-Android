@@ -47,7 +47,7 @@ class OauthRedirectActivity : AppCompatActivity() {
         }
     }
 
-    fun sendAuthCode(
+    suspend fun sendAuthCode(
         platformName: String,
         code: String,
     ) {

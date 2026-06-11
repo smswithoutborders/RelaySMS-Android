@@ -1,177 +1,103 @@
 syntax = "proto3";
 
-package publisher.v2;
+package publisher.v3;
+
+// Represents a public key
+message PublicKey {
+  // The key ID
+  uint32 key_id = 1;
+  // The public key (32 bytes)
+  bytes public_key = 2;
+}
 
 // Request message for getting the OAuth2 authorization URL
+//
+// Required headers:
+//   X-Payload-bin:    Encrypted request payload ciphertext (binary)
+//   X-Public-Key-bin: Client ephemeral public key (eC_pk, 32 bytes, binary)
+//   X-Key-ID:         Server identity key ID used for encrypting the payload (string)
+//   X-Nonce-bin:      Request nonce (16 bytes, binary)
+//   X-Timestamp:      Unix timestamp in seconds (string)
 message GetOAuth2AuthorizationUrlRequest {
   // The platform for which the authorization URL is requested
   string platform = 1;
   // Optional state parameter to prevent CSRF attacks
   string state = 2;
-  // Optional code verifier for PKCE
+  // Optional PKCE code verifier. Ignored if autogenerate_code_verifier is true.
   string code_verifier = 3;
-  // Flag to indicate if the code verifier should be auto-generated
+  // If true, a PKCE code verifier is auto-generated and code_verifier is ignored
   bool autogenerate_code_verifier = 4;
   // Optional redirect URL for the OAuth2 application
   string redirect_url = 5;
-  // Optional request identifier for tracking the request
+  // Optional request identifier for tracking
   string request_identifier = 6;
 }
 
-// Response message for the OAuth2 GetAuthorizationUrl RPC
+// Response message for GetOAuth2AuthorizationUrl
 message GetOAuth2AuthorizationUrlResponse {
-  // The authorization URL
+  // The authorization URL to redirect the user to
   string authorization_url = 1;
-  // The state parameter for preventing CSRF attacks
+  // State parameter for CSRF protection
   string state = 2;
-  // The code verifier used for PKCE
+  // PKCE code verifier (auto-generated or echo of the request value)
   string code_verifier = 3;
   // A response message
   string message = 4;
-  // The scope of the authorization request
+  // Scope of the authorization request
   string scope = 5;
-  // The client ID for the OAuth2 application
+  // Client ID of the OAuth2 application
   string client_id = 6;
-  // The redirect URL for the OAuth2 application
+  // Redirect URL of the OAuth2 application
   string redirect_url = 7;
 }
 
-// Request message for exchanging the OAuth2 authorization code for a token
+// Request message for exchanging an OAuth2 authorization code for a token
 //
-// Headers:
-// authorization = Bearer token (format: `Bearer <long_lived_token>`) 
-// x-sig = Request signature (base64 url-safe encoded)
-// x-nonce = Nonce for request (must be unique, base64 url-safe encoded)
-// x-timestamp = Request timestamp
+// Required headers:
+//   X-Payload-bin:    Encrypted request payload ciphertext (binary)
+//   X-Public-Key-bin: Client ephemeral public key (eC_pk, 32 bytes, binary)
+//   X-Key-ID:         Server identity key ID used for encrypting the payload (string)
+//   X-Nonce-bin:      Request nonce (16 bytes, binary)
+//   X-Timestamp:      Unix timestamp in seconds (string)
 message ExchangeOAuth2CodeAndStoreRequest {
   // The platform for which the token exchange is being performed
   string platform = 1;
   // The authorization code received from the authorization server
   string authorization_code = 2;
-  // Optional code verifier used for PKCE
+  // Optional PKCE code verifier
   string code_verifier = 3;
   // Optional redirect URL for the OAuth2 application
   string redirect_url = 4;
-  // Indicates if the token should be stored on the device instead of the cloud
-  bool store_on_device = 5;
-  // Optional request identifier for tracking the request
-  string request_identifier = 6;
+  // Optional request identifier for tracking
+  string request_identifier = 5;
+  // Client ephemeral public keys to associate with the stored token
+  repeated PublicKey client_ephemeral_public_keys = 6;
 }
 
-// Response message for the ExchangeOAuth2Code RPC
+// Response message for ExchangeOAuth2CodeAndStore
 message ExchangeOAuth2CodeAndStoreResponse {
   // Indicates if the token exchange and storage was successful
   bool success = 1;
   // A response message
   string message = 2;
-  // Access and refresh tokens
-  map<string, string> tokens = 3;
+  // Account identifier associated with the token
+  string account_identifier = 3;
+  // Encrypted token ciphertext
+  bytes token_ciphertext = 4;
+  // Unique identifier of the stored token
+  bytes token_id = 5;
+  // Server ephemeral public key used for encrypting the token ciphertext
+  bytes server_ephemeral_public_key = 6;
+  // Server ephemeral public keys associated with the token
+  repeated PublicKey server_ephemeral_public_keys = 7;
+  // Server identity key ID used for encrypting the token ciphertext
+  uint32 key_id = 8;
 }
 
-// Request message for revoking and deleting an OAuth2 token
-//
-// Headers:
-// authorization = Bearer token (format: `Bearer <long_lived_token>`) 
-// x-sig = Request signature (base64 url-safe encoded)
-// x-nonce = Nonce for request (must be unique, base64 url-safe encoded)
-// x-timestamp = Request timestamp
-message RevokeAndDeleteOAuth2TokenRequest {
-  // The platform associated with the token.
-  string platform = 1;
-  // The identifier of the account associated with the token.
-  string account_identifier = 2;
-}
-
-// Response message for revoking and deleting an OAuth2 token
-message RevokeAndDeleteOAuth2TokenResponse {
-  // A response message.
-  string message = 1;
-  // Indicates whether the operation was successful.
-  bool success = 2;
-}
-
-// Request message for getting the PNBA code
-message GetPNBACodeRequest {
-  // The platform for which the authorization URL is requested
-  string platform = 1;
-  // The identifier for the platform
-  string phone_number = 2;
-  // Optional request identifier for tracking the request
-  string request_identifier = 3;
-}
-
-// Response message for getting the PNBA code
-message GetPNBACodeResponse {
-  // Indicates if the request was successful
-  bool success = 1;
-  // A response message
-  string message = 2;
-}
-
-// Request message for exchanging the PNBA code for a token and storing it
-//
-// Headers:
-// authorization = Bearer token (format: `Bearer <long_lived_token>`) 
-// x-sig = Request signature (base64 url-safe encoded)
-// x-nonce = Nonce for request (must be unique, base64 url-safe encoded)
-// x-timestamp = Request timestamp
-message ExchangePNBACodeAndStoreRequest {
-  // The platform for which the authorization URL is requested
-  string platform = 1;
-  // The identifier for the platform
-  string phone_number = 2;
-  // The authorization code received from the authorization server
-  string authorization_code = 3;
-  // The password for two-step verification
-  string password = 4;
-  // Optional request identifier for tracking the request
-  string request_identifier = 5;
-}
-
-// Response message for exchanging the PNBA code for a token and storing it
-message ExchangePNBACodeAndStoreResponse {
-  // Indicates if the request was successful
-  bool success = 1;
-  // A response message
-  string message = 2;
-  // Indicates if two step verification is enabled
-  bool two_step_verification_enabled = 3;
-}
-
-// Request message for revoking and deleting a PNBA token
-//
-// Headers:
-// authorization = Bearer token (format: `Bearer <long_lived_token>`) 
-// x-sig = Request signature (base64 url-safe encoded)
-// x-nonce = Nonce for request (must be unique, base64 url-safe encoded)
-// x-timestamp = Request timestamp
-message RevokeAndDeletePNBATokenRequest {
-  // The platform associated with the token.
-  string platform = 1;
-  // The identifier of the account associated with the token.
-  string account_identifier = 2;
-}
-
-// Response message for revoking and deleting a PNBA token
-message RevokeAndDeletePNBATokenResponse {
-  // A response message.
-  string message = 1;
-  // Indicates whether the operation was successful.
-  bool success = 2;
-}
-
-// Service definition for Publisher
+// Publisher service
 service Publisher {
-  // RPC for getting the OAuth2 authorization URL
+  // Get an OAuth2 authorization URL for a platform
   rpc GetOAuth2AuthorizationUrl(GetOAuth2AuthorizationUrlRequest) returns (GetOAuth2AuthorizationUrlResponse);
-  // RPC for exchanging OAuth2 authorization code for a token
+  // Exchange an OAuth2 authorization code for a token, store it, and return encrypted token data
   rpc ExchangeOAuth2CodeAndStore(ExchangeOAuth2CodeAndStoreRequest) returns (ExchangeOAuth2CodeAndStoreResponse);
-  // Revokes and deletes an OAuth2 access token
-  rpc RevokeAndDeleteOAuth2Token(RevokeAndDeleteOAuth2TokenRequest) returns (RevokeAndDeleteOAuth2TokenResponse);
-  // RPC for getting the PNBA code
-  rpc GetPNBACode(GetPNBACodeRequest) returns (GetPNBACodeResponse);
-  // RPC for exchanging the PNBA code for a token and storing it
-  rpc ExchangePNBACodeAndStore(ExchangePNBACodeAndStoreRequest) returns (ExchangePNBACodeAndStoreResponse);
-  // RPC for revoking and deleting a PNBA token
-  rpc RevokeAndDeletePNBAToken(RevokeAndDeletePNBATokenRequest) returns (RevokeAndDeletePNBATokenResponse);
 }

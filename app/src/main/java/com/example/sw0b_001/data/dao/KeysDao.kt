@@ -14,15 +14,8 @@ interface KeysDao {
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun _insert(key: List<Keys>)
 
-    @Transaction
-    suspend fun insert(keys: List<Keys>, tokenId: ByteArray, tokenHash: ByteArray) {
-        clear(tokenId)
-        keys.forEach {
-            it.tokenId = tokenId
-            it.tokenHash = tokenHash
-        }
-        _insert(keys)
-    }
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insert(keys: List<Keys>)
 
     @Query("SELECT * FROM Keys WHERE tokenId = :tokenId")
     fun fetchTokenId(tokenId: ByteArray): List<Keys>?

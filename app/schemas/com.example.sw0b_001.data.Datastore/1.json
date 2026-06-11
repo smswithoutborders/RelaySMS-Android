@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "8ddae9fac7926feec5d0cc2a8036dba6",
+    "identityHash": "8d7eb25b98d5c6792333512edfb7b9d4",
     "entities": [
       {
         "tableName": "RatchetStates",
@@ -259,7 +259,7 @@
       },
       {
         "tableName": "Keys",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `keyId` INTEGER NOT NULL, `privateKey` BLOB NOT NULL, `publicKey` BLOB NOT NULL, `tokenId` BLOB, `tokenHash` BLOB, `isOwn` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `keyId` INTEGER NOT NULL, `privateKey` BLOB, `publicKey` BLOB NOT NULL, `tokenId` BLOB, `tokenHash` BLOB, `isOwn` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -276,8 +276,7 @@
           {
             "fieldPath": "privateKey",
             "columnName": "privateKey",
-            "affinity": "BLOB",
-            "notNull": true
+            "affinity": "BLOB"
           },
           {
             "fieldPath": "publicKey",
@@ -348,7 +347,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8ddae9fac7926feec5d0cc2a8036dba6')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8d7eb25b98d5c6792333512edfb7b9d4')"
     ]
   }
 }
