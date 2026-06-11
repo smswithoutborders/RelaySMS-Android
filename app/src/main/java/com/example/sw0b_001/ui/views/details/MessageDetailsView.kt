@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -47,11 +46,7 @@ fun MessageDetailsView(message: Payloads?) {
         mutableStateOf(message?.content?.getBody()?.toUtf8String() ?: "") }
     var date by remember(message) { mutableLongStateOf(message?.date ?: 0L) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
+    Column( modifier = Modifier .fillMaxSize() ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
                 painter = painterResource(R.drawable.round_person_24),

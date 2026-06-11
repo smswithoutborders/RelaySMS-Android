@@ -56,9 +56,7 @@ fun EmailDetailsView(message: Payloads?) {
 
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
+        modifier = Modifier.fillMaxSize()
     ) {
         // Subject
         if(subject.isNotEmpty() || LocalInspectionMode.current) {

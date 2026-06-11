@@ -76,7 +76,7 @@ fun DetailsInterfaceView(
                 .verticalScroll(scrollState)
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(16.dp)
+                .padding(12.dp)
         ) {
             when(cat) {
                 V1ContentCategories.EMAIL,
