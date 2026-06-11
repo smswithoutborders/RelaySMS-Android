@@ -1,8 +1,6 @@
 package com.example.sw0b_001.ui.viewModels
 
 import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sw0b_001.data.Datastore
@@ -11,6 +9,8 @@ import com.example.sw0b_001.data.repositories.SupportedPlatformsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -33,13 +33,8 @@ class SupportedPlatformsViewModel @Inject constructor(
     val db = Datastore.getDatastore(context)?.supportedPlatformsCacheDao()
         ?: throw Exception("Failed to get database")
 
-    private var cache: LiveData<List<SupportedPlatforms>> = MutableLiveData()
-
-    fun get(): LiveData<List<SupportedPlatforms>>{
-        if(cache.value == null) {
-            cache = db.fetch()
-        }
-        return cache
+    fun get(): Flow<List<SupportedPlatforms>> {
+        return db.fetch()
     }
 
     fun fetch() {
@@ -47,8 +42,11 @@ class SupportedPlatformsViewModel @Inject constructor(
             _uiState.value = SupportedPlatformsUiState.Loading
             try {
                 val supportedPlatforms = repository.getSupportedPlatforms()
-                val platforms = SupportedPlatformsUiState.Success(supportedPlatforms)
-                _uiState.value = platforms
+                supportedPlatforms?.let {
+                    cache(supportedPlatforms)
+                    val platforms = SupportedPlatformsUiState.Success(supportedPlatforms)
+                    _uiState.value = platforms
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
                 _uiState.value = SupportedPlatformsUiState.Error(e.localizedMessage
@@ -58,10 +56,12 @@ class SupportedPlatformsViewModel @Inject constructor(
     }
 
     private fun cache(platforms: List<SupportedPlatforms>) {
-        try {
-            db.insert(platforms)
-        } catch (e: Exception) {
-            e.printStackTrace()
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                db.insert(platforms)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 }

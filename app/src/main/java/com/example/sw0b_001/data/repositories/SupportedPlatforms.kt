@@ -19,7 +19,6 @@ data class SupportedPlatforms(
     @PrimaryKey
     val name: String,
     var cat_id: Int,
-    var service_type: String,
     val protocol_type: String?,
     val icon_svg: String?,
     val icon_png: String?,
@@ -33,7 +32,7 @@ private const val BASE_URL = "https://publisher.relaysms.afkanerd.de/"
 
 interface SupportedPlatformsApiService {
     @GET("v1/platforms")
-    suspend fun getSupportedPlatforms(): List<SupportedPlatforms>
+    suspend fun getSupportedPlatforms(): List<SupportedPlatforms>?
 }
 
 @Qualifier

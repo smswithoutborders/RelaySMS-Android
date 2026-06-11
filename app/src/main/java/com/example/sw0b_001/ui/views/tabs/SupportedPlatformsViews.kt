@@ -36,7 +36,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -184,7 +183,8 @@ fun PlatformListContent(
 ) {
     val context = LocalContext.current
     val states by supportedPlatformsViewModel.uiState.collectAsStateWithLifecycle()
-    val supportedPlatforms = supportedPlatformsViewModel.get().observeAsState()
+    val supportedPlatforms by supportedPlatformsViewModel.get()
+        .collectAsStateWithLifecycle(mutableListOf())
 
     val tokens by tokensViewModel.storedTokensUiState.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
@@ -287,7 +287,7 @@ fun PlatformListContent(
             verticalArrangement = Arrangement.Center,
             maxItemsInEachRow = 2
         ) {
-            supportedPlatforms.value?.forEach { platform ->
+            supportedPlatforms.forEach { platform ->
                 val isStored = tokens.find { it.platformName == platform.name }
 
                 PlatformCard(
