@@ -43,7 +43,7 @@ fun TextDetailsView(message: Payloads?) {
 
 //    var from by remember { mutableStateOf( account?.platformName ) }
     var body by remember(message) {
-        mutableStateOf(message?.contents?.getBody()?.toUtf8String() ?: "") }
+        mutableStateOf(message?.content?.getBody()?.toUtf8String() ?: "") }
     var date by remember(message) { mutableLongStateOf(message?.date ?: 0L) }
 
     Column(

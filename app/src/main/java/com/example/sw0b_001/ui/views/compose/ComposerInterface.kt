@@ -42,7 +42,6 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDefaultSim
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.components.mmsImagePicker
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.models.Payloads
 import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.ui.components.AttachImageView
 import com.example.sw0b_001.ui.modals.ComposeChooseGatewayClientsModal
@@ -93,7 +92,7 @@ fun ComposerInterface(
         navController.popBackStack()
     }
 
-    val message by payloadsViewModel.message.collectAsStateWithLifecycle()
+    val payload by payloadsViewModel.message.collectAsStateWithLifecycle()
     val tokens by tokensViewModel.storedTokensUiState.collectAsStateWithLifecycle()
     LaunchedEffect(Unit) {
         if(messageId != null) {
@@ -126,12 +125,12 @@ fun ComposerInterface(
     }
 
     var to: String by remember{
-        mutableStateOf( message?.contents?.getTo()?.toUtf8String() ?: "") }
+        mutableStateOf( payload?.content?.getTo()?.toUtf8String() ?: "") }
     var subject: String by remember{ mutableStateOf(
-        message?.contents?.getSubject()?.toUtf8String() ?: "") }
+        payload?.content?.getSubject()?.toUtf8String() ?: "") }
     var body: String by remember{
-        mutableStateOf(message?.contents?.getBody()?.toUtf8String() ?: "") }
-    var image by remember{ mutableStateOf(message?.contents?.getAttachment()) }
+        mutableStateOf(payload?.content?.getBody()?.toUtf8String() ?: "") }
+    var image by remember{ mutableStateOf(payload?.content?.getAttachment()) }
 
     var showSelectAccountModal by remember { mutableStateOf(
         catId != V1ContentCategories.BRIDGE ) }
@@ -258,21 +257,10 @@ fun ComposerInterface(
                             to = to,
                             subject = subject,
                             imageViewModel = imageViewModel,
+                            payloadsViewModel = payloadsViewModel,
                             onFailureCallback = {},
-                        ) { ser, isAttachment ->
-                            try {
-                                val payload = Payloads(
-                                    payload = ser,
-                                    catId = selectedToken!!.catId,
-                                    isAttachment = isAttachment
-                                )
-                                payloadsViewModel.insert(payload)
-                                navController.popBackStack()
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                                Toast.makeText(
-                                    context, e.message, Toast.LENGTH_LONG).show()
-                            }
+                        ) {
+                            navController.popBackStack()
                         }
                     } else {
                         bridgesViewModel.publish(
@@ -281,21 +269,10 @@ fun ComposerInterface(
                             to = to,
                             subject = subject,
                             imageViewModel = imageViewModel,
+                            payloadsViewModel = payloadsViewModel,
                             onFailureCallback = {},
-                        ) { ser, isAttachment ->
-                            try {
-                                val payload = Payloads(
-                                    payload = ser,
-                                    catId = V1ContentCategories.BRIDGE,
-                                    isAttachment = isAttachment
-                                )
-                                payloadsViewModel.insert(payload)
-                                navController.popBackStack()
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                                Toast.makeText(
-                                    context, e.message, Toast.LENGTH_LONG).show()
-                            }
+                        ) {
+                            navController.popBackStack()
                         }
                     }
                 }

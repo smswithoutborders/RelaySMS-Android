@@ -72,6 +72,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import uniffi.relaysms_spec_payload.V1ContentCategories
+import uniffi.relaysms_spec_payload.v1ContentCategoryFromU8
 
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
@@ -333,7 +334,7 @@ fun PlatformListContent(
                 showPlatformsModal = showPlatformOptions,
                 cat = if(clickedPlatform == null)
                     V1ContentCategories.BRIDGE
-                else clickedPlatform!!.cat_id,
+                else v1ContentCategoryFromU8(clickedPlatform!!.cat_id.toUByte()),
                 isActive = isStored != null,
                 isCompose = isCompose,
                 platform = clickedPlatform,

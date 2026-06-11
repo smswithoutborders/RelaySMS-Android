@@ -30,7 +30,7 @@ object TransportImpl {
         imageViewModel: ImageViewModel,
         sessionId: UByte,
         encrypt: (ByteArray) -> Pair<ByteArray, Int>
-    ) : V1Payloads {
+    ) : V1ContentsContainer {
 
         val contentContainer = V1ContentsContainer(
             catId = catId,
@@ -61,13 +61,7 @@ object TransportImpl {
             payload = splitPayloads,
         )
 
-        return V1Payloads(
-            contents = content,
-            kId = keyId.toUByte(),
-            lenAtt = attachment.size.toUShort(),
-            tId = tokenId?.toIntLittleEndian()?.toUInt(),
-            sessId = sessionId
-        )
+        return contentContainer
     }
 
     fun publishWithoutAttachment(
@@ -78,7 +72,7 @@ object TransportImpl {
         to: String?,
         subject: String?,
         encrypt: (ByteArray) -> Pair<ByteArray, Int>
-    ) : V1Payloads {
+    ) : V1ContentsContainer {
         val contentContainer = V1ContentsContainer(
             catId = catId,
             body = body.encodeToByteArray(),
@@ -102,13 +96,8 @@ object TransportImpl {
         sendSms(context, payload) {
 
         }
-        return V1Payloads(
-            contents = content,
-            kId = keyId.toUByte(),
-            lenAtt = 0u,
-            tId = tokenId?.toIntLittleEndian()?.toUInt(),
-            sessId = null
-        )
+
+        return contentContainer
     }
 
     fun sendSms(

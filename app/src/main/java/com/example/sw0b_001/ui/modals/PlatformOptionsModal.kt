@@ -44,6 +44,7 @@ import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.viewModels.TokensUiState
 import uniffi.relaysms_spec_payload.V1ContentCategories
+import uniffi.relaysms_spec_payload.v1ContentCategoryFromU8
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -138,13 +139,15 @@ fun PlatformOptionsModal(
                             getServiceBasedComposeDescriptions(
                                 context,
                                 if(platform?.cat_id == null) V1ContentCategories.BRIDGE
-                                        else platform.cat_id
+                                        else v1ContentCategoryFromU8(
+                                    platform.cat_id.toUByte())
                             )
                         } else {
                             getServiceBasedAvailableDescription(
                                 context,
                                 if(platform?.cat_id == null) V1ContentCategories.BRIDGE
-                                else  platform.cat_id
+                                else v1ContentCategoryFromU8(
+                                    platform.cat_id.toUByte())
                             )
                         },
                         style = MaterialTheme.typography.bodyMedium,

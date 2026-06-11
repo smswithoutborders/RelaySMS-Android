@@ -9,7 +9,6 @@ import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
-import uniffi.relaysms_spec_payload.V1ContentCategories
 import javax.inject.Inject
 import javax.inject.Qualifier
 import javax.inject.Singleton
@@ -19,7 +18,7 @@ import javax.inject.Singleton
 data class SupportedPlatforms(
     @PrimaryKey
     val name: String,
-    var cat_id: V1ContentCategories,
+    var cat_id: Int,
     var service_type: String,
     val protocol_type: String?,
     val icon_svg: String?,
@@ -29,11 +28,11 @@ data class SupportedPlatforms(
 )
 
 
-private const val BASE_URL = "https://raw.githubusercontent.com/"
+private const val BASE_URL = "https://publisher.relaysms.afkanerd.de/"
 
 
 interface SupportedPlatformsApiService {
-    @GET("smswithoutborders/SMSWithoutBorders-Publisher/master/resources/platforms.json")
+    @GET("v1/platforms")
     suspend fun getSupportedPlatforms(): List<SupportedPlatforms>
 }
 

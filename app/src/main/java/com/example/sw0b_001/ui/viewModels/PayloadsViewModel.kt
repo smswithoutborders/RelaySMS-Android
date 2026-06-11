@@ -4,7 +4,10 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.models.Payloads
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,8 +19,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import uniffi.relaysms_spec_payload.V1ContentCategories
-import uniffi.relaysms_spec_payload.V1ContentsContainer
-import uniffi.relaysms_spec_payload.V1Payloads
 
 @HiltViewModel
 class PayloadsViewModel @Inject constructor(
@@ -40,72 +41,71 @@ class PayloadsViewModel @Inject constructor(
     val db = Datastore.getDatastore(context)?.messagesDao()
         ?: throw Exception("Could not open database")
 
-    fun get() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _isLoading.value = true
-            db.get()?.let {
-                it.collect { items ->
-                    val payloads = mutableListOf<Payloads>()
-                    items.forEach { payload ->
-                        val deserialized = if(payload.isAttachment)
-                            V1Payloads.deserializeFromStorage(payload.payload)
-                        else V1Payloads.deserialize(payload.payload)
-                        val content = V1ContentsContainer.deserialize(
-                            data = deserialized.getPayload(),
-                            catId = payload.catId,
-                            lenAtt = if(payload.isAttachment) deserialized.getLenAtt() else 0u
-                        )
-                        payload.contents = content
-                        payloads.add(payload)
-                    }
-                    _messagesUiState.value = payloads
-                    _isLoading.value = false
-                }
-            }
-        }
-    }
+//    fun get() {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            _isLoading.value = true
+//            db.get()?.let {
+//                _messagesUiState.value = it
+//                _isLoading.value = false
+//                it.collect { items ->
+//                    val payloads = mutableListOf<Payloads>()
+//                    items.forEach { payload ->
+//                        val deserialized = V1Payloads.deserialize(payload.payload)
+//                        val content = V1ContentsContainer.deserialize(
+//                            data = deserialized.getPayload(),
+//                            catId = payload.catId,
+//                            lenAtt = if(payload.isAttachment) deserialized.getLenAtt() else 0u
+//                        )
+////                        payload.contents = content
+//                        payloads.add(payload)
+//                    }
+//                    _messagesUiState.value = payloads
+//                    _isLoading.value = false
+//                }
+//            }
+//        }
+//    }
 
     fun get(messageId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             _isLoading.value = true
             db.get(messageId)?.let { payload ->
-                val deserialized = if(payload.isAttachment)
-                    V1Payloads.deserializeFromStorage(payload.payload)
-                else V1Payloads.deserialize(payload.payload)
-                val content = V1ContentsContainer.deserialize(
-                    data = deserialized.getPayload(),
-                    catId = payload.catId,
-                    lenAtt = if(payload.isAttachment) deserialized.getLenAtt() else 0u
-                )
-                payload.contents = content
                 _messageUiState.value = payload
+//                val deserialized = V1Payloads.deserialize(payload.payload)
+//                val content = V1ContentsContainer.deserialize(
+//                    data = deserialized.getPayload(),
+//                    catId = payload.catId,
+//                    lenAtt = if(payload.isAttachment) deserialized.getLenAtt() else 0u
+//                )
+//                payload.contents = content
             }
             _isLoading.value = false
         }
     }
 
-//    fun get(): Flow<PagingData<Payloads>> {
-//        if (conversationsPager == null) {
-//            val pageSize = 50
-//            val prefetchDistance = 3 * pageSize
-//            val enablePlaceholder = true
+    fun get(): Flow<PagingData<Payloads>> {
+        if (conversationsPager == null) {
+            val pageSize = 50
+            val prefetchDistance = 3 * pageSize
+            val enablePlaceholder = true
 //            val initialLoadSize: Int = 2 * pageSize
-//            val maxSize: Int = PagingConfig.MAX_SIZE_UNBOUNDED
-//            val db = Datastore.getDatastore(context)?.messagesDao()
-//                ?: throw Exception("Could not open database")
-//            conversationsPager = Pager(
-//                config = PagingConfig(
-//                    pageSize,
-//                    prefetchDistance,
-//                    enablePlaceholder,
-//                    initialLoadSize,
-//                    maxSize
-//                ),
-//                pagingSourceFactory = { db.all() }
-//            ).flow.cachedIn(viewModelScope)
-//        }
-//        return conversationsPager!!
-//    }
+            val initialLoadSize: Int = 50
+            val maxSize: Int = PagingConfig.MAX_SIZE_UNBOUNDED
+            val db = Datastore.getDatastore(context)?.messagesDao()
+                ?: throw Exception("Could not open database")
+            conversationsPager = Pager(
+                config = PagingConfig(
+                    pageSize,
+                    prefetchDistance,
+                    enablePlaceholder,
+                    initialLoadSize,
+                    maxSize
+                ),
+                pagingSourceFactory = { db.all() }
+            ).flow.cachedIn(viewModelScope)
+        }
+        return conversationsPager!!
+    }
 
     fun getInboxMessages(): LiveData<MutableList<Payloads>> {
         viewModelScope.launch {

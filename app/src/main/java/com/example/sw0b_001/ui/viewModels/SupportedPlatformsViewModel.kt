@@ -11,12 +11,9 @@ import com.example.sw0b_001.data.repositories.SupportedPlatformsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import uniffi.relaysms_spec_payload.V1ContentCategories
 
 sealed class SupportedPlatformsUiState {
     object Loading : SupportedPlatformsUiState()
@@ -51,17 +48,6 @@ class SupportedPlatformsViewModel @Inject constructor(
             try {
                 val supportedPlatforms = repository.getSupportedPlatforms()
                 val platforms = SupportedPlatformsUiState.Success(supportedPlatforms)
-                withContext(Dispatchers.IO) {
-                    cache(platforms.supportedPlatforms.apply {
-                        forEach { platform ->
-                            when(platform.service_type) {
-                                "email" -> platform.cat_id = V1ContentCategories.EMAIL
-                                "text" -> platform.cat_id = V1ContentCategories.TEXT
-                                "message" -> platform.cat_id = V1ContentCategories.MESSAGE
-                            }
-                        }
-                    })
-                }
                 _uiState.value = platforms
             } catch (e: Exception) {
                 e.printStackTrace()

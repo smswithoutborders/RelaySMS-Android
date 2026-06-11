@@ -10,6 +10,7 @@ import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.TransportImpl
 import com.example.sw0b_001.data.TransportImpl.publishWithAttachment
 import com.example.sw0b_001.data.TransportImpl.publishWithoutAttachment
+import com.example.sw0b_001.data.models.Payloads
 import com.example.sw0b_001.extensions.context.getStaticKeys
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -18,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uniffi.relaysms_spec_payload.V1ContentCategories
+import uniffi.relaysms_spec_payload.V1ContentsContainer
 import uniffi.relaysms_spec_payload.v1PlatformPublisherEncrypt
 
 @HiltViewModel
@@ -31,19 +33,20 @@ class PublisherViewModel @Inject constructor(
         to: String?,
         subject: String?,
         imageViewModel: ImageViewModel,
+        payloadsViewModel: PayloadsViewModel,
         onFailureCallback: (String) -> Unit,
-        onCompleteCallback: (ByteArray, Boolean) -> Unit,
+        onCompleteCallback: () -> Unit,
     ) {
         val attachment = imageViewModel.processedImage.value?.rawBytes
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                var serializedPayload: ByteArray?
                 val isAttachment = attachment != null
+                var contentContainer: V1ContentsContainer?
 
                 try {
                     if(isAttachment) {
                         val sessionId = imageViewModel.getSessionId(context)
-                        val payload = publishWithAttachment(
+                        contentContainer = publishWithAttachment(
                             context,
                             catId,
                             body,
@@ -56,9 +59,8 @@ class PublisherViewModel @Inject constructor(
                         ) { payload ->
                             encrypt(tokenId!!, payload)
                         }
-                        serializedPayload = payload.serializeForStorage();
                     } else {
-                        val payload = publishWithoutAttachment(
+                        contentContainer = publishWithoutAttachment(
                             context,
                             catId,
                             body,
@@ -68,11 +70,17 @@ class PublisherViewModel @Inject constructor(
                         ) { payload ->
                             encrypt(tokenId!!, payload)
                         }
-                        serializedPayload = payload.serialize();
                     }
 
+                    val payload = Payloads(
+                        catId = catId,
+                        content = contentContainer,
+                    )
+
+                    payloadsViewModel.insert(payload)
+
                     withContext(Dispatchers.Main) {
-                        onCompleteCallback(serializedPayload, isAttachment)
+                        onCompleteCallback()
                     }
                 } catch (e: Exception) {
                     onFailureCallback(e.message ?: "")

@@ -10,14 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,8 +29,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.data.models.Payloads
@@ -56,27 +55,32 @@ fun RecentView(
 ) {
     var sendNewMessageRequested by remember { mutableStateOf(false) }
 
-    val payloads by payloadsViewModel.messages.collectAsStateWithLifecycle()
-    LaunchedEffect(Unit) {
-        payloadsViewModel.get()
-    }
+    val payloads = payloadsViewModel.get().collectAsLazyPagingItems()
+//    LaunchedEffect(Unit) {
+//        payloadsViewModel.get()
+//    }
 
     val listState = rememberLazyListState()
     Box(Modifier.fillMaxSize()) {
-        if (payloads?.isNotEmpty() == true) {
+        if (payloads.itemCount > 0) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 state = listState
             ) {
-                items(items = payloads ?: emptyList()) { message ->
+                items(
+//                    items = payloads,
+                    count = payloads.itemCount,
+                    key = payloads.itemKey { it.id }
+                ) { index ->
+                    val message = payloads[index]
                     RecentMessageCard(
-                        cat = message.contents!!.getCatId(),
+                        cat = message?.content!!.getCatId(),
                         payload = message,
 //                        logo = logo,
                         onClickCallback = { clickedMessage ->
                             navController.navigate(
                                 DetailsInterfaceScreen(
-                                    cat = clickedMessage.contents!!.getCatId(),
+                                    cat = clickedMessage.content.getCatId(),
                                     messageId = message.id
                                 )
                             )
@@ -132,9 +136,10 @@ fun RecentMessageCard(
     logo: Bitmap? = null,
     onClickCallback: (Payloads) -> Unit,
 ) {
-    var text by remember { mutableStateOf(payload.contents!!.getBody().toUtf8String()) }
-    var heading by remember { mutableStateOf(payload.contents!!.getSubject()?.toUtf8String() ?: "") }
-    var subHeading by remember { mutableStateOf(payload.contents!!.getTo()?.toUtf8String() ?: "" ) }
+    var text by remember { mutableStateOf(payload.content.getBody().toUtf8String()) }
+    var heading by remember { mutableStateOf(payload.content.getSubject()?.toUtf8String() ?: "") }
+    var subHeading by remember { mutableStateOf(payload.content.getTo()?.toUtf8String() ?: "" ) }
+
 
     Column {
         ListItem(

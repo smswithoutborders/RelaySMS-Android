@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "0fd5e4061776c4f8bfc55d3fc8ef97be",
+    "identityHash": "4ab757f1f8d1868739b9df073ee353e6",
     "entities": [
       {
         "tableName": "RatchetStates",
@@ -174,7 +174,7 @@
       },
       {
         "tableName": "SupportedPlatforms",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `cat_id` TEXT NOT NULL, `service_type` TEXT NOT NULL, `protocol_type` TEXT, `icon_svg` TEXT, `icon_png` TEXT, `support_url_scheme` INTEGER, `logo` BLOB, PRIMARY KEY(`name`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `cat_id` INTEGER NOT NULL, `service_type` TEXT NOT NULL, `protocol_type` TEXT, `icon_svg` TEXT, `icon_png` TEXT, `support_url_scheme` INTEGER, `logo` BLOB, PRIMARY KEY(`name`))",
         "fields": [
           {
             "fieldPath": "name",
@@ -185,7 +185,7 @@
           {
             "fieldPath": "cat_id",
             "columnName": "cat_id",
-            "affinity": "TEXT",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -317,7 +317,7 @@
       },
       {
         "tableName": "Payloads",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `catId` TEXT NOT NULL, `payload` BLOB NOT NULL, `isAttachment` INTEGER NOT NULL, `date` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `catId` TEXT NOT NULL, `content` BLOB NOT NULL, `date` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -332,15 +332,9 @@
             "notNull": true
           },
           {
-            "fieldPath": "payload",
-            "columnName": "payload",
+            "fieldPath": "content",
+            "columnName": "content",
             "affinity": "BLOB",
-            "notNull": true
-          },
-          {
-            "fieldPath": "isAttachment",
-            "columnName": "isAttachment",
-            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -360,7 +354,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0fd5e4061776c4f8bfc55d3fc8ef97be')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4ab757f1f8d1868739b9df073ee353e6')"
     ]
   }
 }

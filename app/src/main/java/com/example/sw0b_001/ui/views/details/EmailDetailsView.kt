@@ -44,13 +44,13 @@ fun EmailDetailsView(message: Payloads?) {
     var from by remember { mutableStateOf("") }
 
     var to by remember(message) {
-        mutableStateOf( message?.contents?.getTo()?.toUtf8String() ?: "") }
+        mutableStateOf( message?.content?.getTo()?.toUtf8String() ?: "") }
 
     var subject by remember(message) { mutableStateOf(
-        message?.contents?.getSubject()?.toUtf8String() ?: "") }
+        message?.content?.getSubject()?.toUtf8String() ?: "") }
 
     var body by remember(message) {
-        mutableStateOf(message?.contents?.getBody()?.toUtf8String() ?: "") }
+        mutableStateOf(message?.content?.getBody()?.toUtf8String() ?: "") }
 
     var date by remember(message) { mutableLongStateOf(message?.date ?: 0L) }
 
