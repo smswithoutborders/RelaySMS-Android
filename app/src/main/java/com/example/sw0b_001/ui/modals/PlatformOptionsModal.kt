@@ -1,8 +1,6 @@
 package com.example.sw0b_001.ui.modals
 
 import android.content.Context
-import android.graphics.BitmapFactory
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,14 +28,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.placeholder
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
@@ -47,7 +47,7 @@ import uniffi.relaysms_spec_payload.V1ContentCategories
 import uniffi.relaysms_spec_payload.v1ContentCategoryFromU8
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun PlatformOptionsModal(
     navController: NavController,
@@ -118,21 +118,17 @@ fun PlatformOptionsModal(
                     AddAccountLoading(platform!!)
                 }
                 else {
-                    Image(
-                        bitmap = if(platform?.logo != null) {
-                            BitmapFactory.decodeByteArray(
-                                platform.logo,
-                                0,
-                                platform.logo!!.count()
-                            ).asImageBitmap()
-                        }
-                        else BitmapFactory.decodeResource( context.resources,
-                            R.drawable.logo
-                        ).asImageBitmap(),
-                        contentDescription = stringResource(R.string.selected_platform),
-                        modifier = Modifier.size(64.dp),
-                        contentScale = ContentScale.Fit
-                    )
+                    GlideImage(
+                        model = platform?.icon_png,
+                        contentDescription = stringResource(R.string.platform_image),
+                        modifier = Modifier
+                            .size(50.dp),
+                        loading = placeholder(R.drawable.logo), // Shows while loading
+                        failure = placeholder(R.drawable.logo)      // Shows if download fails
+                    ) {
+                        it.diskCacheStrategy(DiskCacheStrategy.ALL) // Caches both original and resized images
+                            .circleCrop()                             // Makes the image a circle
+                    }
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = if (isCompose) {

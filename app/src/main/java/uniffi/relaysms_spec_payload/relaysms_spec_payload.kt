@@ -678,9 +678,13 @@ internal object IntegrityCheckingUniffiLib {
     ): Short
     external fun uniffi_relaysms_spec_payload_checksum_func_v1_requests_encrypt(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_func_v1_token_decrypt(
+    external fun uniffi_relaysms_spec_payload_checksum_func_v1_token_decrypt_client(
     ): Short
-    external fun uniffi_relaysms_spec_payload_checksum_func_v1_token_encrypt(
+    external fun uniffi_relaysms_spec_payload_checksum_func_v1_token_decrypt_server(
+    ): Short
+    external fun uniffi_relaysms_spec_payload_checksum_func_v1_token_encrypt_client(
+    ): Short
+    external fun uniffi_relaysms_spec_payload_checksum_func_v1_token_encrypt_server(
     ): Short
     external fun uniffi_relaysms_spec_payload_checksum_method_v1contents_serialize(
     ): Short
@@ -925,9 +929,13 @@ external fun uniffi_relaysms_spec_payload_fn_func_v1_requests_decrypt(`ssKid`: R
 ): RustBuffer.ByValue
 external fun uniffi_relaysms_spec_payload_fn_func_v1_requests_encrypt(`ec`: RustBuffer.ByValue,`ssKidPk`: RustBuffer.ByValue,`methodName`: RustBuffer.ByValue,`payload`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
-external fun uniffi_relaysms_spec_payload_fn_func_v1_token_decrypt(`ecKidPk`: RustBuffer.ByValue,`esKidPk`: RustBuffer.ByValue,`ssKid`: RustBuffer.ByValue,`esKid`: RustBuffer.ByValue,`keyId`: Byte,`receivedPayload`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_func_v1_token_decrypt_client(`ecKid`: RustBuffer.ByValue,`ssKidPk`: RustBuffer.ByValue,`esKidPk`: RustBuffer.ByValue,`keyId`: Byte,`receivedPayload`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
-external fun uniffi_relaysms_spec_payload_fn_func_v1_token_encrypt(`ecKid`: RustBuffer.ByValue,`ssKidPk`: RustBuffer.ByValue,`esKidPk`: RustBuffer.ByValue,`keyId`: Byte,`token`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_func_v1_token_decrypt_server(`ssKid`: RustBuffer.ByValue,`esKid`: RustBuffer.ByValue,`ecKidPk`: RustBuffer.ByValue,`keyId`: Byte,`ciphertext`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+external fun uniffi_relaysms_spec_payload_fn_func_v1_token_encrypt_client(`ecKid`: RustBuffer.ByValue,`ssKidPk`: RustBuffer.ByValue,`esKidPk`: RustBuffer.ByValue,`keyId`: Byte,`token`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+external fun uniffi_relaysms_spec_payload_fn_func_v1_token_encrypt_server(`ssKid`: RustBuffer.ByValue,`esKid`: RustBuffer.ByValue,`ecKidPk`: RustBuffer.ByValue,`keyId`: Byte,`token`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 external fun ffi_relaysms_spec_payload_rustbuffer_alloc(`size`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
@@ -1072,16 +1080,22 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_platform_publisher_encrypt() != 43459.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_requests_decrypt() != 3866.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_requests_decrypt() != 41803.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_requests_encrypt() != 11255.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_token_decrypt() != 46191.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_token_decrypt_client() != 38159.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_token_encrypt() != 5602.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_token_decrypt_server() != 31073.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_token_encrypt_client() != 27524.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_token_encrypt_server() != 29164.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_relaysms_spec_payload_checksum_method_v1contents_serialize() != 24413.toShort()) {
@@ -4157,6 +4171,44 @@ public object FfiConverterTypeRequestPayload: FfiConverterRustBuffer<RequestPayl
 
 
 
+data class ResponsePayload (
+    var `methodName`: kotlin.ByteArray
+    , 
+    var `payload`: kotlin.ByteArray
+    
+){
+    
+
+    
+
+    
+    companion object
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeResponsePayload: FfiConverterRustBuffer<ResponsePayload> {
+    override fun read(buf: ByteBuffer): ResponsePayload {
+        return ResponsePayload(
+            FfiConverterByteArray.read(buf),
+            FfiConverterByteArray.read(buf),
+        )
+    }
+
+    override fun allocationSize(value: ResponsePayload) = (
+            FfiConverterByteArray.allocationSize(value.`methodName`) +
+            FfiConverterByteArray.allocationSize(value.`payload`)
+    )
+
+    override fun write(value: ResponsePayload, buf: ByteBuffer) {
+            FfiConverterByteArray.write(value.`methodName`, buf)
+            FfiConverterByteArray.write(value.`payload`, buf)
+    }
+}
+
+
+
 
 
 sealed class BitParsingException: kotlin.Exception() {
@@ -5499,8 +5551,8 @@ public object FfiConverterSequenceByteArray: FfiConverterRustBuffer<List<kotlin.
     }
     
 
-    @Throws(V1CryptographicException::class) fun `v1RequestsDecrypt`(`ssKid`: kotlin.ByteArray, `ecPk`: kotlin.ByteArray, `nonce`: kotlin.ByteArray, `ciphertext`: kotlin.ByteArray): kotlin.ByteArray {
-            return FfiConverterByteArray.lift(
+    @Throws(V1CryptographicException::class) fun `v1RequestsDecrypt`(`ssKid`: kotlin.ByteArray, `ecPk`: kotlin.ByteArray, `nonce`: kotlin.ByteArray, `ciphertext`: kotlin.ByteArray): ResponsePayload {
+            return FfiConverterTypeResponsePayload.lift(
     uniffiRustCallWithError(V1CryptographicException) { _status ->
     UniffiLib.uniffi_relaysms_spec_payload_fn_func_v1_requests_decrypt(
     
@@ -5521,23 +5573,45 @@ public object FfiConverterSequenceByteArray: FfiConverterRustBuffer<List<kotlin.
     }
     
 
-    @Throws(V1CryptographicException::class) fun `v1TokenDecrypt`(`ecKidPk`: kotlin.ByteArray, `esKidPk`: kotlin.ByteArray, `ssKid`: kotlin.ByteArray, `esKid`: kotlin.ByteArray, `keyId`: kotlin.UByte, `receivedPayload`: kotlin.ByteArray): kotlin.ByteArray {
+    @Throws(V1CryptographicException::class) fun `v1TokenDecryptClient`(`ecKid`: kotlin.ByteArray, `ssKidPk`: kotlin.ByteArray, `esKidPk`: kotlin.ByteArray, `keyId`: kotlin.UByte, `receivedPayload`: kotlin.ByteArray): kotlin.ByteArray {
             return FfiConverterByteArray.lift(
     uniffiRustCallWithError(V1CryptographicException) { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_func_v1_token_decrypt(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_func_v1_token_decrypt_client(
     
-        FfiConverterByteArray.lower(`ecKidPk`),FfiConverterByteArray.lower(`esKidPk`),FfiConverterByteArray.lower(`ssKid`),FfiConverterByteArray.lower(`esKid`),FfiConverterUByte.lower(`keyId`),FfiConverterByteArray.lower(`receivedPayload`),_status)
+        FfiConverterByteArray.lower(`ecKid`),FfiConverterByteArray.lower(`ssKidPk`),FfiConverterByteArray.lower(`esKidPk`),FfiConverterUByte.lower(`keyId`),FfiConverterByteArray.lower(`receivedPayload`),_status)
 }
     )
     }
     
 
-    @Throws(V1CryptographicException::class) fun `v1TokenEncrypt`(`ecKid`: kotlin.ByteArray, `ssKidPk`: kotlin.ByteArray, `esKidPk`: kotlin.ByteArray, `keyId`: kotlin.UByte, `token`: kotlin.ByteArray): kotlin.ByteArray {
+    @Throws(V1CryptographicException::class) fun `v1TokenDecryptServer`(`ssKid`: kotlin.ByteArray, `esKid`: kotlin.ByteArray, `ecKidPk`: kotlin.ByteArray, `keyId`: kotlin.UByte, `ciphertext`: kotlin.ByteArray): kotlin.ByteArray {
             return FfiConverterByteArray.lift(
     uniffiRustCallWithError(V1CryptographicException) { _status ->
-    UniffiLib.uniffi_relaysms_spec_payload_fn_func_v1_token_encrypt(
+    UniffiLib.uniffi_relaysms_spec_payload_fn_func_v1_token_decrypt_server(
+    
+        FfiConverterByteArray.lower(`ssKid`),FfiConverterByteArray.lower(`esKid`),FfiConverterByteArray.lower(`ecKidPk`),FfiConverterUByte.lower(`keyId`),FfiConverterByteArray.lower(`ciphertext`),_status)
+}
+    )
+    }
+    
+
+    @Throws(V1CryptographicException::class) fun `v1TokenEncryptClient`(`ecKid`: kotlin.ByteArray, `ssKidPk`: kotlin.ByteArray, `esKidPk`: kotlin.ByteArray, `keyId`: kotlin.UByte, `token`: kotlin.ByteArray): kotlin.ByteArray {
+            return FfiConverterByteArray.lift(
+    uniffiRustCallWithError(V1CryptographicException) { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_func_v1_token_encrypt_client(
     
         FfiConverterByteArray.lower(`ecKid`),FfiConverterByteArray.lower(`ssKidPk`),FfiConverterByteArray.lower(`esKidPk`),FfiConverterUByte.lower(`keyId`),FfiConverterByteArray.lower(`token`),_status)
+}
+    )
+    }
+    
+
+    @Throws(V1CryptographicException::class) fun `v1TokenEncryptServer`(`ssKid`: kotlin.ByteArray, `esKid`: kotlin.ByteArray, `ecKidPk`: kotlin.ByteArray, `keyId`: kotlin.UByte, `token`: kotlin.ByteArray): kotlin.ByteArray {
+            return FfiConverterByteArray.lift(
+    uniffiRustCallWithError(V1CryptographicException) { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_func_v1_token_encrypt_server(
+    
+        FfiConverterByteArray.lower(`ssKid`),FfiConverterByteArray.lower(`esKid`),FfiConverterByteArray.lower(`ecKidPk`),FfiConverterUByte.lower(`keyId`),FfiConverterByteArray.lower(`token`),_status)
 }
     )
     }

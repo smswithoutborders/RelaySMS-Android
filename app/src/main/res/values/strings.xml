@@ -448,5 +448,6 @@
     <string name="email">Email</string>
     <string name="phone_number1">Phone number</string>
     <string name="supported_platforms">Supported platforms</string>
+    <string name="platform_image">Platform image</string>
 
 </resources>

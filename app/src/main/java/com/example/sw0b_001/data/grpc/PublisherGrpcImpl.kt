@@ -82,6 +82,8 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
 
         try {
             val res = publisherStub.exchangeOAuth2CodeAndStore(request)
+            val tokenHash = TODO()
+            res.tokenCiphertext.toByteArray()
             val serverKeys = res.serverEphemeralPublicKeysList.map {
                 Keys(
                     keyId = it.keyId,
@@ -109,8 +111,9 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
                     ephemeralKeys.add(key)
                 }
             }
-            db.insert(ephemeralKeys)
-            db.insert(serverKeys)
+            db.insert(ephemeralKeys.apply {
+                addAll(serverKeys)
+            })
         } catch (e: Exception) {
             e.printStackTrace()
             throw e

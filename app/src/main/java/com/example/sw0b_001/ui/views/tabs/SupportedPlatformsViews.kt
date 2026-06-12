@@ -1,8 +1,5 @@
 package com.example.sw0b_001.ui.views.tabs
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,7 +41,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
@@ -56,6 +52,10 @@ import androidx.navigation.NavController
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.placeholder
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
@@ -230,7 +230,6 @@ fun PlatformListContent(
             Spacer(modifier = Modifier.height(8.dp))
 
             PlatformCard(
-                logo = null,
                 platform = null,
                 modifier = Modifier.width(130.dp),
                 isActive = true,
@@ -291,12 +290,6 @@ fun PlatformListContent(
                 val isStored = tokens.find { it.platformName == platform.name }
 
                 PlatformCard(
-                    logo = if(platform.logo != null)
-                        BitmapFactory.decodeByteArray(
-                            platform.logo,
-                            0,
-                            platform.logo!!.count()
-                        ) else null,
                     platform = platform,
                     modifier = Modifier
                         .padding(8.dp)
@@ -385,17 +378,15 @@ fun PlatformListContent(
     }
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun PlatformCard(
     modifier: Modifier = Modifier,
-    logo: Bitmap? = null,
     platform: SupportedPlatforms?,
     isActive: Boolean,
     isEnabled: Boolean,
     onClick: (SupportedPlatforms?) -> Unit = {}
 ) {
-    val context = LocalContext.current
-
     Card(
         onClick = { onClick(platform) },
         enabled = isEnabled,
@@ -408,20 +399,22 @@ fun PlatformCard(
         )
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            Image(
-                bitmap = logo?.asImageBitmap()
-                    ?: BitmapFactory.decodeResource(
-                        context.resources,
-                        R.drawable.logo
-                    ).asImageBitmap(),
-                contentDescription = stringResource(R.string.platform_logo),
+            GlideImage(
+                model = platform?.icon_png,
+                contentDescription = stringResource(R.string.platform_image),
                 modifier = Modifier
                     .size(50.dp)
                     .align(Alignment.Center),
-                colorFilter = if (!isActive && platform != null)
-                    ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
-                else null
-            )
+                colorFilter = if(!isActive && platform != null)
+                    ColorFilter.tint(
+                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
+                else null,
+                loading = placeholder(R.drawable.logo), // Shows while loading
+                failure = placeholder(R.drawable.logo)      // Shows if download fails
+            ) {
+                it.diskCacheStrategy(DiskCacheStrategy.ALL) // Caches both original and resized images
+                    .circleCrop()                             // Makes the image a circle
+            }
             if (isActive || platform == null) {
                 Box(
                     modifier = Modifier
