@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import android.security.KeyStoreException
+import android.util.Base64
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
@@ -109,16 +110,15 @@ fun Context.promptBiometrics(
 
 @Serializable
 data class StaticKeys(
-    val kid: Int,
-    val keypair: String,
-    val status: String,
-    val version: String
+    val key_id: Int,
+    val public_key: String,
 )
 fun Context.getStaticKeys(
     kid: Int
 ) : ByteArray? {
-    val key = getStaticKeys()?.get(kid)?.keypair ?: return null
-    return android.util.Base64.decode(key, android.util.Base64.DEFAULT)
+    return getStaticKeys()?.find { it.key_id == kid }?.public_key?.let {
+        Base64.decode(it, Base64.URL_SAFE)
+    }
 }
 
 fun Context.getStaticKeys() : List<StaticKeys>? {

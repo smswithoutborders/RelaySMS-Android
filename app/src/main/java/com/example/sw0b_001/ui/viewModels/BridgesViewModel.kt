@@ -8,6 +8,7 @@ import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.Protocol
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.TransportImpl.publishWithAttachment
 import com.example.sw0b_001.data.TransportImpl.publishWithoutAttachment
+import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
 import com.example.sw0b_001.data.models.Payloads
 import com.example.sw0b_001.extensions.context.getStaticKeys
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -97,9 +98,11 @@ class BridgesViewModel @Inject constructor(
             ?: throw Exception("Could not find static keys for id")
 
         if(tokenId != null) {
-            val othersKeys = db?.fetchOthers(tokenId, keyId)
+            val othersKeys = db?.fetch(
+                tokenId, keyId, PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_SERVER)
                 ?: throw Exception("Could not open database")
-            val keys = db.fetch(tokenId, keyId) ?: throw Exception("Could not open database")
+            val keys = db.fetch(tokenId, keyId, PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_CLIENT)
+                ?: throw Exception("Could not open database")
             keys.use { ec ->
                 val ciphertext = v1BridgeOnlineFirstPublisherEncrypt(
                     ecKid = ec.privateKey!!,

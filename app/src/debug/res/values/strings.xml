@@ -7,12 +7,12 @@
     <string name="vault_grpc_url" translatable="false">vault.staging.smswithoutborders.com</string>
     <string name="vault_grpc_port" translatable="false">443</string>
 
-    <string name="publisher_grpc_url" translatable="false">publisher.staging.smswithoutborders.com</string>
+    <string name="publisher_grpc_url" translatable="false">publisher.relaysms.afkanerd.de</string>
     <string name="publisher_grpc_port" translatable="false">443</string>
 
     <string name="publisher_get_platforms_url" translatable="false">https://raw.githubusercontent.com/smswithoutborders/SMSWithoutBorders-Publisher/staging/resources/platforms.json</string>
     <string name="test_url" translatable="false">https://gatewayserver.staging.smswithoutborders.com/v3/clients/%1$s/tests</string>
 
-    <string name="get_platforms_url" translatable="false">https://publisher.staging.smswithoutborders.com/v1/platforms</string>"
+    <string name="get_platforms_url" translatable="false">https://publisher.relaysms.afkanerd.de/v1/platforms</string>"
 
 </resources>

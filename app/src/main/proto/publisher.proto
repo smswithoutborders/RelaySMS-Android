@@ -86,18 +86,138 @@ message ExchangeOAuth2CodeAndStoreResponse {
   bytes token_ciphertext = 4;
   // Unique identifier of the stored token
   bytes token_id = 5;
-  // Server ephemeral public key used for encrypting the token ciphertext
-  bytes server_ephemeral_public_key = 6;
+  // Server ephemeral public keys associated with the token
+  repeated PublicKey server_ephemeral_public_keys = 6;
+  // Key ID used for encrypting the token ciphertext
+  uint32 key_id = 7;
+}
+
+// Request message for revoking an OAuth2 token
+//
+// Required headers:
+//   X-Payload-bin:    Encrypted request payload ciphertext (binary)
+//   X-Public-Key-bin: Client ephemeral public key (eC_pk, 32 bytes, binary)
+//   X-Key-ID:         Server identity key ID used for encrypting the payload (string)
+//   X-Nonce-bin:      Request nonce (16 bytes, binary)
+//   X-Timestamp:      Unix timestamp in seconds (string)
+message RevokeOAuth2TokenRequest {
+  // The unique identifier of the stored token
+  bytes token_id = 1;
+  // The key ID used for encrypting the token in the payload
+  uint32 key_id = 2;
+}
+
+// Response message for RevokeOAuth2Token
+message RevokeOAuth2TokenResponse {
+  // Indicates if the token revocation and deletion was successful
+  bool success = 1;
+  // A response message
+  string message = 2;
+}
+
+// Request message for getting the PNBA code
+//
+// Required headers:
+//   X-Payload-bin:    Encrypted request payload ciphertext (binary)
+//   X-Public-Key-bin: Client ephemeral public key (eC_pk, 32 bytes, binary)
+//   X-Key-ID:         Server identity key ID used for encrypting the payload (string)
+//   X-Nonce-bin:      Request nonce (16 bytes, binary)
+//   X-Timestamp:      Unix timestamp in seconds (string)
+message GetPNBACodeRequest {
+  // The platform for which the PNBA code is requested
+  string platform = 1;
+  // The phone number for the platform
+  string phone_number = 2;
+  // Optional request identifier for tracking the request
+  string request_identifier = 3;
+}
+
+// Response message for getting the PNBA code
+message GetPNBACodeResponse {
+  // Indicates if the request was successful
+  bool success = 1;
+  // A response message
+  string message = 2;
+}
+
+// Request message for exchanging the PNBA code for a token and storing it
+//
+// Required headers:
+//   X-Payload-bin:    Encrypted request payload ciphertext (binary)
+//   X-Public-Key-bin: Client ephemeral public key (eC_pk, 32 bytes, binary)
+//   X-Key-ID:         Server identity key ID used for encrypting the payload (string)
+//   X-Nonce-bin:      Request nonce (16 bytes, binary)
+//   X-Timestamp:      Unix timestamp in seconds (string)
+message ExchangePNBACodeAndStoreRequest {
+  // The platform for which the token exchange is being performed
+  string platform = 1;
+  // The phone number for the platform
+  string phone_number = 2;
+  // The authorization code received from the platform
+  string authorization_code = 3;
+  // The password for two-step verification
+  string password = 4;
+  // Optional request identifier for tracking the request
+  string request_identifier = 5;
+  // Client ephemeral public keys to associate with the stored token
+  repeated PublicKey client_ephemeral_public_keys = 6;
+}
+
+// Response message for exchanging the PNBA code for a token and storing it
+message ExchangePNBACodeAndStoreResponse {
+  // Indicates if the request was successful
+  bool success = 1;
+  // A response message
+  string message = 2;
+  // Indicates if two step verification is enabled
+  bool two_step_verification_enabled = 3;
+  // Account identifier associated with the token
+  string account_identifier = 4;
+  // Encrypted token ciphertext
+  bytes token_ciphertext = 5;
+  // Unique identifier of the stored token
+  bytes token_id = 6;
   // Server ephemeral public keys associated with the token
   repeated PublicKey server_ephemeral_public_keys = 7;
-  // Server identity key ID used for encrypting the token ciphertext
+  // Key ID used for encrypting the token ciphertext
   uint32 key_id = 8;
+}
+
+// Request message for revoking and deleting a PNBA token
+//
+// Required headers:
+//   X-Payload-bin:    Encrypted request payload ciphertext (binary)
+//   X-Public-Key-bin: Client ephemeral public key (eC_pk, 32 bytes, binary)
+//   X-Key-ID:         Server identity key ID used for encrypting the payload (string)
+//   X-Nonce-bin:      Request nonce (16 bytes, binary)
+//   X-Timestamp:      Unix timestamp in seconds (string)
+message RevokePNBATokenRequest {
+  // The unique identifier of the stored token
+  bytes token_id = 1;
+  // The key ID used for encrypting the token in the payload
+  uint32 key_id = 2;
+}
+
+// Response message for revoking and deleting a PNBA token
+message RevokePNBATokenResponse {
+  // A response message.
+  string message = 1;
+  // Indicates whether the operation was successful.
+  bool success = 2;
 }
 
 // Publisher service
 service Publisher {
-  // Get an OAuth2 authorization URL for a platform
+  // RPC for getting the OAuth2 authorization URL
   rpc GetOAuth2AuthorizationUrl(GetOAuth2AuthorizationUrlRequest) returns (GetOAuth2AuthorizationUrlResponse);
-  // Exchange an OAuth2 authorization code for a token, store it, and return encrypted token data
+  // RPC for exchanging OAuth2 authorization code for a token
   rpc ExchangeOAuth2CodeAndStore(ExchangeOAuth2CodeAndStoreRequest) returns (ExchangeOAuth2CodeAndStoreResponse);
+  // RPC for revoking and deleting an OAuth2 token
+  rpc RevokeOAuth2Token(RevokeOAuth2TokenRequest) returns (RevokeOAuth2TokenResponse);
+  // RPC for getting the PNBA code
+  rpc GetPNBACode(GetPNBACodeRequest) returns (GetPNBACodeResponse);
+  // RPC for exchanging the PNBA code for a token and storing it
+  rpc ExchangePNBACodeAndStore(ExchangePNBACodeAndStoreRequest) returns (ExchangePNBACodeAndStoreResponse);
+  // RPC for revoking and deleting a PNBA token
+  rpc RevokePNBAToken(RevokePNBATokenRequest) returns (RevokePNBATokenResponse);
 }

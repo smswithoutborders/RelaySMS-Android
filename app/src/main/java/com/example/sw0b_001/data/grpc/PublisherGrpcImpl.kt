@@ -8,11 +8,13 @@ import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.OAuth
 import com.example.sw0b_001.data.models.Keys
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
+import com.example.sw0b_001.extensions.context.getStaticKeys
 import com.google.protobuf.kotlin.toByteString
 import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
 import publisher.v3.PublisherGrpc
 import publisher.v3.PublisherOuterClass
+import uniffi.relaysms_spec_payload.v1TokenDecryptClient
 
 class PublisherGrpcImpl(val context: Context) : AutoCloseable {
 
@@ -28,6 +30,7 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
         .withInterceptors(GrpcClientInterceptor(context))
 
     private var oAuthRedirectUrl = "https://relay.smswithoutborders.com/android"
+
 
     fun getOAuthURL(
         availablePlatforms: SupportedPlatforms,
@@ -82,16 +85,32 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
 
         try {
             val res = publisherStub.exchangeOAuth2CodeAndStore(request)
-            val tokenHash = TODO()
-            res.tokenCiphertext.toByteArray()
+            val ecKid = keys.find { it.first == res.keyId }
+                ?: throw Exception("Invalid decryption key requested")
+            val esKidPk = res.serverEphemeralPublicKeysList.find{
+                it.keyId == res.keyId }
+                ?: throw Exception("Invalid server decryption key requested")
+
+            val ssKidPk = context.getStaticKeys(res.keyId)
+                ?: throw Exception("Could not find static keys for id")
+
+            val tokenHash = res.tokenCiphertext.toByteArray().let { ciphertext ->
+                v1TokenDecryptClient(
+                    ecKid = ecKid.second.privateKey?.copyOf()!!,
+                    ssKidPk = ssKidPk,
+                    esKidPk = esKidPk.publicKey.toByteArray(),
+                    keyId = res.keyId.toUByte(),
+                    receivedPayload = ciphertext
+                )
+            }
             val serverKeys = res.serverEphemeralPublicKeysList.map {
                 Keys(
                     keyId = it.keyId,
                     privateKey = null,
                     publicKey = it.publicKey.toByteArray(),
                     tokenId = res.tokenId.toByteArray(),
-                    tokenHash = res.tokenCiphertext.toByteArray(),
-                    isOwn = false
+                    tokenHash = tokenHash,
+                    alias = TOKEN_KEYSTORE_ALIAS_CLIENT
                 )
             }
             val db = Datastore.getDatastore(context)?.keysDao()
@@ -106,7 +125,7 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
                         publicKey = key.publicKey.copyOf(),
                         tokenId = res.tokenId.toByteArray(),
                         tokenHash = res.tokenCiphertext.toByteArray(),
-                        isOwn = true
+                        alias = TOKEN_KEYSTORE_ALIAS_SERVER
                     )
                     ephemeralKeys.add(key)
                 }
@@ -149,6 +168,9 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
 //    }
 
     companion object {
+        const val TOKEN_KEYSTORE_ALIAS_CLIENT = "tokenKeystoreAliasClient"
+        const val TOKEN_KEYSTORE_ALIAS_SERVER = "tokenKeystoreAliasServer"
+
         fun fetchOauthRequestVerifier(context: Context, platformName: String) : OAuth {
             val db = Datastore.getDatastore(context)?.oAuthDao()
                 ?: throw Exception("Could not open database")

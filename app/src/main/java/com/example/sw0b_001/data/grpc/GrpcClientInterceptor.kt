@@ -50,12 +50,12 @@ class GrpcClientInterceptor(private val context: Context): ClientInterceptor {
                         Metadata.BINARY_BYTE_MARSHALLER)
                     val xKeyId = Metadata.Key.of("X-Key-ID",
                         Metadata.ASCII_STRING_MARSHALLER)
-                    val xNonce = Metadata.Key.of("X-Nonce",
+                    val xNonce = Metadata.Key.of("X-Nonce-bin",
                         Metadata.BINARY_BYTE_MARSHALLER)
                     val xTimestamp = Metadata.Key.of("X-Timestamp",
                         Metadata.ASCII_STRING_MARSHALLER)
                     headers?.put(xPayloadBin, ciphertext.ciphertext)
-                    headers?.put(xPublicKeyBin, key.publicKey)
+                    headers?.put(xPublicKeyBin, key.publicKey.copyOf())
                     headers?.put(xKeyId, keyId.toString())
                     headers?.put(xNonce, ciphertext.nonce)
                     headers?.put(xTimestamp, ciphertext.timestamp.toString())

@@ -57,28 +57,13 @@ class OauthRedirectActivity : AppCompatActivity() {
                     .fetchOauthRequestVerifier(applicationContext, platformName)
                 oAuth.use { oa ->
                     try {
-                        val response = publisherGrpcImpl.sendOAuthAuthorizationCode(
+                        publisherGrpcImpl.sendOAuthAuthorizationCode(
                             platform = platformName,
                             code = code,
                             codeVerifier = String(oa.codeVerifier),
                             requestIdentifier = Base64
                                 .encodeToString(oa.requestId, Base64.NO_WRAP)
                         )
-
-                        val tokenHash = TODO("Get token Hash from here")
-                        val serverEphemeralKeys = TODO("Get token Hash from here")
-                        TODO("Store the server's ephemeral keys")
-
-//                        VaultsGrpcImpl(applicationContext).use { vaultsGrpcImpl ->
-//                            try {
-//                                val (tokenId, keys) = vaultsGrpcImpl.uploadKeys(tokenHash)
-//                                Keys.save(applicationContext, tokenHash, keys, tokenId)
-//                            } catch(e: Exception) {
-//                                throw e;
-//                            } finally {
-//                                tokenHash.fill(0)
-//                            }
-//                        }
                     } finally {
                         oAuth.clear(applicationContext)
                     }
