@@ -58,17 +58,15 @@ android {
             matchingFallbacks = ['release']
         }
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField("Boolean", "IS_RECAPTCHA", "false")
-            buildConfigField("Boolean", "IS_ONBOARDING", "false")
-            buildConfigField("Boolean", "IS_SHOWALL_ONBOARDING", "false")
         }
         debug {
-            buildConfigField("Boolean", "IS_RECAPTCHA", "false")
-            buildConfigField("Boolean", "IS_ONBOARDING", "false")
-            // Does not skip the onboarding screens
-            buildConfigField("Boolean", "IS_SHOWALL_ONBOARDING", "true")
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            testProguardFiles 'proguard-rules.pro'
         }
     }
 
@@ -106,6 +104,18 @@ android {
 
     packagingOptions {
         pickFirst 'META-INF/androidx.localbroadcastmanager_localbroadcastmanager.version'
+    }
+
+    bundle {
+        language {
+            enableSplit = false
+        }
+        density {
+            enableSplit = false
+        }
+        abi {
+            enableSplit = false
+        }
     }
 
 }
