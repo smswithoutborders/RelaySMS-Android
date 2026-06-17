@@ -1,6 +1,8 @@
 package com.example.sw0b_001
 
 import android.content.Context
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.sw0b_001.extensions.context.generateSecureRandom
@@ -12,6 +14,25 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class SecurityExtensionsTest {
+
+    private fun clearEncryptedPrefs(context: Context) {
+
+        val masterKey = MasterKey.Builder(context)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+
+        val prefs = EncryptedSharedPreferences.create(
+            context,
+            "com.afkanerd.deku.security",
+            masterKey,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+
+        prefs.edit().clear().commit()
+    }
+
+
 
     @Test
     fun generateSecureRandom_returns32Bytes() {
@@ -38,6 +59,8 @@ class SecurityExtensionsTest {
     fun settingsSetDbPassword_savesAndReturnsPassword() {
 
         val context = ApplicationProvider.getApplicationContext<Context>()
+
+        clearEncryptedPrefs(context)
 
         val password = "my_secret_password".toByteArray()
 
