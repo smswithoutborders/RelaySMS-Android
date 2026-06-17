@@ -95,14 +95,14 @@ class PublisherViewModel @Inject constructor(
         plaintext: ByteArray,
     ) : Pair<ByteArray, Int> {
         val keyId = (0 until 16).random()
-        val db = Datastore.getDatastore(context)?.keysDao()
+        val db = Datastore.getDatastore(context)?.keysDao() ?: throw Exception("Could not open database")
         val authenticationPublicKey = context.getStaticKeys(keyId)
             ?: throw Exception("Could not find static keys for id")
 
-        val othersKeys = db?.fetch(tokenId, keyId, PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_SERVER)
-            ?: throw Exception("Could not open database")
+        val othersKeys = db.fetch(tokenId, keyId, PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_SERVER)
+            ?: throw Exception("Could not fetch server keys")
         val keys = db.fetch(tokenId, keyId, PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_CLIENT)
-            ?: throw Exception("Could not open database")
+            ?: throw Exception("Could not fetch client keys")
         keys.use { k ->
             val ciphertext = v1PlatformPublisherEncrypt(
                 ecKid = k.privateKey!!,

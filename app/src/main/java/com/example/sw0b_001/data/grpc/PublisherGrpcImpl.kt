@@ -7,6 +7,7 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.OAuth
 import com.example.sw0b_001.data.models.Keys
+import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import com.example.sw0b_001.extensions.context.getStaticKeys
 import com.google.protobuf.kotlin.toByteString
@@ -14,6 +15,7 @@ import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
 import publisher.v3.PublisherGrpc
 import publisher.v3.PublisherOuterClass
+import uniffi.relaysms_spec_payload.v1ContentCategoryFromU8
 import uniffi.relaysms_spec_payload.v1TokenDecryptClient
 
 class PublisherGrpcImpl(val context: Context) : AutoCloseable {
@@ -113,8 +115,9 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
                     alias = TOKEN_KEYSTORE_ALIAS_CLIENT
                 )
             }
-            val db = Datastore.getDatastore(context)?.keysDao()
-                ?: throw Exception("Failed to open database")
+            val db = Datastore.getDatastore(context) ?: throw Exception("Failed to open database")
+            val dbKeystore = db.keysDao() ?: throw Exception("Failed to open database")
+            val dbTokens = db.tokensDao() ?: throw Exception("Failed to open database")
 
             val ephemeralKeys = mutableListOf<Keys>()
             keys.forEach { pair ->
@@ -130,9 +133,18 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
                     ephemeralKeys.add(key)
                 }
             }
-            db.insert(ephemeralKeys.apply {
+            dbKeystore.insert(ephemeralKeys.apply {
                 addAll(serverKeys)
             })
+
+            dbTokens.insert(
+                Tokens(
+                    tokenId = res.tokenId.toByteArray(),
+                    catId = v1ContentCategoryFromU8( res.catId.toUByte()),
+                    account = res.accountIdentifier,
+                    platformName = res.platform
+                )
+            )
         } catch (e: Exception) {
             e.printStackTrace()
             throw e

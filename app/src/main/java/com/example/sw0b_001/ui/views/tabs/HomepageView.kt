@@ -34,7 +34,6 @@ import com.example.sw0b_001.ui.appbars.GatewayClientsAppBar
 import com.example.sw0b_001.ui.appbars.RecentAppBar
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
 import com.example.sw0b_001.ui.modals.AddGatewayClientModal
-import com.example.sw0b_001.ui.modals.GetStartedModal
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
@@ -62,7 +61,6 @@ fun HomepageView(
     payloadsViewModel: PayloadsViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
-    isLoggedIn: Boolean,
     showTopBar: Boolean = true,
     drawerCallback: (() -> Unit)? = {},
 ) {
@@ -139,25 +137,23 @@ fun HomepageView(
         floatingActionButton = {
             when(tokensViewModel.bottomTabsItem) {
                 BottomTabsItems.BottomBarRecentTab -> {
-                    if(isLoggedIn) {
-                        ExtendedFloatingActionButton(
-                            onClick = {
-                                sendNewMessageRequested = true
-                            },
-                            icon = {
-                                Icon(
-                                    imageVector = Icons.Default.BubbleChart,
-                                    contentDescription = stringResource(R.string.compose_new),
-                                )
-                            },
-                            text = {
-                                Text(
-                                    text = stringResource(R.string.compose_new),
-                                )
-                            }
-                        )
-                    }
-                    else if (messages?.isNotEmpty() == true) {
+                    ExtendedFloatingActionButton(
+                        onClick = {
+                            sendNewMessageRequested = true
+                        },
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.BubbleChart,
+                                contentDescription = stringResource(R.string.compose_new),
+                            )
+                        },
+                        text = {
+                            Text(
+                                text = stringResource(R.string.compose_new),
+                            )
+                        }
+                    )
+                    if (messages?.isNotEmpty() == true) {
                         ExtendedFloatingActionButton(
                             onClick = { sendNewMessageRequested = true },
                             icon = {
@@ -213,29 +209,17 @@ fun HomepageView(
                 tokensViewModel = tokensViewModel,
                 gatewayClientViewModel = gatewayClientViewModel,
                 supportedPlatformsViewModel = supportedPlatformsViewModel,
-                isLoggedIn = isLoggedIn,
             )
 
             if (sendNewMessageRequested) {
-                if(isLoggedIn) {
-                    ActivePlatformsModal(
-                        sendNewMessageRequested = sendNewMessageRequested,
-                        navController = navController,
-                        isCompose = true,
-                        isLoggedIn = true,
-                        supportedPlatformsViewModel = supportedPlatformsViewModel,
-                        tokensViewModel = tokensViewModel,
-                    ) {
-                        sendNewMessageRequested = false
-                    }
-                } else {
-                    GetStartedModal(
-                        sendNewMessageRequested,
-                        navController = navController,
-                        isLoggedIn = isLoggedIn,
-                    ) {
-                        sendNewMessageRequested = false
-                    }
+                ActivePlatformsModal(
+                    sendNewMessageRequested = sendNewMessageRequested,
+                    navController = navController,
+                    isCompose = true,
+                    supportedPlatformsViewModel = supportedPlatformsViewModel,
+                    tokensViewModel = tokensViewModel,
+                ) {
+                    sendNewMessageRequested = false
                 }
             }
 
@@ -261,7 +245,6 @@ fun GetTabViews(
     tokensViewModel: TokensViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
-    isLoggedIn: Boolean,
 ) {
     when(bottomTabsItems) {
         BottomTabsItems.BottomBarRecentTab -> {
@@ -270,7 +253,6 @@ fun GetTabViews(
                 payloadsViewModel = payloadsViewModel,
                 tokensViewModel = tokensViewModel,
                 supportedPlatformsViewModel = supportedPlatformsViewModel,
-                isLoggedIn = isLoggedIn
             ) {
                 tokensViewModel.bottomTabsItem =
                     BottomTabsItems.BottomBarPlatformsTab
@@ -279,7 +261,6 @@ fun GetTabViews(
         BottomTabsItems.BottomBarPlatformsTab -> {
             SupportedPlatformsView(
                 navController = navController,
-                isLoggedIn = true,
                 supportedPlatformsViewModel = supportedPlatformsViewModel,
                 tokensViewModel = tokensViewModel,
             )

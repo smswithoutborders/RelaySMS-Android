@@ -50,7 +50,6 @@ fun RecentView(
     payloadsViewModel: PayloadsViewModel,
     tokensViewModel: TokensViewModel,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
-    isLoggedIn: Boolean = false,
     tabRequestedCallback: () -> Unit
 ) {
     var sendNewMessageRequested by remember { mutableStateOf(false) }
@@ -100,7 +99,6 @@ fun RecentView(
                 navController = navController,
                 isCompose = true,
                 tokensViewModel = tokensViewModel,
-                isLoggedIn = isLoggedIn,
             ) {
                 sendNewMessageRequested = false
             }

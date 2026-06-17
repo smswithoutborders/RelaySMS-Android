@@ -33,23 +33,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
 import com.example.sw0b_001.R
 import com.example.sw0b_001.extensions.context.settingsSetOnboardedCompletely
 import com.example.sw0b_001.ui.components.OnboardingNextButton
-import com.example.sw0b_001.ui.modals.OnlineActivePlatformsModal
 import com.example.sw0b_001.ui.modals.SignupLoginModal
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
-import com.example.sw0b_001.ui.viewModels.VaultsViewModel
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.views.threads.makeDefault
 
 data class InteractiveOnboarding(
@@ -67,7 +64,6 @@ fun OnboardingInteractive(
     navController: NavController,
     onboardingViewModel: OnboardingViewModel,
     tokensViewModel: TokensViewModel,
-    vaultViewModel: VaultsViewModel,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
 ) {
     val context = LocalContext.current
@@ -84,9 +80,6 @@ fun OnboardingInteractive(
             }
         }
     }
-
-    val isLoggedIn by vaultViewModel.isLoggedIn
-        .collectAsStateWithLifecycle(false)
 
     Scaffold(
         topBar = {
@@ -181,50 +174,6 @@ fun OnboardingInteractive(
                         onboardingViewModel.showLoginSignupModal = false
                     }
                 ) { onboardingViewModel.showLoginSignupModal = false }
-            }
-
-            if(onboardingViewModel.showAddPlatformsModal) {
-                OnlineActivePlatformsModal(
-                    navController = navController,
-                    onboardingViewModel.showAddPlatformsModal,
-                    isCompose = false,
-                    isOnboarding = true,
-                    onCompleteCallback = {
-                        onboardingViewModel.setOnboarding(
-                            InteractiveOnboarding(
-                                title = context.getString(R.string.way_to_go),
-                                description = context.getString(R.string.you_can_save_more_accounts_per_platform_at_anytime_from_inside_the_app),
-                                image = R.drawable.undraw_success_288d,
-                            ) {}
-                        )
-                    },
-                    supportedPlatformsViewModel = supportedPlatformsViewModel,
-                    tokensViewModel = tokensViewModel,
-                    isLoggedIn = isLoggedIn,
-                ) { onboardingViewModel.showAddPlatformsModal = false }
-            }
-
-            if(onboardingViewModel.showSendPlatformsModal) {
-                onboardingViewModel.callback = {
-                    onboardingViewModel.setOnboarding(
-                        InteractiveOnboarding(
-                            title = context.getString(R.string.you_are_now_ready),
-                            description = context.getString(R.string.you_have_successfully_carried_out_the_essentials_of_messaging_with_relaysms),
-                            image = R.drawable.undraw_success_288d,
-                        ){}
-                    )
-                }
-
-                OnlineActivePlatformsModal(
-                    navController = navController,
-                    onboardingViewModel.showSendPlatformsModal,
-                    supportedPlatformsViewModel = supportedPlatformsViewModel,
-                    tokensViewModel = tokensViewModel,
-                    isCompose = true,
-                    isOnboarding = true,
-                    onCompleteCallback = {},
-                    isLoggedIn = isLoggedIn,
-                ) { onboardingViewModel.showSendPlatformsModal = false }
             }
 
             if(onboardingViewModel.showMakeDefaultRequest) {

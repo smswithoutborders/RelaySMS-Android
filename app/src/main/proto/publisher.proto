@@ -90,6 +90,10 @@ message ExchangeOAuth2CodeAndStoreResponse {
   repeated PublicKey server_ephemeral_public_keys = 6;
   // Key ID used for encrypting the token ciphertext
   uint32 key_id = 7;
+  // The platform name
+  string platform = 8;
+  // Category identifier
+  uint32 cat_id = 9;
 }
 
 // Request message for revoking an OAuth2 token
@@ -181,6 +185,10 @@ message ExchangePNBACodeAndStoreResponse {
   repeated PublicKey server_ephemeral_public_keys = 7;
   // Key ID used for encrypting the token ciphertext
   uint32 key_id = 8;
+  // The platform name
+  string platform = 9;
+  // Category identifier
+  uint32 cat_id = 10;
 }
 
 // Request message for revoking and deleting a PNBA token

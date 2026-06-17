@@ -93,12 +93,11 @@ fun ComposerInterface(
     }
 
     val payload by payloadsViewModel.message.collectAsStateWithLifecycle()
-    val tokens by tokensViewModel.storedTokensUiState.collectAsStateWithLifecycle()
+    val tokens by tokensViewModel.fetchTokensByCatId(catId)
+        .collectAsStateWithLifecycle(emptyList())
     LaunchedEffect(Unit) {
         if(messageId != null) {
             payloadsViewModel.get(messageId)
-        } else {
-            tokensViewModel.fetchTokensByCatId(catId)
         }
     }
 

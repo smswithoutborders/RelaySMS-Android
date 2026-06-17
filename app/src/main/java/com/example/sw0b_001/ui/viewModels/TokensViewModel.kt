@@ -28,6 +28,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -52,10 +53,6 @@ sealed class TokensUiState {
 class TokensViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
-
-    private val _storedTokensUiState = MutableStateFlow<List<Tokens>>(emptyList())
-    val storedTokensUiState: StateFlow<List<Tokens>> = _storedTokensUiState
-
     var bottomTabsItem by mutableStateOf(BottomTabsItems.BottomBarRecentTab)
 
     private val _isStoringUiState =
@@ -79,44 +76,20 @@ class TokensViewModel @Inject constructor(
     private val cache = Datastore.getDatastore(context)?.supportedPlatformsCacheDao()
         ?: throw Exception("Cannot open database")
 
-    fun get() {
+    fun get(): Flow<List<Tokens>> {
+        return db.fetchAll()
+    }
+
+    fun getList() {
         viewModelScope.launch(Dispatchers.IO) {
-            db.fetchAll().collect { tokens ->
-                _storedTokensUiState.value = tokens
-            }
+            val list = db.fetchAllListDebug()
+            list
         }
     }
 
-    fun fetchTokensByCatId(catId: V1ContentCategories) {
-        viewModelScope.launch(Dispatchers.IO) {
-            db.fetchCatId(catId).collect { tokens ->
-                _storedTokensUiState.value = tokens
-            }
-        }
+    fun fetchTokensByCatId(catId: V1ContentCategories): Flow<List<Tokens>> {
+        return db.fetchCatId(catId)
     }
-
-    suspend fun revokeAll() {
-        val publisherGrpcImpl = PublisherGrpcImpl(context)
-        db.fetchAllList().forEach { sp ->
-            val cachedPlatform = cache.fetch(sp.platformName)
-//            when(cachedPlatform?.protocol_type) {
-//                "oauth2" -> {
-//                    publisherGrpcImpl.revokeOAuthPlatforms(
-//                        sp.platformName,
-//                        sp.account,
-//                    )
-//                }
-//                "pnba" -> {
-//                    publisherGrpcImpl.revokePNBAPlatforms(
-//                        sp.platformName,
-//                        sp.account
-//                    )
-//                }
-//            }
-        }
-
-    }
-
 
     companion object {
         const val ITP_VERSION_VALUE: Byte = 0x04

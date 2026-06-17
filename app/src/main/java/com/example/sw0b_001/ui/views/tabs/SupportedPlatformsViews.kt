@@ -80,7 +80,6 @@ fun SupportedPlatformsView(
     navController: NavController,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
     tokensViewModel: TokensViewModel,
-    isLoggedIn: Boolean,
     isCompose: Boolean = false,
     isOnboarding: Boolean = false,
 ) {
@@ -165,7 +164,6 @@ fun SupportedPlatformsView(
             tokensViewModel = tokensViewModel,
             isOnboarding = isOnboarding,
             navController = navController,
-            isLoggedIn = isLoggedIn,
         )
     }
 
@@ -177,7 +175,6 @@ fun PlatformListContent(
     navController: NavController,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
     tokensViewModel: TokensViewModel,
-    isLoggedIn: Boolean,
     isCompose: Boolean = false,
     isOnboarding: Boolean = false,
 ) {
@@ -186,10 +183,11 @@ fun PlatformListContent(
     val supportedPlatforms by supportedPlatformsViewModel.get()
         .collectAsStateWithLifecycle(mutableListOf())
 
-    val tokens by tokensViewModel.storedTokensUiState.collectAsStateWithLifecycle()
+    val tokens by tokensViewModel.get().collectAsStateWithLifecycle(emptyList())
     LaunchedEffect(Unit) {
-        tokensViewModel.get()
+        tokensViewModel.getList()
     }
+
     val revokingUiState by tokensViewModel.isRevokingUiState.collectAsStateWithLifecycle()
     val storingUiState by tokensViewModel.isStoringUiState.collectAsStateWithLifecycle()
 
@@ -233,7 +231,6 @@ fun PlatformListContent(
                 platform = null,
                 modifier = Modifier.width(130.dp),
                 isActive = true,
-                isEnabled = true,
                 onClick = {
                     clickedPlatform = null
                     showPlatformOptions = true
@@ -270,14 +267,6 @@ fun PlatformListContent(
             else -> {}
         }
 
-        if(LocalInspectionMode.current || !isLoggedIn) {
-            Text(
-                text = stringResource(R.string.you_can_only_save_these_platforms_after_you_log_in),
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.error
-            )
-        }
-
         Spacer(modifier = Modifier.height(8.dp))
 
         FlowRow(
@@ -295,7 +284,6 @@ fun PlatformListContent(
                         .padding(8.dp)
                         .width(130.dp),
                     isActive = isStored != null,
-                    isEnabled = isLoggedIn,
                 ) {
                     clickedPlatform = platform
                     showPlatformOptions = true
@@ -384,12 +372,10 @@ fun PlatformCard(
     modifier: Modifier = Modifier,
     platform: SupportedPlatforms?,
     isActive: Boolean,
-    isEnabled: Boolean,
     onClick: (SupportedPlatforms?) -> Unit = {}
 ) {
     Card(
         onClick = { onClick(platform) },
-        enabled = isEnabled,
         modifier = modifier
             .height(130.dp)
             .width(130.dp),

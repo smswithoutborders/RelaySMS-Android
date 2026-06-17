@@ -51,7 +51,6 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getCurrentLoc
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.setLocale
 import com.afkanerd.smswithoutborders_libsmsmms.ui.SettingsItem
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
 import com.example.sw0b_001.extensions.context.getAppCompatActivity
 import com.example.sw0b_001.extensions.context.promptBiometrics
 import com.example.sw0b_001.extensions.context.settingsGetIsEmailLogin
@@ -63,7 +62,6 @@ import com.example.sw0b_001.extensions.context.settingsSetLockDownApp
 import com.example.sw0b_001.extensions.context.settingsSetStoreTokensOnDevice
 import com.example.sw0b_001.extensions.context.settingsSetUseDeviceId
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.VaultsViewModel
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -73,7 +71,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingsView(
     navController: NavController,
-    vaultsViewModel: VaultsViewModel,
 ) {
     val context = LocalContext.current
     val inPreviewMode = LocalInspectionMode.current
@@ -94,7 +91,6 @@ fun SettingsView(
 
     var isLoading by remember { mutableStateOf(false) }
 
-    val isLoggedIn by vaultsViewModel.isLoggedIn.collectAsState(false)
 
     val localeArraysValues = stringArrayResource(R.array.language_values)
     val localeArraysOptions= stringArrayResource(R.array.language_options)
@@ -267,44 +263,32 @@ fun SettingsView(
                 }
             }
 
-            if(isLoggedIn) {
-                SettingsItem(
-                    itemTitle = stringResource(R.string.log_out),
-                    itemDescription = stringResource(R.string.this_would_log_you_out_of_your_vault_account_on_this_device_you_can_log_back_in_at_anytime_with_an_internet_connection),
-                    enabled = !isLoading,
-                ) {
-                    CoroutineScope(Dispatchers.Default).launch {
-                        context.settingsSetIsLoggedIn(false)
-                    }
-                }
-
-                SettingsItem(
-                    itemTitle = stringResource(R.string.delete_account),
-                    itemDescription = stringResource(R.string.this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer),
-                    isWarning = true,
-                    enabled = !isLoading,
-                ) {
-                    isLoading = true
-                    scope.launch(Dispatchers.Default) {
-                        context.settingsSetIsLoggedIn(false)
-                        try {
-                            vaultsViewModel.completeDelete()
-                        } catch(e: StatusRuntimeException) {
-                            e.printStackTrace()
-                            scope.launch(Dispatchers.Main){
-                                Toast.makeText(context, e.status.description,
-                                    Toast.LENGTH_SHORT)
-                                    .show()
-                            }
-                        } catch(e: Exception) {
-                            e.printStackTrace()
-                            scope.launch(Dispatchers.Main){
-                                Toast.makeText(context, e.message,
-                                    Toast.LENGTH_SHORT).show()
-                            }
-                        } finally {
-                            isLoading = false
+            SettingsItem(
+                itemTitle = stringResource(R.string.delete_account),
+                itemDescription = stringResource(R.string.this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer),
+                isWarning = true,
+                enabled = !isLoading,
+            ) {
+                isLoading = true
+                scope.launch(Dispatchers.Default) {
+                    context.settingsSetIsLoggedIn(false)
+                    try {
+                        TODO()
+                    } catch(e: StatusRuntimeException) {
+                        e.printStackTrace()
+                        scope.launch(Dispatchers.Main){
+                            Toast.makeText(context, e.status.description,
+                                Toast.LENGTH_SHORT)
+                                .show()
                         }
+                    } catch(e: Exception) {
+                        e.printStackTrace()
+                        scope.launch(Dispatchers.Main){
+                            Toast.makeText(context, e.message,
+                                Toast.LENGTH_SHORT).show()
+                        }
+                    } finally {
+                        isLoading = false
                     }
                 }
             }

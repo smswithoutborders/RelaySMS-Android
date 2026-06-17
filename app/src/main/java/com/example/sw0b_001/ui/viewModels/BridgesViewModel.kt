@@ -94,15 +94,16 @@ class BridgesViewModel @Inject constructor(
     ) : Pair<ByteArray, Int> {
         val keyId = (0 until 16).random()
         val db = Datastore.getDatastore(context)?.keysDao()
+            ?: throw Exception("could not open database")
         val authenticationPublicKey = context.getStaticKeys(keyId)
             ?: throw Exception("Could not find static keys for id")
 
         if(tokenId != null) {
-            val othersKeys = db?.fetch(
+            val othersKeys = db.fetch(
                 tokenId, keyId, PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_SERVER)
-                ?: throw Exception("Could not open database")
+                ?: throw Exception("Could not find server keys")
             val keys = db.fetch(tokenId, keyId, PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_CLIENT)
-                ?: throw Exception("Could not open database")
+                ?: throw Exception("Could not find client keys")
             keys.use { ec ->
                 val ciphertext = v1BridgeOnlineFirstPublisherEncrypt(
                     ecKid = ec.privateKey!!,

@@ -8,8 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.views.tabs.SupportedPlatformsView
 import kotlinx.coroutines.launch
 
@@ -20,13 +20,12 @@ fun ActivePlatformsModal(
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
     tokensViewModel: TokensViewModel,
     sendNewMessageRequested: Boolean,
-    isLoggedIn: Boolean = false,
     isCompose: Boolean = false,
     isOnboarding: Boolean = false,
     onDismiss: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = isLoggedIn
+//        skipPartiallyExpanded = isLoggedIn
     )
     val scope = rememberCoroutineScope()
 
@@ -45,7 +44,6 @@ fun ActivePlatformsModal(
                 supportedPlatformsViewModel = supportedPlatformsViewModel,
                 tokensViewModel = tokensViewModel,
                 isCompose = isCompose,
-                isLoggedIn = isLoggedIn,
                 isOnboarding = isOnboarding,
             )
         }

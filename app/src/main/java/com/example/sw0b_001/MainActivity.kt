@@ -77,7 +77,6 @@ import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.PublisherViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
-import com.example.sw0b_001.ui.viewModels.VaultsViewModel
 import com.example.sw0b_001.ui.views.AboutView
 import com.example.sw0b_001.ui.views.WelcomeMainView
 import com.example.sw0b_001.ui.views.compose.ComposerInterface
@@ -110,7 +109,6 @@ class MainActivity : BindActivity() {
     val payloadsViewModel: PayloadsViewModel by viewModels()
     val gatewayClientViewModel: GatewayClientViewModel by viewModels()
     val imageViewModel: ImageViewModel by viewModels()
-    val vaultViewModel: VaultsViewModel by viewModels()
     val publisherViewModel: PublisherViewModel by viewModels()
     val bridgesViewModel: BridgesViewModel by viewModels()
 
@@ -215,9 +213,6 @@ class MainActivity : BindActivity() {
             defaultSmsApp = context.isDefault()
         }
 
-        val isLoggedIn by vaultViewModel.isLoggedIn
-            .collectAsStateWithLifecycle(false)
-
         var hasSeenOnboarding by remember {
             mutableStateOf(context.settingsGetOnboardedCompletely)
         }
@@ -252,7 +247,6 @@ class MainActivity : BindActivity() {
                             payloadsViewModel = payloadsViewModel,
                             gatewayClientViewModel = gatewayClientViewModel,
                             supportedPlatformsViewModel = supportedPlatformsViewModel,
-                            isLoggedIn = isLoggedIn,
                             drawerCallback = drawerCallback
                         )
                     }
@@ -306,7 +300,6 @@ class MainActivity : BindActivity() {
                     navController,
                     onboardingViewModel,
                     tokensViewModel = tokensViewModel,
-                    vaultViewModel = vaultViewModel,
                     supportedPlatformsViewModel,
                 )
             }
@@ -317,7 +310,6 @@ class MainActivity : BindActivity() {
                     payloadsViewModel = payloadsViewModel,
                     gatewayClientViewModel = gatewayClientViewModel,
                     supportedPlatformsViewModel = supportedPlatformsViewModel,
-                    isLoggedIn = isLoggedIn,
                 )
             }
             composable<AboutScreen> {
@@ -377,7 +369,6 @@ class MainActivity : BindActivity() {
             composable<SettingsScreen> {
                 SettingsView(
                     navController = navController,
-                    vaultsViewModel = vaultViewModel
                 )
             }
         }
