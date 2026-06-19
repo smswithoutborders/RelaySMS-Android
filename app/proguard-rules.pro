@@ -29,5 +29,6 @@
     public static int w(...);
 }
 
--dontwarn androidx.window.extensions.embedding.ActivityStack$Token
--dontwarn androidx.window.extensions.embedding.SplitInfo$Token
+#-dontwarn androidx.window.extensions.embedding.ActivityStack$Token
+#-dontwarn androidx.window.extensions.embedding.SplitInfo$Token
+-dontwarn com.squareup.okhttp.internal.Network

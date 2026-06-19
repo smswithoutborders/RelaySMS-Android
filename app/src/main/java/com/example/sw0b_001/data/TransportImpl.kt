@@ -51,7 +51,7 @@ object TransportImpl {
             sessId = sessionId,
         )
         val splitPayloads = payloads.split(Transports.SMS).map {
-            Base64.encodeToString(it, Base64.DEFAULT)
+            String(it)
         }
 
         val intentFilter = "com.afkanerd.deku.SMS_SENT_BROADCAST_INTENT"

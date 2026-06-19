@@ -1,7 +1,6 @@
 package com.example.sw0b_001
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
 import org.junit.Before
 import org.junit.Test
 
@@ -37,13 +36,12 @@ class gRPCTest {
 
     private var context = InstrumentationRegistry.getInstrumentation().targetContext
 
-    private lateinit var vault: VaultsGrpcImpl
     private val device_id_keystoreAlias = "device_id_keystoreAlias"
     private val publisher_keystoreAlias = "publisher_keystoreAlias"
 
     @Before
     fun init() {
-        vault = VaultsGrpcImpl(context)
+//        vault = VaultsGrpcImpl(context)
 //        deviceIdPubKey = Cryptography.generateKey(context, device_id_keystoreAlias)
 //        publishPubKey = Cryptography.generateKey(context, publisher_keystoreAlias)
     }

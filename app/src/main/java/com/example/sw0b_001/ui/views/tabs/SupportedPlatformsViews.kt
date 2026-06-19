@@ -184,9 +184,6 @@ fun PlatformListContent(
         .collectAsStateWithLifecycle(mutableListOf())
 
     val tokens by tokensViewModel.get().collectAsStateWithLifecycle(emptyList())
-    LaunchedEffect(Unit) {
-        tokensViewModel.getList()
-    }
 
     val revokingUiState by tokensViewModel.isRevokingUiState.collectAsStateWithLifecycle()
     val storingUiState by tokensViewModel.isStoringUiState.collectAsStateWithLifecycle()

@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
-import com.example.sw0b_001.data.grpc.VaultsGrpcImpl
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaType
@@ -36,7 +35,6 @@ class PublisherGrpcImplTest {
 
 
     private lateinit var publisherGrpcImpl: PublisherGrpcImpl
-    private lateinit var vault: VaultsGrpcImpl
 
     private lateinit var datastore: Datastore
 //    private lateinit var storedTokenDao: StoredTokenDao

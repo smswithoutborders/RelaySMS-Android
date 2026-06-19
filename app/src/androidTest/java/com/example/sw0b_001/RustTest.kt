@@ -1,7 +1,6 @@
 package com.example.sw0b_001
 
 import android.content.Context
-import android.util.Base64
 import androidx.test.platform.app.InstrumentationRegistry
 import com.afkanerd.lib_image_android.ui.extensions.toIntLittleEndian
 import junit.framework.TestCase.assertEquals
@@ -11,7 +10,9 @@ import uniffi.relaysms_spec_payload.Transports
 import uniffi.relaysms_spec_payload.V1ContentCategories
 import uniffi.relaysms_spec_payload.V1ContentsContainer
 import uniffi.relaysms_spec_payload.V1Payloads
+import uniffi.relaysms_spec_payload.V1PayloadsTypes
 import uniffi.relaysms_spec_payload.addRust
+import uniffi.relaysms_spec_payload.v1GetPayloadType
 
 class RustTest {
 
@@ -81,13 +82,13 @@ class RustTest {
 
         val split = payloads.split(Transports.SMS)
 
-        val sending = split.map { Base64.encodeToString(it, Base64.NO_WRAP) }
+        assertEquals(V1PayloadsTypes.WITH_ATTACHMENT_HEADER,
+            v1GetPayloadType(split[0]))
 
-        val received = sending.map {
-            Base64.decode(it, Base64.NO_WRAP)
-        }
+        assertEquals(V1PayloadsTypes.WITH_ATTACHMENT_NO_HEADER,
+            v1GetPayloadType(split[1]))
 
-        val joined = V1Payloads.join(received)
+        val joined = V1Payloads.join(split)
 
         val receivedSplit = joined.split(Transports.SMS)
         assertEquals(split.size, receivedSplit.size)
@@ -125,13 +126,16 @@ class RustTest {
             contents = content,
         )
 
-        val payload = payloads.serialize()
-        val output = V1Payloads.deserialize(payload)
+        val payload = payloads.serializeWithoutAttachment()
+        assertEquals(V1PayloadsTypes.WITHOUT_ATTACHMENT,
+            v1GetPayloadType(payload))
 
-        assertArrayEquals(payload, output.serialize())
+        val output = V1Payloads.deserializeWithoutAttachment(payload)
+
+        assertArrayEquals(payload, output.serializeWithoutAttachment())
 
         val contentContainer1 = V1ContentsContainer.deserialize(
-            output.getPayload(), catId, output.getLenAtt())
+            output.getContent(), catId, output.getLenAtt())
         assertArrayEquals(content, contentContainer1.serialize())
     }
 }
