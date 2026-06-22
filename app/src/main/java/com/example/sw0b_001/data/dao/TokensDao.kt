@@ -1,6 +1,7 @@
 package com.example.sw0b_001.data.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.example.sw0b_001.data.models.Tokens
@@ -12,6 +13,9 @@ interface TokensDao {
     @Query("SELECT * FROM Tokens")
     fun fetchAll() : Flow<List<Tokens>>
 
+    @Query("SELECT * FROM Tokens where tokenHash = :tokenHash")
+    fun fetch(tokenHash: ByteArray) : Tokens?
+
     @Query("SELECT * FROM Tokens")
     fun fetchAllListDebug() : List<Tokens>
 
@@ -20,4 +24,7 @@ interface TokensDao {
 
     @Insert
     fun insert(tokens: Tokens)
+
+    @Delete
+    fun delete(tokens: Tokens)
 }

@@ -18,11 +18,9 @@ import androidx.lifecycle.viewModelScope
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.extensions.generateRandomBytes
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Datastore
-import com.example.sw0b_001.data.Network
 import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
 import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.data.repositories.SupportedPlatforms
-import com.example.sw0b_001.ui.views.compose.GatewayClientRequest
 import com.example.sw0b_001.ui.views.tabs.BottomTabsItems
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -36,8 +34,9 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.Json
 import uniffi.relaysms_spec_payload.V1ContentCategories
+import uniffi.relaysms_spec_payload.V1PayloadsSupportedProtocols
+import uniffi.relaysms_spec_payload.v1PayloadSupportProtocolsFromU8
 
 sealed class TokensUiState {
     object Loading: TokensUiState()
@@ -108,22 +107,6 @@ class TokensViewModel @Inject constructor(
             return Pair(image, text)
         }
 
-
-        fun networkRequest(
-            url: String,
-            payload: GatewayClientRequest,
-        ) : String? {
-            var payload = Json.encodeToString(payload)
-
-            try {
-                var response = Network.jsonRequestPost(url, payload)
-                var text = response.result.get()
-                return text
-            } catch(e: Exception) {
-                return e.message
-            }
-        }
-
         fun oAuth2IntentBuilder(context: Context): CustomTabsIntent {
             // get the current toolbar background color (this might work differently in your app)
             @ColorInt val colorPrimaryLight = ContextCompat.getColor( context,
@@ -170,23 +153,14 @@ class TokensViewModel @Inject constructor(
             PublisherGrpcImpl(context).use { publisherGrpcImpl ->
                 _isRevokingUiState.value = TokensUiState.Loading
                 try {
-//                    when(platform.protocol_type) {
-//                        "oauth2" -> {
-//                            publisherGrpcImpl.revokeOAuthPlatforms(
-//                                account.platformName,
-//                                account.account,
-//                            )
-//                        }
-//                        "pnba" -> {
-//                            publisherGrpcImpl.revokePNBAPlatforms(
-//                                account.platformName,
-//                                account.account
-//                            )
-//                        }
-//                    }
-
-                    TODO()
-//                    db.delete(account.id)
+                    when(v1PayloadSupportProtocolsFromU8(
+                        platform.protocol_type!!.toUByte())) {
+                        V1PayloadsSupportedProtocols.O_AUTH20 -> {
+                            publisherGrpcImpl.revokeOAuth2()
+                        }
+                        V1PayloadsSupportedProtocols.PNBA -> { publisherGrpcImpl.revokePnba() }
+                    }
+                    db.delete(account)
                     _isRevokingUiState.value = TokensUiState.Success(null)
                 } catch(e: Exception) {
                     e.printStackTrace()
@@ -204,16 +178,18 @@ class TokensViewModel @Inject constructor(
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             _isStoringUiState.value = TokensUiState.Loading
-            if(platform.protocol_type == "oauth2") {
-                triggerOAuthRequested(platform)
-            }
-            else if (platform.protocol_type == "pnba") {
-                triggerPNBARequested(
-                    phoneNumber = phoneNumber!!,
-                    platform = platform,
-                    authCode = authCode,
-                    password = password
-                )
+            when(v1PayloadSupportProtocolsFromU8(platform.protocol_type!!.toUByte())) {
+                V1PayloadsSupportedProtocols.O_AUTH20 -> {
+                    triggerOAuthRequested(platform)
+                }
+                V1PayloadsSupportedProtocols.PNBA -> {
+                    triggerPNBARequested(
+                        phoneNumber = phoneNumber!!,
+                        platform = platform,
+                        authCode = authCode,
+                        password = password
+                    )
+                }
             }
         }
     }

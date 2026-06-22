@@ -20,27 +20,36 @@ interface KeysDao {
     @Query("DELETE FROM Keys WHERE alias = :alias")
     suspend fun removeAlias(alias: String)
 
+
+    @Query("UPDATE Keys SET alias = :newAlias WHERE alias = :oldAlias AND keyId < 16")
+    suspend fun updateForAttachments(oldAlias: String, newAlias: String)
+
     @Transaction
-    suspend fun insert(keys: List<Keys>, alias: String) {
+    suspend fun insert(keys: List<Keys>, alias: String, updateAlias: String? = null) {
         removeAlias(alias)
         insert(keys)
+        updateAlias?.let {
+            updateForAttachments(alias, updateAlias)
+        }
     }
 
-    @Query("SELECT * FROM Keys WHERE tokenId = :tokenId")
-    fun fetchTokenId(tokenId: ByteArray): List<Keys>?
+    @Query("SELECT * FROM Keys WHERE tokenHash = :tokenHash AND keyId = :keyId AND alias = :alias")
+    fun privateFetch(tokenHash: ByteArray, keyId: Int, alias: String): Keys?
 
-    @Query("SELECT * FROM Keys WHERE tokenId = :tokenId AND keyId = :keyId AND alias = :alias")
-    fun _fetch(tokenId: ByteArray, keyId: Int, alias: String): Keys?
+    @Query("SELECT * FROM Keys WHERE tokenHash = :tokenHash AND alias = :alias " +
+            "ORDER BY RANDOM() LIMIT 1")
+    fun privateFetchRandom(tokenHash: ByteArray, alias: String): Keys?
 
     @Transaction
-    fun fetch(tokenId: ByteArray, keyId: Int, alias: String): Keys? {
-        val key = _fetch(tokenId, keyId, alias)
+    fun fetchEphemeral(tokenHash: ByteArray, alias: String, keyId: Int? = null): Keys? {
+        val key = if(keyId == null) privateFetchRandom(tokenHash, alias)
+        else privateFetch(tokenHash, keyId, alias)
         key?.let { remove(key) } // removes the key as it's used
         return key
     }
 
-    @Query("DELETE FROM Keys WHERE tokenId = :tokenId")
-    suspend fun clear(tokenId: ByteArray)
+    @Query("DELETE FROM Keys WHERE tokenHash = :tokenHash")
+    suspend fun clear(tokenHash: ByteArray)
 
     @Delete
     fun remove(key: Keys)

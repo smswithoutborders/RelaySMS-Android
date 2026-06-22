@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.afkanerd.lib_image_android.ui.data.SmsWorkManager
+import com.afkanerd.lib_image_android.ui.extensions.toIntLittleEndian
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.TransportImpl
@@ -30,7 +31,7 @@ class PublisherViewModel @Inject constructor(
     fun publish(
         catId: V1ContentCategories,
         body: String,
-        tokenId: ByteArray?,
+        tokenHash: ByteArray?,
         to: String?,
         subject: String?,
         imageViewModel: ImageViewModel,
@@ -43,6 +44,16 @@ class PublisherViewModel @Inject constructor(
             withContext(Dispatchers.IO) {
                 val isAttachment = attachment != null
                 var contentContainer: V1ContentsContainer?
+
+                var tokenId: UInt? = null
+                if(tokenHash != null) {
+                    val db = Datastore.getDatastore(context) ?: throw Exception("Failed to open database")
+                    tokenId = db.tokensDao()?.fetch(tokenHash)
+                        ?.tokenId
+                        ?.toIntLittleEndian()
+                        ?.toUInt()
+                        ?: throw Exception("Failed to find token id")
+                }
 
                 try {
                     if(isAttachment) {
@@ -58,7 +69,7 @@ class PublisherViewModel @Inject constructor(
                             imageViewModel,
                             sessionId
                         ) { payload ->
-                            encrypt(tokenId!!, payload)
+                            encrypt(tokenHash!!, payload, true)
                         }
                     } else {
                         contentContainer = publishWithoutAttachment(
@@ -69,7 +80,7 @@ class PublisherViewModel @Inject constructor(
                             to,
                             subject,
                         ) { payload ->
-                            encrypt(tokenId!!, payload)
+                            encrypt(tokenHash!!, payload)
                         }
                     }
 
@@ -84,6 +95,7 @@ class PublisherViewModel @Inject constructor(
                         onCompleteCallback()
                     }
                 } catch (e: Exception) {
+                    e.printStackTrace()
                     onFailureCallback(e.message ?: "")
                 }
             }
@@ -91,28 +103,36 @@ class PublisherViewModel @Inject constructor(
     }
 
     private fun encrypt(
-        tokenId: ByteArray,
+        tokenHash: ByteArray,
         plaintext: ByteArray,
+        withAttachment: Boolean = false
     ) : Pair<ByteArray, Int> {
-        val keyId = (0 until 16).random()
         val db = Datastore.getDatastore(context)?.keysDao() ?: throw Exception("Could not open database")
-        val authenticationPublicKey = context.getStaticKeys(keyId)
+
+        val othersKeys = db.fetchEphemeral(
+            tokenHash,
+            if(withAttachment) PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_SERVER_ATTACHMENT
+            else PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_SERVER,
+        ) ?: throw Exception("Could not fetch server keys")
+
+        val keys = db.fetchEphemeral(
+            tokenHash,
+            PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_CLIENT,
+            othersKeys.keyId
+        ) ?: throw Exception("Could not fetch client keys")
+        val authenticationPublicKey = context.getStaticKeys(othersKeys.keyId)
             ?: throw Exception("Could not find static keys for id")
 
-        val othersKeys = db.fetch(tokenId, keyId, PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_SERVER)
-            ?: throw Exception("Could not fetch server keys")
-        val keys = db.fetch(tokenId, keyId, PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_CLIENT)
-            ?: throw Exception("Could not fetch client keys")
         keys.use { k ->
             val ciphertext = v1PlatformPublisherEncrypt(
                 ecKid = k.privateKey!!,
                 ssKidPk = authenticationPublicKey,
                 esKidPk = othersKeys.publicKey,
-                keyId = keyId.toUByte(),
+                keyId = othersKeys.keyId.toUByte(),
                 plaintext = plaintext
             )
 
-            return Pair(ciphertext, keyId)
+            return Pair(ciphertext, othersKeys.keyId)
         }
     }
 

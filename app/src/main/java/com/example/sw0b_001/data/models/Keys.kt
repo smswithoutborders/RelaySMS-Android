@@ -18,7 +18,6 @@ data class Keys(
     val alias: String,
     var privateKey: ByteArray?,
     val publicKey: ByteArray,
-    var tokenId: ByteArray?,
     var tokenHash: ByteArray? = null,
 ) : AutoCloseable {
     @Ignore
@@ -29,7 +28,6 @@ data class Keys(
         privateKey?.fill(0)
         publicKey.fill(0)
         tokenHash?.fill(0)
-        tokenId?.fill(0)
         isClosed = true
     }
 }

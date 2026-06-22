@@ -15,6 +15,7 @@ import io.grpc.ManagedChannel
 import io.grpc.ManagedChannelBuilder
 import publisher.v3.PublisherGrpc
 import publisher.v3.PublisherOuterClass
+import uniffi.relaysms_spec_payload.V1ContentCategories
 import uniffi.relaysms_spec_payload.v1ContentCategoryFromU8
 import uniffi.relaysms_spec_payload.v1TokenDecryptClient
 
@@ -87,10 +88,11 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
 
         try {
             val res = publisherStub.exchangeOAuth2CodeAndStore(request)
+
             val ecKid = keys.find { it.first == res.keyId }
                 ?: throw Exception("Invalid decryption key requested")
-            val esKidPk = res.serverEphemeralPublicKeysList.find{
-                it.keyId == res.keyId }
+
+            val esKidPk = res.serverEphemeralPublicKeysList.find{ it.keyId == res.keyId }
                 ?: throw Exception("Invalid server decryption key requested")
 
             val ssKidPk = context.getStaticKeys(res.keyId)
@@ -110,45 +112,69 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
                     keyId = it.keyId,
                     privateKey = null,
                     publicKey = it.publicKey.toByteArray(),
-                    tokenId = res.tokenId.toByteArray(),
                     tokenHash = tokenHash,
                     alias = TOKEN_KEYSTORE_ALIAS_CLIENT
                 )
             }
-            val db = Datastore.getDatastore(context) ?: throw Exception("Failed to open database")
-            val dbKeystore = db.keysDao() ?: throw Exception("Failed to open database")
-            val dbTokens = db.tokensDao() ?: throw Exception("Failed to open database")
-
-            val ephemeralKeys = mutableListOf<Keys>()
-            keys.forEach { pair ->
-                pair.second.use { key ->
-                    val key = Keys(
-                        keyId = pair.first,
-                        privateKey = key.privateKey!!.copyOf(),
-                        publicKey = key.publicKey.copyOf(),
-                        tokenId = res.tokenId.toByteArray(),
-                        tokenHash = res.tokenCiphertext.toByteArray(),
-                        alias = TOKEN_KEYSTORE_ALIAS_SERVER
-                    )
-                    ephemeralKeys.add(key)
-                }
-            }
-            dbKeystore.insert(ephemeralKeys.apply {
-                addAll(serverKeys)
-            })
-
-            dbTokens.insert(
-                Tokens(
-                    tokenId = res.tokenId.toByteArray(),
-                    catId = v1ContentCategoryFromU8( res.catId.toUByte()),
-                    account = res.accountIdentifier,
-                    platformName = res.platform
-                )
+            storeKeys(
+                keys = keys,
+                serverKeys = serverKeys,
+                tokenId = res.tokenId.toByteArray(),
+                tokenHash = tokenHash,
+                catId = v1ContentCategoryFromU8(res.catId.toUByte()),
+                accountId = res.accountIdentifier,
+                platformName = res.platform
             )
         } catch (e: Exception) {
             e.printStackTrace()
             throw e
         }
+    }
+
+    private suspend fun storeKeys(
+        keys: List<Pair<Int, Protocols.CloseableCurve15519KeyPair>>,
+        serverKeys: List<Keys>,
+        tokenId: ByteArray,
+        tokenHash: ByteArray,
+        catId: V1ContentCategories,
+        accountId: String,
+        platformName: String
+    ) {
+        val db = Datastore.getDatastore(context) ?: throw Exception("Failed to open database")
+        val dbKeystore = db.keysDao() ?: throw Exception("Failed to open database")
+        val dbTokens = db.tokensDao() ?: throw Exception("Failed to open database")
+
+        val ephemeralKeys = mutableListOf<Keys>()
+        keys.forEach { pair ->
+            pair.second.use { key ->
+                val key = Keys(
+                    keyId = pair.first,
+                    privateKey = key.privateKey!!.copyOf(),
+                    publicKey = key.publicKey.copyOf(),
+                    tokenHash = tokenHash,
+                    alias = TOKEN_KEYSTORE_ALIAS_CLIENT
+                )
+                ephemeralKeys.add(key)
+            }
+        }
+        dbKeystore.insert(
+            serverKeys,
+            TOKEN_KEYSTORE_ALIAS_SERVER,
+            TOKEN_KEYSTORE_ALIAS_SERVER_ATTACHMENT
+        )
+        dbKeystore.insert(
+            ephemeralKeys,
+            TOKEN_KEYSTORE_ALIAS_CLIENT,
+        )
+        dbTokens.insert(
+            Tokens(
+                tokenId = tokenId,
+                catId = catId,
+                account = accountId,
+                platformName = platformName,
+                tokenHash = tokenHash
+            )
+        )
     }
 
 //    fun phoneNumberBaseAuthenticationRequest(
@@ -179,9 +205,34 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
 //        return publisherStub.exchangePNBACodeAndStore(request)
 //    }
 
+    fun revokeOAuth2() {
+        val request = PublisherOuterClass.RevokeOAuth2TokenRequest.newBuilder().apply {
+        }
+
+        try {
+            publisherStub.revokeOAuth2Token(request.build())
+        } catch(e: Exception) {
+            e.printStackTrace()
+            throw e
+        }
+    }
+
+    fun revokePnba() {
+        val request = PublisherOuterClass.RevokeOAuth2TokenRequest.newBuilder().apply {
+        }
+
+        try {
+            publisherStub.revokeOAuth2Token(request.build())
+        } catch(e: Exception) {
+            e.printStackTrace()
+            throw e
+        }
+    }
+
     companion object {
         const val TOKEN_KEYSTORE_ALIAS_CLIENT = "tokenKeystoreAliasClient"
         const val TOKEN_KEYSTORE_ALIAS_SERVER = "tokenKeystoreAliasServer"
+        const val TOKEN_KEYSTORE_ALIAS_SERVER_ATTACHMENT = "tokenKeystoreAliasServerAttachment"
 
         fun fetchOauthRequestVerifier(context: Context, platformName: String) : OAuth {
             val db = Datastore.getDatastore(context)?.oAuthDao()

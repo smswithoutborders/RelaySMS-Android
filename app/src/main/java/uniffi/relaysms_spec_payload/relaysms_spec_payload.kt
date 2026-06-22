@@ -690,6 +690,8 @@ internal object IntegrityCheckingUniffiLib {
     ): Short
     external fun uniffi_relaysms_spec_payload_checksum_func_v1_get_payload_type(
     ): Short
+    external fun uniffi_relaysms_spec_payload_checksum_func_v1_payload_support_protocols_from_u8(
+    ): Short
     external fun uniffi_relaysms_spec_payload_checksum_method_v1contents_serialize(
     ): Short
     external fun uniffi_relaysms_spec_payload_checksum_method_v1contentscontainer_get_attachment(
@@ -945,6 +947,8 @@ external fun uniffi_relaysms_spec_payload_fn_func_v1_get_payload_session_id(`dat
 ): Byte
 external fun uniffi_relaysms_spec_payload_fn_func_v1_get_payload_type(`data`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
+external fun uniffi_relaysms_spec_payload_fn_func_v1_payload_support_protocols_from_u8(`value`: Byte,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
 external fun ffi_relaysms_spec_payload_rustbuffer_alloc(`size`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 external fun ffi_relaysms_spec_payload_rustbuffer_from_bytes(`bytes`: ForeignBytes.ByValue,uniffi_out_err: UniffiRustCallStatus, 
@@ -1110,6 +1114,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_get_payload_type() != 44622.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_payload_support_protocols_from_u8() != 24298.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_relaysms_spec_payload_checksum_method_v1contents_serialize() != 24413.toShort()) {
@@ -4594,140 +4601,6 @@ public object FfiConverterTypeV1ContentError : FfiConverterRustBuffer<V1ContentE
 
 
 
-sealed class V1ContentVariation: Disposable  {
-    
-    data class Email(
-        val `value`: uniffi.relaysms_spec_payload.V1Emails) : V1ContentVariation()
-        
-    {
-        
-
-        companion object
-    }
-    
-    data class Message(
-        val `value`: uniffi.relaysms_spec_payload.V1Messages) : V1ContentVariation()
-        
-    {
-        
-
-        companion object
-    }
-    
-    data class Text(
-        val `value`: uniffi.relaysms_spec_payload.V1Text) : V1ContentVariation()
-        
-    {
-        
-
-        companion object
-    }
-    
-
-    
-    @Suppress("UNNECESSARY_SAFE_CALL") // codegen is much simpler if we unconditionally emit safe calls here
-    override fun destroy() {
-        when(this) {
-            is V1ContentVariation.Email -> {
-                
-    Disposable.destroy(
-        this.`value`
-    )
-                
-            }
-            is V1ContentVariation.Message -> {
-                
-    Disposable.destroy(
-        this.`value`
-    )
-                
-            }
-            is V1ContentVariation.Text -> {
-                
-    Disposable.destroy(
-        this.`value`
-    )
-                
-            }
-        }.let { /* this makes the `when` an expression, which ensures it is exhaustive */ }
-    }
-    
-
-    
-    
-
-
-    companion object
-}
-
-/**
- * @suppress
- */
-public object FfiConverterTypeV1ContentVariation : FfiConverterRustBuffer<V1ContentVariation>{
-    override fun read(buf: ByteBuffer): V1ContentVariation {
-        return when(buf.getInt()) {
-            1 -> V1ContentVariation.Email(
-                FfiConverterTypeV1Emails.read(buf),
-                )
-            2 -> V1ContentVariation.Message(
-                FfiConverterTypeV1Messages.read(buf),
-                )
-            3 -> V1ContentVariation.Text(
-                FfiConverterTypeV1Text.read(buf),
-                )
-            else -> throw RuntimeException("invalid enum value, something is very wrong!!")
-        }
-    }
-
-    override fun allocationSize(value: V1ContentVariation) = when(value) {
-        is V1ContentVariation.Email -> {
-            // Add the size for the Int that specifies the variant plus the size needed for all fields
-            (
-                4UL
-                + FfiConverterTypeV1Emails.allocationSize(value.`value`)
-            )
-        }
-        is V1ContentVariation.Message -> {
-            // Add the size for the Int that specifies the variant plus the size needed for all fields
-            (
-                4UL
-                + FfiConverterTypeV1Messages.allocationSize(value.`value`)
-            )
-        }
-        is V1ContentVariation.Text -> {
-            // Add the size for the Int that specifies the variant plus the size needed for all fields
-            (
-                4UL
-                + FfiConverterTypeV1Text.allocationSize(value.`value`)
-            )
-        }
-    }
-
-    override fun write(value: V1ContentVariation, buf: ByteBuffer) {
-        when(value) {
-            is V1ContentVariation.Email -> {
-                buf.putInt(1)
-                FfiConverterTypeV1Emails.write(value.`value`, buf)
-                Unit
-            }
-            is V1ContentVariation.Message -> {
-                buf.putInt(2)
-                FfiConverterTypeV1Messages.write(value.`value`, buf)
-                Unit
-            }
-            is V1ContentVariation.Text -> {
-                buf.putInt(3)
-                FfiConverterTypeV1Text.write(value.`value`, buf)
-                Unit
-            }
-        }.let { /* this makes the `when` an expression, which ensures it is exhaustive */ }
-    }
-}
-
-
-
-
-
 
 
 sealed class V1CryptographicException: kotlin.Exception() {
@@ -4991,6 +4864,12 @@ sealed class V1PayloadsException: kotlin.Exception() {
             get() = ""
     }
     
+    class UnsupportedProtocol(
+        ) : V1PayloadsException() {
+        override val message
+            get() = ""
+    }
+    
 
     
 
@@ -5059,6 +4938,7 @@ public object FfiConverterTypeV1PayloadsError : FfiConverterRustBuffer<V1Payload
                 )
             23 -> V1PayloadsException.InconsistentLengthSessionId()
             24 -> V1PayloadsException.SerializerNeedsSessionId()
+            25 -> V1PayloadsException.UnsupportedProtocol()
             else -> throw RuntimeException("invalid error enum value, something is very wrong!!")
         }
     }
@@ -5174,6 +5054,10 @@ public object FfiConverterTypeV1PayloadsError : FfiConverterRustBuffer<V1Payload
                 4UL
             )
             is V1PayloadsException.SerializerNeedsSessionId -> (
+                // Add the size for the Int that specifies the variant plus the size needed for all fields
+                4UL
+            )
+            is V1PayloadsException.UnsupportedProtocol -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
@@ -5294,10 +5178,48 @@ public object FfiConverterTypeV1PayloadsError : FfiConverterRustBuffer<V1Payload
                 buf.putInt(24)
                 Unit
             }
+            is V1PayloadsException.UnsupportedProtocol -> {
+                buf.putInt(25)
+                Unit
+            }
         }.let { /* this makes the `when` an expression, which ensures it is exhaustive */ }
     }
 
 }
+
+
+
+
+enum class V1PayloadsSupportedProtocols(val value: kotlin.ULong) {
+    
+    O_AUTH20(0u),
+    PNBA(1u);
+
+    
+
+
+    companion object
+}
+
+
+/**
+ * @suppress
+ */
+public object FfiConverterTypeV1PayloadsSupportedProtocols: FfiConverterRustBuffer<V1PayloadsSupportedProtocols> {
+    override fun read(buf: ByteBuffer) = try {
+        V1PayloadsSupportedProtocols.values()[buf.getInt() - 1]
+    } catch (e: IndexOutOfBoundsException) {
+        throw RuntimeException("invalid enum value, something is very wrong!!", e)
+    }
+
+    override fun allocationSize(value: V1PayloadsSupportedProtocols) = 4UL
+
+    override fun write(value: V1PayloadsSupportedProtocols, buf: ByteBuffer) {
+        buf.putInt(value.ordinal + 1)
+    }
+}
+
+
 
 
 
@@ -5683,6 +5605,17 @@ public object FfiConverterSequenceByteArray: FfiConverterRustBuffer<List<kotlin.
     UniffiLib.uniffi_relaysms_spec_payload_fn_func_v1_get_payload_type(
     
         FfiConverterByteArray.lower(`data`),_status)
+}
+    )
+    }
+    
+
+    @Throws(V1PayloadsException::class) fun `v1PayloadSupportProtocolsFromU8`(`value`: kotlin.UByte): V1PayloadsSupportedProtocols {
+            return FfiConverterTypeV1PayloadsSupportedProtocols.lift(
+    uniffiRustCallWithError(V1PayloadsException) { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_func_v1_payload_support_protocols_from_u8(
+    
+        FfiConverterUByte.lower(`value`),_status)
 }
     )
     }

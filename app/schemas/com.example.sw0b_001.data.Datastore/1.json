@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "8fe338d73dd6d3dcc900a9ff39ead0b0",
+    "identityHash": "6ee5f2ef9ecba1ca66876e5024b71910",
     "entities": [
       {
         "tableName": "RatchetStates",
@@ -121,7 +121,7 @@
       },
       {
         "tableName": "Tokens",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tokenId` BLOB NOT NULL, `catId` TEXT NOT NULL, `account` TEXT NOT NULL, `platformName` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tokenId` BLOB NOT NULL, `tokenHash` BLOB NOT NULL, `catId` TEXT NOT NULL, `account` TEXT NOT NULL, `platformName` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -132,6 +132,12 @@
           {
             "fieldPath": "tokenId",
             "columnName": "tokenId",
+            "affinity": "BLOB",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tokenHash",
+            "columnName": "tokenHash",
             "affinity": "BLOB",
             "notNull": true
           },
@@ -162,19 +168,20 @@
         },
         "indices": [
           {
-            "name": "index_Tokens_tokenId",
+            "name": "index_Tokens_tokenId_tokenHash",
             "unique": true,
             "columnNames": [
-              "tokenId"
+              "tokenId",
+              "tokenHash"
             ],
             "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_Tokens_tokenId` ON `${TABLE_NAME}` (`tokenId`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_Tokens_tokenId_tokenHash` ON `${TABLE_NAME}` (`tokenId`, `tokenHash`)"
           }
         ]
       },
       {
         "tableName": "SupportedPlatforms",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `cat_id` INTEGER NOT NULL, `protocol_type` TEXT, `icon_svg` TEXT, `icon_png` TEXT, `support_url_scheme` INTEGER, `logo` BLOB, PRIMARY KEY(`name`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `cat_id` INTEGER NOT NULL, `protocol_type` INTEGER, `icon_svg` TEXT, `icon_png` TEXT, `support_url_scheme` INTEGER, `logo` BLOB, PRIMARY KEY(`name`))",
         "fields": [
           {
             "fieldPath": "name",
@@ -191,7 +198,7 @@
           {
             "fieldPath": "protocol_type",
             "columnName": "protocol_type",
-            "affinity": "TEXT"
+            "affinity": "INTEGER"
           },
           {
             "fieldPath": "icon_svg",
@@ -259,7 +266,7 @@
       },
       {
         "tableName": "Keys",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `keyId` INTEGER NOT NULL, `alias` TEXT NOT NULL, `privateKey` BLOB, `publicKey` BLOB NOT NULL, `tokenId` BLOB, `tokenHash` BLOB)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `keyId` INTEGER NOT NULL, `alias` TEXT NOT NULL, `privateKey` BLOB, `publicKey` BLOB NOT NULL, `tokenHash` BLOB)",
         "fields": [
           {
             "fieldPath": "id",
@@ -289,11 +296,6 @@
             "columnName": "publicKey",
             "affinity": "BLOB",
             "notNull": true
-          },
-          {
-            "fieldPath": "tokenId",
-            "columnName": "tokenId",
-            "affinity": "BLOB"
           },
           {
             "fieldPath": "tokenHash",
@@ -347,7 +349,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8fe338d73dd6d3dcc900a9ff39ead0b0')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6ee5f2ef9ecba1ca66876e5024b71910')"
     ]
   }
 }

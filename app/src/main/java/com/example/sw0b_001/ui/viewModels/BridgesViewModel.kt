@@ -3,6 +3,7 @@ package com.example.sw0b_001.ui.viewModels
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.afkanerd.lib_image_android.ui.extensions.toIntLittleEndian
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.Protocols
 import com.example.sw0b_001.data.Datastore
@@ -28,7 +29,7 @@ class BridgesViewModel @Inject constructor(
 ): ViewModel() {
     fun publish(
         body: String,
-        tokenId: ByteArray?,
+        tokenHash: ByteArray?,
         to: String?,
         subject: String?,
         imageViewModel: ImageViewModel,
@@ -41,6 +42,15 @@ class BridgesViewModel @Inject constructor(
             withContext(Dispatchers.IO) {
                 var contentContainer: V1ContentsContainer?
                 val isAttachment = attachment != null
+                var tokenId: UInt? = null
+                if(tokenHash != null) {
+                    val db = Datastore.getDatastore(context) ?: throw Exception("Failed to open database")
+                    tokenId = db.tokensDao()?.fetch(tokenHash)
+                        ?.tokenId
+                        ?.toIntLittleEndian()
+                        ?.toUInt()
+                        ?: throw Exception("Failed to find token id")
+                }
                 try {
                     if(isAttachment) {
                         val sessionId = imageViewModel.getSessionId(context)
@@ -55,7 +65,7 @@ class BridgesViewModel @Inject constructor(
                             imageViewModel,
                             sessionId = sessionId
                         ) { payload ->
-                            encrypt(payload, tokenId)
+                            encrypt(payload, tokenHash, true)
                         }
                     } else {
                         contentContainer = publishWithoutAttachment(
@@ -66,7 +76,7 @@ class BridgesViewModel @Inject constructor(
                             to,
                             subject,
                         ) { p ->
-                            encrypt(p, tokenId)
+                            encrypt(p, tokenHash)
                         }
                     }
 
@@ -90,31 +100,43 @@ class BridgesViewModel @Inject constructor(
 
     private fun encrypt(
         plaintext: ByteArray,
-        tokenId: ByteArray?,
+        tokenHash: ByteArray?,
+        withAttachment: Boolean = false,
     ) : Pair<ByteArray, Int> {
-        val keyId = (0 until 16).random()
-        val db = Datastore.getDatastore(context)?.keysDao()
-            ?: throw Exception("could not open database")
-        val authenticationPublicKey = context.getStaticKeys(keyId)
-            ?: throw Exception("Could not find static keys for id")
+        val db = Datastore.getDatastore(context)?.keysDao() ?: throw Exception("Could not open database")
 
-        if(tokenId != null) {
-            val othersKeys = db.fetch(
-                tokenId, keyId, PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_SERVER)
-                ?: throw Exception("Could not find server keys")
-            val keys = db.fetch(tokenId, keyId, PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_CLIENT)
-                ?: throw Exception("Could not find client keys")
+        if(tokenHash != null) {
+            val othersKeys = db.fetchEphemeral(
+                tokenHash,
+                if(withAttachment) PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_SERVER_ATTACHMENT
+                else PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_SERVER,
+            ) ?: throw Exception("Could not fetch server keys")
+
+            val keys = db.fetchEphemeral(
+                tokenHash,
+                PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_CLIENT,
+                othersKeys.keyId
+            ) ?: throw Exception("Could not fetch client keys")
+
             keys.use { ec ->
+                val authenticationPublicKey = context.getStaticKeys(othersKeys.keyId)
+                    ?: throw Exception("Could not find static keys for id")
                 val ciphertext = v1BridgeOnlineFirstPublisherEncrypt(
                     ecKid = ec.privateKey!!,
                     ssKidPk = authenticationPublicKey,
                     esKidPk = othersKeys.publicKey,
-                    keyId = keyId.toUByte(),
+                    keyId = othersKeys.keyId.toUByte(),
                     plaintext = plaintext
                 )
-                return Pair(ciphertext, keyId)
+                return Pair(ciphertext, othersKeys.keyId)
             }
         } else {
+            val keyId = if(withAttachment) (0 until 16).random()
+            else (0 until 255).random()
+
+            val authenticationPublicKey = context.getStaticKeys(keyId)
+                ?: throw Exception("Could not find static keys for id")
+
             val protocol = Protocols(context)
             protocol.generateDH().use { ec ->
                 protocol.generateDH().use { sc ->

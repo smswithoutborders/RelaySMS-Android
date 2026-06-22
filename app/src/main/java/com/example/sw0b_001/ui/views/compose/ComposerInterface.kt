@@ -252,7 +252,7 @@ fun ComposerInterface(
                         publisherViewModel.publish(
                             catId = selectedToken?.catId ?: V1ContentCategories.BRIDGE,
                             body = body,
-                            tokenId = selectedToken?.tokenId,
+                            tokenHash = selectedToken?.tokenHash,
                             to = to,
                             subject = subject,
                             imageViewModel = imageViewModel,
@@ -264,7 +264,7 @@ fun ComposerInterface(
                     } else {
                         bridgesViewModel.publish(
                             body = body,
-                            tokenId = null,
+                            tokenHash = null,
                             to = to,
                             subject = subject,
                             imageViewModel = imageViewModel,

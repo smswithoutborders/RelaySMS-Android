@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Base64
-import com.afkanerd.lib_image_android.ui.extensions.toIntLittleEndian
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.data.data.models.SmsManager
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDefaultSimSubscription
@@ -23,7 +22,7 @@ object TransportImpl {
         context: Context,
         catId: V1ContentCategories,
         body: String,
-        tokenId: ByteArray?,
+        tokenId: UInt?,
         to: String?,
         subject: String?,
         attachment: ByteArray,
@@ -47,7 +46,7 @@ object TransportImpl {
             contents = ciphertext,
             kId = keyId.toUByte(),
             lenAtt = attachment.size.toUShort(),
-            tId = tokenId?.toIntLittleEndian()?.toUInt(),
+            tId = tokenId,
             sessId = sessionId,
         )
         val splitPayloads = payloads.split(Transports.SMS).map {
@@ -68,7 +67,7 @@ object TransportImpl {
         context: Context,
         catId: V1ContentCategories,
         body: String,
-        tokenId: ByteArray?,
+        tokenId: UInt?,
         to: String?,
         subject: String?,
         encrypt: (ByteArray) -> Pair<ByteArray, Int>
@@ -88,7 +87,7 @@ object TransportImpl {
             contents = ciphertext,
             kId = keyId.toUByte(),
             lenAtt = 0u,
-            tId = tokenId?.toIntLittleEndian()?.toUInt(),
+            tId = tokenId,
             sessId = null
         )
 

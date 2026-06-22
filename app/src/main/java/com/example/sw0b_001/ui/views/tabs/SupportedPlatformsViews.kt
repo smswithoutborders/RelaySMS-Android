@@ -71,7 +71,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import uniffi.relaysms_spec_payload.V1ContentCategories
+import uniffi.relaysms_spec_payload.V1PayloadsSupportedProtocols
 import uniffi.relaysms_spec_payload.v1ContentCategoryFromU8
+import uniffi.relaysms_spec_payload.v1PayloadSupportProtocolsFromU8
 
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
@@ -290,12 +292,15 @@ fun PlatformListContent(
 
         val storeCallback : () -> Unit = {
             CoroutineScope(Dispatchers.Default).launch {
-                if(clickedPlatform?.protocol_type == "oauth2") {
-                    tokensViewModel.store(clickedPlatform!!)
-                }
-                else if(clickedPlatform?.protocol_type == "pnba") {
-                    showPlatformOptions = false
-                    storePnbaRequested = true
+                when(v1PayloadSupportProtocolsFromU8(
+                    clickedPlatform!!.protocol_type!!.toUByte())) {
+                    V1PayloadsSupportedProtocols.O_AUTH20 -> {
+                        tokensViewModel.store(clickedPlatform!!)
+                    }
+                    V1PayloadsSupportedProtocols.PNBA -> {
+                        showPlatformOptions = false
+                        storePnbaRequested = true
+                    }
                 }
             }
         }

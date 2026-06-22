@@ -19,7 +19,7 @@ data class SupportedPlatforms(
     @PrimaryKey
     val name: String,
     var cat_id: Int,
-    val protocol_type: String?,
+    val protocol_type: Int?,
     val icon_svg: String?,
     val icon_png: String?,
     val support_url_scheme: Boolean?,
