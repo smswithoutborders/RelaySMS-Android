@@ -15,7 +15,6 @@ data class Payloads(
     val catId: V1ContentCategories,
     val content: V1ContentsContainer,
     val date: Long = System.currentTimeMillis(),
-//    var contents: V1ContentsContainer? = null
 ): AutoCloseable {
     override fun close() {
 //        payload.fill(0)

@@ -13,11 +13,11 @@ interface TokensDao {
     @Query("SELECT * FROM Tokens")
     fun fetchAll() : Flow<List<Tokens>>
 
+    @Query("SELECT * FROM Tokens")
+    suspend fun fetchAllList() : List<Tokens>
+
     @Query("SELECT * FROM Tokens where tokenHash = :tokenHash")
     fun fetch(tokenHash: ByteArray) : Tokens?
-
-    @Query("SELECT * FROM Tokens")
-    fun fetchAllListDebug() : List<Tokens>
 
     @Query("SELECT * FROM Tokens WHERE catId = :catId")
     fun fetchCatId(catId: V1ContentCategories) : Flow<List<Tokens>>
@@ -25,6 +25,12 @@ interface TokensDao {
     @Insert
     fun insert(tokens: Tokens)
 
+    @Insert
+    fun insert(tokens: List<Tokens>)
+
     @Delete
     fun delete(tokens: Tokens)
+
+    @Query("DELETE FROM Tokens")
+    suspend fun deleteAll()
 }

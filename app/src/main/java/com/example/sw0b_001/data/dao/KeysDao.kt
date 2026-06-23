@@ -53,4 +53,10 @@ interface KeysDao {
 
     @Delete
     fun remove(key: Keys)
+
+    @Query("SELECT * FROM Keys")
+    suspend fun fetchAll(): List<Keys>
+
+    @Query("DELETE FROM Keys")
+    suspend fun deleteAll()
 }

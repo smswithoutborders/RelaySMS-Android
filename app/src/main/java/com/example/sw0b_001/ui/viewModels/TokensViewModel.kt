@@ -79,13 +79,6 @@ class TokensViewModel @Inject constructor(
         return db.fetchAll()
     }
 
-    fun getList() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val list = db.fetchAllListDebug()
-            list
-        }
-    }
-
     fun fetchTokensByCatId(catId: V1ContentCategories): Flow<List<Tokens>> {
         return db.fetchCatId(catId)
     }

@@ -449,5 +449,19 @@
     <string name="phone_number1">Phone number</string>
     <string name="supported_platforms">Supported platforms</string>
     <string name="platform_image">Platform image</string>
+    <string name="backup">Backup</string>
+    <string name="restore">Restore</string>
+    <string name="on_device_backups">On-device backups</string>
+    <string name="backups_are_encrypted_with_a_passphrase_and_stored_on_your_device">Backups are encrypted with a passphrase and stored on your device.</string>
+    <string name="backup_now">Backup now</string>
+    <string name="your_recovery_key">Your recovery Key</string>
+    <string name="your_recovery_key_is_a_64_character_code_that_you_will_need_to_restore_your_backup">Your recovery key is a 64-character code that you will need to restore your backup</string>
+    <string name="store_your_recovery_key_somewhere_safe_like_a_secure_password_manager_and_don_t_share_it_with_anyone">Store your recovery key somewhere safe like a secure password manager, and don\'t share it with anyone.</string>
+    <string name="if_you_lose_it_you_won_t_be_able_to_recover_your_messages">If you lose it, you won\'t be able to recover your messages.</string>
+    <string name="view_recovery_key">View recovery key</string>
+    <string name="record_your_recovery_key">Record your recovery key</string>
+    <string name="this_key_is_required_to_recover_your_saved_accounts_and_data_store_this_key_somewhere_safe_if_you_lose_it_you_won_t_be_able_to_recover_your_saved_accounts">This key is required to recover your saved accounts and data. Store this key somewhere safe. If you lose it, you won\'t be able to recover your saved account.</string>
+    <string name="copy_to_clipboard">Copy to clipboard</string>
+    <string name="save_to_password_manager">Save to password manager</string>
 
 </resources>

@@ -7,19 +7,10 @@ import uniffi.relaysms_spec_payload.V1ContentCategories
 object WelcomeScreen
 
 @Serializable
-object OnboardingSkipScreen
-
-@Serializable
 object OnboardingInteractiveScreen
 
 @Serializable
-object GetMeOutScreen
-
-@Serializable
 object HomepageScreen
-
-@Serializable
-object HomepageScreenRelay
 
 @Serializable
 data class LoginScreen(
@@ -37,13 +28,17 @@ object AboutScreen
 @Serializable
 object PasteEncryptedTextScreen
 
+
 @Serializable
 object SettingsScreen
 
 @Serializable
-data class ForgotPasswordScreen(
-    val isOnboarding: Boolean = false
-)
+object BackupScreen
+
+@Serializable
+object RestoreScreen {
+
+}
 
 @Serializable
 data class ComposeScreen(

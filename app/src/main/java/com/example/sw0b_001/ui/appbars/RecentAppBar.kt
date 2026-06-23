@@ -1,7 +1,5 @@
 package com.example.sw0b_001.ui.appbars
 
-import android.content.Intent
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,7 +16,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
@@ -34,7 +31,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -54,10 +50,12 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.navigation.AboutScreen
-import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.data.getPhoneNumberFromPrefs
+import com.example.sw0b_001.ui.navigation.AboutScreen
+import com.example.sw0b_001.ui.navigation.BackupScreen
+import com.example.sw0b_001.ui.navigation.RestoreScreen
 import com.example.sw0b_001.ui.navigation.SettingsScreen
+import com.example.sw0b_001.ui.theme.AppTheme
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -192,6 +190,20 @@ fun RecentAppBar(
                             onClick = {
                                 showMenu = false
                                 navController.navigate(SettingsScreen)
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.backup)) },
+                            onClick = {
+                                showMenu = false
+                                navController.navigate(BackupScreen)
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.restore)) },
+                            onClick = {
+                                showMenu = false
+                                navController.navigate(RestoreScreen)
                             }
                         )
                         DropdownMenuItem(

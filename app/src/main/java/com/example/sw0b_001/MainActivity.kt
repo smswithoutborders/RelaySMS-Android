@@ -33,7 +33,6 @@ import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
@@ -61,11 +60,13 @@ import com.example.sw0b_001.extensions.context.settingsGetLockDownApp
 import com.example.sw0b_001.extensions.context.settingsGetOnboardedCompletely
 import com.example.sw0b_001.extensions.context.settingsSetLockDownApp
 import com.example.sw0b_001.ui.navigation.AboutScreen
+import com.example.sw0b_001.ui.navigation.BackupScreen
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.navigation.DetailsInterfaceScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.OnboardingInteractiveScreen
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
+import com.example.sw0b_001.ui.navigation.RestoreScreen
 import com.example.sw0b_001.ui.navigation.SettingsScreen
 import com.example.sw0b_001.ui.navigation.WelcomeScreen
 import com.example.sw0b_001.ui.onboarding.OnboardingInteractive
@@ -78,6 +79,7 @@ import com.example.sw0b_001.ui.viewModels.PublisherViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.views.AboutView
+import com.example.sw0b_001.ui.views.BackupRestore.BackupView
 import com.example.sw0b_001.ui.views.WelcomeMainView
 import com.example.sw0b_001.ui.views.compose.ComposerInterface
 import com.example.sw0b_001.ui.views.details.DetailsInterfaceView
@@ -370,6 +372,13 @@ class MainActivity : BindActivity() {
                 SettingsView(
                     navController = navController,
                 )
+            }
+
+            composable<BackupScreen> {
+                BackupView()
+            }
+            composable<RestoreScreen> {
+                TODO("Implement screen")
             }
         }
 
