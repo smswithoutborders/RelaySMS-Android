@@ -50,7 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.R
-//import com.example.sw0b_001.ui.navigation.SendingMessages
+import com.example.sw0b_001.ui.navigation.SendingMessages
 import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 
@@ -80,15 +80,15 @@ fun WelcomeMainView(navController: NavController) {
                 when (page) {
                     0 -> PageOneContent()
 
-//                    1 -> ChooseMessageModeScreen(
-//                        onSkip = { navController.navigate(SendingMessages) },
-//                        onBack = {
-//                            scope.launch { pagerState.animateScrollToPage(0) }
-//                        },
-//                        onNext = {
-//                            scope.launch { pagerState.animateScrollToPage(2) }
-//                        }
-//                    )
+                    1 -> ChooseMessageModeScreen(
+                        onSkip = { navController.navigate(SendingMessages) },
+                        onBack = {
+                            scope.launch { pagerState.animateScrollToPage(0) }
+                        },
+                        onNext = {
+                            scope.launch { pagerState.animateScrollToPage(2) }
+                        }
+                    )
 
 //                    2 -> DefaultSmsAppScreen(
 //                        onSkip = { navController.navigate(SendingMessages) },
@@ -170,7 +170,7 @@ fun WelcomeMainView(navController: NavController) {
 
                 }
             }
-            Spacer(modifier = Modifier.height(25.dp))
+            Spacer(modifier = Modifier.height(5.dp))
         }
     }
 }

@@ -7,6 +7,8 @@ import uniffi.relaysms_spec_payload.V1ContentCategories
 object WelcomeScreen
 
 @Serializable
+object SendingMessages
+@Serializable
 object OnboardingSkipScreen
 
 @Serializable
