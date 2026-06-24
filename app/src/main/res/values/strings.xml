@@ -464,5 +464,6 @@
     <string name="copy_to_clipboard">Copy to clipboard</string>
     <string name="save_to_password_manager">Save to password manager</string>
     <string name="Settings">Settings</string>
+    <string name="Messages">Messages</string>
 
 </resources>

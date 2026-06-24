@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChatBubble
 import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Public
@@ -59,14 +60,14 @@ fun BottomNavBar(
                 NavigationBarItem(
                     icon = {
                         Icon(
-                            Icons.Filled.ChatBubbleOutline,
-                            contentDescription = stringResource(R.string.recents),
+                            Icons.Filled.ChatBubble,
+                            contentDescription = stringResource(R.string.Messages),
                             modifier = Modifier.size(20.dp)
                         )
                     },
                     label = {
                         Text(
-                            text = stringResource(R.string.recents_text),
+                            text = stringResource(R.string.Messages),
                             style = MaterialTheme.typography.labelSmall
                         )
                     },
