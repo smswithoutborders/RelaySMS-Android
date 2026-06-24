@@ -5,15 +5,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BubbleChart
-import androidx.compose.material.icons.filled.ContentPaste
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
@@ -34,12 +30,10 @@ import com.example.sw0b_001.ui.appbars.GatewayClientsAppBar
 import com.example.sw0b_001.ui.appbars.RecentAppBar
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
 import com.example.sw0b_001.ui.modals.AddGatewayClientModal
-import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
-import com.example.sw0b_001.ui.views.threads.InboxView
 import com.example.sw0b_001.ui.views.threads.RecentView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -49,7 +43,6 @@ import kotlinx.coroutines.launch
 enum class BottomTabsItems {
     BottomBarRecentTab,
     BottomBarPlatformsTab,
-    BottomBarInboxTab,
     BottomBarCountriesTab
 }
 
@@ -113,18 +106,6 @@ fun HomepageView(
                             }
                         )
                     }
-                    BottomTabsItems.BottomBarInboxTab -> {
-                        TopAppBar(
-                            title = {
-                                Text(
-                                    text = stringResource(R.string.inbox),
-                                    style = MaterialTheme.typography.headlineLarge,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            },
-                            colors = TopAppBarDefaults.topAppBarColors()
-                        )
-                    }
                     else -> {}
                 }
             }
@@ -169,29 +150,6 @@ fun HomepageView(
                             text = {
                                 Text(
                                     text = stringResource(R.string.add_account_compose_new),
-                                )
-                            }
-                        )
-                    }
-                }
-                BottomTabsItems.BottomBarInboxTab -> {
-                    if (inboxMessages.value.isNotEmpty()) {
-                        ExtendedFloatingActionButton(
-                            onClick = {
-                                navController.navigate(PasteEncryptedTextScreen)
-                            },
-                            containerColor = MaterialTheme.colorScheme.secondary,
-                            icon = {
-                                Icon(
-                                    Icons.Filled.ContentPaste,
-                                    contentDescription = stringResource(R.string.paste_new_incoming_message),
-                                    tint = MaterialTheme.colorScheme.onSecondary
-                                )
-                            },
-                            text = {
-                                Text(
-                                    text = stringResource(R.string.paste_message),
-                                    color = MaterialTheme.colorScheme.onSecondary
                                 )
                             }
                         )
@@ -271,13 +229,6 @@ fun GetTabViews(
         }
         BottomTabsItems.BottomBarCountriesTab -> {
             GatewayClientView(viewModel = gatewayClientViewModel)
-        }
-        BottomTabsItems.BottomBarInboxTab -> {
-            InboxView(
-                payloadsViewModel = payloadsViewModel,
-                tokensViewModel = tokensViewModel,
-                navController = navController
-            )
         }
     }
 
