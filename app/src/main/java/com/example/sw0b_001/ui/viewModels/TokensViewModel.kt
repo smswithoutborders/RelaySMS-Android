@@ -171,18 +171,23 @@ class TokensViewModel @Inject constructor(
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             _isStoringUiState.value = TokensUiState.Loading
-            when(v1PayloadSupportProtocolsFromU8(platform.proto_id!!.toUByte())) {
-                V1PayloadsSupportedProtocols.O_AUTH20 -> {
-                    triggerOAuthRequested(platform)
+            try {
+                when(v1PayloadSupportProtocolsFromU8(platform.proto_id!!.toUByte())) {
+                    V1PayloadsSupportedProtocols.O_AUTH20 -> {
+                        triggerOAuthRequested(platform)
+                    }
+                    V1PayloadsSupportedProtocols.PNBA -> {
+                        triggerPNBARequested(
+                            phoneNumber = phoneNumber!!,
+                            platform = platform,
+                            authCode = authCode,
+                            password = password
+                        )
+                    }
                 }
-                V1PayloadsSupportedProtocols.PNBA -> {
-                    triggerPNBARequested(
-                        phoneNumber = phoneNumber!!,
-                        platform = platform,
-                        authCode = authCode,
-                        password = password
-                    )
-                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _isStoringUiState.value = TokensUiState.Error(e)
             }
         }
     }
@@ -212,15 +217,14 @@ class TokensViewModel @Inject constructor(
                 val intentUri = response.authorizationUrl.toUri()
                 _isStoringUiState.value = TokensUiState.Success(intentUri)
             } catch(e: Exception) {
-                e.printStackTrace()
-                _isStoringUiState.value = TokensUiState.Error(e)
+                throw e
             } finally {
                 requestId.fill(0)
             }
         }
     }
 
-    private fun triggerPNBARequested(
+    private suspend fun triggerPNBARequested(
         phoneNumber: String,
         platform: SupportedPlatforms,
         authCode: String? = null,
@@ -229,45 +233,39 @@ class TokensViewModel @Inject constructor(
         PublisherGrpcImpl(context).use { publisherGrpcImpl ->
             try {
                 when {
-//                    !authCode.isNullOrEmpty() && !password.isNullOrEmpty() -> {
-//                        val response = publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
-//                            authorizationCode = authCode,
-//                            phoneNumber = phoneNumber,
-//                            platform = platform.name,
-//                            password = password
-//                        )
-//                        if(response.success) {
-//                            _isStoringUiState.value = TokensUiState.Success(null)
-//                        }
-//                    }
-//                    !authCode.isNullOrEmpty() -> {
-//                        val response = publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
-//                            authorizationCode = authCode,
-//                            phoneNumber = phoneNumber,
-//                            platform = platform.name
-//                        )
-//                        if(response.success) {
-//                            _isStoringUiState.value = TokensUiState.Success(
-//                                null,
-//                                pnbaPasswordRequired = response.twoStepVerificationEnabled,
-//                            )
-//                        }
-//                    }
-//                    else -> {
-//                        val response = publisherGrpcImpl.phoneNumberBaseAuthenticationRequest(
-//                            phoneNumber,
-//                            platform.name
-//                        )
-//                        if(response.success) {
-//                            _isStoringUiState.value = TokensUiState.Success(
-//                                null ,
-//                                pnbaAuthRequired = true
-//                            )
-//                        }
-//                    }
+                    !authCode.isNullOrEmpty() && !password.isNullOrEmpty() -> {
+                        publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
+                            authorizationCode = authCode,
+                            phoneNumber = phoneNumber,
+                            platform = platform.name,
+                            password = password
+                        )
+                        _isStoringUiState.value = TokensUiState.Success(null)
+                    }
+                    !authCode.isNullOrEmpty() -> {
+                        val res = publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
+                            authorizationCode = authCode,
+                            phoneNumber = phoneNumber,
+                            platform = platform.name
+                        )
+                        _isStoringUiState.value = TokensUiState.Success(
+                            null,
+                            pnbaPasswordRequired = res.twoStepVerificationEnabled,
+                        )
+                    }
+                    else -> {
+                        publisherGrpcImpl.phoneNumberBaseAuthenticationRequest(
+                            phoneNumber,
+                            platform.name
+                        )
+                        _isStoringUiState.value = TokensUiState.Success(
+                            null ,
+                            pnbaAuthRequired = true
+                        )
+                    }
                 }
             } catch(e: Exception) {
-                e.printStackTrace()
+                throw e
             }
         }
     }

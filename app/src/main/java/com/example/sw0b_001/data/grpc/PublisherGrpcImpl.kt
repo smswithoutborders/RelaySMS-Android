@@ -56,17 +56,14 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
         return publisherStub.getOAuth2AuthorizationUrl(request)
     }
 
-    suspend fun sendOAuthAuthorizationCode(
-        platform: String,
-        code: String,
-        codeVerifier: String,
-        requestIdentifier: String = ""
-    ) {
-        val protocol = Protocols(context)
-
+    private fun getKeys()
+    :Pair<List<PublisherOuterClass.PublicKey>,
+            List<Pair<Int, Protocols.CloseableCurve15519KeyPair>>>
+    {
         val publisherKeys = mutableListOf<PublisherOuterClass.PublicKey>()
         val keys = mutableListOf<Pair<Int, Protocols.CloseableCurve15519KeyPair>>()
 
+        val protocol = Protocols(context)
         for(i in 0..255) {
             val key = protocol.generateDH()
             val publisherKey = PublisherOuterClass.PublicKey.newBuilder()
@@ -76,6 +73,17 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
             keys.add(Pair(i, key))
             publisherKeys.add(publisherKey)
         }
+
+        return Pair(publisherKeys, keys)
+    }
+
+    suspend fun sendOAuthAuthorizationCode(
+        platform: String,
+        code: String,
+        codeVerifier: String,
+        requestIdentifier: String = ""
+    ) {
+        val (publisherKeys, keys) = getKeys()
 
         val request = PublisherOuterClass.ExchangeOAuth2CodeAndStoreRequest.newBuilder().apply {
             setPlatform(platform)
@@ -88,40 +96,13 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
 
         try {
             val res = publisherStub.exchangeOAuth2CodeAndStore(request)
-
-            val ecKid = keys.find { it.first == res.keyId }
-                ?: throw Exception("Invalid decryption key requested")
-
-            val esKidPk = res.serverEphemeralPublicKeysList.find{ it.keyId == res.keyId }
-                ?: throw Exception("Invalid server decryption key requested")
-
-            val ssKidPk = context.getStaticKeys(res.keyId)
-                ?: throw Exception("Could not find static keys for id")
-
-            val tokenHash = res.tokenCiphertext.toByteArray().let { ciphertext ->
-                v1TokenDecryptClient(
-                    ecKid = ecKid.second.privateKey?.copyOf()!!,
-                    ssKidPk = ssKidPk,
-                    esKidPk = esKidPk.publicKey.toByteArray(),
-                    keyId = res.keyId.toUByte(),
-                    receivedPayload = ciphertext
-                )
-            }
-            val serverKeys = res.serverEphemeralPublicKeysList.map {
-                Keys(
-                    keyId = it.keyId,
-                    privateKey = null,
-                    publicKey = it.publicKey.toByteArray(),
-                    tokenHash = tokenHash,
-                    alias = TOKEN_KEYSTORE_ALIAS_CLIENT
-                )
-            }
-            storeKeys(
+            processEphemeralKeys(
+                keyId = res.keyId,
+                serverEphemeralPublicKeys = res.serverEphemeralPublicKeysList,
                 keys = keys,
-                serverKeys = serverKeys,
+                tokenCipherText = res.tokenCiphertext.toByteArray(),
                 tokenId = res.tokenId.toByteArray(),
-                tokenHash = tokenHash,
-                catId = v1ContentCategoryFromU8(res.catId.toUByte()),
+                catId = res.catId,
                 accountId = res.accountIdentifier,
                 platformName = res.platform
             )
@@ -129,6 +110,54 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
             e.printStackTrace()
             throw e
         }
+    }
+
+    private suspend fun processEphemeralKeys(
+        keyId: Int,
+        serverEphemeralPublicKeys: List<PublisherOuterClass.PublicKey>,
+        keys: List<Pair<Int, Protocols.CloseableCurve15519KeyPair>>,
+        tokenCipherText: ByteArray,
+        tokenId: ByteArray,
+        catId: Int,
+        accountId: String,
+        platformName: String,
+    ) {
+        val ecKid = keys.find { it.first == keyId }
+            ?: throw Exception("Invalid decryption key requested")
+
+        val esKidPk = serverEphemeralPublicKeys.find{ it.keyId == keyId }
+            ?: throw Exception("Invalid server decryption key requested")
+
+        val ssKidPk = context.getStaticKeys(keyId)
+            ?: throw Exception("Could not find static keys for id")
+
+        val tokenHash = v1TokenDecryptClient(
+            ecKid = ecKid.second.privateKey?.copyOf()!!,
+            ssKidPk = ssKidPk,
+            esKidPk = esKidPk.publicKey.toByteArray(),
+            keyId = keyId.toUByte(),
+            receivedPayload = tokenCipherText
+        )
+        val serverKeys = serverEphemeralPublicKeys.map {
+            Keys(
+                keyId = it.keyId,
+                privateKey = null,
+                publicKey = it.publicKey.toByteArray(),
+                tokenHash = tokenHash,
+                alias = TOKEN_KEYSTORE_ALIAS_CLIENT
+            )
+        }
+
+        storeKeys(
+            keys = keys,
+            serverKeys = serverKeys,
+            tokenId = tokenId,
+            tokenHash = tokenHash,
+            catId = v1ContentCategoryFromU8(catId.toUByte()),
+            accountId = accountId,
+            platformName = platformName
+        )
+
     }
 
     private suspend fun storeKeys(
@@ -177,42 +206,75 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
         )
     }
 
-//    fun phoneNumberBaseAuthenticationRequest(
-//        phoneNumber: String,
-//        platform: String
-//    ): PublisherOuterClass.GetPNBACodeResponse {
-//        val request = PublisherOuterClass.GetPNBACodeRequest.newBuilder().apply {
-//            setPlatform(platform)
-//            setPhoneNumber(phoneNumber)
-//        }.build()
-//
-//        return publisherStub.getPNBACode(request)
-//    }
-//
-//    fun phoneNumberBaseAuthenticationExchange(
-//        authorizationCode: String,
-//        phoneNumber: String,
-//        platform: String,
-//        password: String = "",
-//    ) : PublisherOuterClass.ExchangePNBACodeAndStoreResponse {
-//        val request = PublisherOuterClass.ExchangePNBACodeAndStoreRequest.newBuilder().apply {
-//            setPlatform(platform)
-//            setAuthorizationCode(authorizationCode)
-//            setPassword(password)
-//            setPhoneNumber(phoneNumber)
-//        }.build()
-//
-//        return publisherStub.exchangePNBACodeAndStore(request)
-//    }
+    fun phoneNumberBaseAuthenticationRequest(
+        phoneNumber: String,
+        platform: String
+    ) {
+        val request = PublisherOuterClass.GetPNBACodeRequest.newBuilder().apply {
+            setPlatform(platform)
+            setPhoneNumber(phoneNumber)
+        }.build()
+
+        try {
+            val res = publisherStub.getPNBACode(request)
+
+            if(!res.success) {
+                throw Exception(res.message)
+            }
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
+    suspend fun phoneNumberBaseAuthenticationExchange(
+        authorizationCode: String,
+        phoneNumber: String,
+        platform: String,
+        password: String = "",
+    ) : PublisherOuterClass.ExchangePNBACodeAndStoreResponse {
+        val (publisherKeys, keys) = getKeys()
+
+        val request = PublisherOuterClass.ExchangePNBACodeAndStoreRequest.newBuilder().apply {
+            setPlatform(platform)
+            setAuthorizationCode(authorizationCode)
+            setPassword(password)
+            setPhoneNumber(phoneNumber)
+            addAllClientEphemeralPublicKeys(publisherKeys)
+        }.build()
+
+        try {
+            val res = publisherStub.exchangePNBACodeAndStore(request)
+            processEphemeralKeys(
+                keyId = res.keyId,
+                serverEphemeralPublicKeys = res.serverEphemeralPublicKeysList,
+                keys = keys,
+                tokenCipherText = res.tokenCiphertext.toByteArray(),
+                tokenId = res.tokenId.toByteArray(),
+                catId = res.catId,
+                accountId = res.accountIdentifier,
+                platformName = res.platform
+            )
+
+            if(!res.success) {
+                throw Exception(res.message)
+            }
+
+            return res
+        } catch (e: Exception) {
+            throw e
+        }
+    }
 
     fun revokeOAuth2() {
         val request = PublisherOuterClass.RevokeOAuth2TokenRequest.newBuilder().apply {
         }
 
         try {
-            publisherStub.revokeOAuth2Token(request.build())
+            val res = publisherStub.revokeOAuth2Token(request.build())
+            if(!res.success) {
+                throw Exception(res.message)
+            }
         } catch(e: Exception) {
-            e.printStackTrace()
             throw e
         }
     }
@@ -222,9 +284,12 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
         }
 
         try {
-            publisherStub.revokeOAuth2Token(request.build())
+            val res = publisherStub.revokeOAuth2Token(request.build())
+
+            if(!res.success) {
+                throw Exception(res.message)
+            }
         } catch(e: Exception) {
-            e.printStackTrace()
             throw e
         }
     }

@@ -217,11 +217,12 @@ fun PNBAPhoneNumberCodeRequestView(
                 Button(
                     onClick = {
                         if(!isAuthenticationCodeRequested && !isPasswordRequested) {
-                            phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
-                            phoneNumberRequestedCallback(phoneNumber)
+                            val phoneNumber1 = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+                            phoneNumberRequestedCallback(phoneNumber1)
                         }
                         else if(isAuthenticationCodeRequested && !isPasswordRequested) {
-                            codeRequestedCallback(phoneNumber, authCode)
+                            val phoneNumber1 = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+                            codeRequestedCallback(phoneNumber1, authCode)
                         }
                         else {
                             passwordRequestedCallback(phoneNumber, authCode, password)
