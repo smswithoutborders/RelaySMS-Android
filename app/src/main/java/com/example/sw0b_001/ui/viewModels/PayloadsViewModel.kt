@@ -38,7 +38,7 @@ class PayloadsViewModel @Inject constructor(
 
     private var conversationsPager: Flow<PagingData<Payloads>>? = null
 
-    val db = Datastore.getDatastore(context)?.messagesDao()
+    val db = Datastore.getDatastore(context)?.payloadsDao()
         ?: throw Exception("Could not open database")
 
 //    fun get() {
@@ -91,7 +91,7 @@ class PayloadsViewModel @Inject constructor(
 //            val initialLoadSize: Int = 2 * pageSize
             val initialLoadSize: Int = 50
             val maxSize: Int = PagingConfig.MAX_SIZE_UNBOUNDED
-            val db = Datastore.getDatastore(context)?.messagesDao()
+            val db = Datastore.getDatastore(context)?.payloadsDao()
                 ?: throw Exception("Could not open database")
             conversationsPager = Pager(
                 config = PagingConfig(
@@ -112,7 +112,7 @@ class PayloadsViewModel @Inject constructor(
             if (!::inboxMessageList.isInitialized) {
                 _isLoading.value = true
 
-                val db = Datastore.getDatastore(context)?.messagesDao()
+                val db = Datastore.getDatastore(context)?.payloadsDao()
                     ?: throw Exception("Could not open database")
                 inboxMessageList = db.inbox(V1ContentCategories.BRIDGE)
                 _isLoading.value = false
@@ -129,7 +129,7 @@ class PayloadsViewModel @Inject constructor(
 
     fun delete(messageId: Long) {
         viewModelScope.launch(Dispatchers.IO){
-            val db = Datastore.getDatastore(context)?.messagesDao()
+            val db = Datastore.getDatastore(context)?.payloadsDao()
                 ?: throw Exception("Could not open database")
             db.delete(messageId)
         }

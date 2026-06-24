@@ -1,10 +1,9 @@
 plugins {
     id 'com.android.application'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '2.3.20'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '2.4.0'
     id 'com.google.protobuf'
-//    id 'com.google.protobuf' version '0.9.4' apply false
     alias(libs.plugins.compose.compiler)
-    id 'com.google.devtools.ksp' version '2.3.4'
+    id 'com.google.devtools.ksp' version '2.3.9'
     id("com.google.dagger.hilt.android")
 }
 
@@ -14,29 +13,16 @@ versionProperties.load(new FileInputStream(versionsPropertiesFile))
 
 android {
     namespace 'com.example.sw0b_001'
-    compileSdk 36
+    compileSdk 37
 
     def _versionName = versionProperties['versionName']
     def tagVersion = Integer.parseInt(versionProperties['tagVersion'])
 
     splits {
-
-        // Configures multiple APKs based on ABI.
         abi {
-
-            // Enables building multiple APKs per ABI.
             enable true
-
-            // By default all ABIs are included, so use reset() and include to specify that you only
-            // want APKs for x86 and x86_64.
-
-            // Resets the list of ABIs for Gradle to create APKs for to none.
             reset()
-
-            // Specifies a list of ABIs for Gradle to create APKs for.
             include "arm64-v8a", "armeabi-v7a", "x86_64"
-
-            // Specifies that you don't want to also generate a universal APK that includes all ABIs.
             universalApk false
         }
     }
@@ -44,7 +30,7 @@ android {
     defaultConfig {
         applicationId "com.afkanerd.sw0b"
         minSdk 24
-        targetSdk 36
+        targetSdk 37
         versionCode tagVersion
         versionName _versionName
 
@@ -70,25 +56,22 @@ android {
 
     buildTypes {
         profiling {
-            // This copies the configuration from the release build
             initWith release
-
-            // Uses debug keys so you can deploy easily from Android Studio
             signingConfig signingConfigs.debug
-
-            // Ensures dependencies that only have release/debug versions still work
             matchingFallbacks = ['release']
         }
+
         release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+
         debug {
-            minifyEnabled false
-            shrinkResources false
-//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-//            testProguardFiles 'proguard-rules.pro'
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            testProguardFiles 'proguard-rules.pro'
         }
     }
 
@@ -100,8 +83,11 @@ android {
         }
     }
 
+//    composeCompiler {
+//        includeComposeMappingFile.set(false)
+//    }
+
     compileOptions {
-        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -113,15 +99,6 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
-    }
-
-    sourceSets {
-        main {
-            java.srcDirs += [
-                    'build/generated/java/generateDebugProto/java',
-                    'build/generated/java/generateDebugProto/grpc',
-            ]
-        }
     }
 
     packagingOptions {
@@ -139,7 +116,6 @@ android {
             enableSplit = false
         }
     }
-
 }
 
 protobuf {
@@ -158,27 +134,9 @@ protobuf {
     }
 }
 
-//configurations.configureEach {
-//    resolutionStrategy {
-//        // Fix Protobuf/gRPC stalemate
-//        // We use 4.29.3 to match your protoc version defined in the protobuf block
-//        force 'com.google.protobuf:protobuf-javalite:4.29.3'
-//        force 'com.google.protobuf:protobuf-kotlin-lite:4.29.3'
-//
-//        force 'androidx.test.ext:junit:1.3.0'
-//        force 'androidx.test.espresso:espresso-core:3.7.0'
-//        force 'androidx.test:runner:1.6.0'
-//        force 'androidx.test:rules:1.6.0'
-//
-//        dependencySubstitution {
-//            substitute module('com.google.protobuf:protobuf-java') using module('com.google.protobuf:protobuf-javalite:4.29.3')
-//        }
-//    }
-//}
-
 configurations.configureEach {
     resolutionStrategy {
-        // Force uniform matching versions across your active variants
+        force 'org.jetbrains.kotlin:kotlin-metadata-jvm:2.4.0'
         force 'com.google.protobuf:protobuf-javalite:4.29.3'
         force 'com.google.protobuf:protobuf-kotlin-lite:4.29.3'
 
@@ -186,17 +144,15 @@ configurations.configureEach {
         force 'androidx.test.espresso:espresso-core:3.7.0'
         force 'androidx.test:runner:1.6.0'
         force 'androidx.test:rules:1.6.0'
-
-        // REMOVED the global dependencySubstitution that was breaking Android Test orchestration.
     }
 }
 
 
 dependencies {
-    implementation 'com.github.smswithoutborders:lib_image_android:c3d1e23'
-    implementation 'com.github.smswithoutborders:lib_smsmms_android:b9f97c3'
-    implementation 'com.github.smswithoutborders:lib_signal_double_ratchet_java:c4a12f8'
-    implementation("net.java.dev.jna:jna:5.18.1@aar")
+    implementation libs.smswithoutborders.lib.image.android
+    implementation libs.lib.smsmms.android
+    implementation libs.lib.signal.double.ratchet.java
+    implementation(libs.jna)
 
     implementation libs.androidx.appcompat
     implementation libs.material
@@ -271,7 +227,7 @@ dependencies {
 //    implementation("com.google.protobuf:protobuf-kotlin-lite:4.29.3")
 
 
-    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+    implementation libs.javax.annotation.api
 
     implementation(libs.androidx.material)
 
@@ -362,29 +318,28 @@ dependencies {
 
     coreLibraryDesugaring libs.desugar.jdk.libs
 
-    implementation "androidx.security:security-crypto:1.1.0"
+    implementation libs.androidx.security.crypto
 
-    implementation 'net.zetetic:sqlcipher-android:4.14.1@aar'
-    implementation 'androidx.sqlite:sqlite:2.6.2'
-    implementation "androidx.security:security-crypto:1.1.0"
+    implementation libs.sqlcipher.android
+    implementation libs.androidx.sqlite
+    implementation libs.androidx.security.crypto
 
-    implementation "com.google.dagger:hilt-android:2.59.2"
-    ksp "com.google.dagger:hilt-compiler:2.59.2"
+    implementation libs.hilt.android
+    ksp libs.hilt.compiler
 
 //    implementation("com.google.protobuf:protobuf-kotlin:4.34.1")
-    implementation("com.google.protobuf:protobuf-kotlin-lite:4.29.3")
+    implementation(libs.protobuf.kotlin.lite)
 
     // Retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation(libs.retrofit)
 // Retrofit with Scalar Converter
-    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
-    implementation("org.bouncycastle:bcprov-jdk18on:1.83")
+    implementation(libs.converter.scalars)
+//    implementation("org.bouncycastle:bcprov-jdk18on:1.83")
 
-    implementation("com.squareup.retrofit2:converter-gson:3.0.0")
+    implementation(libs.converter.gson)
 
-    implementation("com.github.bumptech.glide:glide:5.0.7")
+    implementation(libs.glide)
 
     // 2. Glide Compose integration library
-    implementation("com.github.bumptech.glide:compose:1.0.0-beta09")
+    implementation(libs.compose)
 }
-

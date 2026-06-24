@@ -724,6 +724,12 @@ internal object IntegrityCheckingUniffiLib {
     ): Short
     external fun uniffi_relaysms_spec_payload_checksum_method_v1text_serialize(
     ): Short
+    external fun uniffi_relaysms_spec_payload_checksum_method_backuprestore_get_ciphertext(
+    ): Short
+    external fun uniffi_relaysms_spec_payload_checksum_method_backuprestore_get_nonce(
+    ): Short
+    external fun uniffi_relaysms_spec_payload_checksum_method_backuprestore_get_recovery_key(
+    ): Short
     external fun uniffi_relaysms_spec_payload_checksum_method_backuprestore_serialize(
     ): Short
     external fun uniffi_relaysms_spec_payload_checksum_method_backuprestore_v1_restore_decrypt(
@@ -875,10 +881,16 @@ external fun uniffi_relaysms_spec_payload_fn_clone_backuprestore(`handle`: Long,
 ): Long
 external fun uniffi_relaysms_spec_payload_fn_free_backuprestore(`handle`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): Unit
-external fun uniffi_relaysms_spec_payload_fn_constructor_backuprestore_deserialize(`data`: RustBuffer.ByValue,`digitList`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_constructor_backuprestore_deserialize(`data`: RustBuffer.ByValue,`recoveryKey`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
 external fun uniffi_relaysms_spec_payload_fn_constructor_backuprestore_v1_backup_encrypt(`data`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
+external fun uniffi_relaysms_spec_payload_fn_method_backuprestore_get_ciphertext(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+external fun uniffi_relaysms_spec_payload_fn_method_backuprestore_get_nonce(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
+external fun uniffi_relaysms_spec_payload_fn_method_backuprestore_get_recovery_key(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
+): RustBuffer.ByValue
 external fun uniffi_relaysms_spec_payload_fn_method_backuprestore_serialize(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 external fun uniffi_relaysms_spec_payload_fn_method_backuprestore_v1_restore_decrypt(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
@@ -1187,6 +1199,15 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_relaysms_spec_payload_checksum_method_v1text_serialize() != 33392.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_backuprestore_get_ciphertext() != 12726.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_backuprestore_get_nonce() != 12635.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_relaysms_spec_payload_checksum_method_backuprestore_get_recovery_key() != 10946.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
     if (lib.uniffi_relaysms_spec_payload_checksum_method_backuprestore_serialize() != 3884.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
@@ -1256,7 +1277,7 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_relaysms_spec_payload_checksum_constructor_v1text_new() != 12276.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_backuprestore_deserialize() != 12609.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_backuprestore_deserialize() != 51856.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_relaysms_spec_payload_checksum_constructor_backuprestore_v1_backup_encrypt() != 6838.toShort()) {
@@ -1754,6 +1775,12 @@ public object FfiConverterByteArray: FfiConverterRustBuffer<ByteArray> {
 
 public interface BackupRestoreInterface {
     
+    fun `getCiphertext`(): kotlin.ByteArray?
+    
+    fun `getNonce`(): kotlin.ByteArray
+    
+    fun `getRecoveryKey`(): kotlin.ByteArray?
+    
     fun `serialize`(): kotlin.ByteArray
     
     fun `v1RestoreDecrypt`(): kotlin.ByteArray
@@ -1857,6 +1884,45 @@ open class BackupRestore: Disposable, AutoCloseable, BackupRestoreInterface
         }
     }
 
+    override fun `getCiphertext`(): kotlin.ByteArray? {
+            return FfiConverterOptionalByteArray.lift(
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_backuprestore_get_ciphertext(
+        it,
+        _status)
+}
+    }
+    )
+    }
+    
+
+    override fun `getNonce`(): kotlin.ByteArray {
+            return FfiConverterByteArray.lift(
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_backuprestore_get_nonce(
+        it,
+        _status)
+}
+    }
+    )
+    }
+    
+
+    override fun `getRecoveryKey`(): kotlin.ByteArray? {
+            return FfiConverterOptionalByteArray.lift(
+    callWithHandle {
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_method_backuprestore_get_recovery_key(
+        it,
+        _status)
+}
+    }
+    )
+    }
+    
+
     
     @Throws(V1CryptographicException::class)override fun `serialize`(): kotlin.ByteArray {
             return FfiConverterByteArray.lift(
@@ -1893,12 +1959,12 @@ open class BackupRestore: Disposable, AutoCloseable, BackupRestoreInterface
     
     companion object {
         
-    @Throws(V1CryptographicException::class) fun `deserialize`(`data`: kotlin.ByteArray, `digitList`: kotlin.ByteArray?): BackupRestore {
+    @Throws(V1CryptographicException::class) fun `deserialize`(`data`: kotlin.ByteArray, `recoveryKey`: kotlin.ByteArray?): BackupRestore {
             return FfiConverterTypeBackupRestore.lift(
     uniffiRustCallWithError(V1CryptographicException) { _status ->
     UniffiLib.uniffi_relaysms_spec_payload_fn_constructor_backuprestore_deserialize(
     
-        FfiConverterByteArray.lower(`data`),FfiConverterOptionalByteArray.lower(`digitList`),_status)
+        FfiConverterByteArray.lower(`data`),FfiConverterOptionalByteArray.lower(`recoveryKey`),_status)
 }
     )
     }
@@ -4948,7 +5014,7 @@ sealed class V1CryptographicException: kotlin.Exception() {
             get() = ""
     }
     
-    class NoDigestFound(
+    class NoRecoveryKeyFound(
         ) : V1CryptographicException() {
         override val message
             get() = ""
@@ -4980,7 +5046,7 @@ public object FfiConverterTypeV1CryptographicError : FfiConverterRustBuffer<V1Cr
                 FfiConverterString.read(buf),
                 )
             3 -> V1CryptographicException.CiphertextEmpty()
-            4 -> V1CryptographicException.NoDigestFound()
+            4 -> V1CryptographicException.NoRecoveryKeyFound()
             else -> throw RuntimeException("invalid error enum value, something is very wrong!!")
         }
     }
@@ -5001,7 +5067,7 @@ public object FfiConverterTypeV1CryptographicError : FfiConverterRustBuffer<V1Cr
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
-            is V1CryptographicException.NoDigestFound -> (
+            is V1CryptographicException.NoRecoveryKeyFound -> (
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
@@ -5024,7 +5090,7 @@ public object FfiConverterTypeV1CryptographicError : FfiConverterRustBuffer<V1Cr
                 buf.putInt(3)
                 Unit
             }
-            is V1CryptographicException.NoDigestFound -> {
+            is V1CryptographicException.NoRecoveryKeyFound -> {
                 buf.putInt(4)
                 Unit
             }

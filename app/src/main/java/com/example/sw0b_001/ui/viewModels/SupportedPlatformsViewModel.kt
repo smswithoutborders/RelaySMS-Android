@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sw0b_001.data.Datastore
-import com.example.sw0b_001.data.repositories.SupportedPlatforms
+import com.example.sw0b_001.data.models.SupportedPlatforms
 import com.example.sw0b_001.data.repositories.SupportedPlatformsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext

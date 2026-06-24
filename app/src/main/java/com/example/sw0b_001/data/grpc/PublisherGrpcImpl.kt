@@ -7,8 +7,8 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.OAuth
 import com.example.sw0b_001.data.models.Keys
+import com.example.sw0b_001.data.models.SupportedPlatforms
 import com.example.sw0b_001.data.models.Tokens
-import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import com.example.sw0b_001.extensions.context.getStaticKeys
 import com.google.protobuf.kotlin.toByteString
 import io.grpc.ManagedChannel
