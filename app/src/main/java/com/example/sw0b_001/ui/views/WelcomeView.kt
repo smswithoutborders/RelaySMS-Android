@@ -90,6 +90,7 @@ fun WelcomeMainView(navController: NavController) {
                     )
 
                     2 -> DefaultSmsAppScreen(
+                        navController = navController,
                         onSkip = { navController.navigate(HomepageScreen)},
                         onBack = {
                             scope.launch { pagerState.animateScrollToPage(1) }

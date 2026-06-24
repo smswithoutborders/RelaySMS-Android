@@ -35,14 +35,46 @@ import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.draw.clip
+import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
+import com.example.sw0b_001.ui.views.threads.makeDefault
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
+import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.navigation.NavController
+
 
 @Composable
 fun DefaultSmsAppScreen(
+    navController: NavController,
     onSkip: () -> Unit,
     onBack: () -> Unit,
     onSetDefault: () -> Unit,
     onDone: () -> Unit,
 ) {
+    val context = LocalContext.current
+    val previewMode = LocalInspectionMode.current
+
+    var isDefault by remember{
+        mutableStateOf(previewMode || context.isDefault()) }
+
+    val getDefaultPermission = getSetDefaultBehaviour(context) {
+        isDefault = context.isDefault()
+        if(isDefault) {
+            navController.navigate(HomeScreenNav()) {
+                popUpTo(HomeScreenNav()) {
+                    inclusive = true
+                }
+                launchSingleTop = true
+            }
+        }
+    }
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -91,7 +123,9 @@ fun DefaultSmsAppScreen(
             Spacer(modifier = Modifier.height(40.dp))
 
             Button(
-                onClick = onSetDefault,
+                onClick = {
+                    getDefaultPermission.launch(makeDefault(context))
+                },
                 shape = RoundedCornerShape(50.dp),
                 modifier = Modifier.height(48.dp)
             ) {
@@ -173,8 +207,10 @@ fun DefaultSmsAppScreen(
 @Preview(showBackground = true)
 @Composable
 fun GetStartedPreviewLoggedIn() {
-    AppTheme (darkTheme = false) {
+    val context = LocalContext.current
+    AppTheme(darkTheme = false) {
         DefaultSmsAppScreen(
+            navController = NavController(context),
             onSkip = {},
             onBack = {},
             onSetDefault = {},
