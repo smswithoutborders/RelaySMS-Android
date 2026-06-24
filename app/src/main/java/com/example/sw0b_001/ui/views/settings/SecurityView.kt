@@ -11,10 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -32,20 +30,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.modals.ConfirmationModal
-import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SecurityView(
     navController: NavController,
+    tokensViewModel: TokensViewModel,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     var showLogoutBottomSheet by remember { mutableStateOf(false) }
@@ -93,21 +90,8 @@ fun SecurityView(
                 // Account Section
                 SecuritySection(title = stringResource(R.string.account)) {
                     SecurityRow(
-                        title = stringResource(R.string.clear_aliasing),
-                        subtext = stringResource(R.string.this_would_delete_your_auth_codes_stored_for_aliasing_you_can_request_for_another_code_at_anytime),
-                        onClick = {},
-                        isEnabled = false,
-                        icon = Icons.Filled.Refresh
-                    )
-                    SecurityRow(
-                        title = stringResource(R.string.logout),
-                        subtext = stringResource(R.string.logout_of_your_account_you_can_always_log_back_in_however_your_current_messages_would_be_deleted),
-                        onClick = {showLogoutBottomSheet = true},
-                        icon = Icons.AutoMirrored.Filled.ExitToApp
-                    )
-                    SecurityRow(
-                        title = stringResource(R.string.delete_),
-                        subtext = stringResource(R.string.deleting_your_account_means_deleting_all_your_saved_accounts_online_you_can_always_recreate_your_account_once_needed),
+                        title = stringResource(R.string.reset),
+                        subtext = stringResource(R.string.reset_removes_all_your_stored_tokens_both_locally_and_on_the_cloud_this_is_what_a_complete_delete_would_look_like_if_there_were_traditional_accounts_you_can_add_more_at_anytime),
                         onClick = {showDeleteBottomSheet = true},
                         icon = Icons.Filled.Delete
                     )
@@ -130,7 +114,9 @@ fun SecurityView(
                 ConfirmationModal(
                     showBottomSheet = showDeleteBottomSheet,
                     onContinue = {
-                        TODO("Implement delete")
+                        tokensViewModel.reset {
+                            navController.popBackStack()
+                        }
                     },
                     onCancel = {
                         showDeleteBottomSheet = false
@@ -236,12 +222,12 @@ fun SecurityRowWithToggle(
     HorizontalDivider(color = MaterialTheme.colorScheme.outline)
 }
 
-@Preview(showBackground = true)
-@Composable
-fun SecurityScreenPreview() {
-    AppTheme(darkTheme = false) {
-        SecurityView(
-            navController = NavController(LocalContext.current)
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun SecurityScreenPreview() {
+//    AppTheme(darkTheme = false) {
+//        SecurityView(
+//            navController = NavController(LocalContext.current)
+//        )
+//    }
+//}

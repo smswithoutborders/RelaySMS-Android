@@ -374,6 +374,7 @@ class MainActivity : BindActivity() {
             composable<SettingsScreen> {
                 SettingsView(
                     navController = navController,
+                    tokensViewModel = tokensViewModel
                 )
             }
 

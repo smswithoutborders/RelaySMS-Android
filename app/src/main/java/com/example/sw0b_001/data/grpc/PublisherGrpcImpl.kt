@@ -106,8 +106,11 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
                 accountId = res.accountIdentifier,
                 platformName = res.platform
             )
+
+            if(!res.success) {
+                throw Exception(res.message)
+            }
         } catch (e: Exception) {
-            e.printStackTrace()
             throw e
         }
     }
@@ -144,7 +147,7 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
                 privateKey = null,
                 publicKey = it.publicKey.toByteArray(),
                 tokenHash = tokenHash,
-                alias = TOKEN_KEYSTORE_ALIAS_CLIENT
+                alias = TOKEN_KEYSTORE_ALIAS_SERVER
             )
         }
 

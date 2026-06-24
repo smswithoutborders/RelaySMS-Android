@@ -62,6 +62,7 @@ import com.example.sw0b_001.extensions.context.settingsSetLockDownApp
 import com.example.sw0b_001.extensions.context.settingsSetStoreTokensOnDevice
 import com.example.sw0b_001.extensions.context.settingsSetUseDeviceId
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -71,6 +72,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingsView(
     navController: NavController,
+    tokensViewModel: TokensViewModel
 ) {
     val context = LocalContext.current
     val inPreviewMode = LocalInspectionMode.current
@@ -273,7 +275,10 @@ fun SettingsView(
                 scope.launch(Dispatchers.Default) {
                     context.settingsSetIsLoggedIn(false)
                     try {
-                        TODO()
+                        TODO("Remove from cloud")
+                        tokensViewModel.reset {
+                            navController.popBackStack()
+                        }
                     } catch(e: StatusRuntimeException) {
                         e.printStackTrace()
                         scope.launch(Dispatchers.Main){

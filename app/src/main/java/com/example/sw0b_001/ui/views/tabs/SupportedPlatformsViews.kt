@@ -213,6 +213,7 @@ fun PlatformListContent(
                 val intent = oAuth2IntentBuilder(context)
                 intent.launchUrl(context, state.url)
                 showPlatformOptions = false
+                tokensViewModel.clearStoringState()
             }
         }
     }

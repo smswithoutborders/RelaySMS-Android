@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
@@ -75,6 +76,10 @@ class TokensViewModel @Inject constructor(
     private val cache = Datastore.getDatastore(context)?.supportedPlatformsCacheDao()
         ?: throw Exception("Cannot open database")
 
+    fun clearStoringState() {
+        _isStoringUiState.value = TokensUiState.Success(null)
+    }
+
     fun get(): Flow<List<Tokens>> {
         return db.fetchAll()
     }
@@ -83,9 +88,16 @@ class TokensViewModel @Inject constructor(
         return db.fetchCatId(catId)
     }
 
-    companion object {
-        const val ITP_VERSION_VALUE: Byte = 0x04
+    fun reset(onCompleteCallback: ()-> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            withContext(Dispatchers.IO) {
+                db.deleteAll()
+            }
+            onCompleteCallback()
+        }
+    }
 
+    companion object {
         fun parseLocalImageContent(
             content: ByteArray,
             imageLength: Int,
