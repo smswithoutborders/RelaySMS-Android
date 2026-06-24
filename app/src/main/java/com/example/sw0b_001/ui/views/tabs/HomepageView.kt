@@ -130,7 +130,11 @@ fun HomepageView(
             }
         },
         bottomBar = {
-            BottomNavBar( selectedTab = tokensViewModel.bottomTabsItem ) { selectedTab ->
+            BottomNavBar(
+                navController = navController,
+
+                selectedTab = tokensViewModel.bottomTabsItem
+            ) { selectedTab ->
                 tokensViewModel.bottomTabsItem = selectedTab
             }
         },
