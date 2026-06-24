@@ -47,10 +47,10 @@ import kotlinx.coroutines.launch
 
 
 enum class BottomTabsItems {
-    BottomBarRecentTab,
+    BottomBarMessageTab,
     BottomBarPlatformsTab,
-    BottomBarInboxTab,
-    BottomBarCountriesTab
+    BottomBarCountriesTab,
+    BottomBarSettingsTab
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,7 +84,7 @@ fun HomepageView(
         topBar = {
             if(showTopBar) {
                 when (tokensViewModel.bottomTabsItem) {
-                    BottomTabsItems.BottomBarRecentTab -> {
+                    BottomTabsItems.BottomBarMessageTab -> {
                         RecentAppBar(
                             navController = navController,
                             onSearchQueryChanged = { searchQuery = it },
@@ -113,7 +113,7 @@ fun HomepageView(
                             }
                         )
                     }
-                    BottomTabsItems.BottomBarInboxTab -> {
+                    BottomTabsItems.BottomBarSettingsTab -> {
                         TopAppBar(
                             title = {
                                 Text(
@@ -130,13 +130,13 @@ fun HomepageView(
             }
         },
         bottomBar = {
-            BottomNavBar( selectedTab = tokensViewModel.bottomTabsItem ) { selectedTab ->
+            BottomNavBar( selectedTab = tokensViewModel.bottomTabsItem, navController = navController,  ) { selectedTab ->
                 tokensViewModel.bottomTabsItem = selectedTab
             }
         },
         floatingActionButton = {
             when(tokensViewModel.bottomTabsItem) {
-                BottomTabsItems.BottomBarRecentTab -> {
+                BottomTabsItems.BottomBarMessageTab -> {
                     ExtendedFloatingActionButton(
                         onClick = {
                             sendNewMessageRequested = true
@@ -170,7 +170,7 @@ fun HomepageView(
                         )
                     }
                 }
-                BottomTabsItems.BottomBarInboxTab -> {
+                BottomTabsItems.BottomBarSettingsTab -> {
                     if (inboxMessages.value.isNotEmpty()) {
                         ExtendedFloatingActionButton(
                             onClick = {
@@ -247,7 +247,7 @@ fun GetTabViews(
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
 ) {
     when(bottomTabsItems) {
-        BottomTabsItems.BottomBarRecentTab -> {
+        BottomTabsItems.BottomBarMessageTab -> {
             RecentView(
                 navController = navController,
                 payloadsViewModel = payloadsViewModel,
@@ -268,13 +268,14 @@ fun GetTabViews(
         BottomTabsItems.BottomBarCountriesTab -> {
             GatewayClientView(viewModel = gatewayClientViewModel)
         }
-        BottomTabsItems.BottomBarInboxTab -> {
+        BottomTabsItems.BottomBarSettingsTab -> {
             InboxView(
                 payloadsViewModel = payloadsViewModel,
                 tokensViewModel = tokensViewModel,
                 navController = navController
             )
         }
+
     }
 
 }

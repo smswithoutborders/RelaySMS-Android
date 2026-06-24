@@ -50,11 +50,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.R
+import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.SendingMessages
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.views.tabs.HomepageView
 import kotlinx.coroutines.launch
-
-
 
 @Composable
 fun WelcomeMainView(navController: NavController) {
@@ -65,7 +65,6 @@ fun WelcomeMainView(navController: NavController) {
     val context = androidx.compose.ui.platform.LocalContext.current
 
     Scaffold { innerPadding ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -81,7 +80,7 @@ fun WelcomeMainView(navController: NavController) {
                     0 -> PageOneContent()
 
                     1 -> ChooseMessageModeScreen(
-                        onSkip = { navController.navigate(SendingMessages) },
+                        onSkip = { navController.navigate(HomepageScreen)},
                         onBack = {
                             scope.launch { pagerState.animateScrollToPage(0) }
                         },
@@ -90,17 +89,17 @@ fun WelcomeMainView(navController: NavController) {
                         }
                     )
 
-//                    2 -> DefaultSmsAppScreen(
-//                        onSkip = { navController.navigate(SendingMessages) },
-//                        onBack = {
-//                            scope.launch { pagerState.animateScrollToPage(1) }
-//                        },
-//                        onSetDefault = {
-//                        },
-//                        onDone = {
-//                            navController.navigate(SendingMessages)
-//                        }
-//                    )
+                    2 -> DefaultSmsAppScreen(
+                        onSkip = { navController.navigate(HomepageScreen)},
+                        onBack = {
+                            scope.launch { pagerState.animateScrollToPage(1) }
+                        },
+                        onSetDefault = {
+                        },
+                        onDone = {
+                            navController.navigate(HomepageScreen)
+                        }
+                    )
                 }
             }
 
@@ -272,85 +271,6 @@ fun PageOneContent() {
     }
 }
 
-
-
-
-@Composable
-fun DefaultSmsAppScreen(
-    onSkip: () -> Unit,
-    onBack: () -> Unit,
-    onSetDefault: () -> Unit,
-    onDone: () -> Unit,
-) {
-    Scaffold { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 20.dp)
-        ) {
-            Box(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = "Skip",
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .padding(top = 20.dp)
-                        .clickable { onSkip() },
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-
-            Spacer(modifier = Modifier.height(60.dp))
-
-            Image(
-                painter = painterResource(id = R.drawable.relay_sms_welcome),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(200.dp)
-                    .align(Alignment.CenterHorizontally)
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Text(
-                text = "Make RelaySMS your\ndefault SMS app",
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.headlineMedium
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "Manage your SMS messages from one place and send images through SMS!",
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Button(
-                onClick = onSetDefault,
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                shape = RoundedCornerShape(50.dp)
-            ) {
-                Text("Set as Default SMS App")
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            BottomNavigationRowLast(
-                onBack = onBack,
-                onDone = onDone,
-                currentIndex = 2
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-        }
-    }
-}
 
 @Composable
 fun BottomNavigationRowLast(

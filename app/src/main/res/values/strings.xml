@@ -449,5 +449,7 @@
     <string name="phone_number1">Phone number</string>
     <string name="supported_platforms">Supported platforms</string>
     <string name="platform_image">Platform image</string>
+    <string name="Messages">Messages</string>
+    <string name="Settings">Settings</string>
 
 </resources>

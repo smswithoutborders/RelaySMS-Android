@@ -52,7 +52,7 @@ sealed class TokensUiState {
 class TokensViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
-    var bottomTabsItem by mutableStateOf(BottomTabsItems.BottomBarRecentTab)
+    var bottomTabsItem by mutableStateOf(BottomTabsItems.BottomBarMessageTab)
 
     private val _isStoringUiState =
         MutableStateFlow<TokensUiState>(TokensUiState.Success(null))
