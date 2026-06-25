@@ -26,52 +26,38 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.GatewayClients
-import com.example.sw0b_001.extensions.context.settingsSetDefaultGatewayClient
 import com.example.sw0b_001.ui.modals.AddGatewayClientModal
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.GatewayClientsUiState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 
 @Composable
 fun GatewayClientView(
     viewModel: GatewayClientViewModel,
 ) {
     val isLoading by viewModel.uiState.collectAsStateWithLifecycle()
-
-    LaunchedEffect(Unit) {
-        viewModel.fetch()
-    }
+    val gatewayClients by viewModel.get().collectAsStateWithLifecycle(emptyList())
 
     val defaultGatewayClient = viewModel.defaultGatewayClients
         .collectAsStateWithLifecycle(null)
 
-    val gatewayClients by viewModel.get().observeAsState(initial = emptyList())
-    var filteredGatewayClients by remember { mutableStateOf(listOf<GatewayClients>()) }
-    LaunchedEffect(defaultGatewayClient.value) {
-        filteredGatewayClients = gatewayClients.filter{
-            it.msisdn != defaultGatewayClient.value?.msisdn
-        }
-    }
-
     var editShowBottomSheet by remember { mutableStateOf(false) }
 
     var currentGatewayClients by remember { mutableStateOf<GatewayClients?>(null) }
+
+    LaunchedEffect(Unit) {
+        viewModel.fetch()
+    }
 
     Column(
         modifier = Modifier
@@ -99,7 +85,7 @@ fun GatewayClientView(
 
                 if (defaultGatewayClient.value != null) {
                     GatewayClientCard(
-                        gatewayClients = defaultGatewayClient.value!!,
+                        gatewayClient = defaultGatewayClient.value!!,
                         gatewayClientViewModel = viewModel,
                         editCallback = null
                     ) {
@@ -132,11 +118,11 @@ fun GatewayClientView(
                     contentPadding = PaddingValues(bottom = 16.dp)
                 ) {
                     items(
-                        items = filteredGatewayClients,
+                        items = gatewayClients,
                         key = { it.msisdn }
                     ) { gatewayClient ->
                         GatewayClientCard(
-                            gatewayClients = gatewayClient,
+                            gatewayClient = gatewayClient,
                             gatewayClientViewModel = viewModel,
                             editCallback = {}
                         ) {
@@ -174,7 +160,7 @@ fun GatewayClientView(
 
 @Composable
 fun GatewayClientCard(
-    gatewayClients: GatewayClients,
+    gatewayClient: GatewayClients,
     gatewayClientViewModel: GatewayClientViewModel,
     editCallback: (() -> Unit)?,
     onDismissCallback: () -> Unit,
@@ -190,40 +176,36 @@ fun GatewayClientCard(
     ) {
         ListItem(
             headlineContent = {
-                Text(gatewayClients.msisdn)
+                Text(gatewayClient.msisdn)
             },
             overlineContent = {
-                Text(gatewayClients.country)
+                Text(gatewayClient.country)
             },
             supportingContent = {
-                Text(gatewayClients.alias ?: "")
+                Text(gatewayClient.alias ?: "")
             },
             leadingContent = {},
             trailingContent = {
                 Column {
-                    Text(gatewayClients.operator)
-                    Text(gatewayClients.operatorCode ?: "",)
+                    Text(gatewayClient.operator)
+                    Text(gatewayClient.operatorCode ?: "",)
                 }
             },
         )
 
-        if((editCallback != null && isClicked) || LocalInspectionMode.current) {
+        if(editCallback != null && isClicked) {
             Row(Modifier.padding(16.dp)) {
                 Button(onClick = {
-                    CoroutineScope(Dispatchers.Default).launch {
-                        context.settingsSetDefaultGatewayClient(
-                            Json.encodeToString(gatewayClients)
-                        )
-                        isClicked = false
-                        onDismissCallback()
-                    }
+                    isClicked = false
+                    gatewayClientViewModel.setDefault(gatewayClient)
+                    onDismissCallback()
                 }) {
                     Text(stringResource(R.string.set_as_default))
                 }
 
                 Spacer(Modifier.weight(1f))
 
-                IconButton(onClick = editCallback!! ) {
+                IconButton(onClick = editCallback ) {
                     Icon(Icons.Default.ModeEdit,
                         stringResource(R.string.edit_gateway_client)
                     )
@@ -231,7 +213,7 @@ fun GatewayClientCard(
 
                 IconButton(onClick = {
                     gatewayClientViewModel
-                        .deleteGatewayClient(context, gatewayClients, {}) {
+                        .deleteGatewayClient(context, gatewayClient, {}) {
                             isClicked = false
                             onDismissCallback()
                         }

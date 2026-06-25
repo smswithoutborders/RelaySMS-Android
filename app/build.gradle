@@ -7,16 +7,32 @@ plugins {
     id("com.google.dagger.hilt.android")
 }
 
-def versionsPropertiesFile = rootProject.file("version.properties")
-def versionProperties = new Properties()
-versionProperties.load(new FileInputStream(versionsPropertiesFile))
-
 android {
     namespace 'com.example.sw0b_001'
     compileSdk 37
 
+    def versionsPropertiesFile = rootProject.file("version.properties")
+    def versionProperties = new Properties()
+    versionProperties.load(new FileInputStream(versionsPropertiesFile))
+
+    def signingPropertiesFile = rootProject.file("keystore.properties")
+    def signingProperties = new Properties()
+    if(signingPropertiesFile.exists())
+        signingProperties.load(new FileInputStream(signingPropertiesFile))
+
     def _versionName = versionProperties['versionName']
     def tagVersion = Integer.parseInt(versionProperties['tagVersion'])
+
+    signingConfigs {
+        release {
+            if (signingProperties) {
+                storeFile = file(signingProperties['storeFile'])
+                storePassword = signingProperties['storePassword']
+                keyAlias = signingProperties['keyAlias']
+                keyPassword = signingProperties['keyPassword']
+            }
+        }
+    }
 
     splits {
         abi {
@@ -65,13 +81,14 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
 
         debug {
-            minifyEnabled true
-            shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            testProguardFiles 'proguard-rules.pro'
+//            minifyEnabled true
+//            shrinkResources true
+//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+//            testProguardFiles 'proguard-rules.pro'
         }
     }
 
@@ -103,6 +120,7 @@ android {
 
     packagingOptions {
         pickFirst 'META-INF/androidx.localbroadcastmanager_localbroadcastmanager.version'
+        resources.excludes.add("META-INF/proguard/okhttp3.pro")
     }
 
     bundle {

@@ -1,5 +1,6 @@
 package com.example.sw0b_001.data.models
 
+import androidx.annotation.Keep
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -11,6 +12,7 @@ import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 @JsonIgnoreUnknownKeys
 @Serializable
 @Entity(indices = [Index(value = ["msisdn"], unique = true)])
+@Keep
 data class GatewayClients(
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0,

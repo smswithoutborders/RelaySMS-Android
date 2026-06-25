@@ -1,18 +1,12 @@
 package com.example.sw0b_001.ui.viewModels
 
 import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.models.GatewayClients
 import com.example.sw0b_001.data.repositories.GatewayClientRepository
 import com.example.sw0b_001.extensions.context.getTelephonyRegion
-import com.example.sw0b_001.extensions.context.settingsDefaultGatewayClientKey
-import com.example.sw0b_001.extensions.context.settingsGetDefaultGatewayClients
-import com.example.sw0b_001.extensions.context.settingsSetDefaultGatewayClient
-import com.example.sw0b_001.relaySmsDatastore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
@@ -20,7 +14,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
@@ -39,9 +32,6 @@ class GatewayClientViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val repository: GatewayClientRepository
 ): ViewModel() {
-    private var liveData: LiveData<List<GatewayClients>> = MutableLiveData()
-    private val _selectedGatewayClients = MutableLiveData<GatewayClients?>()
-
     val db = Datastore.getDatastore(context)?.gatewayClientsDao()
         ?: throw Exception("Could not get database")
 
@@ -55,25 +45,21 @@ class GatewayClientViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 populateDefaults()
+                defaultGatewayClients = db.getDefault()
             } catch(e: Exception) {
                 e.printStackTrace()
-            }
-
-            defaultGatewayClients = context.relaySmsDatastore.data.map { settings ->
-                val currentValue = settings[settingsDefaultGatewayClientKey] ?: return@map null
-                Json.decodeFromString<GatewayClients>(currentValue)
             }
         }
     }
 
-
-    fun get(): LiveData<List<GatewayClients>> {
-        if(liveData.value.isNullOrEmpty()) {
-            val db = Datastore.getDatastore(context)?.gatewayClientsDao()
-                ?: throw Exception("Could not get database")
-            liveData = db.all
+    fun setDefault(gatewayClient: GatewayClients) {
+        viewModelScope.launch(Dispatchers.IO) {
+            db.makeDefault(gatewayClient)
         }
-        return liveData
+    }
+
+    fun get(): Flow<List<GatewayClients>> {
+        return db.all
     }
 
     fun fetch(){
@@ -101,21 +87,17 @@ class GatewayClientViewModel @Inject constructor(
             val region = context.getTelephonyRegion()
             val gatewayClients = Json
                 .decodeFromString<ArrayList<GatewayClients>>(rawGatewayClients).apply {
-                    if (context.settingsGetDefaultGatewayClients == null) {
+                    val default = db.fetchDefault()
+                    if (default == null) {
                         when (region) {
-                            "Africa", "Asia" -> {
+                            "Africa" -> {
                                 firstOrNull { gwc -> gwc.region == region && gwc.isDefault }?.let {
-                                    context.settingsSetDefaultGatewayClient(
-                                        Json.encodeToString(it)
-                                    )
+                                    db.makeDefault(it)
                                 }
                             }
-
                             else -> {
                                 firstOrNull { gwc -> gwc.region != "Africa" && gwc.isDefault }?.let {
-                                    context.settingsSetDefaultGatewayClient(
-                                        Json.encodeToString(it)
-                                    )
+                                    db.makeDefault(it)
                                 }
                             }
                         }
@@ -123,10 +105,6 @@ class GatewayClientViewModel @Inject constructor(
                 }
             insert(gatewayClients)
         }
-    }
-
-    fun selectGatewayClient(gatewayClients: com.example.sw0b_001.data.models.GatewayClients) {
-        _selectedGatewayClients.value = gatewayClients
     }
 
     fun delete(context: Context, gatewayClients: com.example.sw0b_001.data.models.GatewayClients) {

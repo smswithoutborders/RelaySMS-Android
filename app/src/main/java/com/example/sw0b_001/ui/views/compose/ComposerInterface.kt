@@ -43,6 +43,7 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.components.mmsImagePicker
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.Tokens
+import com.example.sw0b_001.extensions.context.settingsGetNotShowChooseGatewayClient
 import com.example.sw0b_001.ui.components.AttachImageView
 import com.example.sw0b_001.ui.modals.ComposeChooseGatewayClientsModal
 import com.example.sw0b_001.ui.modals.SelectAccountModal
@@ -54,6 +55,7 @@ import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.views.DeveloperHTTPView
 import kotlinx.serialization.Serializable
 import uniffi.relaysms_spec_payload.V1ContentCategories
+import java.lang.ProcessBuilder.Redirect.to
 
 
 @Serializable
@@ -138,6 +140,36 @@ fun ComposerInterface(
     var from: String? by remember(selectedToken){
         mutableStateOf(selectedToken?.account) }
 
+    fun sendingCallback() {
+        if(selectedToken != null) {
+            publisherViewModel.publish(
+                catId = selectedToken?.catId ?: V1ContentCategories.BRIDGE,
+                body = body,
+                tokenHash = selectedToken?.tokenHash,
+                to = to,
+                subject = subject,
+                imageViewModel = imageViewModel,
+                payloadsViewModel = payloadsViewModel,
+                onFailureCallback = {},
+            ) {
+                navController.popBackStack()
+            }
+        } else {
+            bridgesViewModel.publish(
+                body = body,
+                tokenHash = null,
+                to = to,
+                subject = subject,
+                imageViewModel = imageViewModel,
+                payloadsViewModel = payloadsViewModel,
+                onFailureCallback = {},
+            ) {
+                navController.popBackStack()
+            }
+        }
+
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -180,7 +212,11 @@ fun ComposerInterface(
                     IconButton(
                         enabled = !isSending,
                         onClick = {
-                            showChooseGatewayClient = true
+                            if(!context.settingsGetNotShowChooseGatewayClient)
+                                showChooseGatewayClient = true
+                            else {
+                                sendingCallback()
+                            }
                         }
                     ) {
                         Icon(Icons.AutoMirrored.Filled.Send,
@@ -247,34 +283,7 @@ fun ComposerInterface(
                 ComposeChooseGatewayClientsModal(
                     showChooseGatewayClient,
                     gatewayClientViewModel,
-                ) {
-                    if(selectedToken != null) {
-                        publisherViewModel.publish(
-                            catId = selectedToken?.catId ?: V1ContentCategories.BRIDGE,
-                            body = body,
-                            tokenHash = selectedToken?.tokenHash,
-                            to = to,
-                            subject = subject,
-                            imageViewModel = imageViewModel,
-                            payloadsViewModel = payloadsViewModel,
-                            onFailureCallback = {},
-                        ) {
-                            navController.popBackStack()
-                        }
-                    } else {
-                        bridgesViewModel.publish(
-                            body = body,
-                            tokenHash = null,
-                            to = to,
-                            subject = subject,
-                            imageViewModel = imageViewModel,
-                            payloadsViewModel = payloadsViewModel,
-                            onFailureCallback = {},
-                        ) {
-                            navController.popBackStack()
-                        }
-                    }
-                }
+                ) { sendingCallback() }
             }
 
             if (showSelectAccountModal) {
@@ -306,4 +315,6 @@ fun ComposerInterface(
             }
         }
     }
+
 }
+

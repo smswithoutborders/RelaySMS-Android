@@ -21,15 +21,19 @@ interface KeysDao {
     suspend fun removeAlias(alias: String)
 
 
-    @Query("UPDATE Keys SET alias = :newAlias WHERE alias = :oldAlias AND keyId < 16")
-    suspend fun updateForAttachments(oldAlias: String, newAlias: String)
+    @Query("UPDATE Keys SET alias = :newAlias " +
+            "WHERE tokenHash = :tokenHash AND alias = :oldAlias AND keyId < 16")
+    suspend fun updateForAttachments(oldAlias: String, newAlias: String, tokenHash: ByteArray)
 
     @Transaction
     suspend fun insert(keys: List<Keys>, alias: String, updateAlias: String? = null) {
-//        removeAlias(alias)
         insert(keys)
         updateAlias?.let {
-            updateForAttachments(alias, updateAlias)
+            updateForAttachments(
+                alias,
+                updateAlias,
+                keys.first().tokenHash!!
+            )
         }
     }
 

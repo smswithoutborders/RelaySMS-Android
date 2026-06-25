@@ -59,7 +59,6 @@ import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
 import com.example.sw0b_001.extensions.context.settingsGetUseDeviceId
 import com.example.sw0b_001.extensions.context.settingsSetIsLoggedIn
 import com.example.sw0b_001.extensions.context.settingsSetLockDownApp
-import com.example.sw0b_001.extensions.context.settingsSetStoreTokensOnDevice
 import com.example.sw0b_001.extensions.context.settingsSetUseDeviceId
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
