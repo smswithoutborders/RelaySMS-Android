@@ -26,7 +26,7 @@ interface KeysDao {
 
     @Transaction
     suspend fun insert(keys: List<Keys>, alias: String, updateAlias: String? = null) {
-        removeAlias(alias)
+//        removeAlias(alias)
         insert(keys)
         updateAlias?.let {
             updateForAttachments(alias, updateAlias)

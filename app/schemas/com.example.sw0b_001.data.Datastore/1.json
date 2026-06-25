@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "6ee5f2ef9ecba1ca66876e5024b71910",
+    "identityHash": "b713f65162f70d9cb283002a56857ea4",
     "entities": [
       {
         "tableName": "RatchetStates",
@@ -181,7 +181,7 @@
       },
       {
         "tableName": "SupportedPlatforms",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `cat_id` INTEGER NOT NULL, `protocol_type` INTEGER, `icon_svg` TEXT, `icon_png` TEXT, `support_url_scheme` INTEGER, `logo` BLOB, PRIMARY KEY(`name`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `cat_id` INTEGER NOT NULL, `proto_id` INTEGER, `icon_svg` TEXT, `icon_png` TEXT, `support_url_scheme` INTEGER, `logo` BLOB, PRIMARY KEY(`name`))",
         "fields": [
           {
             "fieldPath": "name",
@@ -196,8 +196,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "protocol_type",
-            "columnName": "protocol_type",
+            "fieldPath": "proto_id",
+            "columnName": "proto_id",
             "affinity": "INTEGER"
           },
           {
@@ -311,6 +311,41 @@
         }
       },
       {
+        "tableName": "BackupRestoreEnt",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `uri` TEXT NOT NULL, `recovery_key` BLOB, `date` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uri",
+            "columnName": "uri",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recovery_key",
+            "columnName": "recovery_key",
+            "affinity": "BLOB"
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
         "tableName": "Payloads",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `catId` TEXT NOT NULL, `content` BLOB NOT NULL, `date` INTEGER NOT NULL)",
         "fields": [
@@ -349,7 +384,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6ee5f2ef9ecba1ca66876e5024b71910')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b713f65162f70d9cb283002a56857ea4')"
     ]
   }
 }

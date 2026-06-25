@@ -39,8 +39,8 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.models.SupportedPlatforms
 import com.example.sw0b_001.data.models.Tokens
-import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.viewModels.TokensUiState
 import uniffi.relaysms_spec_payload.V1ContentCategories

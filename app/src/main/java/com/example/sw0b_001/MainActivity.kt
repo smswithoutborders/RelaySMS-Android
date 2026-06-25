@@ -71,6 +71,7 @@ import com.example.sw0b_001.ui.navigation.SettingsScreen
 import com.example.sw0b_001.ui.navigation.WelcomeScreen
 import com.example.sw0b_001.ui.onboarding.OnboardingInteractive
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.BackupRestoreViewModel
 import com.example.sw0b_001.ui.viewModels.BridgesViewModel
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
@@ -113,6 +114,8 @@ class MainActivity : BindActivity() {
     val imageViewModel: ImageViewModel by viewModels()
     val publisherViewModel: PublisherViewModel by viewModels()
     val bridgesViewModel: BridgesViewModel by viewModels()
+
+    val backupRestoreViewModel: BackupRestoreViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -371,11 +374,12 @@ class MainActivity : BindActivity() {
             composable<SettingsScreen> {
                 SettingsView(
                     navController = navController,
+                    tokensViewModel = tokensViewModel
                 )
             }
 
             composable<BackupScreen> {
-                BackupView()
+                BackupView(navController, backupRestoreViewModel)
             }
             composable<RestoreScreen> {
                 TODO("Implement screen")

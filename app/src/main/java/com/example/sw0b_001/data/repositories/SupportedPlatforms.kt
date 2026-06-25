@@ -1,7 +1,6 @@
 package com.example.sw0b_001.data.repositories
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import com.example.sw0b_001.data.models.SupportedPlatforms
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,22 +12,7 @@ import javax.inject.Inject
 import javax.inject.Qualifier
 import javax.inject.Singleton
 
-
-@Entity
-data class SupportedPlatforms(
-    @PrimaryKey
-    val name: String,
-    var cat_id: Int,
-    val protocol_type: Int?,
-    val icon_svg: String?,
-    val icon_png: String?,
-    val support_url_scheme: Boolean?,
-    var logo: ByteArray? = null
-)
-
-
 private const val BASE_URL = "https://publisher.relaysms.afkanerd.de/"
-
 
 interface SupportedPlatformsApiService {
     @GET("v1/platforms")

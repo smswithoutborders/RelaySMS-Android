@@ -463,7 +463,7 @@
     <string name="this_key_is_required_to_recover_your_saved_accounts_and_data_store_this_key_somewhere_safe_if_you_lose_it_you_won_t_be_able_to_recover_your_saved_accounts">This key is required to recover your saved accounts and data. Store this key somewhere safe. If you lose it, you won\'t be able to recover your saved account.</string>
     <string name="copy_to_clipboard">Copy to clipboard</string>
     <string name="save_to_password_manager">Save to password manager</string>
-    <string name="Settings">Settings</string>
-    <string name="Messages">Messages</string>
+    <string name="reset">Reset</string>
+    <string name="reset_removes_all_your_stored_tokens_both_locally_and_on_the_cloud_this_is_what_a_complete_delete_would_look_like_if_there_were_traditional_accounts_you_can_add_more_at_anytime">Reset removes all your stored tokens both locally and on the cloud. This is what a complete delete would look like - if there were traditional accounts. You can add more at anytime</string>
 
 </resources>

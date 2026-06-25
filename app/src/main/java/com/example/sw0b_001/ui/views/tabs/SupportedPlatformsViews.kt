@@ -57,8 +57,8 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.models.SupportedPlatforms
 import com.example.sw0b_001.data.models.Tokens
-import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import com.example.sw0b_001.ui.modals.PlatformOptionsModal
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsUiState
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
@@ -213,6 +213,7 @@ fun PlatformListContent(
                 val intent = oAuth2IntentBuilder(context)
                 intent.launchUrl(context, state.url)
                 showPlatformOptions = false
+                tokensViewModel.clearStoringState()
             }
         }
     }
@@ -293,7 +294,7 @@ fun PlatformListContent(
         val storeCallback : () -> Unit = {
             CoroutineScope(Dispatchers.Default).launch {
                 when(v1PayloadSupportProtocolsFromU8(
-                    clickedPlatform!!.protocol_type!!.toUByte())) {
+                    clickedPlatform!!.proto_id!!.toUByte())) {
                     V1PayloadsSupportedProtocols.O_AUTH20 -> {
                         tokensViewModel.store(clickedPlatform!!)
                     }

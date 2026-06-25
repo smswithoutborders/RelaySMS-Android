@@ -11,7 +11,7 @@ import kotlinx.serialization.json.encodeToStream
 import uniffi.relaysms_spec_payload.BackupRestore
 import java.io.ByteArrayOutputStream
 
-class BackupRestore(context: Context) {
+class BackupRestoreImpl(context: Context) {
     private val db = Datastore.getDatastore(context) ?: throw Exception("Failed to open database")
     val keysDb = db.keysDao() ?: throw Exception("Failed to open keys db")
     val tokensDb = db.tokensDao() ?: throw Exception("Failed to open tokens db")

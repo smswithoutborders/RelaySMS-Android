@@ -5,7 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.example.sw0b_001.data.repositories.SupportedPlatforms
+import com.example.sw0b_001.data.models.SupportedPlatforms
 import kotlinx.coroutines.flow.Flow
 
 @Dao

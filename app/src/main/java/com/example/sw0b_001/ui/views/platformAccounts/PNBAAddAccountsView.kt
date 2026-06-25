@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -46,7 +45,7 @@ import com.arpitkatiyarprojects.countrypicker.CountryPickerOutlinedTextField
 import com.arpitkatiyarprojects.countrypicker.enums.CountryListDisplayType
 import com.arpitkatiyarprojects.countrypicker.models.CountryDetails
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.repositories.SupportedPlatforms
+import com.example.sw0b_001.data.models.SupportedPlatforms
 import kotlinx.coroutines.launch
 
 
@@ -72,7 +71,6 @@ fun PNBAPhoneNumberCodeRequestView(
     var authCode by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
     val buttonRequester = remember { BringIntoViewRequester() }
 
@@ -149,7 +147,7 @@ fun PNBAPhoneNumberCodeRequestView(
                             focusedBorderColor = MaterialTheme.colorScheme.outline,
                             unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                         ),
-                        enabled = true
+                        enabled = !isLoading
                     )
                 }
                 else if(isAuthenticationCodeRequested) {
@@ -190,7 +188,7 @@ fun PNBAPhoneNumberCodeRequestView(
                             focusedBorderColor = MaterialTheme.colorScheme.outline,
                             unfocusedBorderColor = MaterialTheme.colorScheme.outline,
                         ),
-                        enabled = true
+                        enabled = !isLoading
                     )
                 }
                 else if (isPhoneNumberRequested) {
@@ -211,17 +209,18 @@ fun PNBAPhoneNumberCodeRequestView(
                                 }
                             },
                         label = { Text(stringResource(R.string.phone_number), style = MaterialTheme.typography.bodySmall) },
-                        enabled = true
+                        enabled = !isLoading
                     )
                 }
                 Button(
                     onClick = {
                         if(!isAuthenticationCodeRequested && !isPasswordRequested) {
-                            phoneNumber = selectedCountry!!.countryPhoneNumberCode + phoneNumber
-                            phoneNumberRequestedCallback(phoneNumber)
+                            val phoneNumber1 = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+                            phoneNumberRequestedCallback(phoneNumber1)
                         }
                         else if(isAuthenticationCodeRequested && !isPasswordRequested) {
-                            codeRequestedCallback(phoneNumber, authCode)
+                            val phoneNumber1 = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+                            codeRequestedCallback(phoneNumber1, authCode)
                         }
                         else {
                             passwordRequestedCallback(phoneNumber, authCode, password)

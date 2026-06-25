@@ -32,3 +32,24 @@
 #-dontwarn androidx.window.extensions.embedding.ActivityStack$Token
 #-dontwarn androidx.window.extensions.embedding.SplitInfo$Token
 -dontwarn com.squareup.okhttp.internal.Network
+
+-dontwarn java.awt.Component
+-dontwarn java.awt.GraphicsEnvironment
+-dontwarn java.awt.HeadlessException
+-dontwarn java.awt.Window
+
+-keep class com.sun.jna.** { *; }
+-keepclassmembers class * implements com.sun.jna.* { *; }
+-dontwarn com.sun.jna.**
+
+# Keep UniFFI internal structures and fields
+-keep class uniffi.** { *; }
+-keepclassmembers class uniffi.** { *; }
+
+# Prevent JNA from losing field reflection
+-keepclassmembers class * extends com.sun.jna.Structure {
+    *** capacity;
+    *** data;
+    *** len;
+}
+

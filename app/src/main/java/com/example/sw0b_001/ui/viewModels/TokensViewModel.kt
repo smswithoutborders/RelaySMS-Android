@@ -19,8 +19,8 @@ import com.afkanerd.smswithoutborders.libsignal_doubleratchet.extensions.generat
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
+import com.example.sw0b_001.data.models.SupportedPlatforms
 import com.example.sw0b_001.data.models.Tokens
-import com.example.sw0b_001.data.repositories.SupportedPlatforms
 import com.example.sw0b_001.ui.views.tabs.BottomTabsItems
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
@@ -75,6 +76,10 @@ class TokensViewModel @Inject constructor(
     private val cache = Datastore.getDatastore(context)?.supportedPlatformsCacheDao()
         ?: throw Exception("Cannot open database")
 
+    fun clearStoringState() {
+        _isStoringUiState.value = TokensUiState.Success(null)
+    }
+
     fun get(): Flow<List<Tokens>> {
         return db.fetchAll()
     }
@@ -83,9 +88,16 @@ class TokensViewModel @Inject constructor(
         return db.fetchCatId(catId)
     }
 
-    companion object {
-        const val ITP_VERSION_VALUE: Byte = 0x04
+    fun reset(onCompleteCallback: ()-> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
+            withContext(Dispatchers.IO) {
+                db.deleteAll()
+            }
+            onCompleteCallback()
+        }
+    }
 
+    companion object {
         fun parseLocalImageContent(
             content: ByteArray,
             imageLength: Int,
@@ -147,7 +159,7 @@ class TokensViewModel @Inject constructor(
                 _isRevokingUiState.value = TokensUiState.Loading
                 try {
                     when(v1PayloadSupportProtocolsFromU8(
-                        platform.protocol_type!!.toUByte())) {
+                        platform.proto_id!!.toUByte())) {
                         V1PayloadsSupportedProtocols.O_AUTH20 -> {
                             publisherGrpcImpl.revokeOAuth2()
                         }
@@ -171,18 +183,23 @@ class TokensViewModel @Inject constructor(
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             _isStoringUiState.value = TokensUiState.Loading
-            when(v1PayloadSupportProtocolsFromU8(platform.protocol_type!!.toUByte())) {
-                V1PayloadsSupportedProtocols.O_AUTH20 -> {
-                    triggerOAuthRequested(platform)
+            try {
+                when(v1PayloadSupportProtocolsFromU8(platform.proto_id!!.toUByte())) {
+                    V1PayloadsSupportedProtocols.O_AUTH20 -> {
+                        triggerOAuthRequested(platform)
+                    }
+                    V1PayloadsSupportedProtocols.PNBA -> {
+                        triggerPNBARequested(
+                            phoneNumber = phoneNumber!!,
+                            platform = platform,
+                            authCode = authCode,
+                            password = password
+                        )
+                    }
                 }
-                V1PayloadsSupportedProtocols.PNBA -> {
-                    triggerPNBARequested(
-                        phoneNumber = phoneNumber!!,
-                        platform = platform,
-                        authCode = authCode,
-                        password = password
-                    )
-                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _isStoringUiState.value = TokensUiState.Error(e)
             }
         }
     }
@@ -212,15 +229,14 @@ class TokensViewModel @Inject constructor(
                 val intentUri = response.authorizationUrl.toUri()
                 _isStoringUiState.value = TokensUiState.Success(intentUri)
             } catch(e: Exception) {
-                e.printStackTrace()
-                _isStoringUiState.value = TokensUiState.Error(e)
+                throw e
             } finally {
                 requestId.fill(0)
             }
         }
     }
 
-    private fun triggerPNBARequested(
+    private suspend fun triggerPNBARequested(
         phoneNumber: String,
         platform: SupportedPlatforms,
         authCode: String? = null,
@@ -229,45 +245,39 @@ class TokensViewModel @Inject constructor(
         PublisherGrpcImpl(context).use { publisherGrpcImpl ->
             try {
                 when {
-//                    !authCode.isNullOrEmpty() && !password.isNullOrEmpty() -> {
-//                        val response = publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
-//                            authorizationCode = authCode,
-//                            phoneNumber = phoneNumber,
-//                            platform = platform.name,
-//                            password = password
-//                        )
-//                        if(response.success) {
-//                            _isStoringUiState.value = TokensUiState.Success(null)
-//                        }
-//                    }
-//                    !authCode.isNullOrEmpty() -> {
-//                        val response = publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
-//                            authorizationCode = authCode,
-//                            phoneNumber = phoneNumber,
-//                            platform = platform.name
-//                        )
-//                        if(response.success) {
-//                            _isStoringUiState.value = TokensUiState.Success(
-//                                null,
-//                                pnbaPasswordRequired = response.twoStepVerificationEnabled,
-//                            )
-//                        }
-//                    }
-//                    else -> {
-//                        val response = publisherGrpcImpl.phoneNumberBaseAuthenticationRequest(
-//                            phoneNumber,
-//                            platform.name
-//                        )
-//                        if(response.success) {
-//                            _isStoringUiState.value = TokensUiState.Success(
-//                                null ,
-//                                pnbaAuthRequired = true
-//                            )
-//                        }
-//                    }
+                    !authCode.isNullOrEmpty() && !password.isNullOrEmpty() -> {
+                        publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
+                            authorizationCode = authCode,
+                            phoneNumber = phoneNumber,
+                            platform = platform.name,
+                            password = password
+                        )
+                        _isStoringUiState.value = TokensUiState.Success(null)
+                    }
+                    !authCode.isNullOrEmpty() -> {
+                        val res = publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
+                            authorizationCode = authCode,
+                            phoneNumber = phoneNumber,
+                            platform = platform.name
+                        )
+                        _isStoringUiState.value = TokensUiState.Success(
+                            null,
+                            pnbaPasswordRequired = res.twoStepVerificationEnabled,
+                        )
+                    }
+                    else -> {
+                        publisherGrpcImpl.phoneNumberBaseAuthenticationRequest(
+                            phoneNumber,
+                            platform.name
+                        )
+                        _isStoringUiState.value = TokensUiState.Success(
+                            null ,
+                            pnbaAuthRequired = true
+                        )
+                    }
                 }
             } catch(e: Exception) {
-                e.printStackTrace()
+                throw e
             }
         }
     }
