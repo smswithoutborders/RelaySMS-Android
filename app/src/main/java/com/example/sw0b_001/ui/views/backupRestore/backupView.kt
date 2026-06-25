@@ -1,16 +1,23 @@
-package com.example.sw0b_001.ui.views.BackupRestore
+package com.example.sw0b_001.ui.views.backupRestore
 
+import android.content.Intent
+import android.os.Build
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -40,11 +47,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.copyItemToClipboard
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.BackupRestoreViewModel
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Date
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -103,7 +113,11 @@ private fun BackupIntroScreen(
     backupRestoreViewModel: BackupRestoreViewModel,
     onNext: () -> Unit = {}
 ) {
-    val currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+    val currentDate = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+    } else {
+        SimpleDateFormat("yyyy-MM-dd").format(Date())
+    }
     val filename = "relaysms-backup-$currentDate.backup"
 
     val exportLauncher = rememberLauncherForActivityResult(
@@ -202,12 +216,42 @@ private fun RecoveryKeyScreen(
     backupRestoreViewModel: BackupRestoreViewModel,
     onDone: () -> Unit = {}
 ) {
+    val context = LocalContext.current
     val recoveryList by backupRestoreViewModel.recoveryKeyUiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         backupRestoreViewModel.showRecoveryKey()
     }
 
+    RecoveryScreenKey(
+        recoveryList,
+        onCopy = {
+            context.copyItemToClipboard(recoveryList.joinToString(""))
+        },
+        onSaveToPasswordManager = {
+            val sendIntent: Intent = Intent().apply {
+                action = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                    Settings.ACTION_CREDENTIAL_PROVIDER
+                } else {
+                    Intent.ACTION_SEND
+                }
+                putExtra(Intent.EXTRA_TEXT, recoveryList.joinToString(""))
+                type = "text/plain"
+            }
+            val shareIntent = Intent.createChooser(sendIntent, null)
+            context.startActivity(shareIntent)
+        },
+        onDone = onDone
+    )
+}
+
+@Composable
+private fun RecoveryScreenKey(
+    recoveryList: List<String>,
+    onCopy: () -> Unit,
+    onSaveToPasswordManager: () -> Unit,
+    onDone: () -> Unit,
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -236,32 +280,44 @@ private fun RecoveryKeyScreen(
 
         Card(
             onClick = {},
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp)
+                .padding(16.dp)
         ) {
-            FlowRow(
-                modifier = Modifier.padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                maxItemsInEachRow = 4 // Forces a 3-column grid
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                recoveryList.forEach { item ->
-                    Text(
-                        text = item,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(4), // Defines exactly 4 equal-width columns
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .heightIn(max = 150.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(recoveryList) { item ->
+                        Text(
+                            text = item,
+                            fontSize = 16.sp
+                        )
+                    }
                 }
             }
         }
 
         Button(
-            onClick = {},
+            onClick = onCopy,
             modifier = Modifier.padding(bottom = 8.dp)
         ) {
             Text(stringResource(R.string.copy_to_clipboard))
         }
 
         Button(
-            onClick = {},
+            onClick = onSaveToPasswordManager,
             modifier = Modifier.padding(bottom = 8.dp)
         ) {
             Text(stringResource(R.string.save_to_password_manager))
@@ -305,11 +361,10 @@ fun RecoveryKeyInfoScreen_Preview() {
 
 @Preview(showBackground = true)
 @Composable
-fun RecoveryKeyScreen_Preview() {
+fun RecoveryScreenKey_preview() {
     val context = LocalContext.current
+    val list = listOf("abcd", "efgh", "ijkl", "mnop", "qrst", "uvwy")
     AppTheme {
-        RecoveryKeyScreen(
-            backupRestoreViewModel = remember{ BackupRestoreViewModel(context) },
-        )
+        RecoveryScreenKey(list, {}, {}, {})
     }
 }

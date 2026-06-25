@@ -80,7 +80,7 @@ import com.example.sw0b_001.ui.viewModels.PublisherViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.views.AboutView
-import com.example.sw0b_001.ui.views.BackupRestore.BackupView
+import com.example.sw0b_001.ui.views.backupRestore.BackupView
 import com.example.sw0b_001.ui.views.WelcomeMainView
 import com.example.sw0b_001.ui.views.compose.ComposerInterface
 import com.example.sw0b_001.ui.views.details.DetailsInterfaceView
