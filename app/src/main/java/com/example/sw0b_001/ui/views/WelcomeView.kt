@@ -79,28 +79,28 @@ fun WelcomeMainView(navController: NavController) {
                 when (page) {
                     0 -> PageOneContent()
 
-//                    1 -> ChooseMessageModeScreen(
-//                        onSkip = { navController.navigate(HomepageScreen)},
-//                        onBack = {
-//                            scope.launch { pagerState.animateScrollToPage(0) }
-//                        },
-//                        onNext = {
-//                            scope.launch { pagerState.animateScrollToPage(2) }
-//                        }
-//                    )
+                    1 -> ChooseMessageModeScreen(
+                        onSkip = { navController.navigate(HomepageScreen)},
+                        onBack = {
+                            scope.launch { pagerState.animateScrollToPage(0) }
+                        },
+                        onNext = {
+                            scope.launch { pagerState.animateScrollToPage(2) }
+                        }
+                    )
 
-//                    2 -> DefaultSmsAppScreen(
-//                        navController = navController,
-//                        onSkip = { navController.navigate(HomepageScreen)},
-//                        onBack = {
-//                            scope.launch { pagerState.animateScrollToPage(1) }
-//                        },
-//                        onSetDefault = {
-//                        },
-//                        onDone = {
-//                            navController.navigate(HomepageScreen)
-//                        }
-//                    )
+                    2 -> DefaultSmsAppScreen(
+                        navController = navController,
+                        onSkip = { navController.navigate(HomepageScreen)},
+                        onBack = {
+                            scope.launch { pagerState.animateScrollToPage(1) }
+                        },
+                        onSetDefault = {
+                        },
+                        onDone = {
+                            navController.navigate(HomepageScreen)
+                        }
+                    )
                 }
             }
 
