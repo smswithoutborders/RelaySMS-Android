@@ -27,10 +27,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -76,13 +72,11 @@ fun MessageComposeView(
     val context = LocalContext.current
     val fieldInfo = getRecipientFieldInfo()
 
-    var to by remember { mutableStateOf(to) }
-
     val launcher = rememberLauncherForActivityResult(
         contract = PickPhoneNumberContract()
     ) { uri ->
         uri?.let {
-            to = context.getPhoneNumberFromUri(it)
+            toCallback(context.getPhoneNumberFromUri(it))
         }
     }
 

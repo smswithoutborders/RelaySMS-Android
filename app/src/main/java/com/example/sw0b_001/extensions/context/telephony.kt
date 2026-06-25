@@ -1,10 +1,10 @@
 package com.example.sw0b_001.extensions.context
 
 import android.content.Context
-import android.database.Cursor
 import android.net.Uri
 import android.provider.ContactsContract
 import android.telephony.TelephonyManager
+import android.util.Log
 import kotlinx.serialization.json.Json
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -28,28 +28,22 @@ fun Context.getTelephonyRegion() : String? {
 
 fun Context.getPhoneNumberFromUri(uri: Uri): String {
     var phoneNumber: String? = null
-    val projection: Array<String> = arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER)
+
+    val projection = arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER)
 
     try {
-        val cursor: Cursor? = contentResolver.query(
-            uri,
-            projection,
-            null,
-            null,
-            null
-        )
-        cursor?.use {
-            if (it.moveToFirst()) {
-                val numberIndex = it.getColumnIndex(ContactsContract.Contacts.CONTENT_URI.toString())
+        contentResolver.query(uri, projection, null, null, null).use { cursor ->
+            if (cursor != null && cursor.moveToFirst()) {
+                val numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+
                 if (numberIndex >= 0) {
-                    phoneNumber = it.getString(numberIndex)
+                    phoneNumber = cursor.getString(numberIndex)
                 }
             }
         }
     } catch (e: Exception) {
-        e.printStackTrace()
-        throw e
+        Log.e("ContactUtils", "Error fetching phone number from URI: $uri", e)
     }
 
-    return phoneNumber ?: ""
+    return phoneNumber?.replace(" ", "") ?: ""
 }
