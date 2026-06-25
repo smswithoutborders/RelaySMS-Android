@@ -923,7 +923,7 @@ external fun uniffi_relaysms_spec_payload_fn_constructor_v1payloads_deserialize_
 ): Long
 external fun uniffi_relaysms_spec_payload_fn_constructor_v1payloads_deserialize_without_attachment(`data`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
-external fun uniffi_relaysms_spec_payload_fn_constructor_v1payloads_join(`payload`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_constructor_v1payloads_join(`sPayload`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
 external fun uniffi_relaysms_spec_payload_fn_constructor_v1payloads_new(`contents`: RustBuffer.ByValue,`kId`: Byte,`lenAtt`: Short,`tId`: RustBuffer.ByValue,`sessId`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
@@ -1292,7 +1292,7 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_relaysms_spec_payload_checksum_constructor_v1payloads_deserialize_without_attachment() != 49103.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_v1payloads_join() != 30841.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_v1payloads_join() != 42714.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_relaysms_spec_payload_checksum_constructor_v1payloads_new() != 54408.toShort()) {
@@ -4193,12 +4193,12 @@ open class V1Payloads: Disposable, AutoCloseable, V1PayloadsInterface
     
 
         
-    @Throws(V1PayloadsException::class) fun `join`(`payload`: List<kotlin.ByteArray>): V1Payloads {
+    @Throws(V1PayloadsException::class) fun `join`(`sPayload`: List<kotlin.ByteArray>): V1Payloads {
             return FfiConverterTypeV1Payloads.lift(
     uniffiRustCallWithError(V1PayloadsException) { _status ->
     UniffiLib.uniffi_relaysms_spec_payload_fn_constructor_v1payloads_join(
     
-        FfiConverterSequenceByteArray.lower(`payload`),_status)
+        FfiConverterSequenceByteArray.lower(`sPayload`),_status)
 }
     )
     }
@@ -5287,6 +5287,18 @@ sealed class V1PayloadsException: kotlin.Exception() {
             get() = ""
     }
     
+    class PayloadTooShort(
+        ) : V1PayloadsException() {
+        override val message
+            get() = ""
+    }
+    
+    class MissingSegments(
+        ) : V1PayloadsException() {
+        override val message
+            get() = ""
+    }
+    
 
     
 
@@ -5356,6 +5368,8 @@ public object FfiConverterTypeV1PayloadsError : FfiConverterRustBuffer<V1Payload
             23 -> V1PayloadsException.InconsistentLengthSessionId()
             24 -> V1PayloadsException.SerializerNeedsSessionId()
             25 -> V1PayloadsException.UnsupportedProtocol()
+            26 -> V1PayloadsException.PayloadTooShort()
+            27 -> V1PayloadsException.MissingSegments()
             else -> throw RuntimeException("invalid error enum value, something is very wrong!!")
         }
     }
@@ -5478,6 +5492,14 @@ public object FfiConverterTypeV1PayloadsError : FfiConverterRustBuffer<V1Payload
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
+            is V1PayloadsException.PayloadTooShort -> (
+                // Add the size for the Int that specifies the variant plus the size needed for all fields
+                4UL
+            )
+            is V1PayloadsException.MissingSegments -> (
+                // Add the size for the Int that specifies the variant plus the size needed for all fields
+                4UL
+            )
         }
     }
 
@@ -5597,6 +5619,14 @@ public object FfiConverterTypeV1PayloadsError : FfiConverterRustBuffer<V1Payload
             }
             is V1PayloadsException.UnsupportedProtocol -> {
                 buf.putInt(25)
+                Unit
+            }
+            is V1PayloadsException.PayloadTooShort -> {
+                buf.putInt(26)
+                Unit
+            }
+            is V1PayloadsException.MissingSegments -> {
+                buf.putInt(27)
                 Unit
             }
         }.let { /* this makes the `when` an expression, which ensures it is exhaustive */ }

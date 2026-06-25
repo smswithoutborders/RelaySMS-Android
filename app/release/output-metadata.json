@@ -25,19 +25,6 @@
       "filters": [
         {
           "filterType": "ABI",
-          "value": "arm64-v8a"
-        }
-      ],
-      "attributes": [],
-      "versionCode": 77,
-      "versionName": "0.34.9",
-      "outputFile": "app-arm64-v8a-release.apk"
-    },
-    {
-      "type": "ONE_OF_MANY",
-      "filters": [
-        {
-          "filterType": "ABI",
           "value": "x86_64"
         }
       ],
@@ -45,6 +32,19 @@
       "versionCode": 77,
       "versionName": "0.34.9",
       "outputFile": "app-x86_64-release.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "arm64-v8a"
+        }
+      ],
+      "attributes": [],
+      "versionCode": 77,
+      "versionName": "0.34.9",
+      "outputFile": "app-arm64-v8a-release.apk"
     }
   ],
   "elementType": "File",
@@ -54,8 +54,8 @@
       "maxApi": 30,
       "baselineProfiles": [
         "baselineProfiles/1/app-armeabi-v7a-release.dm",
-        "baselineProfiles/1/app-arm64-v8a-release.dm",
-        "baselineProfiles/1/app-x86_64-release.dm"
+        "baselineProfiles/1/app-x86_64-release.dm",
+        "baselineProfiles/1/app-arm64-v8a-release.dm"
       ]
     },
     {
@@ -63,8 +63,8 @@
       "maxApi": 2147483647,
       "baselineProfiles": [
         "baselineProfiles/0/app-armeabi-v7a-release.dm",
-        "baselineProfiles/0/app-arm64-v8a-release.dm",
-        "baselineProfiles/0/app-x86_64-release.dm"
+        "baselineProfiles/0/app-x86_64-release.dm",
+        "baselineProfiles/0/app-arm64-v8a-release.dm"
       ]
     }
   ],

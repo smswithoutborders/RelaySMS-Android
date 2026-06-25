@@ -11,7 +11,6 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getThreadId
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewModel
 import com.example.sw0b_001.data.models.Payloads
-import com.example.sw0b_001.extensions.context.settingsGetDefaultGatewayClients
 import uniffi.relaysms_spec_payload.Transports
 import uniffi.relaysms_spec_payload.V1ContentCategories
 import uniffi.relaysms_spec_payload.V1ContentsContainer
@@ -90,8 +89,9 @@ object TransportImpl {
             tId = tokenId,
             sessId = null
         )
+        val serialized = payloads.serializeWithoutAttachment()
 
-        val payload = Base64.encodeToString(payloads.serialize(), Base64.DEFAULT)
+        val payload = Base64.encodeToString(serialized, Base64.NO_WRAP)
         sendSms(context, payload) {
 
         }
@@ -105,9 +105,10 @@ object TransportImpl {
         bundle: Bundle = Bundle(),
         onSuccessRunnable: (Payloads) -> Unit
     ) {
-        val gatewayClient = context.settingsGetDefaultGatewayClients
+        val gatewayClient = Datastore.getDatastore(context)?.gatewayClientsDao()?.fetchDefault()
+            ?: throw Exception("Failed to get default Gateway client")
 
-        gatewayClient?.let {
+        gatewayClient.let {
             if(context.isDefault()) {
                 val subId = context.getDefaultSimSubscription()
                     ?: throw Exception("No available sim card subscription found")

@@ -4,12 +4,7 @@ import android.content.Context
 import androidx.core.content.edit
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
-import com.example.sw0b_001.data.models.GatewayClients
 import com.example.sw0b_001.relaySmsDatastore
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.json.Json
 
 
 object Settings {
@@ -44,11 +39,11 @@ val Context.settingsGetStoreTokensOnDevice get(): Boolean {
         .getBoolean(Settings.SETTINGS_STORE_TOKENS_ON_DEVICE, false)
 }
 
-val Context.settingsGetDefaultGatewayClients get(): GatewayClients? = runBlocking{
-    val gatewayClient = relaySmsDatastore.data.firstOrNull()
-        ?.get(settingsDefaultGatewayClientKey) ?: return@runBlocking null
-    Json.decodeFromString<GatewayClients>(gatewayClient)
-}
+//val Context.settingsGetDefaultGatewayClients get(): GatewayClients? = runBlocking{
+//    val gatewayClient = relaySmsDatastore.data.firstOrNull()
+//        ?.get(settingsDefaultGatewayClientKey) ?: return@runBlocking null
+//    Json.decodeFromString<GatewayClients>(gatewayClient)
+//}
 
 val Context.settingsGetUseDeviceId get(): Boolean {
     val sharedPreferences = getSharedPreferences(
@@ -85,19 +80,12 @@ suspend fun Context.settingsSetIsLoggedIn(state: Boolean) {
     }
 }
 
-val settingsDefaultGatewayClientKey = stringPreferencesKey("default_gateway_client")
-suspend fun Context.settingsSetDefaultGatewayClient(gatewayClients: String) {
-    relaySmsDatastore.edit { setting ->
-        setting[settingsDefaultGatewayClientKey] = gatewayClients
-    }
-}
-
-fun Context.settingsSetStoreTokensOnDevice(state: Boolean) {
-    getSharedPreferences( Settings.FILENAME, Context.MODE_PRIVATE).edit {
-        putBoolean(Settings.SETTINGS_STORE_TOKENS_ON_DEVICE, state)
-        apply()
-    }
-}
+//val settingsDefaultGatewayClientKey = stringPreferencesKey("default_gateway_client")
+//suspend fun Context.settingsSetDefaultGatewayClient(gatewayClients: String) {
+//    relaySmsDatastore.edit { setting ->
+//        setting[settingsDefaultGatewayClientKey] = gatewayClients
+//    }
+//}
 
 fun Context.settingsSetUseDeviceId(state: Boolean) {
     getSharedPreferences( Settings.FILENAME, Context.MODE_PRIVATE).edit {
@@ -119,25 +107,9 @@ fun Context.settingsSetNotShowChooseGatewayClient(state: Boolean) {
         apply()
     }
 }
-
-fun Context.settingsClear() {
-    getSharedPreferences( Settings.FILENAME, Context.MODE_PRIVATE).edit {
-        clear()
-        apply()
-    }
-    settingsSetOnboardedCompletely(true)
-}
-
 fun Context.settingsSetOnboardedCompletely(state: Boolean) {
     getSharedPreferences( Settings.FILENAME, Context.MODE_PRIVATE).edit {
         putBoolean(Settings.SETTINGS_ONBOARDED_COMPLETELY, state)
-        apply()
-    }
-}
-
-fun Context.settingsSetIsEmailLogin(state: Boolean) {
-    getSharedPreferences( Settings.FILENAME, Context.MODE_PRIVATE).edit {
-        putBoolean(Settings.SETTINGS_IS_EMAIL_LOGIN, state)
         apply()
     }
 }

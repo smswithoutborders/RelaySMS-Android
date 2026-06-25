@@ -43,6 +43,7 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.components.mmsImagePicker
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.Tokens
+import com.example.sw0b_001.extensions.context.settingsGetNotShowChooseGatewayClient
 import com.example.sw0b_001.ui.components.AttachImageView
 import com.example.sw0b_001.ui.modals.ComposeChooseGatewayClientsModal
 import com.example.sw0b_001.ui.modals.SelectAccountModal
@@ -54,6 +55,7 @@ import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.views.DeveloperHTTPView
 import kotlinx.serialization.Serializable
 import uniffi.relaysms_spec_payload.V1ContentCategories
+import java.lang.ProcessBuilder.Redirect.to
 
 
 @Serializable
@@ -88,9 +90,11 @@ fun ComposerInterface(
             if(inPreviewMode) -1 else
             if(context.isDefault()) context.getDefaultSimSubscription() ?: -1L else -1L)
     }
-    BackHandler {
+    fun backHandler() {
+        payloadsViewModel.reset()
         navController.popBackStack()
     }
+    BackHandler { backHandler() }
 
     val payload by payloadsViewModel.message.collectAsStateWithLifecycle()
     val tokens by tokensViewModel.fetchTokensByCatId(catId)
@@ -129,7 +133,6 @@ fun ComposerInterface(
         payload?.content?.getSubject()?.toUtf8String() ?: "") }
     var body: String by remember{
         mutableStateOf(payload?.content?.getBody()?.toUtf8String() ?: "") }
-    var image by remember{ mutableStateOf(payload?.content?.getAttachment()) }
 
     var showSelectAccountModal by remember { mutableStateOf(
         catId != V1ContentCategories.BRIDGE ) }
@@ -137,6 +140,36 @@ fun ComposerInterface(
     var selectedToken: Tokens? by remember{ mutableStateOf(null) }
     var from: String? by remember(selectedToken){
         mutableStateOf(selectedToken?.account) }
+
+    fun sendingCallback() {
+        if(selectedToken != null) {
+            publisherViewModel.publish(
+                catId = selectedToken?.catId ?: V1ContentCategories.BRIDGE,
+                body = body,
+                tokenHash = selectedToken?.tokenHash,
+                to = to,
+                subject = subject,
+                imageViewModel = imageViewModel,
+                payloadsViewModel = payloadsViewModel,
+                onFailureCallback = {},
+            ) {
+                backHandler()
+            }
+        } else {
+            bridgesViewModel.publish(
+                body = body,
+                tokenHash = null,
+                to = to,
+                subject = subject,
+                imageViewModel = imageViewModel,
+                payloadsViewModel = payloadsViewModel,
+                onFailureCallback = {},
+            ) {
+                backHandler()
+            }
+        }
+
+    }
 
     Scaffold(
         topBar = {
@@ -157,7 +190,7 @@ fun ComposerInterface(
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-                        navController.popBackStack()
+                        backHandler()
                     }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back))
@@ -180,7 +213,11 @@ fun ComposerInterface(
                     IconButton(
                         enabled = !isSending,
                         onClick = {
-                            showChooseGatewayClient = true
+                            if(!context.settingsGetNotShowChooseGatewayClient)
+                                showChooseGatewayClient = true
+                            else {
+                                sendingCallback()
+                            }
                         }
                     ) {
                         Icon(Icons.AutoMirrored.Filled.Send,
@@ -247,41 +284,14 @@ fun ComposerInterface(
                 ComposeChooseGatewayClientsModal(
                     showChooseGatewayClient,
                     gatewayClientViewModel,
-                ) {
-                    if(selectedToken != null) {
-                        publisherViewModel.publish(
-                            catId = selectedToken?.catId ?: V1ContentCategories.BRIDGE,
-                            body = body,
-                            tokenHash = selectedToken?.tokenHash,
-                            to = to,
-                            subject = subject,
-                            imageViewModel = imageViewModel,
-                            payloadsViewModel = payloadsViewModel,
-                            onFailureCallback = {},
-                        ) {
-                            navController.popBackStack()
-                        }
-                    } else {
-                        bridgesViewModel.publish(
-                            body = body,
-                            tokenHash = null,
-                            to = to,
-                            subject = subject,
-                            imageViewModel = imageViewModel,
-                            payloadsViewModel = payloadsViewModel,
-                            onFailureCallback = {},
-                        ) {
-                            navController.popBackStack()
-                        }
-                    }
-                }
+                ) { sendingCallback() }
             }
 
             if (showSelectAccountModal) {
                 SelectAccountModal(
                     onDismissRequest = {
                         if (selectedToken == null) {
-                            navController.popBackStack()
+                            backHandler()
                         }
                         Toast.makeText(
                             context,
@@ -306,4 +316,6 @@ fun ComposerInterface(
             }
         }
     }
+
 }
+
