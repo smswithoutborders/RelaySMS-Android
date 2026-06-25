@@ -3,6 +3,7 @@ package com.example.sw0b_001.ui.views.backupRestore
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -64,6 +65,12 @@ fun BackupView(
     backupRestoreViewModel: BackupRestoreViewModel,
 ) {
     var currentStep by remember { mutableIntStateOf(0) }
+
+    BackHandler {
+        if(currentStep == 0) {
+            navController.popBackStack()
+        }
+    }
 
     Scaffold(
         topBar = {

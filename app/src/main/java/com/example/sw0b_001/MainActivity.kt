@@ -80,8 +80,9 @@ import com.example.sw0b_001.ui.viewModels.PublisherViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.views.AboutView
-import com.example.sw0b_001.ui.views.backupRestore.BackupView
 import com.example.sw0b_001.ui.views.WelcomeMainView
+import com.example.sw0b_001.ui.views.backupRestore.BackupView
+import com.example.sw0b_001.ui.views.backupRestore.RecoveryView
 import com.example.sw0b_001.ui.views.compose.ComposerInterface
 import com.example.sw0b_001.ui.views.details.DetailsInterfaceView
 import com.example.sw0b_001.ui.views.incoming.PasteEncryptedTextView
@@ -382,7 +383,7 @@ class MainActivity : BindActivity() {
                 BackupView(navController, backupRestoreViewModel)
             }
             composable<RestoreScreen> {
-                TODO("Implement screen")
+                RecoveryView(navController, backupRestoreViewModel)
             }
         }
 

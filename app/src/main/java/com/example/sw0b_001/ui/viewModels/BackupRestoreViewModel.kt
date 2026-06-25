@@ -78,6 +78,27 @@ class BackupRestoreViewModel @Inject constructor(
         }
     }
 
+    fun readBackup(uri: Uri, recoveryKey: ByteArray) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val contents = try {
+                context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                    inputStream.readBytes()
+                }
+            } catch (e: Exception) {
+                throw e
+            }
+            contents ?: throw Exception("Invalid backup file")
+
+            try {
+                BackupRestoreImpl(context)
+                    .restore(contents, recoveryKey)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+
     fun showRecoveryKey() {
         viewModelScope.launch {
             val backupRestore = db.fetch()
