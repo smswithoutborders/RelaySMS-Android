@@ -52,8 +52,8 @@ class BackupRestoreImpl(context: Context) {
     }
 
     @OptIn(ExperimentalSerializationApi::class)
-    suspend fun restore(data: ByteArray, digitList: ByteArray) {
-        val backupRestore = BackupRestore.deserialize(data, digitList)
+    suspend fun restore(data: ByteArray, recoveryKey: ByteArray) {
+        val backupRestore = BackupRestore.deserialize(data, recoveryKey)
         val sBackups = backupRestore.v1RestoreDecrypt()
 
         try {
