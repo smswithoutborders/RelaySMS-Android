@@ -3,28 +3,18 @@ package com.example.sw0b_001.ui.views.tabs
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.BubbleChart
-import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.appbars.BottomNavBar
 import com.example.sw0b_001.ui.appbars.GatewayClientsAppBar
 import com.example.sw0b_001.ui.appbars.RecentAppBar
@@ -39,7 +29,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-
 enum class BottomTabsItems {
     BottomBarRecentTab,
     BottomBarPlatformsTab,
@@ -50,49 +39,41 @@ enum class BottomTabsItems {
 @Composable
 fun HomepageView(
     navController: NavController,
-    tokensViewModel : TokensViewModel,
+    tokensViewModel: TokensViewModel,
     payloadsViewModel: PayloadsViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
-    showTopBar: Boolean = true,
-    drawerCallback: (() -> Unit)? = {},
+    showTopBar: Boolean = true
 ) {
-    val context = LocalContext.current
-    val inboxMessages = payloadsViewModel.getInboxMessages()
-        .observeAsState(emptyList())
-
-    val messages by payloadsViewModel.messages.collectAsStateWithLifecycle()
-
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-
     var showAddGatewayClientsModal by remember { mutableStateOf(false) }
-
-    var sendNewMessageRequested by remember { mutableStateOf(false)}
-
+    var sendNewMessageRequested by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
 
-    Scaffold (
+    Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            if(showTopBar) {
+            if (showTopBar) {
                 when (tokensViewModel.bottomTabsItem) {
                     BottomTabsItems.BottomBarRecentTab -> {
                         RecentAppBar(
-                            navController = navController,
                             onSearchQueryChanged = { searchQuery = it },
                             searchQuery = searchQuery,
                             isSearchActive = isSearchActive,
-                            onToggleSearch = {},
+                            onToggleSearch = { isSearchActive = !isSearchActive },
                             onSearchDone = {},
                             isSelectionMode = tokensViewModel.isSelectionMode,
                             selectedCount = tokensViewModel.selectedMessagesCount,
                             onSelectAll = tokensViewModel.onSelectAll,
                             onDeleteSelected = tokensViewModel.onDeleteSelected,
                             onCancelSelection = tokensViewModel.onCancelSelection,
-                            onMenuClickCallback = drawerCallback
+                            onComposeClicked = {
+                                sendNewMessageRequested = true
+                            }
                         )
                     }
+
                     BottomTabsItems.BottomBarCountriesTab -> {
                         GatewayClientsAppBar(
                             navController = navController,
@@ -106,6 +87,7 @@ fun HomepageView(
                             }
                         )
                     }
+
                     else -> {}
                 }
             }
@@ -113,49 +95,9 @@ fun HomepageView(
         bottomBar = {
             BottomNavBar(
                 navController = navController,
-
                 selectedTab = tokensViewModel.bottomTabsItem
             ) { selectedTab ->
                 tokensViewModel.bottomTabsItem = selectedTab
-            }
-        },
-        floatingActionButton = {
-            when(tokensViewModel.bottomTabsItem) {
-                BottomTabsItems.BottomBarRecentTab -> {
-                    ExtendedFloatingActionButton(
-                        onClick = {
-                            sendNewMessageRequested = true
-                        },
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Default.BubbleChart,
-                                contentDescription = stringResource(R.string.compose_new),
-                            )
-                        },
-                        text = {
-                            Text(
-                                text = stringResource(R.string.compose_new),
-                            )
-                        }
-                    )
-                    if (messages?.isNotEmpty() == true) {
-                        ExtendedFloatingActionButton(
-                            onClick = { sendNewMessageRequested = true },
-                            icon = {
-                                Icon(
-                                    imageVector = Icons.Filled.PersonAdd,
-                                    contentDescription = stringResource(R.string.add_account),
-                                )
-                            },
-                            text = {
-                                Text(
-                                    text = stringResource(R.string.add_account_compose_new),
-                                )
-                            }
-                        )
-                    }
-                }
-                else -> {}
             }
         }
     ) { innerPadding ->
@@ -208,18 +150,14 @@ fun GetTabViews(
     gatewayClientViewModel: GatewayClientViewModel,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
 ) {
-    when(bottomTabsItems) {
+    when (bottomTabsItems) {
         BottomTabsItems.BottomBarRecentTab -> {
             RecentView(
                 navController = navController,
-                payloadsViewModel = payloadsViewModel,
-                tokensViewModel = tokensViewModel,
-                supportedPlatformsViewModel = supportedPlatformsViewModel,
-            ) {
-                tokensViewModel.bottomTabsItem =
-                    BottomTabsItems.BottomBarPlatformsTab
-            }
+                payloadsViewModel = payloadsViewModel
+            )
         }
+
         BottomTabsItems.BottomBarPlatformsTab -> {
             SupportedPlatformsView(
                 navController = navController,
@@ -227,9 +165,9 @@ fun GetTabViews(
                 tokensViewModel = tokensViewModel,
             )
         }
+
         BottomTabsItems.BottomBarCountriesTab -> {
             GatewayClientView(viewModel = gatewayClientViewModel)
         }
     }
-
 }

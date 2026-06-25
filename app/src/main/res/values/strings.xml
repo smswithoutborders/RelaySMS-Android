@@ -465,5 +465,7 @@
     <string name="save_to_password_manager">Save to password manager</string>
     <string name="reset">Reset</string>
     <string name="reset_removes_all_your_stored_tokens_both_locally_and_on_the_cloud_this_is_what_a_complete_delete_would_look_like_if_there_were_traditional_accounts_you_can_add_more_at_anytime">Reset removes all your stored tokens both locally and on the cloud. This is what a complete delete would look like - if there were traditional accounts. You can add more at anytime</string>
+    <string name="Messages">Messages</string>
+    <string name="Settings">Settings</string>
 
 </resources>
