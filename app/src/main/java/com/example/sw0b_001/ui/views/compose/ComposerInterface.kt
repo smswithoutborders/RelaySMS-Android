@@ -90,9 +90,11 @@ fun ComposerInterface(
             if(inPreviewMode) -1 else
             if(context.isDefault()) context.getDefaultSimSubscription() ?: -1L else -1L)
     }
-    BackHandler {
+    fun backHandler() {
+        payloadsViewModel.reset()
         navController.popBackStack()
     }
+    BackHandler { backHandler() }
 
     val payload by payloadsViewModel.message.collectAsStateWithLifecycle()
     val tokens by tokensViewModel.fetchTokensByCatId(catId)
@@ -131,7 +133,6 @@ fun ComposerInterface(
         payload?.content?.getSubject()?.toUtf8String() ?: "") }
     var body: String by remember{
         mutableStateOf(payload?.content?.getBody()?.toUtf8String() ?: "") }
-    var image by remember{ mutableStateOf(payload?.content?.getAttachment()) }
 
     var showSelectAccountModal by remember { mutableStateOf(
         catId != V1ContentCategories.BRIDGE ) }
@@ -152,7 +153,7 @@ fun ComposerInterface(
                 payloadsViewModel = payloadsViewModel,
                 onFailureCallback = {},
             ) {
-                navController.popBackStack()
+                backHandler()
             }
         } else {
             bridgesViewModel.publish(
@@ -164,7 +165,7 @@ fun ComposerInterface(
                 payloadsViewModel = payloadsViewModel,
                 onFailureCallback = {},
             ) {
-                navController.popBackStack()
+                backHandler()
             }
         }
 
@@ -189,7 +190,7 @@ fun ComposerInterface(
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-                        navController.popBackStack()
+                        backHandler()
                     }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back))
@@ -290,7 +291,7 @@ fun ComposerInterface(
                 SelectAccountModal(
                     onDismissRequest = {
                         if (selectedToken == null) {
-                            navController.popBackStack()
+                            backHandler()
                         }
                         Toast.makeText(
                             context,

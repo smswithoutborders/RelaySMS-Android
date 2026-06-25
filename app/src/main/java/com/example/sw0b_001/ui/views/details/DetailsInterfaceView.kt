@@ -1,6 +1,7 @@
 package com.example.sw0b_001.ui.views.details
 
 import android.graphics.BitmapFactory
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -53,8 +54,13 @@ fun DetailsInterfaceView(
         } else null
     )}
 
-
     val scrollState = rememberScrollState() // Remember the scroll state
+
+    fun backHandler() {
+        payloadsViewModel.reset()
+        navController.popBackStack()
+    }
+    BackHandler { backHandler() }
 
     Scaffold(
         topBar = {
@@ -67,7 +73,7 @@ fun DetailsInterfaceView(
                 )
             }) {
                 payloadsViewModel.delete(messageId)
-                navController.popBackStack()
+                backHandler()
             }
         }
     ) { innerPadding ->

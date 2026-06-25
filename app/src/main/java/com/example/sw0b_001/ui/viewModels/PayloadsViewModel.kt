@@ -33,7 +33,6 @@ class PayloadsViewModel @Inject constructor(
     private val _messagesUiState = MutableStateFlow<List<Payloads>?>(null)
     val messages: StateFlow<List<Payloads>?> = _messagesUiState
 
-
     private lateinit var inboxMessageList: LiveData<MutableList<Payloads>>
 
     private var conversationsPager: Flow<PagingData<Payloads>>? = null
@@ -41,30 +40,9 @@ class PayloadsViewModel @Inject constructor(
     val db = Datastore.getDatastore(context)?.payloadsDao()
         ?: throw Exception("Could not open database")
 
-//    fun get() {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            _isLoading.value = true
-//            db.get()?.let {
-//                _messagesUiState.value = it
-//                _isLoading.value = false
-//                it.collect { items ->
-//                    val payloads = mutableListOf<Payloads>()
-//                    items.forEach { payload ->
-//                        val deserialized = V1Payloads.deserialize(payload.payload)
-//                        val content = V1ContentsContainer.deserialize(
-//                            data = deserialized.getPayload(),
-//                            catId = payload.catId,
-//                            lenAtt = if(payload.isAttachment) deserialized.getLenAtt() else 0u
-//                        )
-////                        payload.contents = content
-//                        payloads.add(payload)
-//                    }
-//                    _messagesUiState.value = payloads
-//                    _isLoading.value = false
-//                }
-//            }
-//        }
-//    }
+    fun reset() {
+        _messageUiState.value = null
+    }
 
     fun get(messageId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
