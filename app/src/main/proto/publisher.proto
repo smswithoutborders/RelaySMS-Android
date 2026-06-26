@@ -85,7 +85,7 @@ message ExchangeOAuth2CodeAndStoreResponse {
   // Encrypted token ciphertext
   bytes token_ciphertext = 4;
   // Unique identifier of the stored token
-  bytes token_id = 5;
+  uint32 token_id = 5;
   // Server ephemeral public keys associated with the token
   repeated PublicKey server_ephemeral_public_keys = 6;
   // Key ID used for encrypting the token ciphertext
@@ -106,7 +106,7 @@ message ExchangeOAuth2CodeAndStoreResponse {
 //   X-Timestamp:      Unix timestamp in seconds (string)
 message RevokeOAuth2TokenRequest {
   // The unique identifier of the stored token
-  bytes token_id = 1;
+  uint32 token_id = 1;
   // The key ID used for encrypting the token in the payload
   uint32 key_id = 2;
 }
@@ -180,7 +180,7 @@ message ExchangePNBACodeAndStoreResponse {
   // Encrypted token ciphertext
   bytes token_ciphertext = 5;
   // Unique identifier of the stored token
-  bytes token_id = 6;
+  uint32 token_id = 6;
   // Server ephemeral public keys associated with the token
   repeated PublicKey server_ephemeral_public_keys = 7;
   // Key ID used for encrypting the token ciphertext
@@ -201,7 +201,7 @@ message ExchangePNBACodeAndStoreResponse {
 //   X-Timestamp:      Unix timestamp in seconds (string)
 message RevokePNBATokenRequest {
   // The unique identifier of the stored token
-  bytes token_id = 1;
+  uint32 token_id = 1;
   // The key ID used for encrypting the token in the payload
   uint32 key_id = 2;
 }
@@ -212,6 +212,33 @@ message RevokePNBATokenResponse {
   string message = 1;
   // Indicates whether the operation was successful.
   bool success = 2;
+}
+
+// Request message for syncing key pools for a token
+//
+// Required headers:
+//   X-Payload-bin:    Encrypted request payload ciphertext (binary)
+//   X-Public-Key-bin: Client ephemeral public key (eC_pk, 32 bytes, binary)
+//   X-Key-ID:         Server identity key ID used for encrypting the payload (string)
+//   X-Nonce-bin:      Request nonce (16 bytes, binary)
+//   X-Timestamp:      Unix timestamp in seconds (string)
+message SyncKeysRequest {
+  // The unique identifier of the stored token
+  uint32 token_id = 1;
+  // The key ID used for encrypting the token in the payload
+  uint32 key_id = 2;
+  // Client ephemeral public keys to associate with the stored token
+  repeated PublicKey client_ephemeral_public_keys = 3;
+}
+
+// Response message for SyncKeys
+message SyncKeysResponse {
+  // Indicates if the sync was successful
+  bool success = 1;
+  // A response message
+  string message = 2;
+  // Server ephemeral public keys associated with the token
+  repeated PublicKey server_ephemeral_public_keys = 3;
 }
 
 // Publisher service
@@ -228,4 +255,6 @@ service Publisher {
   rpc ExchangePNBACodeAndStore(ExchangePNBACodeAndStoreRequest) returns (ExchangePNBACodeAndStoreResponse);
   // RPC for revoking and deleting a PNBA token
   rpc RevokePNBAToken(RevokePNBATokenRequest) returns (RevokePNBATokenResponse);
+  // RPC for syncing client and server ephemeral key pools for a token
+  rpc SyncKeys(SyncKeysRequest) returns (SyncKeysResponse);
 }

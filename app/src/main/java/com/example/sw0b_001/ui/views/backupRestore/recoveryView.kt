@@ -56,6 +56,7 @@ fun RecoveryView(
 ) {
     var currentStep by remember { mutableIntStateOf(0) }
     var activeUri: Uri? = null
+    var fileName: String = ""
 
     BackHandler {
         if(currentStep == 0) {
@@ -88,13 +89,15 @@ fun RecoveryView(
                 .padding(innerPadding)
         ) {
             when(currentStep) {
-                0 -> RestoreBackupView { uri ->
+                0 -> RestoreBackupView(backupRestoreViewModel) { uri, fn ->
                     activeUri = uri
+                    fileName = fn
                     currentStep = 1
                 }
                 1 -> RecoveryKeyView(
                     backupRestoreViewModel,
                     activeUri!!,
+                    fileName = fileName
                 ) {
                     navController.navigate(BackupScreen) {
                         popUpTo(RestoreScreen) { inclusive = true }
@@ -107,11 +110,15 @@ fun RecoveryView(
 
 @Composable
 fun RestoreBackupView(
-    onNext: (uri: Uri) -> Unit = {},
+    backupRestoreViewModel: BackupRestoreViewModel,
+    onNext: (uri: Uri, fileName: String) -> Unit = {uri, fn -> },
 ) {
     val importLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument()) { uri ->
-        uri?.let { onNext(uri) }
+        uri?.let {
+            val fileName = backupRestoreViewModel.getFileNameFromUri(uri)
+            fileName?.let { onNext(uri, fileName) }
+        }
     }
 
     RestoreBackupComponents {
@@ -123,6 +130,7 @@ fun RestoreBackupView(
 fun RecoveryKeyView(
     backupRestoreViewModel: BackupRestoreViewModel,
     uri: Uri,
+    fileName: String,
     onNext: () -> Unit = {},
 ) {
     var enabled by remember{ mutableStateOf(false)}
@@ -134,7 +142,7 @@ fun RecoveryKeyView(
             if(recoveryKey.size == 64) {
                 error = false
                 try {
-                    backupRestoreViewModel.restoreBackup(uri, recoveryKey)
+                    backupRestoreViewModel.restoreBackup(uri, recoveryKey, fileName)
                     enabled = true
                     allowEntry = false
                 } catch(e: Exception) {

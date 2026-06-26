@@ -3,7 +3,6 @@ package com.example.sw0b_001.ui.viewModels
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.afkanerd.lib_image_android.ui.extensions.toIntLittleEndian
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.Protocols
 import com.example.sw0b_001.data.Datastore
@@ -47,7 +46,6 @@ class BridgesViewModel @Inject constructor(
                     val db = Datastore.getDatastore(context) ?: throw Exception("Failed to open database")
                     tokenId = db.tokensDao()?.fetch(tokenHash)
                         ?.tokenId
-                        ?.toIntLittleEndian()
                         ?.toUInt()
                         ?: throw Exception("Failed to find token id")
                 }

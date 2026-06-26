@@ -45,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -52,6 +53,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.afkanerd.smswithoutborders_libsmsmms.data.data.models.DateTimeUtils
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.copyItemToClipboard
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.theme.AppTheme
@@ -68,6 +70,7 @@ fun BackupView(
     navController: NavController,
     backupRestoreViewModel: BackupRestoreViewModel,
 ) {
+    val context = LocalContext.current
     var currentStep by remember { mutableIntStateOf(0) }
     val backupRestore by backupRestoreViewModel.getBackup()
         .collectAsStateWithLifecycle(null)
@@ -108,6 +111,8 @@ fun BackupView(
                         OnDeviceBackupView(
                             uri = backupRestore!!.uri.toUri(),
                             backupRestoreViewModel = backupRestoreViewModel,
+                            date = backupRestore!!.date,
+                            fileName = backupRestore!!.fileName,
                             onShowRecoveryKey = {
                                 currentStep = 2
                             }
@@ -145,12 +150,12 @@ private fun BackupIntroScreen(
     } else {
         SimpleDateFormat("yyyy-MM-dd").format(Date())
     }
-    val filename = "relaysms-backup-$currentDate.backup"
+    val filename = stringResource(R.string.relaysms_backup_backup, currentDate)
 
     val exportLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument("application/bin")) { uri ->
         uri?.let {
-            backupRestoreViewModel.saveUri(uri)
+            backupRestoreViewModel.saveUri(uri, filename)
             onNext()
         }
     }
@@ -376,21 +381,25 @@ private fun RecoveryScreenKey(
 @Composable
 private fun OnDeviceBackupView(
     uri: Uri,
+    date: Long,
+    fileName: String,
     backupRestoreViewModel: BackupRestoreViewModel,
     onShowRecoveryKey: () -> Unit,
     onDeleteFile: () -> Unit,
 ) {
     val context = LocalContext.current
-    val lastBackupTime by remember{ mutableStateOf("") } // TODO: read from db
+    val lastBackupTime by remember{ mutableStateOf(DateTimeUtils
+        .formatDateExtended(context, date)) }
     var errorMessage: String? by remember{ mutableStateOf(null) } // TODO: read from db
     OnDeviceBackupViewComponent(
         lastBackupTime = lastBackupTime,
         errorMessage = errorMessage,
+        backupFilename = fileName,
         onCreateBackup = {
             // if you're seeing this, the uri should exist
             // then perform save actions here
             errorMessage = null
-            backupRestoreViewModel.saveUri(uri)
+            backupRestoreViewModel.saveUri(uri, fileName)
         },
         onViewRecoveryKey = onShowRecoveryKey,
         onDeleteBackup = {
@@ -407,6 +416,7 @@ private fun OnDeviceBackupView(
 private fun OnDeviceBackupViewComponent(
     lastBackupTime: String,
     errorMessage: String?,
+    backupFilename: String?,
     onCreateBackup: () -> Unit,
     onViewRecoveryKey: () -> Unit,
     onDeleteBackup: () -> Unit,
@@ -417,21 +427,30 @@ private fun OnDeviceBackupViewComponent(
         Column(
             Modifier
                 .padding(bottom = 16.dp)
-                .clickable { onCreateBackup() }
+                .clickable {
+                    TODO()
+                    onCreateBackup()
+                }
         ) {
-            Text(stringResource(R.string.create_backup))
+            Text(
+                stringResource(R.string.create_backup),
+                fontWeight = FontWeight.Bold
+            )
             Text(stringResource(R.string.last_back, lastBackupTime))
             errorMessage?.let {
                 Text(
                     errorMessage,
-                    color = MaterialTheme.colorScheme.error
+                    color = MaterialTheme.colorScheme.error,
                 )
             }
         }
 
         Column(Modifier.padding(top = 16.dp, bottom = 16.dp)) {
-            Text(stringResource(R.string.backup_file))
-            Text(stringResource(R.string.insert_file_name))
+            Text(
+                stringResource(R.string.backup_file),
+                fontWeight = FontWeight.Bold
+            )
+            Text(backupFilename ?: "")
         }
 
         Column(Modifier
@@ -473,6 +492,7 @@ fun OnDeviceBackupViewComponent_Preview() {
         OnDeviceBackupViewComponent(
             "Now",
             "Error",
+            "filename",
             {},
             {},
             {},

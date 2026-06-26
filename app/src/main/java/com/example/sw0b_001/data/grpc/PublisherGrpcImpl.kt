@@ -101,7 +101,7 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
                 serverEphemeralPublicKeys = res.serverEphemeralPublicKeysList,
                 keys = keys,
                 tokenCipherText = res.tokenCiphertext.toByteArray(),
-                tokenId = res.tokenId.toByteArray(),
+                tokenId = res.tokenId.toUInt(),
                 catId = res.catId,
                 accountId = res.accountIdentifier,
                 platformName = res.platform
@@ -120,7 +120,7 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
         serverEphemeralPublicKeys: List<PublisherOuterClass.PublicKey>,
         keys: List<Pair<Int, Protocols.CloseableCurve15519KeyPair>>,
         tokenCipherText: ByteArray,
-        tokenId: ByteArray,
+        tokenId: UInt,
         catId: Int,
         accountId: String,
         platformName: String,
@@ -166,7 +166,7 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
     private suspend fun storeKeys(
         keys: List<Pair<Int, Protocols.CloseableCurve15519KeyPair>>,
         serverKeys: List<Keys>,
-        tokenId: ByteArray,
+        tokenId: UInt,
         tokenHash: ByteArray,
         catId: V1ContentCategories,
         accountId: String,
@@ -200,7 +200,7 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
         )
         dbTokens.insert(
             Tokens(
-                tokenId = tokenId,
+                tokenId = tokenId.toInt(),
                 catId = catId,
                 account = accountId,
                 platformName = platformName,
@@ -252,7 +252,7 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
                 serverEphemeralPublicKeys = res.serverEphemeralPublicKeysList,
                 keys = keys,
                 tokenCipherText = res.tokenCiphertext.toByteArray(),
-                tokenId = res.tokenId.toByteArray(),
+                tokenId = res.tokenId.toUInt(),
                 catId = res.catId,
                 accountId = res.accountIdentifier,
                 platformName = res.platform

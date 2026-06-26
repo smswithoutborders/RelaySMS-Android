@@ -479,8 +479,8 @@
     <string name="create_backup">Create backup</string>
     <string name="last_back">Last back: %1$s</string>
     <string name="backup_file">Backup file</string>
-    <string name="insert_file_name">[insert file name]</string>
     <string name="delete_backup">Delete backup</string>
     <string name="failed_to_delete_file">Failed to delete file</string>
+    <string name="relaysms_backup_backup">relaysms-backup-%1$s.backup</string>
 
 </resources>

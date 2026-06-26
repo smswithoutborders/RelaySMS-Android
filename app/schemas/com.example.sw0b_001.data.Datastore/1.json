@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "b713f65162f70d9cb283002a56857ea4",
+    "identityHash": "0f537fbb4558aa0af8f15ef8bcdb7510",
     "entities": [
       {
         "tableName": "RatchetStates",
@@ -121,7 +121,7 @@
       },
       {
         "tableName": "Tokens",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tokenId` BLOB NOT NULL, `tokenHash` BLOB NOT NULL, `catId` TEXT NOT NULL, `account` TEXT NOT NULL, `platformName` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tokenId` INTEGER NOT NULL, `tokenHash` BLOB NOT NULL, `catId` TEXT NOT NULL, `account` TEXT NOT NULL, `platformName` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -132,7 +132,7 @@
           {
             "fieldPath": "tokenId",
             "columnName": "tokenId",
-            "affinity": "BLOB",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -312,7 +312,7 @@
       },
       {
         "tableName": "BackupRestoreEnt",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `uri` TEXT NOT NULL, `recovery_key` BLOB, `date` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `uri` TEXT NOT NULL, `fileName` TEXT NOT NULL, `recovery_key` BLOB, `date` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -323,6 +323,12 @@
           {
             "fieldPath": "uri",
             "columnName": "uri",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fileName",
+            "columnName": "fileName",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -384,7 +390,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b713f65162f70d9cb283002a56857ea4')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0f537fbb4558aa0af8f15ef8bcdb7510')"
     ]
   }
 }

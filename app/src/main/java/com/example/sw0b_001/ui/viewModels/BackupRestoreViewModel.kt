@@ -2,6 +2,7 @@ package com.example.sw0b_001.ui.viewModels
 
 import android.content.Context
 import android.net.Uri
+import android.provider.OpenableColumns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sw0b_001.data.BackupRestoreImpl
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.io.File
 import java.io.FileOutputStream
 
 sealed class BackupRestoreUiStates {
@@ -43,7 +45,7 @@ class BackupRestoreViewModel @Inject constructor(
         return db.fetchFlow()
     }
 
-    fun saveUri(uri: Uri?) {
+    fun saveUri(uri: Uri?, fileName: String) {
         if(uri == null) return
 
         _uiState.value = BackupRestoreUiStates.Loading
@@ -52,7 +54,8 @@ class BackupRestoreViewModel @Inject constructor(
                 val recoveryKey = writeBackup(uri)
                 db.insert(BackupRestoreEnt(
                     uri = uri.toString(),
-                    recovery_key = recoveryKey
+                    recovery_key = recoveryKey,
+                    fileName = fileName
                 ))
                 _uiState.value = BackupRestoreUiStates.Idle
             } catch(e: Exception) {
@@ -83,7 +86,7 @@ class BackupRestoreViewModel @Inject constructor(
         }
     }
 
-    fun restoreBackup(uri: Uri, recoveryKey: ByteArray) {
+    fun restoreBackup(uri: Uri, recoveryKey: ByteArray, fileName: String) {
         viewModelScope.launch(Dispatchers.IO) {
             val contents = try {
                 context.contentResolver.openInputStream(uri)?.use { inputStream ->
@@ -101,6 +104,7 @@ class BackupRestoreViewModel @Inject constructor(
                 db.insert(BackupRestoreEnt(
                     uri = uri.toString(),
                     recovery_key = recoveryKey,
+                    fileName = fileName
                 ))
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -139,6 +143,25 @@ class BackupRestoreViewModel @Inject constructor(
         } catch (e: Exception) {
             e.printStackTrace()
             false
+        }
+    }
+
+    fun getFileNameFromUri(uri: Uri): String? {
+        return when (uri.scheme) {
+            "content" -> {
+                context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                    val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    if (nameIndex != -1 && cursor.moveToFirst()) {
+                        cursor.getString(nameIndex)
+                    } else {
+                        null
+                    }
+                }
+            }
+            "file" -> {
+                uri.path?.let { File(it).name }
+            }
+            else -> null
         }
     }
 }

@@ -10,6 +10,7 @@ data class BackupRestoreEnt(
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0,
     val uri: String,
+    val fileName: String,
     val recovery_key: ByteArray? = null,
     var date: Long = System.currentTimeMillis(),
 ) : AutoCloseable {
