@@ -253,7 +253,7 @@ class MainActivity : BindActivity() {
                             payloadsViewModel = payloadsViewModel,
                             gatewayClientViewModel = gatewayClientViewModel,
                             supportedPlatformsViewModel = supportedPlatformsViewModel,
-//                            drawerCallback = drawerCallback
+                            drawerCallback = drawerCallback
                         )
                     }
                 }

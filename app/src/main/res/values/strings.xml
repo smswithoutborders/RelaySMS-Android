@@ -475,7 +475,5 @@
     <string name="select_the_file_on_your_device_where_your_backup_is_stored">Select the file on your device where your backup is stored</string>
     <string name="open_backup_file">Open backup file</string>
     <string name="incorrect_recovery_key">Incorrect recovery key</string>
-    <string name="Settings">Settings</string>
-    <string name="Messages">Messages</string>
 
 </resources>
