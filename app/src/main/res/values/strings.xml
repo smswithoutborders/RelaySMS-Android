@@ -475,5 +475,12 @@
     <string name="select_the_file_on_your_device_where_your_backup_is_stored">Select the file on your device where your backup is stored</string>
     <string name="open_backup_file">Open backup file</string>
     <string name="incorrect_recovery_key">Incorrect recovery key</string>
+    <string name="to_restore_a_backup_install_a_new_copy_of_relaysms_open_the_app_and_tap_restore_backup_then_locate_a_backup_file">To restore a backup, install a new copy of RelaySMS. Open the app and tap Restore backup, then locate a backup file.</string>
+    <string name="create_backup">Create backup</string>
+    <string name="last_back">Last back: %1$s</string>
+    <string name="backup_file">Backup file</string>
+    <string name="insert_file_name">[insert file name]</string>
+    <string name="delete_backup">Delete backup</string>
+    <string name="failed_to_delete_file">Failed to delete file</string>
 
 </resources>

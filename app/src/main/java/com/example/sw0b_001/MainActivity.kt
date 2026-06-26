@@ -226,7 +226,6 @@ class MainActivity : BindActivity() {
         var showThreadsTopBar by remember { mutableStateOf(true) }
         var customThreadView: (@Composable () -> Unit)? by remember { mutableStateOf(null)}
 
-
         var navDrawItemSelected by remember{ mutableStateOf(false) }
         var drawerCallback by remember { mutableStateOf<(() -> Unit)?>(null) }
 

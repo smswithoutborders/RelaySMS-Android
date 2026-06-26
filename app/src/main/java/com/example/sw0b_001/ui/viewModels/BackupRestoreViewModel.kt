@@ -11,6 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -37,6 +38,10 @@ class BackupRestoreViewModel @Inject constructor(
 
     val db = Datastore.getDatastore(context)?.backupRestoreDao()
         ?: throw Exception("Failed to open database")
+
+    fun getBackup(): Flow<BackupRestoreEnt?> {
+        return db.fetchFlow()
+    }
 
     fun saveUri(uri: Uri?) {
         if(uri == null) return
@@ -78,7 +83,7 @@ class BackupRestoreViewModel @Inject constructor(
         }
     }
 
-    fun readBackup(uri: Uri, recoveryKey: ByteArray) {
+    fun restoreBackup(uri: Uri, recoveryKey: ByteArray) {
         viewModelScope.launch(Dispatchers.IO) {
             val contents = try {
                 context.contentResolver.openInputStream(uri)?.use { inputStream ->
@@ -92,6 +97,11 @@ class BackupRestoreViewModel @Inject constructor(
             try {
                 BackupRestoreImpl(context)
                     .restore(contents, recoveryKey)
+
+                db.insert(BackupRestoreEnt(
+                    uri = uri.toString(),
+                    recovery_key = recoveryKey,
+                ))
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -116,5 +126,19 @@ class BackupRestoreViewModel @Inject constructor(
 
         // Chunk the string into substrings of 4 characters each, and take the first 4 chunks
         return cleanedString.chunked(4)
+    }
+
+    fun deleteFileByUri(fileUri: Uri): Boolean {
+        return try {
+            val deletedRows = context.contentResolver
+                .delete(fileUri, null, null)
+            deletedRows > 0
+        } catch (e: SecurityException) {
+            e.printStackTrace()
+            false
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
     }
 }

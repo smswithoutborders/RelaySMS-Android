@@ -44,6 +44,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
+import com.example.sw0b_001.ui.navigation.BackupScreen
+import com.example.sw0b_001.ui.navigation.RestoreScreen
 import com.example.sw0b_001.ui.viewModels.BackupRestoreViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,7 +68,10 @@ fun RecoveryView(
             TopAppBar(
                 title = { Text(stringResource(R.string.restore_backup)) },
                 navigationIcon = {
-                    IconButton(onClick = { if (currentStep > 0) currentStep-- }) {
+                    IconButton(onClick = {
+                        if (currentStep > 0) currentStep--
+                        else navController.popBackStack()
+                    } ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = stringResource(R.string.back)
@@ -91,7 +96,9 @@ fun RecoveryView(
                     backupRestoreViewModel,
                     activeUri!!,
                 ) {
-                    currentStep = 2
+                    navController.navigate(BackupScreen) {
+                        popUpTo(RestoreScreen) { inclusive = true }
+                    }
                 }
             }
         }
@@ -118,14 +125,18 @@ fun RecoveryKeyView(
     uri: Uri,
     onNext: () -> Unit = {},
 ) {
-    val enabled by remember{ mutableStateOf(false)}
+    var enabled by remember{ mutableStateOf(false)}
+    var allowEntry by remember{ mutableStateOf(true)}
     var error by remember{ mutableStateOf(false)}
 
     RecoveryKeyViewComponent(
         onValidatedCallback = { recoveryKey ->
             if(recoveryKey.size == 64) {
+                error = false
                 try {
-                    backupRestoreViewModel.readBackup(uri, recoveryKey)
+                    backupRestoreViewModel.restoreBackup(uri, recoveryKey)
+                    enabled = true
+                    allowEntry = false
                 } catch(e: Exception) {
                     e.printStackTrace()
                     error = true
@@ -135,6 +146,7 @@ fun RecoveryKeyView(
             } else { error = false }
         },
         enabled = enabled,
+        allowEntry = allowEntry,
         error = error,
         onNext = onNext
     )
@@ -202,6 +214,7 @@ private fun RecoveryKeyViewComponent(
     onValidatedCallback: (ByteArray) -> Unit = {},
     enabled: Boolean = false,
     error: Boolean = false,
+    allowEntry: Boolean = true,
     onNext: () -> Unit = {}
 ) {
     val preview = LocalInspectionMode.current
@@ -213,6 +226,7 @@ private fun RecoveryKeyViewComponent(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .imePadding()
             .padding(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -255,6 +269,7 @@ private fun RecoveryKeyViewComponent(
                 .fillMaxWidth()
                 .padding(8.dp),
             isError = error,
+            enabled = allowEntry,
             supportingText = {
                 if(error || preview) {
                     Text(
@@ -269,13 +284,13 @@ private fun RecoveryKeyViewComponent(
         Column(
             horizontalAlignment = Alignment.End,
             modifier = Modifier
-                .padding(8.dp)
+                .padding(bottom = 24.dp)
+                .imePadding()
                 .fillMaxWidth()
         ) {
             Button(
                 onClick = onNext,
                 enabled = enabled,
-                modifier = Modifier.padding(bottom = 24.dp)
             ) {
                 Text(stringResource(R.string.next))
             }
