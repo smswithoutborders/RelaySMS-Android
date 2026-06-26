@@ -5,24 +5,29 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,26 +38,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.getPhoneNumberFromPrefs
+import com.example.sw0b_001.ui.navigation.AboutScreen
+import com.example.sw0b_001.ui.navigation.BackupScreen
+import com.example.sw0b_001.ui.navigation.RestoreScreen
+import com.example.sw0b_001.ui.navigation.SettingsScreen
 import com.example.sw0b_001.ui.theme.AppTheme
-
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun RecentAppBar(
+    navController: NavController,
     onSearchQueryChanged: (String) -> Unit,
     searchQuery: String,
     isSearchActive: Boolean,
@@ -63,13 +71,21 @@ fun RecentAppBar(
     onSelectAll: (() -> Unit)? = null,
     onDeleteSelected: (() -> Unit)? = null,
     onCancelSelection: (() -> Unit)? = null,
-    onComposeClicked: (() -> Unit)? = null,
+    onMenuClickCallback: (() -> Unit)? = null,
 ) {
+    val context = LocalContext.current
     val focusManager = LocalFocusManager.current
+    var showMenu by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val inPreviewMode = LocalInspectionMode.current
+
+    val phoneNumber = remember { getPhoneNumberFromPrefs(context) }
+    val isDefault by remember { mutableStateOf(if(inPreviewMode) true
+    else context.isDefault()) }
 
     Column(modifier = Modifier.fillMaxWidth()) {
         if (isSelectionMode) {
+            // Selection mode app bar
             CenterAlignedTopAppBar(
                 title = {
                     Text(stringResource(R.string.selected_messages, selectedCount))
@@ -89,6 +105,7 @@ fun RecentAppBar(
                             contentDescription = stringResource(R.string.select_all)
                         )
                     }
+
                     IconButton(onClick = { onDeleteSelected?.invoke() }) {
                         Icon(
                             imageVector = Icons.Filled.Delete,
@@ -101,37 +118,101 @@ fun RecentAppBar(
                 modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
             )
         } else {
-            TopAppBar(
+            // Normal mode app bar
+            CenterAlignedTopAppBar(
                 title = {
-                    Text(
-                        text = stringResource(R.string.recents_text),
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold
-                    )
+                    if (!isSearchActive) {
+                        Text(stringResource(R.string.app_name))
+                    }
                 },
-                actions = {
-                    Box(
-                        modifier = Modifier
-                            .padding(end = 12.dp)
-                            .size(42.dp)
-                            .shadow(
-                                elevation = 8.dp,
-                                shape = CircleShape,
-                                clip = false
-                            )
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surfaceVariant),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        IconButton(
-                            onClick = { onComposeClicked?.invoke() }
-                        ) {
+                navigationIcon = {
+                    if(isDefault) {
+                        IconButton(onClick = { onMenuClickCallback?.invoke() }) {
                             Icon(
-                                imageVector = Icons.Filled.Edit,
-                                contentDescription = stringResource(R.string.compose_new),
-                                tint = MaterialTheme.colorScheme.primary
+                                imageVector = Icons.Filled.Menu,
+                                contentDescription = stringResource(R.string.open_menu)
                             )
                         }
+                    }
+                },
+                actions = {
+                    if (!isSearchActive) {
+//                        IconButton(onClick = onToggleSearch) {
+//                            Icon(
+//                                imageVector = Icons.Filled.Search,
+//                                contentDescription = stringResource(R.string.search)
+//                            )
+//                        }
+                    }
+
+                    IconButton(onClick = { showMenu = !showMenu }) {
+                        Icon(
+                            imageVector = Icons.Filled.MoreVert,
+                            contentDescription = stringResource(R.string.menu)
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        if (!phoneNumber.isNullOrBlank()) {
+                            DropdownMenuItem(
+                                text = {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Default.AccountCircle,
+                                            contentDescription = stringResource(R.string.your_account),
+                                            modifier = Modifier.size(40.dp),
+                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Spacer(modifier = Modifier.width(16.dp))
+                                        Column {
+                                            Text(
+                                                text = stringResource(R.string.your_account),
+                                                fontWeight = FontWeight.SemiBold,
+                                                style = MaterialTheme.typography.bodyMedium
+                                            )
+                                            Text(
+                                                text = phoneNumber,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                    }
+                                },
+                                onClick = {  },
+                                enabled = false
+                            )
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                        }
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.settings)) },
+                            onClick = {
+                                showMenu = false
+                                navController.navigate(SettingsScreen)
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.backup)) },
+                            onClick = {
+                                showMenu = false
+                                navController.navigate(BackupScreen)
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.restore)) },
+                            onClick = {
+                                showMenu = false
+                                navController.navigate(RestoreScreen)
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.about)) },
+                            onClick = {
+                                navController.navigate(AboutScreen)
+                                showMenu = false
+                            }
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(),
@@ -189,12 +270,12 @@ fun RecentsAppBarPreview() {
         var searchQuery by remember { mutableStateOf("") }
         var isSearchActive by remember { mutableStateOf(false) }
         RecentAppBar(
+            navController = NavController(context = LocalContext.current),
             onSearchQueryChanged = { searchQuery = it },
             searchQuery = searchQuery,
             isSearchActive = isSearchActive,
             onToggleSearch = { isSearchActive = !isSearchActive },
-            onSearchDone = {},
-            onComposeClicked = {}
+            onSearchDone = {}
         )
     }
 }
@@ -204,6 +285,7 @@ fun RecentsAppBarPreview() {
 fun RecentsAppBarSelectionModePreview() {
     AppTheme(darkTheme = false) {
         RecentAppBar(
+            navController = NavController(context = LocalContext.current),
             onSearchQueryChanged = { },
             searchQuery = "",
             isSearchActive = false,
