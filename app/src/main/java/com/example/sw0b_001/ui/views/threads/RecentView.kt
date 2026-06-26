@@ -2,13 +2,11 @@ package com.example.sw0b_001.ui.views.threads
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -21,25 +19,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
-import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.data.models.Payloads
-import com.example.sw0b_001.ui.modals.ActivePlatformsModal
 import com.example.sw0b_001.ui.navigation.DetailsInterfaceScreen
 import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
-import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
-import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.views.compose.toUtf8String
 import uniffi.relaysms_spec_payload.V1ContentCategories
 
@@ -47,18 +36,9 @@ import uniffi.relaysms_spec_payload.V1ContentCategories
 @Composable
 fun RecentView(
     navController: NavController,
-    payloadsViewModel: PayloadsViewModel,
-    tokensViewModel: TokensViewModel,
-    supportedPlatformsViewModel: SupportedPlatformsViewModel,
-    tabRequestedCallback: () -> Unit
+    payloadsViewModel: PayloadsViewModel
 ) {
-    var sendNewMessageRequested by remember { mutableStateOf(false) }
-
     val payloads = payloadsViewModel.get().collectAsLazyPagingItems()
-//    LaunchedEffect(Unit) {
-//        payloadsViewModel.get()
-//    }
-
     val listState = rememberLazyListState()
     Box(Modifier.fillMaxSize()) {
         if (payloads.itemCount > 0) {
@@ -67,7 +47,6 @@ fun RecentView(
                 state = listState
             ) {
                 items(
-//                    items = payloads,
                     count = payloads.itemCount,
                     key = payloads.itemKey { it.id }
                 ) { index ->
@@ -75,7 +54,6 @@ fun RecentView(
                     RecentMessageCard(
                         cat = message?.content!!.getCatId(),
                         payload = message,
-//                        logo = logo,
                         onClickCallback = { clickedMessage ->
                             navController.navigate(
                                 DetailsInterfaceScreen(
@@ -88,43 +66,8 @@ fun RecentView(
                 }
             }
         }
-        else {
-            GetStartedView( navController = navController, )
-        }
-
-        if (sendNewMessageRequested) {
-            ActivePlatformsModal(
-                sendNewMessageRequested = sendNewMessageRequested,
-                supportedPlatformsViewModel = supportedPlatformsViewModel,
-                navController = navController,
-                isCompose = true,
-                tokensViewModel = tokensViewModel,
-            ) {
-                sendNewMessageRequested = false
-            }
-        }
     }
 }
-
-@Composable
-fun GetMessageAvatar(logo: Bitmap? = null) {
-    val imageSize = 38.dp
-    if(LocalInspectionMode.current || logo == null) {
-        Image(
-            painterResource(R.drawable.relaysms_icon_default_shape),
-            contentDescription = stringResource(R.string.avatar_image),
-            modifier = Modifier.size(imageSize)
-        )
-    }
-    else {
-        Image(
-            bitmap = logo.asImageBitmap(),
-            contentDescription = stringResource(R.string.avatar_image),
-            modifier = Modifier.size(imageSize)
-        )
-    }
-}
-
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -178,9 +121,6 @@ fun RecentMessageCard(
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-            },
-            leadingContent = {
-                GetMessageAvatar(logo)
             },
             trailingContent = {
                 Text(
