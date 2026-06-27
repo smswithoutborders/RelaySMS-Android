@@ -106,8 +106,10 @@ class BackupRestoreViewModel @Inject constructor(
                     recovery_key = recoveryKey,
                     fileName = fileName
                 ))
+                _uiState.value = BackupRestoreUiStates.Success
             } catch (e: Exception) {
                 e.printStackTrace()
+                _uiState.value = BackupRestoreUiStates.Error(e.message ?: "")
             }
         }
     }

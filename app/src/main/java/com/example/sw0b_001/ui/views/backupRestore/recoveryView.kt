@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -46,6 +47,7 @@ import androidx.navigation.NavController
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.navigation.BackupScreen
 import com.example.sw0b_001.ui.navigation.RestoreScreen
+import com.example.sw0b_001.ui.viewModels.BackupRestoreUiStates
 import com.example.sw0b_001.ui.viewModels.BackupRestoreViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -137,18 +139,29 @@ fun RecoveryKeyView(
     var allowEntry by remember{ mutableStateOf(true)}
     var error by remember{ mutableStateOf(false)}
 
+    val uiState by backupRestoreViewModel.uiState.collectAsState()
+    when(val state = uiState) {
+        is BackupRestoreUiStates.Error -> {
+            error = true
+            enabled = false
+        }
+        BackupRestoreUiStates.Loading -> {
+            error = false
+            allowEntry = false
+            enabled = false
+        }
+        BackupRestoreUiStates.Success -> {
+            error = false
+            allowEntry = false
+            enabled = true
+        }
+        else -> {}
+    }
+
     RecoveryKeyViewComponent(
         onValidatedCallback = { recoveryKey ->
             if(recoveryKey.size == 64) {
-                error = false
-                try {
-                    backupRestoreViewModel.restoreBackup(uri, recoveryKey, fileName)
-                    enabled = true
-                    allowEntry = false
-                } catch(e: Exception) {
-                    e.printStackTrace()
-                    error = true
-                }
+                backupRestoreViewModel.restoreBackup(uri, recoveryKey, fileName)
             } else if(recoveryKey.size > 64) {
                 error = true
             } else { error = false }
