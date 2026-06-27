@@ -96,57 +96,6 @@ class OnboardingViewModel @Inject constructor(
                     }
                 }
             ),
-            InteractiveOnboarding(
-                title = context.getString(R.string.save_your_accounts),
-                description = context.getString(R.string.you_can_also_use_sms_to_send_messages_from_your_online_accounts_saving_them_guarantees_you_can_use_them_without_an_internet_connection),
-                actionButtonText = context.getString(R.string.give_it_a_try),
-                image = R.drawable.vault_illus,
-                onClickCallToAction = {
-                    showLoginSignupModal = true
-                }
-            ),
-            InteractiveOnboarding(
-                title = context.getString(R.string.start_messaging_now),
-                description = context.getString(R.string.you_can_now_send_messages_from_your_saved_accounts_you_can_also_save_more_accounts_later),
-                actionButtonText = context.getString(R.string.give_it_a_try),
-                image = R.drawable.try_sending_message_illus,
-                onClickCallToAction = {
-                    showSendPlatformsModal = true
-                }
-            ),
-            InteractiveOnboarding(
-                title = context.getString(R.string.secure_your_app),
-                description = context.getString(R.string.from_locking_with_device_pin_code_to_other_secure_ways_of_making_sure_you_maintain_your_app_s_privacy),
-                actionButtonText = context.getString(R.string.let_s_lock_this_down),
-                image = R.drawable.undraw_fingerprint_kdwq,
-                onClickCallToAction = {
-                    viewModelScope.launch {
-                        _showBiometrics.emit { next() }
-                    }
-                }
-            ),
-            InteractiveOnboarding(
-                title = context.getString(R.string.make_default_sms_app),
-                description = context.getString(R.string.you_can_manage_all_your_sms_messages_from_a_single_place),
-                subDescription = context.getString(R.string.this_also_unlocks_features_like_sending_images_with_sms_yes_not_mms),
-                actionButtonText = context.getString(R.string.set_as_default_sms_app),
-                image = R.drawable.try_sending_message_illus,
-                onClickCallToAction = {
-//                    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-//                        val roleManager = context
-//                            .getSystemService(RoleManager::class.java)
-//                        val roleRequestIntent = roleManager
-//                            .createRequestRoleIntent(RoleManager.ROLE_SMS)
-//                        activity.startActivityForResult(roleRequestIntent, 12)
-//                    } else {
-//                        val intent = Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT)
-//                        intent.putExtra(Telephony.Sms.Intents.EXTRA_PACKAGE_NAME,
-//                            context.packageName)
-//                        context.startActivity(intent)
-//                    }
-                    showMakeDefaultRequest = true
-                }
-            ),
         )
     }
 
