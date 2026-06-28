@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "0f537fbb4558aa0af8f15ef8bcdb7510",
+    "identityHash": "02b9ff55ef3ac724d7827c5cc4fa500c",
     "entities": [
       {
         "tableName": "RatchetStates",
@@ -353,12 +353,18 @@
       },
       {
         "tableName": "Payloads",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `catId` TEXT NOT NULL, `content` BLOB NOT NULL, `date` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `platformName` TEXT NOT NULL, `catId` TEXT NOT NULL, `content` BLOB NOT NULL, `date` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "platformName",
+            "columnName": "platformName",
+            "affinity": "TEXT",
             "notNull": true
           },
           {
@@ -390,7 +396,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0f537fbb4558aa0af8f15ef8bcdb7510')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '02b9ff55ef3ac724d7827c5cc4fa500c')"
     ]
   }
 }

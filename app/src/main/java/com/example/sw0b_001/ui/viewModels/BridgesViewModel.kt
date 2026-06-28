@@ -81,6 +81,7 @@ class BridgesViewModel @Inject constructor(
                     val payload = Payloads(
                         catId = V1ContentCategories.BRIDGE,
                         content = contentContainer,
+                        platformName = "RelaySMS", // TODO: match incoming name
                     )
 
                     payloadsViewModel.insert(payload)

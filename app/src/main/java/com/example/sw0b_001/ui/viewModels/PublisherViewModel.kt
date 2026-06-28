@@ -30,6 +30,7 @@ class PublisherViewModel @Inject constructor(
     fun publish(
         catId: V1ContentCategories,
         body: String,
+        platformName: String,
         tokenHash: ByteArray?,
         to: String?,
         subject: String?,
@@ -85,6 +86,7 @@ class PublisherViewModel @Inject constructor(
                     val payload = Payloads(
                         catId = catId,
                         content = contentContainer,
+                        platformName = platformName
                     )
 
                     payloadsViewModel.insert(payload)
