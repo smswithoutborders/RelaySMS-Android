@@ -161,9 +161,10 @@ class TokensViewModel @Inject constructor(
                     when(v1PayloadSupportProtocolsFromU8(
                         platform.proto_id!!.toUByte())) {
                         V1PayloadsSupportedProtocols.O_AUTH20 -> {
-                            publisherGrpcImpl.revokeOAuth2()
+                            publisherGrpcImpl.revokeOAuth2(account)
                         }
-                        V1PayloadsSupportedProtocols.PNBA -> { publisherGrpcImpl.revokePnba() }
+                        V1PayloadsSupportedProtocols.PNBA -> {
+                            publisherGrpcImpl.revokePnba(account) }
                     }
                     db.delete(account)
                     _isRevokingUiState.value = TokensUiState.Success(null)

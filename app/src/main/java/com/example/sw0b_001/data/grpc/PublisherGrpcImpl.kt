@@ -18,6 +18,7 @@ import publisher.v3.PublisherOuterClass
 import uniffi.relaysms_spec_payload.V1ContentCategories
 import uniffi.relaysms_spec_payload.v1ContentCategoryFromU8
 import uniffi.relaysms_spec_payload.v1TokenDecryptClient
+import uniffi.relaysms_spec_payload.v1TokenEncryptClient
 
 class PublisherGrpcImpl(val context: Context) : AutoCloseable {
 
@@ -27,11 +28,9 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
         .useTransportSecurity()
         .build()
 
-
     private var nativePubStub = PublisherGrpc.newBlockingStub(channel)
     private val publisherStub = nativePubStub
-        .withInterceptors(GrpcClientInterceptor(context))
-
+        .withInterceptors(GrpcClientInterceptor(context) { null })
     private var oAuthRedirectUrl = "https://relay.smswithoutborders.com/android"
 
 
@@ -134,13 +133,19 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
         val ssKidPk = context.getStaticKeys(keyId)
             ?: throw Exception("Could not find static keys for id")
 
-        val tokenHash = v1TokenDecryptClient(
-            ecKid = ecKid.second.privateKey?.copyOf()!!,
-            ssKidPk = ssKidPk,
-            esKidPk = esKidPk.publicKey.toByteArray(),
-            keyId = keyId.toUByte(),
-            receivedPayload = tokenCipherText
-        )
+        val tokenHash = try {
+            v1TokenDecryptClient(
+                ecKid = ecKid.second.privateKey?.copyOf()!!,
+                ssKidPk = ssKidPk,
+                esKidPk = esKidPk.publicKey.toByteArray(),
+                keyId = keyId.toUByte(),
+                receivedPayload = tokenCipherText
+            )
+        } catch(e: Exception) {
+            e.printStackTrace()
+            throw e
+        }
+
         val serverKeys = serverEphemeralPublicKeys.map {
             Keys(
                 keyId = it.keyId,
@@ -189,15 +194,6 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
                 ephemeralKeys.add(key)
             }
         }
-        dbKeystore.insert(
-            serverKeys,
-            TOKEN_KEYSTORE_ALIAS_SERVER,
-            TOKEN_KEYSTORE_ALIAS_SERVER_ATTACHMENT
-        )
-        dbKeystore.insert(
-            ephemeralKeys,
-            TOKEN_KEYSTORE_ALIAS_CLIENT,
-        )
         dbTokens.insert(
             Tokens(
                 tokenId = tokenId.toInt(),
@@ -206,6 +202,15 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
                 platformName = platformName,
                 tokenHash = tokenHash
             )
+        )
+        dbKeystore.insert(
+            serverKeys,
+            TOKEN_KEYSTORE_ALIAS_SERVER,
+            TOKEN_KEYSTORE_ALIAS_SERVER_ATTACHMENT
+        )
+        dbKeystore.insert(
+            ephemeralKeys,
+            TOKEN_KEYSTORE_ALIAS_CLIENT,
         )
     }
 
@@ -268,32 +273,120 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
         }
     }
 
-    fun revokeOAuth2() {
-        val request = PublisherOuterClass.RevokeOAuth2TokenRequest.newBuilder().apply {
-        }
-
+    private fun deleteKeys(tokens: Tokens) {
+        val db = Datastore.getDatastore(context)
+            ?: throw Exception("Failed to open database")
         try {
-            val res = publisherStub.revokeOAuth2Token(request.build())
-            if(!res.success) {
-                throw Exception(res.message)
-            }
+            db.tokensDao()?.delete(tokens) ?: throw Exception("Failed to read tokens db")
         } catch(e: Exception) {
+            e.printStackTrace()
             throw e
         }
     }
 
-    fun revokePnba() {
-        val request = PublisherOuterClass.RevokeOAuth2TokenRequest.newBuilder().apply {
-        }
+    fun revokeOAuth2(token: Tokens) {
+        val db = Datastore.getDatastore(context)
+            ?: throw Exception("Failed to open database")
 
-        try {
-            val res = publisherStub.revokeOAuth2Token(request.build())
+        token.use { tk ->
+            val othersKeys = db.keysDao()?.fetchEphemeral(
+                tk.tokenHash,
+                TOKEN_KEYSTORE_ALIAS_SERVER,
+            ) ?: throw Exception("Could not fetch server keys")
 
-            if(!res.success) {
-                throw Exception(res.message)
+            val keyId = othersKeys.keyId
+
+            val interceptor = GrpcClientInterceptor(context) {
+                val keys = db.keysDao()?.fetchEphemeral(
+                    tk.tokenHash,
+                    TOKEN_KEYSTORE_ALIAS_CLIENT,
+                    keyId
+                ) ?: throw Exception("Could not fetch client keys")
+
+                val authenticationPublicKey = context.getStaticKeys(keyId)
+                    ?: throw Exception("Could not find static keys for id")
+
+                keys.use {
+                    return@GrpcClientInterceptor v1TokenEncryptClient(
+                        ecKid = it.privateKey!!.copyOf(),
+                        ssKidPk = authenticationPublicKey,
+                        esKidPk = othersKeys.publicKey,
+                        keyId = keyId.toUByte(),
+                        token = tk.tokenHash
+                    )
+                }
             }
-        } catch(e: Exception) {
-            throw e
+
+            try {
+                val request = PublisherOuterClass.RevokeOAuth2TokenRequest.newBuilder().apply {
+                    setKeyId(keyId)
+                    setTokenId(tk.tokenId)
+                }
+
+                val res = nativePubStub
+                    .withInterceptors(interceptor)
+                    .revokeOAuth2Token(request.build())
+                if(!res.success) {
+                    throw Exception(res.message)
+                }
+                deleteKeys(tk)
+            } catch(e: Exception) {
+                e.printStackTrace()
+                throw e
+            }
+        }
+    }
+
+    fun revokePnba(token: Tokens) {
+        val db = Datastore.getDatastore(context)
+            ?: throw Exception("Failed to open database")
+
+        token.use { tk ->
+            val othersKeys = db.keysDao()?.fetchEphemeral(
+                tk.tokenHash,
+                TOKEN_KEYSTORE_ALIAS_SERVER,
+            ) ?: throw Exception("Could not fetch server keys")
+
+            val keyId = othersKeys.keyId
+
+            val interceptor = GrpcClientInterceptor(context) {
+                val keys = db.keysDao()?.fetchEphemeral(
+                    tk.tokenHash,
+                    TOKEN_KEYSTORE_ALIAS_CLIENT,
+                    keyId
+                ) ?: throw Exception("Could not fetch client keys")
+
+                val authenticationPublicKey = context.getStaticKeys(keyId)
+                    ?: throw Exception("Could not find static keys for id")
+
+                keys.use {
+                    return@GrpcClientInterceptor v1TokenEncryptClient(
+                        ecKid = it.privateKey!!.copyOf(),
+                        ssKidPk = authenticationPublicKey,
+                        esKidPk = othersKeys.publicKey,
+                        keyId = keyId.toUByte(),
+                        token = tk.tokenHash
+                    )
+                }
+            }
+
+            try {
+                val request = PublisherOuterClass.RevokePNBATokenRequest.newBuilder().apply {
+                    setKeyId(keyId)
+                    setTokenId(tk.tokenId)
+                }
+
+                val res = nativePubStub
+                    .withInterceptors(interceptor)
+                    .revokePNBAToken(request.build())
+                if(!res.success) {
+                    throw Exception(res.message)
+                }
+                deleteKeys(tk)
+            } catch(e: Exception) {
+                e.printStackTrace()
+                throw e
+            }
         }
     }
 
