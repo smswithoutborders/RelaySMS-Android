@@ -85,11 +85,11 @@ fun BottomNavBar(
         NavigationBarItem(
             icon = { Icon(
                 Icons.Filled.Public,
-                contentDescription = stringResource(R.string.countries),
+                contentDescription = stringResource(R.string.routing_numbers),
                 modifier = Modifier.size(20.dp)
             ) },
             label = { Text(
-                text = stringResource(R.string.countries),
+                text = stringResource(R.string.routing_numbers),
                 style = MaterialTheme.typography.labelSmall
             ) },
             selected = selectedTab == BottomTabsItems.BottomBarCountriesTab,
