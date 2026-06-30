@@ -1,6 +1,7 @@
 package com.example.sw0b_001.ui.viewModels
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.lifecycle.ViewModel
@@ -45,12 +46,24 @@ class BackupRestoreViewModel @Inject constructor(
         return db.fetchFlow()
     }
 
+    private fun persistUriPermission(uri: Uri) {
+        val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION // Include write only if needed
+
+        try {
+            context.contentResolver.takePersistableUriPermission(uri, takeFlags)
+        } catch (e: SecurityException) {
+            throw e
+        }
+    }
+
     fun saveUri(uri: Uri?, fileName: String) {
         if(uri == null) return
 
         _uiState.value = BackupRestoreUiStates.Loading
         viewModelScope.launch(Dispatchers.IO) {
             try {
+                persistUriPermission(uri)
                 val recoveryKey = writeBackup(uri)
                 db.insert(BackupRestoreEnt(
                     uri = uri.toString(),
@@ -88,6 +101,7 @@ class BackupRestoreViewModel @Inject constructor(
 
     fun restoreBackup(uri: Uri, recoveryKey: ByteArray, fileName: String) {
         viewModelScope.launch(Dispatchers.IO) {
+            persistUriPermission(uri)
             val contents = try {
                 context.contentResolver.openInputStream(uri)?.use { inputStream ->
                     inputStream.readBytes()

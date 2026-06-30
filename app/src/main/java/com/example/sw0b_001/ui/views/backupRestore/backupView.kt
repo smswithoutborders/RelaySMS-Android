@@ -70,7 +70,6 @@ fun BackupView(
     navController: NavController,
     backupRestoreViewModel: BackupRestoreViewModel,
 ) {
-    val context = LocalContext.current
     var currentStep by remember { mutableIntStateOf(0) }
     val backupRestore by backupRestoreViewModel.getBackup()
         .collectAsStateWithLifecycle(null)
@@ -428,7 +427,6 @@ private fun OnDeviceBackupViewComponent(
             Modifier
                 .padding(bottom = 16.dp)
                 .clickable {
-                    TODO()
                     onCreateBackup()
                 }
         ) {

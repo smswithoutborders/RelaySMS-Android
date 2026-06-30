@@ -7,6 +7,10 @@ plugins {
     id("com.google.dagger.hilt.android")
 }
 
+ext {
+    abiCodes = ['armeabi-v7a': 1, 'x86_64': 2, 'arm64-v8a': 3]
+}
+
 android {
     namespace 'com.example.sw0b_001'
     compileSdk 37
@@ -132,6 +136,23 @@ android {
         }
         abi {
             enableSplit = false
+        }
+    }
+}
+
+androidComponents {
+    onVariants(selector().all()) { variant ->
+        variant.outputs.each { output ->
+            // Look up the ABI name from the variant filters
+            def abiFilter = output.filters.find { it.filterType.name() == "ABI" }?.identifier
+            def baseAbiVersionCode = project.ext.abiCodes.get(abiFilter)
+
+            if (baseAbiVersionCode != null) {
+                // In AGP 9.x, versionCode is a Property wrapper, so we must use .set()
+                output.versionCode.set((100 * android.defaultConfig.versionCode) + baseAbiVersionCode)
+            } else {
+                output.versionCode.set(100 * android.defaultConfig.versionCode)
+            }
         }
     }
 }
