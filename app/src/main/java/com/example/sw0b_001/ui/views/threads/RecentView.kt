@@ -1,8 +1,6 @@
 package com.example.sw0b_001.ui.views.threads
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,17 +19,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.placeholder
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.data.models.Payloads
@@ -55,9 +55,8 @@ fun RecentView(
     var sendNewMessageRequested by remember { mutableStateOf(false) }
 
     val payloads = payloadsViewModel.get().collectAsLazyPagingItems()
-//    LaunchedEffect(Unit) {
-//        payloadsViewModel.get()
-//    }
+    val supportedPlatforms by supportedPlatformsViewModel.get()
+        .collectAsStateWithLifecycle(emptyList())
 
     val listState = rememberLazyListState()
     Box(Modifier.fillMaxSize()) {
@@ -72,10 +71,11 @@ fun RecentView(
                     key = payloads.itemKey { it.id }
                 ) { index ->
                     val message = payloads[index]
+                    val logo = supportedPlatforms.find{ it.name == message?.platformName }?.icon_png
                     RecentMessageCard(
                         cat = message?.content!!.getCatId(),
                         payload = message,
-//                        logo = logo,
+                        logo = logo,
                         onClickCallback = { clickedMessage ->
                             navController.navigate(
                                 DetailsInterfaceScreen(
@@ -106,22 +106,21 @@ fun RecentView(
     }
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun GetMessageAvatar(logo: Bitmap? = null) {
+fun GetMessageAvatar(logo: String?) {
     val imageSize = 38.dp
-    if(LocalInspectionMode.current || logo == null) {
-        Image(
-            painterResource(R.drawable.relaysms_icon_default_shape),
-            contentDescription = stringResource(R.string.avatar_image),
-            modifier = Modifier.size(imageSize)
-        )
-    }
-    else {
-        Image(
-            bitmap = logo.asImageBitmap(),
-            contentDescription = stringResource(R.string.avatar_image),
-            modifier = Modifier.size(imageSize)
-        )
+    GlideImage(
+        model = logo,
+        contentDescription = stringResource(R.string.platform_image),
+        modifier = Modifier
+            .size(imageSize),
+//            .align(Alignment.Center),
+        loading = placeholder(R.drawable.relaysms_icon_default_shape), // Shows while loading
+        failure = placeholder(R.drawable.relaysms_icon_default_shape)      // Shows if download fails
+    ) {
+        it.diskCacheStrategy(DiskCacheStrategy.ALL) // Caches both original and resized images
+            .circleCrop()                             // Makes the image a circle
     }
 }
 
@@ -131,13 +130,12 @@ fun GetMessageAvatar(logo: Bitmap? = null) {
 fun RecentMessageCard(
     cat: V1ContentCategories,
     payload: Payloads,
-    logo: Bitmap? = null,
+    logo: String? = null,
     onClickCallback: (Payloads) -> Unit,
 ) {
     var text by remember { mutableStateOf(payload.content.getBody().toUtf8String()) }
     var heading by remember { mutableStateOf(payload.content.getSubject()?.toUtf8String() ?: "") }
     var subHeading by remember { mutableStateOf(payload.content.getTo()?.toUtf8String() ?: "" ) }
-
 
     Column {
         ListItem(

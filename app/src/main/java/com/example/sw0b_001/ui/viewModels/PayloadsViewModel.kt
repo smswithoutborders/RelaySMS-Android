@@ -49,13 +49,6 @@ class PayloadsViewModel @Inject constructor(
             _isLoading.value = true
             db.get(messageId)?.let { payload ->
                 _messageUiState.value = payload
-//                val deserialized = V1Payloads.deserialize(payload.payload)
-//                val content = V1ContentsContainer.deserialize(
-//                    data = deserialized.getPayload(),
-//                    catId = payload.catId,
-//                    lenAtt = if(payload.isAttachment) deserialized.getLenAtt() else 0u
-//                )
-//                payload.contents = content
             }
             _isLoading.value = false
         }
@@ -66,7 +59,6 @@ class PayloadsViewModel @Inject constructor(
             val pageSize = 50
             val prefetchDistance = 3 * pageSize
             val enablePlaceholder = true
-//            val initialLoadSize: Int = 2 * pageSize
             val initialLoadSize: Int = 50
             val maxSize: Int = PagingConfig.MAX_SIZE_UNBOUNDED
             val db = Datastore.getDatastore(context)?.payloadsDao()

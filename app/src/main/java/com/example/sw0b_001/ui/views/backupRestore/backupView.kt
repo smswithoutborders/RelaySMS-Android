@@ -1,12 +1,14 @@
 package com.example.sw0b_001.ui.views.backupRestore
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,6 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,12 +45,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.afkanerd.smswithoutborders_libsmsmms.data.data.models.DateTimeUtils
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.copyItemToClipboard
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.theme.AppTheme
@@ -64,7 +70,10 @@ fun BackupView(
     navController: NavController,
     backupRestoreViewModel: BackupRestoreViewModel,
 ) {
+    val context = LocalContext.current
     var currentStep by remember { mutableIntStateOf(0) }
+    val backupRestore by backupRestoreViewModel.getBackup()
+        .collectAsStateWithLifecycle(null)
 
     BackHandler {
         if(currentStep == 0) {
@@ -77,7 +86,11 @@ fun BackupView(
             TopAppBar(
                 title = { Text(stringResource(R.string.on_device_backups)) },
                 navigationIcon = {
-                    IconButton(onClick = { if (currentStep > 0) currentStep-- }) {
+                    IconButton(onClick = {
+                        if(currentStep == 0) {
+                            navController.popBackStack()
+                        } else currentStep--
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = stringResource(R.string.back)
@@ -94,10 +107,22 @@ fun BackupView(
         ) {
             when (currentStep) {
                 0 -> {
-                    BackupIntroScreen(
-                        backupRestoreViewModel = backupRestoreViewModel,
-                    ) {
-                        currentStep = 1
+                    if(backupRestore != null) {
+                        OnDeviceBackupView(
+                            uri = backupRestore!!.uri.toUri(),
+                            backupRestoreViewModel = backupRestoreViewModel,
+                            date = backupRestore!!.date,
+                            fileName = backupRestore!!.fileName,
+                            onShowRecoveryKey = {
+                                currentStep = 2
+                            }
+                        ) { currentStep = 1 }
+                    } else {
+                        BackupIntroScreen(
+                            backupRestoreViewModel = backupRestoreViewModel,
+                        ) {
+                            currentStep = 1
+                        }
                     }
                 }
                 1 -> {
@@ -125,16 +150,24 @@ private fun BackupIntroScreen(
     } else {
         SimpleDateFormat("yyyy-MM-dd").format(Date())
     }
-    val filename = "relaysms-backup-$currentDate.backup"
+    val filename = stringResource(R.string.relaysms_backup_backup, currentDate)
 
     val exportLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument("application/bin")) { uri ->
         uri?.let {
-            backupRestoreViewModel.saveUri(uri)
+            backupRestoreViewModel.saveUri(uri, filename)
             onNext()
         }
     }
+    BackupIntroScreenComponent {
+        exportLauncher.launch(filename)
+    }
+}
 
+@Composable
+private fun BackupIntroScreenComponent(
+    onExportClick: () -> Unit
+) {
     Column(
         modifier = Modifier
             .padding(12.dp)
@@ -144,9 +177,7 @@ private fun BackupIntroScreen(
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        Button(onClick = {
-            exportLauncher.launch(filename)
-        }, modifier = Modifier.padding(bottom = 16.dp)) {
+        Button(onClick = onExportClick, modifier = Modifier.padding(bottom = 16.dp)) {
             Text(stringResource(R.string.backup_now))
         }
 
@@ -347,13 +378,124 @@ private fun RecoveryScreenKey(
     }
 }
 
-@Preview
 @Composable
-fun BackupIntroScreen_Preview() {
+private fun OnDeviceBackupView(
+    uri: Uri,
+    date: Long,
+    fileName: String,
+    backupRestoreViewModel: BackupRestoreViewModel,
+    onShowRecoveryKey: () -> Unit,
+    onDeleteFile: () -> Unit,
+) {
     val context = LocalContext.current
+    val lastBackupTime by remember{ mutableStateOf(DateTimeUtils
+        .formatDateExtended(context, date)) }
+    var errorMessage: String? by remember{ mutableStateOf(null) } // TODO: read from db
+    OnDeviceBackupViewComponent(
+        lastBackupTime = lastBackupTime,
+        errorMessage = errorMessage,
+        backupFilename = fileName,
+        onCreateBackup = {
+            // if you're seeing this, the uri should exist
+            // then perform save actions here
+            errorMessage = null
+            backupRestoreViewModel.saveUri(uri, fileName)
+        },
+        onViewRecoveryKey = onShowRecoveryKey,
+        onDeleteBackup = {
+            if(backupRestoreViewModel.deleteFileByUri(uri)) {
+                onDeleteFile()
+            } else {
+                TODO()
+            }
+        }
+    )
+}
+
+@Composable
+private fun OnDeviceBackupViewComponent(
+    lastBackupTime: String,
+    errorMessage: String?,
+    backupFilename: String?,
+    onCreateBackup: () -> Unit,
+    onViewRecoveryKey: () -> Unit,
+    onDeleteBackup: () -> Unit,
+) {
+    Column(
+        modifier = Modifier.padding(12.dp)
+    ) {
+        Column(
+            Modifier
+                .padding(bottom = 16.dp)
+                .clickable {
+                    TODO()
+                    onCreateBackup()
+                }
+        ) {
+            Text(
+                stringResource(R.string.create_backup),
+                fontWeight = FontWeight.Bold
+            )
+            Text(stringResource(R.string.last_back, lastBackupTime))
+            errorMessage?.let {
+                Text(
+                    errorMessage,
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
+        }
+
+        Column(Modifier.padding(top = 16.dp, bottom = 16.dp)) {
+            Text(
+                stringResource(R.string.backup_file),
+                fontWeight = FontWeight.Bold
+            )
+            Text(backupFilename ?: "")
+        }
+
+        Column(Modifier
+            .clickable { onViewRecoveryKey() }
+            .padding(top = 16.dp, bottom = 16.dp)
+        ) {
+            Text(stringResource(R.string.view_recovery_key))
+        }
+
+        Column(Modifier
+            .clickable { onDeleteBackup() }
+            .padding(top = 16.dp, bottom = 16.dp)
+        ) {
+            Text(stringResource(R.string.delete_backup))
+        }
+
+        HorizontalDivider()
+
+        Column(Modifier
+            .padding(top = 16.dp, bottom = 16.dp)
+        ) {
+            Text(stringResource(R.string.to_restore_a_backup_install_a_new_copy_of_relaysms_open_the_app_and_tap_restore_backup_then_locate_a_backup_file))
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun BackupIntroScreenComponent_Preview() {
     AppTheme {
-        BackupIntroScreen(
-            backupRestoreViewModel = remember{ BackupRestoreViewModel(context) },
+        BackupIntroScreenComponent{}
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun OnDeviceBackupViewComponent_Preview() {
+    AppTheme {
+        OnDeviceBackupViewComponent(
+            "Now",
+            "Error",
+            "filename",
+            {},
+            {},
+            {},
         )
     }
 }

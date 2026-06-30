@@ -12,7 +12,10 @@ import io.grpc.Metadata
 import io.grpc.MethodDescriptor
 import uniffi.relaysms_spec_payload.v1RequestsEncrypt
 
-class GrpcClientInterceptor(private val context: Context): ClientInterceptor {
+class GrpcClientInterceptor(
+    private val context: Context,
+    private val onRequest: () -> ByteArray?,
+): ClientInterceptor {
     override fun <ReqT : Any?, RespT : Any?> interceptCall(
         method: MethodDescriptor<ReqT?, RespT?>?,
         callOptions: CallOptions?,
@@ -30,11 +33,14 @@ class GrpcClientInterceptor(private val context: Context): ClientInterceptor {
                     val keyId = (0 until 256).random()
                     val authenticationPublicKey = context.getStaticKeys(keyId)
                         ?: throw Exception("Could not find static keys for id")
+
+                    val payload = onRequest()
+
                     val ciphertext = v1RequestsEncrypt(
                         ec = key.privateKey!!,
                         ssKidPk = authenticationPublicKey,
                         methodName = methodName.toByteArray(),
-                        payload = null
+                        payload = payload
                     )
 
                     /**

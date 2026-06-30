@@ -19,6 +19,9 @@ interface TokensDao {
     @Query("SELECT * FROM Tokens where tokenHash = :tokenHash")
     fun fetch(tokenHash: ByteArray) : Tokens?
 
+    @Query("SELECT * FROM Tokens where id = :id")
+    fun fetch(id: Int) : Tokens?
+
     @Query("SELECT * FROM Tokens WHERE catId = :catId")
     fun fetchCatId(catId: V1ContentCategories) : Flow<List<Tokens>>
 

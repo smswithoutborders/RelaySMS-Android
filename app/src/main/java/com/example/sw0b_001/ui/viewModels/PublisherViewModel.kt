@@ -5,7 +5,6 @@ import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.afkanerd.lib_image_android.ui.data.SmsWorkManager
-import com.afkanerd.lib_image_android.ui.extensions.toIntLittleEndian
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.TransportImpl
@@ -31,6 +30,7 @@ class PublisherViewModel @Inject constructor(
     fun publish(
         catId: V1ContentCategories,
         body: String,
+        platformName: String,
         tokenHash: ByteArray?,
         to: String?,
         subject: String?,
@@ -50,7 +50,6 @@ class PublisherViewModel @Inject constructor(
                     val db = Datastore.getDatastore(context) ?: throw Exception("Failed to open database")
                     tokenId = db.tokensDao()?.fetch(tokenHash)
                         ?.tokenId
-                        ?.toIntLittleEndian()
                         ?.toUInt()
                         ?: throw Exception("Failed to find token id")
                 }
@@ -87,6 +86,7 @@ class PublisherViewModel @Inject constructor(
                     val payload = Payloads(
                         catId = catId,
                         content = contentContainer,
+                        platformName = platformName
                     )
 
                     payloadsViewModel.insert(payload)

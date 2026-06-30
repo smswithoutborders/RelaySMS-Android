@@ -12,6 +12,7 @@ import uniffi.relaysms_spec_payload.V1ContentsContainer
 data class Payloads(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
+    val platformName: String,
     val catId: V1ContentCategories,
     val content: V1ContentsContainer,
     val date: Long = System.currentTimeMillis(),

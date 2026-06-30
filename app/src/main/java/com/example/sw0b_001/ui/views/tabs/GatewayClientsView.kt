@@ -75,7 +75,7 @@ fun GatewayClientView(
                     .padding(16.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.default_sms_receiver),
+                    text = stringResource(R.string._default),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary
@@ -108,7 +108,7 @@ fun GatewayClientView(
                     .padding(horizontal = 16.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.available_countries),
+                    text = stringResource(R.string.routing_numbers),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.primary
                 )

@@ -151,6 +151,7 @@ fun ComposerInterface(
                 subject = subject,
                 imageViewModel = imageViewModel,
                 payloadsViewModel = payloadsViewModel,
+                platformName = selectedToken!!.platformName,
                 onFailureCallback = {},
             ) {
                 backHandler()
