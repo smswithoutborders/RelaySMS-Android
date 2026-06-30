@@ -9,7 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Public
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -27,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.navigation.SettingsScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.views.tabs.BottomTabsItems
 
@@ -107,7 +105,7 @@ fun BottomNavBar(
                     },
                     label = {
                         Text(
-                            text = stringResource(R.string.countries),
+                            text = stringResource(R.string.routing_numbers),
                             style = MaterialTheme.typography.labelSmall
                         )
                     },
@@ -118,25 +116,25 @@ fun BottomNavBar(
                 )
 
 
-                NavigationBarItem(
-                    icon = {
-                        Icon(
-                            Icons.Filled.Settings,
-                            contentDescription = stringResource(R.string.Settings),
-                            modifier = Modifier.size(20.dp)
-                        )
-                    },
-                    label = {
-                        Text(
-                            text = stringResource(R.string.Settings),
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    },
-                    selected = false,
-                    onClick = {
-                        navController.navigate(SettingsScreen)
-                    },
-                )
+//                NavigationBarItem(
+//                    icon = {
+//                        Icon(
+//                            Icons.Filled.Settings,
+//                            contentDescription = stringResource(R.string.Settings),
+//                            modifier = Modifier.size(20.dp)
+//                        )
+//                    },
+//                    label = {
+//                        Text(
+//                            text = stringResource(R.string.Settings),
+//                            style = MaterialTheme.typography.labelSmall
+//                        )
+//                    },
+//                    selected = false,
+//                    onClick = {
+//                        navController.navigate(SettingsScreen)
+//                    },
+//                )
 
 
             }
