@@ -38,7 +38,7 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
 import com.example.sw0b_001.R
 import com.example.sw0b_001.extensions.context.settingsSetOnboardedCompletely
-import com.example.sw0b_001.ui.components.OnboardingNextButton
+//import com.example.sw0b_001.ui.components.OnboardingNextButton
 import com.example.sw0b_001.ui.modals.SignupLoginModal
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
@@ -131,16 +131,16 @@ fun OnboardingInteractive(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            OnboardingNextButton("") {
-                if(onboardingViewModel.next()) {
-                    context.settingsSetOnboardedCompletely(true)
-                    navController.navigate(HomepageScreen) {
-                        popUpTo(HomepageScreen) {
-                            inclusive = true
-                        }
-                    }
-                }
-            }
+//            OnboardingNextButton("") {
+//                if(onboardingViewModel.next()) {
+//                    context.settingsSetOnboardedCompletely(true)
+//                    navController.navigate(HomepageScreen) {
+//                        popUpTo(HomepageScreen) {
+//                            inclusive = true
+//                        }
+//                    }
+//                }
+//            }
 
             Spacer(modifier = Modifier.padding(16.dp))
 

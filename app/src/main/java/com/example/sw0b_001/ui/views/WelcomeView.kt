@@ -3,12 +3,7 @@ package com.example.sw0b_001.ui.views
 import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,13 +13,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
@@ -43,9 +33,12 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.R
 import com.example.sw0b_001.extensions.context.settingsSetOnboardedCompletely
+import com.example.sw0b_001.ui.components.OnboardingNavigationRow
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 
 @Composable
 fun WelcomeMainView(navController: NavController) {
@@ -69,12 +62,10 @@ fun WelcomeMainView(navController: NavController) {
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.weight(1f)
             ) { page ->
-
                 when (page) {
                     0 -> PageOneContent()
 
@@ -100,69 +91,18 @@ fun WelcomeMainView(navController: NavController) {
                 }
             }
 
+
             if (pagerState.currentPage == 0) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 24.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        repeat(pageCount) { index ->
-                            Box(
-                                modifier = Modifier
-                                    .size(
-                                        width = if (pagerState.currentPage == index) 24.dp else 8.dp,
-                                        height = 8.dp
-                                    )
-                                    .background(
-                                        color = if (pagerState.currentPage == index)
-                                            MaterialTheme.colorScheme.primary
-                                        else
-                                            MaterialTheme.colorScheme.outlineVariant,
-                                        shape = CircleShape
-                                    )
-                            )
-                        }
-                    }
-
-                    Button(
-                        onClick = {
-                            scope.launch {
-                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                            }
-                        },
-                        shape = RoundedCornerShape(50.dp)
-                    ) {
-                        Text(text = "Get Started")
-                        Spacer(modifier = Modifier.width(8.dp))
-
-                        val isDark = isSystemInDarkTheme()
-                        Box(
-                            modifier = Modifier
-                                .size(30.dp)
-                                .background(
-                                    color = if (isDark)
-                                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
-                                    else
-                                        MaterialTheme.colorScheme.surface,
-                                    shape = CircleShape
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.KeyboardArrowRight,
-                                contentDescription = null,
-                                tint = if (isDark)
-                                    MaterialTheme.colorScheme.onSurfaceVariant
-                                else
-                                    MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
-                }
+                OnboardingNavigationRow(
+                    onNext = {
+                        scope.launch { pagerState.animateScrollToPage(1) }
+                    },
+                    showBack = false,
+                    showSkip = false,
+                    isGetStarted = true
+                )
             }
+
             Spacer(modifier = Modifier.height(5.dp))
         }
     }
