@@ -220,7 +220,7 @@ fun OnboardingNavigationRow(
 
             when {
                 isGetStarted -> OnboardingGetStartedButton(onClick = onNext)
-                isOutlined -> OnboardingOutlinedNextButton(onClick = onNext) // ✅ page 2
+                isOutlined -> OnboardingOutlinedNextButton(onClick = onNext)
                 else -> OnboardingCircleButton(
                     icon = if (isDone) R.drawable.arrow_forward
                     else R.drawable.arrow_forward,
