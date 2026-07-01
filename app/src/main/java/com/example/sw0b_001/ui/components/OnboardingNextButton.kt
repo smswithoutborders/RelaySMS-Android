@@ -1,6 +1,7 @@
 package com.example.sw0b_001.ui.components
 
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -24,7 +25,7 @@ fun OnboardingCircleButton(
 ) {
     Surface(
         modifier = Modifier
-            .size(64.dp)
+            .size(48.dp)
             .clickable(onClick = onClick),
         shape = CircleShape,
         color = MaterialTheme.colorScheme.primary
@@ -36,9 +37,53 @@ fun OnboardingCircleButton(
             Icon(
                 painter = painterResource(id = icon),
                 contentDescription = contentDescription,
-                modifier = Modifier.size(28.dp),
+                modifier = Modifier.size(20.dp),
                 tint = MaterialTheme.colorScheme.onPrimary
             )
+        }
+    }
+}
+
+@Composable
+fun OnboardingOutlinedNextButton(
+    onClick: () -> Unit
+) {
+    OutlinedButton(
+        onClick = onClick,
+        shape = RoundedCornerShape(50.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+        contentPadding = PaddingValues(
+            start = 22.dp,
+            end = 6.dp,
+            top = 6.dp,
+            bottom = 6.dp
+        ),
+        modifier = Modifier.height(48.dp)
+    ) {
+        Text(
+            text = "Next",
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontWeight = FontWeight.SemiBold
+            ),
+            color = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Surface(
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(32.dp)
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.arrow_forward),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
         }
     }
 }
@@ -139,7 +184,6 @@ fun OnboardingTopBar(
     }
 }
 
-
 @Composable
 fun OnboardingNavigationRow(
     onNext: () -> Unit,
@@ -149,6 +193,7 @@ fun OnboardingNavigationRow(
     showSkip: Boolean = true,
     isDone: Boolean = false,
     isGetStarted: Boolean = false,
+    isOutlined: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -162,10 +207,7 @@ fun OnboardingNavigationRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (showBack) {
-            OnboardingTextButton(
-                label = "Back",
-                onClick = onBack
-            )
+            OnboardingTextButton(label = "Back", onClick = onBack)
         }
 
         Row(
@@ -173,20 +215,15 @@ fun OnboardingNavigationRow(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             if (showSkip) {
-                OnboardingTextButton(
-                    label = "Skip",
-                    onClick = onSkip
-                )
+                OnboardingTextButton(label = "Skip", onClick = onSkip)
             }
 
-            if (isGetStarted) {
-                OnboardingGetStartedButton(onClick = onNext)
-            } else {
-                OnboardingCircleButton(
-                    icon = if (isDone)
-                        R.drawable.arrow_forward
-                    else
-                        R.drawable.arrow_forward,
+            when {
+                isGetStarted -> OnboardingGetStartedButton(onClick = onNext)
+                isOutlined -> OnboardingOutlinedNextButton(onClick = onNext) // ✅ page 2
+                else -> OnboardingCircleButton(
+                    icon = if (isDone) R.drawable.arrow_forward
+                    else R.drawable.arrow_forward,
                     contentDescription = if (isDone) "Done" else "Next",
                     onClick = onNext
                 )

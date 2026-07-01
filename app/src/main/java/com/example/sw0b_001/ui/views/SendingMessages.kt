@@ -5,8 +5,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
@@ -21,11 +23,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.components.OnboardingTextButton
 import com.example.sw0b_001.ui.theme.AppTheme
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
+import com.example.sw0b_001.ui.components.OnboardingNavigationRow
 import com.example.sw0b_001.ui.components.OnboardingTopBar
 
 
@@ -54,66 +56,74 @@ fun ChooseMessageModeScreen(
             showSkip = true
         )
 
-        Spacer(modifier = Modifier.height(50.dp))
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Spacer(modifier = Modifier.height(32.dp))
 
-        Text(
-            text = "Choose how you want to\nsend a message.",
-            fontFamily = UnboundedFontFamily,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.headlineSmall.copy(
-                fontWeight = FontWeight.Bold
+            Text(
+                text = "Choose how you want to\nsend a message.",
+                fontFamily = UnboundedFontFamily,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontWeight = FontWeight.Bold
+                )
             )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            MessageOptionCard(
+                selected = selected == 0,
+                title = "Relay account (Default)",
+                badge = "NO SETUP REQUIRED",
+                badgeContainerColor = MaterialTheme.colorScheme.errorContainer,
+                badgeContentColor = MaterialTheme.colorScheme.onErrorContainer,
+                description = "Send with your RelaySMS email alias created with your phone number, e.g. 12345689@relaysms.me.",
+                imageRes = R.drawable.relay_plateforms,
+                imageCentered = true,
+                onClick = { selected = 0 }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = "Or",
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            MessageOptionCard(
+                selected = selected == 1,
+                title = "Use your online accounts",
+                badge = "REQUIRES INTERNET",
+                badgeContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                badgeContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                description = "Link your existing Gmail, Telegram, or X account(s) to send messages from your real identity.",
+                imageRes = R.drawable.social_platforms,
+                imageCentered = false,
+                onClick = { selected = 1 }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        OnboardingNavigationRow(
+            onNext = onNext,
+            onBack = onBack,
+            onSkip = onSkip,
+            showBack = false,
+            showSkip = false,
+            isOutlined = true,
+            modifier = Modifier.padding(bottom = 16.dp)
         )
-
-        Spacer(modifier = Modifier.height(35.dp))
-
-        MessageOptionCard(
-            selected = selected == 1,
-            title = "Relay account (Default)",
-            badge = "NO SETUP REQUIRED",
-            badgeContainerColor = MaterialTheme.colorScheme.errorContainer,
-            badgeContentColor = MaterialTheme.colorScheme.onErrorContainer,
-            description = "Send with your RelaySMS email alias created with your phone number, e.g. 12345689@relaysms.me.",
-            imageRes = R.drawable.relay_plateforms,
-            imageCentered = true,
-            onClick = { selected = 0 }
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Text(
-            text = "Or",
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.titleMedium
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        MessageOptionCard(
-            selected = selected == 1,
-            title = "Use your online accounts",
-            badge = "REQUIRES INTERNET",
-            badgeContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-            badgeContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-            description = "Link your existing Gmail, Telegram, or X account(s) to send messages from your real identity.",
-            imageRes = R.drawable.social_platforms,
-            imageCentered = false,
-            onClick = { selected = 1 }
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        BottomNavigationRow(
-            currentStep = 1,
-            onNext = onNext
-        )
-
-        Spacer(modifier = Modifier.height(30.dp))
     }
 }
-
 
 
 @Composable
