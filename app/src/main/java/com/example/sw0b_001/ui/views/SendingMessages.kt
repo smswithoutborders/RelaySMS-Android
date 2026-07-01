@@ -23,6 +23,11 @@ import androidx.compose.ui.unit.dp
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.components.OnboardingTextButton
 import com.example.sw0b_001.ui.theme.AppTheme
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.sp
+import com.example.sw0b_001.ui.components.OnboardingTopBar
+
 
 @Composable
 fun ChooseMessageModeScreen(
@@ -32,43 +37,45 @@ fun ChooseMessageModeScreen(
 ) {
     var selected by remember { mutableIntStateOf(0) }
 
+    val UnboundedFontFamily = FontFamily(
+        Font(R.font.unbounded_regular, FontWeight.Normal),
+        Font(R.font.unbounded_semibold, FontWeight.Bold)
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .statusBarsPadding()
             .padding(horizontal = 20.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
-        ) {
-            OnboardingTextButton(
-                label = "Skip",
-                onClick = onSkip
-            )
-        }
+        OnboardingTopBar(
+            onBack = onBack,
+            onSkip = onSkip,
+            showBack = true,
+            showSkip = true
+        )
 
-        Spacer(modifier = Modifier.height(80.dp))
+        Spacer(modifier = Modifier.height(50.dp))
 
         Text(
             text = "Choose how you want to\nsend a message.",
+            fontFamily = UnboundedFontFamily,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.headlineMedium.copy(
-                fontWeight = FontWeight.SemiBold
+            style = MaterialTheme.typography.headlineSmall.copy(
+                fontWeight = FontWeight.Bold
             )
         )
 
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(35.dp))
 
         MessageOptionCard(
-            selected = selected == 0,
+            selected = selected == 1,
             title = "Relay account (Default)",
             badge = "NO SETUP REQUIRED",
             badgeContainerColor = MaterialTheme.colorScheme.errorContainer,
             badgeContentColor = MaterialTheme.colorScheme.onErrorContainer,
             description = "Send with your RelaySMS email alias created with your phone number, e.g. 12345689@relaysms.me.",
-            imageRes = R.drawable.relay_to_account,
+            imageRes = R.drawable.relay_plateforms,
             imageCentered = true,
             onClick = { selected = 0 }
         )
@@ -91,7 +98,7 @@ fun ChooseMessageModeScreen(
             badgeContainerColor = MaterialTheme.colorScheme.secondaryContainer,
             badgeContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
             description = "Link your existing Gmail, Telegram, or X account(s) to send messages from your real identity.",
-            imageRes = R.drawable.relay_sms_save_vault,
+            imageRes = R.drawable.social_platforms,
             imageCentered = false,
             onClick = { selected = 1 }
         )
@@ -100,13 +107,14 @@ fun ChooseMessageModeScreen(
 
         BottomNavigationRow(
             currentStep = 1,
-            onBack = onBack,
             onNext = onNext
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(30.dp))
     }
 }
+
+
 
 @Composable
 private fun MessageOptionCard(
@@ -120,6 +128,12 @@ private fun MessageOptionCard(
     imageCentered: Boolean,
     onClick: () -> Unit
 ) {
+
+    val UnboundedFontFamily = FontFamily(
+        Font(R.font.unbounded_regular, FontWeight.Normal),
+        Font(R.font.unbounded_semibold, FontWeight.Bold)
+    )
+
     OutlinedCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -148,7 +162,10 @@ private fun MessageOptionCard(
                 Text(
                     text = title,
                     modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = UnboundedFontFamily
+                    ),
                 )
 
                 Surface(
@@ -161,30 +178,33 @@ private fun MessageOptionCard(
                             horizontal = 10.dp,
                             vertical = 6.dp
                         ),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = badgeContentColor
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontSize = 10.sp
+                        ),
+                        color = badgeContentColor,
+                        fontFamily = UnboundedFontFamily
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             if (imageCentered) {
 
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(90.dp),
+                        .height(70.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
                         painter = painterResource(imageRes),
                         contentDescription = null,
-                        modifier = Modifier.size(190.dp)
+                        modifier = Modifier.size(150.dp)
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
                     text = description,
@@ -194,7 +214,6 @@ private fun MessageOptionCard(
                 )
 
             } else {
-
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
@@ -222,7 +241,6 @@ private fun MessageOptionCard(
 @Composable
 private fun BottomNavigationRow(
     currentStep: Int,
-    onBack: () -> Unit,
     onNext: () -> Unit
 ) {
 
@@ -253,10 +271,6 @@ private fun BottomNavigationRow(
                         )
                 )
             }
-        }
-
-        TextButton(onClick = onBack) {
-            Text("Back")
         }
 
         Spacer(modifier = Modifier.width(12.dp))

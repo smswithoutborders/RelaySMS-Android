@@ -37,7 +37,6 @@ import com.example.sw0b_001.ui.components.OnboardingNavigationRow
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.coroutines.launch
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -187,7 +186,9 @@ fun PageOneContent() {
                         )
                     )
                 }
+
                 Spacer(modifier = Modifier.height(8.dp))
+
                 Text(
                     text = "Your device is completely independent. We never ask you to register or log in.",
                     style = MaterialTheme.typography.bodyLarge,
@@ -197,9 +198,6 @@ fun PageOneContent() {
                 )
             }
         }
-
-
-
 
         Spacer(modifier = Modifier.weight(1f))
     }

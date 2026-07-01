@@ -103,6 +103,43 @@ fun OnboardingTextButton(
 
 
 
+
+@Composable
+fun OnboardingTopBar(
+    onBack: () -> Unit = {},
+    onSkip: () -> Unit = {},
+    showBack: Boolean = true,
+    showSkip: Boolean = true,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .statusBarsPadding()
+            .padding(horizontal = 24.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        if (showBack) {
+            OnboardingTextButton(
+                label = "Back",
+                onClick = onBack
+            )
+        } else {
+            Spacer(modifier = Modifier.width(64.dp))
+        }
+
+        if (showSkip) {
+            OnboardingTextButton(
+                label = "Skip",
+                onClick = onSkip
+            )
+        }
+    }
+}
+
+
 @Composable
 fun OnboardingNavigationRow(
     onNext: () -> Unit,
