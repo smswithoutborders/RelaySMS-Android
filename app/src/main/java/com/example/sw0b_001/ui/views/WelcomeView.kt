@@ -39,6 +39,8 @@ import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 
 @Composable
 fun WelcomeMainView(navController: NavController) {
@@ -91,7 +93,6 @@ fun WelcomeMainView(navController: NavController) {
                 }
             }
 
-
             if (pagerState.currentPage == 0) {
                 OnboardingNavigationRow(
                     onNext = {
@@ -99,7 +100,8 @@ fun WelcomeMainView(navController: NavController) {
                     },
                     showBack = false,
                     showSkip = false,
-                    isGetStarted = true
+                    isGetStarted = true,
+                    modifier = Modifier.padding(bottom = 16.dp)
                 )
             }
 
@@ -110,10 +112,15 @@ fun WelcomeMainView(navController: NavController) {
 
 @Composable
 fun PageOneContent() {
+    val UnboundedFontFamily = FontFamily(
+        Font(R.font.unbounded_regular, FontWeight.Normal),
+        Font(R.font.unbounded_semibold, FontWeight.Bold)
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.weight(1f))
@@ -124,12 +131,13 @@ fun PageOneContent() {
             modifier = Modifier.size(200.dp)
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(30.dp))
 
         Text(
             text = "Welcome to RelaySMS",
-            style = MaterialTheme.typography.headlineMedium.copy(
-                fontWeight = FontWeight.Bold
+            style = MaterialTheme.typography.headlineSmall.copy(
+                fontWeight = FontWeight.Bold,
+                fontFamily = UnboundedFontFamily
             ),
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
@@ -157,13 +165,12 @@ fun PageOneContent() {
         ) {
             Column(
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(20.dp)
                     .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.Start
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Image(
@@ -174,7 +181,7 @@ fun PageOneContent() {
                     Spacer(modifier = Modifier.width(10.dp))
                     Text(
                         text = "Zero Accounts, Zero Passwords",
-                        textAlign = TextAlign.Center,
+                        textAlign = TextAlign.Start,
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontWeight = FontWeight.Bold
                         )
@@ -183,17 +190,21 @@ fun PageOneContent() {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "Your device is completely independent. We never ask you to register or log in.",
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center,
+                    textAlign = TextAlign.Start,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(80.dp))
+
+
+
+        Spacer(modifier = Modifier.weight(1f))
     }
 }
+
 
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "DefaultPreviewDark", group = "Default")
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_NO, name = "DefaultPreviewLight")

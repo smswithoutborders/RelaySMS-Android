@@ -43,6 +43,7 @@ fun OnboardingCircleButton(
     }
 }
 
+
 @Composable
 fun OnboardingGetStartedButton(
     onClick: () -> Unit
@@ -53,7 +54,8 @@ fun OnboardingGetStartedButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary
         ),
-        modifier = Modifier.height(56.dp)
+        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
+        modifier = Modifier.height(48.dp)
     ) {
         Text(
             text = "Get Started",
@@ -62,13 +64,11 @@ fun OnboardingGetStartedButton(
             ),
             color = MaterialTheme.colorScheme.onPrimary
         )
-
         Spacer(modifier = Modifier.width(12.dp))
-
         Surface(
             shape = CircleShape,
             color = MaterialTheme.colorScheme.onPrimary,
-            modifier = Modifier.size(28.dp)
+            modifier = Modifier.size(24.dp)
         ) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -78,12 +78,14 @@ fun OnboardingGetStartedButton(
                     painter = painterResource(id = R.drawable.arrow_forward),
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(14.dp)
                 )
             }
         }
     }
 }
+
+
 
 @Composable
 fun OnboardingTextButton(
@@ -99,6 +101,8 @@ fun OnboardingTextButton(
     }
 }
 
+
+
 @Composable
 fun OnboardingNavigationRow(
     onNext: () -> Unit,
@@ -107,30 +111,30 @@ fun OnboardingNavigationRow(
     showBack: Boolean = true,
     showSkip: Boolean = true,
     isDone: Boolean = false,
-    isGetStarted: Boolean = false
+    isGetStarted: Boolean = false,
+    modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 24.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+            .padding(horizontal = 32.dp, vertical = 24.dp),
+        horizontalArrangement = if (showBack)
+            Arrangement.SpaceBetween
+        else
+            Arrangement.End,
         verticalAlignment = Alignment.CenterVertically
     ) {
-
         if (showBack) {
             OnboardingTextButton(
                 label = "Back",
                 onClick = onBack
             )
-        } else {
-            Spacer(modifier = Modifier.width(64.dp))
         }
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-
             if (showSkip) {
                 OnboardingTextButton(
                     label = "Skip",
@@ -153,6 +157,7 @@ fun OnboardingNavigationRow(
         }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

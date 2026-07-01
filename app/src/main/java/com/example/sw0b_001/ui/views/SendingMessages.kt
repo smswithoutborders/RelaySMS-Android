@@ -21,6 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sw0b_001.R
+import com.example.sw0b_001.ui.components.OnboardingTextButton
 import com.example.sw0b_001.ui.theme.AppTheme
 
 @Composable
@@ -37,15 +38,13 @@ fun ChooseMessageModeScreen(
             .statusBarsPadding()
             .padding(horizontal = 20.dp)
     ) {
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
         ) {
-            Text(
-                text = "Skip",
-                modifier = Modifier.clickable { onSkip() },
-                style = MaterialTheme.typography.bodyLarge
+            OnboardingTextButton(
+                label = "Skip",
+                onClick = onSkip
             )
         }
 
