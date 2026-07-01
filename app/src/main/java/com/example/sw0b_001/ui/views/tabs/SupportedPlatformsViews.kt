@@ -415,7 +415,7 @@ fun PlatformCard(
                 )
             }
             Text(
-                text = platform?.name?.replaceFirstChar { it.uppercase() } ?: "RelaySMS",
+                text = platform?.display_name ?: stringResource(R.string.error),
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "071328fbe141fd64e56d15d47360fe6a",
+    "identityHash": "a3712cbf0d94c851ed9bc2eabb3df32b",
     "entities": [
       {
         "tableName": "RatchetStates",
@@ -180,11 +180,17 @@
       },
       {
         "tableName": "SupportedPlatforms",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `cat_id` INTEGER NOT NULL, `proto_id` INTEGER, `icon_svg` TEXT, `icon_png` TEXT, `support_url_scheme` INTEGER, `logo` BLOB, PRIMARY KEY(`name`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `display_name` TEXT NOT NULL, `cat_id` INTEGER NOT NULL, `proto_id` INTEGER, `icon_svg` TEXT, `icon_png` TEXT, `logo` BLOB, PRIMARY KEY(`name`))",
         "fields": [
           {
             "fieldPath": "name",
             "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "display_name",
+            "columnName": "display_name",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -208,11 +214,6 @@
             "fieldPath": "icon_png",
             "columnName": "icon_png",
             "affinity": "TEXT"
-          },
-          {
-            "fieldPath": "support_url_scheme",
-            "columnName": "support_url_scheme",
-            "affinity": "INTEGER"
           },
           {
             "fieldPath": "logo",
@@ -419,7 +420,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '071328fbe141fd64e56d15d47360fe6a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a3712cbf0d94c851ed9bc2eabb3df32b')"
     ]
   }
 }

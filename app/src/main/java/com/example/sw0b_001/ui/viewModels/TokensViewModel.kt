@@ -216,7 +216,7 @@ class TokensViewModel @Inject constructor(
                 val response = publisherGrpcImpl.getOAuthURL(
                     availablePlatforms = platform,
                     autogenerateCodeVerifier = true,
-                    supportsUrlScheme = platform.support_url_scheme!!,
+                    supportsUrlScheme = false,
                     requestIdentifier = requestIdentifier
                 )
 

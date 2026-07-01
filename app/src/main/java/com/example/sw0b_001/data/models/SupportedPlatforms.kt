@@ -9,11 +9,11 @@ import androidx.room.PrimaryKey
 data class SupportedPlatforms(
     @PrimaryKey
     val name: String,
+    val display_name: String,
     var cat_id: Int,
     val proto_id: Int?,
     val icon_svg: String?,
     val icon_png: String?,
-    val support_url_scheme: Boolean?,
     var logo: ByteArray? = null
 )
 
