@@ -45,9 +45,46 @@ fun OnboardingCircleButton(
 }
 
 @Composable
-fun OnboardingOutlinedNextButton(
-    onClick: () -> Unit
-) {
+fun OnboardingGetStartedButton(onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        shape = RoundedCornerShape(50.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.primary
+        ),
+        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
+        modifier = Modifier.height(48.dp)
+    ) {
+        Text(
+            text = "Get Started",
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontWeight = FontWeight.SemiBold
+            ),
+            color = MaterialTheme.colorScheme.onPrimary
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Surface(
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier.size(32.dp)
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.arrow_forward),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun OnboardingOutlinedNextButton(onClick: () -> Unit) {
     OutlinedButton(
         onClick = onClick,
         shape = RoundedCornerShape(50.dp),
@@ -88,47 +125,6 @@ fun OnboardingOutlinedNextButton(
     }
 }
 
-
-@Composable
-fun OnboardingGetStartedButton(
-    onClick: () -> Unit
-) {
-    Button(
-        onClick = onClick,
-        shape = RoundedCornerShape(50.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary
-        ),
-        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
-        modifier = Modifier.height(48.dp)
-    ) {
-        Text(
-            text = "Get Started",
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontWeight = FontWeight.SemiBold
-            ),
-            color = MaterialTheme.colorScheme.onPrimary
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-        Surface(
-            shape = CircleShape,
-            color = MaterialTheme.colorScheme.onPrimary,
-            modifier = Modifier.size(24.dp)
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.arrow_forward),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(14.dp)
-                )
-            }
-        }
-    }
-}
 
 
 
