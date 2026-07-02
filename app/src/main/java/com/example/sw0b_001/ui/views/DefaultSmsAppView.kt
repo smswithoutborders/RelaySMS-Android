@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -126,8 +127,9 @@ fun DefaultSmsAppScreen(
                 },
                 shape = RoundedCornerShape(50.dp),
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .wrapContentWidth()
                     .height(48.dp)
+                    .padding(horizontal = 24.dp)
             ) {
                 Text("Set as Default SMS App")
             }
