@@ -9,7 +9,7 @@
       "https"
     ],
     "reliability": "0",
-    "isDefault": true,
+    "possibleDefault": true,
     "region": "America"
   },
   {
@@ -24,7 +24,7 @@
       "ftp"
     ],
     "reliability": "0",
-    "isDefault": true,
+    "possibleDefault": true,
     "region": "Africa"
   },
   {
@@ -39,7 +39,7 @@
       "ftp"
     ],
     "reliability": "36",
-    "isDefault": false,
+    "possibleDefault": false,
     "region": "Africa"
   },
   {
@@ -54,7 +54,7 @@
       "ftp"
     ],
     "reliability": "0",
-    "isDefault": false,
+    "possibleDefault": false,
     "region": "Africa"
   }
 ]

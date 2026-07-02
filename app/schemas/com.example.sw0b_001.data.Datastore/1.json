@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "a3712cbf0d94c851ed9bc2eabb3df32b",
+    "identityHash": "e450bc6f2038d4d01256c42aa09f45ce",
     "entities": [
       {
         "tableName": "RatchetStates",
@@ -36,7 +36,7 @@
       },
       {
         "tableName": "GatewayClients",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `msisdn` TEXT NOT NULL, `operator` TEXT NOT NULL, `country` TEXT NOT NULL, `alias` TEXT, `date` INTEGER NOT NULL, `isDefault` INTEGER NOT NULL, `last_published_date` INTEGER, `manuallyAdded` INTEGER NOT NULL, `operatorCode` TEXT, `region` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `msisdn` TEXT NOT NULL, `operator` TEXT NOT NULL, `country` TEXT NOT NULL, `alias` TEXT, `date` INTEGER NOT NULL, `isDefault` INTEGER NOT NULL, `possibleDefault` INTEGER NOT NULL, `last_published_date` INTEGER, `manuallyAdded` INTEGER NOT NULL, `operatorCode` TEXT, `region` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -76,6 +76,12 @@
           {
             "fieldPath": "isDefault",
             "columnName": "isDefault",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "possibleDefault",
+            "columnName": "possibleDefault",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -420,7 +426,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a3712cbf0d94c851ed9bc2eabb3df32b')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e450bc6f2038d4d01256c42aa09f45ce')"
     ]
   }
 }

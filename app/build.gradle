@@ -191,6 +191,8 @@ dependencies {
     implementation libs.smswithoutborders.lib.image.android
     implementation libs.lib.smsmms.android
     implementation libs.lib.signal.double.ratchet.java
+    implementation 'com.github.shortmesh:Widget-android:89e9e78'
+
 //    implementation(libs.jna)
     implementation 'net.java.dev.jna:jna:5.14.0@aar'
 
@@ -382,4 +384,5 @@ dependencies {
 
     // 2. Glide Compose integration library
     implementation(libs.compose)
+
 }

@@ -85,25 +85,29 @@ class GatewayClientViewModel @Inject constructor(
             val rawGatewayClients = buffer.use { it.readText() }
 
             val region = context.getTelephonyRegion()
-            val gatewayClients = Json
-                .decodeFromString<ArrayList<GatewayClients>>(rawGatewayClients).apply {
-                    val default = db.fetchDefault()
-                    if (default == null) {
-                        when (region) {
-                            "Africa" -> {
-                                firstOrNull { gwc -> gwc.region == region && gwc.isDefault }?.let {
-                                    db.makeDefault(it)
-                                }
-                            }
-                            else -> {
-                                firstOrNull { gwc -> gwc.region != "Africa" && gwc.isDefault }?.let {
-                                    db.makeDefault(it)
-                                }
-                            }
+            val gatewayClients = Json.decodeFromString<ArrayList<GatewayClients>>(rawGatewayClients)
+            insert(gatewayClients)
+
+            val default = db.fetchDefault()
+            if(default != null) return@launch
+
+            gatewayClients.apply {
+                when (region) {
+                    "Africa" -> {
+                        firstOrNull { gwc -> gwc.region == region && gwc.possibleDefault }?.let {
+                            db.makeDefault(it)
+                            return@apply
+                        }
+                    }
+
+                    else -> {
+                        firstOrNull { gwc -> gwc.region != "Africa" && gwc.possibleDefault }?.let {
+                            db.makeDefault(it)
+                            return@apply
                         }
                     }
                 }
-            insert(gatewayClients)
+            }
         }
     }
 

@@ -22,6 +22,7 @@ data class GatewayClients(
     var alias: String? = null,
     var date: Long = System.currentTimeMillis(),
     var isDefault: Boolean = false,
+    var possibleDefault: Boolean = false,
     var last_published_date: Long? = null,
     var manuallyAdded: Boolean = false,
     var operatorCode: String? = null,
