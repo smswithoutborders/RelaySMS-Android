@@ -181,6 +181,7 @@ class TokensViewModel @Inject constructor(
         phoneNumber: String? = null,
         authCode: String? = null,
         password: String? = null,
+        channel: String? = null,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             _isStoringUiState.value = TokensUiState.Loading
@@ -194,7 +195,8 @@ class TokensViewModel @Inject constructor(
                             phoneNumber = phoneNumber!!,
                             platform = platform,
                             authCode = authCode,
-                            password = password
+                            password = password,
+                            channel = channel,
                         )
                     }
                 }
@@ -242,6 +244,7 @@ class TokensViewModel @Inject constructor(
         platform: SupportedPlatforms,
         authCode: String? = null,
         password: String? = null,
+        channel: String? = null,
     ) {
         PublisherGrpcImpl(context).use { publisherGrpcImpl ->
             try {
@@ -269,7 +272,8 @@ class TokensViewModel @Inject constructor(
                     else -> {
                         publisherGrpcImpl.phoneNumberBaseAuthenticationRequest(
                             phoneNumber,
-                            platform.name
+                            platform.name,
+                            channel,
                         )
                         _isStoringUiState.value = TokensUiState.Success(
                             null ,

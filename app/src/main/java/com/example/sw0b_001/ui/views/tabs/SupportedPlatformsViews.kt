@@ -68,6 +68,8 @@ import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel.Companion.oAuth2IntentBuilder
 import com.example.sw0b_001.ui.views.platformAccounts.PNBAPhoneNumberCodeRequestView
 import com.example.sw0b_001.ui.views.threads.makeDefault
+import io.shortmesh.sdk.ui.AuthyWidgetLauncherView
+import io.shortmesh.sdk.viewmodel.AuthyViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -192,11 +194,14 @@ fun PlatformListContent(
     val storingUiState by tokensViewModel.isStoringUiState.collectAsStateWithLifecycle()
 
     var showPlatformOptions by remember { mutableStateOf(false) }
+    var channelBasedAuthRequired by remember { mutableStateOf(false) }
     var storePnbaRequested by remember { mutableStateOf(false) }
     var clickedPlatform: SupportedPlatforms? by remember{ mutableStateOf(null)}
 
     var pnbaAuthenticationCodeRequested by remember{ mutableStateOf(false) }
     var pnbaPasswordRequested by remember{ mutableStateOf(false) }
+
+    val authyViewModel = remember { AuthyViewModel() }
 
     LaunchedEffect(storingUiState) {
         val state = storingUiState
@@ -301,7 +306,9 @@ fun PlatformListContent(
                     }
                     V1PayloadsSupportedProtocols.PNBA -> {
                         showPlatformOptions = false
-                        storePnbaRequested = true
+                        if(clickedPlatform!!.name == "rmail") { // TODO("replace this actual std")
+                            channelBasedAuthRequired = true
+                        } else storePnbaRequested = true
                     }
                 }
             }
@@ -310,6 +317,18 @@ fun PlatformListContent(
         val revokeCallback: (Tokens) -> Unit = { account ->
             CoroutineScope(Dispatchers.Default).launch {
                 tokensViewModel.revoke(clickedPlatform!!, account)
+            }
+        }
+
+        if(channelBasedAuthRequired) {
+            AuthyWidgetLauncherView(
+                showDialog = channelBasedAuthRequired,
+                authyUrl = stringResource(R.string.https_authy_shortmesh_com),
+                viewModel = authyViewModel,
+                requestCodeCallback = {},
+                sendCodeCallback = {},
+            ) {
+                channelBasedAuthRequired = false
             }
         }
 

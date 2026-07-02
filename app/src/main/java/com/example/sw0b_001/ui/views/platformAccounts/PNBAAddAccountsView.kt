@@ -4,6 +4,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -236,6 +237,8 @@ fun PNBAPhoneNumberCodeRequestView(
                         .fillMaxWidth()
                         .padding(top = 32.dp, bottom = 24.dp)
                         .bringIntoViewRequester(buttonRequester),
+                    shape = RoundedCornerShape(8.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
                 ) {
                     if(isLoading) {
                         CircularProgressIndicator(

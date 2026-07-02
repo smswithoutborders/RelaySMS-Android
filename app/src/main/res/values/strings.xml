@@ -488,5 +488,6 @@
     <string name="default_routing_number">Default routing number</string>
     <string name="_default">Default</string>
     <string name="error">Error</string>
+    <string name="https_authy_shortmesh_com">https://authy.shortmesh.com</string>
 
 </resources>

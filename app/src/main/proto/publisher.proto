@@ -134,6 +134,8 @@ message GetPNBACodeRequest {
   string phone_number = 2;
   // Optional request identifier for tracking the request
   string request_identifier = 3;
+  // The medium used to deliver the code (e.g., "whatsapp", "telegram", "signal").
+  string channel = 4;
 }
 
 // Response message for getting the PNBA code
@@ -165,6 +167,8 @@ message ExchangePNBACodeAndStoreRequest {
   string request_identifier = 5;
   // Client ephemeral public keys to associate with the stored token
   repeated PublicKey client_ephemeral_public_keys = 6;
+  // The medium used to receive the code (e.g., "whatsapp", "telegram", "signal").
+  string channel = 7;
 }
 
 // Response message for exchanging the PNBA code for a token and storing it

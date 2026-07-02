@@ -216,11 +216,13 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
 
     fun phoneNumberBaseAuthenticationRequest(
         phoneNumber: String,
-        platform: String
+        platform: String,
+        channel: String?,
     ) {
         val request = PublisherOuterClass.GetPNBACodeRequest.newBuilder().apply {
             setPlatform(platform)
             setPhoneNumber(phoneNumber)
+            setChannel(channel)
         }.build()
 
         try {
