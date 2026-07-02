@@ -3,7 +3,6 @@ package com.example.sw0b_001.ui.views
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -37,8 +36,6 @@ fun ChooseMessageModeScreen(
     onBack: () -> Unit,
     onNext: () -> Unit,
 ) {
-    var selected by remember { mutableIntStateOf(0) }
-
     val UnboundedFontFamily = FontFamily(
         Font(R.font.unbounded_regular, FontWeight.Normal),
         Font(R.font.unbounded_semibold, FontWeight.Bold)
@@ -76,15 +73,13 @@ fun ChooseMessageModeScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             MessageOptionCard(
-                selected = selected == 0,
                 title = "Relay account (Default)",
                 badge = "NO SETUP REQUIRED",
                 badgeContainerColor = MaterialTheme.colorScheme.errorContainer,
                 badgeContentColor = MaterialTheme.colorScheme.onErrorContainer,
                 description = "Send with your RelaySMS email alias created with your phone number, e.g. 12345689@relaysms.me.",
                 imageRes = R.drawable.relay_plateforms,
-                imageCentered = true,
-                onClick = { selected = 0 }
+                imageCentered = true
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -99,15 +94,13 @@ fun ChooseMessageModeScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             MessageOptionCard(
-                selected = selected == 1,
                 title = "Use your online accounts",
                 badge = "REQUIRES INTERNET",
                 badgeContainerColor = MaterialTheme.colorScheme.secondaryContainer,
                 badgeContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                 description = "Link your existing Gmail, Telegram, or X account(s) to send messages from your real identity.",
                 imageRes = R.drawable.social_platforms,
-                imageCentered = false,
-                onClick = { selected = 1 }
+                imageCentered = false
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -126,40 +119,33 @@ fun ChooseMessageModeScreen(
 }
 
 
-@Composable
-private fun MessageOptionCard(
-    selected: Boolean,
-    title: String,
-    badge: String,
-    badgeContainerColor: Color,
-    badgeContentColor: Color,
-    description: String,
-    imageRes: Int,
-    imageCentered: Boolean,
-    onClick: () -> Unit
-) {
-
-    val UnboundedFontFamily = FontFamily(
-        Font(R.font.unbounded_regular, FontWeight.Normal),
-        Font(R.font.unbounded_semibold, FontWeight.Bold)
-    )
-
-    OutlinedCard(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(28.dp),
-        colors = CardDefaults.outlinedCardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright
-        ),
-        border = BorderStroke(
-            width = if (selected) 2.dp else 1.dp,
-            color = if (selected)
-                MaterialTheme.colorScheme.primary
-            else
-                MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
-        )
+    @Composable
+    private fun MessageOptionCard(
+        title: String,
+        badge: String,
+        badgeContainerColor: Color,
+        badgeContentColor: Color,
+        description: String,
+        imageRes: Int,
+        imageCentered: Boolean
     ) {
+
+        val UnboundedFontFamily = FontFamily(
+            Font(R.font.unbounded_regular, FontWeight.Normal),
+            Font(R.font.unbounded_semibold, FontWeight.Bold)
+        )
+
+        OutlinedCard(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(28.dp),
+            colors = CardDefaults.outlinedCardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceBright
+            ),
+            border = BorderStroke(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
+            )
+        ) {
 
         Column(
             modifier = Modifier.padding(20.dp)
