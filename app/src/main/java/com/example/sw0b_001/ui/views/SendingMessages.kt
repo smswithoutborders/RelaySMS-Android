@@ -2,33 +2,27 @@ package com.example.sw0b_001.ui.views
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.theme.AppTheme
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
+import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.components.OnboardingNavigationRow
 import com.example.sw0b_001.ui.components.OnboardingTopBar
-
+import com.example.sw0b_001.ui.theme.AppTheme
 
 @Composable
 fun ChooseMessageModeScreen(
@@ -58,7 +52,7 @@ fun ChooseMessageModeScreen(
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
         ) {
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(40.dp))
 
             Text(
                 text = "Choose how you want to\nsend a message.",
@@ -118,52 +112,42 @@ fun ChooseMessageModeScreen(
     }
 }
 
+@Composable
+private fun MessageOptionCard(
+    title: String,
+    badge: String,
+    badgeContainerColor: Color,
+    badgeContentColor: Color,
+    description: String,
+    imageRes: Int,
+    imageCentered: Boolean
+) {
+    val UnboundedFontFamily = FontFamily(
+        Font(R.font.unbounded_regular, FontWeight.Normal),
+        Font(R.font.unbounded_semibold, FontWeight.Bold)
+    )
 
-    @Composable
-    private fun MessageOptionCard(
-        title: String,
-        badge: String,
-        badgeContainerColor: Color,
-        badgeContentColor: Color,
-        description: String,
-        imageRes: Int,
-        imageCentered: Boolean
-    ) {
-
-        val UnboundedFontFamily = FontFamily(
-            Font(R.font.unbounded_regular, FontWeight.Normal),
-            Font(R.font.unbounded_semibold, FontWeight.Bold)
+    OutlinedCard(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.outlinedCardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceBright
+        ),
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
         )
-
-        OutlinedCard(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(28.dp),
-            colors = CardDefaults.outlinedCardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceBright
-            ),
-            border = BorderStroke(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
-            )
-        ) {
-
-        Column(
-            modifier = Modifier.padding(20.dp)
-        ) {
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
+    ) {
+        Column(modifier = Modifier.padding(20.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = title,
                     modifier = Modifier.weight(1f),
                     style = MaterialTheme.typography.titleSmall.copy(
                         fontWeight = FontWeight.Bold,
                         fontFamily = UnboundedFontFamily
-                    ),
+                    )
                 )
-
                 Surface(
                     shape = RoundedCornerShape(8.dp),
                     color = badgeContainerColor
@@ -186,7 +170,6 @@ fun ChooseMessageModeScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             if (imageCentered) {
-
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -199,30 +182,24 @@ fun ChooseMessageModeScreen(
                         modifier = Modifier.size(150.dp)
                     )
                 }
-
                 Spacer(modifier = Modifier.height(8.dp))
-
                 Text(
                     text = description,
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodyMedium
                 )
-
             } else {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-
                     Text(
                         text = description,
                         modifier = Modifier.weight(1f),
                         style = MaterialTheme.typography.bodyMedium
                     )
-
                     Spacer(modifier = Modifier.width(16.dp))
-
                     Image(
                         painter = painterResource(imageRes),
                         contentDescription = null,
@@ -233,84 +210,6 @@ fun ChooseMessageModeScreen(
         }
     }
 }
-
-@Composable
-private fun BottomNavigationRow(
-    currentStep: Int,
-    onNext: () -> Unit
-) {
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-
-        Row(
-            modifier = Modifier.weight(1f),
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-
-            repeat(3) { index ->
-
-                Box(
-                    modifier = Modifier
-                        .size(
-                            width = if (index == currentStep) 22.dp else 8.dp,
-                            height = 8.dp
-                        )
-                        .clip(CircleShape)
-                        .background(
-                            if (index == currentStep)
-                                MaterialTheme.colorScheme.primary
-                            else
-                                MaterialTheme.colorScheme.outlineVariant
-                        )
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.width(12.dp))
-
-        OutlinedButton(
-            onClick = onNext,
-            shape = RoundedCornerShape(50.dp),
-            border = BorderStroke(
-                1.dp,
-                MaterialTheme.colorScheme.primary
-            ),
-            contentPadding = PaddingValues(
-                start = 22.dp,
-                end = 6.dp,
-                top = 6.dp,
-                bottom = 6.dp
-            )
-        ) {
-
-            Text("Next")
-
-            Spacer(modifier = Modifier.width(14.dp))
-
-            Box(
-                modifier = Modifier
-                    .size(38.dp)
-                    .background(
-                        MaterialTheme.colorScheme.primary,
-                        CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowRight,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
-            }
-        }
-    }
-}
-
-
 
 @Preview(showBackground = true)
 @Composable

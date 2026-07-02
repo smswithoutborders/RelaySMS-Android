@@ -186,7 +186,7 @@ fun OnboardingNavigationRow(
     onBack: () -> Unit = {},
     onSkip: () -> Unit = {},
     showBack: Boolean = true,
-    showSkip: Boolean = true,
+    showSkip: Boolean = false,
     isDone: Boolean = false,
     isGetStarted: Boolean = false,
     isOutlined: Boolean = false,
@@ -217,11 +217,52 @@ fun OnboardingNavigationRow(
             when {
                 isGetStarted -> OnboardingGetStartedButton(onClick = onNext)
                 isOutlined -> OnboardingOutlinedNextButton(onClick = onNext)
+                isDone -> OnboardingDoneButton(onClick = onNext)
                 else -> OnboardingCircleButton(
-                    icon = if (isDone) R.drawable.arrow_forward
-                    else R.drawable.arrow_forward,
-                    contentDescription = if (isDone) "Done" else "Next",
+                    icon = R.drawable.arrow_forward,
+                    contentDescription = "Next",
                     onClick = onNext
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun OnboardingDoneButton(
+    onClick: () -> Unit
+) {
+    Button(
+        onClick = onClick,
+        shape = RoundedCornerShape(50.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.primary
+        ),
+        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
+        modifier = Modifier.height(48.dp)
+    ) {
+        Text(
+            text = "Done",
+            style = MaterialTheme.typography.bodyLarge.copy(
+                fontWeight = FontWeight.SemiBold
+            ),
+            color = MaterialTheme.colorScheme.onPrimary
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Surface(
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier.size(32.dp)
+        ) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.arrow_forward),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(16.dp)
                 )
             }
         }
