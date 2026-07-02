@@ -240,6 +240,7 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
         authorizationCode: String,
         phoneNumber: String,
         platform: String,
+        channel: String? = null,
         password: String = "",
     ) : PublisherOuterClass.ExchangePNBACodeAndStoreResponse {
         val (publisherKeys, keys) = getKeys()
@@ -249,6 +250,7 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
             setAuthorizationCode(authorizationCode)
             setPassword(password)
             setPhoneNumber(phoneNumber)
+            setChannel(channel)
             addAllClientEphemeralPublicKeys(publisherKeys)
         }.build()
 

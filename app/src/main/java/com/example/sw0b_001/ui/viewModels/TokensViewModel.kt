@@ -254,7 +254,8 @@ class TokensViewModel @Inject constructor(
                             authorizationCode = authCode,
                             phoneNumber = phoneNumber,
                             platform = platform.name,
-                            password = password
+                            password = password,
+                            channel = channel
                         )
                         _isStoringUiState.value = TokensUiState.Success(null)
                     }
@@ -262,7 +263,8 @@ class TokensViewModel @Inject constructor(
                         val res = publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
                             authorizationCode = authCode,
                             phoneNumber = phoneNumber,
-                            platform = platform.name
+                            platform = platform.name,
+                            channel = channel
                         )
                         _isStoringUiState.value = TokensUiState.Success(
                             null,

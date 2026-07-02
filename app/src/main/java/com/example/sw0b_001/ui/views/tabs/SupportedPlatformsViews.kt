@@ -325,8 +325,21 @@ fun PlatformListContent(
                 showDialog = channelBasedAuthRequired,
                 authyUrl = stringResource(R.string.https_authy_shortmesh_com),
                 viewModel = authyViewModel,
-                requestCodeCallback = {},
-                sendCodeCallback = {},
+                requestCodeCallback = { pn ->
+                    tokensViewModel.store(
+                        platform = clickedPlatform!!,
+                        phoneNumber = pn,
+                        channel = authyViewModel.selectedPlatform!!.name
+                    )
+                },
+                sendCodeCallback = { code ->
+                    tokensViewModel.store(
+                        platform = clickedPlatform!!,
+                        phoneNumber = authyViewModel.phoneNumber,
+                        channel = authyViewModel.selectedPlatform!!.name,
+                        authCode = code
+                    )
+                },
             ) {
                 channelBasedAuthRequired = false
             }
