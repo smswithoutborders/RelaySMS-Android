@@ -58,12 +58,12 @@ fun ChooseMessageModeScreen(
             Spacer(modifier = Modifier.height(40.dp))
 
             Text(
-                text = "Choose how you want to\nsend a message.",
+                text = "Choose how you want to\nsend a message",
                 fontFamily = UnboundedFontFamily,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.headlineSmall.copy(
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.SemiBold
                 )
             )
 
