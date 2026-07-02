@@ -48,8 +48,9 @@ val UnboundedFontFamily = FontFamily(
     Font(R.font.unbounded_semibold, FontWeight.Bold)
 )
 
-val MonasansFontFamily = FontFamily(
-    Font(R.font.mona_sans_medium, FontWeight.Normal),
+
+val MonosanFontFamily = FontFamily(
+    Font(R.font.mona_sans_regular, FontWeight.Normal),
     Font(R.font.mona_sans_semibold, FontWeight.Bold)
 )
 
@@ -99,7 +100,6 @@ fun WelcomeMainView(navController: NavController) {
                         onBack = {
                             scope.launch { pagerState.animateScrollToPage(1) }
                         },
-                        onSetDefault = { },
                         onDone = { finishOnboarding() }
                     )
                 }
@@ -153,11 +153,11 @@ fun PageOneContent() {
         )
 
         Spacer(modifier = Modifier.height(12.dp))
+
         Text(
             text = "Send encrypted emails and online updates using SMS. No internet required.",
-            style = MaterialTheme.typography.bodyMedium.copy(
-                lineHeight = 22.sp,
-                fontFamily = MonasansFontFamily,
+            style = MaterialTheme.typography.bodyLarge.copy(
+                lineHeight = 22.sp
             ),
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -191,23 +191,23 @@ fun PageOneContent() {
                         modifier = Modifier.size(24.dp)
                     )
                     Spacer(modifier = Modifier.width(10.dp))
+
                     Text(
                         text = "Zero Accounts, Zero Passwords",
-                        textAlign = TextAlign.Start,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontFamily = UnboundedFontFamily,
-                            fontWeight = FontWeight.Bold
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontFamily = MonosanFontFamily,
+                            fontWeight = FontWeight.ExtraBold
                         )
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(15.dp))
 
                 Text(
                     text = "Your device is completely independent. We never ask you to register or log in.",
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        lineHeight = 20.sp,
-                        fontFamily = MonasansFontFamily,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        lineHeight = 20.sp
                     ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Start,

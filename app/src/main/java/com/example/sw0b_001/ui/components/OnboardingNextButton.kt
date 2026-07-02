@@ -10,6 +10,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,9 +28,11 @@ fun OnboardingCircleButton(
     Surface(
         modifier = Modifier
             .size(48.dp)
+            .shadow(elevation = 4.dp, shape = CircleShape, clip = false)
             .clickable(onClick = onClick),
         shape = CircleShape,
-        color = MaterialTheme.colorScheme.primary
+        color = MaterialTheme.colorScheme.primary,
+        tonalElevation = 2.dp
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -51,6 +55,10 @@ fun OnboardingGetStartedButton(onClick: () -> Unit) {
         shape = RoundedCornerShape(50.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.primary
+        ),
+        elevation = ButtonDefaults.buttonElevation(
+            defaultElevation = 3.dp,
+            pressedElevation = 1.dp
         ),
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
         modifier = Modifier.height(48.dp)
@@ -88,7 +96,10 @@ fun OnboardingOutlinedNextButton(onClick: () -> Unit) {
     OutlinedButton(
         onClick = onClick,
         shape = RoundedCornerShape(50.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)
+        ),
         contentPadding = PaddingValues(
             start = 22.dp,
             end = 6.dp,
@@ -125,25 +136,31 @@ fun OnboardingOutlinedNextButton(onClick: () -> Unit) {
     }
 }
 
-
-
-
 @Composable
-fun OnboardingTextButton(
-    label: String,
+fun OnboardingBackButton(
     onClick: () -> Unit
 ) {
-    TextButton(onClick = onClick) {
+    Row(
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.arrow_back),
+            contentDescription = null,
+            modifier = Modifier.size(20.dp)
+        )
+
+        Spacer(Modifier.width(4.dp))
+
         Text(
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.primary
+            text = "Back",
+            style = MaterialTheme.typography.bodyMedium
         )
     }
 }
-
-
-
 
 @Composable
 fun OnboardingTopBar(
@@ -157,24 +174,26 @@ fun OnboardingTopBar(
         modifier = modifier
             .fillMaxWidth()
             .statusBarsPadding()
-            .padding(horizontal = 24.dp, vertical = 12.dp),
+            .padding(horizontal = 32.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
 
         if (showBack) {
-            OnboardingTextButton(
-                label = "Back",
+            OnboardingBackButton(
                 onClick = onBack
             )
         } else {
-            Spacer(modifier = Modifier.width(64.dp))
+            Spacer(modifier = Modifier.size(48.dp))
         }
 
-        if (showSkip) {
-            OnboardingTextButton(
-                label = "Skip",
-                onClick = onSkip
+        TextButton(onClick = onSkip) {
+            Text(
+                text = "Skip",
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Medium
+                ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
@@ -203,7 +222,9 @@ fun OnboardingNavigationRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (showBack) {
-            OnboardingTextButton(label = "Back", onClick = onBack)
+            OnboardingBackButton(
+                onClick = onBack
+            )
         }
 
         Row(
@@ -211,7 +232,15 @@ fun OnboardingNavigationRow(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             if (showSkip) {
-                OnboardingTextButton(label = "Skip", onClick = onSkip)
+                TextButton(onClick = onSkip) {
+                    Text(
+                        text = "Skip",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.Medium
+                        ),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
 
             when {
@@ -232,13 +261,19 @@ fun OnboardingNavigationRow(
 fun OnboardingDoneButton(
     onClick: () -> Unit
 ) {
-    Button(
+    OutlinedButton(
         onClick = onClick,
         shape = RoundedCornerShape(50.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)
         ),
-        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
+        contentPadding = PaddingValues(
+            start = 22.dp,
+            end = 6.dp,
+            top = 6.dp,
+            bottom = 6.dp
+        ),
         modifier = Modifier.height(48.dp)
     ) {
         Text(
@@ -246,12 +281,12 @@ fun OnboardingDoneButton(
             style = MaterialTheme.typography.bodyLarge.copy(
                 fontWeight = FontWeight.SemiBold
             ),
-            color = MaterialTheme.colorScheme.onPrimary
+            color = MaterialTheme.colorScheme.primary
         )
         Spacer(modifier = Modifier.width(12.dp))
         Surface(
             shape = CircleShape,
-            color = MaterialTheme.colorScheme.onPrimary,
+            color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(32.dp)
         ) {
             Box(
@@ -261,7 +296,7 @@ fun OnboardingDoneButton(
                 Icon(
                     painter = painterResource(id = R.drawable.arrow_forward),
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(16.dp)
                 )
             }

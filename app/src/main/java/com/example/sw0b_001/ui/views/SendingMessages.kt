@@ -34,7 +34,10 @@ fun ChooseMessageModeScreen(
         Font(R.font.unbounded_regular, FontWeight.Normal),
         Font(R.font.unbounded_semibold, FontWeight.Bold)
     )
-
+    val MonosanFontFamily = FontFamily(
+        Font(R.font.mona_sans_regular, FontWeight.Normal),
+        Font(R.font.mona_sans_semibold, FontWeight.Bold)
+    )
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -79,8 +82,9 @@ fun ChooseMessageModeScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Or",
+                "OR",
                 modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.outline,
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleMedium
             )
@@ -122,11 +126,6 @@ private fun MessageOptionCard(
     imageRes: Int,
     imageCentered: Boolean
 ) {
-    val UnboundedFontFamily = FontFamily(
-        Font(R.font.unbounded_regular, FontWeight.Normal),
-        Font(R.font.unbounded_semibold, FontWeight.Bold)
-    )
-
     OutlinedCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(28.dp),
@@ -143,9 +142,9 @@ private fun MessageOptionCard(
                 Text(
                     text = title,
                     modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.titleSmall.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = UnboundedFontFamily
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.ExtraBold,
+                        fontFamily = MonosanFontFamily
                     )
                 )
                 Surface(
@@ -155,14 +154,14 @@ private fun MessageOptionCard(
                     Text(
                         text = badge,
                         modifier = Modifier.padding(
-                            horizontal = 10.dp,
-                            vertical = 6.dp
+                            horizontal = 9.dp,
+                            vertical = 5.dp
                         ),
                         style = MaterialTheme.typography.labelSmall.copy(
-                            fontSize = 10.sp
+                            fontSize = 8.sp
                         ),
                         color = badgeContentColor,
-                        fontFamily = UnboundedFontFamily
+                        fontFamily = MonosanFontFamily
                     )
                 }
             }
@@ -186,7 +185,7 @@ private fun MessageOptionCard(
                 Text(
                     text = description,
                     modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center,
+                    textAlign = TextAlign.Start,
                     style = MaterialTheme.typography.bodyMedium
                 )
             } else {
