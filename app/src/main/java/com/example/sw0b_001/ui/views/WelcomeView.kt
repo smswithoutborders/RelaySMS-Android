@@ -65,7 +65,8 @@ fun WelcomeMainView(navController: NavController) {
         ) {
             HorizontalPager(
                 state = pagerState,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                userScrollEnabled = false
             ) { page ->
                 when (page) {
                     0 -> PageOneContent()
