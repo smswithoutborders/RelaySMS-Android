@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
@@ -229,7 +230,7 @@ fun PlatformListContent(
 
             PlatformCard(
                 platform = null,
-                modifier = Modifier.width(130.dp),
+                modifier = Modifier,
                 isActive = true,
                 onClick = {
                     clickedPlatform = null
@@ -391,8 +392,9 @@ fun PlatformCard(
             GlideImage(
                 model = platform?.icon_png,
                 contentDescription = stringResource(R.string.platform_image),
+                contentScale = ContentScale.Fit,
                 modifier = Modifier
-                    .size(50.dp)
+                    .size(45.dp)
                     .align(Alignment.Center),
                 colorFilter = if(!isActive && platform != null)
                     ColorFilter.tint(
