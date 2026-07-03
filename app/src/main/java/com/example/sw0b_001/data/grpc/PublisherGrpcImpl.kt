@@ -222,7 +222,9 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
         val request = PublisherOuterClass.GetPNBACodeRequest.newBuilder().apply {
             setPlatform(platform)
             setPhoneNumber(phoneNumber)
-            setChannel(channel)
+            channel?.let {
+                setChannel(channel)
+            }
         }.build()
 
         try {
@@ -250,7 +252,9 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
             setAuthorizationCode(authorizationCode)
             setPassword(password)
             setPhoneNumber(phoneNumber)
-            setChannel(channel)
+            channel?.let {
+                setChannel(it)
+            }
             addAllClientEphemeralPublicKeys(publisherKeys)
         }.build()
 

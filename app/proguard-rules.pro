@@ -54,3 +54,5 @@
     *** len;
 }
 
+-keep class io.shortmesh.sdk.network.SupportedPlatforms { *; }
+
