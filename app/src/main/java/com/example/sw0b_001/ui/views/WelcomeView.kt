@@ -23,12 +23,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.R
@@ -40,6 +42,17 @@ import kotlinx.coroutines.launch
 import androidx.compose.foundation.layout.Row
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+
+val UnboundedFontFamily = FontFamily(
+    Font(R.font.unbounded_regular, FontWeight.Normal),
+    Font(R.font.unbounded_semibold, FontWeight.Bold)
+)
+
+
+val MonosanFontFamily = FontFamily(
+    Font(R.font.mona_sans_regular, FontWeight.Normal),
+    Font(R.font.mona_sans_semibold, FontWeight.Bold)
+)
 
 @Composable
 fun WelcomeMainView(navController: NavController) {
@@ -87,7 +100,6 @@ fun WelcomeMainView(navController: NavController) {
                         onBack = {
                             scope.launch { pagerState.animateScrollToPage(1) }
                         },
-                        onSetDefault = { },
                         onDone = { finishOnboarding() }
                     )
                 }
@@ -112,10 +124,6 @@ fun WelcomeMainView(navController: NavController) {
 
 @Composable
 fun PageOneContent() {
-    val UnboundedFontFamily = FontFamily(
-        Font(R.font.unbounded_regular, FontWeight.Normal),
-        Font(R.font.unbounded_semibold, FontWeight.Bold)
-    )
 
     Column(
         modifier = Modifier
@@ -136,8 +144,9 @@ fun PageOneContent() {
         Text(
             text = "Welcome to RelaySMS",
             style = MaterialTheme.typography.headlineSmall.copy(
+                fontFamily = UnboundedFontFamily,
                 fontWeight = FontWeight.Bold,
-                fontFamily = UnboundedFontFamily
+                letterSpacing = (-0.2).sp
             ),
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
@@ -147,7 +156,9 @@ fun PageOneContent() {
 
         Text(
             text = "Send encrypted emails and online updates using SMS. No internet required.",
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyLarge.copy(
+                lineHeight = 22.sp
+            ),
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.fillMaxWidth()
@@ -157,10 +168,10 @@ fun PageOneContent() {
 
         OutlinedCard(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+            shape = RoundedCornerShape(20.dp),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)),
             colors = CardDefaults.outlinedCardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f)
             )
         ) {
             Column(
@@ -176,23 +187,28 @@ fun PageOneContent() {
                     Image(
                         painter = painterResource(id = R.drawable.lock_open_right),
                         contentDescription = null,
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
                         modifier = Modifier.size(24.dp)
                     )
                     Spacer(modifier = Modifier.width(10.dp))
+
                     Text(
                         text = "Zero Accounts, Zero Passwords",
-                        textAlign = TextAlign.Start,
+                        textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.bodyLarge.copy(
-                            fontWeight = FontWeight.Bold
+                            fontFamily = MonosanFontFamily,
+                            fontWeight = FontWeight.ExtraBold
                         )
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(15.dp))
 
                 Text(
                     text = "Your device is completely independent. We never ask you to register or log in.",
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        lineHeight = 20.sp
+                    ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Start,
                     modifier = Modifier.fillMaxWidth()

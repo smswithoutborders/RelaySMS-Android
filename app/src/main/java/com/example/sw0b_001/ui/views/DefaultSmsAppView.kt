@@ -1,6 +1,7 @@
 package com.example.sw0b_001.ui.views
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,10 +11,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,12 +29,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
@@ -46,7 +49,6 @@ fun DefaultSmsAppScreen(
     navController: NavController,
     onSkip: () -> Unit,
     onBack: () -> Unit,
-    onSetDefault: () -> Unit,
     onDone: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -66,15 +68,8 @@ fun DefaultSmsAppScreen(
         }
     }
 
-    val UnboundedFontFamily = FontFamily(
-        Font(R.font.unbounded_regular, FontWeight.Normal),
-        Font(R.font.unbounded_semibold, FontWeight.Bold)
-    )
-
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 20.dp)
+        modifier = Modifier.fillMaxSize()
     ) {
         OnboardingTopBar(
             onBack = onBack,
@@ -86,16 +81,28 @@ fun DefaultSmsAppScreen(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.weight(1f))
 
-            Image(
-                painter = painterResource(R.drawable.try_sending_message_illus),
-                contentDescription = null,
-                modifier = Modifier.size(150.dp)
-            )
+            Surface(
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f),
+                modifier = Modifier.size(180.dp)
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.try_sending_message_illus),
+                        contentDescription = null,
+                        modifier = Modifier.size(120.dp)
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(40.dp))
 
@@ -104,17 +111,21 @@ fun DefaultSmsAppScreen(
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontWeight = FontWeight.Bold,
-                    fontFamily = UnboundedFontFamily
+                    fontFamily = UnboundedFontFamily,
+                    letterSpacing = (-0.2).sp
                 ),
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Text(
                 text = "Manage your SMS messages from one place and send images through SMS!",
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.bodyMedium.copy(
+//                    fontFamily = MonasansFontFamily,
+                    lineHeight = 22.sp
+                ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -126,12 +137,24 @@ fun DefaultSmsAppScreen(
                     getDefaultPermission.launch(makeDefault(context))
                 },
                 shape = RoundedCornerShape(50.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                ),
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 3.dp,
+                    pressedElevation = 1.dp
+                ),
                 modifier = Modifier
                     .wrapContentWidth()
                     .height(48.dp)
-                    .padding(horizontal = 24.dp)
+                    .padding(horizontal = 8.dp)
             ) {
-                Text("Set as Default SMS App")
+                Text(
+                    text = "Set as Default SMS App",
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.SemiBold
+                    )
+                )
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -156,7 +179,6 @@ fun DefaultSmsAppScreenPreview() {
             navController = NavController(context),
             onSkip = {},
             onBack = {},
-            onSetDefault = {},
             onDone = {},
         )
     }
