@@ -8,7 +8,6 @@ import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.Protocol
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.TransportImpl.publishWithAttachment
 import com.example.sw0b_001.data.TransportImpl.publishWithoutAttachment
-import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
 import com.example.sw0b_001.data.models.Payloads
 import com.example.sw0b_001.extensions.context.getStaticKeys
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,10 +16,9 @@ import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import uniffi.relaysms_spec_payload.OfflineFirst
 import uniffi.relaysms_spec_payload.V1ContentCategories
 import uniffi.relaysms_spec_payload.V1ContentsContainer
-import uniffi.relaysms_spec_payload.v1BridgeOfflineFirstPublisherEncrypt
-import uniffi.relaysms_spec_payload.v1BridgeOnlineFirstPublisherEncrypt
 
 @HiltViewModel
 class BridgesViewModel @Inject constructor(
@@ -104,50 +102,24 @@ class BridgesViewModel @Inject constructor(
     ) : Pair<ByteArray, Int> {
         val db = Datastore.getDatastore(context)?.keysDao() ?: throw Exception("Could not open database")
 
-        if(tokenHash != null) {
-            val othersKeys = db.fetchEphemeral(
-                tokenHash,
-                if(withAttachment) PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_SERVER_ATTACHMENT
-                else PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_SERVER,
-            ) ?: throw Exception("Could not fetch server keys")
+        val keyId = if(withAttachment) (0 until 16).random()
+        else (0 until 255).random()
 
-            val keys = db.fetchEphemeral(
-                tokenHash,
-                PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_CLIENT,
-                othersKeys.keyId
-            ) ?: throw Exception("Could not fetch client keys")
+        val authenticationPublicKey = context.getStaticKeys(keyId)
+            ?: throw Exception("Could not find static keys for id")
 
-            keys.use { ec ->
-                val authenticationPublicKey = context.getStaticKeys(othersKeys.keyId)
-                    ?: throw Exception("Could not find static keys for id")
-                val ciphertext = v1BridgeOnlineFirstPublisherEncrypt(
-                    ecKid = ec.privateKey!!,
-                    ssKidPk = authenticationPublicKey,
-                    esKidPk = othersKeys.publicKey,
-                    keyId = othersKeys.keyId.toUByte(),
-                    plaintext = plaintext
+        val protocol = Protocols(context)
+        protocol.generateDH().use { ec ->
+            protocol.generateDH().use { sc ->
+                val ciphertext = OfflineFirst.encrypt(
+                    ssPk = authenticationPublicKey,
+                    ec = ec.privateKey!!,
+                    sc = sc.privateKey!!,
+                    payload = plaintext
                 )
-                return Pair(ciphertext, othersKeys.keyId)
-            }
-        } else {
-            val keyId = if(withAttachment) (0 until 16).random()
-            else (0 until 255).random()
-
-            val authenticationPublicKey = context.getStaticKeys(keyId)
-                ?: throw Exception("Could not find static keys for id")
-
-            val protocol = Protocols(context)
-            protocol.generateDH().use { ec ->
-                protocol.generateDH().use { sc ->
-                    val ciphertext = v1BridgeOfflineFirstPublisherEncrypt(
-                        ssPk = authenticationPublicKey,
-                        ec = ec.privateKey!!,
-                        sc = sc.privateKey!!,
-                        payload = plaintext
-                    )
-                    return Pair(ciphertext.getTxPayload(), keyId)
-                }
+                return Pair(ciphertext.getPayload(), keyId)
             }
         }
+
     }
 }

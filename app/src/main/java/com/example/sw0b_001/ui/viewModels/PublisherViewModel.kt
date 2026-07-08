@@ -137,7 +137,7 @@ class PublisherViewModel @Inject constructor(
     }
 
     fun attachmentExecutor(payload: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val bundle = Bundle()
             bundle.putBoolean(SmsWorkManager.ITP_TRANSMISSION_REQUEST, true)
             TransportImpl.sendSms(
