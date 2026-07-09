@@ -19,7 +19,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -33,7 +32,6 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.data.models.Payloads
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
 import com.example.sw0b_001.ui.navigation.DetailsInterfaceScreen
@@ -54,7 +52,7 @@ fun RecentView(
 ) {
     var sendNewMessageRequested by remember { mutableStateOf(false) }
 
-    val payloads = payloadsViewModel.get().collectAsLazyPagingItems()
+    val payloads = payloadsViewModel.uiPayloads.collectAsLazyPagingItems()
     val supportedPlatforms by supportedPlatformsViewModel.get()
         .collectAsStateWithLifecycle(emptyList())
 
@@ -66,25 +64,30 @@ fun RecentView(
                 state = listState
             ) {
                 items(
-//                    items = payloads,
                     count = payloads.itemCount,
                     key = payloads.itemKey { it.id }
                 ) { index ->
                     val message = payloads[index]
-                    val logo = supportedPlatforms.find{ it.name == message?.platformName }?.icon_png
-                    RecentMessageCard(
-                        cat = message?.content!!.getCatId(),
-                        payload = message,
-                        logo = logo,
-                        onClickCallback = { clickedMessage ->
-                            navController.navigate(
-                                DetailsInterfaceScreen(
-                                    cat = clickedMessage.content.getCatId(),
-                                    messageId = message.id
+                    message?.let {
+                        val logo = remember(supportedPlatforms, message) {
+                            supportedPlatforms.find { p ->
+                                p.name == message.payload.platformName }?.icon_png
+                        }
+                        RecentMessageCard(
+                            cat = it.catId,
+                            payload = it.payload,
+                            date = it.date,
+                            logo = logo,
+                            onClickCallback = { clickedMessage ->
+                                navController.navigate(
+                                    DetailsInterfaceScreen(
+                                        cat = clickedMessage.content.getCatId(),
+                                        messageId = it.id
+                                    )
                                 )
-                            )
-                        },
-                    )
+                            },
+                        )
+                    }
                 }
             }
         }
@@ -130,6 +133,7 @@ fun GetMessageAvatar(logo: String?) {
 fun RecentMessageCard(
     cat: V1ContentCategories,
     payload: Payloads,
+    date: String,
     logo: String? = null,
     onClickCallback: (Payloads) -> Unit,
 ) {
@@ -182,8 +186,8 @@ fun RecentMessageCard(
             },
             trailingContent = {
                 Text(
-                    text = Helpers.formatDate(LocalContext.current,
-                        payload.date),
+//                    text = Helpers.formatDate(LocalContext.current, payload.date),
+                    text = date,
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

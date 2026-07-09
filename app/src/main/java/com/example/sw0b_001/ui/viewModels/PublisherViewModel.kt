@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.afkanerd.lib_image_android.ui.data.SmsWorkManager
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
+import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.TransportImpl
 import com.example.sw0b_001.data.TransportImpl.publishWithAttachment
@@ -17,6 +18,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uniffi.relaysms_spec_payload.V1ContentCategories
@@ -27,6 +30,12 @@ import uniffi.relaysms_spec_payload.v1PlatformPublisherEncrypt
 class PublisherViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
 ): ViewModel() {
+
+    private val _debugUiState = MutableStateFlow(BuildConfig.DEBUG)
+    val debugUiState: StateFlow<Boolean> = _debugUiState
+
+    fun toggleDebugState() { _debugUiState.value = !_debugUiState.value }
+
     fun publish(
         catId: V1ContentCategories,
         body: String,
@@ -78,6 +87,7 @@ class PublisherViewModel @Inject constructor(
                             tokenId,
                             to,
                             subject,
+                            debugOnly = _debugUiState.value,
                         ) { payload ->
                             encrypt(tokenHash!!, payload)
                         }

@@ -1,21 +1,12 @@
 package com.example.sw0b_001.data
 
 import android.content.Context
-import android.content.Intent
 import android.text.format.DateUtils
-import android.util.Log
 import com.example.sw0b_001.R
 import java.net.URL
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-import java.security.SecureRandom
 import java.util.Calendar
 
 object Helpers {
-    fun Int.toBytes(order: ByteOrder = ByteOrder.LITTLE_ENDIAN, size: Int=4): ByteArray {
-        return ByteBuffer.allocate(size).order(order).putInt(this).array()
-    }
-
     fun formatDate(context: Context, epochTime: Long): String {
         val currentTime = System.currentTimeMillis()
         val diff = currentTime - epochTime
@@ -31,7 +22,11 @@ object Helpers {
                 dateCal[Calendar.DAY_OF_YEAR] == now[Calendar.DAY_OF_YEAR]) {
             // Use relative time or time if less than a day
             if (diff < DateUtils.HOUR_IN_MILLIS) {
-                return DateUtils.getRelativeTimeSpanString(epochTime, currentTime, DateUtils.MINUTE_IN_MILLIS).toString()
+                return DateUtils.getRelativeTimeSpanString(
+                    epochTime,
+                    currentTime,
+                    DateUtils.MINUTE_IN_MILLIS
+                ).toString()
             } else if (diff < DateUtils.DAY_IN_MILLIS) {
                 return DateUtils.formatDateTime(context, epochTime, DateUtils.FORMAT_SHOW_TIME)
             }
@@ -59,67 +54,8 @@ object Helpers {
         }
         return mappedParameters
     }
+
     fun getPath(data: String): String {
-        // TODO:
         return URL(data.replace("relaysms://", "https://")).path
     }
-
-    fun logIntentDetails(intent: Intent?) {
-        if (intent == null) {
-            Log.v("Intent", "Intent is null")
-            return
-        }
-
-        // Log basic information
-        Log.v("Intent", "Package: ${intent.`package`}")
-        Log.v("Intent", "Action: ${intent.action}")
-        Log.v("Intent", "Type: ${intent.type}")
-        Log.v("Intent", "Component: ${intent.component}")
-        Log.v("Intent", "Data String: ${intent.dataString}")
-
-        // Log categories (if any)
-        val categories = intent.categories
-        if (categories != null && categories.isNotEmpty()) {
-            Log.v("Intent", "Categories:")
-            for (category in categories) {
-                Log.v("Intent", "\t- $category")
-            }
-        } else {
-            Log.v("Intent", "Categories: null")
-        }
-
-        // Log extras (if any)
-        val extras = intent.extras
-        if (extras != null) {
-            Log.v("Intent", "Extras:")
-            for (key in extras.keySet()) {
-                val value = extras.get(key)
-                Log.v("Intent", "\t- $key: $value")
-            }
-        } else {
-            Log.v("Intent", "Extras: null")
-        }
-    }
-
-    fun generateRandomBytes(size: Int): ByteArray {
-        val random = SecureRandom()
-        val bytes = ByteArray(size)
-        random.nextBytes(bytes)
-        return bytes
-    }
-
-    fun getLanguageNameFromCode(context: Context, languageCode: String): String {
-        return when (languageCode) {
-            "en" -> "English"
-            "es" -> "Español"
-            "fr" -> "Français"
-            "de" -> "Deutsch"
-            "ar" -> "العربية"
-            "fa" -> "فارسی"
-            "sw" -> "Kiswahili"
-            "tr" -> "Türkçe"
-            else -> context.getString(R.string.language)
-        }
-    }
-
 }

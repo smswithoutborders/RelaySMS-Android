@@ -111,7 +111,7 @@ class GatewayClientViewModel @Inject constructor(
         }
     }
 
-    fun delete(context: Context, gatewayClients: com.example.sw0b_001.data.models.GatewayClients) {
+    fun delete(context: Context, gatewayClients: GatewayClients) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val db = Datastore.getDatastore(context)?.gatewayClientsDao()
@@ -126,7 +126,7 @@ class GatewayClientViewModel @Inject constructor(
 
     fun deleteGatewayClient(
         context: Context,
-        gatewayClients: com.example.sw0b_001.data.models.GatewayClients,
+        gatewayClients: GatewayClients,
         successRunnable: Runnable,
         failureRunnable: Runnable
     ) {
@@ -191,4 +191,5 @@ class GatewayClientViewModel @Inject constructor(
             }
         }
     }
+
 }

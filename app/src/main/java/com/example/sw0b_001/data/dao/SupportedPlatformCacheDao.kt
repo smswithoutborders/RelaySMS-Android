@@ -30,6 +30,9 @@ interface SupportedPlatformCacheDao {
     fun fetch(): Flow<List<SupportedPlatforms>>
 
     @Query("select * from SupportedPlatforms")
+    fun fetchList(): List<SupportedPlatforms>
+
+    @Query("select * from SupportedPlatforms")
     fun fetchDebug(): List<SupportedPlatforms>
 
     @Query("delete from supportedplatforms")

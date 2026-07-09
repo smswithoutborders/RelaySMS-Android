@@ -10,10 +10,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.NoSim
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,10 +32,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.afkanerd.lib_image_android.ui.navigation.ImageRenderNav
@@ -41,6 +45,7 @@ import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDefaultSimSubscription
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.components.mmsImagePicker
+import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.extensions.context.settingsGetNotShowChooseGatewayClient
@@ -53,18 +58,7 @@ import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.PublisherViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.views.DeveloperHTTPView
-import kotlinx.serialization.Serializable
 import uniffi.relaysms_spec_payload.V1ContentCategories
-import java.lang.ProcessBuilder.Redirect.to
-
-
-@Serializable
-data class GatewayClientRequest(
-    val address: String,
-    val text: String,
-    val date: String,
-    val date_sent: String
-)
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -141,6 +135,8 @@ fun ComposerInterface(
     var from: String? by remember(selectedToken){
         mutableStateOf(selectedToken?.account) }
 
+    val debugState by publisherViewModel.debugUiState.collectAsStateWithLifecycle()
+
     fun sendingCallback() {
         if(selectedToken != null) {
             publisherViewModel.publish(
@@ -198,6 +194,19 @@ fun ComposerInterface(
                     }
                 },
                 actions = {
+                    if(BuildConfig.DEBUG) {
+                        IconButton(
+                            onClick = { publisherViewModel.toggleDebugState() },
+//                            colors = MaterialTheme.colors.error
+                        ) {
+                            Icon(Icons.Default.NoSim,
+                                "Debug send",
+                                tint = if(debugState) MaterialTheme.colors.primary
+                                else Color.LightGray
+                            )
+                        }
+                    }
+
                     if(inPreviewMode || context.isDefault()) {
                         IconButton(
                             onClick = { if(!context.isDefault()) TODO("Show toast") else {
@@ -296,7 +305,7 @@ fun ComposerInterface(
                         }
                         Toast.makeText(
                             context,
-                            context.getString(R.string.no_account_selected),
+                            ContextCompat.getString(context,R.string.no_account_selected),
                             Toast.LENGTH_SHORT
                         ).show()
                     },

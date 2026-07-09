@@ -5,16 +5,12 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.serialization.Serializable
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import javax.inject.Inject
 import javax.inject.Qualifier
 import javax.inject.Singleton
-
-
-private const val BASE_URL = "https://smswithoutborders.com:15000"
 
 interface GatewayClientApiService {
     @GET("/v3/clients")
@@ -33,9 +29,10 @@ object GatewayClientsNetworkModule {
     @Singleton
     @GatewayRetrofit
     fun provideRetrofit(): Retrofit {
+        val baseUrl = "https://smswithoutborders.com:15000"
         return Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl(BASE_URL)
+            .baseUrl(baseUrl)
             .build()
     }
 
@@ -51,11 +48,3 @@ class GatewayClientRepository @Inject constructor(
 ) {
     suspend fun getGatewayClients() = apiService.getSupportedPlatforms()
 }
-
-@Serializable
-data class GatewayClientRequestPayload(
-    val address: String,
-    val text: String,
-    val date: Long = System.currentTimeMillis(),
-    val date_sent: Long = System.currentTimeMillis(),
-)
