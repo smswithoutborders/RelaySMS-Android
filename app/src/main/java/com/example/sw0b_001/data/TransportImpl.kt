@@ -22,6 +22,8 @@ import uniffi.relaysms_spec_payload.V1ContentsContainer
 import uniffi.relaysms_spec_payload.V1Payloads
 
 object TransportImpl {
+
+    const val ATTACHMENT_INTENT_FILTER = "com.afkanerd.deku.SMS_SENT_BROADCAST_INTENT"
     fun publishWithAttachment(
         context: Context,
         catId: V1ContentCategories,
@@ -57,10 +59,9 @@ object TransportImpl {
             String(it)
         }
 
-        val intentFilter = "com.afkanerd.deku.SMS_SENT_BROADCAST_INTENT"
         imageViewModel.startWorkManager(
             context = context,
-            notificationFilter = intentFilter,
+            notificationFilter = ATTACHMENT_INTENT_FILTER,
             payload = splitPayloads,
         )
 

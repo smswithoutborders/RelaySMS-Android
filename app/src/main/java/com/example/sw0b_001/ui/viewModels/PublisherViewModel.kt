@@ -1,7 +1,9 @@
 package com.example.sw0b_001.ui.viewModels
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.afkanerd.lib_image_android.ui.data.SmsWorkManager
@@ -9,6 +11,7 @@ import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.TransportImpl
+import com.example.sw0b_001.data.TransportImpl.gatewayClientForwardDebugger
 import com.example.sw0b_001.data.TransportImpl.publishWithAttachment
 import com.example.sw0b_001.data.TransportImpl.publishWithoutAttachment
 import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
@@ -17,6 +20,7 @@ import com.example.sw0b_001.extensions.context.getStaticKeys
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -148,14 +152,44 @@ class PublisherViewModel @Inject constructor(
 
     fun attachmentExecutor(payload: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val bundle = Bundle()
-            bundle.putBoolean(SmsWorkManager.ITP_TRANSMISSION_REQUEST, true)
-            TransportImpl.sendSms(
-                context = context,
-                payload = payload,
-                bundle = bundle,
-            ) {
+            if(_debugUiState.value) {
+                gatewayClientForwardDebugger(
+                    context = context,
+                    message = payload,
+                    errorCallback = {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            Toast.makeText(
+                                context,
+                                it,
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    },
+                ) {
+                    val intent = Intent(TransportImpl.ATTACHMENT_INTENT_FILTER).apply {
+                        putExtra(SmsWorkManager.ITP_TRANSMISSION_REQUEST, true)
+                        // Ensures the broadcast targets your app package directly for added security
+                        setPackage(context.packageName)
+                    }
+                    context.sendBroadcast(intent)
+                    CoroutineScope(Dispatchers.Main).launch {
+                        Toast.makeText(
+                            context,
+                            "SMS forwarded successfully",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            } else {
+                val bundle = Bundle()
+                bundle.putBoolean(SmsWorkManager.ITP_TRANSMISSION_REQUEST, true)
+                TransportImpl.sendSms(
+                    context = context,
+                    payload = payload,
+                    bundle = bundle,
+                ) {
 
+                }
             }
         }
     }
