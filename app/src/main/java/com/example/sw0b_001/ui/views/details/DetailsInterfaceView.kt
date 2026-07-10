@@ -64,8 +64,10 @@ fun DetailsInterfaceView(
 
     Scaffold(
         topBar = {
-            RelayAppBar(navController = navController, {
-                navController.navigate(
+            RelayAppBar(navController = navController,
+                onBackCallback = { backHandler() },
+                editCallback = {
+                    navController.navigate(
                     ComposeScreen(
                         cat = cat,
                         messageId = messageId
