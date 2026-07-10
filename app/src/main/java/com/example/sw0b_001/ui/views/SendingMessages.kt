@@ -10,214 +10,198 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import android.content.res.Configuration
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.components.OnboardingNavigationRow
-import com.example.sw0b_001.ui.components.OnboardingTopBar
 import com.example.sw0b_001.ui.theme.AppTheme
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+
+
+
+data class OnboardingPageData(
+    val illustration: Painter,
+    val title: String,
+    val description: String,
+
+    val cardTitle: String? = null,
+    val cardDescription: String? = null,
+    val cardIcon: Painter? = null,
+
+    val buttonText: String? = null,
+    val buttonAction: (() -> Unit)? = null
+)
 
 @Composable
-fun ChooseMessageModeScreen(
-    onSkip: () -> Unit,
-    onBack: () -> Unit,
-    onNext: () -> Unit,
+fun OnboardingPage(
+    data: OnboardingPageData,
+    modifier: Modifier = Modifier
 ) {
-    val UnboundedFontFamily = FontFamily(
-        Font(R.font.unbounded_regular, FontWeight.Normal),
-        Font(R.font.unbounded_semibold, FontWeight.Bold)
-    )
-    val MonosanFontFamily = FontFamily(
-        Font(R.font.mona_sans_regular, FontWeight.Normal),
-        Font(R.font.mona_sans_semibold, FontWeight.Bold)
-    )
+
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 20.dp)
-    ) {
-        OnboardingTopBar(
-            onBack = onBack,
-            onSkip = onSkip,
-            showBack = true,
-            showSkip = true
-        )
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 28.dp),
 
-        Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        Spacer(modifier = Modifier.height(40.dp))
+
+        Image(
+            painter = data.illustration,
+            contentDescription = null,
             modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
-        ) {
-            Spacer(modifier = Modifier.height(40.dp))
-
-            Text(
-                text = "Choose how you want to\nsend a message",
-                fontFamily = UnboundedFontFamily,
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.headlineSmall.copy(
-                    fontWeight = FontWeight.SemiBold
-                )
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            MessageOptionCard(
-                title = "Relay account (Default)",
-                badge = "NO SETUP REQUIRED",
-                badgeContainerColor = MaterialTheme.colorScheme.errorContainer,
-                badgeContentColor = MaterialTheme.colorScheme.onErrorContainer,
-                description = "Send with your RelaySMS email alias created with your phone number, e.g. 12345689@relaysms.me.",
-                imageRes = R.drawable.relay_plateforms,
-                imageCentered = true
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                "OR",
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.outline,
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            MessageOptionCard(
-                title = "Use your online accounts",
-                badge = "REQUIRES INTERNET",
-                badgeContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-                badgeContentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                description = "Link your existing Gmail, Telegram, or X account(s) to send messages from your real identity.",
-                imageRes = R.drawable.social_platforms,
-                imageCentered = false
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
-        OnboardingNavigationRow(
-            onNext = onNext,
-            onBack = onBack,
-            onSkip = onSkip,
-            showBack = false,
-            showSkip = false,
-            isOutlined = true,
-            modifier = Modifier.padding(bottom = 16.dp)
+                .fillMaxWidth(.65f)
+                .aspectRatio(1f)
         )
-    }
-}
 
-@Composable
-private fun MessageOptionCard(
-    title: String,
-    badge: String,
-    badgeContainerColor: Color,
-    badgeContentColor: Color,
-    description: String,
-    imageRes: Int,
-    imageCentered: Boolean
-) {
-    OutlinedCard(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(28.dp),
-        colors = CardDefaults.outlinedCardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceBright
-        ),
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
+        Spacer(modifier = Modifier.height(36.dp))
+
+        Text(
+            text = data.title,
+            style = MaterialTheme.typography.headlineSmall.copy(
+
+                fontWeight = FontWeight.Bold,
+                letterSpacing = (-0.3).sp
+            ),
+            textAlign = TextAlign.Center
         )
-    ) {
-        Column(modifier = Modifier.padding(20.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = title,
-                    modifier = Modifier.weight(1f),
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.ExtraBold,
-                        fontFamily = MonosanFontFamily
-                    )
+
+        Spacer(modifier = Modifier.height(14.dp))
+
+        Text(
+            text = data.description,
+            style = MaterialTheme.typography.bodyLarge.copy(
+
+                lineHeight = 22.sp
+            ),
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Spacer(modifier = Modifier.height(30.dp))
+
+        if (data.cardTitle != null) {
+
+            OutlinedCard(
+                modifier = Modifier.fillMaxWidth(),
+
+                shape = RoundedCornerShape(18.dp),
+
+                border = BorderStroke(
+                    1.dp,
+                    MaterialTheme.colorScheme.primary.copy(.35f)
+                ),
+
+                colors = CardDefaults.outlinedCardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(.18f)
                 )
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = badgeContainerColor
+
+            ) {
+
+                Column(
+                    modifier = Modifier.padding(18.dp)
                 ) {
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        data.cardIcon?.let {
+
+                            Image(
+                                painter = it,
+                                contentDescription = null,
+
+                                colorFilter = ColorFilter.tint(
+                                    MaterialTheme.colorScheme.primary
+                                ),
+
+                                modifier = Modifier.size(22.dp)
+                            )
+
+                            Spacer(modifier = Modifier.width(10.dp))
+                        }
+
+                        Text(
+                            text = data.cardTitle,
+                            style = MaterialTheme.typography.titleMedium.copy(
+
+                                fontWeight = FontWeight.Bold
+                            )
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
                     Text(
-                        text = badge,
-                        modifier = Modifier.padding(
-                            horizontal = 9.dp,
-                            vertical = 5.dp
+                        text = data.cardDescription ?: "",
+                        style = MaterialTheme.typography.bodyMedium.copy(
+
                         ),
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontSize = 8.sp
-                        ),
-                        color = badgeContentColor,
-                        fontFamily = MonosanFontFamily
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(10.dp))
-
-            if (imageCentered) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(70.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painterResource(imageRes),
-                        contentDescription = null,
-                        modifier = Modifier.size(150.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = description,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Start,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            } else {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = description,
-                        modifier = Modifier.weight(1f),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Image(
-                        painter = painterResource(imageRes),
-                        contentDescription = null,
-                        modifier = Modifier.size(100.dp)
-                    )
-                }
-            }
+            Spacer(modifier = Modifier.height(24.dp))
         }
+
+        if (data.buttonText != null) {
+
+            Button(
+                onClick = {
+                    data.buttonAction?.invoke()
+                },
+
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+
+                shape = RoundedCornerShape(40.dp),
+
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+
+            ) {
+
+                Text(
+                    text = data.buttonText,
+
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
     }
+
 }
 
-@Preview(showBackground = true)
-@Composable
-fun ChooseMessageModeScreenPreview() {
-    AppTheme(darkTheme = false) {
-        ChooseMessageModeScreen(
-            onSkip = {},
-            onBack = {},
-            onNext = {}
-        )
-    }
-}
+
+

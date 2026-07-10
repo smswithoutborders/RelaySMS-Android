@@ -111,7 +111,6 @@ fun DefaultSmsAppScreen(
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontWeight = FontWeight.Bold,
-                    fontFamily = UnboundedFontFamily,
                     letterSpacing = (-0.2).sp
                 ),
                 modifier = Modifier.fillMaxWidth()
