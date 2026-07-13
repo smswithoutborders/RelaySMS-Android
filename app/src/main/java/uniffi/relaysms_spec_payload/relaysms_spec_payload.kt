@@ -678,6 +678,8 @@ internal object IntegrityCheckingUniffiLib {
     ): Short
     external fun uniffi_relaysms_spec_payload_checksum_func_v1_token_encrypt_server(
     ): Short
+    external fun uniffi_relaysms_spec_payload_checksum_func_v1_get_is_last_segment(
+    ): Short
     external fun uniffi_relaysms_spec_payload_checksum_func_v1_get_payload_session_id(
     ): Short
     external fun uniffi_relaysms_spec_payload_checksum_func_v1_get_payload_type(
@@ -967,6 +969,8 @@ external fun uniffi_relaysms_spec_payload_fn_func_v1_token_encrypt_client(`ecKid
 ): RustBuffer.ByValue
 external fun uniffi_relaysms_spec_payload_fn_func_v1_token_encrypt_server(`ssKid`: RustBuffer.ByValue,`esKid`: RustBuffer.ByValue,`ecKidPk`: RustBuffer.ByValue,`keyId`: Byte,`token`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
+external fun uniffi_relaysms_spec_payload_fn_func_v1_get_is_last_segment(`data`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+): Byte
 external fun uniffi_relaysms_spec_payload_fn_func_v1_get_payload_session_id(`data`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
 external fun uniffi_relaysms_spec_payload_fn_func_v1_get_payload_type(`data`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
@@ -1120,6 +1124,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_token_encrypt_server() != 29164.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_get_is_last_segment() != 54590.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_get_payload_session_id() != 32846.toShort()) {
@@ -1587,6 +1594,29 @@ public object FfiConverterULong: FfiConverter<ULong, Long> {
 
     override fun write(value: ULong, buf: ByteBuffer) {
         buf.putLong(value.toLong())
+    }
+}
+
+/**
+ * @suppress
+ */
+public object FfiConverterBoolean: FfiConverter<Boolean, Byte> {
+    override fun lift(value: Byte): Boolean {
+        return value.toInt() != 0
+    }
+
+    override fun read(buf: ByteBuffer): Boolean {
+        return lift(buf.get())
+    }
+
+    override fun lower(value: Boolean): Byte {
+        return if (value) 1.toByte() else 0.toByte()
+    }
+
+    override fun allocationSize(value: Boolean) = 1UL
+
+    override fun write(value: Boolean, buf: ByteBuffer) {
+        buf.put(lower(value))
     }
 }
 
@@ -5118,6 +5148,12 @@ sealed class V1PayloadsException: kotlin.Exception() {
             get() = ""
     }
     
+    class NoLastSegments(
+        ) : V1PayloadsException() {
+        override val message
+            get() = ""
+    }
+    
 
     
 
@@ -5189,6 +5225,7 @@ public object FfiConverterTypeV1PayloadsError : FfiConverterRustBuffer<V1Payload
             25 -> V1PayloadsException.UnsupportedProtocol()
             26 -> V1PayloadsException.PayloadTooShort()
             27 -> V1PayloadsException.MissingSegments()
+            28 -> V1PayloadsException.NoLastSegments()
             else -> throw RuntimeException("invalid error enum value, something is very wrong!!")
         }
     }
@@ -5319,6 +5356,10 @@ public object FfiConverterTypeV1PayloadsError : FfiConverterRustBuffer<V1Payload
                 // Add the size for the Int that specifies the variant plus the size needed for all fields
                 4UL
             )
+            is V1PayloadsException.NoLastSegments -> (
+                // Add the size for the Int that specifies the variant plus the size needed for all fields
+                4UL
+            )
         }
     }
 
@@ -5446,6 +5487,10 @@ public object FfiConverterTypeV1PayloadsError : FfiConverterRustBuffer<V1Payload
             }
             is V1PayloadsException.MissingSegments -> {
                 buf.putInt(27)
+                Unit
+            }
+            is V1PayloadsException.NoLastSegments -> {
+                buf.putInt(28)
                 Unit
             }
         }.let { /* this makes the `when` an expression, which ensures it is exhaustive */ }
@@ -5805,6 +5850,16 @@ public object FfiConverterSequenceByteArray: FfiConverterRustBuffer<List<kotlin.
     UniffiLib.uniffi_relaysms_spec_payload_fn_func_v1_token_encrypt_server(
     
         FfiConverterByteArray.lower(`ssKid`),FfiConverterByteArray.lower(`esKid`),FfiConverterByteArray.lower(`ecKidPk`),FfiConverterUByte.lower(`keyId`),FfiConverterByteArray.lower(`token`),_status)
+}
+    )
+    }
+    
+ fun `v1GetIsLastSegment`(`data`: kotlin.ByteArray): kotlin.Boolean {
+            return FfiConverterBoolean.lift(
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_func_v1_get_is_last_segment(
+    
+        FfiConverterByteArray.lower(`data`),_status)
 }
     )
     }

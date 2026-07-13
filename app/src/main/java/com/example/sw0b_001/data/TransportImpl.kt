@@ -55,9 +55,9 @@ object TransportImpl {
             tId = tokenId,
             sessId = sessionId,
         )
-        val splitPayloads = payloads.split(Transports.SMS).map {
-            String(it)
-        }
+        val split = payloads.split(Transports.SMS)
+
+        val splitPayloads = split.map{ String(it) }
 
         imageViewModel.startWorkManager(
             context = context,

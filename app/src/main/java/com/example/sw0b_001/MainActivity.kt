@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -432,17 +431,5 @@ class MainActivity : BindActivity() {
         super.onNewIntent(intent)
         if(::navController.isInitialized)
             processIntent(navController, intent)
-    }
-
-    val smsLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == RESULT_OK) {
-            // Handle success
-            val data = result.data
-            // Process the returned intent data here
-        } else {
-            // Handle failure or cancellation
-        }
     }
 }

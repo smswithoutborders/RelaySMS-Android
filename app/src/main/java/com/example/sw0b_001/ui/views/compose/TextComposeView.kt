@@ -11,9 +11,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sw0b_001.R
-import kotlinx.serialization.Serializable
+import com.example.sw0b_001.ui.theme.AppTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,29 +37,16 @@ fun TextComposeView(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f),
         )
     }
 }
 
-
-@Serializable
-data class ReliabilityTestRequestPayload(val test_start_time: String)
-
-@Serializable
-data class ReliabilityTestResponsePayload(
-    val message: String,
-    val test_id: Int,
-    val test_start_time: Int,
-)
-
-//@Preview(showBackground = true)
-//@Composable
-//fun TextComposePreview() {
-//    AppTheme(darkTheme = false) {
-//        TextComposeView(
-//            textContent = Composers.TextComposeHandler.TextContent(),
-//            serviceType = Platforms.ServiceTypes.TEXT
-//        )
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun TextComposePreview() {
+    AppTheme(darkTheme = false) {
+        TextComposeView(
+            "",
+        ) {}
+    }
+}
