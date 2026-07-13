@@ -92,6 +92,8 @@ import com.google.accompanist.permissions.rememberPermissionState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import uniffi.relaysms_spec_payload.Transports
+import uniffi.relaysms_spec_payload.v1CalculateSegments
 
 @AndroidEntryPoint
 class MainActivity : BindActivity() {
@@ -358,9 +360,14 @@ class MainActivity : BindActivity() {
                 ImageRender(
                     navController = navController,
                     imageViewModel = imageViewModel,
-                    smsCountPaddingValue = imageRenderNav.smsCountPadding,
                     uri = imageRenderNav.uri?.toUri(),
-                    imageService = imageTransmissionService,
+                    attachmentCounterCallback = { payloadSize ->
+                        v1CalculateSegments(
+                            payloadSize.toUInt(),
+                            Transports.SMS,
+                            true
+                        ).toInt()
+                    },
                     onApplyCallback = {
                         navController.popBackStack()
                     },

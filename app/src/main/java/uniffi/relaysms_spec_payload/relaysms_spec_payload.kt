@@ -678,6 +678,8 @@ internal object IntegrityCheckingUniffiLib {
     ): Short
     external fun uniffi_relaysms_spec_payload_checksum_func_v1_token_encrypt_server(
     ): Short
+    external fun uniffi_relaysms_spec_payload_checksum_func_v1_calculate_segments(
+    ): Short
     external fun uniffi_relaysms_spec_payload_checksum_func_v1_get_is_last_segment(
     ): Short
     external fun uniffi_relaysms_spec_payload_checksum_func_v1_get_payload_session_id(
@@ -969,6 +971,8 @@ external fun uniffi_relaysms_spec_payload_fn_func_v1_token_encrypt_client(`ecKid
 ): RustBuffer.ByValue
 external fun uniffi_relaysms_spec_payload_fn_func_v1_token_encrypt_server(`ssKid`: RustBuffer.ByValue,`esKid`: RustBuffer.ByValue,`ecKidPk`: RustBuffer.ByValue,`keyId`: Byte,`token`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
+external fun uniffi_relaysms_spec_payload_fn_func_v1_calculate_segments(`payloadSize`: Int,`transports`: RustBuffer.ByValue,`isTokenId`: Byte,uniffi_out_err: UniffiRustCallStatus, 
+): Int
 external fun uniffi_relaysms_spec_payload_fn_func_v1_get_is_last_segment(`data`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Byte
 external fun uniffi_relaysms_spec_payload_fn_func_v1_get_payload_session_id(`data`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
@@ -1124,6 +1128,9 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_token_encrypt_server() != 29164.toShort()) {
+        throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    }
+    if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_calculate_segments() != 13393.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_get_is_last_segment() != 54590.toShort()) {
@@ -5850,6 +5857,16 @@ public object FfiConverterSequenceByteArray: FfiConverterRustBuffer<List<kotlin.
     UniffiLib.uniffi_relaysms_spec_payload_fn_func_v1_token_encrypt_server(
     
         FfiConverterByteArray.lower(`ssKid`),FfiConverterByteArray.lower(`esKid`),FfiConverterByteArray.lower(`ecKidPk`),FfiConverterUByte.lower(`keyId`),FfiConverterByteArray.lower(`token`),_status)
+}
+    )
+    }
+    
+ fun `v1CalculateSegments`(`payloadSize`: kotlin.UInt, `transports`: Transports, `isTokenId`: kotlin.Boolean): kotlin.UInt {
+            return FfiConverterUInt.lift(
+    uniffiRustCall() { _status ->
+    UniffiLib.uniffi_relaysms_spec_payload_fn_func_v1_calculate_segments(
+    
+        FfiConverterUInt.lower(`payloadSize`),FfiConverterTypeTransports.lower(`transports`),FfiConverterBoolean.lower(`isTokenId`),_status)
 }
     )
     }
