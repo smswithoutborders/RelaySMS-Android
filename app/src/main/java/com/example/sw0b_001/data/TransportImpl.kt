@@ -7,6 +7,7 @@ import android.util.Base64
 import android.util.Log
 import android.widget.Toast
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
+import com.afkanerd.smswithoutborders.libsignal_doubleratchet.extensions.generateRandomBytes
 import com.afkanerd.smswithoutborders_libsmsmms.data.data.models.SmsManager
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDefaultSimSubscription
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getThreadId
@@ -100,10 +101,13 @@ object TransportImpl {
 
         val payload = Base64.encodeToString(serialized, Base64.NO_WRAP)
 
+        val fromAddress = Base64.encodeToString(
+            context.generateRandomBytes(16), Base64.DEFAULT)
+
         if(debugOnly) {
             gatewayClientForwardDebugger(
-                context = context,
                 message = payload,
+                fromAddress = fromAddress,
                 errorCallback = {
                     CoroutineScope(Dispatchers.Main).launch {
                         Toast.makeText(
@@ -168,17 +172,14 @@ object TransportImpl {
     }
 
     suspend fun gatewayClientForwardDebugger(
-        context: Context,
         message: String,
+        fromAddress: String,
         errorCallback: (String) -> Unit,
         successCallback: () -> Unit
     ) {
-        val defaultGatewayClients = Datastore.getDatastore(context)
-            ?.gatewayClientsDao()
-            ?.fetchDefault() ?: throw Exception("Failed to fetch database")
         try {
             val requestData = GatewayClientRequest(
-                address = defaultGatewayClients.msisdn,
+                address = fromAddress,
                 text = message,
             )
 

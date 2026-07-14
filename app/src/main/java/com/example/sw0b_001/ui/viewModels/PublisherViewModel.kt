@@ -3,11 +3,13 @@ package com.example.sw0b_001.ui.viewModels
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Base64
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.afkanerd.lib_image_android.ui.data.SmsWorkManager
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
+import com.afkanerd.smswithoutborders.libsignal_doubleratchet.extensions.generateRandomBytes
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.TransportImpl
@@ -150,12 +152,18 @@ class PublisherViewModel @Inject constructor(
         }
     }
 
-    fun attachmentExecutor(payload: String) {
+    private val fromAddressDebug: String by lazy {
+        Base64.encodeToString(context.generateRandomBytes(16), Base64.NO_WRAP)
+    }
+
+    fun attachmentExecutor(
+        payload: String
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             if(_debugUiState.value) {
                 gatewayClientForwardDebugger(
-                    context = context,
                     message = payload,
+                    fromAddress = fromAddressDebug,
                     errorCallback = {
                         CoroutineScope(Dispatchers.Main).launch {
                             Toast.makeText(

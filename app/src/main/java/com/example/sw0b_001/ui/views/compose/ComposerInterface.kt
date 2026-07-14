@@ -57,7 +57,6 @@ import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.PublisherViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
-import com.example.sw0b_001.ui.views.DeveloperHTTPView
 import uniffi.relaysms_spec_payload.V1ContentCategories
 
 
@@ -111,10 +110,6 @@ fun ComposerInterface(
     var showChooseGatewayClient by remember { mutableStateOf(false) }
 
     var isSending by remember { mutableStateOf(false) }
-
-    var showDeveloperDialog by remember{ mutableStateOf(false) }
-
-    var sendRequestPayload by remember{ mutableStateOf<ByteArray?>(null) }
 
     val imagePicker = mmsImagePicker { uri ->
         imageViewModel.reset()
@@ -315,14 +310,6 @@ fun ComposerInterface(
                     },
                     accounts = tokens
                 )
-            }
-
-            if(showDeveloperDialog) {
-                DeveloperHTTPView(
-                    payload = sendRequestPayload!!,
-                ) {
-                    showDeveloperDialog = false
-                }
             }
         }
     }
