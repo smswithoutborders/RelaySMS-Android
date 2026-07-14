@@ -64,12 +64,12 @@ import com.example.sw0b_001.ui.navigation.BackupScreen
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.navigation.DetailsInterfaceScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
-import com.example.sw0b_001.ui.navigation.OnboardingInteractiveScreen
+import com.example.sw0b_001.ui.navigation.OnboardingScreen
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.navigation.RestoreScreen
 import com.example.sw0b_001.ui.navigation.SettingsScreen
 import com.example.sw0b_001.ui.navigation.WelcomeScreen
-import com.example.sw0b_001.ui.onboarding.OnboardingInteractive
+import com.example.sw0b_001.ui.onboarding.OnboardingView
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.BackupRestoreViewModel
 import com.example.sw0b_001.ui.viewModels.BridgesViewModel
@@ -298,16 +298,19 @@ class MainActivity : BindActivity() {
             }
         ) {
             composable<WelcomeScreen> {
-                WelcomeMainView(navController)
-            }
-            composable<OnboardingInteractiveScreen> {
-                OnboardingInteractive(
-                    navController,
-                    onboardingViewModel,
-                    tokensViewModel = tokensViewModel,
-                    supportedPlatformsViewModel,
+                WelcomeMainView(
+                    onContinue = {
+                        navController.navigate(OnboardingScreen)
+                    }
                 )
             }
+
+            composable<OnboardingScreen> {
+                OnboardingView(
+                    navController = navController
+                )
+            }
+
             composable<HomepageScreen> {
                 HomepageView(
                     navController = navController,

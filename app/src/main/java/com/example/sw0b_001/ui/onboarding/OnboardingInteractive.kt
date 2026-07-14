@@ -40,9 +40,9 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.extensions.context.settingsSetOnboardedCompletely
 //import com.example.sw0b_001.ui.components.OnboardingNextButton
 import com.example.sw0b_001.ui.modals.SignupLoginModal
-import com.example.sw0b_001.ui.navigation.CreateAccountScreen
+//import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
-import com.example.sw0b_001.ui.navigation.LoginScreen
+//import com.example.sw0b_001.ui.navigation.LoginScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
@@ -161,19 +161,19 @@ fun OnboardingInteractive(
                     }
                 }
 
-                SignupLoginModal(
-                    onboardingViewModel.showLoginSignupModal,
-                    createAccountCallback = {
-                        onboardingViewModel.callback = callback
-                        onboardingViewModel.showLoginSignupModal = false
-                        navController.navigate(CreateAccountScreen(isOnboarding = true))
-                    },
-                    loginAccountCallback = {
-                        onboardingViewModel.callback = callback
-                        navController.navigate(LoginScreen(isOnboarding = true))
-                        onboardingViewModel.showLoginSignupModal = false
-                    }
-                ) { onboardingViewModel.showLoginSignupModal = false }
+//                SignupLoginModal(
+//                    onboardingViewModel.showLoginSignupModal,
+//                    createAccountCallback = {
+//                        onboardingViewModel.callback = callback
+//                        onboardingViewModel.showLoginSignupModal = false
+//                        navController.navigate(CreateAccountScreen(isOnboarding = true))
+//                    },
+//                    loginAccountCallback = {
+//                        onboardingViewModel.callback = callback
+//                        navController.navigate(LoginScreen(isOnboarding = true))
+//                        onboardingViewModel.showLoginSignupModal = false
+//                    }
+//                ) { onboardingViewModel.showLoginSignupModal = false }
             }
 
             if(onboardingViewModel.showMakeDefaultRequest) {

@@ -7,20 +7,24 @@ import uniffi.relaysms_spec_payload.V1ContentCategories
 object WelcomeScreen
 
 @Serializable
-object OnboardingInteractiveScreen
+object OnboardingScreen
+
+//@Serializable
+//object OnboardingInteractiveScreen
+//
 
 @Serializable
 object HomepageScreen
 
-@Serializable
-data class LoginScreen(
-    val isOnboarding: Boolean = false
-)
-
-@Serializable
-data class CreateAccountScreen(
-    val isOnboarding: Boolean = false
-)
+//@Serializable
+//data class LoginScreen(
+//    val isOnboarding: Boolean = false
+//)
+//
+//@Serializable
+//data class CreateAccountScreen(
+//    val isOnboarding: Boolean = false
+//)
 
 @Serializable
 object AboutScreen
