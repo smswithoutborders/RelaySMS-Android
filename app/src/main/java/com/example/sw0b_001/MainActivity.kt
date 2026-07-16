@@ -1,11 +1,13 @@
 package com.example.sw0b_001
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -54,6 +56,8 @@ import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.afkanerd.smswithoutborders_libsmsmms.ui.requiredReadPhoneStatePermissions
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.SearchViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ThreadsViewModel
+import com.example.sw0b_001.data.CrashHandler
+import com.example.sw0b_001.data.CrashHandler.Companion.saveFileToUri
 import com.example.sw0b_001.extensions.context.promptBiometrics
 import com.example.sw0b_001.extensions.context.settingsGetLockDownApp
 import com.example.sw0b_001.extensions.context.settingsGetOnboardedCompletely
@@ -94,6 +98,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import uniffi.relaysms_spec_payload.Transports
 import uniffi.relaysms_spec_payload.v1CalculateSegments
+import java.io.File
 
 @AndroidEntryPoint
 class MainActivity : BindActivity() {
@@ -129,6 +134,7 @@ class MainActivity : BindActivity() {
         }
 
         imageTransmissionCallback()
+        CrashHandler.initialize(applicationContext)
 
         lifecycleScope.launch {
             onboardingViewModel.showBiometrics.collect { callback ->
@@ -385,7 +391,8 @@ class MainActivity : BindActivity() {
             composable<SettingsScreen> {
                 SettingsView(
                     navController = navController,
-                    tokensViewModel = tokensViewModel
+                    tokensViewModel = tokensViewModel,
+                    activity = this@MainActivity
                 )
             }
 
@@ -444,4 +451,22 @@ class MainActivity : BindActivity() {
         if(::navController.isInitialized)
             processIntent(navController, intent)
     }
+
+    private var pendingSaveFile: File? = null
+    private val createDocumentLauncher = registerForActivityResult(
+        ActivityResultContracts.CreateDocument("text/plain")
+    ) { uri: Uri? ->
+        uri?.let { destUri ->
+            pendingSaveFile?.let { file ->
+                saveFileToUri(this, file, destUri)
+            }
+        }
+        pendingSaveFile = null
+    }
+
+    fun launchSaveCrashLog(mergedFile: File) {
+        pendingSaveFile = mergedFile
+        createDocumentLauncher.launch(mergedFile.name)
+    }
+
 }

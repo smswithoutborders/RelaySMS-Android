@@ -21,6 +21,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -50,7 +51,10 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getActivity
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getCurrentLocale
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.setLocale
 import com.afkanerd.smswithoutborders_libsmsmms.ui.SettingsItem
+import com.example.sw0b_001.BuildConfig
+import com.example.sw0b_001.MainActivity
 import com.example.sw0b_001.R
+import com.example.sw0b_001.data.CrashHandler
 import com.example.sw0b_001.extensions.context.getAppCompatActivity
 import com.example.sw0b_001.extensions.context.promptBiometrics
 import com.example.sw0b_001.extensions.context.settingsGetIsEmailLogin
@@ -71,7 +75,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingsView(
     navController: NavController,
-    tokensViewModel: TokensViewModel
+    tokensViewModel: TokensViewModel,
+    activity: MainActivity,
 ) {
     val context = LocalContext.current
     val inPreviewMode = LocalInspectionMode.current
@@ -294,6 +299,17 @@ fun SettingsView(
                     } finally {
                         isLoading = false
                     }
+                }
+            }
+
+            if(BuildConfig.DEBUG) {
+                HorizontalDivider(Modifier.padding(top = 20.dp))
+                SettingsItem(
+                    itemTitle = "Export logs",
+                    itemDescription = "Export crash logs for debugging purposes",
+                    enabled = true,
+                ) {
+                    CrashHandler.offerCrashLogOptions(activity, context)
                 }
             }
         }
