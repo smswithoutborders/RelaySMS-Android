@@ -37,6 +37,10 @@ class SupportedPlatformsViewModel @Inject constructor(
         return db.fetch()
     }
 
+    fun get(name: String): Flow<SupportedPlatforms?> {
+        return db.fetch(name)
+    }
+
     fun fetch() {
         viewModelScope.launch {
             _uiState.value = SupportedPlatformsUiState.Loading

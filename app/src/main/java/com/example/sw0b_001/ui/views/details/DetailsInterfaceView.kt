@@ -60,6 +60,7 @@ fun DetailsInterfaceView(
         payloadsViewModel.reset()
         navController.popBackStack()
     }
+
     BackHandler { backHandler() }
 
     Scaffold(
@@ -68,11 +69,12 @@ fun DetailsInterfaceView(
                 onBackCallback = { backHandler() },
                 editCallback = {
                     navController.navigate(
-                    ComposeScreen(
-                        cat = cat,
-                        messageId = messageId
+                        ComposeScreen(
+                            cat = cat,
+                            messageId = messageId,
+                            supportedPlatform = message!!.platformName
+                        )
                     )
-                )
             }) {
                 payloadsViewModel.delete(messageId)
                 backHandler()

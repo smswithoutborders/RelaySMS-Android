@@ -70,6 +70,7 @@ fun ComposerInterface(
     payloadsViewModel: PayloadsViewModel,
     publisherViewModel: PublisherViewModel,
     bridgesViewModel: BridgesViewModel,
+    supportedPlatformName: String,
     catId: V1ContentCategories,
     messageId: Long? = null,
 ) {
@@ -90,11 +91,16 @@ fun ComposerInterface(
     BackHandler { backHandler() }
 
     val payload by payloadsViewModel.message.collectAsStateWithLifecycle()
-    val tokens by tokensViewModel.fetchTokensByCatId(catId)
+    val tokens by tokensViewModel.fetchTokensForPlatforms(supportedPlatformName)
         .collectAsStateWithLifecycle(emptyList())
+
     LaunchedEffect(Unit) {
         if(messageId != null) {
             payloadsViewModel.get(messageId)
+        }
+    }
+    LaunchedEffect(payload) {
+        payload?.let {
         }
     }
 
