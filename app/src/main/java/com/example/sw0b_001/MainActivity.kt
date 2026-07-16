@@ -247,6 +247,8 @@ class MainActivity : BindActivity() {
                 navDrawItemSelected -> {
                     {
                         showThreadsTopBar = false
+                        imageViewModel.reset()
+                        payloadsViewModel.reset()
                         HomepageView(
                             navController = navController,
                             tokensViewModel = tokensViewModel,
@@ -310,6 +312,8 @@ class MainActivity : BindActivity() {
                 )
             }
             composable<HomepageScreen> {
+                imageViewModel.reset()
+                payloadsViewModel.reset()
                 HomepageView(
                     navController = navController,
                     tokensViewModel = tokensViewModel,

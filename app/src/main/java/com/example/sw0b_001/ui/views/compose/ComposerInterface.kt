@@ -85,7 +85,6 @@ fun ComposerInterface(
             if(context.isDefault()) context.getDefaultSimSubscription() ?: -1L else -1L)
     }
     fun backHandler() {
-        payloadsViewModel.reset()
         navController.popBackStack()
     }
     BackHandler { backHandler() }

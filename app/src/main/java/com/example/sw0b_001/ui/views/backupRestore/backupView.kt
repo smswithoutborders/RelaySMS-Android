@@ -73,25 +73,29 @@ fun BackupView(
     backupRestoreViewModel: BackupRestoreViewModel,
 ) {
     var currentStep by remember { mutableIntStateOf(0) }
+    var cachedStep: Int? by remember { mutableStateOf(null) }
     val backupRestore by backupRestoreViewModel.getBackup()
         .collectAsStateWithLifecycle(null)
 
-    BackHandler {
+    fun backHandler() {
         if(currentStep == 0) {
             navController.popBackStack()
+        } else if(cachedStep != null) {
+            currentStep = cachedStep!!
+            cachedStep = null
+        } else {
+            currentStep--
         }
     }
+
+    BackHandler { backHandler() }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.on_device_backups)) },
                 navigationIcon = {
-                    IconButton(onClick = {
-                        if(currentStep == 0) {
-                            navController.popBackStack()
-                        } else currentStep--
-                    }) {
+                    IconButton(onClick = { backHandler() } ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
                             contentDescription = stringResource(R.string.back)
@@ -115,6 +119,7 @@ fun BackupView(
                             date = backupRestore!!.date,
                             fileName = backupRestore!!.fileName,
                             onShowRecoveryKey = {
+                                cachedStep = currentStep
                                 currentStep = 2
                             }
                         ) {

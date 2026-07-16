@@ -24,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -65,7 +64,6 @@ fun HomepageView(
     showTopBar: Boolean = true,
     drawerCallback: (() -> Unit)? = {},
 ) {
-    val context = LocalContext.current
     val inboxMessages = payloadsViewModel.getInboxMessages()
         .observeAsState(emptyList())
 
