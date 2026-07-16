@@ -12,12 +12,16 @@ import androidx.activity.result.contract.ActivityResultContract
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Contacts
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,18 +31,25 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.sw0b_001.R
 import com.example.sw0b_001.extensions.context.getPhoneNumberFromUri
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import kotlinx.coroutines.launch
 
 
 class PickPhoneNumberContract : ActivityResultContract<Unit, Uri?>() {
@@ -72,6 +83,10 @@ fun MessageComposeView(
     val context = LocalContext.current
     val fieldInfo = getRecipientFieldInfo()
 
+    val density = LocalDensity.current
+    val coroutineScope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
+
     val launcher = rememberLauncherForActivityResult(
         contract = PickPhoneNumberContract()
     ) { uri ->
@@ -84,8 +99,10 @@ fun MessageComposeView(
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .padding(16.dp)
+            .imePadding()
+            .verticalScroll(scrollState)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -130,19 +147,46 @@ fun MessageComposeView(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedTextField(
+        BasicTextField(
             value = body,
-            onValueChange = bodyCallback,
-            label = { Text(
-                stringResource(R.string.message),
-                style = MaterialTheme.typography.bodyMedium) },
+            onValueChange = { newValue ->
+                bodyCallback(newValue)
+
+                val lines = newValue.lines()
+                val lineCount = lines.size
+
+                val lineHeight = 20.dp
+                val maxVisibleLines = 10
+
+                if (lineCount > maxVisibleLines) {
+                    val scrollOffset = with(density) {
+                        (lineCount - maxVisibleLines) * lineHeight.toPx()
+                    }
+                    coroutineScope.launch {
+                        scrollState.animateScrollTo(scrollOffset.toInt())
+                    }
+                }
+            },
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
+            textStyle = TextStyle.Default.copy(
+                color = MaterialTheme.colorScheme.onSurface,
+                fontSize = 16.sp
+            ),
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Done
-            )
+                .fillMaxHeight(),
+            decorationBox = { innerTextField ->
+                if (body.isEmpty()) {
+                    Text(
+                        text = stringResource(R.string.message),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 16.sp
+                    )
+                }
+                innerTextField()
+            }
         )
     }
 }

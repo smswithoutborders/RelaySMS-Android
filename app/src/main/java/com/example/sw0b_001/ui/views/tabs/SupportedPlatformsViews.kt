@@ -306,7 +306,7 @@ fun PlatformListContent(
                     }
                     V1PayloadsSupportedProtocols.PNBA -> {
                         showPlatformOptions = false
-                        if(!clickedPlatform!!.auth_provider.isNullOrEmpty()) { // TODO("replace this actual std")
+                        if(clickedPlatform!!.auth_provider != "self") { // TODO("replace this actual std")
                             channelBasedAuthRequired = true
                         } else storePnbaRequested = true
                     }

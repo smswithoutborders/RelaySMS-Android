@@ -99,10 +99,6 @@ fun ComposerInterface(
             payloadsViewModel.get(messageId)
         }
     }
-    LaunchedEffect(payload) {
-        payload?.let {
-        }
-    }
 
     var imageBitmap: Bitmap? by remember(processedImage) {
         mutableStateOf(
