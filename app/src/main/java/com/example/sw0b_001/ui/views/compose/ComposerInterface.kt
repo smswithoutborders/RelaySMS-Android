@@ -143,7 +143,10 @@ fun ComposerInterface(
                 imageViewModel = imageViewModel,
                 payloadsViewModel = payloadsViewModel,
                 platformName = selectedToken!!.platformName,
-                onFailureCallback = {},
+                onFailureCallback = {
+                    Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                    showChooseGatewayClient = false
+                },
             ) {
                 backHandler()
             }
@@ -218,7 +221,7 @@ fun ComposerInterface(
                     IconButton(
                         enabled = !isSending,
                         onClick = {
-                            if(!context.settingsGetNotShowChooseGatewayClient)
+                            if(!debugState && !context.settingsGetNotShowChooseGatewayClient)
                                 showChooseGatewayClient = true
                             else {
                                 sendingCallback()

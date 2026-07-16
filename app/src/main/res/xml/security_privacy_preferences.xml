@@ -18,7 +18,7 @@
         <SwitchPreferenceCompat
             app:iconSpaceReserved="false"
             app:key="store_tokens_on_device"
-            app:summary="@string/when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device"
+            app:summary="@string/when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g__x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device"
             app:title="@string/store_tokens_on_device" />
     </PreferenceCategory>
 

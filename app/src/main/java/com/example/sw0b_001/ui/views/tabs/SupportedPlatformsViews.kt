@@ -306,7 +306,7 @@ fun PlatformListContent(
                     }
                     V1PayloadsSupportedProtocols.PNBA -> {
                         showPlatformOptions = false
-                        if(clickedPlatform!!.name == "rmail") { // TODO("replace this actual std")
+                        if(!clickedPlatform!!.auth_provider.isNullOrEmpty()) { // TODO("replace this actual std")
                             channelBasedAuthRequired = true
                         } else storePnbaRequested = true
                     }
@@ -321,27 +321,29 @@ fun PlatformListContent(
         }
 
         if(channelBasedAuthRequired) {
-            AuthyWidgetLauncherView(
-                showDialog = channelBasedAuthRequired,
-                authyUrl = stringResource(R.string.https_authy_shortmesh_com),
-                viewModel = authyViewModel,
-                requestCodeCallback = { pn ->
-                    tokensViewModel.store(
-                        platform = clickedPlatform!!,
-                        phoneNumber = pn,
-                        channel = authyViewModel.selectedPlatform!!.name
-                    )
-                },
-                sendCodeCallback = { code ->
-                    tokensViewModel.store(
-                        platform = clickedPlatform!!,
-                        phoneNumber = authyViewModel.phoneNumber,
-                        channel = authyViewModel.selectedPlatform!!.name,
-                        authCode = code
-                    )
-                },
-            ) {
-                channelBasedAuthRequired = false
+            if(clickedPlatform!!.auth_provider == "shortmesh-authy") { // TODO("std this")
+                AuthyWidgetLauncherView(
+                    showDialog = channelBasedAuthRequired,
+                    authyUrl = stringResource(R.string.https_authy_shortmesh_com),
+                    viewModel = authyViewModel,
+                    requestCodeCallback = { pn ->
+                        tokensViewModel.store(
+                            platform = clickedPlatform!!,
+                            phoneNumber = pn,
+                            channel = authyViewModel.selectedPlatform!!.name
+                        )
+                    },
+                    sendCodeCallback = { code ->
+                        tokensViewModel.store(
+                            platform = clickedPlatform!!,
+                            phoneNumber = authyViewModel.phoneNumber,
+                            channel = authyViewModel.selectedPlatform!!.name,
+                            authCode = code
+                        )
+                    },
+                ) {
+                    channelBasedAuthRequired = false
+                }
             }
         }
 
