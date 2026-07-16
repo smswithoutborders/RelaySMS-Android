@@ -72,7 +72,7 @@ fun OnboardingNavigationRow(
                     label = "dotWidth"
                 )
                 val dotColor by animateColorAsState(
-                    targetValue = if (isSelected)  MaterialTheme.colorScheme.primaryContainer else Color(0xFFD8D8D8),
+                    targetValue = if (isSelected)  MaterialTheme.colorScheme.primary else Color(0xFFD8D8D8),
                     label = "dotColor"
                 )
 
@@ -103,10 +103,10 @@ private fun ContinueButton(
     onClick: () -> Unit
 ) {
 
-    val backgroundColor = if (outlined) Color.White else  MaterialTheme.colorScheme.primaryContainer
-    val contentColor = if (outlined)  MaterialTheme.colorScheme.primaryContainer else Color.White
-    val iconBoxColor = if (outlined)  MaterialTheme.colorScheme.primaryContainer else Color.White
-    val iconTint = if (outlined) Color.White else  MaterialTheme.colorScheme.primaryContainer
+    val backgroundColor = if (outlined) Color.White else  MaterialTheme.colorScheme.primary
+    val contentColor = if (outlined)  MaterialTheme.colorScheme.primary else Color.White
+    val iconBoxColor = if (outlined)  MaterialTheme.colorScheme.primary else Color.White
+    val iconTint = if (outlined) Color.White else  MaterialTheme.colorScheme.primary
 
 
     val interactionSource = remember { MutableInteractionSource() }
@@ -144,7 +144,7 @@ private fun ContinueButton(
             ),
         color = backgroundColor,
         shape = RoundedCornerShape(50),
-        border = if (outlined) BorderStroke(1.5.dp,  MaterialTheme.colorScheme.primaryContainer) else null
+        border = if (outlined) BorderStroke(1.5.dp,  MaterialTheme.colorScheme.primary) else null
     ) {
         Row(
             modifier = Modifier
