@@ -1,6 +1,7 @@
 package com.example.sw0b_001.ui.views
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -38,18 +39,14 @@ import androidx.navigation.NavController
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.components.OnboardingNavigationRow
-import com.example.sw0b_001.ui.components.OnboardingTopBar
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.views.threads.makeDefault
 
+
 @Composable
 fun DefaultSmsAppScreen(
-    navController: NavController,
-    onSkip: () -> Unit,
-    onBack: () -> Unit,
-    onDone: () -> Unit,
+    navController: NavController
 ) {
     val context = LocalContext.current
     val previewMode = LocalInspectionMode.current
@@ -71,27 +68,14 @@ fun DefaultSmsAppScreen(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        OnboardingTopBar(
-            onBack = onBack,
-            onSkip = onSkip,
-            showBack = true,
-            showSkip = true
-        )
-
         Column(
             modifier = Modifier
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Spacer(modifier = Modifier.weight(1f))
-
-            Surface(
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f),
-                modifier = Modifier.size(180.dp)
-            ) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -99,19 +83,18 @@ fun DefaultSmsAppScreen(
                     Image(
                         painter = painterResource(R.drawable.try_sending_message_illus),
                         contentDescription = null,
-                        modifier = Modifier.size(120.dp)
+                        modifier = Modifier.size(180.dp)
                     )
                 }
-            }
+
 
             Spacer(modifier = Modifier.height(40.dp))
 
             Text(
-                text = "Make RelaySMS your\ndefault SMS app",
+                text = "Make RelaySMS your default SMS app",
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontWeight = FontWeight.Bold,
-                    fontFamily = UnboundedFontFamily,
                     letterSpacing = (-0.2).sp
                 ),
                 modifier = Modifier.fillMaxWidth()
@@ -123,8 +106,7 @@ fun DefaultSmsAppScreen(
                 text = "Manage your SMS messages from one place and send images through SMS!",
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyMedium.copy(
-//                    fontFamily = MonasansFontFamily,
-                    lineHeight = 22.sp
+                    lineHeight = 25.sp
                 ),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.fillMaxWidth()
@@ -156,17 +138,8 @@ fun DefaultSmsAppScreen(
                     )
                 )
             }
-
-            Spacer(modifier = Modifier.weight(1f))
         }
 
-        OnboardingNavigationRow(
-            onNext = onDone,
-            isDone = true,
-            showBack = false,
-            showSkip = false,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
     }
 }
 
@@ -176,10 +149,7 @@ fun DefaultSmsAppScreenPreview() {
     val context = LocalContext.current
     AppTheme(darkTheme = false) {
         DefaultSmsAppScreen(
-            navController = NavController(context),
-            onSkip = {},
-            onBack = {},
-            onDone = {},
+            navController = NavController(context)
         )
     }
 }

@@ -1,356 +1,224 @@
 package com.example.sw0b_001.ui.components
 
-import androidx.annotation.DrawableRes
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.Spring
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.theme.AppTheme
-
-@Composable
-fun OnboardingCircleButton(
-    @DrawableRes icon: Int,
-    contentDescription: String,
-    onClick: () -> Unit
-) {
-    Surface(
-        modifier = Modifier
-            .size(48.dp)
-            .shadow(elevation = 4.dp, shape = CircleShape, clip = false)
-            .clickable(onClick = onClick),
-        shape = CircleShape,
-        color = MaterialTheme.colorScheme.primary,
-        tonalElevation = 2.dp
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                painter = painterResource(id = icon),
-                contentDescription = contentDescription,
-                modifier = Modifier.size(20.dp),
-                tint = MaterialTheme.colorScheme.onPrimary
-            )
-        }
-    }
-}
-
-@Composable
-fun OnboardingGetStartedButton(onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        shape = RoundedCornerShape(50.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary
-        ),
-        elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = 3.dp,
-            pressedElevation = 1.dp
-        ),
-        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp),
-        modifier = Modifier.height(48.dp)
-    ) {
-        Text(
-            text = "Get Started",
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontWeight = FontWeight.SemiBold
-            ),
-            color = MaterialTheme.colorScheme.onPrimary
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-        Surface(
-            shape = CircleShape,
-            color = MaterialTheme.colorScheme.onPrimary,
-            modifier = Modifier.size(32.dp)
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.arrow_forward),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun OnboardingOutlinedNextButton(onClick: () -> Unit) {
-    OutlinedButton(
-        onClick = onClick,
-        shape = RoundedCornerShape(50.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
-        colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)
-        ),
-        contentPadding = PaddingValues(
-            start = 22.dp,
-            end = 6.dp,
-            top = 6.dp,
-            bottom = 6.dp
-        ),
-        modifier = Modifier.height(48.dp)
-    ) {
-        Text(
-            text = "Next",
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontWeight = FontWeight.SemiBold
-            ),
-            color = MaterialTheme.colorScheme.primary
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-        Surface(
-            shape = CircleShape,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(32.dp)
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.arrow_forward),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun OnboardingBackButton(
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .clip(RoundedCornerShape(50))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 8.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            painter = painterResource(R.drawable.arrow_back),
-            contentDescription = null,
-            modifier = Modifier.size(20.dp)
-        )
-
-        Spacer(Modifier.width(4.dp))
-
-        Text(
-            text = "Back",
-            style = MaterialTheme.typography.bodyMedium
-        )
-    }
-}
-
-@Composable
-fun OnboardingTopBar(
-    onBack: () -> Unit = {},
-    onSkip: () -> Unit = {},
-    showBack: Boolean = true,
-    showSkip: Boolean = true,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .statusBarsPadding()
-            .padding(horizontal = 32.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-
-        if (showBack) {
-            OnboardingBackButton(
-                onClick = onBack
-            )
-        } else {
-            Spacer(modifier = Modifier.size(48.dp))
-        }
-
-        TextButton(onClick = onSkip) {
-            Text(
-                text = "Skip",
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontWeight = FontWeight.Medium
-                ),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
 
 @Composable
 fun OnboardingNavigationRow(
+    currentPage: Int,
+    pageCount: Int,
+    isLastPage: Boolean,
     onNext: () -> Unit,
-    onBack: () -> Unit = {},
-    onSkip: () -> Unit = {},
-    showBack: Boolean = true,
-    showSkip: Boolean = false,
-    isDone: Boolean = false,
-    isGetStarted: Boolean = false,
-    isOutlined: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 32.dp, vertical = 24.dp),
-        horizontalArrangement = if (showBack)
-            Arrangement.SpaceBetween
-        else
-            Arrangement.End,
+            .height(64.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (showBack) {
-            OnboardingBackButton(
-                onClick = onBack
-            )
-        }
 
         Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            if (showSkip) {
-                TextButton(onClick = onSkip) {
-                    Text(
-                        text = "Skip",
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontWeight = FontWeight.Medium
-                        ),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
 
-            when {
-                isGetStarted -> OnboardingGetStartedButton(onClick = onNext)
-                isOutlined -> OnboardingOutlinedNextButton(onClick = onNext)
-                isDone -> OnboardingDoneButton(onClick = onNext)
-                else -> OnboardingCircleButton(
-                    icon = R.drawable.arrow_forward,
-                    contentDescription = "Next",
-                    onClick = onNext
+            repeat(pageCount) { index ->
+                val isSelected = index == currentPage
+
+                val dotWidth by animateDpAsState(
+                    targetValue = if (isSelected) 24.dp else 8.dp,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessLow
+                    ),
+                    label = "dotWidth"
+                )
+                val dotColor by animateColorAsState(
+                    targetValue = if (isSelected)  MaterialTheme.colorScheme.primaryContainer else Color(0xFFD8D8D8),
+                    label = "dotColor"
+                )
+
+                Box(
+                    modifier = Modifier
+                        .height(8.dp)
+                        .width(dotWidth)
+                        .clip(RoundedCornerShape(50))
+                        .background(dotColor)
                 )
             }
         }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        ContinueButton(
+            text = if (isLastPage) "Done" else "Continue",
+            outlined = isLastPage,
+            onClick = onNext
+        )
     }
 }
 
 @Composable
-fun OnboardingDoneButton(
+private fun ContinueButton(
+    text: String,
+    outlined: Boolean,
     onClick: () -> Unit
 ) {
-    OutlinedButton(
-        onClick = onClick,
-        shape = RoundedCornerShape(50.dp),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
-        colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)
+
+    val backgroundColor = if (outlined) Color.White else  MaterialTheme.colorScheme.primaryContainer
+    val contentColor = if (outlined)  MaterialTheme.colorScheme.primaryContainer else Color.White
+    val iconBoxColor = if (outlined)  MaterialTheme.colorScheme.primaryContainer else Color.White
+    val iconTint = if (outlined) Color.White else  MaterialTheme.colorScheme.primaryContainer
+
+
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.96f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
         ),
-        contentPadding = PaddingValues(
-            start = 22.dp,
-            end = 6.dp,
-            top = 6.dp,
-            bottom = 6.dp
+        label = "buttonScale"
+    )
+
+    val iconOffset by animateFloatAsState(
+        targetValue = if (isPressed) 3f else 0f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
         ),
-        modifier = Modifier.height(48.dp)
-    ) {
-        Text(
-            text = "Done",
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontWeight = FontWeight.SemiBold
+        label = "iconOffset"
+    )
+
+    Surface(
+        modifier = Modifier
+            .width(180.dp)
+            .height(56.dp)
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
+            .clickable(
+                interactionSource = interactionSource,
+                onClick = onClick
             ),
-            color = MaterialTheme.colorScheme.primary
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-        Surface(
-            shape = CircleShape,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(32.dp)
+        color = backgroundColor,
+        shape = RoundedCornerShape(50),
+        border = if (outlined) BorderStroke(1.5.dp,  MaterialTheme.colorScheme.primaryContainer) else null
+    ) {
+        Row(
+            modifier = Modifier
+                .height(50.dp)
+                .width(160.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
         ) {
+
+            Spacer(modifier = Modifier.width(18.dp))
+
+            Text(
+                text = text,
+                color = contentColor,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(iconBoxColor),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.arrow_forward),
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(16.dp)
+                    tint = iconTint,
+                    modifier = Modifier
+                        .size(16.dp)
+                        .graphicsLayer {
+                            translationX = iconOffset
+                        }
                 )
             }
+
+            Spacer(modifier = Modifier.width(8.dp))
         }
     }
 }
 
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "First page")
 @Composable
-fun CircleButtonPreview() {
-    AppTheme {
-        OnboardingCircleButton(
-            icon = R.drawable.arrow_forward,
-            contentDescription = "Next",
-            onClick = {}
-        )
+private fun OnboardingNavigationRowFirstPagePreview() {
+    MaterialTheme {
+        Surface(color = Color.White) {
+            OnboardingNavigationRow(
+                currentPage = 0,
+                pageCount = 3,
+                isLastPage = false,
+                onNext = {},
+                modifier = Modifier.padding(16.dp)
+            )
+        }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun GetStartedPreview() {
-    AppTheme {
-        OnboardingNavigationRow(
-            onNext = {},
-            showBack = false,
-            showSkip = false,
-            isGetStarted = true
-        )
-    }
-}
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "Last page (Done)")
 @Composable
-fun NavigationRowPreview() {
-    AppTheme {
-        OnboardingNavigationRow(
-            onNext = {},
-            onBack = {},
-            onSkip = {}
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DoneNavigationPreview() {
-    AppTheme {
-        OnboardingNavigationRow(
-            onNext = {},
-            onBack = {},
-            onSkip = {},
-            isDone = true
-        )
+private fun OnboardingNavigationRowLastPagePreview() {
+    MaterialTheme {
+        Surface(color = Color.White) {
+            OnboardingNavigationRow(
+                currentPage = 2,
+                pageCount = 3,
+                isLastPage = true,
+                onNext = {},
+                modifier = Modifier.padding(16.dp)
+            )
+        }
     }
 }

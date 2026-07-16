@@ -69,6 +69,7 @@ import com.example.sw0b_001.ui.navigation.RestoreScreen
 import com.example.sw0b_001.ui.navigation.SettingsScreen
 import com.example.sw0b_001.ui.navigation.WelcomeScreen
 import com.example.sw0b_001.ui.onboarding.OnboardingInteractive
+import com.example.sw0b_001.ui.onboarding.OnboardingView
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.BackupRestoreViewModel
 import com.example.sw0b_001.ui.viewModels.BridgesViewModel
@@ -299,7 +300,7 @@ class MainActivity : BindActivity() {
             }
         ) {
             composable<WelcomeScreen> {
-                WelcomeMainView(navController)
+                OnboardingView(navController = navController)
             }
             composable<OnboardingInteractiveScreen> {
                 OnboardingInteractive(
