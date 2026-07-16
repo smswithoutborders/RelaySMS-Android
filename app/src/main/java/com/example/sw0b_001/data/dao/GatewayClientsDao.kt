@@ -18,7 +18,7 @@ interface GatewayClientsDao {
     @Query("SELECT * FROM GatewayClients WHERE operatorCode = :operatorCode")
     fun findForOperatorCode(operatorCode: String?): MutableList<GatewayClients>?
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(gatewayClients: List<GatewayClients>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
