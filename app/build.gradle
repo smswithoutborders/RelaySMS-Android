@@ -89,10 +89,10 @@ android {
         }
 
         debug {
-            minifyEnabled true
-            shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            testProguardFiles 'proguard-rules.pro'
+//            minifyEnabled true
+//            shrinkResources true
+//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+//            testProguardFiles 'proguard-rules.pro'
         }
     }
 
@@ -189,6 +189,7 @@ configurations.configureEach {
 
 dependencies {
     implementation libs.androidx.compose.foundation.layout
+    implementation libs.androidx.documentfile
     implementation libs.smswithoutborders.lib.image.android
     implementation libs.lib.smsmms.android
     implementation libs.lib.signal.double.ratchet.java

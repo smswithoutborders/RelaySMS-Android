@@ -50,9 +50,7 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
-import uniffi.relaysms_spec_payload.V1ContentCategories
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -96,13 +94,7 @@ fun GetStartedView (navController: NavController) {
                 verticalArrangement = Arrangement.Center
             ) {
                 Button(
-                    onClick = {
-                        navController.navigate(
-                            ComposeScreen(
-                                V1ContentCategories.BRIDGE,
-                                messageId = null
-                            )
-                        )},
+                    onClick = { TODO() },
                     colors = ButtonDefaults
                         .buttonColors(MaterialTheme.colorScheme.primary),
                     modifier = Modifier.fillMaxWidth(),

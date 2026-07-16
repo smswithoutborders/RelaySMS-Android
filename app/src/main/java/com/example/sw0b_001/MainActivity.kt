@@ -334,7 +334,8 @@ class MainActivity : BindActivity() {
                     payloadsViewModel = payloadsViewModel,
                     publisherViewModel = publisherViewModel,
                     bridgesViewModel = bridgesViewModel,
-                    catId = composeScreenNav.cat
+                    catId = composeScreenNav.cat,
+                    supportedPlatformName = composeScreenNav.supportedPlatform
                 )
             }
             composable<DetailsInterfaceScreen> { backEntry ->

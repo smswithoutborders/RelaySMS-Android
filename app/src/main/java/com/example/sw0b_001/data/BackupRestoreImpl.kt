@@ -16,6 +16,7 @@ class BackupRestoreImpl(context: Context) {
     private val db = Datastore.getDatastore(context) ?: throw Exception("Failed to open database")
     val keysDb = db.keysDao() ?: throw Exception("Failed to open keys db")
     val tokensDb = db.tokensDao() ?: throw Exception("Failed to open tokens db")
+    val backupRestoreDb = db.backupRestoreDao() ?: throw Exception("Failed to open backup/resetore db")
 
     @Serializable
     private data class BackupData(
@@ -27,6 +28,7 @@ class BackupRestoreImpl(context: Context) {
     suspend fun backup(): BackupRestore {
         val keys = keysDb.fetchAll()
         val tokens = tokensDb.fetchAllList()
+        val backupRestore = backupRestoreDb.fetch()
 
         val sKeys = ByteArrayOutputStream()
         sKeys.use { stream ->
@@ -49,7 +51,7 @@ class BackupRestoreImpl(context: Context) {
         }
 
         val data = sBackups.toByteArray()
-        return BackupRestore.v1BackupEncrypt(data)
+        return BackupRestore.v1BackupEncrypt(data, backupRestore?.recovery_key)
     }
 
     @OptIn(ExperimentalSerializationApi::class)
@@ -65,7 +67,9 @@ class BackupRestoreImpl(context: Context) {
             keysDb.deleteAll()
 
             val orphanedKeys = sKeys.filter { key ->
-                key.tokenHash != null && sTokens.none { it.tokenHash.contentEquals(key.tokenHash!!) }
+                key.tokenHash != null && sTokens.none {
+                    it.tokenHash.contentEquals(key.tokenHash!!)
+                }
             }
             Log.w("Restore", "Orphaned keys: ${orphanedKeys.size}")
 

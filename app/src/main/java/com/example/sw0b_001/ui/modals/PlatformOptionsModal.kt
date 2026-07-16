@@ -151,11 +151,12 @@ fun PlatformOptionsModal(
                     )
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    if (isCompose || platform == null) {
+                    if (isCompose) {
                         ComposeMessages(
                             navController = navController,
                             isOnboarding = isOnboarding,
                             cat = cat,
+                            supportedPlatforms = platform!!.name
                         ) {
                             onDismissRequest()
                         }
@@ -220,6 +221,7 @@ private fun RevokeAccountLoading(platform: SupportedPlatforms) {
 @Composable
 private fun ComposeMessages(
     cat: V1ContentCategories,
+    supportedPlatforms: String,
     navController: NavController,
     isOnboarding: Boolean = false,
     onDismissRequest: () -> Unit
@@ -229,6 +231,7 @@ private fun ComposeMessages(
             navController.navigate(ComposeScreen(
                 cat = cat,
                 messageId = null,
+                supportedPlatform = supportedPlatforms
             ))
             onDismissRequest()
         },
@@ -270,7 +273,7 @@ private fun getServiceBasedAvailableDescription(
 ) : String {
     return when(cat) {
         V1ContentCategories.EMAIL -> {
-            context.getString(R.string.adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported)
+            context.getString(R.string.adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging__are_currently_supported)
         }
         V1ContentCategories.MESSAGE -> {
             context.getString(R.string.adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported)

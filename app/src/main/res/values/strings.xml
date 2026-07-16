@@ -152,7 +152,7 @@
     <string name="send_message">Send Message</string>
     <string name="add_account">Add Account</string>
     <string name="remove_accounts">Remove Accounts</string>
-    <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported">Adding emails to your RelaySMS account enables you use them to send emails using SMS messaging.\n\nGmail are currently supported.</string>
+    <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging__are_currently_supported">Adding emails to your RelaySMS account enables you use them to send emails using SMS messaging.</string>
     <string name="adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported">Adding numbers to your RelaySMS account enables you use them to send messages using SMS messaging.\n\nTelegram messaging is currently supported.</string>
     <string name="adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported">Adding accounts to your RelaySMS account enables you use them to make post using SMS messaging.\n\nPosting is currently supported.</string>
     <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias">Your RelaySMS account is an alias of your phone number with the domain @relaysms.me.\n\nYou can receive replies by SMS whenever a message is sent to your alias.</string>
@@ -187,7 +187,7 @@
     <string name="create_relaysms_account">Create RelaySMS Account</string>
     <string name="create_your_account_and">"Create your account and "</string>
     <string name="save_platforms">save platforms</string>
-    <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline">" for RelaySMS to send messages to Gmail, X, and Telegram on your behalf when offline"</string>
+    <string name="for_relaysms_to_send_messages_to__x_and_telegram_on_your_behalf_when_offline">" for RelaySMS to send messages to Gmail, X, and Telegram on your behalf when offline"</string>
     <string name="i_have_read_the">"I have read the  "</string>
     <string name="privacy_policy">privacy policy</string>
     <string name="log_in">Log in</string>
@@ -200,7 +200,7 @@
     <string name="paste_new_incoming_message">Paste new incoming message</string>
     <string name="log_into_relaysms">Log Into RelaySMS</string>
     <string name="log_into_your_account_and">"Log into your account and "</string>
-    <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline_">" for RelaySMS to send messages to Gmail, X, and Telegram on your behalf when offline"</string>
+    <string name="for_relaysms_to_send_messages_to__x_and_telegram_on_your_behalf_when_offline_">" for RelaySMS to send messages to Gmail, X, and Telegram on your behalf when offline"</string>
     <string name="already_got_code">Already got code</string>
     <string name="do_not_have_an_account">"Do not have an account?  "</string>
     <string name="get_started_with">Get started with</string>
@@ -305,7 +305,7 @@
     <string name="request_new_code">Request new code!</string>
     <string name="test_url" translatable="false">https://gatewayserver.smswithoutborders.com/v3/clients/%1$s/tests</string>
     <string name="store_tokens_on_device_dialog_title">Store OAuth2.0 Tokens on Device</string>
-    <string name="store_tokens_on_device_enable_dialog_message">Turning on this feature automatically deletes your tokens for platforms that utilize OAuth2.0 (Gmail and X) on the server and saves them in your device. Bear in mind RelaySMS utilizes these tokens to send messages on your behalf for the above platforms.  Therefore in case you lose your device or happen to re-install this application, your tokens will be lost and you will have to revoke existing stored accounts and store them again to get new tokens</string>
+    <string name="store_tokens_on_device_enable_dialog_message">Turning on this feature automatically deletes your tokens for platforms that utilize OAuth2.0 on the server and saves them in your device. Bear in mind RelaySMS utilizes these tokens to send messages on your behalf for the above platforms.  Therefore in case you lose your device or happen to re-install this application, your tokens will be lost and you will have to revoke existing stored accounts and store them again to get new tokens</string>
     <string name="store_tokens_on_device_disable_dialog_message">Turning off this setting will prevent subsequent tokens from being stored on your device. Messages for platforms with existing tokens stored on your device will still be able to publish regardless. In any case of missing tokens, please revoke for the accounts involved and store again. </string>
     <string name="are_you_sure_you_want_to_continue">Are you sure you want to continue with this action?</string>
     <string name="missing_token_text">Your following accounts may have missing tokens. You might need to revoke and add them again to ensure message publishing works correctly, especially if \'Store Tokens On-device\' is enabled:</string>
@@ -317,7 +317,7 @@
     <string name="missing_tokens_info">Missing Tokens Info</string>
     <string name="store_tokens_on_device">Store Tokens On-device</string>
     <string name="storing_platform_accounts">Storing Platform Accounts</string>
-    <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">When adding accounts for platforms that utilize OAuth2.0 (e.g Gmail, X), enabling this makes sure your access tokens are rather stored on your current device</string>
+    <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g__x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">When adding accounts for platforms that utilize OAuth2.0 enabling this makes sure your access tokens are rather stored on your current device</string>
     <string name="stored_tokens_detected_title">Stored Tokens Detected</string>
     <string name="stored_tokens_dialog_message_part1">Stored tokens for this</string>
     <string name="stored_tokens_dialog_message_part2">account have been detected. You can use your stored tokens to make a post on</string>
@@ -376,11 +376,10 @@
     <string name="message_content_could_not_be_displayed">Message content could not be displayed</string>
     <string name="text_message">Text Message</string>
     <string name="get_platforms_url" translatable="false">https://publisher.smswithoutborders.com/v1/platforms</string>
-    "
     <string name="recipient_account">Recipient account</string>
     <string name="recipient_account_format_hint">Make sure the recipient account is in the right format.</string>
     <string name="slack_recipient">Slack Channel or User</string>
-    <string name="slack_hint">For channels: use #name or an ID (e.g., #general or C123ABC). For DMs: use @username, an email, or a user ID (e.g., @jane or @user@gmail.com or U456DEF).</string>
+    <string name="slack_hint">For channels: use #name or an ID (e.g., #general or C123ABC). For DMs: use @username, an email, or a user ID (e.g., @jane or @user@.com or U456DEF).</string>
     <string name="view_account_menu">You can now see the account you are currently logged into by clicking the menu icon on the navigation bar"</string>
     <string name="your_account">Your Account</string>
     <string name="set_as_default_sms_app">Set as default SMS app</string>

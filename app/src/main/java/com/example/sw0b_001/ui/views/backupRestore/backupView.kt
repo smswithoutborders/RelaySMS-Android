@@ -35,6 +35,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -57,6 +58,7 @@ import com.afkanerd.smswithoutborders_libsmsmms.data.data.models.DateTimeUtils
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.copyItemToClipboard
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.BackupRestoreUiStates
 import com.example.sw0b_001.ui.viewModels.BackupRestoreViewModel
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -115,7 +117,9 @@ fun BackupView(
                             onShowRecoveryKey = {
                                 currentStep = 2
                             }
-                        ) { currentStep = 1 }
+                        ) {
+                            currentStep = 0
+                        }
                     } else {
                         BackupIntroScreen(
                             backupRestoreViewModel = backupRestoreViewModel,
@@ -183,8 +187,8 @@ private fun BackupIntroScreenComponent(
         HorizontalDivider()
 
         Text(
-            "[write more about backups]",
-            modifier = Modifier.padding(top = 20.dp)
+            stringResource(R.string.to_restore_a_backup_install_a_new_copy_of_relaysms_open_the_app_and_tap_restore_backup_then_locate_a_backup_file),
+            modifier = Modifier.padding(top =20.dp)
         )
     }
 }
@@ -387,13 +391,29 @@ private fun OnDeviceBackupView(
     onDeleteFile: () -> Unit,
 ) {
     val context = LocalContext.current
-    val lastBackupTime by remember{ mutableStateOf(DateTimeUtils
+    val lastBackupTime by remember(date){ mutableStateOf(DateTimeUtils
         .formatDateExtended(context, date)) }
     var errorMessage: String? by remember{ mutableStateOf(null) } // TODO: read from db
+
+    var backupEnabled by remember{ mutableStateOf(false) }
+    val uiState by backupRestoreViewModel.uiState.collectAsState()
+    when(val state = uiState) {
+        BackupRestoreUiStates.Loading -> backupEnabled = false
+        is BackupRestoreUiStates.Error -> {
+            backupEnabled = true
+            errorMessage = state.message
+        }
+        else -> {
+            backupEnabled = true
+            errorMessage = null
+        }
+    }
+
     OnDeviceBackupViewComponent(
         lastBackupTime = lastBackupTime,
         errorMessage = errorMessage,
         backupFilename = fileName,
+        backupEnabled = backupEnabled,
         onCreateBackup = {
             // if you're seeing this, the uri should exist
             // then perform save actions here
@@ -402,11 +422,8 @@ private fun OnDeviceBackupView(
         },
         onViewRecoveryKey = onShowRecoveryKey,
         onDeleteBackup = {
-            if(backupRestoreViewModel.deleteFileByUri(uri)) {
-                onDeleteFile()
-            } else {
-                TODO()
-            }
+            backupRestoreViewModel.deleteBackup()
+            onDeleteFile()
         }
     )
 }
@@ -416,17 +433,20 @@ private fun OnDeviceBackupViewComponent(
     lastBackupTime: String,
     errorMessage: String?,
     backupFilename: String?,
+    backupEnabled: Boolean,
     onCreateBackup: () -> Unit,
     onViewRecoveryKey: () -> Unit,
     onDeleteBackup: () -> Unit,
 ) {
     Column(
-        modifier = Modifier.padding(12.dp)
+        modifier = Modifier
+            .padding(12.dp)
     ) {
         Column(
             Modifier
+                .fillMaxWidth()
                 .padding(bottom = 16.dp)
-                .clickable {
+                .clickable( enabled = backupEnabled ) {
                     onCreateBackup()
                 }
         ) {
@@ -452,6 +472,7 @@ private fun OnDeviceBackupViewComponent(
         }
 
         Column(Modifier
+            .fillMaxWidth()
             .clickable { onViewRecoveryKey() }
             .padding(top = 16.dp, bottom = 16.dp)
         ) {
@@ -459,6 +480,7 @@ private fun OnDeviceBackupViewComponent(
         }
 
         Column(Modifier
+            .fillMaxWidth()
             .clickable { onDeleteBackup() }
             .padding(top = 16.dp, bottom = 16.dp)
         ) {
@@ -491,6 +513,7 @@ fun OnDeviceBackupViewComponent_Preview() {
             "Now",
             "Error",
             "filename",
+            true,
             {},
             {},
             {},

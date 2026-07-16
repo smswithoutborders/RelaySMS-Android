@@ -885,7 +885,7 @@ external fun uniffi_relaysms_spec_payload_fn_free_backuprestore(`handle`: Long,u
 ): Unit
 external fun uniffi_relaysms_spec_payload_fn_constructor_backuprestore_deserialize(`data`: RustBuffer.ByValue,`recoveryKey`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
-external fun uniffi_relaysms_spec_payload_fn_constructor_backuprestore_v1_backup_encrypt(`data`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_constructor_backuprestore_v1_backup_encrypt(`data`: RustBuffer.ByValue,`recoveryKey`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): Long
 external fun uniffi_relaysms_spec_payload_fn_method_backuprestore_get_ciphertext(`ptr`: Long,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
@@ -1274,7 +1274,7 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_relaysms_spec_payload_checksum_constructor_backuprestore_deserialize() != 51856.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_backuprestore_v1_backup_encrypt() != 6838.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_constructor_backuprestore_v1_backup_encrypt() != 62137.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_relaysms_spec_payload_checksum_constructor_offlinefirst_decrypt() != 31684.toShort()) {
@@ -1997,12 +1997,12 @@ open class BackupRestore: Disposable, AutoCloseable, BackupRestoreInterface
     
 
         
-    @Throws(V1CryptographicException::class) fun `v1BackupEncrypt`(`data`: kotlin.ByteArray): BackupRestore {
+    @Throws(V1CryptographicException::class) fun `v1BackupEncrypt`(`data`: kotlin.ByteArray, `recoveryKey`: kotlin.ByteArray?): BackupRestore {
             return FfiConverterTypeBackupRestore.lift(
     uniffiRustCallWithError(V1CryptographicException) { _status ->
     UniffiLib.uniffi_relaysms_spec_payload_fn_constructor_backuprestore_v1_backup_encrypt(
     
-        FfiConverterByteArray.lower(`data`),_status)
+        FfiConverterByteArray.lower(`data`),FfiConverterOptionalByteArray.lower(`recoveryKey`),_status)
 }
     )
     }

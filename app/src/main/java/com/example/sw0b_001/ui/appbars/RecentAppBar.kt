@@ -64,6 +64,7 @@ fun RecentAppBar(
     onSearchQueryChanged: (String) -> Unit,
     searchQuery: String,
     isSearchActive: Boolean,
+    enableBackup: Boolean,
     onToggleSearch: () -> Unit,
     onSearchDone: () -> Unit,
     isSelectionMode: Boolean = false,
@@ -193,6 +194,7 @@ fun RecentAppBar(
                             }
                         )
                         DropdownMenuItem(
+                            enabled = enableBackup,
                             text = { Text(stringResource(R.string.backup)) },
                             onClick = {
                                 showMenu = false
@@ -273,6 +275,7 @@ fun RecentsAppBarPreview() {
             navController = NavController(context = LocalContext.current),
             onSearchQueryChanged = { searchQuery = it },
             searchQuery = searchQuery,
+            enableBackup = true,
             isSearchActive = isSearchActive,
             onToggleSearch = { isSearchActive = !isSearchActive },
             onSearchDone = {}
@@ -289,6 +292,7 @@ fun RecentsAppBarSelectionModePreview() {
             onSearchQueryChanged = { },
             searchQuery = "",
             isSearchActive = false,
+            enableBackup = false,
             onToggleSearch = { },
             onSearchDone = {},
             isSelectionMode = true,

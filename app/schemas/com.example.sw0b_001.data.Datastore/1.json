@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "e450bc6f2038d4d01256c42aa09f45ce",
+    "identityHash": "a86bdcbcded8d0df19196c420e4b700d",
     "entities": [
       {
         "tableName": "RatchetStates",
@@ -186,7 +186,7 @@
       },
       {
         "tableName": "SupportedPlatforms",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `display_name` TEXT NOT NULL, `cat_id` INTEGER NOT NULL, `proto_id` INTEGER, `icon_svg` TEXT, `icon_png` TEXT, `logo` BLOB, PRIMARY KEY(`name`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `display_name` TEXT NOT NULL, `supports_offline_first` INTEGER NOT NULL, `cat_id` INTEGER NOT NULL, `proto_id` INTEGER, `icon_svg` TEXT, `icon_png` TEXT, `auth_provider` TEXT, `logo` BLOB, PRIMARY KEY(`name`))",
         "fields": [
           {
             "fieldPath": "name",
@@ -198,6 +198,12 @@
             "fieldPath": "display_name",
             "columnName": "display_name",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "supports_offline_first",
+            "columnName": "supports_offline_first",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -219,6 +225,11 @@
           {
             "fieldPath": "icon_png",
             "columnName": "icon_png",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "auth_provider",
+            "columnName": "auth_provider",
             "affinity": "TEXT"
           },
           {
@@ -426,7 +437,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e450bc6f2038d4d01256c42aa09f45ce')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a86bdcbcded8d0df19196c420e4b700d')"
     ]
   }
 }

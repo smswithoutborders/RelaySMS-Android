@@ -44,6 +44,7 @@ object RestoreScreen {
 data class ComposeScreen(
     val cat: V1ContentCategories,
     val messageId: Long?,
+    val supportedPlatform: String,
 )
 
 @Serializable

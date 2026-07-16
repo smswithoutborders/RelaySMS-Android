@@ -70,6 +70,7 @@ fun ComposerInterface(
     payloadsViewModel: PayloadsViewModel,
     publisherViewModel: PublisherViewModel,
     bridgesViewModel: BridgesViewModel,
+    supportedPlatformName: String,
     catId: V1ContentCategories,
     messageId: Long? = null,
 ) {
@@ -90,8 +91,9 @@ fun ComposerInterface(
     BackHandler { backHandler() }
 
     val payload by payloadsViewModel.message.collectAsStateWithLifecycle()
-    val tokens by tokensViewModel.fetchTokensByCatId(catId)
+    val tokens by tokensViewModel.fetchTokensForPlatforms(supportedPlatformName)
         .collectAsStateWithLifecycle(emptyList())
+
     LaunchedEffect(Unit) {
         if(messageId != null) {
             payloadsViewModel.get(messageId)
@@ -143,7 +145,10 @@ fun ComposerInterface(
                 imageViewModel = imageViewModel,
                 payloadsViewModel = payloadsViewModel,
                 platformName = selectedToken!!.platformName,
-                onFailureCallback = {},
+                onFailureCallback = {
+                    Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                    showChooseGatewayClient = false
+                },
             ) {
                 backHandler()
             }
@@ -218,7 +223,7 @@ fun ComposerInterface(
                     IconButton(
                         enabled = !isSending,
                         onClick = {
-                            if(!context.settingsGetNotShowChooseGatewayClient)
+                            if(!debugState && !context.settingsGetNotShowChooseGatewayClient)
                                 showChooseGatewayClient = true
                             else {
                                 sendingCallback()

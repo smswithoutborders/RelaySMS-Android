@@ -35,7 +35,6 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import uniffi.relaysms_spec_payload.V1ContentCategories
 import uniffi.relaysms_spec_payload.V1PayloadsSupportedProtocols
 import uniffi.relaysms_spec_payload.v1PayloadSupportProtocolsFromU8
 
@@ -84,8 +83,8 @@ class TokensViewModel @Inject constructor(
         return db.fetchAll()
     }
 
-    fun fetchTokensByCatId(catId: V1ContentCategories): Flow<List<Tokens>> {
-        return db.fetchCatId(catId)
+    fun fetchTokensForPlatforms(platformName: String): Flow<List<Tokens>> {
+        return db.fetch(platformName)
     }
 
     fun reset(onCompleteCallback: ()-> Unit) {
