@@ -187,8 +187,8 @@ private fun BackupIntroScreenComponent(
         HorizontalDivider()
 
         Text(
-            "[write more about backups]",
-            modifier = Modifier.padding(top = 20.dp)
+            stringResource(R.string.to_restore_a_backup_install_a_new_copy_of_relaysms_open_the_app_and_tap_restore_backup_then_locate_a_backup_file),
+            modifier = Modifier.padding(top =20.dp)
         )
     }
 }
