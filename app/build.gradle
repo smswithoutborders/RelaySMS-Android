@@ -188,6 +188,7 @@ configurations.configureEach {
 
 
 dependencies {
+    implementation libs.androidx.compose.foundation.layout
     implementation libs.androidx.documentfile
     implementation libs.smswithoutborders.lib.image.android
     implementation libs.lib.smsmms.android
