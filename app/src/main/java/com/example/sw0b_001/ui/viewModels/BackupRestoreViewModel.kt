@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.OpenableColumns
+import androidx.core.net.toUri
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sw0b_001.data.BackupRestoreImpl
@@ -148,18 +150,33 @@ class BackupRestoreViewModel @Inject constructor(
         return cleanedString.chunked(4)
     }
 
-    fun deleteFileByUri(fileUri: Uri): Boolean {
-        return try {
-            val deletedRows = context.contentResolver
-                .delete(fileUri, null, null)
-            deletedRows > 0
-        } catch (e: SecurityException) {
-            e.printStackTrace()
-            false
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
+    fun deleteBackup() {
+        _uiState.value = BackupRestoreUiStates.Loading
+        viewModelScope.launch(Dispatchers.IO) {
+            val backupRestore = db.fetch()
+            backupRestore?.let {
+                val uri = backupRestore.uri.toUri()
+                if (DocumentFile.isDocumentUri(context, uri)) {
+                    if (!deleteFileByUri(uri)) {
+                        _uiState.value = BackupRestoreUiStates.Error("Failed to delete file")
+                        return@launch
+                    }
+                } else if (uri.scheme == "file") {
+                    val file = File(uri.path ?: "")
+                    if (file.exists() && !file.delete()) {
+                        _uiState.value = BackupRestoreUiStates.Error("Failed to delete local file")
+                        return@launch
+                    }
+                }
+            }
+            db.deleteAll()
+            _uiState.value = BackupRestoreUiStates.Idle
         }
+    }
+
+    private fun deleteFileByUri(fileUri: Uri): Boolean {
+        val documentFile = DocumentFile.fromSingleUri(context, fileUri)
+        return documentFile?.delete() ?: false
     }
 
     fun getFileNameFromUri(uri: Uri): String? {

@@ -188,6 +188,7 @@ configurations.configureEach {
 
 
 dependencies {
+    implementation libs.androidx.documentfile
     implementation libs.smswithoutborders.lib.image.android
     implementation libs.lib.smsmms.android
     implementation libs.lib.signal.double.ratchet.java

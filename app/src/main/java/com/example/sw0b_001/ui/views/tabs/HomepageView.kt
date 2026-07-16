@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -79,6 +80,12 @@ fun HomepageView(
     var searchQuery by remember { mutableStateOf("") }
     var isSearchActive by remember { mutableStateOf(false) }
 
+    var enableBackup by remember{ mutableStateOf(false) }
+    val availableTokens by tokensViewModel.get().collectAsStateWithLifecycle(null)
+    LaunchedEffect(availableTokens) {
+        enableBackup = availableTokens?.isNotEmpty() == true
+    }
+
     Scaffold (
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -94,6 +101,7 @@ fun HomepageView(
                             onSearchDone = {},
                             isSelectionMode = tokensViewModel.isSelectionMode,
                             selectedCount = tokensViewModel.selectedMessagesCount,
+                            enableBackup = enableBackup,
                             onSelectAll = tokensViewModel.onSelectAll,
                             onDeleteSelected = tokensViewModel.onDeleteSelected,
                             onCancelSelection = tokensViewModel.onCancelSelection,
