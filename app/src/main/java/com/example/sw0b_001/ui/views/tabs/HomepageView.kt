@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BubbleChart
 import androidx.compose.material.icons.filled.ContentPaste
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -149,7 +150,7 @@ fun HomepageView(
                         },
                         icon = {
                             Icon(
-                                imageVector = Icons.Default.BubbleChart,
+                                imageVector = Icons.Default.Edit,
                                 contentDescription = stringResource(R.string.compose_new),
                             )
                         },
