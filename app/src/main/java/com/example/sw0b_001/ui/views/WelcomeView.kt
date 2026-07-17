@@ -61,7 +61,7 @@ fun WelcomeMainView() {
                 text = "Send messages online even when the internet is gone.",
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.headlineSmall.copy(
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.Bold
                 ),
                 modifier = Modifier.fillMaxWidth()
             )
