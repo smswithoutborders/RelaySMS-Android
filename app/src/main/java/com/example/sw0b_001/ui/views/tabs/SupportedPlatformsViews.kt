@@ -1,12 +1,10 @@
 package com.example.sw0b_001.ui.views.tabs
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,12 +19,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChatBubbleOutline
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -94,15 +95,19 @@ fun SupportedPlatformsView(
     LaunchedEffect(Unit) {
         supportedPlatformsViewModel.fetch()
     }
+    var showDefaultSmsCard by remember {
+        mutableStateOf(true)
+    }
 
     val inPreviewMode = LocalInspectionMode.current
 
-    var isDefault by remember{
-        mutableStateOf(inPreviewMode || context.isDefault()) }
+    var isDefault by remember {
+        mutableStateOf(inPreviewMode || context.isDefault())
+    }
 
     val getDefaultPermission = getSetDefaultBehaviour(context) {
         isDefault = context.isDefault()
-        if(isDefault) {
+        if (isDefault) {
             navController.navigate(HomeScreenNav()) {
                 popUpTo(HomeScreenNav()) {
                     inclusive = true
@@ -112,68 +117,86 @@ fun SupportedPlatformsView(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        Text(
-            text = if(isCompose) stringResource(R.string.send_new_message)
-            else stringResource(R.string.supported_platforms),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 16.dp),
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp, vertical = 16.dp)
+                .padding(bottom = 170.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = if (isCompose) stringResource(R.string.send_new_message)
+                else stringResource(R.string.supported_platforms),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(bottom = 16.dp),
+            )
 
-        if(inPreviewMode || (isCompose && !isDefault && !isOnboarding)) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                OutlinedButton(onClick = {
-                    getDefaultPermission.launch(makeDefault(context))
-                }) {
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ChatBubbleOutline,
-                            contentDescription = stringResource(R.string.compose),
-                        )
+            if (inPreviewMode || (isCompose && !isDefault && !isOnboarding)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    OutlinedButton(onClick = {
+                        getDefaultPermission.launch(makeDefault(context))
+                    }) {
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ChatBubbleOutline,
+                                contentDescription = stringResource(R.string.compose),
+                            )
 
-                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
 
-                        Text(
-                            stringResource(R.string.set_as_default_sms_app),
-                            fontWeight = FontWeight.SemiBold,
-                        )
+                            Text(
+                                stringResource(R.string.set_as_default_sms_app),
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        }
                     }
                 }
+                HorizontalDivider()
             }
 
-            HorizontalDivider()
+            PlatformListContent(
+                isCompose = isCompose,
+                supportedPlatformsViewModel = supportedPlatformsViewModel,
+                tokensViewModel = tokensViewModel,
+                isOnboarding = isOnboarding,
+                navController = navController,
+            )
         }
 
-        PlatformListContent(
-            isCompose = isCompose,
-            supportedPlatformsViewModel = supportedPlatformsViewModel,
-            tokensViewModel = tokensViewModel,
-            isOnboarding = isOnboarding,
-            navController = navController,
-        )
+        if (!isDefault && showDefaultSmsCard) {
+            DefaultSmsCard(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(16.dp),
+                onDismiss = {
+                    showDefaultSmsCard = false
+                },
+                onSetDefault = {
+                    getDefaultPermission.launch(makeDefault(context))
+                }
+            )
+        }
+        }
     }
 
-}
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -500,3 +523,75 @@ fun PlatformListRow(
     }
 }
 
+
+@Composable
+fun DefaultSmsCard(
+    modifier: Modifier = Modifier,
+onDismiss: () -> Unit,
+    onSetDefault: () -> Unit
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(15.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(
+                    onClick = {
+                        onDismiss()
+                    },
+                    modifier = Modifier.size(28.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Dismiss",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "To send attachments and enjoy the full RelaySMS experience, make RelaySMS your default SMS app.",
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = onSetDefault,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .height(44.dp)
+                    .width(170.dp),
+                shape = RoundedCornerShape(14.dp),
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 1.dp
+                ),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Text(
+                    text = "Set Default SMS App",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
+    }
+}
