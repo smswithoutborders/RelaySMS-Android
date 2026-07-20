@@ -1,6 +1,7 @@
 package com.example.sw0b_001.ui.views.tabs
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -230,41 +231,6 @@ fun PlatformListContent(
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        if(!isOnboarding) {
-            Spacer(modifier = Modifier.height(8.dp))
-
-            PlatformCard(
-                platform = null,
-                modifier = Modifier,
-                isActive = true,
-                onClick = {
-                    clickedPlatform = null
-                    showPlatformOptions = true
-                }
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = stringResource(R.string.use_your_relaysms_account),
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.secondary
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-        }
-
-        HorizontalDivider()
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(
-            text = stringResource(R.string.use_your_online_accounts),
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.secondary
-        )
-
-        Spacer(modifier = Modifier.padding(8.dp))
 
         when(val state = states) {
             is SupportedPlatformsUiState.Loading -> {
@@ -279,7 +245,7 @@ fun PlatformListContent(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            supportedPlatforms.forEach { platform ->
+            supportedPlatforms.forEach {  platform ->
                 val isStored = tokens.find { it.platformName == platform.name }
 
                 PlatformListRow(
@@ -290,8 +256,10 @@ fun PlatformListContent(
                     clickedPlatform = platform
                     showPlatformOptions = true
                 }
+
             }
         }
+
 
         val storeCallback : () -> Unit = {
             CoroutineScope(Dispatchers.Default).launch {
@@ -470,11 +438,10 @@ fun PlatformListRow(
 ) {
     Card(
         onClick = { onClick(platform) },
-        modifier = Modifier
-            .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
         )
     ) {
         Row(
@@ -483,27 +450,19 @@ fun PlatformListRow(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                modifier = Modifier
-                    .size(45.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant),
-                contentAlignment = Alignment.Center
+            GlideImage(
+                model = platform?.icon_png,
+                contentDescription = stringResource(R.string.platform_image),
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.size(28.dp),
+                colorFilter = if (!isActive && platform != null)
+                    ColorFilter.tint(
+                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
+                else null,
+                loading = placeholder(R.drawable.logo),
+                failure = placeholder(R.drawable.logo)
             ) {
-                GlideImage(
-                    model = platform?.icon_png,
-                    contentDescription = stringResource(R.string.platform_image),
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier.size(28.dp),
-                    colorFilter = if (!isActive && platform != null)
-                        ColorFilter.tint(
-                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
-                    else null,
-                    loading = placeholder(R.drawable.logo),
-                    failure = placeholder(R.drawable.logo)
-                ) {
-                    it.diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop()
-                }
+                it.diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop()
             }
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -540,3 +499,4 @@ fun PlatformListRow(
         }
     }
 }
+
