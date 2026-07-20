@@ -128,6 +128,8 @@ fun GetMessageAvatar(logo: String?) {
 }
 
 
+
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RecentMessageCard(
@@ -137,9 +139,19 @@ fun RecentMessageCard(
     logo: String? = null,
     onClickCallback: (Payloads) -> Unit,
 ) {
-    var text by remember { mutableStateOf(payload.content.getBody().toUtf8String()) }
-    var heading by remember { mutableStateOf(payload.content.getSubject()?.toUtf8String() ?: "") }
-    var subHeading by remember { mutableStateOf(payload.content.getTo()?.toUtf8String() ?: "" ) }
+    val rawBody = payload.content.getBody().toUtf8String()
+    val heading = payload.content.getSubject()?.toUtf8String() ?: ""
+    val subHeading = payload.content.getTo()?.toUtf8String() ?: ""
+
+    val hasHeading = heading.isNotBlank()
+    val hasSubHeading = subHeading.isNotBlank()
+
+    val maxPreviewChars = 50
+    val previewText = remember(rawBody) {
+        if (rawBody.length > maxPreviewChars) {
+            rawBody.take(maxPreviewChars).trimEnd() + "…"
+        } else rawBody
+    }
 
     Column {
         ListItem(
@@ -152,41 +164,44 @@ fun RecentMessageCard(
                 .fillMaxWidth(),
             headlineContent = {
                 Text(
-                    subHeading,
+                    text = if (hasSubHeading) subHeading else previewText,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
             },
-            overlineContent = {
-                Text(
-                    heading,
-                    style = if (cat == V1ContentCategories.TEXT) {
-                        MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
-                    } else {
-                        MaterialTheme.typography.bodyLarge
-                    },
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            },
-            supportingContent = {
-                Text(
-                    text = text,
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            },
+            overlineContent = if (hasHeading) {
+                {
+                    Text(
+                        heading,
+                        style = if (cat == V1ContentCategories.TEXT) {
+                            MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
+                        } else {
+                            MaterialTheme.typography.bodyLarge
+                        },
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            } else null,
+            supportingContent = if (hasSubHeading) {
+                {
+                    Text(
+                        text = previewText,
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else null,
             leadingContent = {
                 GetMessageAvatar(logo)
             },
             trailingContent = {
                 Text(
-//                    text = Helpers.formatDate(LocalContext.current, payload.date),
                     text = date,
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -195,3 +210,5 @@ fun RecentMessageCard(
         )
     }
 }
+
+
