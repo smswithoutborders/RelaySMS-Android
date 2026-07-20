@@ -275,21 +275,17 @@ fun PlatformListContent(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        FlowRow(
+        Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalArrangement = Arrangement.Center,
-            maxItemsInEachRow = 2
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             supportedPlatforms.forEach { platform ->
                 val isStored = tokens.find { it.platformName == platform.name }
 
-                PlatformCard(
+                PlatformListRow(
                     platform = platform,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .width(130.dp),
                     isActive = isStored != null,
+                    badgeCount = null // TODO: wire real count once you know what it represents
                 ) {
                     clickedPlatform = platform
                     showPlatformOptions = true
@@ -458,6 +454,89 @@ fun PlatformCard(
                     .padding(bottom = 16.dp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
             )
+        }
+    }
+}
+
+
+
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun PlatformListRow(
+    platform: SupportedPlatforms?,
+    isActive: Boolean,
+    badgeCount: Int? = null,
+    onClick: (SupportedPlatforms?) -> Unit = {}
+) {
+    Card(
+        onClick = { onClick(platform) },
+        modifier = Modifier
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(45.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surfaceVariant),
+                contentAlignment = Alignment.Center
+            ) {
+                GlideImage(
+                    model = platform?.icon_png,
+                    contentDescription = stringResource(R.string.platform_image),
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(28.dp),
+                    colorFilter = if (!isActive && platform != null)
+                        ColorFilter.tint(
+                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
+                    else null,
+                    loading = placeholder(R.drawable.logo),
+                    failure = placeholder(R.drawable.logo)
+                ) {
+                    it.diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop()
+                }
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = platform?.display_name ?: stringResource(R.string.error),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = "Send messages using your ${platform?.display_name ?: ""} account.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            if (badgeCount != null && badgeCount > 0) {
+                Box(
+                    modifier = Modifier
+                        .size(22.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFFF9800)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = badgeCount.toString(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.White
+                    )
+                }
+            }
         }
     }
 }
