@@ -79,6 +79,11 @@ import uniffi.relaysms_spec_payload.V1ContentCategories
 import uniffi.relaysms_spec_payload.V1PayloadsSupportedProtocols
 import uniffi.relaysms_spec_payload.v1ContentCategoryFromU8
 import uniffi.relaysms_spec_payload.v1PayloadSupportProtocolsFromU8
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.style.TextDecoration
 
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
@@ -248,7 +253,6 @@ fun PlatformListContent(
         }
     }
 
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -282,6 +286,51 @@ fun PlatformListContent(
 
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        val infoText = buildAnnotatedString {
+            append("Connect your accounts once while online. Send from any of them offline, anytime. ")
+            pushStringAnnotation(
+                tag = "learn_more",
+                annotation = "learn_more"
+            )
+            withStyle(
+                style = SpanStyle(
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            ) {
+                append("Learn more")
+            }
+
+            pop()
+        }
+
+
+        ClickableText(
+            text = infoText,
+            style = MaterialTheme.typography.bodySmall.copy(
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Start
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(9.dp),
+            onClick = { offset ->
+
+                infoText
+                    .getStringAnnotations(
+                        tag = "learn_more",
+                        start = offset,
+                        end = offset
+                    )
+                    .firstOrNull()
+                    ?.let {
+                        // TODO: Navigate to Learn More page
+                    }
+            }
+        )
 
 
         val storeCallback : () -> Unit = {
