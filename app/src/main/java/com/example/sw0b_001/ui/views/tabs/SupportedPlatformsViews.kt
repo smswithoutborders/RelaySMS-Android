@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,12 +19,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChatBubbleOutline
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -77,6 +79,11 @@ import uniffi.relaysms_spec_payload.V1ContentCategories
 import uniffi.relaysms_spec_payload.V1PayloadsSupportedProtocols
 import uniffi.relaysms_spec_payload.v1ContentCategoryFromU8
 import uniffi.relaysms_spec_payload.v1PayloadSupportProtocolsFromU8
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.style.TextDecoration
 
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
@@ -93,15 +100,19 @@ fun SupportedPlatformsView(
     LaunchedEffect(Unit) {
         supportedPlatformsViewModel.fetch()
     }
+    var showDefaultSmsCard by remember {
+        mutableStateOf(true)
+    }
 
     val inPreviewMode = LocalInspectionMode.current
 
-    var isDefault by remember{
-        mutableStateOf(inPreviewMode || context.isDefault()) }
+    var isDefault by remember {
+        mutableStateOf(inPreviewMode || context.isDefault())
+    }
 
     val getDefaultPermission = getSetDefaultBehaviour(context) {
         isDefault = context.isDefault()
-        if(isDefault) {
+        if (isDefault) {
             navController.navigate(HomeScreenNav()) {
                 popUpTo(HomeScreenNav()) {
                     inclusive = true
@@ -111,68 +122,86 @@ fun SupportedPlatformsView(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(start = 16.dp, end = 16.dp, top = 16.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        Text(
-            text = if(isCompose) stringResource(R.string.send_new_message)
-            else stringResource(R.string.supported_platforms),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 16.dp),
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp, vertical = 16.dp)
+                .padding(bottom = 170.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = if (isCompose) stringResource(R.string.send_new_message)
+                else stringResource(R.string.supported_platforms),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(bottom = 16.dp),
+            )
 
-        if(inPreviewMode || (isCompose && !isDefault && !isOnboarding)) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                OutlinedButton(onClick = {
-                    getDefaultPermission.launch(makeDefault(context))
-                }) {
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ChatBubbleOutline,
-                            contentDescription = stringResource(R.string.compose),
-                        )
+            if (inPreviewMode || (isCompose && !isDefault && !isOnboarding)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    OutlinedButton(onClick = {
+                        getDefaultPermission.launch(makeDefault(context))
+                    }) {
+                        Row(
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ChatBubbleOutline,
+                                contentDescription = stringResource(R.string.compose),
+                            )
 
-                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
 
-                        Text(
-                            stringResource(R.string.set_as_default_sms_app),
-                            fontWeight = FontWeight.SemiBold,
-                        )
+                            Text(
+                                stringResource(R.string.set_as_default_sms_app),
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        }
                     }
                 }
+                HorizontalDivider()
             }
 
-            HorizontalDivider()
+            PlatformListContent(
+                isCompose = isCompose,
+                supportedPlatformsViewModel = supportedPlatformsViewModel,
+                tokensViewModel = tokensViewModel,
+                isOnboarding = isOnboarding,
+                navController = navController,
+            )
         }
 
-        PlatformListContent(
-            isCompose = isCompose,
-            supportedPlatformsViewModel = supportedPlatformsViewModel,
-            tokensViewModel = tokensViewModel,
-            isOnboarding = isOnboarding,
-            navController = navController,
-        )
+        if (!isDefault && showDefaultSmsCard) {
+            DefaultSmsCard(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(16.dp),
+                onDismiss = {
+                    showDefaultSmsCard = false
+                },
+                onSetDefault = {
+                    getDefaultPermission.launch(makeDefault(context))
+                }
+            )
+        }
+        }
     }
 
-}
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -224,47 +253,11 @@ fun PlatformListContent(
         }
     }
 
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        if(!isOnboarding) {
-            Spacer(modifier = Modifier.height(8.dp))
-
-            PlatformCard(
-                platform = null,
-                modifier = Modifier,
-                isActive = true,
-                onClick = {
-                    clickedPlatform = null
-                    showPlatformOptions = true
-                }
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = stringResource(R.string.use_your_relaysms_account),
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.secondary
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-        }
-
-        HorizontalDivider()
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(
-            text = stringResource(R.string.use_your_online_accounts),
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.secondary
-        )
-
-        Spacer(modifier = Modifier.padding(8.dp))
 
         when(val state = states) {
             is SupportedPlatformsUiState.Loading -> {
@@ -275,27 +268,70 @@ fun PlatformListContent(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        FlowRow(
+        Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalArrangement = Arrangement.Center,
-            maxItemsInEachRow = 2
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            supportedPlatforms.forEach { platform ->
+            supportedPlatforms.forEach {  platform ->
                 val isStored = tokens.find { it.platformName == platform.name }
 
-                PlatformCard(
+                PlatformListRow(
                     platform = platform,
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .width(130.dp),
                     isActive = isStored != null,
+                    badgeCount = null // TODO: wire real count once you know what it represents
                 ) {
                     clickedPlatform = platform
                     showPlatformOptions = true
                 }
+
             }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        val infoText = buildAnnotatedString {
+            append("Connect your accounts once while online. Send from any of them offline, anytime. ")
+            pushStringAnnotation(
+                tag = "learn_more",
+                annotation = "learn_more"
+            )
+            withStyle(
+                style = SpanStyle(
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            ) {
+                append("Learn more")
+            }
+
+            pop()
+        }
+
+
+        ClickableText(
+            text = infoText,
+            style = MaterialTheme.typography.bodySmall.copy(
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Start
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(9.dp),
+            onClick = { offset ->
+
+                infoText
+                    .getStringAnnotations(
+                        tag = "learn_more",
+                        start = offset,
+                        end = offset
+                    )
+                    .firstOrNull()
+                    ?.let {
+                        // TODO: Navigate to Learn More page
+                    }
+            }
+        )
+
 
         val storeCallback : () -> Unit = {
             CoroutineScope(Dispatchers.Default).launch {
@@ -458,6 +494,153 @@ fun PlatformCard(
                     .padding(bottom = 16.dp),
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
             )
+        }
+    }
+}
+
+
+
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun PlatformListRow(
+    platform: SupportedPlatforms?,
+    isActive: Boolean,
+    badgeCount: Int? = null,
+    onClick: (SupportedPlatforms?) -> Unit = {}
+) {
+    Card(
+        onClick = { onClick(platform) },
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            GlideImage(
+                model = platform?.icon_png,
+                contentDescription = stringResource(R.string.platform_image),
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.size(28.dp),
+                colorFilter = if (!isActive && platform != null)
+                    ColorFilter.tint(
+                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
+                else null,
+                loading = placeholder(R.drawable.logo),
+                failure = placeholder(R.drawable.logo)
+            ) {
+                it.diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop()
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = platform?.display_name ?: stringResource(R.string.error),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = "Send messages using your ${platform?.display_name ?: ""} account.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            if (badgeCount != null && badgeCount > 0) {
+                Box(
+                    modifier = Modifier
+                        .size(22.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFFF9800)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = badgeCount.toString(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.White
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+fun DefaultSmsCard(
+    modifier: Modifier = Modifier,
+onDismiss: () -> Unit,
+    onSetDefault: () -> Unit
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(15.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(
+                    onClick = {
+                        onDismiss()
+                    },
+                    modifier = Modifier.size(28.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Dismiss",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "To send attachments and enjoy the full RelaySMS experience, make RelaySMS your default SMS app.",
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = onSetDefault,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .height(44.dp)
+                    .width(170.dp),
+                shape = RoundedCornerShape(14.dp),
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 1.dp
+                ),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Text(
+                    text = "Set Default SMS App",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
         }
     }
 }
