@@ -1,7 +1,6 @@
 package com.example.sw0b_001.ui.modals
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,11 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,7 +36,7 @@ import kotlinx.coroutines.launch
 fun ConfirmationModal(
     showBottomSheet: Boolean = true,
     message: String = stringResource(R.string.click_continue_to_confirm_this_action_do_not_worry_it_has_no_dangerous_effects),
-
+    confirmButtonText: String = stringResource(R.string.continue_text),
     onContinue: () -> Unit,
     onCancel: () -> Unit,
 ) {
@@ -93,7 +88,7 @@ fun ConfirmationModal(
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer)
                     ) {
                         Text(
-                            text = stringResource(R.string.continue_text),
+                            text = confirmButtonText,
                             color = MaterialTheme.colorScheme.onErrorContainer
                         )
                     }

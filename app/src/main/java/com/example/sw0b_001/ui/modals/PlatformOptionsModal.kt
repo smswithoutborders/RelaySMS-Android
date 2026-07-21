@@ -107,6 +107,8 @@ fun PlatformOptionsModal(
                 else if(revokeAccountConfirmationRequested) {
                     ConfirmationModal(
                         showBottomSheet = revokeAccountConfirmationRequested,
+                        message = "Are you sure you want to remove this account\n${selectedAccount?.account}?",
+                        confirmButtonText = "Yes, remove.",
                         onContinue = {
                             revokeAccountConfirmationRequested = false
                             revokeCallback(selectedAccount!!)
