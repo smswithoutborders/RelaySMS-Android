@@ -1,23 +1,25 @@
 package com.example.sw0b_001.ui.appbars
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChatBubbleOutline
+import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.GridView
-import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.PhoneForwarded
+import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material.icons.outlined.GridView
+import androidx.compose.material.icons.outlined.PhoneForwarded
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
@@ -38,111 +40,121 @@ fun BottomNavBar(
     val context = LocalContext.current
     val isDefaultSmsApp = if (LocalInspectionMode.current) true else context.isDefault()
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 16.dp)
+    Surface(
+        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+        tonalElevation = 3.dp,
+        shadowElevation = 6.dp,
+        color = MaterialTheme.colorScheme.surface,
     ) {
-        Surface(
-            shape = RoundedCornerShape(30.dp),
-            tonalElevation = 6.dp,
-            shadowElevation = 8.dp,
-            color = MaterialTheme.colorScheme.surface
+        NavigationBar(
+            containerColor = Color.Transparent,
+            tonalElevation = 0.dp,
         ) {
-            NavigationBar(
-                containerColor = Color.Transparent,
-                tonalElevation = 0.dp
-            ) {
 
-                NavigationBarItem(
-                    icon = {
-                        Icon(
-                            Icons.Filled.ChatBubbleOutline,
-                            contentDescription = stringResource(R.string.Messages),
-                            modifier = Modifier.size(20.dp)
-                        )
-                    },
-                    label = {
-                        Text(
-                            text = stringResource(R.string.Messages),
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    },
-                    selected = selectedTab == BottomTabsItems.BottomBarRecentTab,
-                    onClick = {
-                        onChangeTab(BottomTabsItems.BottomBarRecentTab)
-                    },
-                )
+            val isMessagesSelected = selectedTab == BottomTabsItems.BottomBarRecentTab
+            NavigationBarItem(
+                icon = {
+                    Icon(
+                        imageVector = navIcon(
+                            selected = isMessagesSelected,
+                            filled = Icons.Filled.Chat,
+                            outlined = Icons.Outlined.ChatBubbleOutline,
+                        ),
+                        contentDescription = stringResource(R.string.Messages),
+                        modifier = Modifier.size(24.dp)
+                    )
+                },
+                label = {
+                    Text(
+                        text = stringResource(R.string.Messages),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                },
+                selected = isMessagesSelected,
+                onClick = {
+                    onChangeTab(BottomTabsItems.BottomBarRecentTab)
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    indicatorColor = Color.Transparent,
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                ),
+            )
 
-                NavigationBarItem(
-                    icon = {
-                        Icon(
-                            Icons.Filled.GridView,
-                            contentDescription = stringResource(R.string.platforms),
-                            modifier = Modifier.size(20.dp)
-                        )
-                    },
-                    label = {
-                        Text(
-                            text = stringResource(R.string.platforms),
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    },
-                    selected = selectedTab == BottomTabsItems.BottomBarPlatformsTab,
-                    onClick = {
-                        onChangeTab(BottomTabsItems.BottomBarPlatformsTab,)
-                    },
-                )
+            val isPlatformsSelected = selectedTab == BottomTabsItems.BottomBarPlatformsTab
+            NavigationBarItem(
+                icon = {
+                    Icon(
+                        imageVector = navIcon(
+                            selected = isPlatformsSelected,
+                            filled = Icons.Filled.GridView,
+                            outlined = Icons.Outlined.GridView,
+                        ),
+                        contentDescription = stringResource(R.string.platforms),
+                        modifier = Modifier.size(24.dp)
+                    )
+                },
+                label = {
+                    Text(
+                        text = stringResource(R.string.platforms),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                },
+                selected = isPlatformsSelected,
+                onClick = {
+                    onChangeTab(BottomTabsItems.BottomBarPlatformsTab)
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    indicatorColor = Color.Transparent,
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                ),
+            )
 
-
-                NavigationBarItem(
-                    icon = {
-                        Icon(
-                            Icons.Filled.Public,
-                            contentDescription = stringResource(R.string.countries),
-                            modifier = Modifier.size(20.dp)
-                        )
-                    },
-                    label = {
-                        Text(
-                            text = stringResource(R.string.routing_numbers),
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    },
-                    selected = selectedTab == BottomTabsItems.BottomBarCountriesTab,
-                    onClick = {
-                        onChangeTab(BottomTabsItems.BottomBarCountriesTab,)
-                    },
-                )
-
-
-//                NavigationBarItem(
-//                    icon = {
-//                        Icon(
-//                            Icons.Filled.Settings,
-//                            contentDescription = stringResource(R.string.Settings),
-//                            modifier = Modifier.size(20.dp)
-//                        )
-//                    },
-//                    label = {
-//                        Text(
-//                            text = stringResource(R.string.Settings),
-//                            style = MaterialTheme.typography.labelSmall
-//                        )
-//                    },
-//                    selected = false,
-//                    onClick = {
-//                        navController.navigate(SettingsScreen)
-//                    },
-//                )
-
-
-            }
+            val isRoutingSelected = selectedTab == BottomTabsItems.BottomBarCountriesTab
+            NavigationBarItem(
+                icon = {
+                    Icon(
+                        imageVector = navIcon(
+                            selected = isRoutingSelected,
+                            filled = Icons.Filled.PhoneForwarded,
+                            outlined = Icons.Outlined.PhoneForwarded,
+                        ),
+                        contentDescription = stringResource(R.string.countries),
+                        modifier = Modifier.size(24.dp)
+                    )
+                },
+                label = {
+                    Text(
+                        text = stringResource(R.string.routing_numbers),
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                },
+                selected = isRoutingSelected,
+                onClick = {
+                    onChangeTab(BottomTabsItems.BottomBarCountriesTab)
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    indicatorColor = Color.Transparent,
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                ),
+            )
         }
     }
 }
 
-
+private fun navIcon(
+    selected: Boolean,
+    filled: ImageVector,
+    outlined: ImageVector,
+): ImageVector = if (selected) filled else outlined
 
 @Preview
 @Composable
