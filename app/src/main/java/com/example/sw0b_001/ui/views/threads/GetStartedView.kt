@@ -8,28 +8,28 @@ import android.os.Build
 import android.provider.Telephony
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.theme.AppTheme
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
 
 @Composable
-fun GetStartedView(navController: NavController) {
+fun GetStartedView() {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -49,7 +49,7 @@ fun GetStartedView(navController: NavController) {
         }
 
         Text(
-            text = "Compose your first message.",
+            text = stringResource(R.string.compose_your_first_message),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -76,6 +76,6 @@ fun makeDefault(context: Context): Intent {
 @Composable
 fun GetStartedPreviewLoggedIn() {
     AppTheme(darkTheme = false) {
-        GetStartedView(navController = NavController(androidx.compose.ui.platform.LocalContext.current))
+        GetStartedView()
     }
 }

@@ -209,6 +209,13 @@ fun RecentAppBar(
                             }
                         )
                         DropdownMenuItem(
+                            text = { Text(stringResource(R.string.metrics)) },
+                            onClick = {
+                                showMenu = false
+                                navController.navigate(RestoreScreen)
+                            }
+                        )
+                        DropdownMenuItem(
                             text = { Text(stringResource(R.string.about)) },
                             onClick = {
                                 navController.navigate(AboutScreen)

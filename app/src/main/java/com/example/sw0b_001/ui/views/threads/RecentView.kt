@@ -92,7 +92,7 @@ fun RecentView(
             }
         }
         else {
-            GetStartedView( navController = navController, )
+            GetStartedView()
         }
 
         if (sendNewMessageRequested) {

@@ -491,5 +491,14 @@
     <string name="connect_your_accounts_once_while_online_send_from_any_of_them_offline_anytime">"Connect your accounts once while online. Send from any of them offline, anytime. "</string>
     <string name="learn_more">Learn more</string>
     <string name="to_send_attachments_and_enjoy_the_full_relaysms_experience_make_relaysms_your_default_sms_app">To send attachments and enjoy the full RelaySMS experience, make RelaySMS your default SMS app.</string>
+    <string name="metrics">Metrics</string>
+    <string name="compose_your_first_message">Compose your first message.</string>
+    <string name="encryption_keys_left">Encryption keys left</string>
+    <string name="number_of_stored_accounts">Number of stored accounts</string>
+    <string name="encryption_details">Encryption details</string>
+    <string name="text_keys">Text keys</string>
+    <string name="attachment_keys">Attachment keys</string>
+    <string name="account_name">Account name</string>
+    <string name="refresh">Refresh</string>
 
 </resources>

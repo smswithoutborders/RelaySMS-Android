@@ -39,7 +39,7 @@ fun GetStartedModal(
             sheetState = sheetState,
             modifier = Modifier.fillMaxWidth()
         ) {
-            GetStartedView(navController)
+            GetStartedView()
         }
 
     }
