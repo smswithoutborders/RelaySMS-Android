@@ -18,6 +18,7 @@ data class Tokens(
     val catId: V1ContentCategories,
     val account: String,
     val platformName: String,
+    val date: Long = System.currentTimeMillis(),
 ): AutoCloseable {
 
     @Ignore

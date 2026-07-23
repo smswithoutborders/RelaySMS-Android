@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import com.example.sw0b_001.data.models.Tokens
+import com.example.sw0b_001.ui.viewModels.TokensMetrics
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -19,7 +20,7 @@ interface TokensDao {
     fun fetch(tokenHash: ByteArray) : Tokens?
 
     @Query("SELECT * FROM Tokens where id = :id")
-    fun fetch(id: Int) : Tokens?
+    fun fetch(id: Int) : Flow<Tokens>
 
     @Query("SELECT * FROM Tokens WHERE platformName = :name")
     fun fetch(name: String) : Flow<List<Tokens>>
@@ -36,4 +37,15 @@ interface TokensDao {
 
     @Query("DELETE FROM Tokens")
     suspend fun deleteAll()
+
+
+    @Query("SELECT account, date, keys.*, keysText.*, keysAtt.* FROM Tokens, " +
+            "(SELECT COUNT(*) as quantityEncryptionKeys, date as  lastSync FROM Keys WHERE tokenId = :tokenId) as keys, " +
+            "(SELECT COUNT(*) as quantityText FROM Keys WHERE alias = :alias) as keysText, " +
+            "(SELECT COUNT(*) as quantityAttachments FROM Keys WHERE alias != :alias) as keysAtt " +
+            "WHERE tokenId = :tokenId")
+    fun getTokensMetrics(
+        tokenId: Int,
+        alias: String
+    ): Flow<TokensMetrics>
 }

@@ -22,7 +22,8 @@ interface KeysDao {
 
 
     @Query("UPDATE Keys SET alias = :newAlias " +
-            "WHERE tokenHash = :tokenHash AND alias = :oldAlias AND keyId < 16")
+            "WHERE tokenId = :tokenHash AND alias = :oldAlias AND keyId < 16"
+    )
     suspend fun updateForAttachments(oldAlias: String, newAlias: String, tokenHash: ByteArray)
 
     @Transaction
@@ -32,15 +33,16 @@ interface KeysDao {
             updateForAttachments(
                 alias,
                 updateAlias,
-                keys.first().tokenHash!!
+                keys.first().tokenId!!
             )
         }
     }
 
-    @Query("SELECT * FROM Keys WHERE tokenHash = :tokenHash AND keyId = :keyId AND alias = :alias")
+    @Query("SELECT * FROM Keys WHERE tokenId = :tokenHash AND keyId = :keyId AND alias = :alias")
     fun privateFetch(tokenHash: ByteArray, keyId: Int, alias: String): Keys?
 
-    @Query("SELECT * FROM Keys WHERE tokenHash = :tokenHash AND alias = :alias " +
+    @Query(
+        "SELECT * FROM Keys WHERE tokenId = :tokenHash AND alias = :alias " +
             "ORDER BY RANDOM() LIMIT 1")
     fun privateFetchRandom(tokenHash: ByteArray, alias: String): Keys?
 
@@ -52,7 +54,7 @@ interface KeysDao {
         return key
     }
 
-    @Query("DELETE FROM Keys WHERE tokenHash = :tokenHash")
+    @Query("DELETE FROM Keys WHERE tokenId = :tokenHash")
     suspend fun clear(tokenHash: ByteArray)
 
     @Delete

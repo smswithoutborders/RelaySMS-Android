@@ -500,5 +500,9 @@
     <string name="attachment_keys">Attachment keys</string>
     <string name="account_name">Account name</string>
     <string name="refresh">Refresh</string>
+    <string name="account_details">Account details</string>
+    <string name="account_type">Account type</string>
+    <string name="date_stored">Date stored</string>
+    <string name="last_sync">Last sync: %1$s</string>
 
 </resources>

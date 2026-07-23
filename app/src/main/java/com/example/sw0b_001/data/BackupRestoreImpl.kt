@@ -67,9 +67,7 @@ class BackupRestoreImpl(context: Context) {
             keysDb.deleteAll()
 
             val orphanedKeys = sKeys.filter { key ->
-                key.tokenHash != null && sTokens.none {
-                    it.tokenHash.contentEquals(key.tokenHash!!)
-                }
+                sTokens.none { it.id == key.tokenId }
             }
             Log.w("Restore", "Orphaned keys: ${orphanedKeys.size}")
 

@@ -151,7 +151,7 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
                 keyId = it.keyId,
                 privateKey = null,
                 publicKey = it.publicKey.toByteArray(),
-                tokenHash = tokenHash,
+                tokenId = tokenHash,
                 alias = TOKEN_KEYSTORE_ALIAS_SERVER
             )
         }
@@ -188,7 +188,7 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
                     keyId = pair.first,
                     privateKey = key.privateKey!!.copyOf(),
                     publicKey = key.publicKey.copyOf(),
-                    tokenHash = tokenHash,
+                    tokenId = tokenHash,
                     alias = TOKEN_KEYSTORE_ALIAS_CLIENT
                 )
                 ephemeralKeys.add(key)

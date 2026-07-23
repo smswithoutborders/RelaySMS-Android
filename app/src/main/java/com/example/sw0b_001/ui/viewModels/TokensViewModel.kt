@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.room.Entity
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.extensions.generateRandomBytes
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Datastore
@@ -32,6 +33,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -47,6 +49,17 @@ sealed class TokensUiState {
     ): TokensUiState()
     data class Error(val exception: Throwable): TokensUiState()
 }
+
+@Entity
+@Serializable
+data class TokensMetrics(
+    val account: String,
+    val quantityEncryptionKeys: Int,
+    val quantityText: Int,
+    val quantityAttachments: Int,
+    val lastSync: Long,
+    val date: Long
+)
 
 @HiltViewModel
 class TokensViewModel @Inject constructor(
@@ -72,9 +85,6 @@ class TokensViewModel @Inject constructor(
     private val db = Datastore.getDatastore(context)?.tokensDao()
         ?: throw Exception("Cannot open database")
 
-    private val cache = Datastore.getDatastore(context)?.supportedPlatformsCacheDao()
-        ?: throw Exception("Cannot open database")
-
     fun clearStoringState() {
         _isStoringUiState.value = TokensUiState.Success(null)
     }
@@ -85,6 +95,10 @@ class TokensViewModel @Inject constructor(
 
     fun fetchTokensForPlatforms(platformName: String): Flow<List<Tokens>> {
         return db.fetch(platformName)
+    }
+
+    fun fetchTokenMetrics(tokenId: Int): Flow<TokensMetrics> {
+        return db.getTokensMetrics(tokenId)
     }
 
     fun reset(onCompleteCallback: ()-> Unit) {

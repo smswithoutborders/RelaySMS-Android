@@ -14,8 +14,8 @@ import java.security.MessageDigest
     foreignKeys = [
         ForeignKey(
             entity = Tokens::class,
-            parentColumns = ["tokenHash"],
-            childColumns = ["tokenHash"],
+            parentColumns = ["tokenId"],
+            childColumns = ["tokenId"],
             onDelete = ForeignKey.CASCADE // This triggers the automatic deletion
         )
     ],
@@ -29,7 +29,8 @@ data class Keys(
     val alias: String,
     var privateKey: ByteArray?,
     val publicKey: ByteArray,
-    var tokenHash: ByteArray? = null,
+    val tokenId: Long,
+    val date: Long = System.currentTimeMillis(),
 ) : AutoCloseable {
     @Ignore
     @Transient
@@ -54,12 +55,6 @@ data class Keys(
         if (thisPrivate != null && otherPrivate != null &&
             !MessageDigest.isEqual(thisPrivate, otherPrivate)) return false
 
-        val thisHash = tokenHash
-        val otherHash = other.tokenHash
-        if (thisHash == null != (otherHash == null)) return false
-        if (thisHash != null && otherHash != null &&
-            !MessageDigest.isEqual(thisHash, otherHash)) return false
-
         return true
     }
 
@@ -72,7 +67,6 @@ data class Keys(
     override fun close() {
         privateKey?.fill(0)
         publicKey.fill(0)
-        tokenHash?.fill(0)
         isClosed = true
     }
 }
