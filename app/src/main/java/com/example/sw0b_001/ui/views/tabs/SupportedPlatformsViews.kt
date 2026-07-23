@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChatBubbleOutline
@@ -47,8 +48,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -79,11 +83,6 @@ import uniffi.relaysms_spec_payload.V1ContentCategories
 import uniffi.relaysms_spec_payload.V1PayloadsSupportedProtocols
 import uniffi.relaysms_spec_payload.v1ContentCategoryFromU8
 import uniffi.relaysms_spec_payload.v1PayloadSupportProtocolsFromU8
-import androidx.compose.foundation.text.ClickableText
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.text.style.TextDecoration
 
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
@@ -290,7 +289,7 @@ fun PlatformListContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         val infoText = buildAnnotatedString {
-            append("Connect your accounts once while online. Send from any of them offline, anytime. ")
+            append(stringResource(R.string.connect_your_accounts_once_while_online_send_from_any_of_them_offline_anytime))
             pushStringAnnotation(
                 tag = "learn_more",
                 annotation = "learn_more"
@@ -301,7 +300,7 @@ fun PlatformListContent(
                     fontWeight = FontWeight.SemiBold,
                 )
             ) {
-                append("Learn more")
+                append(stringResource(R.string.learn_more))
             }
 
             pop()
@@ -442,66 +441,6 @@ fun PlatformListContent(
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun PlatformCard(
-    modifier: Modifier = Modifier,
-    platform: SupportedPlatforms?,
-    isActive: Boolean,
-    onClick: (SupportedPlatforms?) -> Unit = {}
-) {
-    Card(
-        onClick = { onClick(platform) },
-        modifier = modifier
-            .height(130.dp)
-            .width(130.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            GlideImage(
-                model = platform?.icon_png,
-                contentDescription = stringResource(R.string.platform_image),
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .size(45.dp)
-                    .align(Alignment.Center),
-                colorFilter = if(!isActive && platform != null)
-                    ColorFilter.tint(
-                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
-                else null,
-                loading = placeholder(R.drawable.logo), // Shows while loading
-                failure = placeholder(R.drawable.logo)      // Shows if download fails
-            ) {
-                it.diskCacheStrategy(DiskCacheStrategy.ALL) // Caches both original and resized images
-                    .circleCrop()                             // Makes the image a circle
-            }
-            if (isActive || platform == null) {
-                Box(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .size(12.dp)
-                        .clip(CircleShape)
-                        .background(Color.Green)
-                        .align(Alignment.TopEnd)
-                )
-            }
-            Text(
-                text = platform?.display_name ?: stringResource(R.string.error),
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 16.dp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-            )
-        }
-    }
-}
-
-
-
-@OptIn(ExperimentalGlideComposeApi::class)
-@Composable
 fun PlatformListRow(
     platform: SupportedPlatforms?,
     isActive: Boolean,
@@ -576,7 +515,7 @@ fun PlatformListRow(
 @Composable
 fun DefaultSmsCard(
     modifier: Modifier = Modifier,
-onDismiss: () -> Unit,
+    onDismiss: () -> Unit,
     onSetDefault: () -> Unit
 ) {
     Card(
@@ -612,7 +551,7 @@ onDismiss: () -> Unit,
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "To send attachments and enjoy the full RelaySMS experience, make RelaySMS your default SMS app.",
+                text = stringResource(R.string.to_send_attachments_and_enjoy_the_full_relaysms_experience_make_relaysms_your_default_sms_app),
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -624,9 +563,7 @@ onDismiss: () -> Unit,
             Button(
                 onClick = onSetDefault,
                 modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .height(44.dp)
-                    .width(170.dp),
+                    .align(Alignment.CenterHorizontally),
                 shape = RoundedCornerShape(14.dp),
                 elevation = ButtonDefaults.buttonElevation(
                     defaultElevation = 1.dp
@@ -636,7 +573,7 @@ onDismiss: () -> Unit,
                 )
             ) {
                 Text(
-                    text = "Set Default SMS App",
+                    text = stringResource(R.string.set_as_default_sms_app),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold
                 )

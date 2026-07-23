@@ -11,14 +11,14 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface BackupRestoreDao {
 
-    @Insert(onConflict = OnConflictStrategy.ABORT)
-    fun insertPrivate(backupRestoreEnt: BackupRestoreEnt)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPrivate(backupRestoreEnt: BackupRestoreEnt)
 
     @Query("DELETE FROM BackupRestoreEnt")
-    fun deleteAll()
+    suspend fun deleteAll()
 
     @Transaction
-    fun insert(backupRestoreEnt: BackupRestoreEnt) {
+    suspend fun insert(backupRestoreEnt: BackupRestoreEnt) {
         deleteAll()
         insertPrivate(backupRestoreEnt)
     }

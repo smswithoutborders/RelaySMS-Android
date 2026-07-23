@@ -488,5 +488,8 @@
     <string name="_default">Default</string>
     <string name="error">Error</string>
     <string name="https_authy_shortmesh_com">https://authy.shortmesh.com</string>
+    <string name="connect_your_accounts_once_while_online_send_from_any_of_them_offline_anytime">"Connect your accounts once while online. Send from any of them offline, anytime. "</string>
+    <string name="learn_more">Learn more</string>
+    <string name="to_send_attachments_and_enjoy_the_full_relaysms_experience_make_relaysms_your_default_sms_app">To send attachments and enjoy the full RelaySMS experience, make RelaySMS your default SMS app.</string>
 
 </resources>
