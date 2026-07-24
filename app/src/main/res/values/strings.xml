@@ -508,5 +508,8 @@
     <string name="add_new">Add New</string>
     <string name="encryption_keys_server">Encryption keys server</string>
     <string name="encryption_keys_client">Encryption keys client</string>
+    <string name="your_accounts_s">Your <b>%1$s</b> accounts(s)</string>
+    <string name="yes_remove">Yes, remove</string>
+    <string name="you_have_not_saved_any_account_yet_click_the_add_button_to_connect_your_account">You have not saved any account yet. Click the add button to connect your %1$s account.</string>
 
 </resources>

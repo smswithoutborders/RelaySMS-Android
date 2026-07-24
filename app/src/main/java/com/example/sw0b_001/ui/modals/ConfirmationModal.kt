@@ -1,7 +1,6 @@
 package com.example.sw0b_001.ui.modals
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,11 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,14 +31,13 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 
+@Preview(showBackground = true)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConfirmationModal(
     showBottomSheet: Boolean = true,
-    message: String = stringResource(R.string.click_continue_to_confirm_this_action_do_not_worry_it_has_no_dangerous_effects),
-
-    onContinue: () -> Unit,
-    onCancel: () -> Unit,
+    onContinue: () -> Unit = {},
+    onCancel: () -> Unit = {},
 ) {
     val sheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.Expanded,
@@ -58,56 +52,71 @@ fun ConfirmationModal(
             },
             sheetState = sheetState,
         ) {
-            Column(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(MaterialTheme.colorScheme.surface)
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+            ConfirmationModalComponent(
+                onCancel = {
+                    onCancel()
+                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                        if (!sheetState.isVisible) {
+                            onCancel()
+                        }
+                    }
+                },
+                onContinue = onContinue
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ConfirmationModalComponent(
+    message: String = stringResource(R.string.click_continue_to_confirm_this_action_do_not_worry_it_has_no_dangerous_effects),
+    onContinue: () -> Unit = {},
+    onCancel: () -> Unit = {},
+) {
+    Column(
+        modifier = Modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.padding(16.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            TextButton(
+                onClick = onCancel,
+            ) {
+                Text(stringResource(R.string.cancel))
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Button(
+                onClick = onContinue,
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
             ) {
                 Text(
-                    text = message,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center
+                    text = stringResource(R.string.yes_remove),
+                    color = MaterialTheme.colorScheme.onError
                 )
-                Spacer(modifier = Modifier.padding(16.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    TextButton(
-                        onClick = {
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) {
-                                    onCancel()
-                                }
-                            }
-                        },
-                    ) {
-                        Text(stringResource(R.string.cancel))
-                    }
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Button(
-                        onClick = onContinue,
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.errorContainer)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.continue_text),
-                            color = MaterialTheme.colorScheme.onErrorContainer
-                        )
-                    }
-                }
             }
         }
     }
+
 }
 
 @Preview(showBackground = false)
 @Composable
 fun ConfirmationModalPreview() {
     AppTheme(darkTheme = true) {
-        ConfirmationModal(
+        ConfirmationModalComponent(
             onContinue = {},
             onCancel = {},
         )

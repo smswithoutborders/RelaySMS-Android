@@ -27,7 +27,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -48,19 +47,15 @@ fun PlatformOptionsModal(
     navController: NavController,
     accounts: List<Tokens>,
     showPlatformsModal: Boolean,
-    isActive: Boolean,
     isCompose: Boolean,
     cat: V1ContentCategories,
     platform: SupportedPlatforms?,
-    isOnboarding: Boolean = false,
     isRevoking: TokensUiState = TokensUiState.Success(null),
     isStoring: TokensUiState = TokensUiState.Success(null),
     revokeCallback: (Tokens) -> Unit,
     storeCallback: () -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    val context = LocalContext.current
-    var removeAccountRequested by remember { mutableStateOf(false) }
     var revokeAccountConfirmationRequested by remember { mutableStateOf(false) }
 
     var selectedAccount: Tokens? by remember { mutableStateOf(null) }
@@ -104,7 +99,6 @@ fun PlatformOptionsModal(
                     if (isCompose) {
                         ComposeMessages(
                             navController = navController,
-                            isOnboarding = isOnboarding,
                             cat = cat,
                             supportedPlatforms = platform!!.name
                         ) {
@@ -113,6 +107,7 @@ fun PlatformOptionsModal(
                     } else {
                         SelectAccountModal(
                             accounts = accounts,
+                            displayName = platform?.display_name ?: "",
                             onAddAccountCallback = storeCallback,
                             onAccountSelected = { storedAccount ->
                                 navController.navigate(MetricsScreen(
@@ -181,7 +176,6 @@ private fun ComposeMessages(
     cat: V1ContentCategories,
     supportedPlatforms: String,
     navController: NavController,
-    isOnboarding: Boolean = false,
     onDismissRequest: () -> Unit
 ) {
     Button(

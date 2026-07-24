@@ -383,17 +383,14 @@ fun PlatformListContent(
         }
 
         if (showPlatformOptions) {
-            val isStored = tokens.find { it.platformName == clickedPlatform?.name }
             PlatformOptionsModal(
                 showPlatformsModal = showPlatformOptions,
                 cat = if(clickedPlatform == null)
                     V1ContentCategories.BRIDGE
                 else v1ContentCategoryFromU8(clickedPlatform!!.cat_id.toUByte()),
-                isActive = isStored != null,
                 isCompose = isCompose,
                 platform = clickedPlatform,
                 navController = navController,
-                isOnboarding = isOnboarding,
                 isStoring = storingUiState,
                 isRevoking = revokingUiState,
                 storeCallback = storeCallback,

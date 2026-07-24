@@ -16,7 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -53,6 +53,7 @@ data class Account(
 fun SelectAccountModal(
     accounts: List<Tokens> = emptyList(),
     isCompose: Boolean = false,
+    displayName: String = "",
     onAddAccountCallback: () -> Unit = {},
     onRemoveAccountCallback: (Tokens) -> Unit = {},
     onAccountSelected: (Tokens) -> Unit = {},
@@ -61,6 +62,7 @@ fun SelectAccountModal(
     SelectAccountModalComponent(
         accounts = accounts,
         isCompose = isCompose,
+        displayName = displayName,
         onAccountSelected = { token ->
             onAccountSelected(token)
             onDismissRequest()
@@ -76,6 +78,7 @@ fun SelectAccountModal(
 fun SelectAccountModalComponent(
     accounts: List<Tokens>,
     isCompose: Boolean,
+    displayName: String,
     onAddAccountCallback: () -> Unit,
     onRemoveAccountCallback: (Tokens) -> Unit,
     onAccountSelected: (Tokens) -> Unit,
@@ -90,6 +93,7 @@ fun SelectAccountModalComponent(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            Text(stringResource(R.string.your_accounts_s, displayName))
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = onSheetHideCallback) {
                 Icon(
@@ -116,16 +120,24 @@ fun SelectAccountModalComponent(
             }
         }
 
-        LazyColumn(
-            contentPadding = PaddingValues(bottom = 16.dp),
-        ) {
-            items(accounts) { account ->
-                AccountCard(
-                    account = account,
-                    isCompose = isCompose,
-                    onRemoveAccountCallback = onRemoveAccountCallback,
-                    onAccountSelected = { onAccountSelected(account) }
-                )
+        if(accounts.isEmpty()) {
+            Text(
+                stringResource(
+                    R.string.you_have_not_saved_any_account_yet_click_the_add_button_to_connect_your_account,
+                    displayName
+                ), modifier = Modifier.padding(32.dp))
+        } else {
+            LazyColumn(
+                contentPadding = PaddingValues(bottom = 16.dp),
+            ) {
+                items(accounts) { account ->
+                    AccountCard(
+                        account = account,
+                        isCompose = isCompose,
+                        onRemoveAccountCallback = onRemoveAccountCallback,
+                        onAccountSelected = { onAccountSelected(account) }
+                    )
+                }
             }
         }
     }
@@ -142,7 +154,7 @@ fun AccountCard(
         onClick = onAccountSelected,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(bottom = 8.dp, top = 16.dp),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 2.dp,
         )
@@ -171,12 +183,12 @@ fun AccountCard(
             ) {
                 Text(
                     text = account.account,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = account.platformName,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -188,7 +200,7 @@ fun AccountCard(
                     onClick = { onRemoveAccountCallback(account) }
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Delete,
+                        imageVector = Icons.Outlined.Delete,
                         contentDescription = stringResource(R.string.delete),
                         tint = MaterialTheme.colorScheme.error
                     )
@@ -222,6 +234,7 @@ fun SelectAccountModalComponent_preview_is_compose() {
         )
         SelectAccountModalComponent(
             accounts = tokens,
+            displayName = "Gmail",
             isCompose = false,
             onSheetHideCallback = {},
             onAccountSelected = {},
@@ -255,6 +268,7 @@ fun SelectAccountModalComponent_preview() {
         )
         SelectAccountModalComponent(
             accounts = tokens,
+            displayName = "Gmail",
             isCompose = true,
             onSheetHideCallback = {},
             onAccountSelected = {},
