@@ -67,6 +67,7 @@ import com.example.sw0b_001.ui.navigation.BackupScreen
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.navigation.DetailsInterfaceScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
+import com.example.sw0b_001.ui.navigation.MetricsScreen
 import com.example.sw0b_001.ui.navigation.OnboardingInteractiveScreen
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.navigation.RestoreScreen
@@ -84,7 +85,6 @@ import com.example.sw0b_001.ui.viewModels.PublisherViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.views.AboutView
-import com.example.sw0b_001.ui.views.WelcomeMainView
 import com.example.sw0b_001.ui.views.backupRestore.BackupView
 import com.example.sw0b_001.ui.views.backupRestore.RecoveryView
 import com.example.sw0b_001.ui.views.compose.ComposerInterface
@@ -92,6 +92,7 @@ import com.example.sw0b_001.ui.views.details.DetailsInterfaceView
 import com.example.sw0b_001.ui.views.incoming.PasteEncryptedTextView
 import com.example.sw0b_001.ui.views.settings.SettingsView
 import com.example.sw0b_001.ui.views.tabs.HomepageView
+import com.example.sw0b_001.ui.views.threads.MetricsView
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import dagger.hilt.android.AndroidEntryPoint
@@ -402,6 +403,14 @@ class MainActivity : BindActivity() {
             }
             composable<RestoreScreen> {
                 RecoveryView(navController, backupRestoreViewModel)
+            }
+            composable<MetricsScreen> { backStackEntry ->
+                val metricsNav: MetricsScreen = backStackEntry.toRoute()
+                MetricsView(
+                    navController,
+                    tokensId = metricsNav.tokenId,
+                    tokensViewModel = tokensViewModel
+                )
             }
         }
 

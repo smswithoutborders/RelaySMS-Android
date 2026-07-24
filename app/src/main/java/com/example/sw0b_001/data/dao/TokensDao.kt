@@ -20,14 +20,14 @@ interface TokensDao {
     fun fetch(tokenHash: ByteArray) : Tokens?
 
     @Query("SELECT * FROM Tokens where id = :id")
-    fun fetch(id: Int) : Flow<Tokens>
+    fun fetch(id: Long) : Tokens
 
     @Query("SELECT * FROM Tokens WHERE platformName = :name")
     fun fetch(name: String) : Flow<List<Tokens>>
 
 
     @Insert
-    fun insert(tokens: Tokens)
+    fun insert(tokens: Tokens): Long
 
     @Insert
     fun insert(tokens: List<Tokens>)
@@ -39,13 +39,19 @@ interface TokensDao {
     suspend fun deleteAll()
 
 
-    @Query("SELECT account, date, keys.*, keysText.*, keysAtt.* FROM Tokens, " +
-            "(SELECT COUNT(*) as quantityEncryptionKeys, date as  lastSync FROM Keys WHERE tokenId = :tokenId) as keys, " +
-            "(SELECT COUNT(*) as quantityText FROM Keys WHERE alias = :alias) as keysText, " +
-            "(SELECT COUNT(*) as quantityAttachments FROM Keys WHERE alias != :alias) as keysAtt " +
-            "WHERE tokenId = :tokenId")
+    @Query("SELECT account, date, keys.* FROM Tokens, " +
+            "(SELECT " +
+            "COUNT(CASE WHEN alias = :aliasServer OR alias = :alias THEN 1 END) as quantityEncryptionKeysServer, " +
+            "COUNT(CASE WHEN alias = :aliasClient THEN 1 END) as quantityEncryptionKeysClient, " +
+            "COUNT(CASE WHEN alias = :aliasServer THEN 1 END) as quantityText, " +
+            "COUNT(CASE WHEN alias = :alias THEN 1 END) as quantityAttachments, " +
+            "date as lastSync " +
+            "FROM Keys WHERE tokenId = :tokenId) as keys " +
+            "WHERE id = :tokenId")
     fun getTokensMetrics(
-        tokenId: Int,
-        alias: String
+        tokenId: Long,
+        alias: String,
+        aliasClient: String,
+        aliasServer: String,
     ): Flow<TokensMetrics>
 }

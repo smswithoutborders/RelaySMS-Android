@@ -2,13 +2,13 @@ package com.example.sw0b_001.data.models
 
 import androidx.room.Entity
 import androidx.room.Ignore
-import androidx.room.Index
 import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
 import uniffi.relaysms_spec_payload.V1ContentCategories
 import java.security.MessageDigest
 
-@Entity(indices = [Index(value = ["tokenHash"], unique = true)])
+//@Entity(indices = [Index(value = ["tokenHash"], unique = true)])
+@Entity
 @Serializable
 data class Tokens(
     @PrimaryKey(autoGenerate = true)

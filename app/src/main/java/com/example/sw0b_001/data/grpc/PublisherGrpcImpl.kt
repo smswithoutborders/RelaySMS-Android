@@ -119,10 +119,10 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
         serverEphemeralPublicKeys: List<PublisherOuterClass.PublicKey>,
         keys: List<Pair<Int, Protocols.CloseableCurve15519KeyPair>>,
         tokenCipherText: ByteArray,
-        tokenId: UInt,
         catId: Int,
         accountId: String,
         platformName: String,
+        tokenId: UInt,
     ) {
         val ecKid = keys.find { it.first == keyId }
             ?: throw Exception("Invalid decryption key requested")
@@ -146,19 +146,9 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
             throw e
         }
 
-        val serverKeys = serverEphemeralPublicKeys.map {
-            Keys(
-                keyId = it.keyId,
-                privateKey = null,
-                publicKey = it.publicKey.toByteArray(),
-                tokenId = tokenHash,
-                alias = TOKEN_KEYSTORE_ALIAS_SERVER
-            )
-        }
-
         storeKeys(
             keys = keys,
-            serverKeys = serverKeys,
+            serverEphemeralPublicKeys = serverEphemeralPublicKeys,
             tokenId = tokenId,
             tokenHash = tokenHash,
             catId = v1ContentCategoryFromU8(catId.toUByte()),
@@ -170,7 +160,7 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
 
     private suspend fun storeKeys(
         keys: List<Pair<Int, Protocols.CloseableCurve15519KeyPair>>,
-        serverKeys: List<Keys>,
+        serverEphemeralPublicKeys: List<PublisherOuterClass.PublicKey>,
         tokenId: UInt,
         tokenHash: ByteArray,
         catId: V1ContentCategories,
@@ -181,20 +171,7 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
         val dbKeystore = db.keysDao() ?: throw Exception("Failed to open database")
         val dbTokens = db.tokensDao() ?: throw Exception("Failed to open database")
 
-        val ephemeralKeys = mutableListOf<Keys>()
-        keys.forEach { pair ->
-            pair.second.use { key ->
-                val key = Keys(
-                    keyId = pair.first,
-                    privateKey = key.privateKey!!.copyOf(),
-                    publicKey = key.publicKey.copyOf(),
-                    tokenId = tokenHash,
-                    alias = TOKEN_KEYSTORE_ALIAS_CLIENT
-                )
-                ephemeralKeys.add(key)
-            }
-        }
-        dbTokens.insert(
+        val id = dbTokens.insert(
             Tokens(
                 tokenId = tokenId.toInt(),
                 catId = catId,
@@ -203,6 +180,31 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
                 tokenHash = tokenHash
             )
         )
+
+        val serverKeys = serverEphemeralPublicKeys.map {
+            Keys(
+                keyId = it.keyId,
+                privateKey = null,
+                publicKey = it.publicKey.toByteArray(),
+                tokenId = id,
+                alias = TOKEN_KEYSTORE_ALIAS_SERVER
+            )
+        }
+
+
+        val ephemeralKeys = mutableListOf<Keys>()
+        keys.forEach { pair ->
+            pair.second.use { key ->
+                val key = Keys(
+                    keyId = pair.first,
+                    privateKey = key.privateKey!!.copyOf(),
+                    publicKey = key.publicKey.copyOf(),
+                    tokenId = id,
+                    alias = TOKEN_KEYSTORE_ALIAS_CLIENT
+                )
+                ephemeralKeys.add(key)
+            }
+        }
         dbKeystore.insert(
             serverKeys,
             TOKEN_KEYSTORE_ALIAS_SERVER,
@@ -298,7 +300,7 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
 
         token.use { tk ->
             val othersKeys = db.keysDao()?.fetchEphemeral(
-                tk.tokenHash,
+                tk.id,
                 TOKEN_KEYSTORE_ALIAS_SERVER,
             ) ?: throw Exception("Could not fetch server keys")
 
@@ -306,7 +308,7 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
 
             val interceptor = GrpcClientInterceptor(context) {
                 val keys = db.keysDao()?.fetchEphemeral(
-                    tk.tokenHash,
+                    tk.id,
                     TOKEN_KEYSTORE_ALIAS_CLIENT,
                     keyId
                 ) ?: throw Exception("Could not fetch client keys")
@@ -351,7 +353,7 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
 
         token.use { tk ->
             val othersKeys = db.keysDao()?.fetchEphemeral(
-                tk.tokenHash,
+                tk.id,
                 TOKEN_KEYSTORE_ALIAS_SERVER,
             ) ?: throw Exception("Could not fetch server keys")
 
@@ -359,7 +361,7 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
 
             val interceptor = GrpcClientInterceptor(context) {
                 val keys = db.keysDao()?.fetchEphemeral(
-                    tk.tokenHash,
+                    tk.id,
                     TOKEN_KEYSTORE_ALIAS_CLIENT,
                     keyId
                 ) ?: throw Exception("Could not fetch client keys")

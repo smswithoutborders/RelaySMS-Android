@@ -1,7 +1,6 @@
 package com.example.sw0b_001.ui.modals
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -15,37 +14,30 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.Tokens
-import com.example.sw0b_001.ui.viewModels.TokensViewModel
-import kotlinx.coroutines.launch
+import com.example.sw0b_001.ui.theme.AppTheme
+import uniffi.relaysms_spec_payload.V1ContentCategories
 
 // Data class to represent an account
 data class Account(
@@ -55,79 +47,79 @@ data class Account(
     val subtext: String
 )
 
+@Preview(showBackground = true)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectAccountModal(
-    accounts: List<Tokens>,
+    accounts: List<Tokens> = emptyList(),
+    onAddAccountCallback: () -> Unit = {},
+    onRemoveAccountCallback: (Tokens) -> Unit = {},
     onAccountSelected: (Tokens) -> Unit = {},
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit = {}
 ) {
-    val context = LocalContext.current
-    val sheetState = rememberStandardBottomSheetState(
-        confirmValueChange = { it != SheetValue.Hidden },
-        skipHiddenState = false
+    SelectAccountModalComponent(
+        accounts = accounts,
+        onAccountSelected = { token ->
+            onAccountSelected(token)
+            onDismissRequest()
+        },
+        onSheetHideCallback = { onDismissRequest() },
+        onAddAccountCallback = onAddAccountCallback,
+        onRemoveAccountCallback = onRemoveAccountCallback
     )
-    val scope = rememberCoroutineScope()
-    var showBottomSheet by remember { mutableStateOf(true) }
+}
 
-    val tokensViewModel = remember{ TokensViewModel(context) }
-
-    if (showBottomSheet) {
-        ModalBottomSheet(
-            onDismissRequest = {
-
-            },
-            sheetState = sheetState,
-            dragHandle = null,
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SelectAccountModalComponent(
+    accounts: List<Tokens> = emptyList(),
+    onAddAccountCallback: () -> Unit,
+    onRemoveAccountCallback: (Tokens) -> Unit,
+    onAccountSelected: (Tokens) -> Unit,
+    onSheetHideCallback: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Spacer(modifier = Modifier.weight(1f))
-                    IconButton(onClick = {
-                        scope.launch {
-                            sheetState.hide()
-                        }.invokeOnCompletion {
-                            showBottomSheet = false
-                            onDismissRequest()
-                        }
-                    }) {
-                        Icon(
-                            imageVector = Icons.Filled.Close,
-                            contentDescription = stringResource(R.string.close_modal)
-                        )
-                    }
-                }
-                Text(
-                    text = stringResource(R.string.select_an_account),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center,
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(onClick = onSheetHideCallback) {
+                Icon(
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = stringResource(R.string.close_modal)
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
 
-                LazyColumn(
-                    contentPadding = PaddingValues(bottom = 16.dp)
-                ) {
-                    items(accounts) { account ->
-                        AccountCard(account = account) {
-                            onAccountSelected(account)
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) {
-                                    showBottomSheet = false
-                                }
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
-                }
+        Column(
+            horizontalAlignment = Alignment.End,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Button(
+                onClick = onAddAccountCallback,
+            ) {
+                Icon(Icons.Default.Add,
+                    stringResource(R.string.add_new))
+                Text(stringResource(R.string.add_new))
+            }
+        }
+
+        LazyColumn(
+            contentPadding = PaddingValues(bottom = 16.dp),
+        ) {
+            items(accounts) { account ->
+                AccountCard(
+                    account = account,
+                    onRemoveAccountCallback = onRemoveAccountCallback,
+                    onAccountSelected = { onAccountSelected(account) }
+                )
             }
         }
     }
@@ -136,29 +128,40 @@ fun SelectAccountModal(
 @Composable
 fun AccountCard(
     account: Tokens,
+    onRemoveAccountCallback: (Tokens) -> Unit,
     onAccountSelected: () -> Unit
 ) {
     Card(
+        onClick = onAccountSelected,
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onAccountSelected() },
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            .padding(8.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp,
+        )
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             val profileImage = R.drawable.round_person_24
+
             Image(
                 painter = painterResource(id = profileImage),
                 contentDescription = stringResource(R.string.profile_photo),
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(40.dp)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop
             )
+
             Spacer(modifier = Modifier.width(16.dp))
-            Column {
+
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
                 Text(
                     text = account.account,
                     style = MaterialTheme.typography.titleMedium,
@@ -170,6 +173,50 @@ fun AccountCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            IconButton(
+                onClick = { onRemoveAccountCallback(account) }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = stringResource(R.string.delete),
+                    tint = MaterialTheme.colorScheme.error
+                )
+            }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SelectAccountModalComponent_preview() {
+    AppTheme() {
+        val tokens = listOf(
+            Tokens(
+                tokenId = 1,
+                tokenHash = ByteArray(0),
+                catId = V1ContentCategories.EMAIL,
+                account = "sample@example.com",
+                platformName = "gmail",
+                date = System.currentTimeMillis()
+            ),
+            Tokens(
+                tokenId = 2,
+                tokenHash = ByteArray(0),
+                catId = V1ContentCategories.TEXT,
+                account = "sample@example.com",
+                platformName = "bluesky",
+                date = System.currentTimeMillis()
+            )
+        )
+        SelectAccountModalComponent(
+            accounts = tokens,
+            onSheetHideCallback = {},
+            onAccountSelected = {},
+            onAddAccountCallback = {},
+            onRemoveAccountCallback = {}
+        )
     }
 }

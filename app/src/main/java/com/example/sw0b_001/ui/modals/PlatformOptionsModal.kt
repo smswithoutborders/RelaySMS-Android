@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -29,22 +28,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
-import com.bumptech.glide.integration.compose.placeholder
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.SupportedPlatforms
 import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.ui.navigation.ComposeScreen
+import com.example.sw0b_001.ui.navigation.MetricsScreen
 import com.example.sw0b_001.ui.viewModels.TokensUiState
 import uniffi.relaysms_spec_payload.V1ContentCategories
-import uniffi.relaysms_spec_payload.v1ContentCategoryFromU8
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
@@ -102,55 +97,10 @@ fun PlatformOptionsModal(
                         onDismissRequest()
                     }
                 }
-                else if(removeAccountRequested) {
-                    SelectAccountModal(
-                        accounts = accounts,
-                        onAccountSelected = { storedAccount ->
-                            removeAccountRequested = false
-                            revokeAccountConfirmationRequested = true
-                            selectedAccount = storedAccount
-                        }
-                    ) {
-                        removeAccountRequested = false
-                    }
-                }
                 else if(isStoring == TokensUiState.Loading) {
                     AddAccountLoading(platform!!)
                 }
                 else {
-                    GlideImage(
-                        model = platform?.icon_png,
-                        contentDescription = stringResource(R.string.platform_image),
-                        modifier = Modifier
-                            .size(50.dp),
-                        loading = placeholder(R.drawable.logo), // Shows while loading
-                        failure = placeholder(R.drawable.logo)      // Shows if download fails
-                    ) {
-                        it.diskCacheStrategy(DiskCacheStrategy.ALL) // Caches both original and resized images
-                            .circleCrop()                             // Makes the image a circle
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = if (isCompose) {
-                            getServiceBasedComposeDescriptions(
-                                context,
-                                if(platform?.cat_id == null) V1ContentCategories.BRIDGE
-                                        else v1ContentCategoryFromU8(
-                                    platform.cat_id.toUByte())
-                            )
-                        } else {
-                            getServiceBasedAvailableDescription(
-                                context,
-                                if(platform?.cat_id == null) V1ContentCategories.BRIDGE
-                                else v1ContentCategoryFromU8(
-                                    platform.cat_id.toUByte())
-                            )
-                        },
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(24.dp))
-
                     if (isCompose) {
                         ComposeMessages(
                             navController = navController,
@@ -161,11 +111,19 @@ fun PlatformOptionsModal(
                             onDismissRequest()
                         }
                     } else {
-                        ManageAccounts(
-                            isActive,
-                            isOnboarding = isOnboarding,
-                            addAccountsCallback = storeCallback,
-                            removeAccountsCallback = { removeAccountRequested = true }
+                        SelectAccountModal(
+                            accounts = accounts,
+                            onAddAccountCallback = storeCallback,
+                            onAccountSelected = { storedAccount ->
+                                navController.navigate(MetricsScreen(
+                                    tokenId = storedAccount.id
+                                ))
+                            },
+                            onDismissRequest = onDismissRequest,
+                            onRemoveAccountCallback = {
+                                revokeAccountConfirmationRequested = true
+                                selectedAccount = it
+                            }
                         )
                     }
                     Spacer(modifier = Modifier.height(16.dp))
@@ -241,28 +199,30 @@ private fun ComposeMessages(
     }
 }
 
+@Preview(showBackground = true)
 @Composable
 private fun ManageAccounts(
-    isActive: Boolean,
-    isOnboarding: Boolean,
-    addAccountsCallback: () -> Unit,
-    removeAccountsCallback: () -> Unit
+    isActive: Boolean = false,
+    addAccountsCallback: () -> Unit = {},
+    removeAccountsCallback: () -> Unit = {}
 ) {
-    Button(
-        onClick = addAccountsCallback,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text(stringResource(R.string.add_account))
-    }
-    Spacer(modifier = Modifier.height(8.dp))
-
-    if (LocalInspectionMode.current ||  (isActive && !isOnboarding)) {
-        TextButton(
-            onClick = removeAccountsCallback,
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)
+    Column {
+        Button(
+            onClick = addAccountsCallback,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text(stringResource(R.string.remove_accounts))
+            Text(stringResource(R.string.add_account))
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+
+        if (isActive) {
+            TextButton(
+                onClick = removeAccountsCallback,
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)
+            ) {
+                Text(stringResource(R.string.remove_accounts))
+            }
         }
     }
 }

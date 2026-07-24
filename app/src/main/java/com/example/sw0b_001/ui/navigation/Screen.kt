@@ -55,5 +55,5 @@ data class DetailsInterfaceScreen(
 
 @Serializable
 data class MetricsScreen(
-    val tokenHash: ByteArray,
+    val tokenId: Long,
 )

@@ -486,7 +486,10 @@ fun PlatformListRow(
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
-                    text = "Send messages using your ${platform?.display_name ?: ""} account.",
+                    text = stringResource(
+                        R.string.send_messages_using_your_account,
+                        platform?.display_name ?: ""
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

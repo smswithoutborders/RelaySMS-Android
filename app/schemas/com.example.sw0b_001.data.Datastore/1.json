@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "a86bdcbcded8d0df19196c420e4b700d",
+    "identityHash": "0505cb12cf754d7be24b66f2db6b7ccf",
     "entities": [
       {
         "tableName": "RatchetStates",
@@ -127,7 +127,7 @@
       },
       {
         "tableName": "Tokens",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tokenId` INTEGER NOT NULL, `tokenHash` BLOB NOT NULL, `catId` TEXT NOT NULL, `account` TEXT NOT NULL, `platformName` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tokenId` INTEGER NOT NULL, `tokenHash` BLOB NOT NULL, `catId` TEXT NOT NULL, `account` TEXT NOT NULL, `platformName` TEXT NOT NULL, `date` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -164,6 +164,12 @@
             "columnName": "platformName",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -171,18 +177,7 @@
           "columnNames": [
             "id"
           ]
-        },
-        "indices": [
-          {
-            "name": "index_Tokens_tokenHash",
-            "unique": true,
-            "columnNames": [
-              "tokenHash"
-            ],
-            "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_Tokens_tokenHash` ON `${TABLE_NAME}` (`tokenHash`)"
-          }
-        ]
+        }
       },
       {
         "tableName": "SupportedPlatforms",
@@ -283,7 +278,7 @@
       },
       {
         "tableName": "Keys",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `keyId` INTEGER NOT NULL, `alias` TEXT NOT NULL, `privateKey` BLOB, `publicKey` BLOB NOT NULL, `tokenHash` BLOB, FOREIGN KEY(`tokenHash`) REFERENCES `Tokens`(`tokenHash`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `keyId` INTEGER NOT NULL, `alias` TEXT NOT NULL, `privateKey` BLOB, `publicKey` BLOB NOT NULL, `tokenId` INTEGER NOT NULL, `date` INTEGER NOT NULL, FOREIGN KEY(`tokenId`) REFERENCES `Tokens`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -315,9 +310,16 @@
             "notNull": true
           },
           {
-            "fieldPath": "tokenHash",
-            "columnName": "tokenHash",
-            "affinity": "BLOB"
+            "fieldPath": "tokenId",
+            "columnName": "tokenId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -328,13 +330,13 @@
         },
         "indices": [
           {
-            "name": "index_Keys_tokenHash",
+            "name": "index_Keys_tokenId",
             "unique": false,
             "columnNames": [
-              "tokenHash"
+              "tokenId"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_Keys_tokenHash` ON `${TABLE_NAME}` (`tokenHash`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Keys_tokenId` ON `${TABLE_NAME}` (`tokenId`)"
           }
         ],
         "foreignKeys": [
@@ -343,10 +345,10 @@
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
-              "tokenHash"
+              "tokenId"
             ],
             "referencedColumns": [
-              "tokenHash"
+              "id"
             ]
           }
         ]
@@ -437,7 +439,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a86bdcbcded8d0df19196c420e4b700d')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0505cb12cf754d7be24b66f2db6b7ccf')"
     ]
   }
 }

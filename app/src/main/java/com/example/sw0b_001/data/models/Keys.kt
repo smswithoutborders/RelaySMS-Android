@@ -14,12 +14,12 @@ import java.security.MessageDigest
     foreignKeys = [
         ForeignKey(
             entity = Tokens::class,
-            parentColumns = ["tokenId"],
+            parentColumns = ["id"],
             childColumns = ["tokenId"],
             onDelete = ForeignKey.CASCADE // This triggers the automatic deletion
         )
     ],
-    indices = [Index(value = ["tokenHash"])]
+    indices = [Index(value = ["tokenId"])]
 )
 @Serializable
 data class Keys(

@@ -138,7 +138,7 @@ fun ComposerInterface(
             publisherViewModel.publish(
                 catId = selectedToken?.catId ?: V1ContentCategories.BRIDGE,
                 body = body,
-                tokenHash = selectedToken?.tokenHash,
+                tokenId = selectedToken?.id,
                 to = to,
                 subject = subject,
                 imageViewModel = imageViewModel,

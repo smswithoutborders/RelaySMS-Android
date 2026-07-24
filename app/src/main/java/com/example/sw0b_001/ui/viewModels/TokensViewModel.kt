@@ -54,7 +54,8 @@ sealed class TokensUiState {
 @Serializable
 data class TokensMetrics(
     val account: String,
-    val quantityEncryptionKeys: Int,
+    val quantityEncryptionKeysClient: Int,
+    val quantityEncryptionKeysServer: Int,
     val quantityText: Int,
     val quantityAttachments: Int,
     val lastSync: Long,
@@ -97,8 +98,13 @@ class TokensViewModel @Inject constructor(
         return db.fetch(platformName)
     }
 
-    fun fetchTokenMetrics(tokenId: Int): Flow<TokensMetrics> {
-        return db.getTokensMetrics(tokenId)
+    fun fetchTokenMetrics(tokenId: Long): Flow<TokensMetrics> {
+        return db.getTokensMetrics(
+            tokenId,
+            PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_SERVER_ATTACHMENT,
+            aliasClient = PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_CLIENT,
+            aliasServer = PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_SERVER,
+        )
     }
 
     fun reset(onCompleteCallback: ()-> Unit) {

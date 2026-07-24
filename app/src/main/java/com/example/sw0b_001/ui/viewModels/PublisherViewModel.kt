@@ -46,7 +46,7 @@ class PublisherViewModel @Inject constructor(
         catId: V1ContentCategories,
         body: String,
         platformName: String,
-        tokenHash: ByteArray?,
+        tokenId: Long?,
         to: String?,
         subject: String?,
         imageViewModel: ImageViewModel,
@@ -60,10 +60,10 @@ class PublisherViewModel @Inject constructor(
                 val isAttachment = attachment != null
                 var contentContainer: V1ContentsContainer?
 
-                var tokenId: UInt? = null
-                if(tokenHash != null) {
+                var publishingTokenId: UInt? = null
+                if(tokenId != null) {
                     val db = Datastore.getDatastore(context) ?: throw Exception("Failed to open database")
-                    tokenId = db.tokensDao()?.fetch(tokenHash)
+                    publishingTokenId = db.tokensDao()?.fetch(tokenId)
                         ?.tokenId
                         ?.toUInt()
                         ?: throw Exception("Failed to find token id")
@@ -76,26 +76,26 @@ class PublisherViewModel @Inject constructor(
                             context,
                             catId,
                             body,
-                            tokenId,
+                            publishingTokenId,
                             to,
                             subject,
                             attachment,
                             imageViewModel,
                             sessionId
                         ) { payload ->
-                            encrypt(tokenHash!!, payload, true)
+                            encrypt(tokenId!!, payload, true)
                         }
                     } else {
                         contentContainer = publishWithoutAttachment(
                             context,
                             catId,
                             body,
-                            tokenId,
+                            publishingTokenId,
                             to,
                             subject,
                             debugOnly = _debugUiState.value,
                         ) { payload ->
-                            encrypt(tokenHash!!, payload)
+                            encrypt(tokenId!!, payload)
                         }
                     }
 
@@ -119,20 +119,20 @@ class PublisherViewModel @Inject constructor(
     }
 
     private fun encrypt(
-        tokenHash: ByteArray,
+        tokenId: Long,
         plaintext: ByteArray,
         withAttachment: Boolean = false
     ) : Pair<ByteArray, Int> {
         val db = Datastore.getDatastore(context)?.keysDao() ?: throw Exception("Could not open database")
 
         val othersKeys = db.fetchEphemeral(
-            tokenHash,
+            tokenId,
             if(withAttachment) PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_SERVER_ATTACHMENT
             else PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_SERVER,
         ) ?: throw Exception("Could not fetch server keys")
 
         val keys = db.fetchEphemeral(
-            tokenHash,
+            tokenId,
             PublisherGrpcImpl.TOKEN_KEYSTORE_ALIAS_CLIENT,
             othersKeys.keyId
         ) ?: throw Exception("Could not fetch client keys")
