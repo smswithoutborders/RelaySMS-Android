@@ -65,4 +65,7 @@ interface KeysDao {
 
     @Query("DELETE FROM Keys")
     suspend fun deleteAll()
+
+    @Query("DELETE FROM Keys WHERE tokenId = :tokenId")
+    suspend fun deleteForTokenId(tokenId: Long)
 }

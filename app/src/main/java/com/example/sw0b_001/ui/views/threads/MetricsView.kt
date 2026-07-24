@@ -19,6 +19,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -26,6 +27,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -35,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
+import com.example.sw0b_001.ui.viewModels.TokensUiState
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGridApi::class)
@@ -47,6 +52,8 @@ fun MetricsView(
 ) {
     val tokenMetrics by tokensViewModel.fetchTokenMetrics(tokensId)
         .collectAsStateWithLifecycle(null)
+
+    val isLoadingUiState by tokensViewModel.isStoringUiState.collectAsStateWithLifecycle()
 
     fun backHandler() {
         navController.popBackStack()
@@ -81,7 +88,11 @@ fun MetricsView(
                 quanEncryptionKeysClient = tokenMetrics?.quantityEncryptionKeysClient ?: 0,
                 quanTextKeys = tokenMetrics?.quantityText ?: 0,
                 quanAttachmentKeys = tokenMetrics?.quantityAttachments ?: 0,
-                lastSyncDate = tokenMetrics?.lastSync.toString()
+                lastSyncDate = tokenMetrics?.lastSync.toString(),
+                isLoading = isLoadingUiState,
+                onRefreshClickCallback = {
+                    tokensViewModel.refreshTokens(tokensId)
+                }
             )
         }
     }
@@ -99,18 +110,16 @@ fun MetricsViewComponent(
     quanTextKeys: Int = -1,
     quanAttachmentKeys: Int = -1,
     lastSyncDate: String = "",
+    isLoading: TokensUiState = TokensUiState.Loading,
+    onRefreshClickCallback: () -> Unit = {},
 ) {
+    var isEnabled by remember{ mutableStateOf(false) }
+
     Column(Modifier
         .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            stringResource(R.string.account_details),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.secondary,
-        )
-
         Card(
             colors = CardDefaults
                 .cardColors(MaterialTheme.colorScheme.tertiary),
@@ -153,6 +162,18 @@ fun MetricsViewComponent(
         }
 
         Spacer(Modifier.padding(20.dp))
+        when(val state = isLoading) {
+            is TokensUiState.Loading -> {
+                isEnabled = false
+                LinearProgressIndicator()
+            }
+            else -> {
+                if(quanEncryptionKeysServer < 256 || quanEncryptionKeysClient < 256) {
+                    isEnabled = true
+                }
+            }
+        }
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -165,7 +186,8 @@ fun MetricsViewComponent(
             )
             Spacer(Modifier.padding(16.dp))
             TextButton(
-                onClick = { TODO() },
+                onClick = onRefreshClickCallback,
+                enabled = isEnabled,
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)

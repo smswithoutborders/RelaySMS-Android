@@ -95,6 +95,9 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
 
         try {
             val res = publisherStub.exchangeOAuth2CodeAndStore(request)
+            if(!res.success) {
+                throw Exception(res.message)
+            }
             processEphemeralKeys(
                 keyId = res.keyId,
                 serverEphemeralPublicKeys = res.serverEphemeralPublicKeysList,
@@ -106,9 +109,6 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
                 platformName = res.platform
             )
 
-            if(!res.success) {
-                throw Exception(res.message)
-            }
         } catch (e: Exception) {
             throw e
         }
@@ -165,21 +165,23 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
         tokenHash: ByteArray,
         catId: V1ContentCategories,
         accountId: String,
-        platformName: String
+        platformName: String,
+        id: Long? = null,
     ) {
         val db = Datastore.getDatastore(context) ?: throw Exception("Failed to open database")
         val dbKeystore = db.keysDao() ?: throw Exception("Failed to open database")
         val dbTokens = db.tokensDao() ?: throw Exception("Failed to open database")
 
-        val id = dbTokens.insert(
-            Tokens(
-                tokenId = tokenId.toInt(),
-                catId = catId,
-                account = accountId,
-                platformName = platformName,
-                tokenHash = tokenHash
+        val id = id
+            ?: dbTokens.insert(
+                Tokens(
+                    tokenId = tokenId.toInt(),
+                    catId = catId,
+                    account = accountId,
+                    platformName = platformName,
+                    tokenHash = tokenHash
+                )
             )
-        )
 
         val serverKeys = serverEphemeralPublicKeys.map {
             Keys(
@@ -262,6 +264,10 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
 
         try {
             val res = publisherStub.exchangePNBACodeAndStore(request)
+            if(!res.success) {
+                throw Exception(res.message)
+            }
+
             processEphemeralKeys(
                 keyId = res.keyId,
                 serverEphemeralPublicKeys = res.serverEphemeralPublicKeysList,
@@ -272,10 +278,6 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
                 accountId = res.accountIdentifier,
                 platformName = res.platform
             )
-
-            if(!res.success) {
-                throw Exception(res.message)
-            }
 
             return res
         } catch (e: Exception) {
@@ -294,6 +296,35 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
         }
     }
 
+    private fun getInterceptor(
+        db: Datastore,
+        tokenId: Long,
+        keyId: Int,
+        serverPublicKey: ByteArray,
+        tokenHash: ByteArray
+    ): GrpcClientInterceptor {
+        return GrpcClientInterceptor(context) {
+            val keys = db.keysDao()?.fetchEphemeral(
+                tokenId,
+                TOKEN_KEYSTORE_ALIAS_CLIENT,
+                keyId
+            ) ?: throw Exception("Could not fetch client keys")
+
+            val authenticationPublicKey = context.getStaticKeys(keyId)
+                ?: throw Exception("Could not find static keys for id")
+
+            keys.use {
+                return@GrpcClientInterceptor v1TokenEncryptClient(
+                    ecKid = it.privateKey!!.copyOf(),
+                    ssKidPk = authenticationPublicKey,
+                    esKidPk = serverPublicKey,
+                    keyId = keyId.toUByte(),
+                    token = tokenHash
+                )
+            }
+        }
+    }
+
     fun revokeOAuth2(token: Tokens) {
         val db = Datastore.getDatastore(context)
             ?: throw Exception("Failed to open database")
@@ -306,32 +337,19 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
 
             val keyId = othersKeys.keyId
 
-            val interceptor = GrpcClientInterceptor(context) {
-                val keys = db.keysDao()?.fetchEphemeral(
-                    tk.id,
-                    TOKEN_KEYSTORE_ALIAS_CLIENT,
-                    keyId
-                ) ?: throw Exception("Could not fetch client keys")
-
-                val authenticationPublicKey = context.getStaticKeys(keyId)
-                    ?: throw Exception("Could not find static keys for id")
-
-                keys.use {
-                    return@GrpcClientInterceptor v1TokenEncryptClient(
-                        ecKid = it.privateKey!!.copyOf(),
-                        ssKidPk = authenticationPublicKey,
-                        esKidPk = othersKeys.publicKey,
-                        keyId = keyId.toUByte(),
-                        token = tk.tokenHash
-                    )
-                }
-            }
 
             try {
                 val request = PublisherOuterClass.RevokeOAuth2TokenRequest.newBuilder().apply {
                     setKeyId(keyId)
                     setTokenId(tk.tokenId)
                 }
+                val interceptor = getInterceptor(
+                    db = db,
+                    tokenId = tk.id,
+                    keyId = keyId,
+                    serverPublicKey = othersKeys.publicKey,
+                    tokenHash = tk.tokenHash
+                )
 
                 val res = nativePubStub
                     .withInterceptors(interceptor)
@@ -359,26 +377,13 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
 
             val keyId = othersKeys.keyId
 
-            val interceptor = GrpcClientInterceptor(context) {
-                val keys = db.keysDao()?.fetchEphemeral(
-                    tk.id,
-                    TOKEN_KEYSTORE_ALIAS_CLIENT,
-                    keyId
-                ) ?: throw Exception("Could not fetch client keys")
-
-                val authenticationPublicKey = context.getStaticKeys(keyId)
-                    ?: throw Exception("Could not find static keys for id")
-
-                keys.use {
-                    return@GrpcClientInterceptor v1TokenEncryptClient(
-                        ecKid = it.privateKey!!.copyOf(),
-                        ssKidPk = authenticationPublicKey,
-                        esKidPk = othersKeys.publicKey,
-                        keyId = keyId.toUByte(),
-                        token = tk.tokenHash
-                    )
-                }
-            }
+            val interceptor = getInterceptor(
+                db = db,
+                tokenId = tk.id,
+                keyId = keyId,
+                serverPublicKey = othersKeys.publicKey,
+                tokenHash = tk.tokenHash
+            )
 
             try {
                 val request = PublisherOuterClass.RevokePNBATokenRequest.newBuilder().apply {
@@ -398,6 +403,68 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
                 throw e
             }
         }
+    }
+
+    suspend fun refreshKeys(token: Tokens) {
+        val db = Datastore.getDatastore(context)
+            ?: throw Exception("Failed to open database")
+
+        val (publisherKeys, keys) = getKeys()
+        token.use { tk ->
+            val othersKeys = db.keysDao()?.fetchEphemeral(
+                tk.id,
+                TOKEN_KEYSTORE_ALIAS_SERVER,
+            ) ?: throw Exception("Could not fetch server keys")
+
+            val keyId = othersKeys.keyId
+
+            val interceptor = getInterceptor(
+                db = db,
+                tokenId = tk.id,
+                keyId = keyId,
+                serverPublicKey = othersKeys.publicKey,
+                tokenHash = tk.tokenHash
+            )
+
+            try {
+                val request = PublisherOuterClass.SyncKeysRequest.newBuilder().apply {
+                    setKeyId(keyId)
+                    setTokenId(tk.tokenId)
+                    addAllClientEphemeralPublicKeys(publisherKeys)
+                }
+
+                val res = nativePubStub
+                    .withInterceptors(interceptor)
+                    .syncKeys(request.build())
+
+                if(!res.success) {
+                    throw Exception(res.message)
+                }
+
+                db.keysDao()?.deleteForTokenId(token.id).also {
+                    try {
+                        storeKeys(
+                            keys = keys,
+                            serverEphemeralPublicKeys = res.serverEphemeralPublicKeysList,
+                            tokenId = token.tokenId.toUInt(),
+                            tokenHash = token.tokenHash,
+                            catId = token.catId,
+                            accountId = token.account,
+                            platformName = token.platformName,
+                            id = token.id
+                        )
+                    } catch(e: Exception) {
+                        e.printStackTrace()
+                        throw e
+                    }
+                }
+
+            } catch(e: Exception) {
+                e.printStackTrace()
+                throw e
+            }
+        }
+
     }
 
     companion object {

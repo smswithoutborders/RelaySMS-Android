@@ -307,4 +307,22 @@ class TokensViewModel @Inject constructor(
             }
         }
     }
+
+    fun refreshTokens(tokenId: Long) {
+        _isStoringUiState.value = TokensUiState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
+            PublisherGrpcImpl(context).use { publisherGrpcImpl ->
+                try {
+                    val token = db.fetch(tokenId)
+                    token.use {
+                        publisherGrpcImpl.refreshKeys(token)
+                        _isStoringUiState.value = TokensUiState.Success(null)
+                    }
+                } catch(e: Exception) {
+                    e.printStackTrace()
+                    _isStoringUiState.value = TokensUiState.Error(e)
+                }
+            }
+        }
+    }
 }

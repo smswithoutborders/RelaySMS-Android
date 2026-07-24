@@ -25,7 +25,6 @@ interface TokensDao {
     @Query("SELECT * FROM Tokens WHERE platformName = :name")
     fun fetch(name: String) : Flow<List<Tokens>>
 
-
     @Insert
     fun insert(tokens: Tokens): Long
 
