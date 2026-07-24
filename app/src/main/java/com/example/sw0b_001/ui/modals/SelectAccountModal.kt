@@ -52,6 +52,7 @@ data class Account(
 @Composable
 fun SelectAccountModal(
     accounts: List<Tokens> = emptyList(),
+    isCompose: Boolean = false,
     onAddAccountCallback: () -> Unit = {},
     onRemoveAccountCallback: (Tokens) -> Unit = {},
     onAccountSelected: (Tokens) -> Unit = {},
@@ -59,6 +60,7 @@ fun SelectAccountModal(
 ) {
     SelectAccountModalComponent(
         accounts = accounts,
+        isCompose = isCompose,
         onAccountSelected = { token ->
             onAccountSelected(token)
             onDismissRequest()
@@ -72,7 +74,8 @@ fun SelectAccountModal(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectAccountModalComponent(
-    accounts: List<Tokens> = emptyList(),
+    accounts: List<Tokens>,
+    isCompose: Boolean,
     onAddAccountCallback: () -> Unit,
     onRemoveAccountCallback: (Tokens) -> Unit,
     onAccountSelected: (Tokens) -> Unit,
@@ -97,17 +100,19 @@ fun SelectAccountModalComponent(
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        Column(
-            horizontalAlignment = Alignment.End,
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Button(
-                onClick = onAddAccountCallback,
+        if(!isCompose) {
+            Column(
+                horizontalAlignment = Alignment.End,
+                modifier = Modifier
+                    .fillMaxWidth()
             ) {
-                Icon(Icons.Default.Add,
-                    stringResource(R.string.add_new))
-                Text(stringResource(R.string.add_new))
+                Button(
+                    onClick = onAddAccountCallback,
+                ) {
+                    Icon(Icons.Default.Add,
+                        stringResource(R.string.add_new))
+                    Text(stringResource(R.string.add_new))
+                }
             }
         }
 
@@ -117,6 +122,7 @@ fun SelectAccountModalComponent(
             items(accounts) { account ->
                 AccountCard(
                     account = account,
+                    isCompose = isCompose,
                     onRemoveAccountCallback = onRemoveAccountCallback,
                     onAccountSelected = { onAccountSelected(account) }
                 )
@@ -128,6 +134,7 @@ fun SelectAccountModalComponent(
 @Composable
 fun AccountCard(
     account: Tokens,
+    isCompose: Boolean,
     onRemoveAccountCallback: (Tokens) -> Unit,
     onAccountSelected: () -> Unit
 ) {
@@ -174,18 +181,53 @@ fun AccountCard(
                 )
             }
 
-            Spacer(modifier = Modifier.width(16.dp))
+            if(!isCompose) {
+                Spacer(modifier = Modifier.width(16.dp))
 
-            IconButton(
-                onClick = { onRemoveAccountCallback(account) }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = stringResource(R.string.delete),
-                    tint = MaterialTheme.colorScheme.error
-                )
+                IconButton(
+                    onClick = { onRemoveAccountCallback(account) }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.delete),
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun SelectAccountModalComponent_preview_is_compose() {
+    AppTheme() {
+        val tokens = listOf(
+            Tokens(
+                tokenId = 1,
+                tokenHash = ByteArray(0),
+                catId = V1ContentCategories.EMAIL,
+                account = "sample@example.com",
+                platformName = "gmail",
+                date = System.currentTimeMillis()
+            ),
+            Tokens(
+                tokenId = 2,
+                tokenHash = ByteArray(0),
+                catId = V1ContentCategories.TEXT,
+                account = "sample@example.com",
+                platformName = "bluesky",
+                date = System.currentTimeMillis()
+            )
+        )
+        SelectAccountModalComponent(
+            accounts = tokens,
+            isCompose = false,
+            onSheetHideCallback = {},
+            onAccountSelected = {},
+            onAddAccountCallback = {},
+            onRemoveAccountCallback = {},
+        )
     }
 }
 
@@ -213,10 +255,11 @@ fun SelectAccountModalComponent_preview() {
         )
         SelectAccountModalComponent(
             accounts = tokens,
+            isCompose = true,
             onSheetHideCallback = {},
             onAccountSelected = {},
             onAddAccountCallback = {},
-            onRemoveAccountCallback = {}
+            onRemoveAccountCallback = {},
         )
     }
 }

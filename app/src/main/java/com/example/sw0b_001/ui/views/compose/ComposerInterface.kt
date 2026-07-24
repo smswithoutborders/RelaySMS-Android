@@ -298,15 +298,16 @@ fun ComposerInterface(
 
             if (showSelectAccountModal) {
                 SelectAccountModal(
+                    isCompose = true,
                     onDismissRequest = {
                         if (selectedToken == null) {
+                            Toast.makeText(
+                                context,
+                                ContextCompat.getString(context,R.string.no_account_selected),
+                                Toast.LENGTH_SHORT
+                            ).show()
                             backHandler()
                         }
-                        Toast.makeText(
-                            context,
-                            ContextCompat.getString(context,R.string.no_account_selected),
-                            Toast.LENGTH_SHORT
-                        ).show()
                     },
                     onAccountSelected = { account ->
                         selectedToken = account
