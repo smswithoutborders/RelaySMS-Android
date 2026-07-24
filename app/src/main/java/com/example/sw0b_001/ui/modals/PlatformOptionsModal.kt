@@ -105,16 +105,18 @@ fun PlatformOptionsModal(
                             onDismissRequest()
                         }
                     } else {
-                        SelectAccountModal(
+                        SelectAccountModalComponent(
                             accounts = accounts,
                             displayName = platform?.display_name ?: "",
+                            isCompose = false,
                             onAddAccountCallback = storeCallback,
                             onAccountSelected = { storedAccount ->
+                                onDismissRequest()
                                 navController.navigate(MetricsScreen(
                                     tokenId = storedAccount.id
                                 ))
                             },
-                            onDismissRequest = onDismissRequest,
+                            onSheetHideCallback = onDismissRequest,
                             onRemoveAccountCallback = {
                                 revokeAccountConfirmationRequested = true
                                 selectedAccount = it

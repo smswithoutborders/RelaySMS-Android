@@ -303,9 +303,10 @@ fun ComposerInterface(
                         if (selectedToken == null) {
                             Toast.makeText(
                                 context,
-                                ContextCompat.getString(context,R.string.no_account_selected),
+                                ContextCompat.getString(context, R.string.no_account_selected),
                                 Toast.LENGTH_SHORT
-                            ).show()
+                            )
+                                .show()
                             backHandler()
                         }
                     },
@@ -313,7 +314,8 @@ fun ComposerInterface(
                         selectedToken = account
                         showSelectAccountModal = false
                     },
-                    accounts = tokens
+                    accounts = tokens,
+                    displayName = supportedPlatformName,
                 )
             }
         }

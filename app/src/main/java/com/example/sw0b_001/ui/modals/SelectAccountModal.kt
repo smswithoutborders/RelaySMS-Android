@@ -24,7 +24,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,30 +50,41 @@ data class Account(
     val subtext: String
 )
 
-@Preview(showBackground = true)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectAccountModal(
-    accounts: List<Tokens> = emptyList(),
-    isCompose: Boolean = false,
-    displayName: String = "",
-    onAddAccountCallback: () -> Unit = {},
-    onRemoveAccountCallback: (Tokens) -> Unit = {},
-    onAccountSelected: (Tokens) -> Unit = {},
-    onDismissRequest: () -> Unit = {}
+    accounts: List<Tokens>,
+    isCompose: Boolean,
+    displayName: String,
+    onRemoveAccountCallback: ((Tokens) -> Unit)? = null,
+    onAddAccountCallback: (() -> Unit)? = null,
+    onAccountSelected: ((Tokens) -> Unit)? = null,
+    onDismissRequest: () -> Unit,
 ) {
-    SelectAccountModalComponent(
-        accounts = accounts,
-        isCompose = isCompose,
-        displayName = displayName,
-        onAccountSelected = { token ->
-            onAccountSelected(token)
-            onDismissRequest()
-        },
-        onSheetHideCallback = { onDismissRequest() },
-        onAddAccountCallback = onAddAccountCallback,
-        onRemoveAccountCallback = onRemoveAccountCallback
+
+    val sheetState = rememberStandardBottomSheetState(
+        initialValue = SheetValue.Expanded,
+        skipHiddenState = false,
     )
+
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        sheetState = sheetState,
+        dragHandle = null,
+    ) {
+        SelectAccountModalComponent(
+            accounts = accounts,
+            isCompose = isCompose,
+            displayName = displayName,
+            onAccountSelected = { token ->
+                onAccountSelected?.invoke(token)
+                onDismissRequest()
+            },
+            onSheetHideCallback = onDismissRequest,
+            onAddAccountCallback = onAddAccountCallback ?: {},
+            onRemoveAccountCallback = onRemoveAccountCallback ?: {}
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
