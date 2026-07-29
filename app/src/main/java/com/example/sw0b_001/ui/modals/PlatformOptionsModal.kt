@@ -263,7 +263,6 @@ private fun getServiceBasedAvailableDescription(
         V1ContentCategories.TEXT -> {
             return context.getString(R.string.adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported)
         }
-        V1ContentCategories.BRIDGE -> context.getString(R.string.your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias)
     }
 }
 
@@ -281,7 +280,6 @@ private fun getServiceBasedComposeDescriptions(
         V1ContentCategories.MESSAGE -> {
             context.getString(R.string.continue_to_make_posts_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
         }
-        V1ContentCategories.BRIDGE ->  context.getString(R.string.your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
     }
 }
 

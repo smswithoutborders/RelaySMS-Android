@@ -185,8 +185,7 @@ fun ComposerInterface(
             TopAppBar(
                 title = {
                     when(catId) {
-                        V1ContentCategories.EMAIL,
-                        V1ContentCategories.BRIDGE -> {
+                        V1ContentCategories.EMAIL -> {
                             Text(stringResource(R.string.compose_email))
                         }
                         V1ContentCategories.TEXT -> {
@@ -265,8 +264,7 @@ fun ComposerInterface(
                 }
                 Column {
                     when(catId) {
-                        V1ContentCategories.EMAIL,
-                        V1ContentCategories.BRIDGE -> EmailComposeView(
+                        V1ContentCategories.EMAIL -> EmailComposeView(
                             catId,
                             from = from,
                             to = to,

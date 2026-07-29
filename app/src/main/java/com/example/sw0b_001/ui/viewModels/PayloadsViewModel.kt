@@ -99,7 +99,7 @@ class PayloadsViewModel @Inject constructor(
 
                 val db = Datastore.getDatastore(context)?.payloadsDao()
                     ?: throw Exception("Could not open database")
-                inboxMessageList = db.inbox(V1ContentCategories.BRIDGE)
+                inboxMessageList = db.inbox(V1ContentCategories.EMAIL)
                 _isLoading.value = false
             }
         }

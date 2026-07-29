@@ -79,7 +79,6 @@ import io.shortmesh.sdk.viewmodel.AuthyViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import uniffi.relaysms_spec_payload.V1ContentCategories
 import uniffi.relaysms_spec_payload.V1PayloadsSupportedProtocols
 import uniffi.relaysms_spec_payload.v1ContentCategoryFromU8
 import uniffi.relaysms_spec_payload.v1PayloadSupportProtocolsFromU8
@@ -377,9 +376,7 @@ fun PlatformListContent(
         if(showPlatformOptions) {
             PlatformOptionsModal(
                 showPlatformsModal = showPlatformOptions,
-                cat = if(clickedPlatform == null)
-                    V1ContentCategories.BRIDGE
-                else v1ContentCategoryFromU8(clickedPlatform!!.cat_id.toUByte()),
+                cat = v1ContentCategoryFromU8(clickedPlatform!!.cat_id.toUByte()),
                 isCompose = isCompose,
                 isOfflineCompose = clickedPlatform?.supports_offline_first == true,
                 platform = clickedPlatform,

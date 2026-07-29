@@ -4562,8 +4562,7 @@ enum class V1ContentCategories(val value: kotlin.UByte) {
     
     EMAIL(0u),
     MESSAGE(1u),
-    TEXT(2u),
-    BRIDGE(3u);
+    TEXT(2u);
 
     
 

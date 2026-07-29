@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.Protocols
 import com.example.sw0b_001.BuildConfig
-import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.TransportImpl.publishWithAttachment
 import com.example.sw0b_001.data.TransportImpl.publishWithoutAttachment
 import com.example.sw0b_001.data.models.Payloads
@@ -79,7 +78,7 @@ class OfflineFirstPublisherViewModel @Inject constructor(
                     }
 
                     val payload = Payloads(
-                        catId = V1ContentCategories.BRIDGE,
+                        catId = catId,
                         content = contentContainer,
                         platformName = "RelaySMS", // TODO: match incoming name
                     )
@@ -101,8 +100,6 @@ class OfflineFirstPublisherViewModel @Inject constructor(
         plaintext: ByteArray,
         withAttachment: Boolean = false,
     ) : Pair<ByteArray, Int> {
-        val db = Datastore.getDatastore(context)?.keysDao() ?: throw Exception("Could not open database")
-
         val keyId = if(withAttachment) (0 until 16).random()
         else (0 until 255).random()
 
@@ -112,13 +109,13 @@ class OfflineFirstPublisherViewModel @Inject constructor(
         val protocol = Protocols(context)
         protocol.generateDH().use { ec ->
             protocol.generateDH().use { sc ->
-                val ciphertext = OfflineFirst.encrypt(
+                val offlineFirst = OfflineFirst.encrypt(
                     ssPk = authenticationPublicKey,
                     ec = ec.privateKey!!,
                     sc = sc.privateKey!!,
                     payload = plaintext
                 )
-                return Pair(ciphertext.getPayload(), keyId)
+                return Pair(offlineFirst.serialize(), keyId)
             }
         }
 

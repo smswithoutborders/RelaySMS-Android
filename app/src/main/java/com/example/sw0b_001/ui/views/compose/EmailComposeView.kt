@@ -77,40 +77,37 @@ fun EmailComposeView(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            if(cat != V1ContentCategories.BRIDGE) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(R.string.from),
-                        modifier = Modifier.padding(end = 24.dp),
-                        fontWeight = FontWeight.Medium
-                    )
-                    from?.let {
-                        BasicTextField(
-                            value = from,
-                            onValueChange = {},
-                            textStyle = TextStyle.Default.copy(
-                                color = MaterialTheme.colorScheme.onSurface,
-                                fontSize = 16.sp
-                            ),
-                            enabled = false,
-                            readOnly = true,
-                            modifier = Modifier.weight(1f),
-                        )
-                    }
-                }
-                Divider(
-                    color = MaterialTheme.colorScheme.outline,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp),
-                    thickness = 0.5.dp
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.from),
+                    modifier = Modifier.padding(end = 24.dp),
+                    fontWeight = FontWeight.Medium
                 )
-
+                from?.let {
+                    BasicTextField(
+                        value = from,
+                        onValueChange = {},
+                        textStyle = TextStyle.Default.copy(
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 16.sp
+                        ),
+                        enabled = false,
+                        readOnly = true,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
             }
+            Divider(
+                color = MaterialTheme.colorScheme.outline,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                thickness = 0.5.dp
+            )
 
             Column(
                 modifier = Modifier

@@ -101,8 +101,7 @@ fun DetailsInterfaceView(
                 .padding(12.dp)
         ) {
             when(cat) {
-                V1ContentCategories.EMAIL,
-                V1ContentCategories.BRIDGE -> {
+                V1ContentCategories.EMAIL -> {
                     EmailDetailsView(message)
                 }
                 V1ContentCategories.MESSAGE -> {
