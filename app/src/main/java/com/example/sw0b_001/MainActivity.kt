@@ -32,8 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
-import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
@@ -54,6 +53,7 @@ import com.afkanerd.smswithoutborders_libsmsmms.ui.components.NavHostControllerI
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.ConversationsScreenNav
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.afkanerd.smswithoutborders_libsmsmms.ui.requiredReadPhoneStatePermissions
+import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.SearchViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ThreadsViewModel
 import com.example.sw0b_001.data.CrashHandler
@@ -77,11 +77,11 @@ import com.example.sw0b_001.ui.onboarding.OnboardingInteractive
 import com.example.sw0b_001.ui.onboarding.OnboardingView
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.BackupRestoreViewModel
-import com.example.sw0b_001.ui.viewModels.BridgesViewModel
+import com.example.sw0b_001.ui.viewModels.OfflineFirstPublisherViewModel
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
 import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
-import com.example.sw0b_001.ui.viewModels.PublisherViewModel
+import com.example.sw0b_001.ui.viewModels.OnlineFirstPublisherViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.views.AboutView
@@ -115,14 +115,15 @@ class MainActivity : BindActivity() {
     val supportedPlatformsViewModel: SupportedPlatformsViewModel by viewModels()
 
     val threadsViewModel: ThreadsViewModel by viewModels()
+    val conversationViewModel: ConversationsViewModel by viewModels()
     val onboardingViewModel: OnboardingViewModel by viewModels()
 
     val tokensViewModel: TokensViewModel by viewModels()
     val payloadsViewModel: PayloadsViewModel by viewModels()
     val gatewayClientViewModel: GatewayClientViewModel by viewModels()
     val imageViewModel: ImageViewModel by viewModels()
-    val publisherViewModel: PublisherViewModel by viewModels()
-    val bridgesViewModel: BridgesViewModel by viewModels()
+    val onlineFirstPublisherViewModel: OnlineFirstPublisherViewModel by viewModels()
+    val offlineFirstPublisherViewModel: OfflineFirstPublisherViewModel by viewModels()
 
     val backupRestoreViewModel: BackupRestoreViewModel by viewModels()
 
@@ -238,16 +239,10 @@ class MainActivity : BindActivity() {
         var navDrawItemSelected by remember{ mutableStateOf(false) }
         var drawerCallback by remember { mutableStateOf<(() -> Unit)?>(null) }
 
-        val lifeCycleOwner = LocalLifecycleOwner.current
-        DisposableEffect(lifeCycleOwner) {
-            val observer = Observer<ThreadsViewModel.InboxType> { newInboxType ->
-                navDrawItemSelected = newInboxType == ThreadsViewModel.InboxType.CUSTOM
-            }
-            threadsViewModel.selectedInbox.observe(lifeCycleOwner, observer)
+        val inboxType by threadsViewModel.inboxType.collectAsStateWithLifecycle()
 
-            onDispose {
-                threadsViewModel.selectedInbox.removeObserver(observer)
-            }
+        LaunchedEffect(inboxType) {
+            navDrawItemSelected = inboxType == ThreadsViewModel.InboxType.CUSTOM
         }
 
         LaunchedEffect(navDrawItemSelected) {
@@ -275,10 +270,11 @@ class MainActivity : BindActivity() {
         }
 
         NavHostControllerInstance(
-            newLayoutInfo,
-            navController,
-            threadsViewModel,
-            searchViewModel,
+            newLayoutInfo = newLayoutInfo,
+            navController = navController,
+            threadsViewModel = threadsViewModel,
+            conversationsViewModel = conversationViewModel,
+            searchViewModel = searchViewModel,
             appName = stringResource(R.string.app_name),
             showThreadsTopBar = showThreadsTopBar,
             startDestination = if(hasSeenOnboarding) {
@@ -333,7 +329,6 @@ class MainActivity : BindActivity() {
             composable<AboutScreen> {
                 AboutView(navController = navController)
             }
-
             composable<ComposeScreen> { backEntry ->
                 val composeScreenNav: ComposeScreen = backEntry.toRoute()
                 ComposerInterface(
@@ -343,10 +338,11 @@ class MainActivity : BindActivity() {
                     tokensViewModel = tokensViewModel,
                     messageId = composeScreenNav.messageId,
                     payloadsViewModel = payloadsViewModel,
-                    publisherViewModel = publisherViewModel,
-                    bridgesViewModel = bridgesViewModel,
+                    onlineFirstPublisherViewModel = onlineFirstPublisherViewModel,
+                    offlineFirstPublisherViewModel = offlineFirstPublisherViewModel,
                     catId = composeScreenNav.cat,
-                    supportedPlatformName = composeScreenNav.supportedPlatform
+                    supportedPlatformName = composeScreenNav.supportedPlatform,
+                    isOfflineCompose = composeScreenNav.isOfflineCompose
                 )
             }
             composable<DetailsInterfaceScreen> { backEntry ->
@@ -357,7 +353,8 @@ class MainActivity : BindActivity() {
                     payloadsViewModel = payloadsViewModel,
                     imageViewModel = imageViewModel,
                     cat = detailsInterfaceScreen.cat,
-                    messageId = detailsInterfaceScreen.messageId
+                    messageId = detailsInterfaceScreen.messageId,
+                    supportedPlatformsViewModel = supportedPlatformsViewModel,
                 )
             }
             composable<PasteEncryptedTextScreen> {
@@ -367,7 +364,6 @@ class MainActivity : BindActivity() {
                     navController = navController,
                 )
             }
-
             composable<ImageRenderNav>{ backStackEntry ->
                 val imageRenderNav: ImageRenderNav = backStackEntry.toRoute()
                 ImageRender(
@@ -389,7 +385,6 @@ class MainActivity : BindActivity() {
                     }
                 )
             }
-
             composable<SettingsScreen> {
                 SettingsView(
                     navController = navController,
@@ -397,7 +392,6 @@ class MainActivity : BindActivity() {
                     activity = this@MainActivity
                 )
             }
-
             composable<BackupScreen> {
                 BackupView(navController, backupRestoreViewModel)
             }
@@ -419,7 +413,7 @@ class MainActivity : BindActivity() {
 
     private fun imageTransmissionCallback() {
         setRemoteExecutionCallback { payload ->
-            publisherViewModel.attachmentExecutor(payload)
+            onlineFirstPublisherViewModel.attachmentExecutor(payload)
         }
     }
 

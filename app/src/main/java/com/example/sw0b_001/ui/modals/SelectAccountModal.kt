@@ -56,6 +56,7 @@ fun SelectAccountModal(
     accounts: List<Tokens>,
     isCompose: Boolean,
     displayName: String,
+    isComposeOffline: Boolean,
     onRemoveAccountCallback: ((Tokens) -> Unit)? = null,
     onAddAccountCallback: (() -> Unit)? = null,
     onAccountSelected: ((Tokens) -> Unit)? = null,
@@ -75,6 +76,7 @@ fun SelectAccountModal(
         SelectAccountModalComponent(
             accounts = accounts,
             isCompose = isCompose,
+            isComposeOffline = isComposeOffline,
             displayName = displayName,
             onAccountSelected = { token ->
                 onAccountSelected?.invoke(token)
@@ -93,6 +95,7 @@ fun SelectAccountModalComponent(
     accounts: List<Tokens>,
     isCompose: Boolean,
     displayName: String,
+    isComposeOffline: Boolean,
     onAddAccountCallback: () -> Unit,
     onRemoveAccountCallback: (Tokens) -> Unit,
     onAccountSelected: (Tokens) -> Unit,
@@ -101,7 +104,7 @@ fun SelectAccountModalComponent(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(16.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -118,12 +121,21 @@ fun SelectAccountModalComponent(
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        if(!isCompose) {
-            Column(
-                horizontalAlignment = Alignment.End,
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
+        Column(
+            horizontalAlignment = Alignment.End,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+//            if(isComposeOffline) {
+//                Button(
+//                    onClick = { TODO("Implement") },
+//                ) {
+//                    Text(stringResource(R.string.offline_compose))
+//                }
+//            }
+//
+//            Spacer(Modifier.padding(16.dp))
+
+            if(!isCompose) {
                 Button(
                     onClick = onAddAccountCallback,
                 ) {
@@ -250,6 +262,7 @@ fun SelectAccountModalComponent_preview_is_compose() {
             accounts = tokens,
             displayName = "Gmail",
             isCompose = false,
+            isComposeOffline = true,
             onSheetHideCallback = {},
             onAccountSelected = {},
             onAddAccountCallback = {},
@@ -284,6 +297,7 @@ fun SelectAccountModalComponent_preview() {
             accounts = tokens,
             displayName = "Gmail",
             isCompose = true,
+            isComposeOffline = true,
             onSheetHideCallback = {},
             onAccountSelected = {},
             onAddAccountCallback = {},

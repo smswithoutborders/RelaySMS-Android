@@ -21,7 +21,6 @@ fun ActivePlatformsModal(
     tokensViewModel: TokensViewModel,
     sendNewMessageRequested: Boolean,
     isCompose: Boolean = false,
-    isOnboarding: Boolean = false,
     onDismiss: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(
@@ -44,7 +43,6 @@ fun ActivePlatformsModal(
                 supportedPlatformsViewModel = supportedPlatformsViewModel,
                 tokensViewModel = tokensViewModel,
                 isCompose = isCompose,
-                isOnboarding = isOnboarding,
             )
         }
 

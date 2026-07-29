@@ -31,12 +31,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.SupportedPlatforms
 import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.navigation.MetricsScreen
+import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.TokensUiState
 import uniffi.relaysms_spec_payload.V1ContentCategories
 
@@ -48,6 +50,7 @@ fun PlatformOptionsModal(
     accounts: List<Tokens>,
     showPlatformsModal: Boolean,
     isCompose: Boolean,
+    isOfflineCompose: Boolean,
     cat: V1ContentCategories,
     platform: SupportedPlatforms?,
     isRevoking: TokensUiState = TokensUiState.Success(null),
@@ -100,7 +103,8 @@ fun PlatformOptionsModal(
                         ComposeMessages(
                             navController = navController,
                             cat = cat,
-                            supportedPlatforms = platform!!.name
+                            supportedPlatforms = platform!!.name,
+                            isOfflineCompose = platform.supports_offline_first
                         ) {
                             onDismissRequest()
                         }
@@ -109,6 +113,7 @@ fun PlatformOptionsModal(
                             accounts = accounts,
                             displayName = platform?.display_name ?: "",
                             isCompose = false,
+                            isComposeOffline = isOfflineCompose,
                             onAddAccountCallback = storeCallback,
                             onAccountSelected = { storedAccount ->
                                 onDismissRequest()
@@ -178,20 +183,41 @@ private fun ComposeMessages(
     cat: V1ContentCategories,
     supportedPlatforms: String,
     navController: NavController,
+    isOfflineCompose: Boolean,
     onDismissRequest: () -> Unit
 ) {
-    Button(
-        onClick = {
-            navController.navigate(ComposeScreen(
-                cat = cat,
-                messageId = null,
-                supportedPlatform = supportedPlatforms
-            ))
-            onDismissRequest()
-        },
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text(stringResource(R.string.send_message))
+    Column {
+        Button(
+            onClick = {
+                navController.navigate(ComposeScreen(
+                    cat = cat,
+                    messageId = null,
+                    supportedPlatform = supportedPlatforms,
+                    isOfflineCompose = false
+                ))
+                onDismissRequest()
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(stringResource(R.string.send_message))
+        }
+
+        if(isOfflineCompose) {
+            Button(
+                onClick = {
+                    navController.navigate(ComposeScreen(
+                        cat = cat,
+                        messageId = null,
+                        supportedPlatform = supportedPlatforms,
+                        isOfflineCompose = true
+                    ))
+                    onDismissRequest()
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.send_message_offline))
+            }
+        }
     }
 }
 
@@ -256,5 +282,19 @@ private fun getServiceBasedComposeDescriptions(
             context.getString(R.string.continue_to_make_posts_from_your_saved_messaging_account_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
         }
         V1ContentCategories.BRIDGE ->  context.getString(R.string.your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias_you_can_choose_a_message_forwarding_country_from_the_countries_tab_below_continue_to_send_message)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ComposeMessages_Preview() {
+    AppTheme {
+        ComposeMessages(
+            cat = V1ContentCategories.TEXT,
+            supportedPlatforms = "Gmail",
+            navController = rememberNavController(),
+            true,
+            onDismissRequest = {}
+        )
     }
 }

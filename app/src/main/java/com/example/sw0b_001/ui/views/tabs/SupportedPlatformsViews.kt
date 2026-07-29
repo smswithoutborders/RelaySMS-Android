@@ -84,7 +84,6 @@ import uniffi.relaysms_spec_payload.V1PayloadsSupportedProtocols
 import uniffi.relaysms_spec_payload.v1ContentCategoryFromU8
 import uniffi.relaysms_spec_payload.v1PayloadSupportProtocolsFromU8
 
-
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SupportedPlatformsView(
@@ -92,7 +91,6 @@ fun SupportedPlatformsView(
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
     tokensViewModel: TokensViewModel,
     isCompose: Boolean = false,
-    isOnboarding: Boolean = false,
 ) {
     val context = LocalContext.current
 
@@ -141,7 +139,7 @@ fun SupportedPlatformsView(
                 modifier = Modifier.padding(bottom = 16.dp),
             )
 
-            if (inPreviewMode || (isCompose && !isDefault && !isOnboarding)) {
+            if (inPreviewMode || (isCompose && !isDefault)) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -180,7 +178,6 @@ fun SupportedPlatformsView(
                 isCompose = isCompose,
                 supportedPlatformsViewModel = supportedPlatformsViewModel,
                 tokensViewModel = tokensViewModel,
-                isOnboarding = isOnboarding,
                 navController = navController,
             )
         }
@@ -208,8 +205,7 @@ fun PlatformListContent(
     navController: NavController,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
     tokensViewModel: TokensViewModel,
-    isCompose: Boolean = false,
-    isOnboarding: Boolean = false,
+    isCompose: Boolean,
 ) {
     val context = LocalContext.current
     val states by supportedPlatformsViewModel.uiState.collectAsStateWithLifecycle()
@@ -276,7 +272,7 @@ fun PlatformListContent(
 
                 PlatformListRow(
                     platform = platform,
-                    isActive = isStored != null,
+                    isActive = isStored != null || platform.supports_offline_first,
                     badgeCount = null // TODO: wire real count once you know what it represents
                 ) {
                     clickedPlatform = platform
@@ -306,7 +302,6 @@ fun PlatformListContent(
             pop()
         }
 
-
         ClickableText(
             text = infoText,
             style = MaterialTheme.typography.bodySmall.copy(
@@ -317,20 +312,17 @@ fun PlatformListContent(
                 .fillMaxWidth()
                 .padding(9.dp),
             onClick = { offset ->
-
-                infoText
-                    .getStringAnnotations(
-                        tag = "learn_more",
-                        start = offset,
-                        end = offset
-                    )
-                    .firstOrNull()
-                    ?.let {
-                        // TODO: Navigate to Learn More page
-                    }
+                infoText.getStringAnnotations(
+                    tag = "learn_more",
+                    start = offset,
+                    end = offset
+                )
+                .firstOrNull()
+                ?.let {
+                    // TODO: Navigate to Learn More page
+                }
             }
         )
-
 
         val storeCallback : () -> Unit = {
             CoroutineScope(Dispatchers.Default).launch {
@@ -382,13 +374,14 @@ fun PlatformListContent(
             }
         }
 
-        if (showPlatformOptions) {
+        if(showPlatformOptions) {
             PlatformOptionsModal(
                 showPlatformsModal = showPlatformOptions,
                 cat = if(clickedPlatform == null)
                     V1ContentCategories.BRIDGE
                 else v1ContentCategoryFromU8(clickedPlatform!!.cat_id.toUByte()),
                 isCompose = isCompose,
+                isOfflineCompose = clickedPlatform?.supports_offline_first == true,
                 platform = clickedPlatform,
                 navController = navController,
                 isStoring = storingUiState,
@@ -463,7 +456,7 @@ fun PlatformListRow(
                 contentDescription = stringResource(R.string.platform_image),
                 contentScale = ContentScale.Fit,
                 modifier = Modifier.size(28.dp),
-                colorFilter = if (!isActive && platform != null)
+                colorFilter = if (!isActive)
                     ColorFilter.tint(
                         MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
                 else null,

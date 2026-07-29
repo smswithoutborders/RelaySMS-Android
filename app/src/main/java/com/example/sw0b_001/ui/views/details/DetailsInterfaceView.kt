@@ -26,6 +26,7 @@ import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.components.AttachImageView
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
+import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import uniffi.relaysms_spec_payload.V1ContentCategories
 
@@ -37,7 +38,8 @@ fun DetailsInterfaceView(
     tokensViewModel: TokensViewModel,
     payloadsViewModel: PayloadsViewModel,
     imageViewModel: ImageViewModel,
-    messageId: Long
+    messageId: Long,
+    supportedPlatformsViewModel: SupportedPlatformsViewModel,
 ) {
 
     val message by payloadsViewModel.message.collectAsStateWithLifecycle()
@@ -61,6 +63,15 @@ fun DetailsInterfaceView(
         navController.popBackStack()
     }
 
+    val supportedPlatform by supportedPlatformsViewModel.supportedPlatform
+        .collectAsStateWithLifecycle()
+
+    LaunchedEffect(message) {
+        message?.let {
+            supportedPlatformsViewModel.getItem(message!!.platformName)
+        }
+    }
+
     BackHandler { backHandler() }
 
     Scaffold(
@@ -72,7 +83,8 @@ fun DetailsInterfaceView(
                         ComposeScreen(
                             cat = cat,
                             messageId = messageId,
-                            supportedPlatform = message!!.platformName
+                            supportedPlatform = message!!.platformName,
+                            isOfflineCompose = supportedPlatform?.supports_offline_first == true
                         )
                     )
             }) {

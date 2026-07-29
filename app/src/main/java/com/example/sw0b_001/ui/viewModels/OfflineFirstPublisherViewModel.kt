@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.libsignal.Protocols
+import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.TransportImpl.publishWithAttachment
 import com.example.sw0b_001.data.TransportImpl.publishWithoutAttachment
@@ -14,6 +15,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uniffi.relaysms_spec_payload.OfflineFirst
@@ -21,12 +24,18 @@ import uniffi.relaysms_spec_payload.V1ContentCategories
 import uniffi.relaysms_spec_payload.V1ContentsContainer
 
 @HiltViewModel
-class BridgesViewModel @Inject constructor(
+class OfflineFirstPublisherViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
 ): ViewModel() {
+
+    private val _debugUiState = MutableStateFlow(BuildConfig.DEBUG)
+    val debugUiState: StateFlow<Boolean> = _debugUiState
+
+    fun toggleDebugState() { _debugUiState.value = !_debugUiState.value }
+
     fun publish(
+        catId: V1ContentCategories,
         body: String,
-        tokenHash: ByteArray?,
         to: String?,
         subject: String?,
         imageViewModel: ImageViewModel,
@@ -39,40 +48,33 @@ class BridgesViewModel @Inject constructor(
             withContext(Dispatchers.IO) {
                 var contentContainer: V1ContentsContainer?
                 val isAttachment = attachment != null
-                var tokenId: UInt? = null
-                if(tokenHash != null) {
-                    val db = Datastore.getDatastore(context) ?: throw Exception("Failed to open database")
-                    tokenId = db.tokensDao()?.fetch(tokenHash)
-                        ?.tokenId
-                        ?.toUInt()
-                        ?: throw Exception("Failed to find token id")
-                }
                 try {
                     if(isAttachment) {
                         val sessionId = imageViewModel.getSessionId(context)
                         contentContainer = publishWithAttachment(
                             context,
-                            V1ContentCategories.BRIDGE,
+                            catId,
                             body,
-                            tokenId,
+                            tokenId = null,
                             to,
                             subject,
                             attachment,
                             imageViewModel,
                             sessionId = sessionId
                         ) { payload ->
-                            encrypt(payload, tokenHash, true)
+                            encrypt(payload, true)
                         }
                     } else {
                         contentContainer = publishWithoutAttachment(
                             context,
-                            V1ContentCategories.BRIDGE,
+                            catId,
                             body,
-                            tokenId,
+                            tokenId = null,
                             to,
                             subject,
+                            debugOnly = _debugUiState.value,
                         ) { p ->
-                            encrypt(p, tokenHash)
+                            encrypt(p)
                         }
                     }
 
@@ -97,7 +99,6 @@ class BridgesViewModel @Inject constructor(
 
     private fun encrypt(
         plaintext: ByteArray,
-        tokenHash: ByteArray?,
         withAttachment: Boolean = false,
     ) : Pair<ByteArray, Int> {
         val db = Datastore.getDatastore(context)?.keysDao() ?: throw Exception("Could not open database")

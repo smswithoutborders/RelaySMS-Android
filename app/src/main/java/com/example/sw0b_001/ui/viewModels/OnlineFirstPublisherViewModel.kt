@@ -33,7 +33,7 @@ import uniffi.relaysms_spec_payload.V1ContentsContainer
 import uniffi.relaysms_spec_payload.v1PlatformPublisherEncrypt
 
 @HiltViewModel
-class PublisherViewModel @Inject constructor(
+class OnlineFirstPublisherViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
 ): ViewModel() {
 

@@ -26,6 +26,9 @@ interface SupportedPlatformCacheDao {
     @Query("select * from SupportedPlatforms where name = :name")
     fun fetch(name: String): Flow<SupportedPlatforms?>
 
+    @Query("select * from SupportedPlatforms where name = :name")
+    fun fetchItem(name: String): SupportedPlatforms?
+
     @Query("select * from SupportedPlatforms")
     fun fetch(): Flow<List<SupportedPlatforms>>
 

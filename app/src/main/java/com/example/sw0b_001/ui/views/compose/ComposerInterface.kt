@@ -52,10 +52,10 @@ import com.example.sw0b_001.extensions.context.settingsGetNotShowChooseGatewayCl
 import com.example.sw0b_001.ui.components.AttachImageView
 import com.example.sw0b_001.ui.modals.ComposeChooseGatewayClientsModal
 import com.example.sw0b_001.ui.modals.SelectAccountModal
-import com.example.sw0b_001.ui.viewModels.BridgesViewModel
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
+import com.example.sw0b_001.ui.viewModels.OfflineFirstPublisherViewModel
+import com.example.sw0b_001.ui.viewModels.OnlineFirstPublisherViewModel
 import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
-import com.example.sw0b_001.ui.viewModels.PublisherViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import uniffi.relaysms_spec_payload.V1ContentCategories
 
@@ -68,10 +68,11 @@ fun ComposerInterface(
     gatewayClientViewModel: GatewayClientViewModel,
     tokensViewModel: TokensViewModel,
     payloadsViewModel: PayloadsViewModel,
-    publisherViewModel: PublisherViewModel,
-    bridgesViewModel: BridgesViewModel,
+    onlineFirstPublisherViewModel: OnlineFirstPublisherViewModel,
+    offlineFirstPublisherViewModel: OfflineFirstPublisherViewModel,
     supportedPlatformName: String,
     catId: V1ContentCategories,
+    isOfflineCompose: Boolean,
     messageId: Long? = null,
 ) {
     val context = LocalContext.current
@@ -124,19 +125,27 @@ fun ComposerInterface(
     var body: String by remember{
         mutableStateOf(payload?.content?.getBody()?.toUtf8String() ?: "") }
 
-    var showSelectAccountModal by remember { mutableStateOf(
-        catId != V1ContentCategories.BRIDGE ) }
+//    var showSelectAccountModal by remember { mutableStateOf(
+//        catId != V1ContentCategories.BRIDGE ) }
+
+    var showSelectAccountModal by remember { mutableStateOf(!isOfflineCompose) }
 
     var selectedToken: Tokens? by remember{ mutableStateOf(null) }
     var from: String? by remember(selectedToken){
         mutableStateOf(selectedToken?.account) }
 
-    val debugState by publisherViewModel.debugUiState.collectAsStateWithLifecycle()
+    val debugState by run {
+        if(isOfflineCompose) {
+            offlineFirstPublisherViewModel.debugUiState.collectAsStateWithLifecycle()
+        } else {
+            onlineFirstPublisherViewModel.debugUiState.collectAsStateWithLifecycle()
+        }
+    }
 
     fun sendingCallback() {
-        if(selectedToken != null) {
-            publisherViewModel.publish(
-                catId = selectedToken?.catId ?: V1ContentCategories.BRIDGE,
+        if(!isOfflineCompose) {
+            onlineFirstPublisherViewModel.publish(
+                catId = catId,
                 body = body,
                 tokenId = selectedToken?.id,
                 to = to,
@@ -152,14 +161,18 @@ fun ComposerInterface(
                 backHandler()
             }
         } else {
-            bridgesViewModel.publish(
+            offlineFirstPublisherViewModel.publish(
                 body = body,
-                tokenHash = null,
                 to = to,
                 subject = subject,
                 imageViewModel = imageViewModel,
                 payloadsViewModel = payloadsViewModel,
-                onFailureCallback = {},
+                onFailureCallback = {
+                    Toast.makeText(context, it, Toast.LENGTH_LONG)
+                        .show()
+                    showChooseGatewayClient = false
+                },
+                catId = catId,
             ) {
                 backHandler()
             }
@@ -195,7 +208,13 @@ fun ComposerInterface(
                 actions = {
                     if(BuildConfig.DEBUG) {
                         IconButton(
-                            onClick = { publisherViewModel.toggleDebugState() },
+                            onClick = {
+                                if(isOfflineCompose) {
+                                    offlineFirstPublisherViewModel.toggleDebugState()
+                                } else {
+                                    onlineFirstPublisherViewModel.toggleDebugState()
+                                }
+                            },
 //                            colors = MaterialTheme.colors.error
                         ) {
                             Icon(Icons.Default.NoSim,
@@ -316,6 +335,7 @@ fun ComposerInterface(
                     },
                     accounts = tokens,
                     displayName = supportedPlatformName,
+                    isComposeOffline = isOfflineCompose,
                 )
             }
         }

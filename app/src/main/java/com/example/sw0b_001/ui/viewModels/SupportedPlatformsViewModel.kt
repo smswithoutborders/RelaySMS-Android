@@ -26,6 +26,9 @@ class SupportedPlatformsViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val repository: SupportedPlatformsRepository
 ): ViewModel(){
+    private val _supportedPlatform = MutableStateFlow<SupportedPlatforms?>(null)
+    val supportedPlatform: StateFlow<SupportedPlatforms?> = _supportedPlatform
+
     private val _uiState =
         MutableStateFlow<SupportedPlatformsUiState>(SupportedPlatformsUiState.Loading)
     val uiState: StateFlow<SupportedPlatformsUiState> = _uiState
@@ -39,6 +42,12 @@ class SupportedPlatformsViewModel @Inject constructor(
 
     fun get(name: String): Flow<SupportedPlatforms?> {
         return db.fetch(name)
+    }
+
+    fun getItem(name: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _supportedPlatform.value = db.fetchItem(name)
+        }
     }
 
     fun fetch() {

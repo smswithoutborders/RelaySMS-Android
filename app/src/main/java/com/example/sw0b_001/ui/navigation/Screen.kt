@@ -45,6 +45,7 @@ data class ComposeScreen(
     val cat: V1ContentCategories,
     val messageId: Long?,
     val supportedPlatform: String,
+    val isOfflineCompose: Boolean,
 )
 
 @Serializable
