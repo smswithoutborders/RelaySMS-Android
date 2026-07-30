@@ -73,7 +73,7 @@ fun EmailDetailsView(message: Payloads?) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             // Sender Avatar
             Image(
-                painter = painterResource(R.drawable.round_person_24),
+                painter = painterResource(R.drawable.generic_avatar),
                 contentDescription = stringResource(R.string.sender_avatar),
                 modifier = Modifier
                     .size(48.dp)

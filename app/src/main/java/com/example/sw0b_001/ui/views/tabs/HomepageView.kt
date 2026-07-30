@@ -5,8 +5,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentPaste
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -149,13 +149,13 @@ fun HomepageView(
                         },
                         icon = {
                             Icon(
-                                imageVector = Icons.Default.Edit,
+                                imageVector = Icons.Outlined.Edit,
                                 contentDescription = stringResource(R.string.compose_new),
                             )
                         },
                         text = {
                             Text(
-                                text = stringResource(R.string.compose_new),
+                                text = stringResource(R.string.compose),
                             )
                         }
                     )

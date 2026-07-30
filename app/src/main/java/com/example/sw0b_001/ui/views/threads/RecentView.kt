@@ -6,10 +6,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -33,13 +36,16 @@ import com.bumptech.glide.integration.compose.placeholder
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.Payloads
+import com.example.sw0b_001.ui.components.PulsingMessagePlaceholder
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
 import com.example.sw0b_001.ui.navigation.DetailsInterfaceScreen
+import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.views.compose.toUtf8String
 import uniffi.relaysms_spec_payload.V1ContentCategories
+import uniffi.relaysms_spec_payload.V1ContentsContainer
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -58,41 +64,47 @@ fun RecentView(
 
     val listState = rememberLazyListState()
     Box(Modifier.fillMaxSize()) {
-        if (payloads.itemCount > 0) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                state = listState
-            ) {
-                items(
-                    count = payloads.itemCount,
-                    key = payloads.itemKey { it.id }
-                ) { index ->
-                    val message = payloads[index]
-                    message?.let {
-                        val logo = remember(supportedPlatforms, message) {
-                            supportedPlatforms.find { p ->
-                                p.name == message.payload.platformName }?.icon_png
-                        }
-                        RecentMessageCard(
-                            cat = it.catId,
-                            payload = it.payload,
-                            date = it.date,
-                            logo = logo,
-                            onClickCallback = { clickedMessage ->
-                                navController.navigate(
-                                    DetailsInterfaceScreen(
-                                        cat = clickedMessage.content.getCatId(),
-                                        messageId = it.id
+        if(!payloads.loadState.isIdle && payloads.itemCount == 0) {
+            PulsingMessagePlaceholder()
+        } else {
+            if (payloads.itemCount > 0) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    state = listState
+                ) {
+                    items(
+                        count = payloads.itemCount,
+                        key = payloads.itemKey { it.id }
+                    ) { index ->
+                        val message = payloads[index]
+                        message?.let {
+                            val logo = remember(supportedPlatforms, message) {
+                                supportedPlatforms.find { p ->
+                                    p.name == message.payload.platformName }?.icon_png
+                            }
+                            RecentMessageCard(
+                                cat = it.catId,
+                                payload = it.payload,
+                                date = it.date,
+                                logo = logo,
+                                onClickCallback = { clickedMessage ->
+                                    navController.navigate(
+                                        DetailsInterfaceScreen(
+                                            cat = clickedMessage.content.getCatId(),
+                                            messageId = it.id
+                                        )
                                     )
-                                )
-                            },
-                        )
+                                },
+                            )
+
+                            HorizontalDivider(Modifier.padding(start=60.dp, end=32.dp, bottom=18.dp))
+                        }
                     }
                 }
             }
-        }
-        else {
-            GetStartedView()
+            else {
+                GetStartedView()
+            }
         }
 
         if (sendNewMessageRequested) {
@@ -212,3 +224,25 @@ fun RecentMessageCard(
 }
 
 
+@Preview(showBackground = true)
+@Composable
+fun RecentMessageCard_preview() {
+    val payload = Payloads(
+        platformName = "RelaySMS mail",
+        catId = V1ContentCategories.EMAIL,
+        content = V1ContentsContainer(
+            catId = V1ContentCategories.EMAIL,
+            body = "Hello world".encodeToByteArray(),
+            to = "person@example.com".encodeToByteArray(),
+            subject = "subject sample".encodeToByteArray(),
+            attachment = null
+        )
+    )
+    AppTheme() {
+        RecentMessageCard(
+            cat = V1ContentCategories.EMAIL,
+            payload = payload,
+            date = "Tuesday",
+        ) {}
+    }
+}
