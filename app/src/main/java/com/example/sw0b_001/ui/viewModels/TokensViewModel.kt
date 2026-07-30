@@ -44,8 +44,6 @@ sealed class TokensUiState {
     object Loading: TokensUiState()
     data class Success(
         val url: Uri?,
-        val pnbaAuthRequired: Boolean = false,
-        val pnbaPasswordRequired: Boolean = false,
     ): TokensUiState()
     data class Error(val exception: Throwable): TokensUiState()
 }
@@ -62,6 +60,15 @@ data class TokensMetrics(
     val date: Long
 )
 
+
+sealed class PnbaUiState {
+    object PhoneNumberRequested : PnbaUiState()
+    object AuthCodeRequested: PnbaUiState()
+    object PasswordRequested : PnbaUiState()
+    object Success : PnbaUiState()
+    data class Error(val message: String) : PnbaUiState()
+}
+
 @HiltViewModel
 class TokensViewModel @Inject constructor(
     @ApplicationContext private val context: Context
@@ -75,6 +82,10 @@ class TokensViewModel @Inject constructor(
     private val _isRevokingUiState =
         MutableStateFlow<TokensUiState>(TokensUiState.Success(null))
     val isRevokingUiState: StateFlow<TokensUiState> = _isRevokingUiState
+
+    private val _pnbaUiState =
+        MutableStateFlow<PnbaUiState>(PnbaUiState.PhoneNumberRequested)
+    val pnbaUiState: StateFlow<PnbaUiState> = _pnbaUiState
 
     // Selection mode properties
     var isSelectionMode by mutableStateOf(false)
@@ -267,43 +278,44 @@ class TokensViewModel @Inject constructor(
     ) {
         PublisherGrpcImpl(context).use { publisherGrpcImpl ->
             try {
-                when {
-                    !authCode.isNullOrEmpty() && !password.isNullOrEmpty() -> {
-                        publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
-                            authorizationCode = authCode,
-                            phoneNumber = phoneNumber,
-                            platform = platform.name,
-                            password = password,
-                            channel = channel
-                        )
-                        _isStoringUiState.value = TokensUiState.Success(null)
-                    }
-                    !authCode.isNullOrEmpty() -> {
-                        val res = publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
-                            authorizationCode = authCode,
-                            phoneNumber = phoneNumber,
-                            platform = platform.name,
-                            channel = channel
-                        )
-                        _isStoringUiState.value = TokensUiState.Success(
-                            null,
-                            pnbaPasswordRequired = res.twoStepVerificationEnabled,
-                        )
-                    }
-                    else -> {
+                when(val state = _pnbaUiState.value) {
+                    PnbaUiState.PhoneNumberRequested -> {
                         publisherGrpcImpl.phoneNumberBaseAuthenticationRequest(
                             phoneNumber,
                             platform.name,
                             channel,
                         )
-                        _isStoringUiState.value = TokensUiState.Success(
-                            null ,
-                            pnbaAuthRequired = true
-                        )
+                        _pnbaUiState.value = PnbaUiState.AuthCodeRequested
                     }
+                    PnbaUiState.AuthCodeRequested -> {
+                        val res = publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
+                            authorizationCode = authCode!!,
+                            phoneNumber = phoneNumber,
+                            platform = platform.name,
+                            channel = channel
+                        )
+                        if(res == null) {
+                            _pnbaUiState.value = PnbaUiState.Success
+                        } else {
+                            _pnbaUiState.value = PnbaUiState.PasswordRequested
+                        }
+                    }
+                    PnbaUiState.PasswordRequested -> {
+                        publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
+                            authorizationCode = authCode!!,
+                            phoneNumber = phoneNumber,
+                            platform = platform.name,
+                            password = password!!,
+                            channel = channel
+                        )
+                        _pnbaUiState.value = PnbaUiState.Success
+                    }
+                    else -> {}
                 }
+                _isStoringUiState.value = TokensUiState.Success( null, )
             } catch(e: Exception) {
-                throw e
+                e.printStackTrace()
+                _isStoringUiState.value = TokensUiState.Error(e)
             }
         }
     }

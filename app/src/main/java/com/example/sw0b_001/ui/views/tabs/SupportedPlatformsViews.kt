@@ -66,13 +66,13 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.SupportedPlatforms
 import com.example.sw0b_001.data.models.Tokens
+import com.example.sw0b_001.ui.modals.PNBAPhoneNumberCodeRequestView
 import com.example.sw0b_001.ui.modals.PlatformOptionsModal
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsUiState
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensUiState
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel.Companion.oAuth2IntentBuilder
-import com.example.sw0b_001.ui.views.platformAccounts.PNBAPhoneNumberCodeRequestView
 import com.example.sw0b_001.ui.views.threads.makeDefault
 import io.shortmesh.sdk.ui.AuthyWidgetLauncherView
 import io.shortmesh.sdk.viewmodel.AuthyViewModel
@@ -229,16 +229,7 @@ fun PlatformListContent(
     LaunchedEffect(storingUiState) {
         val state = storingUiState
         if(state is TokensUiState.Success) {
-            if(storePnbaRequested) {
-                if(!state.pnbaAuthRequired && !state.pnbaPasswordRequired) {
-                    storePnbaRequested = false
-                }
-                else {
-                    pnbaAuthenticationCodeRequested = state.pnbaAuthRequired
-                    pnbaPasswordRequested = state.pnbaPasswordRequired
-                }
-            }
-            else if(state.url != null) {
+            if(state.url != null) {
                 val intent = oAuth2IntentBuilder(context)
                 intent.launchUrl(context, state.url)
                 showPlatformOptions = false
@@ -394,31 +385,8 @@ fun PlatformListContent(
         if(storePnbaRequested) {
             PNBAPhoneNumberCodeRequestView(
                 showModal = storePnbaRequested,
-                isLoading = storingUiState == TokensUiState.Loading,
-                platform = clickedPlatform,
-                isAuthenticationCodeRequested = pnbaAuthenticationCodeRequested,
-                isPasswordRequested = pnbaPasswordRequested,
-                phoneNumberRequestedCallback = { phoneNumber ->
-                    tokensViewModel.store(
-                        platform = clickedPlatform!!,
-                        phoneNumber = phoneNumber,
-                    )
-                },
-                codeRequestedCallback = { phoneNumber, authCode ->
-                    tokensViewModel.store(
-                        platform = clickedPlatform!!,
-                        phoneNumber = phoneNumber,
-                        authCode = authCode
-                    )
-                },
-                passwordRequestedCallback = { phoneNumber, authCode, password ->
-                    tokensViewModel.store(
-                        platform = clickedPlatform!!,
-                        phoneNumber = phoneNumber,
-                        authCode = authCode,
-                        password = password
-                    )
-                }
+                tokensViewModel = tokensViewModel,
+                platform = clickedPlatform!!,
             ) {
                 storePnbaRequested = false
             }

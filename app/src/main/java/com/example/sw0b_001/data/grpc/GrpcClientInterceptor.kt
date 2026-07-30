@@ -40,7 +40,8 @@ class GrpcClientInterceptor(
                         ec = key.privateKey!!,
                         ssKidPk = authenticationPublicKey,
                         methodName = methodName.toByteArray(),
-                        payload = payload
+                        payload = payload,
+                        timestamp = null
                     )
 
                     /**

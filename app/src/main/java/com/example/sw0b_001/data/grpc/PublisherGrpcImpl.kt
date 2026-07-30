@@ -222,7 +222,7 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
         phoneNumber: String,
         platform: String,
         channel: String?,
-    ) {
+    ) : PublisherOuterClass.GetPNBACodeResponse {
         val request = PublisherOuterClass.GetPNBACodeRequest.newBuilder().apply {
             setPlatform(platform)
             setPhoneNumber(phoneNumber)
@@ -237,6 +237,7 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
             if(!res.success) {
                 throw Exception(res.message)
             }
+            return res
         } catch (e: Exception) {
             throw e
         }
@@ -248,7 +249,7 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
         platform: String,
         channel: String? = null,
         password: String = "",
-    ) : PublisherOuterClass.ExchangePNBACodeAndStoreResponse {
+    ) : PublisherOuterClass.ExchangePNBACodeAndStoreResponse? {
         val (publisherKeys, keys) = getKeys()
 
         val request = PublisherOuterClass.ExchangePNBACodeAndStoreRequest.newBuilder().apply {
@@ -268,21 +269,23 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
                 throw Exception(res.message)
             }
 
-            processEphemeralKeys(
-                keyId = res.keyId,
-                serverEphemeralPublicKeys = res.serverEphemeralPublicKeysList,
-                keys = keys,
-                tokenCipherText = res.tokenCiphertext.toByteArray(),
-                tokenId = res.tokenId.toUInt(),
-                catId = res.catId,
-                accountId = res.accountIdentifier,
-                platformName = res.platform
-            )
-
-            return res
+            if(!res.twoStepVerificationEnabled) {
+                processEphemeralKeys(
+                    keyId = res.keyId,
+                    serverEphemeralPublicKeys = res.serverEphemeralPublicKeysList,
+                    keys = keys,
+                    tokenCipherText = res.tokenCiphertext.toByteArray(),
+                    tokenId = res.tokenId.toUInt(),
+                    catId = res.catId,
+                    accountId = res.accountIdentifier,
+                    platformName = res.platform
+                )
+            } else return res
         } catch (e: Exception) {
             throw e
         }
+
+        return null
     }
 
     private fun deleteKeys(tokens: Tokens) {

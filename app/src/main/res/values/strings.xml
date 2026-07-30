@@ -513,5 +513,6 @@
     <string name="you_have_not_saved_any_account_yet_click_the_add_button_to_connect_your_account">You have not saved any account yet. Click the add button to connect your %1$s account.</string>
     <string name="offline_compose">Offline compose</string>
     <string name="send_message_offline">Send message offline</string>
+    <string name="please_enter_your_avoid_copying_and_pasting_if_telegram_to_not_get_flagged">Please enter your %1$s code. Avoid copying and pasting if Telegram to not get flagged!</string>
 
 </resources>

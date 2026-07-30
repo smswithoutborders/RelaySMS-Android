@@ -8,12 +8,43 @@
   "variantName": "debug",
   "elements": [
     {
-      "type": "SINGLE",
-      "filters": [],
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "armeabi-v7a"
+        }
+      ],
       "attributes": [],
-      "versionCode": 66,
-      "versionName": "0.18.0",
-      "outputFile": "app-debug.apk"
+      "versionCode": 7701,
+      "versionName": "0.34.9",
+      "outputFile": "app-armeabi-v7a-debug.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "x86_64"
+        }
+      ],
+      "attributes": [],
+      "versionCode": 7702,
+      "versionName": "0.34.9",
+      "outputFile": "app-x86_64-debug.apk"
+    },
+    {
+      "type": "ONE_OF_MANY",
+      "filters": [
+        {
+          "filterType": "ABI",
+          "value": "arm64-v8a"
+        }
+      ],
+      "attributes": [],
+      "versionCode": 7703,
+      "versionName": "0.34.9",
+      "outputFile": "app-arm64-v8a-debug.apk"
     }
   ],
   "elementType": "File",

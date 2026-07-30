@@ -961,7 +961,7 @@ external fun uniffi_relaysms_spec_payload_fn_func_v1_platform_publisher_encrypt(
 ): RustBuffer.ByValue
 external fun uniffi_relaysms_spec_payload_fn_func_v1_requests_decrypt(`ssKid`: RustBuffer.ByValue,`ecPk`: RustBuffer.ByValue,`nonce`: RustBuffer.ByValue,`ciphertext`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
-external fun uniffi_relaysms_spec_payload_fn_func_v1_requests_encrypt(`ec`: RustBuffer.ByValue,`ssKidPk`: RustBuffer.ByValue,`methodName`: RustBuffer.ByValue,`payload`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
+external fun uniffi_relaysms_spec_payload_fn_func_v1_requests_encrypt(`ec`: RustBuffer.ByValue,`ssKidPk`: RustBuffer.ByValue,`methodName`: RustBuffer.ByValue,`payload`: RustBuffer.ByValue,`timestamp`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
 external fun uniffi_relaysms_spec_payload_fn_func_v1_token_decrypt_client(`ecKid`: RustBuffer.ByValue,`ssKidPk`: RustBuffer.ByValue,`esKidPk`: RustBuffer.ByValue,`keyId`: Byte,`receivedPayload`: RustBuffer.ByValue,uniffi_out_err: UniffiRustCallStatus, 
 ): RustBuffer.ByValue
@@ -1115,7 +1115,7 @@ private fun uniffiCheckApiChecksums(lib: IntegrityCheckingUniffiLib) {
     if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_requests_decrypt() != 41803.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
-    if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_requests_encrypt() != 11255.toShort()) {
+    if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_requests_encrypt() != 36529.toShort()) {
         throw RuntimeException("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     }
     if (lib.uniffi_relaysms_spec_payload_checksum_func_v1_token_decrypt_client() != 38159.toShort()) {
@@ -5699,6 +5699,38 @@ public object FfiConverterOptionalUInt: FfiConverterRustBuffer<kotlin.UInt?> {
 /**
  * @suppress
  */
+public object FfiConverterOptionalULong: FfiConverterRustBuffer<kotlin.ULong?> {
+    override fun read(buf: ByteBuffer): kotlin.ULong? {
+        if (buf.get().toInt() == 0) {
+            return null
+        }
+        return FfiConverterULong.read(buf)
+    }
+
+    override fun allocationSize(value: kotlin.ULong?): ULong {
+        if (value == null) {
+            return 1UL
+        } else {
+            return 1UL + FfiConverterULong.allocationSize(value)
+        }
+    }
+
+    override fun write(value: kotlin.ULong?, buf: ByteBuffer) {
+        if (value == null) {
+            buf.put(0)
+        } else {
+            buf.put(1)
+            FfiConverterULong.write(value, buf)
+        }
+    }
+}
+
+
+
+
+/**
+ * @suppress
+ */
 public object FfiConverterOptionalByteArray: FfiConverterRustBuffer<kotlin.ByteArray?> {
     override fun read(buf: ByteBuffer): kotlin.ByteArray? {
         if (buf.get().toInt() == 0) {
@@ -5806,12 +5838,12 @@ public object FfiConverterSequenceByteArray: FfiConverterRustBuffer<List<kotlin.
     }
     
 
-    @Throws(V1CryptographicException::class) fun `v1RequestsEncrypt`(`ec`: kotlin.ByteArray, `ssKidPk`: kotlin.ByteArray, `methodName`: kotlin.ByteArray, `payload`: kotlin.ByteArray?): RequestPayload {
+    @Throws(V1CryptographicException::class) fun `v1RequestsEncrypt`(`ec`: kotlin.ByteArray, `ssKidPk`: kotlin.ByteArray, `methodName`: kotlin.ByteArray, `payload`: kotlin.ByteArray?, `timestamp`: kotlin.ULong?): RequestPayload {
             return FfiConverterTypeRequestPayload.lift(
     uniffiRustCallWithError(V1CryptographicException) { _status ->
     UniffiLib.uniffi_relaysms_spec_payload_fn_func_v1_requests_encrypt(
     
-        FfiConverterByteArray.lower(`ec`),FfiConverterByteArray.lower(`ssKidPk`),FfiConverterByteArray.lower(`methodName`),FfiConverterOptionalByteArray.lower(`payload`),_status)
+        FfiConverterByteArray.lower(`ec`),FfiConverterByteArray.lower(`ssKidPk`),FfiConverterByteArray.lower(`methodName`),FfiConverterOptionalByteArray.lower(`payload`),FfiConverterOptionalULong.lower(`timestamp`),_status)
 }
     )
     }
