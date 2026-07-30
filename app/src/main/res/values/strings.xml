@@ -514,5 +514,8 @@
     <string name="offline_compose">Offline compose</string>
     <string name="send_message_offline">Send message offline</string>
     <string name="please_enter_your_avoid_copying_and_pasting_if_telegram_to_not_get_flagged">Please enter your %1$s code. Avoid copying and pasting if Telegram to not get flagged!</string>
+    <string name="you_can_send_a_quick_mail_without_verifying_or_adding_accounts_using_relaysms_mail">You can send a quick mail without verifying or adding accounts using RelaySMS mail.</string>
+    <string name="try_it">Try it.</string>
+    <string name="you_can_always_find_the_option_when_you_click_compose"><![CDATA[You can always find the option when you click <b>Compose</b>]]></string>
 
 </resources>

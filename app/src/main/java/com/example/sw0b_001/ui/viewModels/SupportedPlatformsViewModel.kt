@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 sealed class SupportedPlatformsUiState {
+    object Idle : SupportedPlatformsUiState()
     object Loading : SupportedPlatformsUiState()
     data class Success(val supportedPlatforms: List<SupportedPlatforms>) : SupportedPlatformsUiState()
     data class Error(val message: String) : SupportedPlatformsUiState()
