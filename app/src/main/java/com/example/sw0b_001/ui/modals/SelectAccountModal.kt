@@ -1,13 +1,16 @@
 package com.example.sw0b_001.ui.modals
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -79,19 +82,25 @@ fun SelectAccountModal(
         sheetState = sheetState,
         dragHandle = null,
     ) {
-        SelectAccountModalComponent(
-            accounts = accounts,
-            isCompose = isCompose,
-            isComposeOffline = isComposeOffline,
-            supportedPlatform = supportedPlatform,
-            onAccountSelected = { token ->
-                onAccountSelected?.invoke(token)
-                onDismissRequest()
-            },
-            onSheetHideCallback = onDismissRequest,
-            onAddAccountCallback = onAddAccountCallback ?: {},
-            onRemoveAccountCallback = onRemoveAccountCallback ?: {},
-        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .safeDrawingPadding()
+        ) {
+            SelectAccountModalComponent(
+                accounts = accounts,
+                isCompose = isCompose,
+                isComposeOffline = isComposeOffline,
+                supportedPlatform = supportedPlatform,
+                onAccountSelected = { token ->
+                    onAccountSelected?.invoke(token)
+                    onDismissRequest()
+                },
+                onSheetHideCallback = onDismissRequest,
+                onAddAccountCallback = onAddAccountCallback ?: {},
+                onRemoveAccountCallback = onRemoveAccountCallback ?: {},
+            )
+        }
     }
 }
 

@@ -523,5 +523,9 @@
     <string name="you_can_use_this_account_without_verifying_a_number_this_is_a_one_time_use_account_and_cannot_receive_replies">"You can use this account without verifying a number."</string>
     <string name="your_sending_address_changes_everytime_you_use">Your sending address changes everytime you use.</string>
     <string name="send_from_a_random_alias_e_g_qwertyuiop_relaysms_me">Send from a random alias, e.g. qwertyuiop@relaysms.me</string>
+    <string name="enter_phone_number">Enter phone number.</string>
+    <string name="will_send_a_code">%1$s will send a code.</string>
+    <string name="enter_verification_code">Enter verification code</string>
+    <string name="enter_your_password">Enter your password</string>
 
 </resources>

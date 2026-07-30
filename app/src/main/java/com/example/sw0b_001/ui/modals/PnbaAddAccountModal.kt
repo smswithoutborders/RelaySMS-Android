@@ -3,19 +3,22 @@ package com.example.sw0b_001.ui.modals
 import android.telephony.PhoneNumberUtils
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.relocation.BringIntoViewRequester
-import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -37,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -145,6 +149,7 @@ fun PNBAPhoneNumberCodeRequestView(
                     PnbaUiState.PhoneNumberRequested -> {
                         PhoneNumberRequestedView(
                             phoneNumber = phoneNumber,
+                            displayName = platform.display_name,
                             enabled = isEnabled,
                             onPhoneNumberChangedCallback = { cc, pn ->
                                 selectedCountry = cc
@@ -170,61 +175,72 @@ fun PNBAPhoneNumberCodeRequestView(
                     else -> {}
                 }
 
-                Button(
-                    onClick = {
-                        val phoneNumber1 = selectedCountry!!.countryPhoneNumberCode + phoneNumber
-                        when(val state = pnbaUiState) {
-                            PnbaUiState.PhoneNumberRequested -> {
-                                tokensViewModel.store(
-                                    platform = platform,
-                                    phoneNumber = phoneNumber1,
-                                )
-                            }
-                            PnbaUiState.AuthCodeRequested -> {
-                                tokensViewModel.store(
-                                    platform = platform,
-                                    phoneNumber = phoneNumber1,
-                                    authCode = authCode
-                                )
-                            }
-                            PnbaUiState.PasswordRequested -> {
-                                tokensViewModel.store(
-                                    platform = platform,
-                                    phoneNumber = phoneNumber1,
-                                    authCode = authCode,
-                                    password = password
-                                )
-                            }
-                            else -> {}
-                        }
-                    },
-                    enabled = isEnabled && when(val state = pnbaUiState) {
-                        PnbaUiState.PhoneNumberRequested -> {
-                            if(selectedCountry == null) false
-                            else {
-                                val phoneNumber1 = selectedCountry!!.countryPhoneNumberCode + phoneNumber
-                                PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber1)
-                            }
-                        }
-                        PnbaUiState.AuthCodeRequested -> { authCode.length > 3 }
-                        PnbaUiState.PasswordRequested -> { password.isNotEmpty() }
-                        else -> true
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 32.dp, bottom = 24.dp)
-                        .bringIntoViewRequester(buttonRequester),
-                    shape = RoundedCornerShape(8.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    if(isLoading) {
-                        CircularProgressIndicator(
-                            color = MaterialTheme.colorScheme.secondary,
-                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                    Button(
+                        onClick = onDismissRequest,
+                        colors = ButtonDefaults
+                            .buttonColors(MaterialTheme.colorScheme.secondary)) {
+                        Text(
+                            stringResource(R.string.cancel),
+                            color = MaterialTheme.colorScheme.onSecondary
                         )
                     }
-                    else {
-                        Text(stringResource(R.string.submit))
+
+                    Spacer(Modifier.size(32.dp))
+
+                    Button(
+                        onClick = {
+                            val phoneNumber1 = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+                            when(val state = pnbaUiState) {
+                                PnbaUiState.PhoneNumberRequested -> {
+                                    tokensViewModel.store(
+                                        platform = platform,
+                                        phoneNumber = phoneNumber1,
+                                    )
+                                }
+                                PnbaUiState.AuthCodeRequested -> {
+                                    tokensViewModel.store(
+                                        platform = platform,
+                                        phoneNumber = phoneNumber1,
+                                        authCode = authCode
+                                    )
+                                }
+                                PnbaUiState.PasswordRequested -> {
+                                    tokensViewModel.store(
+                                        platform = platform,
+                                        phoneNumber = phoneNumber1,
+                                        authCode = authCode,
+                                        password = password
+                                    )
+                                }
+                                else -> {}
+                            }
+                        },
+                        enabled = isEnabled && when(val state = pnbaUiState) {
+                            PnbaUiState.PhoneNumberRequested -> {
+                                if(selectedCountry == null) false
+                                else {
+                                    val phoneNumber1 = selectedCountry!!.countryPhoneNumberCode + phoneNumber
+                                    PhoneNumberUtils.isWellFormedSmsAddress(phoneNumber1)
+                                }
+                            }
+                            PnbaUiState.AuthCodeRequested -> { authCode.length > 3 }
+                            PnbaUiState.PasswordRequested -> { password.isNotEmpty() }
+                            else -> true
+                        },
+                    ) {
+                        if(isLoading) {
+                            CircularProgressIndicator(
+                                color = MaterialTheme.colorScheme.secondary,
+                                trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                            )
+                        }
+                        else {
+                            Text(stringResource(R.string.submit))
+                        }
                     }
                 }
             }
@@ -241,7 +257,16 @@ private fun PasswordRequestedView(
 ) {
     var isPasswordVisible by remember { mutableStateOf(false) }
 
-    Column {
+    Column(
+        Modifier.padding(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            stringResource(R.string.enter_your_password),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold
+        )
+        Spacer(Modifier.size(16.dp))
         OutlinedTextField(
             value = password,
             onValueChange = onPasswordChangedCallback,
@@ -286,7 +311,16 @@ private fun AuthenticationCodeRequestedView(
     onAuthCodeChangeCallback: (String) -> Unit = {},
 ) {
     var isCodeVisible by remember { mutableStateOf(false) }
-    Column(Modifier.padding(8.dp)) {
+    Column(
+        Modifier.padding(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            stringResource(R.string.enter_verification_code),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold
+        )
+        Spacer(Modifier.size(16.dp))
         OutlinedTextField(
             value = authCode,
             onValueChange = onAuthCodeChangeCallback,
@@ -304,7 +338,7 @@ private fun AuthenticationCodeRequestedView(
                         displayName
                     ),
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    color = MaterialTheme.colorScheme.tertiary,
                 )
             },
             trailingIcon = {
@@ -337,12 +371,27 @@ private fun AuthenticationCodeRequestedView(
 @Composable
 private fun PhoneNumberRequestedView(
     phoneNumber: String = "",
+    displayName: String = "",
     enabled: Boolean = false,
     onPhoneNumberChangedCallback: (CountryDetails, String) -> Unit = { cc, pn ->},
 ) {
     var selectedCountry by remember { mutableStateOf<CountryDetails?>(null) }
 
-    Column(Modifier.padding(8.dp)) {
+    Column(
+        Modifier.padding(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            stringResource(R.string.enter_phone_number),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.SemiBold
+        )
+        Text(
+            stringResource(R.string.will_send_a_code, displayName),
+            style = MaterialTheme.typography.bodySmall
+        )
+        Spacer(Modifier.size(16.dp))
+
         CountryPickerOutlinedTextField(
             mobileNumber = phoneNumber,
             onMobileNumberChange = {
