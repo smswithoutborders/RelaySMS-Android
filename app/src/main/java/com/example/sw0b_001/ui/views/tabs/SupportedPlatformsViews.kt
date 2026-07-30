@@ -388,6 +388,7 @@ fun PlatformListContent(
                 tokensViewModel = tokensViewModel,
                 platform = clickedPlatform!!,
             ) {
+                tokensViewModel.clearStoringState()
                 storePnbaRequested = false
             }
         }

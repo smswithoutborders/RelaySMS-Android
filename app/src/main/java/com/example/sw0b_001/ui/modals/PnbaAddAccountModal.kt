@@ -79,10 +79,7 @@ fun PNBAPhoneNumberCodeRequestView(
 
     LaunchedEffect(pnbaUiState) {
         when(val state = pnbaUiState) {
-            PnbaUiState.Success -> {
-                tokensViewModel.clearStoringState()
-                onDismissRequest()
-            }
+            PnbaUiState.Success -> { onDismissRequest() }
             else -> {}
         }
     }
