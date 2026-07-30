@@ -201,13 +201,13 @@ fun SupportedPlatformsView(
                 },
                 onTryItCallback = {
                     supportedPlatforms.find{ it.name == "rmail" }?.let { rmail ->
-                        navController.navigate(HomeScreenNav()) {
-                            popUpTo(ComposeScreen(
-                                cat = v1ContentCategoryFromU8(rmail.cat_id.toUByte()),
-                                messageId = null,
-                                supportedPlatform = rmail.name,
-                                isOfflineCompose = rmail.supports_offline_first
-                            )) {
+                        navController.navigate(ComposeScreen(
+                            cat = v1ContentCategoryFromU8(rmail.cat_id.toUByte()),
+                            messageId = null,
+                            supportedPlatform = rmail.name,
+                            isOfflineCompose = rmail.supports_offline_first
+                        )) {
+                            popUpTo(HomeScreenNav()) {
                                 inclusive = true
                             }
                             launchSingleTop = true
