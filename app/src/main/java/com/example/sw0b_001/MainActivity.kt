@@ -77,11 +77,11 @@ import com.example.sw0b_001.ui.onboarding.OnboardingInteractive
 import com.example.sw0b_001.ui.onboarding.OnboardingView
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.BackupRestoreViewModel
-import com.example.sw0b_001.ui.viewModels.OfflineFirstPublisherViewModel
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
+import com.example.sw0b_001.ui.viewModels.OfflineFirstPublisherViewModel
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
-import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.OnlineFirstPublisherViewModel
+import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.views.AboutView
@@ -342,7 +342,8 @@ class MainActivity : BindActivity() {
                     offlineFirstPublisherViewModel = offlineFirstPublisherViewModel,
                     catId = composeScreenNav.cat,
                     supportedPlatformName = composeScreenNav.supportedPlatform,
-                    isOfflineCompose = composeScreenNav.isOfflineCompose
+                    isOfflineCompose = composeScreenNav.isOfflineCompose,
+                    supportedPlatformsViewModel = supportedPlatformsViewModel,
                 )
             }
             composable<DetailsInterfaceScreen> { backEntry ->

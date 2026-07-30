@@ -508,14 +508,20 @@
     <string name="add_new">Add New</string>
     <string name="encryption_keys_server">Encryption keys server</string>
     <string name="encryption_keys_client">Encryption keys client</string>
-    <string name="your_accounts_s">Your <b>%1$s</b> accounts(s)</string>
+    <plurals name="your_accounts_s">
+        <item quantity="one"><![CDATA[Your <b>%1$s</b> account]]></item>
+        <item quantity="other"><![CDATA[Your <b>%1$s</b> accounts]]></item>
+    </plurals>
     <string name="yes_remove">Yes, remove</string>
-    <string name="you_have_not_saved_any_account_yet_click_the_add_button_to_connect_your_account">You have not saved any account yet. Click the add button to connect your %1$s account.</string>
+    <string name="you_have_not_saved_any_account_yet_click_the_add_button_to_connect_your_account"><![CDATA[You have not saved any account yet. Click the add button to connect your <b>%1$s</b> account.]]></string>
     <string name="offline_compose">Offline compose</string>
     <string name="send_message_offline">Send message offline</string>
     <string name="please_enter_your_avoid_copying_and_pasting_if_telegram_to_not_get_flagged">Please enter your %1$s code. Avoid copying and pasting if Telegram to not get flagged!</string>
     <string name="you_can_send_a_quick_mail_without_verifying_or_adding_accounts_using_relaysms_mail">You can send a quick mail without verifying or adding accounts using RelaySMS mail.</string>
     <string name="try_it">Try it.</string>
     <string name="you_can_always_find_the_option_when_you_click_compose"><![CDATA[You can always find the option when you click <b>Compose</b>]]></string>
+    <string name="you_can_use_this_account_without_verifying_a_number_this_is_a_one_time_use_account_and_cannot_receive_replies">"You can use this account without verifying a number."</string>
+    <string name="your_sending_address_changes_everytime_you_use">Your sending address changes everytime you use.</string>
+    <string name="send_from_a_random_alias_e_g_qwertyuiop_relaysms_me">Send from a random alias, e.g. qwertyuiop@relaysms.me</string>
 
 </resources>

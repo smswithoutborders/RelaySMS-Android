@@ -56,6 +56,7 @@ import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.OfflineFirstPublisherViewModel
 import com.example.sw0b_001.ui.viewModels.OnlineFirstPublisherViewModel
 import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
+import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import uniffi.relaysms_spec_payload.V1ContentCategories
 
@@ -70,6 +71,7 @@ fun ComposerInterface(
     payloadsViewModel: PayloadsViewModel,
     onlineFirstPublisherViewModel: OnlineFirstPublisherViewModel,
     offlineFirstPublisherViewModel: OfflineFirstPublisherViewModel,
+    supportedPlatformsViewModel: SupportedPlatformsViewModel,
     supportedPlatformName: String,
     catId: V1ContentCategories,
     isOfflineCompose: Boolean,
@@ -91,6 +93,10 @@ fun ComposerInterface(
     BackHandler { backHandler() }
 
     val payload by payloadsViewModel.message.collectAsStateWithLifecycle()
+
+    val supportedPlatform by supportedPlatformsViewModel.get(supportedPlatformName)
+        .collectAsStateWithLifecycle(null)
+
     val tokens by tokensViewModel.fetchTokensForPlatforms(supportedPlatformName)
         .collectAsStateWithLifecycle(emptyList())
 
@@ -313,7 +319,7 @@ fun ComposerInterface(
                 ) { sendingCallback() }
             }
 
-            if (showSelectAccountModal) {
+            if (showSelectAccountModal && supportedPlatform != null) {
                 SelectAccountModal(
                     isCompose = true,
                     onDismissRequest = {
@@ -332,8 +338,8 @@ fun ComposerInterface(
                         showSelectAccountModal = false
                     },
                     accounts = tokens,
-                    displayName = supportedPlatformName,
                     isComposeOffline = isOfflineCompose,
+                    supportedPlatform = supportedPlatform!!,
                 )
             }
         }

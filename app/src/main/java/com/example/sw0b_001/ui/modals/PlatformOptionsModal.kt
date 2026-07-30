@@ -111,20 +111,31 @@ fun PlatformOptionsModal(
                     } else {
                         SelectAccountModalComponent(
                             accounts = accounts,
-                            displayName = platform?.display_name ?: "",
                             isCompose = false,
                             isComposeOffline = isOfflineCompose,
                             onAddAccountCallback = storeCallback,
                             onAccountSelected = { storedAccount ->
                                 onDismissRequest()
-                                navController.navigate(MetricsScreen(
-                                    tokenId = storedAccount.id
-                                ))
+                                navController.navigate(
+                                    MetricsScreen(
+                                        tokenId = storedAccount.id
+                                    )
+                                )
                             },
                             onSheetHideCallback = onDismissRequest,
                             onRemoveAccountCallback = {
                                 revokeAccountConfirmationRequested = true
                                 selectedAccount = it
+                            },
+                            supportedPlatform = platform!!,
+                            onOfflineComposeCallback = {
+                                navController.navigate(ComposeScreen(
+                                    cat = cat,
+                                    messageId = null,
+                                    supportedPlatform = platform.name,
+                                    isOfflineCompose = true
+                                ))
+                                onDismissRequest()
                             }
                         )
                     }
