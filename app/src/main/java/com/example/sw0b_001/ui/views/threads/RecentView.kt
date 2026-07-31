@@ -125,17 +125,20 @@ fun RecentView(
 @Composable
 fun GetMessageAvatar(logo: String?) {
     val imageSize = 38.dp
-    GlideImage(
-        model = logo,
-        contentDescription = stringResource(R.string.platform_image),
-        modifier = Modifier
-            .size(imageSize),
-//            .align(Alignment.Center),
-        loading = placeholder(R.drawable.relaysms_icon_default_shape), // Shows while loading
-        failure = placeholder(R.drawable.relaysms_icon_default_shape)      // Shows if download fails
+    Box(
+//        modifier = Modifier
+//            .size(50.dp)
     ) {
-        it.diskCacheStrategy(DiskCacheStrategy.ALL) // Caches both original and resized images
-            .circleCrop()                             // Makes the image a circle
+        GlideImage(
+            model = logo,
+            contentDescription = stringResource(R.string.platform_image),
+            modifier = Modifier
+                .size(imageSize),
+            loading = placeholder(R.drawable.relaysms_icon_default_shape), // Shows while loading
+            failure = placeholder(R.drawable.relaysms_icon_default_shape)      // Shows if download fails
+        ) {
+            it.diskCacheStrategy(DiskCacheStrategy.ALL) // Caches both original and resized images
+        }
     }
 }
 

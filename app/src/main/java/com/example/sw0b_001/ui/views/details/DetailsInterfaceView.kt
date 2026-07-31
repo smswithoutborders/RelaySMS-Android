@@ -76,7 +76,7 @@ fun DetailsInterfaceView(
 
     Scaffold(
         topBar = {
-            RelayAppBar(navController = navController,
+            RelayAppBar(
                 onBackCallback = { backHandler() },
                 editCallback = {
                     navController.navigate(

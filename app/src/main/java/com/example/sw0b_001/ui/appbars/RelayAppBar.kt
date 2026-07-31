@@ -2,8 +2,6 @@ package com.example.sw0b_001.ui.appbars
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -13,17 +11,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavController
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.theme.AppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RelayAppBar(
-    navController: NavController,
     onBackCallback: () -> Unit,
     editCallback: () -> Unit,
     deleteCallback: () -> Unit,
@@ -67,7 +62,6 @@ fun RelayAppBar(
 fun RelayAppBarPreview() {
     AppTheme {
         RelayAppBar(
-            navController = NavController(LocalContext.current),
             {},
             {}
         ) {}

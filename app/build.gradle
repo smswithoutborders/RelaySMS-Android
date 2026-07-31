@@ -89,10 +89,10 @@ android {
         }
 
         debug {
-            minifyEnabled true
-            shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            testProguardFiles 'proguard-rules.pro'
+//            minifyEnabled true
+//            shrinkResources true
+//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+//            testProguardFiles 'proguard-rules.pro'
         }
     }
 
@@ -386,5 +386,7 @@ dependencies {
 
     // 2. Glide Compose integration library
     implementation(libs.compose)
+
+    implementation("io.coil-kt.coil3:coil-svg:3.5.0")
 
 }

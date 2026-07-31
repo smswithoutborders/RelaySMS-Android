@@ -527,5 +527,7 @@
     <string name="will_send_a_code">%1$s will send a code.</string>
     <string name="enter_verification_code">Enter verification code</string>
     <string name="enter_your_password">Enter your password</string>
+    <string name="send_with">Send with...</string>
+    <string name="always_available_no_setup_required">Always available - No setup required.</string>
 
 </resources>
