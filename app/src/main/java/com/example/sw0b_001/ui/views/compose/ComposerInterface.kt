@@ -45,12 +45,14 @@ import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDefaultSimSubscription
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.components.mmsImagePicker
+import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
 import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.extensions.context.settingsGetNotShowChooseGatewayClient
 import com.example.sw0b_001.ui.components.AttachImageView
 import com.example.sw0b_001.ui.modals.ComposeChooseGatewayClientsModal
+import com.example.sw0b_001.ui.modals.MakeDefaultModal
 import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.OfflineFirstPublisherViewModel
@@ -58,6 +60,7 @@ import com.example.sw0b_001.ui.viewModels.OnlineFirstPublisherViewModel
 import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
+import com.example.sw0b_001.ui.views.threads.makeDefault
 import uniffi.relaysms_spec_payload.V1ContentCategories
 
 
@@ -135,6 +138,7 @@ fun ComposerInterface(
 //        catId != V1ContentCategories.BRIDGE ) }
 
     var showSelectAccountModal by remember { mutableStateOf(!isOfflineCompose) }
+    var showSetAsDefault by remember { mutableStateOf(false) }
 
     var selectedToken: Tokens? by remember{ mutableStateOf(null) }
     var from: String? by remember(selectedToken){
@@ -186,6 +190,14 @@ fun ComposerInterface(
 
     }
 
+    var isDefault by remember {
+        mutableStateOf(inPreviewMode || context.isDefault())
+    }
+
+    val getDefaultPermission = getSetDefaultBehaviour(context) {
+        isDefault = context.isDefault()
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -230,17 +242,17 @@ fun ComposerInterface(
                         }
                     }
 
-                    if(inPreviewMode || context.isDefault()) {
-                        IconButton(
-                            onClick = { if(!context.isDefault()) TODO("Show toast") else {
+                    IconButton(
+                        onClick = {
+                            if(!context.isDefault()) { showSetAsDefault = true }
+                            else {
                                 imagePicker.launch(
                                     arrayOf( "image/png", "image/jpg", "image/jpeg"))
                             }}
-                        ) {
-                            Icon(Icons.Default.AttachFile,
-                                stringResource(R.string.add_photos)
-                            )
-                        }
+                    ) {
+                        Icon(Icons.Default.AttachFile,
+                            stringResource(R.string.add_photos)
+                        )
                     }
 
                     IconButton(
@@ -341,6 +353,16 @@ fun ComposerInterface(
                     isComposeOffline = isOfflineCompose,
                     supportedPlatform = supportedPlatform!!,
                 )
+            }
+
+            if(showSetAsDefault) {
+                MakeDefaultModal(
+                    makeDefault = {
+                        getDefaultPermission.launch(makeDefault(context))
+                    }
+                ) {
+
+                }
             }
         }
     }

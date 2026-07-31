@@ -529,5 +529,8 @@
     <string name="enter_your_password">Enter your password</string>
     <string name="send_with">Send with...</string>
     <string name="always_available_no_setup_required">Always available - No setup required.</string>
+    <string name="make_relaysms_default">Make RelaySMS default</string>
+    <string name="you_need_to_set_relaysms_as_your_default_sms_app_to_be_able_to_send_attachments">You need to set RelaySMS as your default SMS app to be able to send attachments.</string>
+    <string name="this_lets_the_app_manage_the_sending_requirements_for_you">This lets the app manage the sending requirements for you.</string>
 
 </resources>
