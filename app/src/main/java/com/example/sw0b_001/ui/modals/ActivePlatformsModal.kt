@@ -1,7 +1,6 @@
 package com.example.sw0b_001.ui.modals
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -42,6 +40,8 @@ import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import kotlinx.coroutines.launch
+import uniffi.relaysms_spec_payload.V1ContentCategories
+import uniffi.relaysms_spec_payload.V1PayloadsSupportedProtocols
 import uniffi.relaysms_spec_payload.v1ContentCategoryFromU8
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,7 +51,6 @@ fun ActivePlatformsModal(
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
     tokensViewModel: TokensViewModel,
     sendNewMessageRequested: Boolean,
-    isCompose: Boolean = false,
     onDismiss: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(
@@ -73,17 +72,6 @@ fun ActivePlatformsModal(
             },
             sheetState = sheetState,
             modifier = Modifier.fillMaxWidth(),
-            dragHandle = {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.background),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    // Renders the standard pill shape indicator
-                    BottomSheetDefaults.DragHandle()
-                }
-            },
         ) {
             ActivePlatformsComposeComponents(
                 supportedPlatforms.filter{ sp->
@@ -120,7 +108,18 @@ fun ActivePlatformsModal(
 @Preview(showBackground = true)
 @Composable
 fun ActivePlatformsComposeComponents(
-    supportedPlatforms: List<SupportedPlatforms> = emptyList(),
+    supportedPlatforms: List<SupportedPlatforms> =
+        listOf(
+            SupportedPlatforms(
+                name = "example",
+                display_name = "Example",
+                supports_offline_first = true,
+                cat_id = V1ContentCategories.EMAIL.value.toInt(),
+                proto_id = V1PayloadsSupportedProtocols.O_AUTH20.value.toInt(),
+                icon_svg = null,
+                icon_png = null
+            )
+        ),
     onOfflineAccountCallback: () -> Unit = {},
     onSelected: (SupportedPlatforms) -> Unit = {},
 ) {
@@ -144,18 +143,16 @@ fun ActivePlatformsComposeComponents(
                 val platform = supportedPlatforms[index]
                 Box(
                     modifier = Modifier
-                        .size(60.dp)
-                        .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.secondary,
-//                            shape = RoundedCornerShape(30.dp),
-                            shape = CircleShape
-                        ),
+                        .background(
+                            MaterialTheme.colorScheme.secondary,
+                            CircleShape
+                        )
+                        .size(50.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     GlideImage(
                         modifier = Modifier
-                            .size(38.dp)
+                            .size(30.dp)
                             .clickable { onSelected(platform) },
                         model = platform.icon_png,
                         contentDescription = stringResource(R.string.platform_image),

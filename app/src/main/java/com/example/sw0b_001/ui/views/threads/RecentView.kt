@@ -112,7 +112,6 @@ fun RecentView(
                 sendNewMessageRequested = sendNewMessageRequested,
                 supportedPlatformsViewModel = supportedPlatformsViewModel,
                 navController = navController,
-                isCompose = true,
                 tokensViewModel = tokensViewModel,
             ) {
                 sendNewMessageRequested = false

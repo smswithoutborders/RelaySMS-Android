@@ -57,6 +57,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
@@ -462,7 +463,7 @@ fun PlatformListRow(
                 loading = placeholder(R.drawable.logo),
                 failure = placeholder(R.drawable.logo)
             ) {
-                it.diskCacheStrategy(DiskCacheStrategy.ALL).circleCrop()
+                it.diskCacheStrategy(DiskCacheStrategy.ALL)
             }
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -576,7 +577,8 @@ private fun RmailAlertDialog(
             Spacer(Modifier.padding(8.dp))
             Text(
                 text = AnnotatedString.fromHtml(
-                    context.getString(
+                    ContextCompat.getString(
+                        context,
                         R.string.you_can_always_find_the_option_when_you_click_compose)),
                 style = MaterialTheme.typography.labelSmall,
                 textAlign = TextAlign.Center,
