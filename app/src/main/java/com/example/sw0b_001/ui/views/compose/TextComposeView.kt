@@ -70,6 +70,7 @@ fun TextComposeView(
                 fontSize = 16.sp
             ),
             modifier = Modifier
+                .padding(top=16.dp)
                 .fillMaxWidth()
                 .fillMaxHeight(),
             decorationBox = { innerTextField ->

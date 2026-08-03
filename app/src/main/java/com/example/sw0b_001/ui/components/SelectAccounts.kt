@@ -1,5 +1,6 @@
 package com.example.sw0b_001.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,6 +14,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -29,6 +33,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -119,9 +126,9 @@ fun SelectAccountModalComponent(
                     Spacer(modifier = Modifier.size(8.dp))
                     AccountCard(
                         account = account,
-                        isCompose = isCompose,
-                        onRemoveAccountCallback = onRemoveAccountCallback,
-                        onAccountSelected = { onAccountSelected(account) }
+                        supportingIcon = Icons.Outlined.Delete,
+                        supportingIconCallback = onRemoveAccountCallback,
+                        onAccountSelected = { onAccountSelected(account) },
                     )
                 }
             }
@@ -157,7 +164,8 @@ fun AccountCardOffline(
             .padding(bottom = 8.dp, top = 16.dp),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 1.dp,
-        )
+        ),
+        shape = RoundedCornerShape(25.dp)
     ) {
         Row(
             modifier = Modifier
@@ -191,17 +199,26 @@ fun AccountCardOffline(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AccountCard(
     account: Tokens,
-    isCompose: Boolean,
-    onRemoveAccountCallback: (Tokens) -> Unit,
-    onAccountSelected: () -> Unit
+    backgroundColor: Color = MaterialTheme.colorScheme.background,
+    shape: Shape = RoundedCornerShape(25.dp),
+    supportingIcon: ImageVector? = null,
+    supportingIconDescription: String = "",
+    supportingIconTint: Color = MaterialTheme.colorScheme.error,
+    supportingIconCallback: (Tokens) -> Unit = {},
+    onAccountSelected: () -> Unit,
 ) {
     Card(
         onClick = onAccountSelected,
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth(),
+        backgroundColor = backgroundColor,
+        shape = shape,
+        elevation = 0.dp,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary)
     ) {
         Row(
             modifier = Modifier
@@ -228,25 +245,23 @@ fun AccountCard(
                 Text(
                     text = account.account,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = account.platformName,
                     style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
-            if(!isCompose) {
+            supportingIcon?.let {
                 Spacer(modifier = Modifier.width(16.dp))
 
                 IconButton(
-                    onClick = { onRemoveAccountCallback(account) }
+                    onClick = { supportingIconCallback(account) }
                 ) {
                     Icon(
-                        imageVector = Icons.Outlined.Delete,
-                        contentDescription = stringResource(R.string.delete),
-                        tint = MaterialTheme.colorScheme.error
+                        imageVector = supportingIcon,
+                        contentDescription = supportingIconDescription,
+                        tint = supportingIconTint
                     )
                 }
             }

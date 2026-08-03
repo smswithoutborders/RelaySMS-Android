@@ -4,21 +4,34 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.NoSim
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -32,12 +45,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.afkanerd.lib_image_android.ui.navigation.ImageRenderNav
@@ -50,10 +67,10 @@ import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.extensions.context.settingsGetNotShowChooseGatewayClient
+import com.example.sw0b_001.ui.components.AccountCard
 import com.example.sw0b_001.ui.components.AttachImageView
 import com.example.sw0b_001.ui.modals.ComposeChooseGatewayClientsModal
 import com.example.sw0b_001.ui.modals.MakeDefaultModal
-import com.example.sw0b_001.ui.modals.SelectAccountModal
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.OfflineFirstPublisherViewModel
 import com.example.sw0b_001.ui.viewModels.OnlineFirstPublisherViewModel
@@ -236,7 +253,7 @@ fun ComposerInterface(
                         ) {
                             Icon(Icons.Default.NoSim,
                                 "Debug send",
-                                tint = if(debugState) MaterialTheme.colors.primary
+                                tint = if(debugState) MaterialTheme.colorScheme.primary
                                 else Color.LightGray
                             )
                         }
@@ -256,7 +273,7 @@ fun ComposerInterface(
                     }
 
                     IconButton(
-                        enabled = !isSending,
+                        enabled = !isSending && !from.isNullOrBlank(),
                         onClick = {
                             if(!debugState && !context.settingsGetNotShowChooseGatewayClient)
                                 showChooseGatewayClient = true
@@ -276,15 +293,20 @@ fun ComposerInterface(
             .fillMaxWidth()
             .padding(innerPadding)
         ) {
-            Column {
+            Column(Modifier.padding(16.dp)) {
                 if(isSending || LocalInspectionMode.current) {
                     LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                }
+                FromView(
+                    tokens = tokens,
+                    selectedAccount = selectedToken,
+                ) {
+                    selectedToken = it
                 }
                 Column {
                     when(catId) {
                         V1ContentCategories.EMAIL -> EmailComposeView(
                             catId,
-                            from = from,
                             to = to,
                             subject = subject,
                             body = body,
@@ -331,30 +353,6 @@ fun ComposerInterface(
                 ) { sendingCallback() }
             }
 
-            if (showSelectAccountModal && supportedPlatform != null) {
-                SelectAccountModal(
-                    isCompose = true,
-                    onDismissRequest = {
-                        if (selectedToken == null) {
-                            Toast.makeText(
-                                context,
-                                ContextCompat.getString(context, R.string.no_account_selected),
-                                Toast.LENGTH_SHORT
-                            )
-                                .show()
-                            backHandler()
-                        }
-                    },
-                    onAccountSelected = { account ->
-                        selectedToken = account
-                        showSelectAccountModal = false
-                    },
-                    accounts = tokens,
-                    isComposeOffline = isOfflineCompose,
-                    supportedPlatform = supportedPlatform!!,
-                )
-            }
-
             if(showSetAsDefault) {
                 MakeDefaultModal(
                     makeDefault = {
@@ -366,6 +364,132 @@ fun ComposerInterface(
             }
         }
     }
+}
 
+@OptIn(ExperimentalMaterialApi::class)
+@Preview(showBackground = true)
+@Composable
+private fun FromView(
+    tokens: List<Tokens> = listOf(
+        Tokens(
+            tokenId = 1,
+            tokenHash = ByteArray(0),
+            catId = V1ContentCategories.EMAIL,
+            account = "sample@example.com",
+            platformName = "sample platform"
+        )
+    ),
+    selectedAccount: Tokens? = null,
+    showListSelected: (Tokens) -> Unit = {},
+) {
+    val inPreviewMode = LocalInspectionMode.current
+    var showList by remember{ mutableStateOf(inPreviewMode)}
+    var dropDownIcon by remember(showList){ mutableStateOf(
+        if(!showList) Icons.Filled.KeyboardArrowDown
+        else Icons.Filled.KeyboardArrowUp,
+    )}
+    Column(Modifier
+        .fillMaxWidth()
+    ) {
+        if(selectedAccount == null || inPreviewMode) {
+            Box(Modifier.padding(16.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { showList = !showList }
+                ) {
+                    Text(
+                        text = stringResource(R.string.from),
+                        modifier = Modifier.padding(end = 24.dp),
+                        fontWeight = FontWeight.Medium
+                    )
+
+                    Spacer(Modifier.weight(1f))
+
+                    IconButton(onClick = {
+                        showList = !showList
+                    }) {
+                        Icon(
+                            dropDownIcon,
+                            contentDescription = stringResource(R.string.expand_to)
+                        )
+                    }
+                }
+            }
+        }
+
+        if(selectedAccount != null || inPreviewMode) {
+            AccountCard(
+                account = if(inPreviewMode) {
+                    Tokens(
+                        tokenId = 1,
+                        tokenHash = ByteArray(0),
+                        catId = V1ContentCategories.EMAIL,
+                        account = "sample@example.com",
+                        platformName = "sample platform"
+                    )
+                } else selectedAccount!!,
+                supportingIcon = dropDownIcon,
+                supportingIconTint = MaterialTheme.colorScheme.onBackground,
+                supportingIconDescription = stringResource(R.string.show_accounts),
+                supportingIconCallback = { showList = !showList },
+            ){ showList = !showList }
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 8.dp)
+        ) {
+            if(showList) {
+                Divider(
+                    color = MaterialTheme.colorScheme.outline,
+                    modifier = Modifier
+                        .padding(top = 4.dp, bottom = 8.dp)
+                        .fillMaxWidth(),
+                    thickness = 0.5.dp,
+                )
+            }
+
+            DropdownMenu(
+                expanded = showList,
+                modifier = Modifier.width(IntrinsicSize.Min),
+                onDismissRequest = {
+                    showList = false
+                },
+            ) {
+                tokens.forEach { token ->
+                    DropdownMenuItem(
+                        leadingIcon = {
+                            Image(
+                                painter = painterResource(id = R.drawable.generic_avatar),
+                                contentDescription = stringResource(R.string.profile_photo),
+                                modifier = Modifier
+                                    .size(30.dp)
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+
+                        },
+                        text = {
+                            Column {
+                                Text(
+                                    text = token.account,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Text(
+                                    text = token.platformName,
+                                    style = MaterialTheme.typography.titleSmall,
+                                )
+                            }
+                        },
+                        onClick = {
+                            showListSelected(token)
+                            showList = false
+                        }
+                    )
+                }
+            }
+        }
+    }
 }
 
