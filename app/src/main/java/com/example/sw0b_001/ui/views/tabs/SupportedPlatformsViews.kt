@@ -103,7 +103,7 @@ fun SupportedPlatformsView(
     LaunchedEffect(Unit) {
         supportedPlatformsViewModel.fetch()
     }
-    var showDefaultSmsCard by remember {
+    var showRelaySmsAvailable by remember {
         mutableStateOf(true)
     }
 
@@ -192,13 +192,13 @@ fun SupportedPlatformsView(
             )
         }
 
-        if (supportedPlatforms.isNotEmpty()) {
+        if (showRelaySmsAvailable && supportedPlatforms.isNotEmpty()) {
             RmailAlertDialog(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(16.dp),
                 onDismiss = {
-                    showDefaultSmsCard = false
+                    showRelaySmsAvailable = false
                 },
                 onTryItCallback = {
                     supportedPlatforms.find{ it.name == "rmail" }?.let { rmail ->
