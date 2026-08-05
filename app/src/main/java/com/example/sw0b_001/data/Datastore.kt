@@ -70,6 +70,7 @@ abstract class Datastore : RoomDatabase() {
                         )
                             .openHelperFactory(SupportOpenHelperFactory(rawBytes))
                             .fallbackToDestructiveMigration(true)
+                            .setJournalMode(JournalMode.WRITE_AHEAD_LOGGING)
                             .build()
                     }
                 }

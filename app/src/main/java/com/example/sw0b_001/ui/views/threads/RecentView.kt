@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -63,47 +64,46 @@ fun RecentView(
         .collectAsStateWithLifecycle(emptyList())
 
     val listState = rememberLazyListState()
+    val isRefreshing = payloads.loadState.refresh is LoadState.Loading
     Box(Modifier.fillMaxSize()) {
-        if(!payloads.loadState.isIdle && payloads.itemCount == 0) {
+        if(isRefreshing) {
             PulsingMessagePlaceholder()
-        } else {
-            if (payloads.itemCount > 0) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    state = listState
-                ) {
-                    items(
-                        count = payloads.itemCount,
-                        key = payloads.itemKey { it.id }
-                    ) { index ->
-                        val message = payloads[index]
-                        message?.let {
-                            val logo = remember(supportedPlatforms, message) {
-                                supportedPlatforms.find { p ->
-                                    p.name == message.payload.platformName }?.icon_png
-                            }
-                            RecentMessageCard(
-                                cat = it.catId,
-                                payload = it.payload,
-                                date = it.date,
-                                logo = logo,
-                                onClickCallback = { clickedMessage ->
-                                    navController.navigate(
-                                        DetailsInterfaceScreen(
-                                            cat = clickedMessage.content.getCatId(),
-                                            messageId = it.id
-                                        )
-                                    )
-                                },
-                            )
+        }
+        if(!isRefreshing && payloads.itemCount == 0) {
+            GetStartedView()
+        }
 
-                            HorizontalDivider(Modifier.padding(start=60.dp, end=32.dp, bottom=18.dp))
-                        }
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            state = listState
+        ) {
+            items(
+                count = payloads.itemCount,
+                key = payloads.itemKey { it.id }
+            ) { index ->
+                val message = payloads[index]
+                message?.let {
+                    val logo = remember(supportedPlatforms, message) {
+                        supportedPlatforms.find { p ->
+                            p.name == message.payload.platformName }?.icon_png
                     }
+                    RecentMessageCard(
+                        cat = it.catId,
+                        payload = it.payload,
+                        date = it.date,
+                        logo = logo,
+                        onClickCallback = { clickedMessage ->
+                            navController.navigate(
+                                DetailsInterfaceScreen(
+                                    cat = clickedMessage.content.getCatId(),
+                                    messageId = it.id
+                                )
+                            )
+                        },
+                    )
+
+                    HorizontalDivider(Modifier.padding(start=60.dp, end=32.dp, bottom=18.dp))
                 }
-            }
-            else {
-                GetStartedView()
             }
         }
 
