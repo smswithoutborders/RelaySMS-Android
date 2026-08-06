@@ -68,12 +68,11 @@ import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.navigation.DetailsInterfaceScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.MetricsScreen
-import com.example.sw0b_001.ui.navigation.OnboardingInteractiveScreen
+import com.example.sw0b_001.ui.navigation.OnboardingViewScreen
 import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
 import com.example.sw0b_001.ui.navigation.RestoreScreen
 import com.example.sw0b_001.ui.navigation.SettingsScreen
 import com.example.sw0b_001.ui.navigation.WelcomeScreen
-import com.example.sw0b_001.ui.onboarding.OnboardingInteractive
 import com.example.sw0b_001.ui.onboarding.OnboardingView
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.BackupRestoreViewModel
@@ -85,6 +84,7 @@ import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.views.AboutView
+import com.example.sw0b_001.ui.views.WelcomeMainView
 import com.example.sw0b_001.ui.views.backupRestore.BackupView
 import com.example.sw0b_001.ui.views.backupRestore.RecoveryView
 import com.example.sw0b_001.ui.views.compose.ComposerInterface
@@ -305,16 +305,20 @@ class MainActivity : BindActivity() {
             }
         ) {
             composable<WelcomeScreen> {
+                WelcomeMainView(navController = navController)
+            }
+
+            composable<OnboardingViewScreen> {
                 OnboardingView(navController = navController)
             }
-            composable<OnboardingInteractiveScreen> {
-                OnboardingInteractive(
-                    navController,
-                    onboardingViewModel,
-                    tokensViewModel = tokensViewModel,
-                    supportedPlatformsViewModel,
-                )
-            }
+//            composable<OnboardingInteractiveScreen> {
+//                OnboardingInteractive(
+//                    navController,
+//                    onboardingViewModel,
+//                    tokensViewModel = tokensViewModel,
+//                    supportedPlatformsViewModel,
+//                )
+//            }
             composable<HomepageScreen> {
                 imageViewModel.reset()
                 payloadsViewModel.reset()
