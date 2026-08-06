@@ -14,15 +14,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.sw0b_001.R
 import com.example.sw0b_001.extensions.context.settingsSetOnboardedCompletely
 import com.example.sw0b_001.ui.components.OnboardingNavigationRow
+import com.example.sw0b_001.ui.components.OnboardingTopBar
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.views.DefaultSmsAppScreen
+import com.example.sw0b_001.ui.views.OnboardingDetailView
 import com.example.sw0b_001.ui.views.WelcomeMainView
 import kotlinx.coroutines.launch
 
-private const val PAGE_COUNT = 2
+private const val PAGE_COUNT = 3
 
 @Composable
 fun OnboardingView(
@@ -32,7 +35,6 @@ fun OnboardingView(
         initialPage = 0,
         pageCount = { PAGE_COUNT }
     )
-
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
@@ -44,20 +46,49 @@ fun OnboardingView(
         }
     }
 
+    fun goToPage(page: Int) {
+        coroutineScope.launch {
+            pagerState.animateScrollToPage(page)
+        }
+    }
+
     Scaffold { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            OnboardingTopBar(
+                currentPage = pagerState.currentPage,
+                onPrevious = {
+                    if (pagerState.currentPage > 0) {
+                        goToPage(pagerState.currentPage - 1)
+                    }
+                },
+                onSkip = {
+                    finishOnboarding()
+                },
+                modifier = Modifier.padding(
+                    horizontal = 36.dp,
+                    vertical = 30.dp
+                )
+            )
+
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.weight(1f),
                 userScrollEnabled = false
             ) { page ->
                 when (page) {
-                    0 -> WelcomeMainView()
-                    1 -> DefaultSmsAppScreen(
+                    0 -> OnboardingDetailView(
+                        imageRes = R.drawable.onboarding1,
+                        description = "RelaySMS no longer asks you to login or register because your privacy matters."
+                    )
+                    1 -> OnboardingDetailView(
+                        imageRes = R.drawable.relay_sms_save_vault,
+                        description = "Save access to your accounts. It's stored securely on your device, so you can send messages as yourself."
+                    )
+                    2 -> DefaultSmsAppScreen(
                         navController = navController
                     )
                 }
@@ -69,16 +100,14 @@ fun OnboardingView(
                 isLastPage = pagerState.currentPage == PAGE_COUNT - 1,
                 onNext = {
                     if (pagerState.currentPage < PAGE_COUNT - 1) {
-                        coroutineScope.launch {
-                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                        }
+                        goToPage(pagerState.currentPage + 1)
                     } else {
                         finishOnboarding()
                     }
                 },
                 modifier = Modifier.padding(
-                    horizontal = 24.dp,
-                    vertical = 20.dp
+                    horizontal = 36.dp,
+                    vertical = 15.dp
                 )
             )
         }
@@ -89,6 +118,8 @@ fun OnboardingView(
 @Composable
 private fun OnboardingViewPreview() {
     AppTheme {
-        OnboardingView(rememberNavController())
+        OnboardingView(
+            rememberNavController()
+        )
     }
 }

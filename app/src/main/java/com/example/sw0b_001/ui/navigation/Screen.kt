@@ -7,7 +7,7 @@ import uniffi.relaysms_spec_payload.V1ContentCategories
 object WelcomeScreen
 
 @Serializable
-object OnboardingInteractiveScreen
+object OnboardingViewScreen
 
 @Serializable
 object HomepageScreen
