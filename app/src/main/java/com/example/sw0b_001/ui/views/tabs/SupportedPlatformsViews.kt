@@ -141,7 +141,7 @@ fun SupportedPlatformsView(
         ) {
             Text(
                 text = if (isCompose) stringResource(R.string.send_new_message)
-                else stringResource(R.string.supported_platforms),
+                else stringResource(R.string.platforms),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center,
