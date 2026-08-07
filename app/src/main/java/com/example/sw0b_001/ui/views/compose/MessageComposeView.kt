@@ -9,6 +9,9 @@ import android.provider.ContactsContract
 import android.telephony.PhoneNumberUtils
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContract
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +22,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -42,6 +46,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sw0b_001.R
@@ -104,89 +109,130 @@ fun MessageComposeView(
             .imePadding()
             .verticalScroll(scrollState)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(
+                    width = 1.dp,
+                    color = if (to.isNotEmpty() && !PhoneNumberUtils.isGlobalPhoneNumber(to))
+                        MaterialTheme.colorScheme.error
+                    else MaterialTheme.colorScheme.outline,
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .padding(horizontal = 16.dp)
         ) {
-            OutlinedTextField(
-                value = to,
-                onValueChange = toCallback,
-                label = { Text(fieldInfo.label, style = MaterialTheme.typography.bodyMedium) },
-                modifier = Modifier.weight(1f),
-                isError = to.isNotEmpty() && !PhoneNumberUtils.isGlobalPhoneNumber(to),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Phone,
-                    imeAction = ImeAction.Next
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BasicTextField(
+                    value = to,
+                    onValueChange = toCallback,
+                    textStyle = TextStyle.Default.copy(
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = 16.sp
+                    ),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Phone,
+                        imeAction = ImeAction.Next
+                    ),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(vertical = 16.dp),
+                    decorationBox = { innerTextField ->
+                        if (to.isEmpty()) {
+                            Text(
+                                text = fieldInfo.label,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        innerTextField()
+                    }
                 )
-            )
 
-            Spacer(modifier = Modifier.width(8.dp))
-            IconButton(onClick = {
-                if(readContactPermissions.status.isGranted) {
-                    launcher.launch(Unit)
-                } else {
-                    readContactPermissions.launchPermissionRequest()
+                IconButton(onClick = {
+                    if (readContactPermissions.status.isGranted) {
+                        launcher.launch(Unit)
+                    } else {
+                        readContactPermissions.launchPermissionRequest()
+                    }
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.Contacts,
+                        contentDescription = stringResource(R.string.select_contact),
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
                 }
-
-            }) {
-                Icon(
-                    imageVector = Icons.Filled.Contacts,
-                    contentDescription = stringResource(R.string.select_contact),
-                    tint = MaterialTheme.colorScheme.primary,
-                )
             }
         }
 
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Text(
-            text = fieldInfo.hint,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
         Spacer(modifier = Modifier.height(16.dp))
 
-        BasicTextField(
-            value = body,
-            onValueChange = { newValue ->
-                bodyCallback(newValue)
-
-                val lines = newValue.lines()
-                val lineCount = lines.size
-
-                val lineHeight = 20.dp
-                val maxVisibleLines = 10
-
-                if (lineCount > maxVisibleLines) {
-                    val scrollOffset = with(density) {
-                        (lineCount - maxVisibleLines) * lineHeight.toPx()
-                    }
-                    coroutineScope.launch {
-                        scrollState.animateScrollTo(scrollOffset.toInt())
-                    }
-                }
-            },
-            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
-            textStyle = TextStyle.Default.copy(
-                color = MaterialTheme.colorScheme.onSurface,
-                fontSize = 16.sp
-            ),
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(),
-            decorationBox = { innerTextField ->
-                if (body.isEmpty()) {
-                    Text(
-                        text = stringResource(R.string.message),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 16.sp
-                    )
+                .height(220.dp)
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outline,
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .padding(16.dp)
+        ) {
+            BasicTextField(
+                value = body,
+                onValueChange = { newValue ->
+                    bodyCallback(newValue)
+
+                    val lines = newValue.lines()
+                    val lineCount = lines.size
+
+                    val lineHeight = 20.dp
+                    val maxVisibleLines = 10
+
+                    if (lineCount > maxVisibleLines) {
+                        val scrollOffset = with(density) {
+                            (lineCount - maxVisibleLines) * lineHeight.toPx()
+                        }
+                        coroutineScope.launch {
+                            scrollState.animateScrollTo(scrollOffset.toInt())
+                        }
+                    }
+                },
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
+                textStyle = TextStyle.Default.copy(
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = 16.sp
+                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+                decorationBox = { innerTextField ->
+                    if (body.isEmpty()) {
+                        Text(
+                            text = stringResource(R.string.message),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp
+                        )
+                    }
+                    innerTextField()
                 }
-                innerTextField()
-            }
-        )
+            )
+        }
     }
 }
+
+
+@Preview(showBackground = true)
+@Composable fun MessageComposePreview() {
+    MessageComposeView(
+        to = "",
+        body = "",
+        toCallback = {},
+        bodyCallback = {}
+    ) }
