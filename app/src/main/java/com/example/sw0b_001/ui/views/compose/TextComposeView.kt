@@ -1,10 +1,15 @@
 package com.example.sw0b_001.ui.views.compose
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
@@ -44,48 +49,62 @@ fun TextComposeView(
             .imePadding()
             .verticalScroll(scrollState)
     ) {
-        BasicTextField(
-            value = body,
-            onValueChange = { newValue ->
-                bodyCallback(newValue)
-
-                val lines = newValue.lines()
-                val lineCount = lines.size
-
-                val lineHeight = 20.dp
-                val maxVisibleLines = 10
-
-                if (lineCount > maxVisibleLines) {
-                    val scrollOffset = with(density) {
-                        (lineCount - maxVisibleLines) * lineHeight.toPx()
-                    }
-                    coroutineScope.launch {
-                        scrollState.animateScrollTo(scrollOffset.toInt())
-                    }
-                }
-            },
-            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
-            textStyle = TextStyle.Default.copy(
-                color = MaterialTheme.colorScheme.onSurface,
-                fontSize = 16.sp
-            ),
+        Row(
             modifier = Modifier
-                .padding(top=16.dp)
+                .padding(top = 16.dp)
                 .fillMaxWidth()
-                .fillMaxHeight(),
-            decorationBox = { innerTextField ->
-                if (body.isEmpty()) {
-                    Text(
-                        text = stringResource(R.string.what_s_happening),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontWeight = FontWeight.Medium,
-                        fontSize = 16.sp
-                    )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(2.dp)
+                    .background(MaterialTheme.colorScheme.primary)
+            )
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            BasicTextField(
+                value = body,
+                onValueChange = { newValue ->
+                    bodyCallback(newValue)
+
+                    val lines = newValue.lines()
+                    val lineCount = lines.size
+
+                    val lineHeight = 20.dp
+                    val maxVisibleLines = 10
+
+                    if (lineCount > maxVisibleLines) {
+                        val scrollOffset = with(density) {
+                            (lineCount - maxVisibleLines) * lineHeight.toPx()
+                        }
+                        coroutineScope.launch {
+                            scrollState.animateScrollTo(scrollOffset.toInt())
+                        }
+                    }
+                },
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
+                textStyle = TextStyle.Default.copy(
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = 16.sp
+                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+                decorationBox = { innerTextField ->
+                    if (body.isEmpty()) {
+                        Text(
+                            text = stringResource(R.string.what_s_happening),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp
+                        )
+                    }
+                    innerTextField()
                 }
-                innerTextField()
-            }
-        )
+            )
+        }
     }
 }
 
