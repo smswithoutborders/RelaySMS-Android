@@ -101,7 +101,7 @@ class RustTest {
     fun test_payloads_without_attachments() {
         val keyId: UByte = 9u // TODO("Encryption ID")
         val tokenId = ByteArray(4) // TODO("Device ID")
-        val catId = V1ContentCategories.BRIDGE
+        val catId = V1ContentCategories.EMAIL
 
         val body = "body"
         val to = "to@example.com"

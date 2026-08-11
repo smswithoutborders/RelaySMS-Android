@@ -11,6 +11,7 @@ object Settings {
     const val FILENAME: String = "com.afkanerd.smswithoutborders.settings"
     const val SETTINGS_NOT_SHOW_CHOOSE_GATEWAY_CLIENT = "SETTINGS_NOT_SHOW_CHOOSE_GATEWAY_CLIENT"
     const val SETTINGS_ONBOARDED_COMPLETELY = "SETTINGS_ONBOARDED_COMPLETELY"
+    const val SETTINGS_SHOW_RMAIL = "SETTINGS_SHOW_RMAIL"
     const val SETTINGS_LOCK_DOWN_APP = "SETTINGS_LOCK_DOWN_APP"
     const val SETTINGS_USE_DEVICE_ID = "SETTINGS_USE_DEVICE_ID"
     const val SETTINGS_STORE_TOKENS_ON_DEVICE = "SETTINGS_STORE_TOKENS_ON_DEVICE"
@@ -73,6 +74,13 @@ val Context.settingsGetOnboardedCompletely get(): Boolean {
         .getBoolean(Settings.SETTINGS_ONBOARDED_COMPLETELY, false)
 }
 
+val Context.hasShownRmailAd get(): Boolean {
+    val sharedPreferences = getSharedPreferences(
+        Settings.FILENAME, Context.MODE_PRIVATE)
+    return sharedPreferences
+        .getBoolean(Settings.SETTINGS_SHOW_RMAIL, false)
+}
+
 val settingsIsLoggedInKey = booleanPreferencesKey("settingsIsLoggedInKey")
 suspend fun Context.settingsSetIsLoggedIn(state: Boolean) {
     relaySmsDatastore.edit { setting ->
@@ -107,9 +115,17 @@ fun Context.settingsSetNotShowChooseGatewayClient(state: Boolean) {
         apply()
     }
 }
+
 fun Context.settingsSetOnboardedCompletely(state: Boolean) {
     getSharedPreferences( Settings.FILENAME, Context.MODE_PRIVATE).edit {
         putBoolean(Settings.SETTINGS_ONBOARDED_COMPLETELY, state)
+        apply()
+    }
+}
+
+fun Context.hasSeenRmailAd(state: Boolean) {
+    getSharedPreferences( Settings.FILENAME, Context.MODE_PRIVATE).edit {
+        putBoolean(Settings.SETTINGS_SHOW_RMAIL, state)
         apply()
     }
 }

@@ -20,7 +20,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -31,14 +33,19 @@ import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
+import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.Payloads
+import com.example.sw0b_001.extensions.context.hasSeenRmailAd
+import com.example.sw0b_001.extensions.context.hasShownRmailAd
 import com.example.sw0b_001.ui.components.PulsingMessagePlaceholder
+import com.example.sw0b_001.ui.components.RmailAlertDialog
 import com.example.sw0b_001.ui.modals.ActivePlatformsModal
+import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.navigation.DetailsInterfaceScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
@@ -47,6 +54,7 @@ import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.views.compose.toUtf8String
 import uniffi.relaysms_spec_payload.V1ContentCategories
 import uniffi.relaysms_spec_payload.V1ContentsContainer
+import uniffi.relaysms_spec_payload.v1ContentCategoryFromU8
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -57,6 +65,11 @@ fun RecentView(
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
     tabRequestedCallback: () -> Unit
 ) {
+    val context = LocalContext.current
+
+    var showRelaySmsAvailable by remember {
+        mutableStateOf(!context.hasShownRmailAd)
+    }
     var sendNewMessageRequested by remember { mutableStateOf(false) }
 
     val payloads = payloadsViewModel.uiPayloads.collectAsLazyPagingItems()
@@ -116,6 +129,33 @@ fun RecentView(
             ) {
                 sendNewMessageRequested = false
             }
+        }
+
+        if (showRelaySmsAvailable) {
+            RmailAlertDialog(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(16.dp),
+                onDismiss = {
+                    showRelaySmsAvailable = false
+                    context.hasSeenRmailAd(true)
+                },
+                onTryItCallback = {
+                    supportedPlatforms.find{ it.name == "rmail" }?.let { rmail ->
+                        navController.navigate(ComposeScreen(
+                            cat = v1ContentCategoryFromU8(rmail.cat_id.toUByte()),
+                            messageId = null,
+                            supportedPlatform = rmail.name,
+                            isOfflineCompose = rmail.supports_offline_first
+                        )) {
+                            popUpTo(HomeScreenNav()) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    }
+                }
+            )
         }
     }
 }

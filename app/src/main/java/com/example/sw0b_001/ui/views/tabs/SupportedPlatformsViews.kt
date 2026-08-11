@@ -20,15 +20,12 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChatBubbleOutline
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -48,16 +45,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.fromHtml
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
@@ -72,7 +66,6 @@ import com.example.sw0b_001.data.models.SupportedPlatforms
 import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.ui.modals.PNBAPhoneNumberCodeRequestView
 import com.example.sw0b_001.ui.modals.PlatformOptionsModal
-import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsUiState
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
@@ -103,9 +96,6 @@ fun SupportedPlatformsView(
     LaunchedEffect(Unit) {
         supportedPlatformsViewModel.fetch()
     }
-    var showRelaySmsAvailable by remember {
-        mutableStateOf(true)
-    }
 
     val inPreviewMode = LocalInspectionMode.current
 
@@ -128,10 +118,8 @@ fun SupportedPlatformsView(
     val supportedPlatforms by supportedPlatformsViewModel.get()
         .collectAsStateWithLifecycle(mutableListOf())
 
-    val scrollState = rememberScrollState()
     Box(
         modifier = Modifier
-            .verticalScroll(scrollState)
             .fillMaxSize()
     ) {
         Column(
@@ -195,31 +183,6 @@ fun SupportedPlatformsView(
             )
         }
 
-        if (showRelaySmsAvailable && supportedPlatforms.isNotEmpty()) {
-            RmailAlertDialog(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(16.dp),
-                onDismiss = {
-                    showRelaySmsAvailable = false
-                },
-                onTryItCallback = {
-                    supportedPlatforms.find{ it.name == "rmail" }?.let { rmail ->
-                        navController.navigate(ComposeScreen(
-                            cat = v1ContentCategoryFromU8(rmail.cat_id.toUByte()),
-                            messageId = null,
-                            supportedPlatform = rmail.name,
-                            isOfflineCompose = rmail.supports_offline_first
-                        )) {
-                            popUpTo(HomeScreenNav()) {
-                                inclusive = true
-                            }
-                            launchSingleTop = true
-                        }
-                    }
-                }
-            )
-        }
     }
 }
 
@@ -427,8 +390,6 @@ private fun PlatformListContentComponent(
                     }
             }
         )
-
-
     }
 }
 
@@ -507,90 +468,6 @@ fun PlatformListRow(
     }
 }
 
-
-@Preview(showBackground = true)
-@Composable
-private fun RmailAlertDialog(
-    modifier: Modifier = Modifier,
-    onDismiss: () -> Unit = {},
-    onTryItCallback: () -> Unit = {}
-) {
-    val context = LocalContext.current
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(15.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                IconButton(
-                    onClick = {
-                        onDismiss()
-                    },
-                    modifier = Modifier.size(28.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Dismiss",
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                stringResource(R.string.you_can_send_a_quick_mail_without_verifying_or_adding_accounts_using_relaysms_mail),
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Button(
-                onClick = onTryItCallback,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally),
-                shape = RoundedCornerShape(14.dp),
-                elevation = ButtonDefaults.buttonElevation(
-                    defaultElevation = 1.dp
-                ),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
-            ) {
-                Text(
-                    text = stringResource(R.string.try_it),
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                )
-            }
-
-            Spacer(Modifier.padding(8.dp))
-            Text(
-                text = AnnotatedString.fromHtml(
-                    ContextCompat.getString(
-                        context,
-                        R.string.you_can_always_find_the_option_when_you_click_compose)),
-                style = MaterialTheme.typography.labelSmall,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
