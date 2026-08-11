@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -91,7 +92,7 @@ fun DefaultSmsAppScreen(
             Spacer(modifier = Modifier.height(40.dp))
 
             Text(
-                text = "Make RelaySMS your default SMS app",
+                text = stringResource(R.string.make_relaysms_your_default_sms_app),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontWeight = FontWeight.Bold,
@@ -103,7 +104,7 @@ fun DefaultSmsAppScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Manage your SMS messages from one place and send images through SMS!",
+                text = stringResource(R.string.manage_your_sms_messages_from_one_place),
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyMedium.copy(
                     lineHeight = 25.sp
@@ -132,7 +133,7 @@ fun DefaultSmsAppScreen(
                     .padding(horizontal = 8.dp)
             ) {
                 Text(
-                    text = "Set as Default SMS App",
+                    text = stringResource(R.string.set_as_default_sms_app),
                     style = MaterialTheme.typography.bodyLarge.copy(
                         fontWeight = FontWeight.SemiBold
                     )

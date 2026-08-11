@@ -54,7 +54,7 @@ fun OnboardingDetailView(
                     .height(220.dp)
             )
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             Text(
                 text = description,

@@ -214,7 +214,8 @@ fun AccountCard(
     Card(
         onClick = onAccountSelected,
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp),
         backgroundColor = backgroundColor,
         shape = shape,
         elevation = 0.dp,
@@ -223,7 +224,7 @@ fun AccountCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             val profileImage = R.drawable.generic_avatar
