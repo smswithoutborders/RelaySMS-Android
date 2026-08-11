@@ -136,7 +136,7 @@
     <string name="countries">Countries</string>
     <string name="settings">Settings</string>
     <string name="permission_denied">Permission Denied!</string>
-    <string name="add_gateway_client">Add Gateway Client</string>
+    <string name="add_routing_numbers">Add Routing Numbers</string>
     <string name="edit_gateway_client">Edit Gateway Client</string>
     <string name="e_g_237123456_or_select_contact">e.g +237123456 or select contact</string>
     <string name="alias_optional">Alias (optional)</string>
