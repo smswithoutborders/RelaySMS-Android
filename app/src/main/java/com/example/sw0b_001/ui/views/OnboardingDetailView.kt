@@ -19,18 +19,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.sw0b_001.R
 import com.example.sw0b_001.ui.theme.AppTheme
 
 @Composable
 fun OnboardingDetailView(
     @DrawableRes imageRes: Int,
-    description: String
+    description: String,
+    useUnboundedFont: Boolean = false
 ) {
     Column(
         modifier = Modifier.fillMaxSize()
@@ -58,13 +57,9 @@ fun OnboardingDetailView(
 
             Text(
                 text = description,
+                style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Medium,
-                    lineHeight = 28.sp
-                ),
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.fillMaxWidth()
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Spacer(modifier = Modifier.weight(1f))

@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -82,14 +83,16 @@ fun OnboardingView(
                 when (page) {
                     0 -> OnboardingDetailView(
                         imageRes = R.drawable.no_account,
-                        description = "RelaySMS no longer asks you to login or register because your privacy matters."
+                        description = stringResource(R.string.onboarding_no_login_description),
+                        useUnboundedFont = true
                     )
                     1 -> OnboardingDetailView(
                         imageRes = R.drawable.relay_sms_save_vault,
-                        description = "Save access to your accounts. It's stored securely on your device, so you can send messages as yourself."
+                        description = stringResource(R.string.onboarding_save_vault_description),
+                        useUnboundedFont = true
                     )
                     2 -> DefaultSmsAppScreen(
-                        navController = navController
+                        navController = navController,
                     )
                 }
             }
