@@ -82,15 +82,17 @@ fun OnboardingView(
             ) { page ->
                 when (page) {
                     0 -> OnboardingDetailView(
-                        imageRes = R.drawable.onboarding1,
+                        imageRes = R.drawable.no_account,
                         description = stringResource(R.string.onboarding_no_login_description),
+                        useUnboundedFont = true
                     )
                     1 -> OnboardingDetailView(
                         imageRes = R.drawable.relay_sms_save_vault,
-                        description = stringResource(R.string.onboarding_save_access_description)
+                        description = stringResource(R.string.onboarding_save_vault_description),
+                        useUnboundedFont = true
                     )
                     2 -> DefaultSmsAppScreen(
-                        navController = navController
+                        navController = navController,
                     )
                 }
             }

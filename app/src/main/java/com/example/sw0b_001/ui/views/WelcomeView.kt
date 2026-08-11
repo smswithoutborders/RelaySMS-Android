@@ -10,13 +10,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -32,7 +30,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,7 +52,6 @@ import androidx.core.net.toUri
 import androidx.navigation.compose.rememberNavController
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getCurrentLocale
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.setLocale
-import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.ui.navigation.OnboardingViewScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 
@@ -132,12 +128,17 @@ fun WelcomeMainView(
                 verticalArrangement = Arrangement.Center ) {
                 Spacer(modifier = Modifier.height(64.dp))
 
-            Text(
-                text = stringResource(R.string.welcome_to_relaysms_),
-                style = MaterialTheme.typography.headlineSmall,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+
+                Text(
+                    text = stringResource(R.string.welcome_to_relaysms_),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.headlineSmall.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        letterSpacing = (-0.2).sp
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
 
             Spacer(modifier = Modifier.height(25.dp))
 
