@@ -128,8 +128,11 @@ fun SupportedPlatformsView(
     val supportedPlatforms by supportedPlatformsViewModel.get()
         .collectAsStateWithLifecycle(mutableListOf())
 
+    val scrollState = rememberScrollState()
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .verticalScroll(scrollState)
+            .fillMaxSize()
     ) {
         Column(
             modifier = Modifier
