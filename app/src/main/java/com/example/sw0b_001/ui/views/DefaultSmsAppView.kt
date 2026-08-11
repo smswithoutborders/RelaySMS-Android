@@ -81,7 +81,7 @@ fun DefaultSmsAppScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
-                        painter = painterResource(R.drawable.onboarding2),
+                        painter = painterResource(R.drawable.attachments),
                         contentDescription = null,
                         modifier = Modifier.size(200.dp)
                     )

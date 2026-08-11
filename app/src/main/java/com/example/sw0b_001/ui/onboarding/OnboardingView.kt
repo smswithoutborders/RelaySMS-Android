@@ -81,7 +81,7 @@ fun OnboardingView(
             ) { page ->
                 when (page) {
                     0 -> OnboardingDetailView(
-                        imageRes = R.drawable.onboarding1,
+                        imageRes = R.drawable.no_account,
                         description = "RelaySMS no longer asks you to login or register because your privacy matters."
                     )
                     1 -> OnboardingDetailView(
