@@ -207,7 +207,7 @@ fun GatewayClientCard(
 
                 IconButton(onClick = editCallback ) {
                     Icon(Icons.Default.ModeEdit,
-                        stringResource(R.string.edit_gateway_client)
+                        stringResource(R.string.edit_routing_numbers)
                     )
                 }
 

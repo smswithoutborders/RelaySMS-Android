@@ -227,15 +227,15 @@ fun SettingsView(
                 color = MaterialTheme.colorScheme.secondary,
             )
 
-            SettingsItem(
-                itemTitle = stringResource(R.string.send_messages_with_device_id),
-                itemDescription = stringResource(R.string.device_id_lets_you_send_messages_without_using_your_actual_phone_number_for_authentication_this_works_well_for_dual_sim_phones),
-                checked = useDeviceId,
-                enabled = !isEmailLogin && !isLoading,
-            ) {
-                context.settingsSetUseDeviceId(it ?: true)
-                useDeviceId = it ?: true
-            }
+//            SettingsItem(
+//                itemTitle = stringResource(R.string.send_messages_with_device_id),
+//                itemDescription = stringResource(R.string.device_id_lets_you_send_messages_without_using_your_actual_phone_number_for_authentication_this_works_well_for_dual_sim_phones),
+//                checked = useDeviceId,
+//                enabled = !isEmailLogin && !isLoading,
+//            ) {
+//                context.settingsSetUseDeviceId(it ?: true)
+//                useDeviceId = it ?: true
+//            }
 
             Spacer(Modifier.padding(8.dp))
 

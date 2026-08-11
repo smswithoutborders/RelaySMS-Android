@@ -83,7 +83,6 @@
     <string name="settings">Ayarlar</string>
     <string name="permission_denied">İzin Reddedildi!</string>
     <string name="add_gateway_client">Ağ Geçidi İstemcisi Ekle</string>
-    <string name="edit_gateway_client">Ağ Geçidi İstemcisini Düzenle</string>
     <string name="e_g_237123456_or_select_contact">örn. +237123456 veya bir kişi seçin</string>
     <string name="alias_optional">Takma ad (isteğe bağlı)</string>
     <string name="name_to_help_remember_the_gateway_client">Ağ Geçidi İstemcisini hatırlamaya yardımcı olacak ad</string>

@@ -86,7 +86,6 @@
     <string name="settings">सेटिंग्स</string>
     <string name="permission_denied">अनुमति अस्वीकृत!</string>
     <string name="add_gateway_client">गेटवे क्लाइंट जोड़ें</string>
-    <string name="edit_gateway_client">गेटवे क्लाइंट संपादित करें</string>
     <string name="e_g_237123456_or_select_contact">जैसे +237123456 या संपर्क चुनें</string>
     <string name="alias_optional">उपनाम (वैकल्पिक)</string>
     <string name="name_to_help_remember_the_gateway_client">गेटवे क्लाइंट को याद रखने में मदद करने के लिए नाम</string>

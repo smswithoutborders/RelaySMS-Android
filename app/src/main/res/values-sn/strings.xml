@@ -121,7 +121,8 @@
     <string name="countries">Nyika</string>
     <string name="settings">Zvirongwa</string>
     <string name="permission_denied">Mvumo Yarambwa!</string>
-    <string name="add_gateway_client">Wedzera Mushandisi weGedhi</string> <string name="edit_gateway_client">Gadzirisa Mushandisi weGedhi</string> <string name="e_g_237123456_or_select_contact">sekuti +237123456 kana sarudza waunotumira</string>
+    <string name="add_gateway_client">Wedzera Mushandisi weGedhi</string>
+    <string name="e_g_237123456_or_select_contact">sekuti +237123456 kana sarudza waunotumira</string>
     <string name="alias_optional">Zita rekunyepedzera (zvisiri zvekumanikidza)</string>
     <string name="name_to_help_remember_the_gateway_client">Zita rekubatsira kuyeuka Mushandisi weGedhi</string> <string name="saving">Kuchengeta…</string>
     <string name="save">Chengeta</string>

@@ -139,8 +139,8 @@ fun AddGatewayClientModal(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = if (gatewayClients == null) stringResource(R.string.add_gateway_client) else stringResource(
-                        R.string.edit_gateway_client
+                    text = if (gatewayClients == null) stringResource(R.string.add_routing_numbers) else stringResource(
+                        R.string.edit_routing_numbers
                     ),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,

@@ -83,7 +83,6 @@
     <string name="settings">Mipangilio</string>
     <string name="permission_denied">Ruhusa Imekataliwa!</string>
     <string name="add_gateway_client">Ongeza Mteja wa Lango</string>
-    <string name="edit_gateway_client">Hariri Mteja wa Lango</string>
     <string name="e_g_237123456_or_select_contact">mf. +237123456 au chagua anwani</string>
     <string name="alias_optional">Jina bandia (hiari)</string>
     <string name="name_to_help_remember_the_gateway_client">Jina la kusaidia kukumbuka Mteja wa Lango</string>

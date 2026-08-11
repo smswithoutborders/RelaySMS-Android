@@ -82,7 +82,6 @@
     <string name="settings">Einstellungen</string>
     <string name="permission_denied">Berechtigung verweigert!</string>
     <string name="add_gateway_client">Gateway-Client hinzufügen</string>
-    <string name="edit_gateway_client">Gateway-Client bearbeiten</string>
     <string name="e_g_237123456_or_select_contact">z. B. +237123456 oder Kontakt auswählen</string>
     <string name="alias_optional">Alias (optional)</string>
     <string name="name_to_help_remember_the_gateway_client">Name zur Erinnerung an den Gateway-Client</string>

@@ -84,7 +84,6 @@
     <string name="settings">الإعدادات</string>
     <string name="permission_denied">تم رفض الإذن!</string>
     <string name="add_gateway_client">إضافة عميل البوابة</string>
-    <string name="edit_gateway_client">تحرير عميل البوابة</string>
     <string name="e_g_237123456_or_select_contact">على سبيل المثال +237123456 أو حدد جهة اتصال</string>
     <string name="alias_optional">الاسم المستعار (اختياري)</string>
     <string name="name_to_help_remember_the_gateway_client">اسم للمساعدة في تذكر عميل البوابة</string>
@@ -100,6 +99,7 @@
     <string name="add_account">إضافة حساب</string>
     <string name="remove_accounts">إزالة الحسابات</string>
     <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported">تتيح لك إضافة رسائل بريد إلكتروني إلى حساب RelaySMS الخاص بك استخدامها لإرسال رسائل بريد إلكتروني باستخدام رسائل SMS.\n\nGmail مدعوم حاليًا.</string>
+    <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging__are_currently_supported">تتيح لك إضافة عناوين البريد الإلكتروني إلى حساب RelaySMS الخاص بك استخدامها لإرسال رسائل البريد الإلكتروني باستخدام الرسائل النصية القصيرة (SMS).</string>
     <string name="adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported">تتيح لك إضافة أرقام إلى حساب RelaySMS الخاص بك استخدامها لإرسال رسائل باستخدام رسائل SMS.\n\nمراسلة Telegram مدعومة حاليًا.</string>
     <string name="adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported">تتيح لك إضافة حسابات إلى حساب RelaySMS الخاص بك استخدامها لإنشاء منشور باستخدام رسائل SMS.\n\nالنشر مدعوم حاليًا.</string>
     <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias">حساب RelaySMS الخاص بك هو اسم مستعار لرقم هاتفك مع النطاق @relaysms.me.\n\nيمكنك تلقي الردود عبر الرسائل القصيرة عندما يتم إرسال رسالة إلى اسمك المستعار.</string>
@@ -135,6 +135,7 @@
     <string name="create_your_account_and">إنشاء حسابك و</string>
     <string name="save_platforms">حفظ المنصات</string>
     <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline">لـ RelaySMS لإرسال رسائل إلى Gmail و X و Telegram نيابة عنك عندما تكون غير متصل بالإنترنت</string>
+    <string name="for_relaysms_to_send_messages_to__x_and_telegram_on_your_behalf_when_offline">لتمكين RelaySMS من إرسال الرسائل إلى Gmail وX وTelegram نيابةً عنك عند عدم الاتصال بالإنترنت</string>
     <string name="i_have_read_the">لقد قرأت</string>
     <string name="privacy_policy">سياسةالخصوصية</string>
     <string name="log_in">تسجيل الدخول</string>

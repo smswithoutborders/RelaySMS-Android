@@ -83,7 +83,6 @@
     <string name="settings">تنظیمات</string>
     <string name="permission_denied">مجوز رد شد!</string>
     <string name="add_gateway_client">افزودن مشتری دروازه</string>
-    <string name="edit_gateway_client">ویرایش مشتری دروازه</string>
     <string name="e_g_237123456_or_select_contact">به عنوان مثال +237123456 یا انتخاب مخاطب</string>
     <string name="alias_optional">نام مستعار (اختیاری)</string>
     <string name="name_to_help_remember_the_gateway_client">نام برای کمک به یادآوری مشتری دروازه</string>

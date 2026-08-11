@@ -83,8 +83,7 @@
     <string name="settings">Paramètres</string>
     <string name="permission_denied">Autorisation refusée !</string>
     <string name="add_gateway_client">Ajouter un client de passerelle</string>
-    <string name="add_routing_numbers">Ajouter les numéros de routage</string>
-    <string name="edit_gateway_client">Modifier le client de la passerelle</string>
+    <string name="edit_routing_numbers">Modifier les numéros de routage</string>
     <string name="e_g_237123456_or_select_contact">par ex. +237123456 ou sélectionner un contact</string>
     <string name="alias_optional">Alias (facultatif)</string>
     <string name="name_to_help_remember_the_gateway_client">Nom pour aider à se souvenir du client de la passerelle</string>
@@ -482,4 +481,5 @@
     <string name="always_available_no_setup_required">Toujours disponible - Aucune installation requise.</string>
     <string name="this_lets_the_app_manage_the_sending_requirements_for_you">Cela permet à l\'application de gérer les exigences d\'envoi pour vous.</string>
     <string name="onboarding_save_vault_description">Enregistrez l\'accès à vos comptes. Il est stocké en toute sécurité sur votre appareil, vous permettant ainsi d\'envoyer des messages en votre nom propre.</string>
+    <string name="add_routing_numbers">Ajouter les numéros de routage</string>
 </resources>

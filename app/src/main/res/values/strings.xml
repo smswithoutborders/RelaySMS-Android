@@ -104,7 +104,7 @@
     <string name="lock_screen_relay_sms_is_locked">RelaySMS App is locked</string>
     <string name="lock_screen_unlock_with_your_phone_s_locking_system">Unlock with your phone\'s locking system</string>
     <string name="gateway_client_add_custom_example_text">e.g +237123456789 or select contact</string>
-    <string name="gateway_client_add_gateway_client_text">Add Gateway Client</string>
+    <string name="gateway_client_add_gateway_client_text">Add Gateway Client text</string>
     <string name="otp_verification_code_template" translatable="false">Your SMSWithoutBorders-Auth verification code is: </string>
 
     <string name="logout_you_have_no_accounts_logged_into_vaults_at_this_time">You have no accounts logged into Vaults at this time</string>
@@ -136,8 +136,7 @@
     <string name="countries">Countries</string>
     <string name="settings">Settings</string>
     <string name="permission_denied">Permission Denied!</string>
-    <string name="add_gateway_client">Add Gateway Client</string>
-    <string name="edit_gateway_client">Edit Gateway Client</string>
+    <string name="edit_routing_numbers">Edit Routing Numbers</string>
     <string name="e_g_237123456_or_select_contact">e.g +237123456 or select contact</string>
     <string name="alias_optional">Alias (optional)</string>
     <string name="name_to_help_remember_the_gateway_client">Name to help remember the Gateway Client</string>
@@ -547,5 +546,6 @@
     <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">When adding accounts for platforms that use OAuth2.0 (e.g., Gmail, X), enabling this option ensures that your access tokens are stored on your current device instead.</string>
     <string name="onboarding_save_vault_description">Save access to your accounts. It\'s stored securely on your device, so you can send messages as yourself.</string>
     <string name="add_gateway_client">Add a gateway client</string>
+    <string name="add_routing_numbers">Add Routing Numbers</string>
 
 </resources>

@@ -85,7 +85,6 @@
     <string name="settings">설정</string>
     <string name="permission_denied">권한이 거부되었습니다!</string>
     <string name="add_gateway_client">게이트웨이 클라이언트 추가</string>
-    <string name="edit_gateway_client">게이트웨이 클라이언트 편집</string>
     <string name="e_g_237123456_or_select_contact">예: +237123456 또는 연락처 선택</string>
     <string name="alias_optional">별칭 (선택 사항)</string>
     <string name="name_to_help_remember_the_gateway_client">게이트웨이 클라이언트를 기억하는 데 도움이 되는 이름</string>

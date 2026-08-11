@@ -86,7 +86,6 @@
     <string name="settings">设置</string>
     <string name="permission_denied">权限被拒绝！</string>
     <string name="add_gateway_client">添加网关客户端</string>
-    <string name="edit_gateway_client">编辑网关客户端</string>
     <string name="e_g_237123456_or_select_contact">例如 +237123456 或选择联系人</string>
     <string name="alias_optional">别名 (可选)</string>
     <string name="name_to_help_remember_the_gateway_client">用于帮助记住网关客户端的名称</string>
@@ -102,6 +101,7 @@
     <string name="add_account">添加帐户</string>
     <string name="remove_accounts">移除帐户</string>
     <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported">将电子邮件添加到您的 RelaySMS 帐户后，您可以使用它们通过短信发送电子邮件。\n\n目前支持 Gmail。</string>
+    <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging__are_currently_supported">将电子邮件地址添加到您的 RelaySMS 帐户后，您就可以使用短信功能发送电子邮件。</string>
     <string name="adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported">将号码添加到您的 RelaySMS 帐户后，您可以使用它们通过短信发送消息。\n\n目前支持 Telegram 消息。</string>
     <string name="adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported">将帐户添加到您的 RelaySMS 帐户后，您可以使用它们通过短信发帖。\n\n目前支持发帖功能。</string>
     <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias">您的 RelaySMS 帐户是您电话号码的别名，域名为 @relaysms.me。\n\n当消息发送到您的别名时，您可以通过短信接收回复。</string>
@@ -137,6 +137,7 @@
     <string name="create_your_account_and">创建您的帐户并</string>
     <string name="save_platforms">保存平台</string>
     <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline">以便 RelaySMS 在您离线时代表您向 Gmail、X 和 Telegram 发送消息</string>
+    <string name="for_relaysms_to_send_messages_to__x_and_telegram_on_your_behalf_when_offline">离线时，RelaySMS 可以代表您向 Gmail、X 和 Telegram 发送消息。</string>
     <string name="i_have_read_the">我已阅读</string>
     <string name="privacy_policy">隐私政策</string>
     <string name="log_in">登录</string>

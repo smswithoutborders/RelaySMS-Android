@@ -83,7 +83,6 @@
     <string name="settings">Configuración</string>
     <string name="permission_denied">¡Permiso denegado!</string>
     <string name="add_gateway_client">Agregar cliente de puerta de enlace</string>
-    <string name="edit_gateway_client">Editar cliente de puerta de enlace</string>
     <string name="e_g_237123456_or_select_contact">p. ej. +237123456 o seleccionar contacto</string>
     <string name="alias_optional">Alias (opcional)</string>
     <string name="name_to_help_remember_the_gateway_client">Nombre para ayudar a recordar el cliente de la puerta de enlace</string>
