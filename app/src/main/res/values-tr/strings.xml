@@ -83,6 +83,7 @@
     <string name="settings">Ayarlar</string>
     <string name="permission_denied">İzin Reddedildi!</string>
     <string name="add_gateway_client">Ağ Geçidi İstemcisi Ekle</string>
+    <string name="add_routing_numbers">Yönlendirme Numaraları Ekle</string>
     <string name="edit_gateway_client">Ağ Geçidi İstemcisini Düzenle</string>
     <string name="e_g_237123456_or_select_contact">örn. +237123456 veya bir kişi seçin</string>
     <string name="alias_optional">Takma ad (isteğe bağlı)</string>
@@ -98,7 +99,14 @@
     <string name="send_message">Mesaj Gönder</string>
     <string name="add_account">Hesap Ekle</string>
     <string name="remove_accounts">Hesapları Kaldır</string>
+    <string name="make_relaysms_your_default_sms_app">RelaySMS\'i varsayılan SMS uygulamanız yapın.</string>
+    <string name="manage_your_sms_messages_from_one_place">SMS mesajlarınızı tek bir yerden yönetin ve SMS yoluyla resim gönderin!</string>
+    <string name="previous">Öncesi</string>
+    <string name="awesome_">Mükemmel!</string>
+    <string name="got_it_">Anladım!</string>
+    <string name="done_">Tamamlamak!</string>
     <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported">RelaySMS hesabınıza e-posta eklemek, bunları SMS mesajlaşmasını kullanarak e-posta göndermek için kullanmanızı sağlar.\n\nŞu anda Gmail desteklenmektedir.</string>
+    <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging__are_currently_supported">RelaySMS hesabınıza e-posta adresleri eklemek, bu adresleri kullanarak SMS mesajlaşma yoluyla e-posta göndermenizi sağlar.</string>
     <string name="adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported">RelaySMS hesabınıza numara eklemek, bunları SMS mesajlaşmasını kullanarak mesaj göndermek için kullanmanızı sağlar.\n\nŞu anda Telegram mesajlaşması desteklenmektedir.</string>
     <string name="adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported">RelaySMS hesabınıza hesap eklemek, bunları SMS mesajlaşmasını kullanarak gönderi oluşturmak için kullanmanızı sağlar.\n\nŞu anda gönderi oluşturma desteklenmektedir.</string>
     <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias">RelaySMS hesabınız, @relaysms.me alan adıyla telefon numaranızın bir takma adıdır.\n\nTakma adınıza bir mesaj gönderildiğinde SMS ile yanıt alabilirsiniz.</string>
@@ -136,6 +144,7 @@
     <string name="create_your_account_and">Hesabınızı oluşturun ve</string>
     <string name="save_platforms">platformları kaydedin</string>
     <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline">RelaySMS\'in çevrimdışıyken sizin adınıza Gmail, X ve Telegram\'a mesaj göndermesi için</string>
+    <string name="for_relaysms_to_send_messages_to__x_and_telegram_on_your_behalf_when_offline">RelaySMS\'in çevrimdışı olduğunuzda sizin adınıza Gmail, X ve Telegram\'a mesaj göndermesi için kullanılır.</string>
     <string name="i_have_read_the">Okudum</string>
     <string name="privacy_policy">gizlilik politikası</string>
     <string name="log_in">Giriş yap</string>
@@ -149,6 +158,7 @@
     <string name="log_into_relaysms">RelaySMS\'e Giriş Yap</string>
     <string name="log_into_your_account_and">Hesabınıza giriş yapın ve</string>
     <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline_">RelaySMS\'in çevrimdışıyken sizin adınıza Gmail, X ve Telegram\'a mesaj göndermesi için</string>
+    <string name="for_relaysms_to_send_messages_to__x_and_telegram_on_your_behalf_when_offline_">RelaySMS\'in çevrimdışı olduğunuzda sizin adınıza Gmail, X ve Telegram\'a mesaj göndermesi için kullanılır.</string>
     <string name="already_got_code">Zaten kod aldım</string>
     <string name="do_not_have_an_account">Hesabınız yok mu?</string>
     <string name="get_started_with">Şununla başlayın</string>
@@ -264,6 +274,7 @@
     <string name="store_tokens_on_device">Tokenları Cihazda Sakla</string>
     <string name="storing_platform_accounts">Platform Hesapları Saklanıyor</string>
     <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">OAuth2.0 (örneğin Gmail, X) kullanan platformlar için hesap eklerken, bunu etkinleştirmek erişim tokenlarınızın bunun yerine mevcut cihazınızda saklanmasını sağlar.</string>
+    <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g__x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">OAuth2.0 kullanan platformlar için hesap eklerken bu özelliği etkinleştirmek, erişim belirteçlerinizin mevcut cihazınızda saklanmasını sağlar.</string>
     <string name="stored_tokens_detected_title">Kaydedilmiş Jetonlar Algılandı</string>
     <string name="stored_tokens_dialog_message_part1">Bu hesap için kaydedilmiş jetonlar</string>
     <string name="stored_tokens_dialog_message_part2"> algılandı. Kayıtlı jetonlarınızı kullanarak X platformunda</string>
@@ -391,5 +402,26 @@
     <string name="optional">(İsteğe bağlı)</string>
     <string name="email">E-posta</string>
     <string name="phone_number1">Telefon numarası</string>
+    <string name="platform_image">Platform görüntüsü</string>
+    <string name="backup">Yedekleme</string>
+    <string name="restore">Eski haline getirmek</string>
+    <string name="on_device_backups">Cihaz içi yedeklemeler</string>
+    <string name="backups_are_encrypted_with_a_passphrase_and_stored_on_your_device">Yedeklemeler bir parola ile şifrelenir ve cihazınızda saklanır.</string>
+    <string name="backup_now">Şimdi yedekle</string>
+    <string name="your_recovery_key">Kurtarma Anahtarınız</string>
+    <string name="your_recovery_key_is_a_64_character_code_that_you_will_need_to_restore_your_backup">Yedeklemenizi geri yüklemek için ihtiyacınız olacak kurtarma anahtarınız 64 karakterlik bir koddur.</string>
+    <string name="store_your_recovery_key_somewhere_safe_like_a_secure_password_manager_and_don_t_share_it_with_anyone">Kurtarma anahtarınızı güvenli bir parola yöneticisi gibi güvenli bir yerde saklayın ve kimseyle paylaşmayın.</string>
+    <string name="if_you_lose_it_you_won_t_be_able_to_recover_your_messages">Kaybederseniz mesajlarınızı kurtaramazsınız.</string>
+    <string name="view_recovery_key">Kurtarma anahtarını görüntüle</string>
+    <string name="record_your_recovery_key">Kurtarma anahtarınızı kaydedin.</string>
+    <string name="this_key_is_required_to_recover_your_saved_accounts_and_data_store_this_key_somewhere_safe_if_you_lose_it_you_won_t_be_able_to_recover_your_saved_accounts">Kaydedilmiş hesaplarınızı ve verilerinizi kurtarmak için bu anahtar gereklidir. Bu anahtarı güvenli bir yerde saklayın. Kaybederseniz, kaydedilmiş hesabınızı kurtaramazsınız.</string>
+    <string name="copy_to_clipboard">Panoya kopyala</string>
+    <string name="save_to_password_manager">Parola yöneticisine kaydet</string>
+    <string name="reset">Sıfırla</string>
+    <string name="reset_removes_all_your_stored_tokens_both_locally_and_on_the_cloud_this_is_what_a_complete_delete_would_look_like_if_there_were_traditional_accounts_you_can_add_more_at_anytime">Sıfırlama işlemi, hem yerel olarak hem de bulutta saklanan tüm token\'larınızı siler. Geleneksel hesaplar olsaydı, tam bir silme işlemi böyle görünürdü. İstediğiniz zaman daha fazla token ekleyebilirsiniz.</string>
+    <string name="restore_backup">Yedeklemeyi geri yükle</string>
+    <string name="enter_your_recovery_key">Kurtarma anahtarınızı girin.</string>
+    <string name="your_recovery_key_is_a_64_character_code_required_to_recover_your_data">Veri kurtarma anahtarınız, verilerinizi kurtarmak için gereken 64 karakterlik bir koddur.</string>
+    <string name="recovery_key">Kurtarma anahtarı</string>
 
 </resources>

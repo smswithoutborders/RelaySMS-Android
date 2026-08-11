@@ -83,6 +83,7 @@
     <string name="settings">Configuración</string>
     <string name="permission_denied">¡Permiso denegado!</string>
     <string name="add_gateway_client">Agregar cliente de puerta de enlace</string>
+    <string name="add_routing_numbers">Agregar números de ruta</string>
     <string name="edit_gateway_client">Editar cliente de puerta de enlace</string>
     <string name="e_g_237123456_or_select_contact">p. ej. +237123456 o seleccionar contacto</string>
     <string name="alias_optional">Alias (opcional)</string>
@@ -98,7 +99,14 @@
     <string name="send_message">Enviar mensaje</string>
     <string name="add_account">Agregar cuenta</string>
     <string name="remove_accounts">Eliminar cuentas</string>
+    <string name="make_relaysms_your_default_sms_app">Establece RelaySMS como tu aplicación de SMS predeterminada.</string>
+    <string name="manage_your_sms_messages_from_one_place">¡Gestiona tus mensajes SMS desde un solo lugar y envía imágenes por SMS!</string>
+    <string name="previous">Previa</string>
+    <string name="awesome_">¡Impresionante!</string>
+    <string name="got_it_">¡Entiendo!</string>
+    <string name="done_">¡Hecho!</string>
     <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported">Agregar correos electrónicos a su cuenta RelaySMS le permite usarlos para enviar correos electrónicos mediante mensajería SMS.\n\nActualmente se admite Gmail.</string>
+    <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging__are_currently_supported">Agregar direcciones de correo electrónico a tu cuenta de RelaySMS te permite utilizarlas para enviar correos electrónicos mediante mensajes SMS.</string>
     <string name="adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported">Agregar números a su cuenta RelaySMS le permite usarlos para enviar mensajes mediante mensajería SMS.\n\nActualmente se admite la mensajería de Telegram.</string>
     <string name="adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported">Agregar cuentas a su cuenta RelaySMS le permite usarlas para publicar mensajes mediante mensajería SMS.\n\nActualmente se admite la publicación.</string>
     <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias">Su cuenta RelaySMS es un alias de su número de teléfono con el dominio @relaysms.me.\n\nPuede recibir respuestas por SMS cada vez que se envíe un mensaje a su alias.</string>
@@ -134,6 +142,7 @@
     <string name="create_your_account_and">Crea tu cuenta y</string>
     <string name="save_platforms">guardar plataformas</string>
     <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline">para que RelaySMS envíe mensajes a Gmail, X y Telegram en su nombre cuando esté sin conexión</string>
+    <string name="for_relaysms_to_send_messages_to__x_and_telegram_on_your_behalf_when_offline">para que RelaySMS envíe mensajes a Gmail, X y Telegram en tu nombre cuando estés sin conexión.</string>
     <string name="i_have_read_the">He leído la</string>
     <string name="privacy_policy">política de privacidad</string>
     <string name="log_in">Iniciar sesión</string>
@@ -147,6 +156,7 @@
     <string name="log_into_relaysms">Iniciar sesión en RelaySMS</string>
     <string name="log_into_your_account_and">Inicie sesión en su cuenta y</string>
     <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline_">para que RelaySMS envíe mensajes a Gmail,X y Telegram en su nombre cuando esté sin conexión</string>
+    <string name="for_relaysms_to_send_messages_to__x_and_telegram_on_your_behalf_when_offline_">para que RelaySMS envíe mensajes a Gmail, X y Telegram en tu nombre cuando estés sin conexión.</string>
     <string name="already_got_code">Ya tengo el código</string>
     <string name="do_not_have_an_account">¿No tienes una cuenta?</string>
     <string name="get_started_with">Comenzar con</string>
@@ -262,6 +272,7 @@
     <string name="store_tokens_on_device">Almacenar tokens en el dispositivo</string>
     <string name="storing_platform_accounts">Almacenando cuentas de plataforma</string>
     <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">Al agregar cuentas para plataformas que utilizan OAuth2.0 (por ejemplo, Gmail, X), habilitar esto asegura que sus tokens de acceso se almacenen en su dispositivo actual en su lugar.</string>
+    <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g__x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">Al agregar cuentas para plataformas que utilizan OAuth2.0, habilitar esta opción garantiza que sus tokens de acceso se almacenen en su dispositivo actual.</string>
     <string name="stored_tokens_detected_title">Tokens almacenados detectados</string>
     <string name="stored_tokens_dialog_message_part1">Se han detectado tokens almacenados para esta cuenta</string>
     <string name="stored_tokens_dialog_message_part2">. Puedes usar tus tokens almacenados para hacer una publicación en X</string>
@@ -389,5 +400,26 @@
     <string name="optional">(Opcional)</string>
     <string name="email">Correo electrónico</string>
     <string name="phone_number1">Número de teléfono</string>
+    <string name="platform_image">Imagen de la plataforma</string>
+    <string name="backup">Respaldo</string>
+    <string name="restore">Restaurar</string>
+    <string name="on_device_backups">Copias de seguridad en el dispositivo</string>
+    <string name="backups_are_encrypted_with_a_passphrase_and_stored_on_your_device">Las copias de seguridad están cifradas con una contraseña y se almacenan en su dispositivo.</string>
+    <string name="backup_now">Copia de seguridad ahora</string>
+    <string name="your_recovery_key">Tu clave de recuperación</string>
+    <string name="your_recovery_key_is_a_64_character_code_that_you_will_need_to_restore_your_backup">Tu clave de recuperación es un código de 64 caracteres que necesitarás para restaurar tu copia de seguridad.</string>
+    <string name="store_your_recovery_key_somewhere_safe_like_a_secure_password_manager_and_don_t_share_it_with_anyone">Guarda tu clave de recuperación en un lugar seguro, como un gestor de contraseñas seguro, y no la compartas con nadie.</string>
+    <string name="if_you_lose_it_you_won_t_be_able_to_recover_your_messages">Si lo pierdes, no podrás recuperar tus mensajes.</string>
+    <string name="view_recovery_key">Ver clave de recuperación</string>
+    <string name="record_your_recovery_key">Anota tu clave de recuperación</string>
+    <string name="this_key_is_required_to_recover_your_saved_accounts_and_data_store_this_key_somewhere_safe_if_you_lose_it_you_won_t_be_able_to_recover_your_saved_accounts">Esta clave es necesaria para recuperar tus cuentas y datos guardados. Guárdala en un lugar seguro. Si la pierdes, no podrás recuperar tu cuenta.</string>
+    <string name="copy_to_clipboard">Copiar al portapapeles</string>
+    <string name="save_to_password_manager">Guardar en el gestor de contraseñas</string>
+    <string name="reset">Reiniciar</string>
+    <string name="reset_removes_all_your_stored_tokens_both_locally_and_on_the_cloud_this_is_what_a_complete_delete_would_look_like_if_there_were_traditional_accounts_you_can_add_more_at_anytime">El restablecimiento elimina todos tus tokens almacenados, tanto localmente como en la nube. Así es como se vería una eliminación completa, si hubiera cuentas tradicionales. Puedes agregar más en cualquier momento.</string>
+    <string name="restore_backup">Restaurar copia de seguridad</string>
+    <string name="enter_your_recovery_key">Introduzca su clave de recuperación</string>
+    <string name="your_recovery_key_is_a_64_character_code_required_to_recover_your_data">Su clave de recuperación es un código de 64 caracteres necesario para recuperar sus datos.</string>
+    <string name="recovery_key">Clave de recuperación</string>
 
 </resources>

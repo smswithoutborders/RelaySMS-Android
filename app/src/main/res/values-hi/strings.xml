@@ -86,6 +86,7 @@
     <string name="settings">सेटिंग्स</string>
     <string name="permission_denied">अनुमति अस्वीकृत!</string>
     <string name="add_gateway_client">गेटवे क्लाइंट जोड़ें</string>
+    <string name="add_routing_numbers">रूटिंग नंबर जोड़ें</string>
     <string name="edit_gateway_client">गेटवे क्लाइंट संपादित करें</string>
     <string name="e_g_237123456_or_select_contact">जैसे +237123456 या संपर्क चुनें</string>
     <string name="alias_optional">उपनाम (वैकल्पिक)</string>
@@ -101,7 +102,14 @@
     <string name="send_message">संदेश भेजें</string>
     <string name="add_account">खाता जोड़ें</string>
     <string name="remove_accounts">खाते हटाएं</string>
+    <string name="make_relaysms_your_default_sms_app">RelaySMS को अपना डिफ़ॉल्ट SMS ऐप बनाएं</string>
+    <string name="manage_your_sms_messages_from_one_place">अपने SMS मैसेज एक ही जगह से मैनेज करें और SMS से इमेज भेजें!</string>
+    <string name="previous">पहले का</string>
+    <string name="awesome_">बहुत बढ़िया!</string>
+    <string name="got_it_">समझ गया!</string>
+    <string name="done_">हो गया!</string>
     <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported">अपने RelaySMS खाते में ईमेल जोड़ने से आप SMS मैसेजिंग का उपयोग करके ईमेल भेज सकते हैं।\n\nGmail वर्तमान में समर्थित है।</string>
+    <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging__are_currently_supported">अपने RelaySMS अकाउंट में ईमेल जोड़ने से आप SMS मैसेजिंग का इस्तेमाल करके ईमेल भेज सकते हैं।</string>
     <string name="adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported">अपने RelaySMS खाते में नंबर जोड़ने से आप SMS मैसेजिंग का उपयोग करके संदेश भेज सकते हैं।\n\nTelegram मैसेजिंग वर्तमान में समर्थित है।</string>
     <string name="adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported">अपने RelaySMS खाते में खाते जोड़ने से आप SMS मैसेजिंग का उपयोग करके पोस्ट कर सकते हैं।\n\nपोस्टिंग वर्तमान में समर्थित है।</string>
     <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias">आपका RelaySMS खाता @relaysms.me डोमेन के साथ आपके फ़ोन नंबर का एक उपनाम है।\n\nजब भी आपके उपनाम पर कोई संदेश भेजा जाता है तो आप SMS द्वारा उत्तर प्राप्त कर सकते हैं।</string>
@@ -137,6 +145,7 @@
     <string name="create_your_account_and">अपना खाता बनाएँ और </string>
     <string name="save_platforms">प्लेटफ़ॉर्म सहेजें</string>
     <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline"> ताकि RelaySMS ऑफ़लाइन होने पर आपकी ओर से Gmail, X और Telegram को संदेश भेज सके</string>
+    <string name="for_relaysms_to_send_messages_to__x_and_telegram_on_your_behalf_when_offline">RelaySMS के लिए ऑफ़लाइन होने पर आपकी ओर से Gmail, X, और Telegram पर संदेश भेजना</string>
     <string name="i_have_read_the">मैंने </string>
     <string name="privacy_policy">गोपनीयता नीति पढ़ ली है</string>
     <string name="log_in">लॉग इन करें</string>
@@ -150,6 +159,7 @@
     <string name="log_into_relaysms">RelaySMS में लॉग इन करें</string>
     <string name="log_into_your_account_and">अपने खाते में लॉग इन करें और </string>
     <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline_"> ताकि RelaySMS ऑफ़लाइन होने पर आपकी ओर से Gmail, X और Telegram को संदेश भेज सके</string>
+    <string name="for_relaysms_to_send_messages_to__x_and_telegram_on_your_behalf_when_offline_">RelaySMS के लिए ऑफ़लाइन होने पर आपकी ओर से Gmail, X, और Telegram पर संदेश भेजना</string>
     <string name="already_got_code">पहले से ही कोड मिल गया है</string>
     <string name="do_not_have_an_account">खाता नहीं है? </string>
     <string name="get_started_with">के साथ शुरू करें</string>
@@ -267,6 +277,7 @@
     <string name="store_tokens_on_device">डिवाइस पर टोकन स्टोर करें</string>
     <string name="storing_platform_accounts">प्लेटफ़ॉर्म खाते संग्रहीत करना</string>
     <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">OAuth2.0 (जैसे Gmail, X) का उपयोग करने वाले प्लेटफ़ॉर्म के लिए खाते जोड़ते समय, इसे सक्षम करने से यह सुनिश्चित होता है कि आपके एक्सेस टोकन आपके वर्तमान डिवाइस पर संग्रहीत हैं</string>
+    <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g__x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">OAuth2.0 इस्तेमाल करने वाले प्लेटफॉर्म के लिए अकाउंट जोड़ते समय इसे इनेबल करने से यह पक्का होता है कि आपके एक्सेस टोकन आपके मौजूदा डिवाइस पर स्टोर हों।</string>
     <string name="stored_tokens_detected_title">संग्रहीत टोकन का पता चला</string>
     <string name="stored_tokens_dialog_message_part1">इसके लिए संग्रहीत टोकन </string>
     <string name="stored_tokens_dialog_message_part2">खाते का पता चला है। आप अपने संग्रहीत टोकन का उपयोग करके </string>
@@ -394,5 +405,26 @@
     <string name="optional">(वैकल्पिक)</string>
     <string name="email">ईमेल</string>
     <string name="phone_number1">फ़ोन नंबर</string>
+    <string name="platform_image">प्लेटफ़ॉर्म छवि</string>
+    <string name="backup">बैकअप</string>
+    <string name="restore">पुनर्स्थापित करना</string>
+    <string name="on_device_backups">ऑन-डिवाइस बैकअप</string>
+    <string name="backups_are_encrypted_with_a_passphrase_and_stored_on_your_device">बैकअप को पासफ़्रेज़ से एन्क्रिप्ट किया जाता है और आपके डिवाइस पर स्टोर किया जाता है।</string>
+    <string name="backup_now">अब समर्थन देना</string>
+    <string name="your_recovery_key">आपकी रिकवरी कुंजी</string>
+    <string name="your_recovery_key_is_a_64_character_code_that_you_will_need_to_restore_your_backup">आपकी रिकवरी की एक 64-कैरेक्टर का कोड है जिसकी ज़रूरत आपको अपना बैकअप रिस्टोर करने के लिए पड़ेगी।</string>
+    <string name="store_your_recovery_key_somewhere_safe_like_a_secure_password_manager_and_don_t_share_it_with_anyone">अपनी रिकवरी की को किसी सुरक्षित जगह जैसे सिक्योर पासवर्ड मैनेजर में स्टोर करें, और इसे किसी के साथ शेयर न करें।</string>
+    <string name="if_you_lose_it_you_won_t_be_able_to_recover_your_messages">अगर आप इसे खो देते हैं, तो आप अपने मैसेज वापस नहीं पा सकेंगे।</string>
+    <string name="view_recovery_key">पुनर्प्राप्ति कुंजी देखें</string>
+    <string name="record_your_recovery_key">अपनी रिकवरी कुंजी रिकॉर्ड करें</string>
+    <string name="this_key_is_required_to_recover_your_saved_accounts_and_data_store_this_key_somewhere_safe_if_you_lose_it_you_won_t_be_able_to_recover_your_saved_accounts">आपके सेव किए गए अकाउंट और डेटा को रिकवर करने के लिए यह की ज़रूरी है। इस की को कहीं सुरक्षित रखें। अगर आप इसे खो देते हैं, तो आप अपना सेव किया हुआ अकाउंट रिकवर नहीं कर पाएंगे।</string>
+    <string name="copy_to_clipboard">क्लिपबोर्ड पर कॉपी करें</string>
+    <string name="save_to_password_manager">पासवर्ड मैनेजर में सेव करें</string>
+    <string name="reset">रीसेट करें</string>
+    <string name="reset_removes_all_your_stored_tokens_both_locally_and_on_the_cloud_this_is_what_a_complete_delete_would_look_like_if_there_were_traditional_accounts_you_can_add_more_at_anytime">रीसेट आपके सभी स्टोर किए गए टोकन को लोकल और क्लाउड दोनों जगह हटा देता है। अगर ट्रेडिशनल अकाउंट होते तो पूरा डिलीट कुछ ऐसा दिखता। आप कभी भी और जोड़ सकते हैं।</string>
+    <string name="restore_backup">बैकअप बहाल</string>
+    <string name="enter_your_recovery_key">अपनी रिकवरी कुंजी दर्ज करें</string>
+    <string name="your_recovery_key_is_a_64_character_code_required_to_recover_your_data">आपकी रिकवरी की एक 64-कैरेक्टर का कोड है जो आपके डेटा को रिकवर करने के लिए ज़रूरी है।</string>
+    <string name="recovery_key">रिकवरी कुंजी</string>
 
 </resources>

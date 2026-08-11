@@ -83,6 +83,7 @@
     <string name="settings">تنظیمات</string>
     <string name="permission_denied">مجوز رد شد!</string>
     <string name="add_gateway_client">افزودن مشتری دروازه</string>
+    <string name="add_routing_numbers">اضافه کردن شماره‌های مسیریابی</string>
     <string name="edit_gateway_client">ویرایش مشتری دروازه</string>
     <string name="e_g_237123456_or_select_contact">به عنوان مثال +237123456 یا انتخاب مخاطب</string>
     <string name="alias_optional">نام مستعار (اختیاری)</string>
@@ -98,7 +99,14 @@
     <string name="send_message">ارسال پیام</string>
     <string name="add_account">افزودن حساب</string>
     <string name="remove_accounts">حذف حساب‌ها</string>
+    <string name="make_relaysms_your_default_sms_app">RelaySMS را برنامه پیامکی پیش‌فرض خود قرار دهید</string>
+    <string name="manage_your_sms_messages_from_one_place">پیامک‌های خود را از یک جا مدیریت کنید و تصاویر را از طریق پیامک ارسال کنید!</string>
+    <string name="previous">قبلی</string>
+    <string name="awesome_">عالیه!</string>
+    <string name="got_it_">گرفتمش!</string>
+    <string name="done_">انجام شد!</string>
     <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported">افزودن ایمیل‌ها به حساب RelaySMS به شما امکان می‌دهد با استفاده از پیام‌رسانی SMS ایمیل ارسال کنید.\n\nدر حال حاضر Gmail پشتیبانی می‌شود.</string>
+    <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging__are_currently_supported">افزودن ایمیل به حساب RelaySMS شما به شما این امکان را می‌دهد که از آنها برای ارسال ایمیل با استفاده از پیام کوتاه استفاده کنید.</string>
     <string name="adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported">افزودن شماره‌ها به حساب RelaySMS به شما امکان می‌دهد با استفاده از پیام‌رسانی SMS پیام ارسال کنید.\n\nدر حال حاضر پیام‌رسانی Telegram پشتیبانی می‌شود.</string>
     <string name="adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported">افزودن حساب‌ها به حساب RelaySMS به شما امکان می‌دهد با استفاده از پیام‌رسانی SMS پست ارسال کنید.\n\nدر حال حاضر ارسال پست پشتیبانی می‌شود.</string>
     <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias">حساب RelaySMS شما یک نام مستعار از شماره تلفن شما با دامنه @relaysms.me است.\n\nهر زمان که پیامی به نام مستعار شما ارسال شود، می‌توانید از طریق SMS پاسخ دریافت کنید.</string>
@@ -134,6 +142,7 @@
     <string name="create_your_account_and">حساب خود را ایجاد کنید و</string>
     <string name="save_platforms">بسترها را ذخیره کنید</string>
     <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline">برای اینکه RelaySMS از طرف شما هنگام آفلاین بودن پیام‌هایی را به Gmail، X و Telegram ارسال کند</string>
+    <string name="for_relaysms_to_send_messages_to__x_and_telegram_on_your_behalf_when_offline">برای اینکه RelaySMS بتواند از طرف شما در حالت آفلاین به Gmail، X و Telegram پیام ارسال کند</string>
     <string name="i_have_read_the">من خوانده‌ام</string>
     <string name="privacy_policy">سیاست حفظ حریم خصوصی</string>
     <string name="log_in">ورود</string>
@@ -147,6 +156,7 @@
     <string name="log_into_relaysms">ورود به RelaySMS</string>
     <string name="log_into_your_account_and">وارد حساب خود شوید و</string>
     <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline_">برای اینکه RelaySMS از طرف شما هنگام آفلاین بودن پیام‌هایی را به Gmail، X و Telegram ارسال کند</string>
+    <string name="for_relaysms_to_send_messages_to__x_and_telegram_on_your_behalf_when_offline_">برای اینکه RelaySMS بتواند از طرف شما در حالت آفلاین به Gmail، X و Telegram پیام ارسال کند</string>
     <string name="already_got_code">کد را قبلاً دریافت کرده‌ام</string>
     <string name="do_not_have_an_account">حساب ندارید؟</string>
     <string name="get_started_with">شروع با</string>
@@ -262,6 +272,7 @@
     <string name="store_tokens_on_device">ذخیره توکن‌ها در دستگاه</string>
     <string name="storing_platform_accounts">ذخیره حساب‌های پلتفرم</string>
     <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">هنگام افزودن حساب برای پلتفرم‌هایی که از OAuth2.0 (مانند Gmail، X) استفاده می‌کنند، فعال کردن این گزینه اطمینان حاصل می‌کند که توکن‌های دسترسی شما به جای آن در دستگاه فعلی شما ذخیره می‌شوند.</string>
+    <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g__x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">هنگام اضافه کردن حساب برای پلتفرم‌هایی که از OAuth2.0 استفاده می‌کنند، فعال کردن این گزینه باعث می‌شود توکن‌های دسترسی شما به جای رمز عبور، روی دستگاه فعلی‌تان ذخیره شوند.</string>
     <string name="stored_tokens_detected_title">توکن‌های ذخیره‌شده شناسایی شدند</string>
     <string name="stored_tokens_dialog_message_part1">توکن‌های ذخیره‌شده برای این حساب</string>
     <string name="stored_tokens_dialog_message_part2"> شناسایی شده‌اند. شما می‌توانید از توکن‌های ذخیره‌شده خود برای ارسال پست در X</string>
@@ -389,5 +400,26 @@
     <string name="optional">(اختیاری)</string>
     <string name="email">ایمیل</string>
     <string name="phone_number1">شماره تلفن</string>
+    <string name="platform_image">تصویر پلتفرم</string>
+    <string name="backup">پشتیبان گیری</string>
+    <string name="restore">بازیابی</string>
+    <string name="on_device_backups">پشتیبان‌گیری روی دستگاه</string>
+    <string name="backups_are_encrypted_with_a_passphrase_and_stored_on_your_device">پشتیبان‌ها با یک عبارت عبور رمزگذاری شده و در دستگاه شما ذخیره می‌شوند.</string>
+    <string name="backup_now">اکنون پشتیبان گیری کنید</string>
+    <string name="your_recovery_key">کلید بازیابی شما</string>
+    <string name="your_recovery_key_is_a_64_character_code_that_you_will_need_to_restore_your_backup">کلید بازیابی شما یک کد ۶۴ کاراکتری است که برای بازیابی نسخه پشتیبان خود به آن نیاز خواهید داشت.</string>
+    <string name="store_your_recovery_key_somewhere_safe_like_a_secure_password_manager_and_don_t_share_it_with_anyone">کلید بازیابی خود را در جایی امن مانند یک برنامه مدیریت رمز عبور امن ذخیره کنید و آن را با کسی به اشتراک نگذارید.</string>
+    <string name="if_you_lose_it_you_won_t_be_able_to_recover_your_messages">اگر آن را گم کنید، نمی‌توانید پیام‌هایتان را بازیابی کنید.</string>
+    <string name="view_recovery_key">مشاهده کلید بازیابی</string>
+    <string name="record_your_recovery_key">کلید بازیابی خود را ثبت کنید</string>
+    <string name="this_key_is_required_to_recover_your_saved_accounts_and_data_store_this_key_somewhere_safe_if_you_lose_it_you_won_t_be_able_to_recover_your_saved_accounts">این کلید برای بازیابی حساب‌ها و داده‌های ذخیره شده شما مورد نیاز است. این کلید را در جایی امن نگهداری کنید. اگر آن را گم کنید، نمی‌توانید حساب ذخیره شده خود را بازیابی کنید.</string>
+    <string name="copy_to_clipboard">کپی در کلیپ بورد</string>
+    <string name="save_to_password_manager">ذخیره در مدیریت رمز عبور</string>
+    <string name="reset">تنظیم مجدد</string>
+    <string name="reset_removes_all_your_stored_tokens_both_locally_and_on_the_cloud_this_is_what_a_complete_delete_would_look_like_if_there_were_traditional_accounts_you_can_add_more_at_anytime">تنظیم مجدد، تمام توکن‌های ذخیره شده شما را چه به صورت محلی و چه در فضای ابری حذف می‌کند. این همان چیزی است که حذف کامل به آن شبیه است - اگر حساب‌های سنتی وجود داشته باشد. می‌توانید در هر زمان حساب‌های بیشتری اضافه کنید.</string>
+    <string name="restore_backup">بازیابی نسخه پشتیبان</string>
+    <string name="enter_your_recovery_key">کلید بازیابی خود را وارد کنید</string>
+    <string name="your_recovery_key_is_a_64_character_code_required_to_recover_your_data">کلید بازیابی شما یک کد ۶۴ کاراکتری است که برای بازیابی اطلاعات شما لازم است.</string>
+    <string name="recovery_key">کلید بازیابی</string>
 
 </resources>
