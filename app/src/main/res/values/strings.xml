@@ -446,7 +446,7 @@
     <string name="optional">" (Optional)"</string>
     <string name="email">Email</string>
     <string name="phone_number1">Phone number</string>
-    <string name="supported_platforms">Supported platforms</string>
+<!--    <string name="platforms">Platforms</string>-->
     <string name="platform_image">Platform image</string>
     <string name="backup">Backup</string>
     <string name="restore">Restore</string>
@@ -533,5 +533,17 @@
     <string name="you_need_to_set_relaysms_as_your_default_sms_app_to_be_able_to_send_attachments">You need to set RelaySMS as your default SMS app to be able to send attachments.</string>
     <string name="this_lets_the_app_manage_the_sending_requirements_for_you">This lets the app manage the sending requirements for you.</string>
     <string name="show_accounts">Show accounts</string>
+    <string name="onboarding_no_login_description">RelaySMS no longer asks you to login or register because your privacy matters.</string>
+    <string name="onboarding_save_access_description">" Save access to your accounts. It's stored securely on your device, so you can send messages as yourself."</string>
+    <string name="make_relaysms_your_default_sms_app">Make RelaySMS your default SMS app</string>
+    <string name="manage_your_sms_messages_from_one_place">Manage your SMS messages from one place and send images through SMS!</string>
+    <string name="previous">Previous</string>
+    <string name="awesome_">Awesome!</string>
+    <string name="got_it_">Got it!</string>
+    <string name="done_">Done!</string>
+    <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported">Adding email addresses to your RelaySMS account allows you to use them to send emails via SMS.</string>
+    <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline_">Gmail is currently supported.</string>
+    <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline">so that RelaySMS can send messages to Gmail, X, and Telegram on your behalf when you are offline</string>
+    <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">When adding accounts for platforms that use OAuth2.0 (e.g., Gmail, X), enabling this option ensures that your access tokens are stored on your current device instead.</string>
 
 </resources>

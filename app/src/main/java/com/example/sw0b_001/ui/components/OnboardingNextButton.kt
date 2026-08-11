@@ -28,6 +28,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.R
@@ -46,7 +47,7 @@ fun OnboardingTopBar(
     ) {
 
         Text(
-            text = "Previous",
+            text = stringResource(R.string.previous),
             color =
                 if (currentPage == 0)
                     MaterialTheme.colorScheme.onSurface.copy(alpha = .35f)
@@ -62,7 +63,7 @@ fun OnboardingTopBar(
         )
 
         Text(
-            text = "Skip",
+            text = stringResource(R.string.skip),
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.clickable(
                 indication = null,
@@ -83,9 +84,9 @@ fun OnboardingNavigationRow(
     modifier: Modifier = Modifier
 ) {
     val buttonText = when (currentPage) {
-        0 -> "Awesome!"
-        1 -> "Got it!"
-        else -> "Done!"
+        0 -> stringResource(R.string.awesome_)
+        1 -> stringResource(R.string.got_it_)
+        else -> stringResource(R.string.done_)
     }
 
     Row(
