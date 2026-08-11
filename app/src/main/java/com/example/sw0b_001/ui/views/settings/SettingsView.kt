@@ -133,7 +133,6 @@ fun SettingsView(
     val scrollState = rememberScrollState()
 
     val isEmailLogin = context.settingsGetIsEmailLogin
-
     var localeExpanded by remember { mutableStateOf(false) }
     var setLockDownApp by remember { mutableStateOf( context.settingsGetLockDownApp) }
     var useDeviceId by remember { mutableStateOf(
@@ -183,7 +182,6 @@ fun SettingsView(
                 LinearProgressIndicator(Modifier.fillMaxWidth())
 
             SectionLabel(stringResource(R.string.system))
-
             Surface(
                 shape = RoundedCornerShape(20.dp),
                 color = Color.Transparent,
@@ -204,6 +202,23 @@ fun SettingsView(
                                 enabled = !isLoading,
                             ) {
                                 localeExpanded = true
+                            }
+                            DropdownMenu(
+                                expanded = localeExpanded,
+                                onDismissRequest = { localeExpanded = false },
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                            ) {
+                                localeArraysOptions.forEachIndexed { i, item ->
+                                    DropdownMenuItem(
+                                        text = { Text(item) },
+                                        onClick = {
+                                            context.setLocale(localeArraysValues[i])
+                                            localeExpanded = false
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
@@ -226,30 +241,6 @@ fun SettingsView(
                                 themeExpanded = true
                             }
                         }
-                    }
-                }
-            }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 8.dp)
-            ) {
-                DropdownMenu(
-                    expanded = localeExpanded,
-                    onDismissRequest = { localeExpanded = false },
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                ) {
-                    localeArraysOptions.forEachIndexed { i, item ->
-                        DropdownMenuItem(
-                            text = { Text(item) },
-                            onClick = {
-                                context.setLocale(localeArraysValues[i])
-                                localeExpanded = false
-                            }
-                        )
                     }
                 }
             }
