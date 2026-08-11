@@ -120,6 +120,16 @@ fun ComposerInterface(
     val tokens by tokensViewModel.fetchTokensForPlatforms(supportedPlatformName)
         .collectAsStateWithLifecycle(emptyList())
 
+    var selectedToken: Tokens? by remember{ mutableStateOf(null) }
+    var from: String? by remember(selectedToken){
+        mutableStateOf(selectedToken?.account) }
+
+    LaunchedEffect(tokens) {
+        if (selectedToken == null && tokens.isNotEmpty()) {
+            selectedToken = tokens.first()
+        }
+    }
+
     LaunchedEffect(Unit) {
         if(messageId != null) {
             payloadsViewModel.get(messageId)
@@ -156,10 +166,6 @@ fun ComposerInterface(
 
     var showSelectAccountModal by remember { mutableStateOf(!isOfflineCompose) }
     var showSetAsDefault by remember { mutableStateOf(false) }
-
-    var selectedToken: Tokens? by remember{ mutableStateOf(null) }
-    var from: String? by remember(selectedToken){
-        mutableStateOf(selectedToken?.account) }
 
     val debugState by run {
         if(isOfflineCompose) {
