@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,8 +25,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -203,22 +203,29 @@ fun SettingsView(
                             ) {
                                 localeExpanded = true
                             }
-                            DropdownMenu(
-                                expanded = localeExpanded,
-                                onDismissRequest = { localeExpanded = false },
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                            ) {
-                                localeArraysOptions.forEachIndexed { i, item ->
-                                    DropdownMenuItem(
-                                        text = { Text(item) },
-                                        onClick = {
-                                            context.setLocale(localeArraysValues[i])
-                                            localeExpanded = false
+
+                            if (localeExpanded) {
+                                AlertDialog(
+                                    onDismissRequest = { localeExpanded = false },
+                                    title = { Text(stringResource(R.string.language)) },
+                                    text = {
+                                        Column {
+                                            localeArraysOptions.forEachIndexed { i, item ->
+                                                Text(
+                                                    text = item,
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .clickable {
+                                                            context.setLocale(localeArraysValues[i])
+                                                            localeExpanded = false
+                                                        }
+                                                        .padding(vertical = 12.dp)
+                                                )
+                                            }
                                         }
-                                    )
-                                }
+                                    },
+                                    confirmButton = {}
+                                )
                             }
                         }
                     }
@@ -245,43 +252,46 @@ fun SettingsView(
                 }
             }
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 8.dp)
-            ) {
-                DropdownMenu(
-                    expanded = themeExpanded,
+            if (themeExpanded) {
+                AlertDialog(
                     onDismissRequest = { themeExpanded = false },
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                ) {
-                    DropdownMenuItem(
-                        text = { Text(stringResource(com.afkanerd.lib_smsmms_android.R.string.light)) },
-                        onClick = {
-                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                            themeExpanded = false
+                    title = { Text(stringResource(com.afkanerd.lib_smsmms_android.R.string.theme)) },
+                    text = {
+                        Column {
+                            Text(
+                                text = stringResource(com.afkanerd.lib_smsmms_android.R.string.light),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                                        themeExpanded = false
+                                    }
+                                    .padding(vertical = 12.dp)
+                            )
+                            Text(
+                                text = stringResource(com.afkanerd.lib_smsmms_android.R.string.dark),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                                        themeExpanded = false
+                                    }
+                                    .padding(vertical = 12.dp)
+                            )
+                            Text(
+                                text = stringResource(com.afkanerd.lib_smsmms_android.R.string.system_default),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                                        themeExpanded = false
+                                    }
+                                    .padding(vertical = 12.dp)
+                            )
                         }
-                    )
-
-                    DropdownMenuItem(
-                        text = { Text(stringResource(com.afkanerd.lib_smsmms_android.R.string.dark)) },
-                        onClick = {
-                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                            themeExpanded = false
-                        }
-                    )
-
-                    DropdownMenuItem(
-                        text = { Text(stringResource(com.afkanerd.lib_smsmms_android.R.string.system_default)) },
-                        onClick = {
-                            AppCompatDelegate
-                                .setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-                            themeExpanded = false
-                        }
-                    )
-                }
+                    },
+                    confirmButton = {}
+                )
             }
 
 //            SettingsItem(
