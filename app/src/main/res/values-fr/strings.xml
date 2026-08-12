@@ -83,6 +83,7 @@
     <string name="settings">Paramètres</string>
     <string name="permission_denied">Autorisation refusée !</string>
     <string name="add_gateway_client">Ajouter un client de passerelle</string>
+    <string name="add_routing_numbers">Ajouter les numéros de routage</string>
     <string name="edit_gateway_client">Modifier le client de la passerelle</string>
     <string name="e_g_237123456_or_select_contact">par ex. +237123456 ou sélectionner un contact</string>
     <string name="alias_optional">Alias (facultatif)</string>
@@ -411,6 +412,7 @@
     <string name="please_enter_your_avoid_copying_and_pasting_if_telegram_to_not_get_flagged">Veuillez saisir votre code %1$s. Évitez de copier-coller si vous utilisez Telegram pour ne pas être signalé !</string>
     <string name="you_can_send_a_quick_mail_without_verifying_or_adding_accounts_using_relaysms_mail">Vous pouvez envoyer un mail rapidement sans vérification ni ajout de compte grâce à RelaySMS.</string>
     <string name="try_it">Essayez.</string>
+    <string name="you_can_always_find_the_option_when_you_click_compose"><![CDATA[Vous pouvez toujours trouver cette option lorsque vous cliquez sur <b>Composer</b>]]></string>
     <string name="you_can_use_this_account_without_verifying_a_number_this_is_a_one_time_use_account_and_cannot_receive_replies">Vous pouvez utiliser ce compte sans vérifier de numéro.</string>
     <string name="yes_remove">Oui, retirez</string>
     <string name="send_messages_using_your_account">Envoyez des messages en utilisant votre compte %1$s.</string>
