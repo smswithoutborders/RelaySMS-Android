@@ -1,6 +1,7 @@
 package com.example.sw0b_001.ui.viewModels
 
 import android.content.Context
+import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,6 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import uniffi.relaysms_spec_payload.V1ContentCategories
@@ -27,6 +29,42 @@ import uniffi.relaysms_spec_payload.V1ContentCategories
 class PayloadsViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
 ): ViewModel() {
+
+    private var _from = MutableStateFlow("")
+    var from: StateFlow<String> = _from.asStateFlow()
+
+    private var _to = MutableStateFlow("")
+    var to: StateFlow<String> = _to.asStateFlow()
+
+    private var _subject = MutableStateFlow("")
+    var subject: StateFlow<String> = _subject.asStateFlow()
+
+    private var _body = MutableStateFlow("")
+    var body: StateFlow<String> = _body.asStateFlow()
+
+    private var _imageBitmap: MutableStateFlow<Bitmap?> = MutableStateFlow(null)
+    var imageBitmap: StateFlow<Bitmap?> = _imageBitmap.asStateFlow()
+
+    fun updateImageBitmap(image: Bitmap?) {
+        _imageBitmap.value = image
+    }
+
+    fun updateFrom(from: String) {
+        _from.value = from
+    }
+
+    fun updateTo(to: String) {
+        _to.value = to
+    }
+
+    fun updateSubject(subject: String) {
+        _subject.value = subject
+    }
+
+    fun updateBody(body: String) {
+        _body.value = body
+    }
+
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
 
@@ -38,13 +76,16 @@ class PayloadsViewModel @Inject constructor(
 
     private lateinit var inboxMessageList: LiveData<MutableList<Payloads>>
 
-//    private var conversationsPager: Flow<PagingData<Payloads>>? = null
 
     val db = Datastore.getDatastore(context)?.payloadsDao()
         ?: throw Exception("Could not open database")
 
     fun reset() {
         _messageUiState.value = null
+        _to.value = ""
+        _subject.value = ""
+        _from.value = ""
+        _body.value = ""
     }
 
     fun get(messageId: Long) {

@@ -30,6 +30,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
@@ -73,6 +74,14 @@ sealed class PnbaUiState {
 class TokensViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ViewModel() {
+
+    private var _selectedToken: MutableStateFlow<Tokens?> = MutableStateFlow(null)
+    var selectedToken: StateFlow<Tokens?> = _selectedToken.asStateFlow()
+
+    fun updateSelectedToken(token: Tokens) {
+        _selectedToken.value = token
+    }
+
     var bottomTabsItem by mutableStateOf(BottomTabsItems.BottomBarRecentTab)
 
     private val _isStoringUiState =
@@ -96,6 +105,10 @@ class TokensViewModel @Inject constructor(
 
     private val db = Datastore.getDatastore(context)?.tokensDao()
         ?: throw Exception("Cannot open database")
+
+    fun reset() {
+        _selectedToken.value = null
+    }
 
     fun clearStoringState() {
         _isStoringUiState.value = TokensUiState.Success(null)

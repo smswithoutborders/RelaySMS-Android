@@ -345,7 +345,6 @@ class MainActivity : BindActivity() {
                     catId = composeScreenNav.cat,
                     supportedPlatformName = composeScreenNav.supportedPlatform,
                     isOfflineCompose = composeScreenNav.isOfflineCompose,
-                    supportedPlatformsViewModel = supportedPlatformsViewModel,
                 )
             }
             composable<DetailsInterfaceScreen> { backEntry ->

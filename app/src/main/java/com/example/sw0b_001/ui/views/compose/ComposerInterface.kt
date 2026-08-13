@@ -1,7 +1,5 @@
 package com.example.sw0b_001.ui.views.compose
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -75,7 +73,6 @@ import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.ui.viewModels.OfflineFirstPublisherViewModel
 import com.example.sw0b_001.ui.viewModels.OnlineFirstPublisherViewModel
 import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
-import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.views.threads.makeDefault
 import uniffi.relaysms_spec_payload.V1ContentCategories
@@ -91,7 +88,6 @@ fun ComposerInterface(
     payloadsViewModel: PayloadsViewModel,
     onlineFirstPublisherViewModel: OnlineFirstPublisherViewModel,
     offlineFirstPublisherViewModel: OfflineFirstPublisherViewModel,
-    supportedPlatformsViewModel: SupportedPlatformsViewModel,
     supportedPlatformName: String,
     catId: V1ContentCategories,
     isOfflineCompose: Boolean,
@@ -108,25 +104,26 @@ fun ComposerInterface(
             if(context.isDefault()) context.getDefaultSimSubscription() ?: -1L else -1L)
     }
     fun backHandler() {
+        tokensViewModel.reset()
+        payloadsViewModel.reset()
         navController.popBackStack()
     }
     BackHandler { backHandler() }
 
     val payload by payloadsViewModel.message.collectAsStateWithLifecycle()
 
-    val supportedPlatform by supportedPlatformsViewModel.get(supportedPlatformName)
-        .collectAsStateWithLifecycle(null)
-
     val tokens by tokensViewModel.fetchTokensForPlatforms(supportedPlatformName)
         .collectAsStateWithLifecycle(emptyList())
 
-    var selectedToken: Tokens? by remember{ mutableStateOf(null) }
-    var from: String? by remember(selectedToken){
-        mutableStateOf(selectedToken?.account) }
+    val selectedToken by tokensViewModel.selectedToken.collectAsStateWithLifecycle()
 
-    LaunchedEffect(tokens) {
-        if (selectedToken == null && tokens.isNotEmpty()) {
-            selectedToken = tokens.first()
+    LaunchedEffect(processedImage) {
+        payloadsViewModel.updateImageBitmap(processedImage?.image)
+    }
+
+    LaunchedEffect(selectedToken) {
+        selectedToken?.let { selectedToken ->
+            payloadsViewModel.updateFrom(selectedToken.account)
         }
     }
 
@@ -136,14 +133,14 @@ fun ComposerInterface(
         }
     }
 
-    var imageBitmap: Bitmap? by remember(processedImage) {
-        mutableStateOf(
-            if(inPreviewMode) {
-                BitmapFactory.decodeResource(context.resources,
-                    com.afkanerd.lib_image_android.R.drawable._0241226_124819)
-            } else processedImage?.image
-        )
+    LaunchedEffect(payload) {
+        payload?.let { payload ->
+            payloadsViewModel.updateTo(payload.content.getTo()?.toUtf8String() ?: "")
+            payloadsViewModel.updateSubject(payload.content.getSubject()?.toUtf8String() ?: "")
+            payloadsViewModel.updateBody(payload.content.getBody().toUtf8String())
+        }
     }
+
 
     var showChooseGatewayClient by remember { mutableStateOf(false) }
 
@@ -154,17 +151,12 @@ fun ComposerInterface(
         navController.navigate(ImageRenderNav(uri.toString()))
     }
 
-    var to: String by remember{
-        mutableStateOf( payload?.content?.getTo()?.toUtf8String() ?: "") }
-    var subject: String by remember{ mutableStateOf(
-        payload?.content?.getSubject()?.toUtf8String() ?: "") }
-    var body: String by remember{
-        mutableStateOf(payload?.content?.getBody()?.toUtf8String() ?: "") }
+    val from by payloadsViewModel.from.collectAsStateWithLifecycle()
+    val to by payloadsViewModel.to.collectAsStateWithLifecycle()
+    val subject by payloadsViewModel.subject.collectAsStateWithLifecycle()
+    val body by payloadsViewModel.body.collectAsStateWithLifecycle()
+    val imageBitmap by payloadsViewModel.imageBitmap.collectAsStateWithLifecycle()
 
-//    var showSelectAccountModal by remember { mutableStateOf(
-//        catId != V1ContentCategories.BRIDGE ) }
-
-    var showSelectAccountModal by remember { mutableStateOf(!isOfflineCompose) }
     var showSetAsDefault by remember { mutableStateOf(false) }
 
     val debugState by run {
@@ -219,6 +211,7 @@ fun ComposerInterface(
 
     val getDefaultPermission = getSetDefaultBehaviour(context) {
         isDefault = context.isDefault()
+        showSetAsDefault = false
     }
 
     Scaffold(
@@ -307,7 +300,7 @@ fun ComposerInterface(
                     tokens = tokens,
                     selectedAccount = selectedToken,
                 ) {
-                    selectedToken = it
+                    tokensViewModel.updateSelectedToken(it)
                 }
                 Column {
                     when(catId) {
@@ -316,19 +309,19 @@ fun ComposerInterface(
                             to = to,
                             subject = subject,
                             body = body,
-                            toCallback = { to = it },
-                            subjectCallback = { subject = it },
-                            bodyCallback = { body = it }
+                            toCallback = { payloadsViewModel.updateTo(it) },
+                            subjectCallback = { payloadsViewModel.updateSubject(it) },
+                            bodyCallback = { payloadsViewModel.updateBody(it) }
                         )
                         V1ContentCategories.TEXT -> TextComposeView(
                             body = body,
-                            bodyCallback = { body = it }
+                            bodyCallback = { payloadsViewModel.updateBody(it) }
                         )
                         V1ContentCategories.MESSAGE -> MessageComposeView(
                             to = to,
                             body = body,
-                            toCallback = { to = it },
-                            bodyCallback = { body = it }
+                            toCallback = { payloadsViewModel.updateTo(it) },
+                            bodyCallback = { payloadsViewModel.updateBody(it) }
                         )
                     }
                 }
