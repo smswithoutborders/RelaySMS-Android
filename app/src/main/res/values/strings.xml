@@ -546,6 +546,5 @@
     <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline">so that RelaySMS can send messages to Gmail, X, and Telegram on your behalf when you are offline</string>
     <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">When adding accounts for platforms that use OAuth2.0 (e.g., Gmail, X), enabling this option ensures that your access tokens are stored on your current device instead.</string>
     <string name="onboarding_save_vault_description">Save access to your accounts. It\'s stored securely on your device, so you can send messages as yourself.</string>
-    <string name="add_gateway_client">Add a gateway client</string>
 
 </resources>
