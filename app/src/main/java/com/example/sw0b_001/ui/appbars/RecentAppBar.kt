@@ -137,15 +137,6 @@ fun RecentAppBar(
                     }
                 },
                 actions = {
-                    if (!isSearchActive) {
-//                        IconButton(onClick = onToggleSearch) {
-//                            Icon(
-//                                imageVector = Icons.Filled.Search,
-//                                contentDescription = stringResource(R.string.search)
-//                            )
-//                        }
-                    }
-
                     IconButton(onClick = { showMenu = !showMenu }) {
                         Icon(
                             imageVector = Icons.Filled.MoreVert,
@@ -199,13 +190,6 @@ fun RecentAppBar(
                             onClick = {
                                 showMenu = false
                                 navController.navigate(BackupScreen)
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.restore)) },
-                            onClick = {
-                                showMenu = false
-                                navController.navigate(RestoreScreen)
                             }
                         )
                         DropdownMenuItem(

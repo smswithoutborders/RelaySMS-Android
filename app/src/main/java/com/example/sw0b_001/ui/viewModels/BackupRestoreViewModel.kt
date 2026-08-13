@@ -44,6 +44,9 @@ class BackupRestoreViewModel @Inject constructor(
     val db = Datastore.getDatastore(context)?.backupRestoreDao()
         ?: throw Exception("Failed to open database")
 
+    fun reset() {
+        _uiState.value = BackupRestoreUiStates.Idle
+    }
     fun getBackup(): Flow<BackupRestoreEnt?> {
         return db.fetchFlow()
     }

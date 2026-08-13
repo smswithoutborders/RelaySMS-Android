@@ -45,8 +45,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.sw0b_001.R
-import com.example.sw0b_001.ui.navigation.BackupScreen
-import com.example.sw0b_001.ui.navigation.RestoreScreen
+import com.example.sw0b_001.ui.navigation.HomepageScreen
+import com.example.sw0b_001.ui.navigation.OnboardingViewScreen
 import com.example.sw0b_001.ui.viewModels.BackupRestoreUiStates
 import com.example.sw0b_001.ui.viewModels.BackupRestoreViewModel
 
@@ -61,6 +61,7 @@ fun RecoveryView(
     var fileName: String = ""
 
     BackHandler {
+        backupRestoreViewModel.reset()
         if(currentStep == 0) {
             navController.popBackStack()
         }
@@ -72,8 +73,11 @@ fun RecoveryView(
                 title = { Text(stringResource(R.string.restore_backup)) },
                 navigationIcon = {
                     IconButton(onClick = {
+                        backupRestoreViewModel.reset()
                         if (currentStep > 0) currentStep--
-                        else navController.popBackStack()
+                        else {
+                            navController.popBackStack()
+                        }
                     } ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Default.ArrowBack,
@@ -101,8 +105,8 @@ fun RecoveryView(
                     activeUri!!,
                     fileName = fileName
                 ) {
-                    navController.navigate(BackupScreen) {
-                        popUpTo(RestoreScreen) { inclusive = true }
+                    navController.navigate(OnboardingViewScreen) {
+                        popUpTo(HomepageScreen) { inclusive = true }
                     }
                 }
             }
@@ -155,7 +159,9 @@ fun RecoveryKeyView(
             allowEntry = false
             enabled = true
         }
-        else -> {}
+        else -> {
+            error = false
+        }
     }
 
     RecoveryKeyViewComponent(
@@ -269,7 +275,8 @@ private fun RecoveryKeyViewComponent(
         TextField(
             value = recoveryKey,
             onValueChange = {
-                recoveryKey = it.chunked(4).joinToString(" ")
+//                recoveryKey = it.chunked(4).joinToString(" ")
+                recoveryKey = it
                 onValidatedCallback(it
                     .replace(" ", "")
                     .encodeToByteArray()

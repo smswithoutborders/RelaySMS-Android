@@ -320,8 +320,6 @@ class MainActivity : BindActivity() {
 //                )
 //            }
             composable<HomepageScreen> {
-                imageViewModel.reset()
-                payloadsViewModel.reset()
                 HomepageView(
                     navController = navController,
                     tokensViewModel = tokensViewModel,
