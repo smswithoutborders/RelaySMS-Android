@@ -82,23 +82,19 @@ fun DefaultSmsAppScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Image(
-                        painter = painterResource(R.drawable.onboarding2),
+                        painter = painterResource(R.drawable.attachments),
                         contentDescription = null,
                         modifier = Modifier.size(200.dp)
                     )
                 }
 
-
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             Text(
                 text = stringResource(R.string.make_relaysms_your_default_sms_app),
+                style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.headlineSmall.copy(
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = (-0.2).sp
-                ),
-                modifier = Modifier.fillMaxWidth()
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Spacer(modifier = Modifier.height(16.dp))

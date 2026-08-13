@@ -31,7 +31,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -58,7 +57,6 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getCurrentLoc
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.setLocale
 import com.example.sw0b_001.data.Helpers
 import com.example.sw0b_001.ui.navigation.OnboardingViewScreen
-import com.example.sw0b_001.ui.navigation.RestoreScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 
 @Composable
@@ -69,7 +67,7 @@ fun WelcomeMainView(
 
     var localeExpanded by remember { mutableStateOf(false) }
     val localeArraysValues = stringArrayResource(R.array.language_values)
-    val localeArraysOptions = stringArrayResource(R.array.language_options)
+    val localeArraysOptions= stringArrayResource(R.array.language_options)
 
     Scaffold { innerPadding ->
         Column(
@@ -103,23 +101,23 @@ fun WelcomeMainView(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = context.getCurrentLocale()?.displayName
-                                ?: stringResource(R.string.english1),
+                            text = context.getCurrentLocale()?.displayName ?:
+                            stringResource(R.string.english1),
                         )
                     }
-                    DropdownMenu(
-                        expanded = localeExpanded,
-                        onDismissRequest = { localeExpanded = false }
-                    ) {
-                        localeArraysOptions.forEachIndexed { i, item ->
-                            DropdownMenuItem(
-                                text = { Text(item) },
-                                onClick = {
-                                    context.setLocale(localeArraysValues[i])
-                                    localeExpanded = false
-                                }
-                            )
-                        }
+                        DropdownMenu(
+                            expanded = localeExpanded,
+                            onDismissRequest = { localeExpanded = false }
+                        ) {
+                            localeArraysOptions.forEachIndexed { i, item ->
+                                DropdownMenuItem(
+                                    text = { Text(item) },
+                                    onClick = {
+                                        context.setLocale(localeArraysValues[i])
+                                        localeExpanded = false
+                                    }
+                                )
+                            }
                     }
                 }
             }
@@ -127,92 +125,89 @@ fun WelcomeMainView(
             Spacer(modifier = Modifier.height(64.dp))
 
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier .weight(1f)
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
+                verticalArrangement = Arrangement.Center ) {
                 Spacer(modifier = Modifier.height(64.dp))
+
 
                 Text(
                     text = stringResource(R.string.welcome_to_relaysms_),
-                    style = MaterialTheme.typography.headlineSmall,
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-
-                Spacer(modifier = Modifier.height(25.dp))
-
-                Image(
-                    painter = painterResource(id = R.drawable.relay_sms_welcome,),
-                    contentDescription = null,
-                    modifier = Modifier.size(250.dp)
-                )
-                Spacer(modifier = Modifier.height(32.dp))
-
-                Text(
-                    text = stringResource(R.string.use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontWeight = FontWeight.Medium
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.headlineSmall.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        letterSpacing = (-0.2).sp
                     ),
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(25.dp))
+
+            Image(
+                painter = painterResource(id = R.drawable.relay_sms_welcome,),
+                contentDescription = null,
+                modifier = Modifier.size(250.dp)
+            )
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Text(
+                text = stringResource(R.string.use_sms_to_make_a_post_send_emails_and_messages_with_no_internet_connection),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.Medium
+                ),
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
 
 
-                Button(
-                    onClick = {
-                        navController.navigate(OnboardingViewScreen)
-                    },
-                    modifier = Modifier
-                        .width(250.dp)
-                        .padding(horizontal = 8.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    )
+            Button(
+                onClick = {
+                    navController.navigate(OnboardingViewScreen)
+                },
+                modifier = Modifier
+                    .width(250.dp)
+                    .padding(horizontal = 8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = stringResource(R.string.learn_how_it_works_),
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Icon(
-                            painter = painterResource(R.drawable.arrow_forward),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onPrimary,
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
+                    Text(
+                        text = stringResource(R.string.learn_how_it_works_),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(
+                        painter = painterResource(R.drawable.arrow_forward),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier.size(18.dp)
+                    )
                 }
-
-                TextButton(onClick = {
-                    navController.navigate(RestoreScreen)
-                }) {
-                    Text(stringResource(R.string.restore_backup))
-                }
-                Spacer(modifier = Modifier.size(16.dp))
-                Text(
-                    text = stringResource(R.string.read_our_privacy_policy),
-                    modifier = if (LocalInspectionMode.current) Modifier
-                    else Modifier.clickable(onClick = {
-                        val intent = Intent(
-                            Intent.ACTION_VIEW,
-                            context.getString(R.string.https_smswithoutborders_com_privacy_policy)
-                                .toUri()
-                        )
-                        context.startActivity(intent)
-                    }),
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.bodySmall
-                )
             }
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(R.string.read_our_privacy_policy),
+                modifier = if(LocalInspectionMode.current) Modifier
+                else Modifier.clickable(onClick = {
+                    val intent = Intent(Intent.ACTION_VIEW,
+                        context.getString(R.string.https_smswithoutborders_com_privacy_policy).toUri())
+                    context.startActivity(intent)
+                }),
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.bodySmall
+            )
+            Spacer(modifier = Modifier.height(64.dp))
+        }
         }
     }
 }
