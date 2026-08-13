@@ -218,7 +218,7 @@ private fun PlatformListContent(
                 val intent = oAuth2IntentBuilder(context)
                 intent.launchUrl(context, state.url)
                 showPlatformOptions = false
-                tokensViewModel.clearStoringState()
+                tokensViewModel.reset()
             }
         }
     }
@@ -306,7 +306,7 @@ private fun PlatformListContent(
             tokensViewModel = tokensViewModel,
             platform = clickedPlatform!!,
         ) {
-            tokensViewModel.clearStoringState()
+            tokensViewModel.reset()
             storePnbaRequested = false
         }
     }

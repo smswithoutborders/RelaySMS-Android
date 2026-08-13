@@ -43,6 +43,7 @@ import uniffi.relaysms_spec_payload.v1PayloadSupportProtocolsFromU8
 
 sealed class TokensUiState {
     object Loading: TokensUiState()
+    object Idle: TokensUiState()
     data class Success(
         val url: Uri?,
     ): TokensUiState()
@@ -96,6 +97,10 @@ class TokensViewModel @Inject constructor(
         MutableStateFlow<PnbaUiState>(PnbaUiState.PhoneNumberRequested)
     val pnbaUiState: StateFlow<PnbaUiState> = _pnbaUiState
 
+    fun updatePnbaState(state: PnbaUiState) {
+        _pnbaUiState.value = state
+    }
+
     // Selection mode properties
     var isSelectionMode by mutableStateOf(false)
     var selectedMessagesCount by mutableIntStateOf(0)
@@ -108,6 +113,8 @@ class TokensViewModel @Inject constructor(
 
     fun reset() {
         _selectedToken.value = null
+        _pnbaUiState.value = PnbaUiState.PhoneNumberRequested
+        _isStoringUiState.value = TokensUiState.Idle
     }
 
     fun clearStoringState() {

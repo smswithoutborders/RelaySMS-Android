@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -72,8 +71,6 @@ fun PNBAPhoneNumberCodeRequestView(
     var password by remember { mutableStateOf("") }
 
     var errorMessage: String? by remember { mutableStateOf(null) }
-
-    val buttonRequester = remember { BringIntoViewRequester() }
 
     val uiState by tokensViewModel.isStoringUiState.collectAsStateWithLifecycle()
     val pnbaUiState by tokensViewModel.pnbaUiState.collectAsStateWithLifecycle()
