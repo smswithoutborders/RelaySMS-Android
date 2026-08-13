@@ -8,6 +8,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -19,12 +20,13 @@ import com.example.sw0b_001.ui.theme.AppTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RelayAppBar(
+    platformName: String,
     onBackCallback: () -> Unit,
     editCallback: () -> Unit,
     deleteCallback: () -> Unit,
 ) {
     TopAppBar(
-        title = { },
+        title = { Text(platformName) },
         navigationIcon = {
             IconButton(onClick = onBackCallback) {
                 Icon(
@@ -62,6 +64,7 @@ fun RelayAppBar(
 fun RelayAppBarPreview() {
     AppTheme {
         RelayAppBar(
+            "RelaySMS",
             {},
             {}
         ) {}

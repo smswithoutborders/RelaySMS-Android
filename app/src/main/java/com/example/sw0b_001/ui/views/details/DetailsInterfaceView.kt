@@ -21,13 +21,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.example.sw0b_001.ui.appbars.RelayAppBar
 import com.example.sw0b_001.ui.components.AttachImageView
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
-import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import uniffi.relaysms_spec_payload.V1ContentCategories
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,11 +33,10 @@ import uniffi.relaysms_spec_payload.V1ContentCategories
 fun DetailsInterfaceView(
     navController: NavController,
     cat: V1ContentCategories,
-    tokensViewModel: TokensViewModel,
     payloadsViewModel: PayloadsViewModel,
-    imageViewModel: ImageViewModel,
     messageId: Long,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
+    isOfflineMode: Boolean,
 ) {
 
     val message by payloadsViewModel.message.collectAsStateWithLifecycle()
@@ -77,6 +74,7 @@ fun DetailsInterfaceView(
     Scaffold(
         topBar = {
             RelayAppBar(
+                platformName = supportedPlatform?.display_name ?: "",
                 onBackCallback = { backHandler() },
                 editCallback = {
                     navController.navigate(
@@ -84,7 +82,7 @@ fun DetailsInterfaceView(
                             cat = cat,
                             messageId = messageId,
                             supportedPlatform = message!!.platformName,
-                            isOfflineCompose = supportedPlatform?.supports_offline_first == true
+                            isOfflineCompose = isOfflineMode
                         )
                     )
             }) {

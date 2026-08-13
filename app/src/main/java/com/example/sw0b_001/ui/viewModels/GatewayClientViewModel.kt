@@ -63,7 +63,7 @@ class GatewayClientViewModel @Inject constructor(
     }
 
     fun fetch(){
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = GatewayClientsUiState.Loading
             try {
                 val gatewayClientsRepo = repository.getGatewayClients()

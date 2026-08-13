@@ -102,7 +102,8 @@ class OnlineFirstPublisherViewModel @Inject constructor(
                     val payload = Payloads(
                         catId = catId,
                         content = contentContainer,
-                        platformName = platformName
+                        platformName = platformName,
+                        isOfflineFirst = false
                     )
 
                     payloadsViewModel.insert(payload)

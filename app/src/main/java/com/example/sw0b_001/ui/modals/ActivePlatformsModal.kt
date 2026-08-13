@@ -1,18 +1,18 @@
 package com.example.sw0b_001.ui.modals
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +28,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -35,6 +37,7 @@ import com.bumptech.glide.integration.compose.placeholder
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.SupportedPlatforms
+import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.ui.components.AccountCardOffline
 import com.example.sw0b_001.ui.navigation.ComposeScreen
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
@@ -74,9 +77,8 @@ fun ActivePlatformsModal(
             modifier = Modifier.fillMaxWidth(),
         ) {
             ActivePlatformsComposeComponents(
-                supportedPlatforms.filter{ sp->
-                    tokens.find{ it.platformName == sp.name } != null
-                },
+                tokens = tokens.distinctBy { it.platformName },
+                supportedPlatforms = supportedPlatforms,
                 onOfflineAccountCallback = { platform ->
                     navController.navigate(
                         ComposeScreen(
@@ -87,12 +89,12 @@ fun ActivePlatformsModal(
                         )
                     )
                 }
-            ) { platform ->
+            ) { token ->
                 navController.navigate(
                     ComposeScreen(
-                        cat = v1ContentCategoryFromU8( platform.cat_id.toUByte()),
+                        cat = token.catId,
                         messageId = null,
-                        supportedPlatform = platform.name,
+                        supportedPlatform = token.platformName,
                         isOfflineCompose = false
                     )
                 )
@@ -106,6 +108,15 @@ fun ActivePlatformsModal(
 @Preview(showBackground = true)
 @Composable
 fun ActivePlatformsComposeComponents(
+    tokens: List<Tokens> = listOf(
+        Tokens(
+            tokenId = 1,
+            tokenHash = ByteArray(0),
+            catId = V1ContentCategories.EMAIL,
+            account = "sample",
+            platformName = "example"
+        )
+    ),
     supportedPlatforms: List<SupportedPlatforms> =
         listOf(
             SupportedPlatforms(
@@ -119,7 +130,7 @@ fun ActivePlatformsComposeComponents(
             )
         ),
     onOfflineAccountCallback: (SupportedPlatforms) -> Unit? = {},
-    onSelected: (SupportedPlatforms) -> Unit = {},
+    onSelected: (Tokens) -> Unit = {},
 ) {
     Column(Modifier.padding(16.dp)) {
         Text(stringResource(R.string.send_with))
@@ -127,9 +138,9 @@ fun ActivePlatformsComposeComponents(
         Spacer(Modifier.size(16.dp))
 
         LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 60.dp),
+            columns = GridCells.Adaptive(minSize = 70.dp),
 
-            contentPadding = PaddingValues(16.dp),
+//            contentPadding = PaddingValues(16.dp),
 
             // Adds inner spacing between rows and columns
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -137,29 +148,41 @@ fun ActivePlatformsComposeComponents(
 
             modifier = Modifier.fillMaxWidth()
         ) {
-            items(supportedPlatforms.size) { index ->
-                val platform = supportedPlatforms[index]
-                Box(
-                    modifier = Modifier
-                        .background(
-                            MaterialTheme.colorScheme.secondary,
-                            RoundedCornerShape(50.dp)
-                        )
-                        .size(75.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    GlideImage(
-                        modifier = Modifier
-                            .size(30.dp)
-                            .clickable { onSelected(platform) },
-                        model = platform.icon_png,
-                        contentDescription = stringResource(R.string.platform_image),
-                        contentScale = ContentScale.Fit,
-                        alignment = Alignment.Center,
-                        loading = placeholder(R.drawable.logo),
-                        failure = placeholder(R.drawable.logo)
+            items(tokens) { account ->
+                val platform = remember(account) {
+                    supportedPlatforms.find{ account.platformName == it.name }
+                }
+                if(platform != null){
+                    Card(
+                        shape = RoundedCornerShape(10.dp),
                     ) {
-                        it.diskCacheStrategy(DiskCacheStrategy.ALL)
+                        Column(
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            GlideImage(
+                                modifier = Modifier
+                                    .size(45.dp)
+                                    .clickable { onSelected(account) },
+                                model = platform.icon_png,
+                                contentDescription = stringResource(R.string.platform_image),
+                                contentScale = ContentScale.Fit,
+                                alignment = Alignment.Center,
+                                loading = placeholder(R.drawable.logo),
+                                failure = placeholder(R.drawable.logo)
+                            ) {
+                                it.diskCacheStrategy(DiskCacheStrategy.ALL)
+                            }
+                            Spacer(Modifier.size(4.dp))
+                            Text(
+                                platform.display_name,
+                                style = MaterialTheme.typography.titleSmall,
+                                fontSize = 11.sp
+                            )
+                        }
                     }
                 }
             }
@@ -167,12 +190,17 @@ fun ActivePlatformsComposeComponents(
 
         Spacer(Modifier.size(32.dp))
         Text(stringResource(R.string.always_available_no_setup_required))
-        supportedPlatforms.forEach {
-            if(it.supports_offline_first) {
-                AccountCardOffline {
-                    onOfflineAccountCallback(it)
-                }
-            }
+        AccountCardOffline {
+            onOfflineAccountCallback(SupportedPlatforms(
+                name = "rmail",
+                display_name = "RelaySMS-Mail",
+                supports_offline_first = true,
+                cat_id = V1ContentCategories.EMAIL.value.toInt(),
+                proto_id = V1PayloadsSupportedProtocols.PNBA.value.toInt(),
+                icon_svg = null,
+                icon_png = null,
+                auth_provider = "shortmesh-authy",
+            ))
         }
     }
 }

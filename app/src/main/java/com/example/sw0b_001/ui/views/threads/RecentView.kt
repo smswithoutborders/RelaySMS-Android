@@ -109,7 +109,8 @@ fun RecentView(
                             navController.navigate(
                                 DetailsInterfaceScreen(
                                     cat = clickedMessage.content.getCatId(),
-                                    messageId = it.id
+                                    messageId = it.id,
+                                    isOfflineCompose = clickedMessage.isOfflineFirst
                                 )
                             )
                         },
@@ -278,7 +279,8 @@ fun RecentMessageCard_preview() {
             to = "person@example.com".encodeToByteArray(),
             subject = "subject sample".encodeToByteArray(),
             attachment = null
-        )
+        ),
+        isOfflineFirst = false
     )
     AppTheme() {
         RecentMessageCard(

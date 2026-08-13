@@ -106,6 +106,7 @@ fun ComposerInterface(
     fun backHandler() {
         tokensViewModel.reset()
         payloadsViewModel.reset()
+        imageViewModel.reset()
         navController.popBackStack()
     }
     BackHandler { backHandler() }
@@ -198,6 +199,7 @@ fun ComposerInterface(
                     showChooseGatewayClient = false
                 },
                 catId = catId,
+                platformName = supportedPlatformName
             ) {
                 backHandler()
             }
@@ -272,7 +274,11 @@ fun ComposerInterface(
                     }
 
                     IconButton(
-                        enabled = !isSending && !from.isNullOrBlank(),
+                        enabled = if(isOfflineCompose) {
+                            !isSending
+                        } else {
+                            !isSending && from.isNotBlank()
+                        },
                         onClick = {
                             if(!debugState && !context.settingsGetNotShowChooseGatewayClient)
                                 showChooseGatewayClient = true

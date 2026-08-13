@@ -52,7 +52,7 @@ class SupportedPlatformsViewModel @Inject constructor(
     }
 
     fun fetch() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _uiState.value = SupportedPlatformsUiState.Loading
             try {
                 val supportedPlatforms = repository.getSupportedPlatforms()

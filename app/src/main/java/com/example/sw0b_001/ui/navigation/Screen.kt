@@ -51,7 +51,8 @@ data class ComposeScreen(
 @Serializable
 data class DetailsInterfaceScreen(
     val cat: V1ContentCategories,
-    val messageId: Long
+    val messageId: Long,
+    val isOfflineCompose: Boolean
 )
 
 @Serializable

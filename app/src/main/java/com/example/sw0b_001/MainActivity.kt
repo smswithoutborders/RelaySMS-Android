@@ -351,12 +351,11 @@ class MainActivity : BindActivity() {
                 val detailsInterfaceScreen: DetailsInterfaceScreen = backEntry.toRoute()
                 DetailsInterfaceView(
                     navController = navController,
-                    tokensViewModel = tokensViewModel,
                     payloadsViewModel = payloadsViewModel,
-                    imageViewModel = imageViewModel,
                     cat = detailsInterfaceScreen.cat,
                     messageId = detailsInterfaceScreen.messageId,
                     supportedPlatformsViewModel = supportedPlatformsViewModel,
+                    isOfflineMode = detailsInterfaceScreen.isOfflineCompose
                 )
             }
             composable<PasteEncryptedTextScreen> {

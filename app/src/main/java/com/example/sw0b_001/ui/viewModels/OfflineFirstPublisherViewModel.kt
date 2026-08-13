@@ -37,6 +37,7 @@ class OfflineFirstPublisherViewModel @Inject constructor(
         body: String,
         to: String?,
         subject: String?,
+        platformName: String,
         imageViewModel: ImageViewModel,
         payloadsViewModel: PayloadsViewModel,
         onFailureCallback: (String) -> Unit,
@@ -80,7 +81,8 @@ class OfflineFirstPublisherViewModel @Inject constructor(
                     val payload = Payloads(
                         catId = catId,
                         content = contentContainer,
-                        platformName = "RelaySMS", // TODO: match incoming name
+                        platformName = platformName,
+                        isOfflineFirst = true
                     )
 
                     payloadsViewModel.insert(payload)
