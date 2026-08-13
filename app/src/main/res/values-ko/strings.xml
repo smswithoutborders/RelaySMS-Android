@@ -427,7 +427,7 @@
     <string name="enter_your_recovery_key">복구 키를 입력하세요</string>
     <string name="your_recovery_key_is_a_64_character_code_required_to_recover_your_data">복구 키는 데이터를 복구하는 데 필요한 64자리 코드입니다.</string>
     <string name="recovery_key">복구 키</string>
-    <string name="you_can_always_find_the_option_when_you_click_compose"><![CDATA[<b>작성</b></b>을 클릭하면 항상 해당 옵션을 찾을 수 있습니다.]]></string>
+    <string name="you_can_always_find_the_option_when_you_click_compose"><![CDATA[<b>작성</b>을 클릭하면 항상 해당 옵션을 찾을 수 있습니다.]]></string>
     <string name="you_can_use_this_account_without_verifying_a_number_this_is_a_one_time_use_account_and_cannot_receive_replies">이 계정은 번호 인증 없이 사용할 수 있습니다.</string>
     <string name="your_sending_address_changes_everytime_you_use">사용할 때마다 발송 주소가 변경됩니다.</string>
     <string name="always_available_no_setup_required">언제든지 사용 가능하며, 별도의 설정이 필요 없습니다.</string>
@@ -457,7 +457,7 @@
     <string name="date_stored">저장된 날짜</string>
     <string name="last_sync">마지막 동기화: %1$s</string>
     <string name="send_messages_using_your_account">%1$s 계정을 사용하여 메시지를 보내세요.</string>
-    <string name="you_have_not_saved_any_account_yet_click_the_add_button_to_connect_your_account">아직 계정을 저장하지 않았습니다. 추가 버튼을 클릭하여 <b>%1$s</b> 계정을 연결하세요.]]></string>
+    <string name="you_have_not_saved_any_account_yet_click_the_add_button_to_connect_your_account">아직 계정을 저장하지 않았습니다. 추가 버튼을 클릭하여 <b>%1$s</b> 계정을 연결하세요.</string>
     <string name="offline_compose">오프라인 작곡</string>
     <string name="send_message_offline">오프라인으로 메시지 보내기</string>
     <string name="send_from_a_random_alias_e_g_qwertyuiop_relaysms_me">임의의 가명(예: qwertyuiop@relaysms.me)으로 메시지를 보내세요.</string>

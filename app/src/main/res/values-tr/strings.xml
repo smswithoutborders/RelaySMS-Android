@@ -434,7 +434,7 @@
     <string name="you_have_not_saved_any_account_yet_click_the_add_button_to_connect_your_account"><![CDATA[Henüz hiçbir hesap kaydetmediniz. <b>%1$s</b> hesabınızı bağlamak için ekle düğmesine tıklayın.]]></string>
     <string name="you_can_send_a_quick_mail_without_verifying_or_adding_accounts_using_relaysms_mail">RelaySMS posta hizmetini kullanarak hesap doğrulama veya ekleme yapmadan hızlı bir e-posta gönderebilirsiniz.</string>
     <string name="try_it">Deneyin.</string>
-    <string name="you_can_always_find_the_option_when_you_click_compose"><![CDATA[Seçeneği her zaman <b>Oluştur</b>'a tıkladığınızda bulabilirsiniz]]></string>
+    <string name="you_can_always_find_the_option_when_you_click_compose"><![CDATA[Tıkladığınızda seçeneği her zaman bulabilirsiniz. <b>Oluştur</b>]]></string>
     <string name="account_name">Hesap adı</string>
     <string name="refresh">Yenile</string>
     <string name="encryption_keys_left">Şifreleme anahtarları kaldı</string>
@@ -458,7 +458,7 @@
     <string name="select_the_file_on_your_device_where_your_backup_is_stored">Yedekleme dosyanızın saklandığı dosyayı cihazınızda seçin.</string>
     <string name="open_backup_file">Yedekleme dosyasını açın</string>
     <string name="incorrect_recovery_key">Yanlış kurtarma anahtarı</string>
-    <string name="Settings">Ayarlar</string>
+<!--    <string name="Settings">Ayarlar</string>-->
     <string name="default_routing_number">Varsayılan yönlendirme numarası</string>
     <string name="_default">Varsayılan</string>
     <string name="error">Hata</string>
@@ -477,7 +477,6 @@
     <string name="metrics">Metrikler</string>
     <string name="compose_your_first_message">İlk mesajınızı yazın.</string>
     <string name="restore_on_device_backup">Cihaz üzerindeki yedeklemeyi geri yükle</string>
-    <string name="Messages">Mesajlar</string>
     <string name="connect_your_accounts_once_while_online_send_from_any_of_them_offline_anytime">Çevrimiçi olduğunuzda hesaplarınızı bir kez bağlayın. İstediğiniz zaman, çevrimdışı olarak herhangi birinden e-posta gönderin.</string>
     <string name="always_available_no_setup_required">Her zaman kullanılabilir - Kurulum gerektirmez.</string>
     <string name="backup_file">Yedekleme dosyası</string>

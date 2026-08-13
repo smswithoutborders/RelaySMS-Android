@@ -438,8 +438,8 @@
     <string name="previous">Vorherige</string>
     <string name="you_can_send_a_quick_mail_without_verifying_or_adding_accounts_using_relaysms_mail">Mit RelaySMS Mail können Sie schnell eine E-Mail versenden, ohne Konten verifizieren oder hinzufügen zu müssen.</string>
     <string name="try_it">Probier es aus.</string>
-    <string name="restore_on_device_backup">Wiederherstellung der Sicherung auf dem Gerät</string>
-    <string name="restore_on_device_backup">Wiederherstellung der Sicherung auf dem Gerät</string>
+<!--    <string name="restore_on_device_backup">Wiederherstellung der Sicherung auf dem Gerät</string>-->
+<!--    <string name="restore_on_device_backup">Wiederherstellung der Sicherung auf dem Gerät</string>-->
     <string name="restore_on_device_backup">Wiederherstellung der Sicherung auf dem Gerät</string>
     <string name="restore_your_saved_accounts_from_the_backup_you_saved_on_your_device_if_you_don_t_restore_now_you_won_t_be_able_to_restore_later">Stellen Sie Ihre gespeicherten Konten aus der Sicherung wieder her, die Sie auf Ihrem Gerät gespeichert haben. Wenn Sie die Wiederherstellung jetzt nicht durchführen, ist sie später nicht mehr möglich.</string>
     <string name="choose_your_backup_file">Wählen Sie Ihre Sicherungsdatei aus</string>

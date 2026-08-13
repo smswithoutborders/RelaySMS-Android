@@ -444,8 +444,8 @@
     <string name="recovery_key">恢复密钥</string>
     <string name="you_can_send_a_quick_mail_without_verifying_or_adding_accounts_using_relaysms_mail">使用 RelaySMS 邮件，无需验证或添加帐户即可快速发送邮件。</string>
     <string name="try_it">试试看。</string>
-    <string name="restore_on_device_backup">恢复设备上的备份</string>
-    <string name="restore_on_device_backup">恢复设备上的备份</string>
+<!--    <string name="restore_on_device_backup">恢复设备上的备份</string>-->
+<!--    <string name="restore_on_device_backup">恢复设备上的备份</string>-->
     <string name="restore_on_device_backup">恢复设备上的备份</string>
     <string name="restore_your_saved_accounts_from_the_backup_you_saved_on_your_device_if_you_don_t_restore_now_you_won_t_be_able_to_restore_later">从您设备上保存的备份中恢复已保存的帐户。如果您现在不恢复，以后将无法恢复。</string>
     <string name="choose_your_backup_file">选择您的备份文件</string>
@@ -484,7 +484,7 @@
     <string name="add_new">添加新</string>
     <string name="encryption_keys_server">加密密钥服务器</string>
     <string name="yes_remove">是的，移除</string>
-    <string name="you_have_not_saved_any_account_yet_click_the_add_button_to_connect_your_account">您尚未保存任何帐户。点击“添加”按钮连接您的<b>%1$s</b>帐户。></string>
+    <string name="you_have_not_saved_any_account_yet_click_the_add_button_to_connect_your_account">您尚未保存任何帐户。点击“添加”按钮连接您的<b>%1$s</b>帐户。</string>
     <string name="offline_compose">离线作曲</string>
     <string name="send_message_offline">离线发送消息</string>
     <string name="please_enter_your_avoid_copying_and_pasting_if_telegram_to_not_get_flagged">请输入您的 %1$s 验证码。请勿复制粘贴 Telegram 验证码，以免被标记！</string>

@@ -24,7 +24,7 @@
     <string name="settings_security_and_privacy_enable_lockscreen_open">Enable lockscreen</string>
     <string name="settings_security_and_privacy_enable_lockscreen_open_summary">Require lockscreen pin/fingerprint when starting the app</string>
 
-    <string name="settings_security_and_privacy_account">"Account</string>
+    <string name="settings_security_and_privacy_account">Account</string>
     <string name="settings_security_and_privacy_account_logout">Logout</string>
     <string name="settings_security_and_privacy_account_logout_summary">Logout of your account. You can always log back in, however you current messages would be deleted. </string>
 
@@ -34,7 +34,7 @@
 
     <!-- settings language -->
     <string name="language_english">English</string>
-    <string name="language_french">"French</string>
+    <string name="language_french">French</string>
     <string name="language_farsi">Farsi</string>
     <string name="language_spanish">Spanish</string>
     <string name="language_turkish">Turkish</string>
@@ -380,7 +380,7 @@
     <string name="recipient_account_format_hint">Make sure the recipient account is in the right format.</string>
     <string name="slack_recipient">Slack Channel or User</string>
     <string name="slack_hint">For channels: use #name or an ID (e.g., #general or C123ABC). For DMs: use @username, an email, or a user ID (e.g., @jane or @user@.com or U456DEF).</string>
-    <string name="view_account_menu">You can now see the account you are currently logged into by clicking the menu icon on the navigation bar"</string>
+    <string name="view_account_menu">You can now see the account you are currently logged into by clicking the menu icon on the navigation bar</string>
     <string name="your_account">Your Account</string>
     <string name="set_as_default_sms_app">Set as default SMS app</string>
     <string name="log_in_or_sign_up_to_save_your_online_accounts">Log in or sign up to save your online accounts.</string>

@@ -91,7 +91,7 @@
     <string name="saving">در حال ذخیره…</string>
     <string name="save">ذخیره</string>
     <string name="error_saving_gateway_client">خطا در ذخیره مشتری دروازه</string>
-    <string name="click_continue_to_confirm_this_action_do_not_worry_it_has_no_dangerous_effects">برای تأیید این عمل روی ادامه کلیک کنیدنگران نباشید، این اثرات خطرناکی ندارد.</string>
+    <string name="click_continue_to_confirm_this_action_do_not_worry_it_has_no_dangerous_effects">برای تأیید این عمل روی ادامه کلیک کنید. نگران نباشید، این اثرات خطرناکی ندارد.</string>
     <string name="continue_text">ادامه</string>
     <string name="country_options">گزینه‌های کشور</string>
     <string name="revoking_account_for">لغو حساب برای %1$s</string>

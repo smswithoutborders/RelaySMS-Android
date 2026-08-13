@@ -440,11 +440,11 @@
     <string name="recovery_key">مفتاح الاسترداد</string>
     <string name="you_can_send_a_quick_mail_without_verifying_or_adding_accounts_using_relaysms_mail">يمكنك إرسال بريد إلكتروني سريع دون التحقق من الحسابات أو إضافتها باستخدام بريد RelaySMS.</string>
     <string name="try_it">جربها.</string>
-    <string name="restore_on_device_backup">استعادة النسخة الاحتياطية الموجودة على الجهاز</string>
-    <string name="restore_on_device_backup">استعادة النسخة الاحتياطية الموجودة على الجهاز</string>
-    <string name="restore_on_device_backup">استعادة النسخة الاحتياطية الموجودة على الجهاز</string>
-    <string name="restore_on_device_backup">استعادة النسخة الاحتياطية الموجودة على الجهاز</string>
-    <string name="restore_on_device_backup">استعادة النسخة الاحتياطية الموجودة على الجهاز</string>
+<!--    <string name="restore_on_device_backup">استعادة النسخة الاحتياطية الموجودة على الجهاز</string>-->
+<!--    <string name="restore_on_device_backup">استعادة النسخة الاحتياطية الموجودة على الجهاز</string>-->
+<!--    <string name="restore_on_device_backup">استعادة النسخة الاحتياطية الموجودة على الجهاز</string>-->
+<!--    <string name="restore_on_device_backup">استعادة النسخة الاحتياطية الموجودة على الجهاز</string>-->
+<!--    <string name="restore_on_device_backup">استعادة النسخة الاحتياطية الموجودة على الجهاز</string>-->
     <string name="restore_your_saved_accounts_from_the_backup_you_saved_on_your_device_if_you_don_t_restore_now_you_won_t_be_able_to_restore_later">استعد حساباتك المحفوظة من النسخة الاحتياطية التي قمت بحفظها على جهازك. إذا لم تقم بالاستعادة الآن، فلن تتمكن من استعادتها لاحقًا.</string>
     <string name="restore_on_device_backup">استعادة النسخة الاحتياطية الموجودة على الجهاز</string>
     <string name="choose_your_backup_file">اختر ملف النسخ الاحتياطي الخاص بك</string>
