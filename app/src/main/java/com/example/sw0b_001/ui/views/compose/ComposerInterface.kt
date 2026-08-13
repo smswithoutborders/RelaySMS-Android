@@ -296,16 +296,18 @@ fun ComposerInterface(
                 if(isSending || LocalInspectionMode.current) {
                     LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                 }
-                FromView(
-                    tokens = tokens,
-                    selectedAccount = selectedToken,
-                ) {
-                    tokensViewModel.updateSelectedToken(it)
+                if(!isOfflineCompose) {
+                    FromView(
+                        tokens = tokens,
+                        selectedAccount = selectedToken,
+                    ) {
+                        tokensViewModel.updateSelectedToken(it)
+                    }
                 }
+
                 Column {
                     when(catId) {
                         V1ContentCategories.EMAIL -> EmailComposeView(
-                            catId,
                             to = to,
                             subject = subject,
                             body = body,

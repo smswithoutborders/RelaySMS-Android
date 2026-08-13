@@ -283,6 +283,7 @@ private fun PlatformListContent(
     }
 
     if(showPlatformOptions) {
+        val accounts = tokens.filter { it.platformName == clickedPlatform?.name }
         PlatformOptionsModal(
             showPlatformsModal = showPlatformOptions,
             cat = v1ContentCategoryFromU8(clickedPlatform!!.cat_id.toUByte()),
@@ -294,7 +295,7 @@ private fun PlatformListContent(
             isRevoking = revokingUiState,
             storeCallback = storeCallback,
             revokeCallback = revokeCallback,
-            accounts = tokens.filter { it.platformName == clickedPlatform?.name }
+            accounts = accounts
         ) {
             showPlatformOptions = false
         }

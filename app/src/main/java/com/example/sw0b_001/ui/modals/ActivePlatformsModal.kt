@@ -77,17 +77,15 @@ fun ActivePlatformsModal(
                 supportedPlatforms.filter{ sp->
                     tokens.find{ it.platformName == sp.name } != null
                 },
-                onOfflineAccountCallback = {
-                    supportedPlatforms.find{ it.name == "rmail"}?.let { platform ->
-                        navController.navigate(
-                            ComposeScreen(
-                                cat = v1ContentCategoryFromU8( platform.cat_id.toUByte()),
-                                messageId = null,
-                                supportedPlatform = platform.name,
-                                isOfflineCompose = platform.supports_offline_first
-                            )
+                onOfflineAccountCallback = { platform ->
+                    navController.navigate(
+                        ComposeScreen(
+                            cat = v1ContentCategoryFromU8( platform.cat_id.toUByte()),
+                            messageId = null,
+                            supportedPlatform = platform.name,
+                            isOfflineCompose = true
                         )
-                    }
+                    )
                 }
             ) { platform ->
                 navController.navigate(
@@ -95,7 +93,7 @@ fun ActivePlatformsModal(
                         cat = v1ContentCategoryFromU8( platform.cat_id.toUByte()),
                         messageId = null,
                         supportedPlatform = platform.name,
-                        isOfflineCompose = platform.supports_offline_first
+                        isOfflineCompose = false
                     )
                 )
             }
@@ -120,7 +118,7 @@ fun ActivePlatformsComposeComponents(
                 icon_png = null
             )
         ),
-    onOfflineAccountCallback: () -> Unit = {},
+    onOfflineAccountCallback: (SupportedPlatforms) -> Unit? = {},
     onSelected: (SupportedPlatforms) -> Unit = {},
 ) {
     Column(Modifier.padding(16.dp)) {
@@ -169,6 +167,12 @@ fun ActivePlatformsComposeComponents(
 
         Spacer(Modifier.size(32.dp))
         Text(stringResource(R.string.always_available_no_setup_required))
-        AccountCardOffline(onOfflineAccountCallback)
+        supportedPlatforms.forEach {
+            if(it.supports_offline_first) {
+                AccountCardOffline {
+                    onOfflineAccountCallback(it)
+                }
+            }
+        }
     }
 }

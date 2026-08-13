@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sw0b_001.R
 import kotlinx.coroutines.launch
-import uniffi.relaysms_spec_payload.V1ContentCategories
 
 
 fun ByteArray.toUtf8String(): String {
@@ -40,7 +39,6 @@ fun ByteArray.toUtf8String(): String {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EmailComposeView(
-    cat: V1ContentCategories,
     to: String,
     subject: String,
     body: String,
