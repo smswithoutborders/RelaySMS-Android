@@ -89,10 +89,10 @@ android {
         }
 
         debug {
-//            minifyEnabled true
-//            shrinkResources true
-//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-//            testProguardFiles 'proguard-rules.pro'
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            testProguardFiles 'proguard-rules.pro'
         }
     }
 
@@ -193,7 +193,7 @@ dependencies {
     implementation libs.smswithoutborders.lib.image.android
     implementation libs.lib.smsmms.android
     implementation libs.lib.signal.double.ratchet.java
-    implementation 'com.github.shortmesh:Widget-android:89e9e78'
+    implementation 'com.github.shortmesh:Widget-android:d7b574fe33'
 
 //    implementation(libs.jna)
     implementation 'net.java.dev.jna:jna:5.14.0@aar'
