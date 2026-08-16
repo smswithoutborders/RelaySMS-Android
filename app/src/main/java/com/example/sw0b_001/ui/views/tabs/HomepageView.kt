@@ -147,6 +147,8 @@ fun HomepageView(
                         onClick = {
                             sendNewMessageRequested = true
                         },
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
                         icon = {
                             Icon(
                                 imageVector = Icons.Outlined.Edit,
@@ -162,6 +164,8 @@ fun HomepageView(
                     if (messages?.isNotEmpty() == true) {
                         ExtendedFloatingActionButton(
                             onClick = { sendNewMessageRequested = true },
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
                             icon = {
                                 Icon(
                                     imageVector = Icons.Filled.PersonAdd,

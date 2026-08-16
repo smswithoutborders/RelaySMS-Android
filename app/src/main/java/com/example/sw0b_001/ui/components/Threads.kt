@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -46,15 +47,15 @@ fun PulsingMessagePlaceholder() {
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val color = MaterialTheme.colorScheme.secondary
+        val color = MaterialTheme.colorScheme.surfaceVariant
         Box(
             modifier = Modifier
-                .size(50.dp)
+                .size(42.dp)
                 .clip(CircleShape)
                 .pulseLoading(isLoading = true, color)
         )
 
-        Spacer(Modifier.padding(start=12.dp))
+        Spacer(Modifier.width(12.dp))
         Column(
             modifier = Modifier
                 .fillMaxWidth(),
@@ -65,15 +66,15 @@ fun PulsingMessagePlaceholder() {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(0.7f)
-                        .height(20.dp)
+                        .height(12.dp)
                         .clip(RoundedCornerShape(12.dp))
                         .pulseLoading(isLoading = true, color)
                 )
 
-                Spacer(Modifier.padding(start=32.dp))
+                Spacer(Modifier.width(32.dp))
                 Box(
                     modifier = Modifier
-                        .height(20.dp)
+                        .height(12.dp)
                         .clip(RoundedCornerShape(12.dp))
                         .pulseLoading(isLoading = true, color)
                         .weight(1f)
@@ -83,7 +84,7 @@ fun PulsingMessagePlaceholder() {
             Box(
                 modifier = Modifier
                     .fillMaxWidth(0.5f)
-                    .height(20.dp)
+                    .height(12.dp)
                     .clip(RoundedCornerShape(12.dp))
                     .pulseLoading(isLoading = true, color)
             )

@@ -135,7 +135,7 @@ fun RecentView(
         if (showRelaySmsAvailable) {
             RmailAlertDialog(
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
+                    .align(Alignment.TopCenter)
                     .padding(16.dp),
                 onDismiss = {
                     showRelaySmsAvailable = false

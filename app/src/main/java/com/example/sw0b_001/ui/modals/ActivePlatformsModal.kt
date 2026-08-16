@@ -154,7 +154,7 @@ fun ActivePlatformsComposeComponents(
                 }
                 if(platform != null){
                     Card(
-                        shape = RoundedCornerShape(10.dp),
+                        shape = RoundedCornerShape(12.dp),
                     ) {
                         Column(
                             modifier = Modifier
@@ -165,7 +165,7 @@ fun ActivePlatformsComposeComponents(
                         ) {
                             GlideImage(
                                 modifier = Modifier
-                                    .size(45.dp)
+                                    .size(40.dp)
                                     .clickable { onSelected(account) },
                                 model = platform.icon_png,
                                 contentDescription = stringResource(R.string.platform_image),

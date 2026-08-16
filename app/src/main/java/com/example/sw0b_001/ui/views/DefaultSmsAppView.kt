@@ -91,23 +91,23 @@ fun DefaultSmsAppScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
             Text(
-                text = stringResource(R.string.make_relaysms_your_default_sms_app),
+                text = stringResource(R.string.to_send_attachments_and_enjoy_the_best_experience_make_relaysms_your_default_sms_app),
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = stringResource(R.string.manage_your_sms_messages_from_one_place),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    lineHeight = 25.sp
-                ),
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.fillMaxWidth()
-            )
+//            Spacer(modifier = Modifier.height(16.dp))
+//
+//            Text(
+//                text = stringResource(R.string.manage_your_sms_messages_from_one_place),
+//                textAlign = TextAlign.Center,
+//                style = MaterialTheme.typography.bodyMedium.copy(
+//                    lineHeight = 25.sp
+//                ),
+//                color = MaterialTheme.colorScheme.onSurfaceVariant,
+//                modifier = Modifier.fillMaxWidth()
+//            )
 
             Spacer(modifier = Modifier.height(40.dp))
 
@@ -124,6 +124,7 @@ fun DefaultSmsAppScreen(
                     pressedElevation = 1.dp
                 ),
                 modifier = Modifier
+                    .fillMaxWidth()
                     .wrapContentWidth()
                     .height(48.dp)
                     .padding(horizontal = 8.dp)

@@ -126,6 +126,7 @@ fun SelectAccountModalComponent(
                     Spacer(modifier = Modifier.size(8.dp))
                     AccountCard(
                         account = account,
+                        platformDisplayName = supportedPlatform.display_name,
                         supportingIcon = Icons.Outlined.Delete,
                         supportingIconCallback = onRemoveAccountCallback,
                         onAccountSelected = { onAccountSelected(account) },
@@ -203,6 +204,7 @@ fun AccountCardOffline(
 @Composable
 fun AccountCard(
     account: Tokens,
+    platformDisplayName: String? = null,
     backgroundColor: Color = MaterialTheme.colorScheme.background,
     shape: Shape = RoundedCornerShape(25.dp),
     supportingIcon: ImageVector? = null,
@@ -248,7 +250,10 @@ fun AccountCard(
                     style = MaterialTheme.typography.bodyMedium,
                 )
                 Text(
-                    text = account.platformName,
+                    text = formatPlatformName(
+                        displayName = platformDisplayName,
+                        platformName = account.platformName
+                    ),
                     style = MaterialTheme.typography.titleSmall,
                 )
             }
@@ -266,6 +271,20 @@ fun AccountCard(
                     )
                 }
             }
+        }
+    }
+}
+
+private fun formatPlatformName(displayName: String?, platformName: String): String {
+    if (!displayName.isNullOrBlank()) {
+        return displayName
+    }
+
+    return platformName.replaceFirstChar { firstChar ->
+        if (firstChar.isLowerCase()) {
+            firstChar.titlecase()
+        } else {
+            firstChar.toString()
         }
     }
 }
