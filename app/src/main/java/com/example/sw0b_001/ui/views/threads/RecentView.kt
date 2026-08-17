@@ -40,6 +40,7 @@ import com.bumptech.glide.integration.compose.placeholder
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.Payloads
+import com.example.sw0b_001.data.models.SupportedPlatforms
 import com.example.sw0b_001.extensions.context.hasSeenRmailAd
 import com.example.sw0b_001.extensions.context.hasShownRmailAd
 import com.example.sw0b_001.ui.components.PulsingMessagePlaceholder
@@ -54,6 +55,7 @@ import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.views.compose.toUtf8String
 import uniffi.relaysms_spec_payload.V1ContentCategories
 import uniffi.relaysms_spec_payload.V1ContentsContainer
+import uniffi.relaysms_spec_payload.V1PayloadsSupportedProtocols
 import uniffi.relaysms_spec_payload.v1ContentCategoryFromU8
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -142,18 +144,28 @@ fun RecentView(
                     context.hasSeenRmailAd(true)
                 },
                 onTryItCallback = {
-                    supportedPlatforms.find{ it.name == "rmail" }?.let { rmail ->
-                        navController.navigate(ComposeScreen(
-                            cat = v1ContentCategoryFromU8(rmail.cat_id.toUByte()),
-                            messageId = null,
-                            supportedPlatform = rmail.name,
-                            isOfflineCompose = rmail.supports_offline_first
-                        )) {
-                            popUpTo(HomeScreenNav()) {
-                                inclusive = true
-                            }
-                            launchSingleTop = true
+                    showRelaySmsAvailable = false
+                    context.hasSeenRmailAd(true)
+                    val rmail = SupportedPlatforms(
+                        name = "rmail",
+                        display_name = "RelaySMS-Mail",
+                        supports_offline_first = true,
+                        cat_id = V1ContentCategories.EMAIL.value.toInt(),
+                        proto_id = V1PayloadsSupportedProtocols.PNBA.value.toInt(),
+                        icon_svg = null,
+                        icon_png = null,
+                        auth_provider = "shortmesh-authy",
+                    )
+                    navController.navigate(ComposeScreen(
+                        cat = v1ContentCategoryFromU8(rmail.cat_id.toUByte()),
+                        messageId = null,
+                        supportedPlatform = rmail.name,
+                        isOfflineCompose = rmail.supports_offline_first
+                    )) {
+                        popUpTo(HomeScreenNav()) {
+                            inclusive = true
                         }
+                        launchSingleTop = true
                     }
                 }
             )

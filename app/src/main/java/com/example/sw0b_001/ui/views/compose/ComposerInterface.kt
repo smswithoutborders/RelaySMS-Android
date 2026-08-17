@@ -75,6 +75,9 @@ import com.example.sw0b_001.ui.viewModels.OnlineFirstPublisherViewModel
 import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.views.threads.makeDefault
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import uniffi.relaysms_spec_payload.V1ContentCategories
 
 
@@ -194,8 +197,10 @@ fun ComposerInterface(
                 imageViewModel = imageViewModel,
                 payloadsViewModel = payloadsViewModel,
                 onFailureCallback = {
-                    Toast.makeText(context, it, Toast.LENGTH_LONG)
-                        .show()
+                    CoroutineScope(Dispatchers.Main).launch {
+                        Toast.makeText(context, it, Toast.LENGTH_LONG)
+                            .show()
+                    }
                     showChooseGatewayClient = false
                 },
                 catId = catId,
