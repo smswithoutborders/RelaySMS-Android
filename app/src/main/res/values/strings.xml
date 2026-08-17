@@ -118,8 +118,6 @@
     <string name="vault_grpc_url" translatable="false">vault.smswithoutborders.com</string>
     <string name="vault_grpc_port" translatable="false">443</string>
 
-    <string name="publisher_grpc_url" translatable="false">publisher.smswithoutborders.com</string>
-    <string name="publisher_grpc_port" translatable="false">443</string>
 
     <string name="publisher_get_platforms_url" translatable="false"></string>
     <string name="cancel">Cancel</string>
@@ -547,4 +545,10 @@
     <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">When adding accounts for platforms that use OAuth2.0 (e.g., Gmail, X), enabling this option ensures that your access tokens are stored on your current device instead.</string>
     <string name="onboarding_save_vault_description">Save access to your accounts. It\'s stored securely on your device, so you can send messages as yourself.</string>
     <string name="to_send_attachments_and_enjoy_the_best_experience_make_relaysms_your_default_sms_app">To send attachments and enjoy the best experience, make RelaySMS your default SMS app.</string>
+
+    <string name="oauth_redirect_url" translatable="false">https://relay.smswithoutborders.com/android</string>
+    <string name="publisher_grpc_url" translatable="false">relaysms.smswithoutborders.afkanerd.com</string>
+    <string name="publisher_grpc_port" translatable="false">443</string>
+    <string name="base_url" translatable="false">https://relaysms.smswithoutborders.afkanerd.com</string>
+
 </resources>

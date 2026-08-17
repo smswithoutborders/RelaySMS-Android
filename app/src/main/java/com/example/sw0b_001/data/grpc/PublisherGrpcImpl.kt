@@ -31,7 +31,8 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
     private var nativePubStub = PublisherGrpc.newBlockingStub(channel)
     private val publisherStub = nativePubStub
         .withInterceptors(GrpcClientInterceptor(context) { null })
-    private var oAuthRedirectUrl = "https://relay.smswithoutborders.com/android"
+    private var oAuthRedirectUrl =
+        context.getString(R.string.oauth_redirect_url)
 
 
     fun getOAuthURL(

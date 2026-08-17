@@ -1,9 +1,12 @@
 package com.example.sw0b_001.data.repositories
 
+import android.content.Context
+import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.GatewayClients
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -13,7 +16,7 @@ import javax.inject.Qualifier
 import javax.inject.Singleton
 
 interface GatewayClientApiService {
-    @GET("/v3/clients")
+    @GET("/v1/gateway-clients")
     suspend fun getSupportedPlatforms(): List<GatewayClients>
 }
 
@@ -28,8 +31,8 @@ object GatewayClientsNetworkModule {
     @Provides
     @Singleton
     @GatewayRetrofit
-    fun provideRetrofit(): Retrofit {
-        val baseUrl = "https://smswithoutborders.com:15000"
+    fun provideRetrofit(@ApplicationContext context: Context): Retrofit {
+        val baseUrl = context.getString(R.string.base_url)
         return Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
             .baseUrl(baseUrl)
