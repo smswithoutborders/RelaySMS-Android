@@ -101,6 +101,7 @@ import kotlinx.coroutines.launch
 import uniffi.relaysms_spec_payload.Transports
 import uniffi.relaysms_spec_payload.v1CalculateSegments
 import java.io.File
+import kotlin.system.exitProcess
 
 @AndroidEntryPoint
 class MainActivity : BindActivity() {
@@ -190,25 +191,21 @@ class MainActivity : BindActivity() {
             }
         }
 
-        if(!settingsGetOnboardedCompletely) {
-            beginAppLifecycle()
-        }
-        else securityChecks {
+        securityChecks {
             beginAppLifecycle()
         }
     }
 
     private fun securityChecks(callback: () -> Unit) {
         if(settingsGetLockDownApp) {
-            TODO()
-//            promptBiometrics(this) {
-//                if(!it) {
-//                    finish()
-//                    exitProcess(0)
-//                } else {
-//                    callback()
-//                }
-//            }
+            promptBiometrics(this) {
+                if(!it) {
+                    finish()
+                    exitProcess(0)
+                } else {
+                    callback()
+                }
+            }
         } else {
             callback()
         }

@@ -56,3 +56,15 @@
 
 -keep class io.shortmesh.sdk.network.SupportedPlatforms { *; }
 
+# Keep Protobuf GeneratedMessageLite and its fields
+-keepclassmembers class * extends com.google.protobuf.GeneratedMessageLite {
+    <fields>;
+}
+
+# Keep any proto message types from being obfuscated/stripped
+-keep class * extends com.google.protobuf.MessageLite { *; }
+-keep class * extends com.google.protobuf.GeneratedMessageLite$Builder { *; }
+
+# If using Firebase or Play Services internals
+-dontwarn com.google.protobuf.**
+

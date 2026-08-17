@@ -17,6 +17,6 @@
     <string name="publisher_grpc_url" translatable="false">publisher.relaysms.afkanerd.de</string>
     <string name="publisher_grpc_port" translatable="false">443</string>
     <string name="supported_platforms_url" translatable="false">https://publisher.relaysms.afkanerd.de/</string>
-    <string name="base_url" translatable="false">https://relaysms.smswithoutborders.afkanerd.com/v1/platforms/</string>
+    <string name="base_url" translatable="false">https://relaysms.smswithoutborders.afkanerd.com</string>
 
 </resources>
