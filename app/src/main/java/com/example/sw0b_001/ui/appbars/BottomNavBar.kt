@@ -4,10 +4,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Chat
-import androidx.compose.material.icons.filled.GridView
+import androidx.compose.material.icons.filled.ViewAgenda
 import androidx.compose.material.icons.filled.PhoneForwarded
 import androidx.compose.material.icons.outlined.ChatBubbleOutline
-import androidx.compose.material.icons.outlined.GridView
+import androidx.compose.material.icons.outlined.ViewAgenda
 import androidx.compose.material.icons.outlined.PhoneForwarded
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -89,8 +89,8 @@ fun BottomNavBar(
                     Icon(
                         imageVector = navIcon(
                             selected = isPlatformsSelected,
-                            filled = Icons.Filled.GridView,
-                            outlined = Icons.Outlined.GridView,
+                            filled = Icons.Filled.ViewAgenda,
+                            outlined = Icons.Outlined.ViewAgenda,
                         ),
                         contentDescription = stringResource(R.string.platforms),
                         modifier = Modifier.size(24.dp)
@@ -162,7 +162,7 @@ fun BottomNavBar_Preview() {
     AppTheme {
         BottomNavBar(
             navController = NavController(LocalContext.current),
-            selectedTab = BottomTabsItems.BottomBarRecentTab
+            selectedTab = BottomTabsItems.BottomBarPlatformsTab
         )
     }
 }

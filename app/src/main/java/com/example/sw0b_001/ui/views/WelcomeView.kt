@@ -173,7 +173,7 @@ fun WelcomeMainView(
                         navController.navigate(OnboardingViewScreen)
                     },
                     modifier = Modifier
-                        .width(250.dp)
+                        .fillMaxWidth()
                         .padding(horizontal = 8.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary
