@@ -53,7 +53,6 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.data.getPhoneNumberFromPrefs
 import com.example.sw0b_001.ui.navigation.AboutScreen
 import com.example.sw0b_001.ui.navigation.BackupScreen
-import com.example.sw0b_001.ui.navigation.RestoreScreen
 import com.example.sw0b_001.ui.navigation.SettingsScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 
@@ -190,13 +189,6 @@ fun RecentAppBar(
                             onClick = {
                                 showMenu = false
                                 navController.navigate(BackupScreen)
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.metrics)) },
-                            onClick = {
-                                showMenu = false
-                                navController.navigate(RestoreScreen)
                             }
                         )
                         DropdownMenuItem(
