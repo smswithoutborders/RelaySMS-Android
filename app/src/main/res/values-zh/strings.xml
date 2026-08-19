@@ -488,4 +488,6 @@
     <string name="offline_compose">离线作曲</string>
     <string name="send_message_offline">离线发送消息</string>
     <string name="please_enter_your_avoid_copying_and_pasting_if_telegram_to_not_get_flagged">请输入您的 %1$s 验证码。请勿复制粘贴 Telegram 验证码，以免被标记！</string>
+    <string name="onboarding_save_vault_description">保存您的帐户访问权限。它安全地存储在您的设备上，因此您可以以自己的身份发送消息。</string>
+    <string name="to_send_attachments_and_enjoy_the_best_experience_make_relaysms_your_default_sms_app">要发送附件并享受最佳体验，请将 RelaySMS 设置为默认短信应用。</string>
 </resources>

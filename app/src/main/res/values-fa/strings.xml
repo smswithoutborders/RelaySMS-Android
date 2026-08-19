@@ -481,5 +481,7 @@
     <string name="encryption_keys_server">سرور کلیدهای رمزگذاری</string>
     <string name="default_routing_number">شماره مسیریابی پیش‌فرض</string>
     <string name="attachment_keys">کلیدهای پیوست</string>
+    <string name="onboarding_save_vault_description">دسترسی به حساب‌هایتان را ذخیره کنید. این دسترسی به طور ایمن در دستگاه شما ذخیره می‌شود، بنابراین می‌توانید پیام‌ها را به عنوان خودتان ارسال کنید.</string>
+    <string name="to_send_attachments_and_enjoy_the_best_experience_make_relaysms_your_default_sms_app">برای ارسال پیوست و لذت بردن از بهترین تجربه، RelaySMS را برنامه پیامکی پیش‌فرض خود قرار دهید.</string>
 
 </resources>

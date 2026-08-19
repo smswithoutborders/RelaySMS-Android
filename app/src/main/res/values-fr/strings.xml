@@ -483,4 +483,5 @@
     <string name="always_available_no_setup_required">Toujours disponible - Aucune installation requise.</string>
     <string name="this_lets_the_app_manage_the_sending_requirements_for_you">Cela permet à l\'application de gérer les exigences d\'envoi pour vous.</string>
     <string name="onboarding_save_vault_description">Enregistrez l\'accès à vos comptes. Il est stocké en toute sécurité sur votre appareil, vous permettant ainsi d\'envoyer des messages en votre nom propre.</string>
+    <string name="to_send_attachments_and_enjoy_the_best_experience_make_relaysms_your_default_sms_app">Pour envoyer des pièces jointes et bénéficier d\'une expérience optimale, définissez RelaySMS comme application SMS par défaut.</string>
 </resources>

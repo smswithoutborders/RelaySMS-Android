@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -53,6 +54,7 @@ import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.views.compose.toUtf8String
+import uniffi.relaysms_spec_payload.NoHandle
 import uniffi.relaysms_spec_payload.V1ContentCategories
 import uniffi.relaysms_spec_payload.V1ContentsContainer
 import uniffi.relaysms_spec_payload.V1PayloadsSupportedProtocols
@@ -176,7 +178,7 @@ fun RecentView(
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun GetMessageAvatar(logo: String?) {
-    val imageSize = 38.dp
+    val imageSize = 25.dp
     Box(
 //        modifier = Modifier
 //            .size(50.dp)
@@ -196,7 +198,6 @@ fun GetMessageAvatar(logo: String?) {
 
 
 
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RecentMessageCard(
@@ -206,9 +207,22 @@ fun RecentMessageCard(
     logo: String? = null,
     onClickCallback: (Payloads) -> Unit,
 ) {
-    val rawBody = payload.content.getBody().toUtf8String()
-    val heading = payload.content.getSubject()?.toUtf8String() ?: ""
-    val subHeading = payload.content.getTo()?.toUtf8String() ?: ""
+    val isInPreview = LocalInspectionMode.current
+    val rawBody = if (isInPreview) {
+        "Hello world"
+    } else {
+        payload.content.getBody().toUtf8String()
+    }
+    val heading = if (isInPreview) {
+        "subject sample"
+    } else {
+        payload.content.getSubject()?.toUtf8String() ?: ""
+    }
+    val subHeading = if (isInPreview) {
+        "person@example.com"
+    } else {
+        payload.content.getTo()?.toUtf8String() ?: ""
+    }
 
     val hasHeading = heading.isNotBlank()
     val hasSubHeading = subHeading.isNotBlank()
@@ -285,13 +299,7 @@ fun RecentMessageCard_preview() {
     val payload = Payloads(
         platformName = "RelaySMS mail",
         catId = V1ContentCategories.EMAIL,
-        content = V1ContentsContainer(
-            catId = V1ContentCategories.EMAIL,
-            body = "Hello world".encodeToByteArray(),
-            to = "person@example.com".encodeToByteArray(),
-            subject = "subject sample".encodeToByteArray(),
-            attachment = null
-        ),
+        content = V1ContentsContainer(NoHandle),
         isOfflineFirst = false
     )
     AppTheme() {

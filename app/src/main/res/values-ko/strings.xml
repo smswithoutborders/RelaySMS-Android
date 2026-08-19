@@ -485,5 +485,7 @@
     <string name="encryption_keys_server">암호화 키 서버</string>
     <string name="default_routing_number">기본 라우팅 번호</string>
     <string name="attachment_keys">첨부 키</string>
+    <string name="onboarding_save_vault_description">계정 접근 권한을 저장하세요. 안전하게 기기에 저장되므로 본인 계정으로 메시지를 보낼 수 있습니다.</string>
+    <string name="to_send_attachments_and_enjoy_the_best_experience_make_relaysms_your_default_sms_app">첨부 파일을 전송하고 최상의 경험을 누리려면 RelaySMS를 기본 SMS 앱으로 설정하세요.</string>
 
 </resources>

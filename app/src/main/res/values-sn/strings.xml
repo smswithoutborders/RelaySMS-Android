@@ -481,4 +481,6 @@
     <string name="encryption_keys_server">Seva yemakiyi e encryption</string>
     <string name="default_routing_number">Nhamba yekutanga yekufambisa</string>
     <string name="attachment_keys">Makiyi ekubatanidza</string>
+    <string name="onboarding_save_vault_description">Chengetedza mukana wekupinda muakaundi yako. Inochengetwa zvakachengeteka pamudziyo wako, saka unogona kutumira mameseji sewe pachako.</string>
+    <string name="to_send_attachments_and_enjoy_the_best_experience_make_relaysms_your_default_sms_app">Kuti utumire zvakabatanidzwa uye unakirwe neruzivo rwakanakisisa, ita kuti RelaySMS ive app yako yeSMS yaunogara uchiita.</string>
 </resources>

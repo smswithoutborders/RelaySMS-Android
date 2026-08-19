@@ -486,5 +486,7 @@
     <string name="encryption_keys_server">एन्क्रिप्शन कुंजी सर्वर</string>
     <string name="default_routing_number">डिफ़ॉल्ट रूटिंग नंबर</string>
     <string name="attachment_keys">अनुलग्नक कुंजियाँ</string>
+    <string name="onboarding_save_vault_description">अपने अकाउंट का एक्सेस सेव करें। यह आपके डिवाइस पर सुरक्षित रूप से स्टोर रहता है, ताकि आप खुद से मैसेज भेज सकें।</string>
+    <string name="to_send_attachments_and_enjoy_the_best_experience_make_relaysms_your_default_sms_app">अटैचमेंट भेजने और सबसे अच्छा अनुभव पाने के लिए, RelaySMS को अपना डिफ़ॉल्ट SMS ऐप बनाएं।</string>
 
 </resources>

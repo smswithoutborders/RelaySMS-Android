@@ -487,5 +487,7 @@
     <string name="offline_compose">التأليف دون اتصال بالإنترنت</string>
     <string name="send_message_offline">إرسال الرسائل دون اتصال بالإنترنت</string>
     <string name="please_enter_your_avoid_copying_and_pasting_if_telegram_to_not_get_flagged">الرجاء إدخال رمز %1$s الخاص بك. تجنب النسخ واللصق في تيليجرام حتى لا يتم الإبلاغ عنك!</string>
+    <string name="onboarding_save_vault_description">احفظ بيانات الوصول إلى حساباتك. يتم تخزينها بشكل آمن على جهازك، لذا يمكنك إرسال الرسائل باسمك الحقيقي.</string>
+    <string name="to_send_attachments_and_enjoy_the_best_experience_make_relaysms_your_default_sms_app">لإرسال المرفقات والاستمتاع بأفضل تجربة، اجعل تطبيق RelaySMS تطبيق الرسائل النصية الافتراضي لديك.</string>
 
 </resources>
