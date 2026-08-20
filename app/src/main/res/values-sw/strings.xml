@@ -481,5 +481,8 @@
     <string name="backup_file">Faili ya nakala rudufu</string>
     <string name="routing_numbers">Nambari za uelekezaji</string>
     <string name="encryption_keys_server">Seva ya funguo za usimbaji fiche</string>
-
+    <plurals name="your_accounts_s">
+        <item quantity="one"><![CDATA[Akaunti yako ya <b>%1$s</b>]]></item>
+        <item quantity="other"><![CDATA[Akaunti zako za <b>%1$s</b>]]></item>
+    </plurals>
 </resources>

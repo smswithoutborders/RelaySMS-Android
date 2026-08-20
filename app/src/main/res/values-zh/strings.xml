@@ -488,4 +488,8 @@
     <string name="offline_compose">离线作曲</string>
     <string name="send_message_offline">离线发送消息</string>
     <string name="please_enter_your_avoid_copying_and_pasting_if_telegram_to_not_get_flagged">请输入您的 %1$s 验证码。请勿复制粘贴 Telegram 验证码，以免被标记！</string>
+    <plurals name="your_accounts_s">
+        <item quantity="one"><![CDATA[你的 <b>%1$s</b> 账户]]></item>
+        <item quantity="other"><![CDATA[你的 <b>%1$s</b> 账户]]></item>
+    </plurals>
 </resources>

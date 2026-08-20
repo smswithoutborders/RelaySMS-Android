@@ -487,5 +487,11 @@
     <string name="offline_compose">التأليف دون اتصال بالإنترنت</string>
     <string name="send_message_offline">إرسال الرسائل دون اتصال بالإنترنت</string>
     <string name="please_enter_your_avoid_copying_and_pasting_if_telegram_to_not_get_flagged">الرجاء إدخال رمز %1$s الخاص بك. تجنب النسخ واللصق في تيليجرام حتى لا يتم الإبلاغ عنك!</string>
-
+    <plurals name="your_accounts_s">
+        <item quantity="one"><![CDATA[حساب <b>%1$s</b> الخاص بك]]></item>
+        <item quantity="two"><![CDATA[حسابا <b>%1$s</b> الخاصان بك]]></item>
+        <item quantity="few"><![CDATA[حسابات <b>%1$s</b> الخاصة بك]]></item>
+        <item quantity="many"><![CDATA[حسابات <b>%1$s</b> الخاصة بك]]></item>
+        <item quantity="other"><![CDATA[حساب <b>%1$s</b> الخاص بك]]></item>
+    </plurals>
 </resources>

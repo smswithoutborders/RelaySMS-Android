@@ -482,5 +482,8 @@
     <string name="backup_file">Yedekleme dosyası</string>
     <string name="routing_numbers">Yönlendirme numaraları</string>
     <string name="encryption_keys_server">Şifreleme anahtarları sunucusu</string>
-
+    <plurals name="your_accounts_s">
+        <item quantity="one"><![CDATA[<b>%1$s</b> hesabınız]]></item>
+        <item quantity="other"><![CDATA[<b>%1$s</b> hesaplarınız]]></item>
+    </plurals>
 </resources>

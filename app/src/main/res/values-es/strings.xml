@@ -481,5 +481,8 @@
     <string name="backup_file">Archivo de copia de seguridad</string>
     <string name="routing_numbers">Números de ruta</string>
     <string name="encryption_keys_server">Servidor de claves de cifrado</string>
-
+    <plurals name="your_accounts_s">
+        <item quantity="one"><![CDATA[Tu cuenta de <b>%1$s</b>]]></item>
+        <item quantity="other"><![CDATA[Tus cuentas de <b>%1$s</b>]]></item>
+    </plurals>
 </resources>
