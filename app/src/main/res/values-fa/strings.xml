@@ -488,4 +488,6 @@
         <item quantity="one"><![CDATA[حساب <b>%1$s</b> شما]]></item>
         <item quantity="other"><![CDATA[حساب‌های <b>%1$s</b> شما]]></item>
     </plurals>
+    <string name="no_saved_platforms">بدون پلتفرم ذخیره شده</string>
+    <string name="add_a_platform">اضافه کردن پلتفرم</string>
 </resources>

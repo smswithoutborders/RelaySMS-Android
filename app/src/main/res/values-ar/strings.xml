@@ -495,4 +495,6 @@
         <item quantity="one"><![CDATA[حسابك <b>%1$s</b>]]></item>
         <item quantity="other"><![CDATA[حساباتك <b>%1$s</b>]]></item>
     </plurals>
+    <string name="no_saved_platforms">لا توجد منصات محفوظة</string>
+    <string name="add_a_platform">أضف منصة</string>
 </resources>

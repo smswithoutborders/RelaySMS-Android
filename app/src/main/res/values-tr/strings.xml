@@ -491,4 +491,6 @@
         <item quantity="one"><![CDATA[<b>%1$s</b> hesabınız]]></item>
         <item quantity="other"><![CDATA[<b>%1$s</b> hesaplarınız]]></item>
     </plurals>
+    <string name="no_saved_platforms">Kaydedilmiş platform yok</string>
+    <string name="add_a_platform">Platform Ekle</string>
 </resources>

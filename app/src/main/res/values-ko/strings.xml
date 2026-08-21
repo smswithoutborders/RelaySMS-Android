@@ -492,4 +492,6 @@
         <item quantity="one"><![CDATA[내 <b>%1$s</b> 계정]]></item>
         <item quantity="other"><![CDATA[내 <b>%1$s</b> 계정]]></item>
     </plurals>
+    <string name="no_saved_platforms">저장된 플랫폼 없음</string>
+    <string name="add_a_platform">플랫폼을 추가하세요</string>
 </resources>

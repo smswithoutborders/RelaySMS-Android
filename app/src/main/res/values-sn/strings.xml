@@ -488,4 +488,6 @@
         <item quantity="one"><![CDATA[Akaunti yako ye<b>%1$s</b>]]></item>
         <item quantity="other"><![CDATA[Maakaundi ako e<b>%1$s</b>]]></item>
     </plurals>
+    <string name="no_saved_platforms">Hapana Mapuratifomu Akachengetwa</string>
+    <string name="add_a_platform">Wedzera Puratifomu</string>
 </resources>
