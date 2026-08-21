@@ -193,7 +193,7 @@ dependencies {
     implementation libs.smswithoutborders.lib.image.android
     implementation libs.lib.smsmms.android
     implementation libs.lib.signal.double.ratchet.java
-    implementation 'com.github.shortmesh:Widget-android:66cddd2f57'
+    implementation 'com.github.shortmesh:Widget-android:03d04ddbac'
 
 //    implementation(libs.jna)
     implementation 'net.java.dev.jna:jna:5.14.0@aar'
