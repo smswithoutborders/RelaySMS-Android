@@ -257,7 +257,7 @@ fun SettingsView(
 
             SettingsItem(
                 itemTitle = stringResource(R.string.delete_account),
-                itemDescription = stringResource(R.string.this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer),
+                itemDescription = stringResource (R.string.this_would_delete_all_your_saved_tokens_platforms_security_keys_and_every_data_you_have_stored_on_device_you_can_still_use_the_random_alias_whenever_you_want),
                 isWarning = true,
                 enabled = !isLoading,
             ) {
