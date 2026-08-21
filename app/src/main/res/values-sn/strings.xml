@@ -220,6 +220,7 @@
     <string name="security_and_privacy">Chengetedzo neKuchengetwa Kwezvakavanzika</string>
     <string name="security">Chengetedzo</string>
     <string name="enable_app_locks_and_pin_codes">Batidza kukiya app nemapinikhodhi</string>
+    <string name="encryption_key_client">Mutengi wemakiyi e encryption</string>
 
     <string name="english">Chirungu</string>
     <string name="arabic">ChiArabic</string>

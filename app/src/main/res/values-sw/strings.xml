@@ -193,6 +193,7 @@
     <string name="security_and_privacy">Usalama na Faragha</string>
     <string name="security">Usalama</string>
     <string name="enable_app_locks_and_pin_codes">Washa kufuli za programu na misimbo ya siri</string>
+    <string name="encryption_key_client">Kiteja cha funguo za usimbaji fiche</string>
 
     <string name="english">Kiingereza</string>
     <string name="arabic">Kiarabu</string>

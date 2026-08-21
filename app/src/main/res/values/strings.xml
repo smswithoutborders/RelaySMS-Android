@@ -505,7 +505,7 @@
     <string name="send_messages_using_your_account">Send messages using your %1$s account.</string>
     <string name="add_new">Add New</string>
     <string name="encryption_keys_server">Encryption keys server</string>
-    <string name="encryption_keys_client">Encryption keys client</string>
+    <string name="encryption_key_client">Encryption keys client</string>
     <plurals name="your_accounts_s">
         <item quantity="one"><![CDATA[Your <b>%1$s</b> account]]></item>
         <item quantity="other"><![CDATA[Your <b>%1$s</b> accounts]]></item>

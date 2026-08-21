@@ -194,6 +194,7 @@
     <string name="security_and_privacy">امنیت و حریم خصوصی</string>
     <string name="security">امنیت</string>
     <string name="enable_app_locks_and_pin_codes">فعال کردن قفل‌های برنامه و کدهای پین</string>
+    <string name="encryption_key_client">کلاینت کلیدهای رمزگذاری</string>
 
     <string name="english">انگلیسی</string>
     <string name="arabic">عربی</string>

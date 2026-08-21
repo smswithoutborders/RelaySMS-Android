@@ -196,6 +196,7 @@
     <string name="security_and_privacy">보안 및 개인 정보 보호</string>
     <string name="security">보안</string>
     <string name="enable_app_locks_and_pin_codes">앱 잠금 및 PIN 코드 활성화</string>
+    <string name="encryption_key_client">암호화 키 클라이언트</string>
 
     <string name="english">영어</string>
     <string name="arabic">아랍어</string>

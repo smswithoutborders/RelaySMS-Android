@@ -188,6 +188,7 @@
     <string name="security_and_privacy">Sicherheit und Datenschutz</string>
     <string name="security">Sicherheit</string>
     <string name="enable_app_locks_and_pin_codes">App-Sperren und PIN-Codes aktivieren</string>
+    <string name="encryption_key_client">Verschlüsselungsschlüssel-Client</string>
 
     <string name="english">Englisch</string>
     <string name="arabic">Arabisch</string>

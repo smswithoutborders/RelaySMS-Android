@@ -210,6 +210,8 @@
     <string name="security">الأمان</string>
     <string name="enable_app_locks_and_pin_codes">تمكين أقفال التطبيقات ورموز PIN</string>
 
+    <string name="encryption_key_client">عملاء مفاتيح التشفير</string>
+
     <string name="english">الإنجليزية</string>
     <string name="arabic">العربية</string>
     <string name="french">الفرنسية</string>

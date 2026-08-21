@@ -193,6 +193,7 @@
     <string name="security_and_privacy">Seguridad y privacidad</string>
     <string name="security">Seguridad</string>
     <string name="enable_app_locks_and_pin_codes">Activar bloqueos de aplicaciones y códigos PIN</string>
+    <string name="encryption_key_client">Claves de cifrado del cliente</string>
 
     <string name="english">Inglés</string>
     <string name="arabic">Árabe</string>

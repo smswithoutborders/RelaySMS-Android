@@ -195,6 +195,7 @@
     <string name="security_and_privacy">Güvenlik ve Gizlilik</string>
     <string name="security">Güvenlik</string>
     <string name="enable_app_locks_and_pin_codes">Uygulama kilitlerini ve pin kodlarını etkinleştir</string>
+    <string name="encryption_key_client">Şifreleme anahtarları istemcisi</string>
 
     <string name="english">İngilizce</string>
     <string name="arabic">Arapça</string>

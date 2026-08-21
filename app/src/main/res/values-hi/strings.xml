@@ -197,6 +197,7 @@
     <string name="security_and_privacy">सुरक्षा और गोपनीयता</string>
     <string name="security">सुरक्षा</string>
     <string name="enable_app_locks_and_pin_codes">ऐप लॉक और पिन कोड सक्षम करें</string>
+    <string name="encryption_key_client">एन्क्रिप्शन कुंजी क्लाइंट</string>
 
     <string name="english">अंग्रेज़ी</string>
     <string name="arabic">अरबी</string>

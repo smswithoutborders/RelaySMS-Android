@@ -211,6 +211,7 @@
     <string name="security_and_privacy">安全和隐私</string>
     <string name="security">安全</string>
     <string name="enable_app_locks_and_pin_codes">启用应用锁和 PIN 码</string>
+    <string name="encryption_key_client">加密密钥客户端</string>
 
     <string name="english">英语</string>
     <string name="arabic">阿拉伯语</string>

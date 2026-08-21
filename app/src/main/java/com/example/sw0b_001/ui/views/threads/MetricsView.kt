@@ -219,7 +219,7 @@ fun MetricsViewComponent(
             Spacer(Modifier.size(8.dp))
 
             CardItem(
-                stringResource(R.string.encryption_keys_client),
+                stringResource(R.string.encryption_key_client),
                 quanEncryptionKeysClient.toString()
             )
         }
