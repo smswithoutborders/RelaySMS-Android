@@ -377,7 +377,6 @@
     <string name="open_menu">Menü öffnen</string>
     <string name="default_sms_receiver">Standard-SMS-Empfänger</string>
     <string name="set_as_default">Als Standard festlegen</string>
-    <string name="this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer">Dadurch werden alle Ihre gespeicherten Token, Sicherheitsschlüssel und alle auf dem Gerät und im Vault gespeicherten Daten gelöscht. Sie können Bridges weiterhin jederzeit verwenden.</string>
     <string name="this_would_delete_all_your_saved_tokens_platforms_security_keys_and_every_data_you_have_stored_on_device_you_can_still_use_the_random_alias_whenever_you_want">Dadurch würden alle Ihre gespeicherten Tokens (Plattformen), Sicherheitsschlüssel und alle auf dem Gerät gespeicherten Daten gelöscht. Sie können den zufälligen Alias ​​weiterhin jederzeit verwenden.</string>
     <string name="this_would_migrate_your_tokens_stored_on_the_vault_to_your_device_this_would_send_the_token_alongside_every_time_you_send_the_message_potentially_increasing_the_size_of_messages">Dadurch werden Ihre im Vault gespeicherten Token auf Ihr Gerät migriert. Dadurch wird das Token bei jedem Senden der Nachricht mitgesendet, was möglicherweise die Größe der Nachrichten erhöht.</string>
     <string name="delete_gateway_client">Gateway-Client löschen</string>
@@ -485,5 +484,8 @@
     <string name="please_enter_your_avoid_copying_and_pasting_if_telegram_to_not_get_flagged">Bitte geben Sie Ihren %1$s-Code ein. Vermeiden Sie das Kopieren und Einfügen, damit Ihr Telegram-Konto nicht gesperrt wird!</string>
     <string name="onboarding_save_vault_description">Sichern Sie den Zugriff auf Ihre Konten. Die Daten werden sicher auf Ihrem Gerät gespeichert, sodass Sie Nachrichten in Ihrem eigenen Namen versenden können.</string>
     <string name="to_send_attachments_and_enjoy_the_best_experience_make_relaysms_your_default_sms_app">Um Anhänge zu versenden und das beste Erlebnis zu genießen, legen Sie RelaySMS als Ihre Standard-SMS-App fest.</string>
-
+    <plurals name="your_accounts_s">
+        <item quantity="one"><![CDATA[Dein <b>%1$s</b>-Konto]]></item>
+        <item quantity="other"><![CDATA[Deine <b>%1$s</b>-Konten]]></item>
+    </plurals>
 </resources>

@@ -387,7 +387,6 @@
     <string name="open_menu">메뉴 열기</string>
     <string name="default_sms_receiver">기본 SMS 수신자</string>
     <string name="set_as_default">기본값으로 설정</string>
-    <string name="this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer">이렇게 하면 저장된 토큰, 보안 키, 그리고 기기와 Vault에 저장된 모든 데이터가 취소됩니다. 브리지는 언제든지 사용할 수 있습니다.</string>
     <string name="this_would_delete_all_your_saved_tokens_platforms_security_keys_and_every_data_you_have_stored_on_device_you_can_still_use_the_random_alias_whenever_you_want">이렇게 하면 저장된 모든 토큰(플랫폼), 보안 키 및 기기에 저장된 모든 데이터가 삭제됩니다. 하지만 원할 때마다 임의의 별칭은 계속 사용할 수 있습니다.</string>
     <string name="this_would_migrate_your_tokens_stored_on_the_vault_to_your_device_this_would_send_the_token_alongside_every_time_you_send_the_message_potentially_increasing_the_size_of_messages">이렇게 하면 Vault에 저장된 토큰이 기기로 마이그레이션됩니다. 메시지를 보낼 때마다 토큰이 함께 전송되므로 메시지 크기가 커질 수 있습니다.</string>
     <string name="delete_gateway_client">게이트웨이 클라이언트 삭제</string>
@@ -488,5 +487,8 @@
     <string name="attachment_keys">첨부 키</string>
     <string name="onboarding_save_vault_description">계정 접근 권한을 저장하세요. 안전하게 기기에 저장되므로 본인 계정으로 메시지를 보낼 수 있습니다.</string>
     <string name="to_send_attachments_and_enjoy_the_best_experience_make_relaysms_your_default_sms_app">첨부 파일을 전송하고 최상의 경험을 누리려면 RelaySMS를 기본 SMS 앱으로 설정하세요.</string>
-
+    <plurals name="your_accounts_s">
+        <item quantity="one"><![CDATA[내 <b>%1$s</b> 계정]]></item>
+        <item quantity="other"><![CDATA[내 <b>%1$s</b> 계정]]></item>
+    </plurals>
 </resources>

@@ -388,7 +388,6 @@
     <string name="open_menu">मेनू खोलें</string>
     <string name="default_sms_receiver">डिफ़ॉल्ट SMS रिसीवर</string>
     <string name="set_as_default">डिफाल्ट के रूप में सेट</string>
-    <string name="this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer">इससे आपके सभी स्टोर किए गए टोकन, सिक्योरिटी की और डिवाइस और वॉल्ट पर स्टोर किया गया हर डेटा रद्द हो जाएगा। आप जब चाहें तब भी ब्रिज का इस्तेमाल कर सकते हैं।</string>
     <string name="this_would_delete_all_your_saved_tokens_platforms_security_keys_and_every_data_you_have_stored_on_device_you_can_still_use_the_random_alias_whenever_you_want">इससे आपके सभी सेव किए गए टोकन (प्लेटफ़ॉर्म), सिक्योरिटी की और डिवाइस पर स्टोर किया गया हर डेटा डिलीट हो जाएगा। आप जब चाहें रैंडम एलियास का इस्तेमाल कर सकते हैं।</string>
     <string name="this_would_migrate_your_tokens_stored_on_the_vault_to_your_device_this_would_send_the_token_alongside_every_time_you_send_the_message_potentially_increasing_the_size_of_messages">इससे वॉल्ट में स्टोर आपके टोकन आपके डिवाइस पर माइग्रेट हो जाएंगे। इससे हर बार जब आप मैसेज भेजेंगे तो टोकन भी साथ में भेजा जाएगा - जिससे मैसेज का साइज़ बढ़ सकता है।</string>
     <string name="delete_gateway_client">गेटवे क्लाइंट हटाएँ</string>
@@ -489,5 +488,8 @@
     <string name="attachment_keys">अनुलग्नक कुंजियाँ</string>
     <string name="onboarding_save_vault_description">अपने अकाउंट का एक्सेस सेव करें। यह आपके डिवाइस पर सुरक्षित रूप से स्टोर रहता है, ताकि आप खुद से मैसेज भेज सकें।</string>
     <string name="to_send_attachments_and_enjoy_the_best_experience_make_relaysms_your_default_sms_app">अटैचमेंट भेजने और सबसे अच्छा अनुभव पाने के लिए, RelaySMS को अपना डिफ़ॉल्ट SMS ऐप बनाएं।</string>
-
+    <plurals name="your_accounts_s">
+        <item quantity="one"><![CDATA[आपका <b>%1$s</b> खाता]]></item>
+        <item quantity="other"><![CDATA[आपके <b>%1$s</b> खाते]]></item>
+    </plurals>
 </resources>

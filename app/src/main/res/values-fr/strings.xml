@@ -386,7 +386,6 @@
     <string name="log_out">Se déconnecter</string>
     <string name="this_would_log_you_out_of_your_vault_account_on_this_device_you_can_log_back_in_at_anytime_with_an_internet_connection">Cela vous déconnectera de votre compte Vault sur cet appareil. Vous pourrez vous reconnecter à tout moment (avec une connexion internet).</string>
     <string name="delete_account">Supprimer le compte</string>
-    <string name="this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer">Cela révoquera tous vos jetons, clés de sécurité et données enregistrés sur votre appareil et dans Vault. Vous pouvez continuer à utiliser les ponts quand vous le souhaitez.</string>
     <string name="this_would_delete_all_your_saved_tokens_platforms_security_keys_and_every_data_you_have_stored_on_device_you_can_still_use_the_random_alias_whenever_you_want">Cette opération supprimera tous vos jetons enregistrés (plateformes), vos clés de sécurité et toutes les données stockées sur votre appareil. Vous pourrez toujours utiliser l\'alias aléatoire à votre guise.</string>
     <string name="this_would_migrate_your_tokens_stored_on_the_vault_to_your_device_this_would_send_the_token_alongside_every_time_you_send_the_message_potentially_increasing_the_size_of_messages">Cela migrerait vos jetons stockés dans le coffre vers votre appareil. Le jeton serait alors envoyé à chaque envoi de message, ce qui pourrait augmenter la taille des messages.</string>
     <string name="enter_the_text_in_the_image">Saisissez le texte dans l\'image</string>
@@ -485,4 +484,8 @@
     <string name="this_lets_the_app_manage_the_sending_requirements_for_you">Cela permet à l\'application de gérer les exigences d\'envoi pour vous.</string>
     <string name="onboarding_save_vault_description">Enregistrez l\'accès à vos comptes. Il est stocké en toute sécurité sur votre appareil, vous permettant ainsi d\'envoyer des messages en votre nom propre.</string>
     <string name="to_send_attachments_and_enjoy_the_best_experience_make_relaysms_your_default_sms_app">Pour envoyer des pièces jointes et bénéficier d\'une expérience optimale, définissez RelaySMS comme application SMS par défaut.</string>
+    <plurals name="your_accounts_s">
+        <item quantity="one"><![CDATA[Votre compte <b>%1$s</b>]]></item>
+        <item quantity="other"><![CDATA[Vos comptes <b>%1$s</b>]]></item>
+    </plurals>
 </resources>
