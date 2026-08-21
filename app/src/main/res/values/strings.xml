@@ -551,5 +551,7 @@
     <string name="publisher_grpc_port" translatable="false">443</string>
     <string name="base_url" translatable="false">https://relaysms.smswithoutborders.afkanerd.com</string>
     <string name="add_routing_numbers">Add the routing numbers</string>
+    <string name="no_saved_platforms">No Saved Platforms</string>
+    <string name="add_a_platform">Add a Platform</string>
 
 </resources>
