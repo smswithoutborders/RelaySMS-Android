@@ -130,12 +130,12 @@ fun ActivePlatformsComposeComponents(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "no saved platforms",
+                    text = "No Saved Platforms",
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Spacer(Modifier.size(12.dp))
                 Button(onClick = onNavigateToPlatforms) {
-                    Text("add a platform")
+                    Text("Add a Platform")
                 }
             }
         } else {
