@@ -55,6 +55,7 @@ fun ActivePlatformsModal(
     tokensViewModel: TokensViewModel,
     sendNewMessageRequested: Boolean,
     onDismiss: () -> Unit,
+    onNavigateToPlatforms: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
@@ -88,7 +89,8 @@ fun ActivePlatformsModal(
                             isOfflineCompose = true
                         )
                     )
-                }
+                },
+                onNavigateToPlatforms = onNavigateToPlatforms,
             ) { token ->
                 navController.navigate(
                     ComposeScreen(
