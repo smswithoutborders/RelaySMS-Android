@@ -227,9 +227,12 @@ fun HomepageView(
                     navController = navController,
                     supportedPlatformsViewModel = supportedPlatformsViewModel,
                     tokensViewModel = tokensViewModel,
-                ) {
-                    sendNewMessageRequested = false
-                }
+                    onDismiss = {sendNewMessageRequested = false},
+                    onNavigateToPlatforms = {
+                        tokensViewModel.bottomTabsItem =
+                            BottomTabsItems.BottomBarPlatformsTab
+                    }
+                )
             }
 
             if (showAddGatewayClientsModal) {

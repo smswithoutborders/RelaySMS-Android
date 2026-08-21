@@ -131,9 +131,11 @@ fun RecentView(
                 supportedPlatformsViewModel = supportedPlatformsViewModel,
                 navController = navController,
                 tokensViewModel = tokensViewModel,
-            ) {
-                sendNewMessageRequested = false
-            }
+                onDismiss = { sendNewMessageRequested = false },
+                onNavigateToPlatforms = {
+                    tabRequestedCallback()
+                }
+            )
         }
 
         if (showRelaySmsAvailable) {

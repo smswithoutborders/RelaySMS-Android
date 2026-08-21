@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -55,6 +56,7 @@ fun ActivePlatformsModal(
     tokensViewModel: TokensViewModel,
     sendNewMessageRequested: Boolean,
     onDismiss: () -> Unit,
+    onNavigateToPlatforms: () -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
@@ -88,7 +90,8 @@ fun ActivePlatformsModal(
                             isOfflineCompose = true
                         )
                     )
-                }
+                },
+                onNavigateToPlatforms = onNavigateToPlatforms,
             ) { token ->
                 navController.navigate(
                     ComposeScreen(
@@ -129,6 +132,7 @@ fun ActivePlatformsComposeComponents(
                 icon_png = null
             )
         ),
+    onNavigateToPlatforms: () -> Unit = {},
     onOfflineAccountCallback: (SupportedPlatforms) -> Unit? = {},
     onSelected: (Tokens) -> Unit = {},
 ) {
@@ -137,51 +141,64 @@ fun ActivePlatformsComposeComponents(
 
         Spacer(Modifier.size(16.dp))
 
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 70.dp),
-
-//            contentPadding = PaddingValues(16.dp),
-
-            // Adds inner spacing between rows and columns
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            items(tokens) { account ->
-                val platform = remember(account) {
-                    supportedPlatforms.find{ account.platformName == it.name }
+        if (tokens.isEmpty()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(R.string.no_saved_platforms),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(Modifier.size(12.dp))
+                Button(onClick = onNavigateToPlatforms) {
+                    Text(stringResource(R.string.add_a_platform))
                 }
-                if(platform != null){
-                    Card(
-                        shape = RoundedCornerShape(12.dp),
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
+            }
+        } else {
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(minSize = 70.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                items(tokens) { account ->
+                    val platform = remember(account) {
+                        supportedPlatforms.find{ account.platformName == it.name }
+                    }
+                    if(platform != null){
+                        Card(
+                            shape = RoundedCornerShape(12.dp),
                         ) {
-                            GlideImage(
+                            Column(
                                 modifier = Modifier
-                                    .size(40.dp)
-                                    .clickable { onSelected(account) },
-                                model = platform.icon_png,
-                                contentDescription = stringResource(R.string.platform_image),
-                                contentScale = ContentScale.Fit,
-                                alignment = Alignment.Center,
-                                loading = placeholder(R.drawable.logo),
-                                failure = placeholder(R.drawable.logo)
+                                    .padding(8.dp)
+                                    .fillMaxSize(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
                             ) {
-                                it.diskCacheStrategy(DiskCacheStrategy.ALL)
+                                GlideImage(
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .clickable { onSelected(account) },
+                                    model = platform.icon_png,
+                                    contentDescription = stringResource(R.string.platform_image),
+                                    contentScale = ContentScale.Fit,
+                                    alignment = Alignment.Center,
+                                    loading = placeholder(R.drawable.logo),
+                                    failure = placeholder(R.drawable.logo)
+                                ) {
+                                    it.diskCacheStrategy(DiskCacheStrategy.ALL)
+                                }
+                                Spacer(Modifier.size(4.dp))
+                                Text(
+                                    platform.display_name,
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontSize = 11.sp
+                                )
                             }
-                            Spacer(Modifier.size(4.dp))
-                            Text(
-                                platform.display_name,
-                                style = MaterialTheme.typography.titleSmall,
-                                fontSize = 11.sp
-                            )
                         }
                     }
                 }
