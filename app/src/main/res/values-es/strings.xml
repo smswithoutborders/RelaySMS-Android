@@ -481,5 +481,7 @@
     <string name="backup_file">Archivo de copia de seguridad</string>
     <string name="routing_numbers">Números de ruta</string>
     <string name="encryption_keys_server">Servidor de claves de cifrado</string>
+    <string name="onboarding_save_vault_description">Guarda el acceso a tus cuentas. Se almacena de forma segura en tu dispositivo, para que puedas enviar mensajes con tu nombre de usuario.</string>
+    <string name="to_send_attachments_and_enjoy_the_best_experience_make_relaysms_your_default_sms_app">Para enviar archivos adjuntos y disfrutar de la mejor experiencia, configura RelaySMS como tu aplicación de SMS predeterminada.</string>
 
 </resources>

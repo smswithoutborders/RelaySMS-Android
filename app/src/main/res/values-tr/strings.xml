@@ -439,6 +439,8 @@
     <string name="refresh">Yenile</string>
     <string name="encryption_keys_left">Şifreleme anahtarları kaldı</string>
     <string name="number_of_stored_accounts">Kaydedilen hesap sayısı</string>
+    <string name="Settings">Ayarlar</string>
+    <string name="Messages">Mesajlar</string>
     <string name="to_restore_a_backup_install_a_new_copy_of_relaysms_open_the_app_and_tap_restore_backup_then_locate_a_backup_file">Yedeklemeyi geri yüklemek için RelaySMS\'in yeni bir kopyasını yükleyin. Uygulamayı açın ve \"Yedeklemeyi geri yükle\" seçeneğine dokunun, ardından bir yedekleme dosyası bulun.</string>
     <string name="create_backup">Yedekleme oluştur</string>
     <string name="encryption_details">Şifreleme detayları</string>
@@ -482,5 +484,7 @@
     <string name="backup_file">Yedekleme dosyası</string>
     <string name="routing_numbers">Yönlendirme numaraları</string>
     <string name="encryption_keys_server">Şifreleme anahtarları sunucusu</string>
+    <string name="onboarding_save_vault_description">Hesaplarınıza erişiminizi kaydedin. Bilgileriniz cihazınızda güvenli bir şekilde saklanır, böylece kendi adınızla mesaj gönderebilirsiniz.</string>
+    <string name="to_send_attachments_and_enjoy_the_best_experience_make_relaysms_your_default_sms_app">Ekli dosyalar göndermek ve en iyi deneyimi yaşamak için RelaySMS\'i varsayılan SMS uygulamanız yapın.</string>
 
 </resources>

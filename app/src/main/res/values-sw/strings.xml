@@ -437,6 +437,8 @@
     <string name="refresh">Onyesha upya</string>
     <string name="encryption_keys_left">Funguo za usimbaji fiche zimesalia</string>
     <string name="number_of_stored_accounts">Idadi ya akaunti zilizohifadhiwa</string>
+    <string name="Settings">Mipangilio</string>
+    <string name="Messages">Ujumbe</string>
     <string name="to_restore_a_backup_install_a_new_copy_of_relaysms_open_the_app_and_tap_restore_backup_then_locate_a_backup_file">Ili kurejesha nakala rudufu, sakinisha nakala mpya ya RelaySMS. Fungua programu na uguse Rejesha nakala rudufu, kisha tafuta faili rudufu.</string>
     <string name="create_backup">Unda nakala rudufu</string>
     <string name="encryption_details">Maelezo ya usimbaji fiche</string>
@@ -481,5 +483,7 @@
     <string name="backup_file">Faili ya nakala rudufu</string>
     <string name="routing_numbers">Nambari za uelekezaji</string>
     <string name="encryption_keys_server">Seva ya funguo za usimbaji fiche</string>
+    <string name="onboarding_save_vault_description">Hifadhi ufikiaji wa akaunti zako. Imehifadhiwa salama kwenye kifaa chako, ili uweze kutuma ujumbe kama wewe mwenyewe.</string>
+    <string name="to_send_attachments_and_enjoy_the_best_experience_make_relaysms_your_default_sms_app">Ili kutuma viambatisho na kufurahia matumizi bora zaidi, fanya RelaySMS iwe programu yako chaguo-msingi ya SMS.</string>
 
 </resources>

@@ -482,5 +482,7 @@
     <string name="offline_compose">Offline komponieren</string>
     <string name="send_message_offline">Nachricht offline senden</string>
     <string name="please_enter_your_avoid_copying_and_pasting_if_telegram_to_not_get_flagged">Bitte geben Sie Ihren %1$s-Code ein. Vermeiden Sie das Kopieren und Einfügen, damit Ihr Telegram-Konto nicht gesperrt wird!</string>
+    <string name="onboarding_save_vault_description">Sichern Sie den Zugriff auf Ihre Konten. Die Daten werden sicher auf Ihrem Gerät gespeichert, sodass Sie Nachrichten in Ihrem eigenen Namen versenden können.</string>
+    <string name="to_send_attachments_and_enjoy_the_best_experience_make_relaysms_your_default_sms_app">Um Anhänge zu versenden und das beste Erlebnis zu genießen, legen Sie RelaySMS als Ihre Standard-SMS-App fest.</string>
 
 </resources>
