@@ -111,10 +111,29 @@ fun ActivePlatformsModal(
 @Preview(showBackground = true)
 @Composable
 fun ActivePlatformsComposeComponents(
-    tokens: List<Tokens> = listOf(),
-    supportedPlatforms: List<SupportedPlatforms> = listOf(),
-    onOfflineAccountCallback: (SupportedPlatforms) -> Unit? = {},
+    tokens: List<Tokens> = listOf(
+        Tokens(
+            tokenId = 1,
+            tokenHash = ByteArray(0),
+            catId = V1ContentCategories.EMAIL,
+            account = "sample",
+            platformName = "example"
+        )
+    ),
+    supportedPlatforms: List<SupportedPlatforms> =
+        listOf(
+            SupportedPlatforms(
+                name = "example",
+                display_name = "Example",
+                supports_offline_first = true,
+                cat_id = V1ContentCategories.EMAIL.value.toInt(),
+                proto_id = V1PayloadsSupportedProtocols.O_AUTH20.value.toInt(),
+                icon_svg = null,
+                icon_png = null
+            )
+        ),
     onNavigateToPlatforms: () -> Unit = {},
+    onOfflineAccountCallback: (SupportedPlatforms) -> Unit? = {},
     onSelected: (Tokens) -> Unit = {},
 ) {
     Column(Modifier.padding(16.dp)) {
