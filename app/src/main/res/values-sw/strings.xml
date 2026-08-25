@@ -492,4 +492,6 @@
     </plurals>
     <string name="no_saved_platforms">Hakuna Mifumo Iliyohifadhiwa</string>
     <string name="add_a_platform">Ongeza Jukwaa</string>
+    <string name="export_logs">Hamisha kumbukumbu</string>
+    <string name="export_crasg_logs_for_debugging_purposes">Hamisha kumbukumbu za hitilafu kwa madhumuni ya utatuzi wa matatizo</string>
 </resources>

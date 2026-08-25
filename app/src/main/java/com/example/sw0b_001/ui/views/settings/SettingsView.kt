@@ -291,8 +291,8 @@ fun SettingsView(
             if(BuildConfig.DEBUG) {
                 HorizontalDivider(Modifier.padding(top = 20.dp))
                 SettingsItem(
-                    itemTitle = "Export logs",
-                    itemDescription = "Export crash logs for debugging purposes",
+                    itemTitle = stringResource(R.string.export_logs),
+                    itemDescription = stringResource(R.string.export_crasg_logs_for_debugging_purposes),
                     enabled = true,
                 ) {
                     CrashHandler.offerCrashLogOptions(activity, context)
