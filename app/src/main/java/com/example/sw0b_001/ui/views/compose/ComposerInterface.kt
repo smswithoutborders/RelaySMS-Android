@@ -107,7 +107,7 @@ fun ComposerInterface(
             if(context.isDefault()) context.getDefaultSimSubscription() ?: -1L else -1L)
     }
     fun backHandler() {
-        tokensViewModel.reset()
+        tokensViewModel.deleteAll()
         payloadsViewModel.reset()
         imageViewModel.reset()
         navController.popBackStack()

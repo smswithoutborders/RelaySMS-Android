@@ -114,7 +114,7 @@ fun SecurityView(
                 ConfirmationModal(
                     showBottomSheet = showDeleteBottomSheet,
                     onContinue = {
-                        tokensViewModel.reset {
+                        tokensViewModel.deleteAll {
                             navController.popBackStack()
                         }
                     },

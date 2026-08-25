@@ -1,12 +1,8 @@
 package com.example.sw0b_001.ui.views.settings
 
 
-import android.content.Context
-import android.content.ContextWrapper
 import android.content.res.Configuration
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -30,7 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,12 +38,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getActivity
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getCurrentLocale
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.setLocale
 import com.afkanerd.smswithoutborders_libsmsmms.ui.SettingsItem
@@ -57,17 +51,12 @@ import com.example.sw0b_001.R
 import com.example.sw0b_001.data.CrashHandler
 import com.example.sw0b_001.extensions.context.getAppCompatActivity
 import com.example.sw0b_001.extensions.context.promptBiometrics
-import com.example.sw0b_001.extensions.context.settingsGetIsEmailLogin
 import com.example.sw0b_001.extensions.context.settingsGetLockDownApp
 import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
-import com.example.sw0b_001.extensions.context.settingsGetUseDeviceId
-import com.example.sw0b_001.extensions.context.settingsSetIsLoggedIn
 import com.example.sw0b_001.extensions.context.settingsSetLockDownApp
-import com.example.sw0b_001.extensions.context.settingsSetUseDeviceId
-import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.TokensUiState
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import io.grpc.StatusRuntimeException
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -91,13 +80,22 @@ fun SettingsView(
     val currentNightMode = LocalConfiguration.current.uiMode and Configuration.UI_MODE_NIGHT_MASK
     var themeExpanded by remember { mutableStateOf(false) }
 
-    var isLoading by remember { mutableStateOf(false) }
 
+    val deletingUiState by tokensViewModel.deletingUiState.collectAsStateWithLifecycle()
+    var isLoading by remember { mutableStateOf(false) }
 
     val localeArraysValues = stringArrayResource(R.array.language_values)
     val localeArraysOptions= stringArrayResource(R.array.language_options)
 
+    val tokens by tokensViewModel.get().collectAsStateWithLifecycle(emptyList())
+
     val scope = rememberCoroutineScope()
+    LaunchedEffect(deletingUiState) {
+        isLoading = when(val state = deletingUiState) {
+            TokensUiState.Loading -> true
+            else -> false
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -259,32 +257,27 @@ fun SettingsView(
                 itemTitle = stringResource(R.string.delete_account),
                 itemDescription = stringResource (R.string.this_would_delete_all_your_saved_tokens_platforms_security_keys_and_every_data_you_have_stored_on_device_you_can_still_use_the_random_alias_whenever_you_want),
                 isWarning = true,
-                enabled = !isLoading,
+                enabled = !isLoading && tokens.isNotEmpty(),
             ) {
-                isLoading = true
-                scope.launch(Dispatchers.Default) {
-                    context.settingsSetIsLoggedIn(false)
-                    try {
-                        TODO("Remove from cloud")
-                        tokensViewModel.reset {
-                            navController.popBackStack()
-                        }
-                    } catch(e: StatusRuntimeException) {
-                        e.printStackTrace()
-                        scope.launch(Dispatchers.Main){
-                            Toast.makeText(context, e.status.description,
-                                Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                    } catch(e: Exception) {
-                        e.printStackTrace()
-                        scope.launch(Dispatchers.Main){
-                            Toast.makeText(context, e.message,
-                                Toast.LENGTH_SHORT).show()
-                        }
-                    } finally {
-                        isLoading = false
+                try {
+                    tokensViewModel.deleteAll {
+                        navController.popBackStack()
                     }
+                } catch(e: StatusRuntimeException) {
+                    e.printStackTrace()
+                    scope.launch(Dispatchers.Main){
+                        Toast.makeText(context, e.status.description,
+                            Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                } catch(e: Exception) {
+                    e.printStackTrace()
+                    scope.launch(Dispatchers.Main){
+                        Toast.makeText(context, e.message,
+                            Toast.LENGTH_SHORT).show()
+                    }
+                } finally {
+                    isLoading = false
                 }
             }
 

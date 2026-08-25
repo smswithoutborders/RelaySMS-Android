@@ -341,7 +341,6 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
 
             val keyId = othersKeys.keyId
 
-
             try {
                 val request = PublisherOuterClass.RevokeOAuth2TokenRequest.newBuilder().apply {
                     setKeyId(keyId)

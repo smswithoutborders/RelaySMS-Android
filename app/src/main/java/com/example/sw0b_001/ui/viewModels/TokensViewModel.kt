@@ -97,9 +97,9 @@ class TokensViewModel @Inject constructor(
         MutableStateFlow<PnbaUiState>(PnbaUiState.PhoneNumberRequested)
     val pnbaUiState: StateFlow<PnbaUiState> = _pnbaUiState
 
-    fun updatePnbaState(state: PnbaUiState) {
-        _pnbaUiState.value = state
-    }
+    private val _deletingUiState =
+        MutableStateFlow<TokensUiState>(TokensUiState.Idle)
+    val deletingUiState: StateFlow<TokensUiState> = _deletingUiState
 
     // Selection mode properties
     var isSelectionMode by mutableStateOf(false)
@@ -111,14 +111,10 @@ class TokensViewModel @Inject constructor(
     private val db = Datastore.getDatastore(context)?.tokensDao()
         ?: throw Exception("Cannot open database")
 
-    fun reset() {
+    fun deleteAll() {
         _selectedToken.value = null
         _pnbaUiState.value = PnbaUiState.PhoneNumberRequested
         _isStoringUiState.value = TokensUiState.Idle
-    }
-
-    fun clearStoringState() {
-        _isStoringUiState.value = TokensUiState.Success(null)
     }
 
     fun get(): Flow<List<Tokens>> {
@@ -138,14 +134,53 @@ class TokensViewModel @Inject constructor(
         )
     }
 
-    fun reset(onCompleteCallback: ()-> Unit) {
+    fun deleteAll(onCompleteCallback: ()-> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            withContext(Dispatchers.IO) {
-                db.deleteAll()
+            _deletingUiState.value = TokensUiState.Loading
+            val platforms = Datastore.getDatastore(context)
+                ?.supportedPlatformsCacheDao()
+                ?.fetchList()
+                ?: throw Exception("Failed to open supported platforms db")
+            db.fetchAllList().forEach { token ->
+                try {
+                    revokeAll(
+                        platforms.find { it.name == token.platformName }!!,
+                        token,
+                    )
+                } catch(e: Exception) {
+                    e.printStackTrace()
+                }
             }
-            onCompleteCallback()
+
+            withContext(Dispatchers.Main) {
+                _deletingUiState.value = TokensUiState.Success(null)
+                onCompleteCallback()
+            }
         }
     }
+
+    private fun revokeAll(
+        platform: SupportedPlatforms,
+        account: Tokens,
+    ) {
+        PublisherGrpcImpl(context).use { publisherGrpcImpl ->
+            try {
+                when(v1PayloadSupportProtocolsFromU8(
+                    platform.proto_id!!.toUByte())) {
+                    V1PayloadsSupportedProtocols.O_AUTH20 -> {
+                        publisherGrpcImpl.revokeOAuth2(account)
+                    }
+                    V1PayloadsSupportedProtocols.PNBA -> {
+                        publisherGrpcImpl.revokePnba(account) }
+                }
+                db.delete(account)
+            } catch(e: Exception) {
+                e.printStackTrace()
+                throw e
+            }
+        }
+    }
+
 
     companion object {
         fun parseLocalImageContent(
