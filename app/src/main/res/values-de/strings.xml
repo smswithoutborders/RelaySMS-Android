@@ -489,4 +489,6 @@
         <item quantity="one"><![CDATA[Dein <b>%1$s</b>-Konto]]></item>
         <item quantity="other"><![CDATA[Deine <b>%1$s</b>-Konten]]></item>
     </plurals>
+    <string name="no_saved_platforms">Keine gespeicherten Plattformen</string>
+    <string name="add_a_platform">Plattform hinzufügen</string>
 </resources>

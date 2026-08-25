@@ -493,4 +493,6 @@
         <item quantity="one"><![CDATA[आपका <b>%1$s</b> खाता]]></item>
         <item quantity="other"><![CDATA[आपके <b>%1$s</b> खाते]]></item>
     </plurals>
+    <string name="no_saved_platforms">कोई सहेजा गया प्लेटफ़ॉर्म नहीं</string>
+    <string name="add_a_platform">एक प्लेटफ़ॉर्म जोड़ें</string>
 </resources>

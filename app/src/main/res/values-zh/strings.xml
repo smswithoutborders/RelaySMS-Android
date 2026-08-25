@@ -495,4 +495,6 @@
         <item quantity="one"><![CDATA[你的 <b>%1$s</b> 账户]]></item>
         <item quantity="other"><![CDATA[你的 <b>%1$s</b> 个账户]]></item>
     </plurals>
+    <string name="no_saved_platforms">没有已保存的平台</string>
+    <string name="add_a_platform">添加平台</string>
 </resources>

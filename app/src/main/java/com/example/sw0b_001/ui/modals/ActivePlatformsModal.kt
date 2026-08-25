@@ -91,7 +91,11 @@ fun ActivePlatformsModal(
                         )
                     )
                 },
-                onNavigateToPlatforms = onNavigateToPlatforms,
+                onNavigateToPlatforms = {
+                    scope
+                        .launch { sheetState.hide() }
+                        .invokeOnCompletion { onNavigateToPlatforms() }
+                },
             ) { token ->
                 navController.navigate(
                     ComposeScreen(
