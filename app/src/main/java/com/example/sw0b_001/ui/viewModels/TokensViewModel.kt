@@ -267,18 +267,22 @@ class TokensViewModel @Inject constructor(
         authCode: String? = null,
         password: String? = null,
         channel: String? = null,
-    ) : Long? {
-        try {
-            return triggerPNBARequested(
-                phoneNumber = phoneNumber!!,
-                platform = platform,
-                authCode = authCode,
-                password = password,
-                channel = channel,
-            )
-        } catch (e: Exception) {
-            e.printStackTrace()
-            throw e
+        onCompleteCallback: (Pair<Boolean, String?>, Long?) -> Unit
+    ){
+        viewModelScope.launch(Dispatchers.Default) {
+            try {
+                val expiry = triggerPNBARequested(
+                    phoneNumber = phoneNumber!!,
+                    platform = platform,
+                    authCode = authCode,
+                    password = password,
+                    channel = channel,
+                )
+                onCompleteCallback(Pair(true, null), expiry)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                onCompleteCallback(Pair(false, e.message), null)
+            }
         }
     }
 
@@ -308,6 +312,7 @@ class TokensViewModel @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
+                e.printStackTrace()
                 withContext(Dispatchers.Main) {
                     onFailedCallback(e.message ?: "")
                 }
@@ -365,6 +370,7 @@ class TokensViewModel @Inject constructor(
                             channel,
                         )
                         _pnbaUiState.value = PnbaUiState.AuthCodeRequested
+                        _isStoringUiState.value = TokensUiState.Success( null, )
                         return res.expiresAt
                     }
                     PnbaUiState.AuthCodeRequested -> {

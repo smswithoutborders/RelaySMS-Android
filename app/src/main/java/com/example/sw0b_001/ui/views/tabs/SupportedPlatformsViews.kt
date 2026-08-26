@@ -264,23 +264,22 @@ private fun PlatformListContent(
                 authyUrl = stringResource(R.string.https_authy_shortmesh_com),
                 viewModel = authyViewModel,
                 requestCodeCallback = { pn, _ ->
-                    val expires = tokensViewModel.storeCustom(
+                    tokensViewModel.storeCustom(
                         platform = clickedPlatform!!,
                         phoneNumber = pn,
                         channel = authyViewModel.selectedPlatform!!.name
-                    )
-                    authyViewModel.setOtpExpiresAt(expires.toString())
+                    ) { _, exp ->
+                        authyViewModel.setOtpExpiresAt(exp.toString())
+                    }
                 },
-                sendCodeCallback = { code ->
-                    try {
-                        val expires = tokensViewModel.storeCustom(
-                            platform = clickedPlatform!!,
-                            phoneNumber = authyViewModel.phoneNumber,
-                            channel = authyViewModel.selectedPlatform!!.name,
-                            authCode = code
-                        )
-                    } catch(e: Exception) {
-                        throw e
+                sendCodeCallback = { code, onResult ->
+                    tokensViewModel.storeCustom(
+                        platform = clickedPlatform!!,
+                        phoneNumber = authyViewModel.phoneNumber,
+                        channel = authyViewModel.selectedPlatform!!.name,
+                        authCode = code
+                    ) { pair, _ ->
+                        onResult(pair.first, pair.second ?: "")
                     }
                 },
             ) {
