@@ -115,7 +115,7 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
         }
     }
 
-    private suspend fun processEphemeralKeys(
+    private fun processEphemeralKeys(
         keyId: Int,
         serverEphemeralPublicKeys: List<PublisherOuterClass.PublicKey>,
         keys: List<Pair<Int, Protocols.CloseableCurve15519KeyPair>>,
@@ -159,7 +159,7 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
 
     }
 
-    private suspend fun storeKeys(
+    private fun storeKeys(
         keys: List<Pair<Int, Protocols.CloseableCurve15519KeyPair>>,
         serverEphemeralPublicKeys: List<PublisherOuterClass.PublicKey>,
         tokenId: UInt,
@@ -244,7 +244,7 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
         }
     }
 
-    suspend fun phoneNumberBaseAuthenticationExchange(
+    fun phoneNumberBaseAuthenticationExchange(
         authorizationCode: String,
         phoneNumber: String,
         platform: String,

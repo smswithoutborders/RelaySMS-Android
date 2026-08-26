@@ -144,6 +144,8 @@ message GetPNBACodeResponse {
   bool success = 1;
   // A response message
   string message = 2;
+  // Optional code expiry, Unix epoch seconds
+  optional int64 expires_at = 3;
 }
 
 // Request message for exchanging the PNBA code for a token and storing it

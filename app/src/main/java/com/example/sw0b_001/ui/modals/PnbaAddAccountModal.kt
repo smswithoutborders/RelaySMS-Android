@@ -196,14 +196,14 @@ fun PNBAPhoneNumberCodeRequestView(
                                     tokensViewModel.store(
                                         platform = platform,
                                         phoneNumber = phoneNumber1,
-                                    )
+                                    ){}
                                 }
                                 PnbaUiState.AuthCodeRequested -> {
                                     tokensViewModel.store(
                                         platform = platform,
                                         phoneNumber = phoneNumber1,
                                         authCode = authCode
-                                    )
+                                    ){}
                                 }
                                 PnbaUiState.PasswordRequested -> {
                                     tokensViewModel.store(
@@ -211,7 +211,7 @@ fun PNBAPhoneNumberCodeRequestView(
                                         phoneNumber = phoneNumber1,
                                         authCode = authCode,
                                         password = password
-                                    )
+                                    ){}
                                 }
                                 else -> {}
                             }

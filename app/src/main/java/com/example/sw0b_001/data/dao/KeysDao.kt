@@ -15,7 +15,7 @@ interface KeysDao {
     suspend fun _insert(key: List<Keys>)
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insert(keys: List<Keys>)
+    fun insert(keys: List<Keys>)
 
     @Query("DELETE FROM Keys WHERE alias = :alias")
     suspend fun removeAlias(alias: String)
@@ -24,10 +24,10 @@ interface KeysDao {
     @Query("UPDATE Keys SET alias = :newAlias " +
             "WHERE tokenId = :tokenId AND alias = :oldAlias AND keyId < 16"
     )
-    suspend fun updateForAttachments(oldAlias: String, newAlias: String, tokenId: Long)
+    fun updateForAttachments(oldAlias: String, newAlias: String, tokenId: Long)
 
     @Transaction
-    suspend fun insert(keys: List<Keys>, alias: String, updateAlias: String? = null) {
+    fun insert(keys: List<Keys>, alias: String, updateAlias: String? = null) {
         insert(keys)
         updateAlias?.let {
             updateForAttachments(

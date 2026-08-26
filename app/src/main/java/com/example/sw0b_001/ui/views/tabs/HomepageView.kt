@@ -41,6 +41,7 @@ import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensViewModel
 import com.example.sw0b_001.ui.views.threads.InboxView
 import com.example.sw0b_001.ui.views.threads.RecentView
+import io.shortmesh.sdk.viewmodel.AuthyViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -61,6 +62,7 @@ fun HomepageView(
     payloadsViewModel: PayloadsViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
+    authyViewModel: AuthyViewModel,
     showTopBar: Boolean = true,
     drawerCallback: (() -> Unit)? = {},
 ) {
@@ -219,6 +221,7 @@ fun HomepageView(
                 tokensViewModel = tokensViewModel,
                 gatewayClientViewModel = gatewayClientViewModel,
                 supportedPlatformsViewModel = supportedPlatformsViewModel,
+                authyViewModel = authyViewModel
             )
 
             if (sendNewMessageRequested) {
@@ -257,6 +260,7 @@ fun GetTabViews(
     tokensViewModel: TokensViewModel,
     gatewayClientViewModel: GatewayClientViewModel,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
+    authyViewModel: AuthyViewModel,
 ) {
     when(bottomTabsItems) {
         BottomTabsItems.BottomBarRecentTab -> {
@@ -275,6 +279,7 @@ fun GetTabViews(
                 navController = navController,
                 supportedPlatformsViewModel = supportedPlatformsViewModel,
                 tokensViewModel = tokensViewModel,
+                authyViewModel = authyViewModel
             )
         }
         BottomTabsItems.BottomBarCountriesTab -> {

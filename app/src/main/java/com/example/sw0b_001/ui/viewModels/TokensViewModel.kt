@@ -261,12 +261,34 @@ class TokensViewModel @Inject constructor(
         }
     }
 
+    fun storeCustom(
+        platform: SupportedPlatforms,
+        phoneNumber: String? = null,
+        authCode: String? = null,
+        password: String? = null,
+        channel: String? = null,
+    ) : Long? {
+        try {
+            return triggerPNBARequested(
+                phoneNumber = phoneNumber!!,
+                platform = platform,
+                authCode = authCode,
+                password = password,
+                channel = channel,
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw e
+        }
+    }
+
     fun store(
         platform: SupportedPlatforms,
         phoneNumber: String? = null,
         authCode: String? = null,
         password: String? = null,
         channel: String? = null,
+        onFailedCallback: (String) -> Unit,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             _isStoringUiState.value = TokensUiState.Loading
@@ -286,7 +308,9 @@ class TokensViewModel @Inject constructor(
                     }
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    onFailedCallback(e.message ?: "")
+                }
                 _isStoringUiState.value = TokensUiState.Error(e)
             }
         }
@@ -324,35 +348,42 @@ class TokensViewModel @Inject constructor(
         }
     }
 
-    private suspend fun triggerPNBARequested(
+    private fun triggerPNBARequested(
         phoneNumber: String,
         platform: SupportedPlatforms,
         authCode: String? = null,
         password: String? = null,
         channel: String? = null,
-    ) {
+    ) : Long? {
         PublisherGrpcImpl(context).use { publisherGrpcImpl ->
             try {
                 when(val state = _pnbaUiState.value) {
                     PnbaUiState.PhoneNumberRequested -> {
-                        publisherGrpcImpl.phoneNumberBaseAuthenticationRequest(
+                        val res = publisherGrpcImpl.phoneNumberBaseAuthenticationRequest(
                             phoneNumber,
                             platform.name,
                             channel,
                         )
                         _pnbaUiState.value = PnbaUiState.AuthCodeRequested
+                        return res.expiresAt
                     }
                     PnbaUiState.AuthCodeRequested -> {
-                        val res = publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
-                            authorizationCode = authCode!!,
-                            phoneNumber = phoneNumber,
-                            platform = platform.name,
-                            channel = channel
-                        )
-                        if(res == null) {
-                            _pnbaUiState.value = PnbaUiState.Success
-                        } else {
-                            _pnbaUiState.value = PnbaUiState.PasswordRequested
+                        try {
+                            val res = publisherGrpcImpl.phoneNumberBaseAuthenticationExchange(
+                                authorizationCode = authCode!!,
+                                phoneNumber = phoneNumber,
+                                platform = platform.name,
+                                channel = channel
+                            )
+                            if(res == null) {
+                                _pnbaUiState.value = PnbaUiState.Success
+                            } else {
+                                _pnbaUiState.value = PnbaUiState.PasswordRequested
+                            }
+                        } catch(e: Exception) {
+                            throw if(e is io.grpc.StatusRuntimeException) {
+                                Exception(context.getString(R.string.wrong_code))
+                            } else e
                         }
                     }
                     PnbaUiState.PasswordRequested -> {
@@ -370,9 +401,13 @@ class TokensViewModel @Inject constructor(
                 _isStoringUiState.value = TokensUiState.Success( null, )
             } catch(e: Exception) {
                 e.printStackTrace()
-                _isStoringUiState.value = TokensUiState.Error(e)
+                if(_pnbaUiState.value == PnbaUiState.AuthCodeRequested) {
+                    throw e
+                }
+                else _isStoringUiState.value = TokensUiState.Error(e)
             }
         }
+        return null
     }
 
     fun refreshTokens(tokenId: Long) {

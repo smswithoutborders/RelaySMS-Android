@@ -89,6 +89,7 @@ fun SupportedPlatformsView(
     navController: NavController,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
     tokensViewModel: TokensViewModel,
+    authyViewModel: AuthyViewModel,
     isCompose: Boolean = false,
 ) {
     val context = LocalContext.current
@@ -179,6 +180,7 @@ fun SupportedPlatformsView(
                 supportedPlatforms = supportedPlatforms,
                 supportedPlatformsViewModel = supportedPlatformsViewModel,
                 tokensViewModel = tokensViewModel,
+                authyViewModel = authyViewModel,
                 navController = navController,
             )
         }
@@ -194,6 +196,7 @@ private fun PlatformListContent(
     supportedPlatforms: List<SupportedPlatforms>,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
     tokensViewModel: TokensViewModel,
+    authyViewModel: AuthyViewModel,
     isCompose: Boolean,
 ) {
     val context = LocalContext.current
@@ -209,7 +212,6 @@ private fun PlatformListContent(
     var storePnbaRequested by remember { mutableStateOf(false) }
     var clickedPlatform: SupportedPlatforms? by remember{ mutableStateOf(null)}
 
-    val authyViewModel = remember { AuthyViewModel() }
 
     LaunchedEffect(storingUiState) {
         val state = storingUiState
@@ -237,7 +239,7 @@ private fun PlatformListContent(
             when(v1PayloadSupportProtocolsFromU8(
                 clickedPlatform!!.proto_id!!.toUByte())) {
                 V1PayloadsSupportedProtocols.O_AUTH20 -> {
-                    tokensViewModel.store(clickedPlatform!!)
+                    tokensViewModel.store(clickedPlatform!!){}
                 }
                 V1PayloadsSupportedProtocols.PNBA -> {
                     showPlatformOptions = false
@@ -261,20 +263,25 @@ private fun PlatformListContent(
                 showDialog = channelBasedAuthRequired,
                 authyUrl = stringResource(R.string.https_authy_shortmesh_com),
                 viewModel = authyViewModel,
-                requestCodeCallback = { pn ->
-                    tokensViewModel.store(
+                requestCodeCallback = { pn, _ ->
+                    val expires = tokensViewModel.storeCustom(
                         platform = clickedPlatform!!,
                         phoneNumber = pn,
                         channel = authyViewModel.selectedPlatform!!.name
                     )
+                    authyViewModel.setOtpExpiresAt(expires.toString())
                 },
                 sendCodeCallback = { code ->
-                    tokensViewModel.store(
-                        platform = clickedPlatform!!,
-                        phoneNumber = authyViewModel.phoneNumber,
-                        channel = authyViewModel.selectedPlatform!!.name,
-                        authCode = code
-                    )
+                    try {
+                        val expires = tokensViewModel.storeCustom(
+                            platform = clickedPlatform!!,
+                            phoneNumber = authyViewModel.phoneNumber,
+                            channel = authyViewModel.selectedPlatform!!.name,
+                            authCode = code
+                        )
+                    } catch(e: Exception) {
+                        throw e
+                    }
                 },
             ) {
                 channelBasedAuthRequired = false

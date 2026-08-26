@@ -96,6 +96,7 @@ import com.example.sw0b_001.ui.views.threads.MetricsView
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import dagger.hilt.android.AndroidEntryPoint
+import io.shortmesh.sdk.viewmodel.AuthyViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import uniffi.relaysms_spec_payload.Transports
@@ -125,8 +126,8 @@ class MainActivity : BindActivity() {
     val imageViewModel: ImageViewModel by viewModels()
     val onlineFirstPublisherViewModel: OnlineFirstPublisherViewModel by viewModels()
     val offlineFirstPublisherViewModel: OfflineFirstPublisherViewModel by viewModels()
-
     val backupRestoreViewModel: BackupRestoreViewModel by viewModels()
+    val authyViewModel: AuthyViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -255,6 +256,7 @@ class MainActivity : BindActivity() {
                             payloadsViewModel = payloadsViewModel,
                             gatewayClientViewModel = gatewayClientViewModel,
                             supportedPlatformsViewModel = supportedPlatformsViewModel,
+                            authyViewModel = authyViewModel,
                             drawerCallback = drawerCallback
                         )
                     }
@@ -323,6 +325,7 @@ class MainActivity : BindActivity() {
                     payloadsViewModel = payloadsViewModel,
                     gatewayClientViewModel = gatewayClientViewModel,
                     supportedPlatformsViewModel = supportedPlatformsViewModel,
+                    authyViewModel = authyViewModel,
                 )
             }
             composable<AboutScreen> {
