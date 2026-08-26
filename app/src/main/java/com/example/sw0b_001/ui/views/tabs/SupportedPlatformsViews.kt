@@ -67,6 +67,7 @@ import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.ui.modals.PNBAPhoneNumberCodeRequestView
 import com.example.sw0b_001.ui.modals.PlatformOptionsModal
 import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.PnbaUiState
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsUiState
 import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
 import com.example.sw0b_001.ui.viewModels.TokensUiState
@@ -263,13 +264,14 @@ private fun PlatformListContent(
                 showDialog = channelBasedAuthRequired,
                 authyUrl = stringResource(R.string.https_authy_shortmesh_com),
                 viewModel = authyViewModel,
-                requestCodeCallback = { pn, _ ->
+                requestCodeCallback = { pn, cb ->
+                    tokensViewModel.setPnbaState(PnbaUiState.PhoneNumberRequested)
                     tokensViewModel.storeCustom(
                         platform = clickedPlatform!!,
                         phoneNumber = pn,
                         channel = authyViewModel.selectedPlatform!!.name
-                    ) { _, exp ->
-                        authyViewModel.setOtpExpiresAt(exp.toString())
+                    ) { pair, exp ->
+                        cb(pair, exp.toString())
                     }
                 },
                 sendCodeCallback = { code, onResult ->

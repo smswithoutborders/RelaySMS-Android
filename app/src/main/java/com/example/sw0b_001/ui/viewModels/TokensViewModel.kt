@@ -353,6 +353,10 @@ class TokensViewModel @Inject constructor(
         }
     }
 
+    fun setPnbaState(state: PnbaUiState) {
+        _pnbaUiState.value = state
+    }
+
     private fun triggerPNBARequested(
         phoneNumber: String,
         platform: SupportedPlatforms,
