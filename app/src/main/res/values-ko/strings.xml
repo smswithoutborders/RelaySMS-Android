@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">RelaySMS</string>
     <string name="messages_deleted">메시지 삭제됨</string>
     <string name="select_all">모두 선택</string>
     <string name="selected_messages">%d개 선택됨</string>
@@ -53,23 +52,14 @@
     <string name="lock_screen_unlock_with_your_phone_s_locking_system">휴대폰 잠금 시스템으로 잠금 해제</string>
     <string name="gateway_client_add_custom_example_text">예: +237123456789 또는 연락처 선택</string>
     <string name="gateway_client_add_gateway_client_text">게이트웨이 클라이언트 추가</string>
-    <string name="otp_verification_code_template" translatable="false">Your SMSWithoutBorders-Auth verification code is: </string>
 
     <string name="logout_you_have_no_accounts_logged_into_vaults_at_this_time">현재 Vaults에 로그인된 계정이 없습니다</string>
     <string name="security_settings_you_have_no_accounts_to_delete_in_vault_at_this_time">현재 Vault에서 삭제할 계정이 없습니다</string>
     <string name="helper_yesterday">어제</string>
 
 
-    <string name="smswithoutboarders_official_gateway_client_seeding_url" translatable="false">https://smswithoutborders.com:15000/v3/clients</string>
     <string name="recovery_continue">계속</string>
 
-    <string name="vault_grpc_url" translatable="false">vault.smswithoutborders.com</string>
-    <string name="vault_grpc_port" translatable="false">443</string>
-
-    <string name="publisher_grpc_url" translatable="false">publisher.smswithoutborders.com</string>
-    <string name="publisher_grpc_port" translatable="false">443</string>
-
-    <string name="publisher_get_platforms_url" translatable="false">https://raw.githubusercontent.com/smswithoutborders/SMSWithoutBorders-Publisher/master/resources/platforms.json</string>
     <string name="cancel">취소</string>
     <string name="click_continue_to_confirm_this_action_do_not_worry_this_has_no_dangerous_effects">계속을 클릭하여 이 작업을 확인하세요. 걱정하지 마세요, 위험한 영향은 없습니다.</string>
     <string name="messaging">메시징</string>
@@ -244,7 +234,6 @@
     <string name="you_can_also_send_out_emails_without_an_account_or_vault">계정이나 Vault 없이도 이메일을 보낼 수 있습니다</string>
     <string name="this_will_create_a_default_email_your_phonenumber_relaysms_me_using_your_phone_number">이렇게 하면 전화번호를 사용하여 기본 이메일(your_phonenumber@relaysms.me)이 생성됩니다.</string>
     <string name="next">다음</string>
-    <string name="https_smswithoutborders_com_privacy_policy" translatable="false">https://smswithoutborders.com/privacy-policy</string>
     <string name="version">버전 %1$s</string>
     <string name="compose_new">새로 작성</string>
     <string name="add_account_compose_new">계정 추가 / 새로 작성</string>
@@ -264,7 +253,6 @@
     <string name="relaysms_bug_report">RelaySMS - 버그 신고</string>
     <string name="request_new_code_in">새 코드 요청까지 남은 시간: </string>
     <string name="request_new_code">새 코드 요청!</string>
-    <string name="test_url" translatable="false">https://gatewayserver.smswithoutborders.com/v3/clients/%1$s/tests</string>
     <string name="store_tokens_on_device_dialog_title">장치에 OAuth2.0 토큰 저장</string>
     <string name="store_tokens_on_device_enable_dialog_message">이 기능을 켜면 OAuth2.0(Gmail 및 X)을 사용하는 플랫폼의 토큰이 서버에서 자동으로 삭제되고 장치에 저장됩니다. RelaySMS는 이러한 토큰을 사용하여 위 플랫폼을 대신하여 메시지를 보냅니다. 따라서 장치를 분실하거나 이 애플리케이션을 다시 설치하는 경우 토큰이 손실되며 기존에 저장된 계정을 해지하고 다시 저장하여 새 토큰을 받아야 합니다.</string>
     <string name="store_tokens_on_device_disable_dialog_message">이 설정을 끄면 이후 토큰이 장치에 저장되지 않습니다. 장치에 기존 토큰이 저장된 플랫폼의 메시지는 계속 게시할 수 있습니다. 토큰이 누락된 경우 관련된 계정을 해지하고 다시 저장하세요.</string>

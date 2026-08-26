@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name" translatable="false">RelaySMS</string>
     <string name="messages_deleted">Nachrichten gelöscht</string>
     <string name="select_all">Alle auswählen</string>
     <string name="selected_messages">%d ausgewählt</string>
@@ -51,22 +50,13 @@
     <string name="lock_screen_unlock_with_your_phone_s_locking_system">Mit dem Sperrsystem Ihres Telefons entsperren</string>
     <string name="gateway_client_add_custom_example_text">z. B. +237123456789 oder Kontakt auswählen</string>
     <string name="gateway_client_add_gateway_client_text">Gateway-Client hinzufügen</string>
-    <string name="otp_verification_code_template" translatable="false">Ihr SMSWithoutBorders-Auth-Verifizierungscode lautet:</string>
 
     <string name="logout_you_have_no_accounts_logged_into_vaults_at_this_time">Sie haben derzeit keine Konten in Vaults angemeldet</string>
     <string name="security_settings_you_have_no_accounts_to_delete_in_vault_at_this_time">Sie haben derzeit keine Konten in Vault zu löschen</string>
     <string name="helper_yesterday">gestern</string>
 
-    <string name="smswithoutboarders_official_gateway_client_seeding_url" translatable="false">https://smswithoutborders.com:15000/v3/clients</string>
     <string name="recovery_continue">Fortfahren</string>
 
-    <string name="vault_grpc_url" translatable="false">vault.smswithoutborders.com</string>
-    <string name="vault_grpc_port" translatable="false">443</string>
-
-    <string name="publisher_grpc_url" translatable="false">publisher.smswithoutborders.com</string>
-    <string name="publisher_grpc_port" translatable="false">443</string>
-
-    <string name="publisher_get_platforms_url" translatable="false">https://raw.githubusercontent.com/smswithoutborders/SMSWithoutBorders-Publisher/master/resources/platforms.json</string>
     <string name="cancel">Abbrechen</string>
     <string name="click_continue_to_confirm_this_action_do_not_worry_this_has_no_dangerous_effects">Klicken Sie zum Bestätigen auf Fortfahren. Keine Sorge, dies hat keine gefährlichen Auswirkungen.</string>
     <string name="messaging">Messaging</string>

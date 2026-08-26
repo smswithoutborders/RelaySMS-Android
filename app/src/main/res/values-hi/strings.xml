@@ -67,9 +67,6 @@
     <string name="vault_grpc_url" translatable="false">vault.smswithoutborders.com</string>
     <string name="vault_grpc_port" translatable="false">443</string>
 
-    <string name="publisher_grpc_url" translatable="false">publisher.smswithoutborders.com</string>
-    <string name="publisher_grpc_port" translatable="false">443</string>
-
     <string name="publisher_get_platforms_url" translatable="false">https://raw.githubusercontent.com/smswithoutborders/SMSWithoutBorders-Publisher/master/resources/platforms.json</string>
     <string name="cancel">रद्द करें</string>
     <string name="click_continue_to_confirm_this_action_do_not_worry_this_has_no_dangerous_effects">इस कार्रवाई की पुष्टि करने के लिए जारी रखें पर क्लिक करें। चिंता न करें, इसका कोई खतरनाक प्रभाव नहीं है।</string>

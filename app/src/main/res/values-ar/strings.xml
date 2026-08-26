@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name" translatable="false">RelaySMS</string>
     <string name="messages_deleted">تم حذف الرسائل</string>
     <string name="select_all">تحديد الكل</string>
     <string name="selected_messages">تم تحديد %d</string>
@@ -53,22 +52,13 @@
     <string name="lock_screen_unlock_with_your_phone_s_locking_system">فتح باستخدام نظام قفل هاتفك</string>
     <string name="gateway_client_add_custom_example_text">على سبيل المثال +237123456789 أو حدد جهة اتصال</string>
     <string name="gateway_client_add_gateway_client_text">إضافة عميل البوابة</string>
-    <string name="otp_verification_code_template" translatable="false">رمز التحقق الخاص بك لـ SMSWithoutBorders-Auth هو:</string>
 
     <string name="logout_you_have_no_accounts_logged_into_vaults_at_this_time">ليس لديك حسابات مسجلة الدخول في Vaults في هذا الوقت</string>
     <string name="security_settings_you_have_no_accounts_to_delete_in_vault_at_this_time">ليس لديك حسابات لحذفها في Vault في هذا الوقت</string>
     <string name="helper_yesterday">أمس</string>
 
-    <string name="smswithoutboarders_official_gateway_client_seeding_url" translatable="false">https://smswithoutborders.com:15000/v3/clients</string>
     <string name="recovery_continue">متابعة</string>
 
-    <string name="vault_grpc_url" translatable="false">vault.smswithoutborders.com</string>
-    <string name="vault_grpc_port" translatable="false">443</string>
-
-    <string name="publisher_grpc_url" translatable="false">publisher.smswithoutborders.com</string>
-    <string name="publisher_grpc_port" translatable="false">443</string>
-
-    <string name="publisher_get_platforms_url" translatable="false">https://raw.githubusercontent.com/smswithoutborders/SMSWithoutBorders-Publisher/master/resources/platforms.json</string>
     <string name="cancel">إلغاء</string>
     <string name="click_continue_to_confirm_this_action_do_not_worry_this_has_no_dangerous_effects">انقر فوق متابعة لتأكيد هذا الإجراء. لا تقلق، هذا ليس له أي آثار خطيرة.</string>
     <string name="messaging">المراسلة</string>

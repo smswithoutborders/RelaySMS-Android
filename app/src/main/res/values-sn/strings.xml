@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">RelaySMS</string>
     <string name="messages_deleted">Mashoko adzimwa</string>
     <string name="select_all">Sarudza Zvose</string>
     <string name="selected_messages">%d akasarudzwa</string>
@@ -40,48 +39,6 @@
     <string name="language_shona">ChiShona</string>
 
 
-    <string name="language_english_value" translatable="false">
-        en
-    </string>
-    <string name="language_french_value" translatable="false">
-        fr
-    </string>
-    <string name="language_farsi_value" translatable="false">
-        fa
-    </string>
-    <string name="language_spanish_value" translatable="false">
-        es
-    </string>
-    <string name="language_turkish_value" translatable="false">
-        tr
-    </string>
-    <string name="language_german_value" translatable="false">
-        de
-    </string>
-    <string name="language_arabic_value" translatable="false">
-        ar
-    </string>
-    <string name="language_swahili_value" translatable="false">
-        sw
-    </string>
-    <string name="language_chinese_value" translatable="false">
-        zh
-    </string>
-    <string name="language_korean_value" translatable="false">
-        ko
-    </string>
-    <string name="language_hindi_value" translatable="false">
-        hi
-    </string>
-    <string name="language_shona_value" translatable="false">
-        sn
-    </string>
-
-
-    <string name="default_gateway_MSISDN_0" translatable="false">+237679466332</string>
-    <string name="default_gateway_MSISDN_2" translatable="false">+237690826242</string>
-    <string name="default_gateway_MSISDN_3" translatable="false">+2348131498393</string>
-
     <string name="gateway_client_settings_add_custom_empty_error">Ndapota isai nhamba yefoni</string>
 
     <string name="new_gateway_client_alias">Zita rekunyepedzera (zvisiri zvekumanikidza)</string>
@@ -94,21 +51,12 @@
     <string name="lock_screen_relay_sms_is_locked">RelaySMS App yakiyinwa</string>
     <string name="lock_screen_unlock_with_your_phone_s_locking_system">Vhura uchishandisa nzira yekukiya yefoni yako</string>
     <string name="gateway_client_add_custom_example_text">sekuti +237123456789 kana sarudza waunotumira</string>
-    <string name="gateway_client_add_gateway_client_text">Wedzera Mushandisi weGedhi</string> <string name="otp_verification_code_template" translatable="false">Your SMSWithoutBorders-Auth verification code is: </string>
 
     <string name="logout_you_have_no_accounts_logged_into_vaults_at_this_time">Hapana maakaundi awakapinda nawo muDura parizvino</string> <string name="security_settings_you_have_no_accounts_to_delete_in_vault_at_this_time">Hapana maakaundi ekudzima muDura parizvino</string> <string name="helper_yesterday">nezuro</string>
 
 
-    <string name="smswithoutboarders_official_gateway_client_seeding_url" translatable="false">https://smswithoutborders.com:15000/v3/clients</string>
     <string name="recovery_continue">Enderera</string>
 
-    <string name="vault_grpc_url" translatable="false">vault.smswithoutborders.com</string>
-    <string name="vault_grpc_port" translatable="false">443</string>
-
-    <string name="publisher_grpc_url" translatable="false">publisher.smswithoutborders.com</string>
-    <string name="publisher_grpc_port" translatable="false">443</string>
-
-    <string name="publisher_get_platforms_url" translatable="false">https://raw.githubusercontent.com/smswithoutborders/SMSWithoutBorders-Publisher/master/resources/platforms.json</string>
     <string name="cancel">Kanzura</string>
     <string name="click_continue_to_confirm_this_action_do_not_worry_this_has_no_dangerous_effects">Dzvanya enderera kuti utendere chiitiko ichi. Usanetseke, hapana njodzi.</string>
     <string name="messaging">Kutumira Mashoko</string>
@@ -263,7 +211,6 @@
     <string name="paste_message">Isa shoko</string>
     <string name="error_decrypting_text">Chinetso pakuzarura rugwaro</string> <string name="you_can_also_send_out_emails_without_an_account_or_vault">Unogonawo kutumira mae-mail usina akaundi kana Dura</string> <string name="this_will_create_a_default_email_your_phonenumber_relaysms_me_using_your_phone_number">Izvi zvinogadzira e-mail yekutanga (nhambayako@relaysms.me) uchishandisa nhamba yako yefoni.</string>
     <string name="next">Pamberi</string>
-    <string name="https_smswithoutborders_com_privacy_policy" translatable="false">https://smswithoutborders.com/privacy-policy</string>
     <string name="version">Shanduro %1$s</string>
     <string name="compose_new">Nyora Idzva</string>
     <string name="add_account_compose_new">Wedzera akaundi / Nyora idzva</string>
@@ -283,7 +230,6 @@
     <string name="relaysms_bug_report">RelaySMS - Chirevo cheChikanganiso</string>
     <string name="request_new_code_in">Kumbira kodhi itsva mu: </string>
     <string name="request_new_code">Kumbira kodhi itsva!</string>
-    <string name="test_url" translatable="false">https://gatewayserver.smswithoutborders.com/v3/clients/%1$s/tests</string>
     <string name="store_tokens_on_device_dialog_title">Chengeta OAuth2.0 Zviratidzo paChishandiso</string> <string name="store_tokens_on_device_enable_dialog_message">Kubatidza chinhu ichi kunodzima otomatiki zviratidzo zvako zvemapuratifomu anoshandisa OAuth2.0 (Gmail neX) paseva uye kuzvichengeta pachishandiso chako. Rangarira kuti RelaySMS inoshandisa zviratidzo izvi kutumira mashoko pachinzvimbo chako pamapuratifomu ataurwa. Saka kana ukarasikirwa nechishandiso chako kana kuisazve application iyi, zviratidzo zvako zvicharasika uye uchafanira kubvisa mvumo yemaakaundi akachengetwa kare nekuchengetazve kuti uwane zviratidzo zvitsva.</string> <string name="store_tokens_on_device_disable_dialog_message">Kudzima chirongwa ichi kunodzivirira zviratidzo zvinotevera kuchengetwa pachishandiso chako. Mashoko emapuratifomu ane zviratidzo zvakatochengetwa pachishandiso chako acharamba achikwanisa kuburitswa. Kana paine zviratidzo zvisipo, ndapota bvisa mvumo yemaakaundi acho wochengetazve.</string> <string name="are_you_sure_you_want_to_continue">Une chokwadi here kuti unoda kuenderera mberi nechiitiko ichi?</string>
     <string name="missing_token_text">Maakaundi ako anotevera anogona kunge asina zviratidzo. Ungangoda kuabvisa mvumo wowedzerazve kuti uve nechokwadi chekuti kutumira mashoko kuri kushanda nemazvo, kunyanya kana \'Chengeta Zviratidzo paChishandiso\' yakabatidzwa:</string> <string name="toast_tokens_refreshed_successfully">Zviratidzo zvavandudzwa zvinobudirira</string> <string name="toast_error_refreshing_tokens">Chinetso pakuvandudza zviratidzo: %s</string> <string name="toast_tokens_not_stored_subsequent">Zviratidzo zvemaakaundi anotevera hazvizochengetwi pachishandiso</string> <string name="an_unexpected_error_occurred">Chinetso chisingatarisirwi chaitika: %s</string>
     <string name="do_not_show_this_again">Usaratidze izvi zvakare</string>

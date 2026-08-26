@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">RelaySMS</string>
     <string name="messages_deleted">消息已删除</string>
     <string name="select_all">全选</string>
     <string name="selected_messages">已选择 %d 项</string>
@@ -54,23 +53,14 @@
     <string name="lock_screen_unlock_with_your_phone_s_locking_system">使用您手机的锁定系统解锁</string>
     <string name="gateway_client_add_custom_example_text">例如 +237123456789 或选择联系人</string>
     <string name="gateway_client_add_gateway_client_text">添加网关客户端</string>
-    <string name="otp_verification_code_template" translatable="false">Your SMSWithoutBorders-Auth verification code is: </string>
 
     <string name="logout_you_have_no_accounts_logged_into_vaults_at_this_time">您当前没有登录到保险库的帐户</string>
     <string name="security_settings_you_have_no_accounts_to_delete_in_vault_at_this_time">您当前没有可在保险库中删除的帐户</string>
     <string name="helper_yesterday">昨天</string>
 
 
-    <string name="smswithoutboarders_official_gateway_client_seeding_url" translatable="false">https://smswithoutborders.com:15000/v3/clients</string>
     <string name="recovery_continue">继续</string>
 
-    <string name="vault_grpc_url" translatable="false">vault.smswithoutborders.com</string>
-    <string name="vault_grpc_port" translatable="false">443</string>
-
-    <string name="publisher_grpc_url" translatable="false">publisher.smswithoutborders.com</string>
-    <string name="publisher_grpc_port" translatable="false">443</string>
-
-    <string name="publisher_get_platforms_url" translatable="false">https://raw.githubusercontent.com/smswithoutborders/SMSWithoutBorders-Publisher/master/resources/platforms.json</string>
     <string name="cancel">取消</string>
     <string name="click_continue_to_confirm_this_action_do_not_worry_this_has_no_dangerous_effects">点击“继续”以确认此操作。不用担心，这没有危险影响。</string>
     <string name="messaging">消息</string>
@@ -259,7 +249,6 @@
     <string name="you_can_also_send_out_emails_without_an_account_or_vault">您也可以在没有帐户或保险库的情况下发送电子邮件</string>
     <string name="this_will_create_a_default_email_your_phonenumber_relaysms_me_using_your_phone_number">这将使用您的电话号码创建一个默认电子邮件 (your_phonenumber@relaysms.me)。</string>
     <string name="next">下一步</string>
-    <string name="https_smswithoutborders_com_privacy_policy" translatable="false">https://smswithoutborders.com/privacy-policy</string>
     <string name="version">版本 %1$s</string>
     <string name="compose_new">撰写新内容</string>
     <string name="add_account_compose_new">添加帐户/撰写新内容</string>
@@ -279,7 +268,6 @@
     <string name="relaysms_bug_report">RelaySMS - 错误报告</string>
     <string name="request_new_code_in">请求新验证码倒计时：</string>
     <string name="request_new_code">请求新验证码！</string>
-    <string name="test_url" translatable="false">https://gatewayserver.smswithoutborders.com/v3/clients/%1$s/tests</string>
     <string name="store_tokens_on_device_dialog_title">在设备上存储 OAuth2.0 令牌</string>
     <string name="store_tokens_on_device_enable_dialog_message">开启此功能会自动删除服务器上使用 OAuth2.0 的平台 (Gmail 和 X) 的令牌，并将其保存在您的设备上。请注意，RelaySMS 利用这些令牌代表您为上述平台发送消息。因此，如果您丢失设备或重新安装此应用程序，您的令牌将会丢失，您将需要撤销现有的已存储帐户并重新存储它们以获取新的令牌。</string>
     <string name="store_tokens_on_device_disable_dialog_message">关闭此设置将阻止后续令牌存储在您的设备上。对于设备上已存储令牌的平台，消息仍能发布。如果出现令牌丢失的情况，请撤销相关帐户并重新存储。</string>

@@ -64,9 +64,6 @@
     <string name="vault_grpc_url" translatable="false">vault.smswithoutborders.com</string>
     <string name="vault_grpc_port" translatable="false">443</string>
 
-    <string name="publisher_grpc_url" translatable="false">publisher.smswithoutborders.com</string>
-    <string name="publisher_grpc_port" translatable="false">443</string>
-
     <string name="publisher_get_platforms_url" translatable="false">https://raw.githubusercontent.com/smswithoutborders/SMSWithoutBorders-Publisher/master/resources/platforms.json</string>
     <string name="cancel">لغو</string>
     <string name="click_continue_to_confirm_this_action_do_not_worry_this_has_no_dangerous_effects">برای تأیید این عمل روی ادامه کلیک کنید. نگران نباشید، این اثرات خطرناکی ندارد.</string>

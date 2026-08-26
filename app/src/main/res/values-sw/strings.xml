@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name" translatable="false">RelaySMS</string>
     <string name="messages_deleted">Ujumbe umefutwa</string>
     <string name="select_all">Chagua Zote</string>
     <string name="selected_messages">%d zimechaguliwa</string>
@@ -52,22 +51,13 @@
     <string name="lock_screen_unlock_with_your_phone_s_locking_system">Fungua kwa mfumo wa kufunga wa simu yako</string>
     <string name="gateway_client_add_custom_example_text">mf. +237123456789 au chagua anwani</string>
     <string name="gateway_client_add_gateway_client_text">Ongeza Mteja wa Lango</string>
-    <string name="otp_verification_code_template" translatable="false">Msimbo wako wa uthibitishaji wa SMSWithoutBorders-Auth ni:</string>
 
     <string name="logout_you_have_no_accounts_logged_into_vaults_at_this_time">Huna akaunti zilizounganishwa kwenye Vaults kwa wakati huu</string>
     <string name="security_settings_you_have_no_accounts_to_delete_in_vault_at_this_time">Huna akaunti za kufuta kwenye Vault kwa wakati huu</string>
     <string name="helper_yesterday">jana</string>
 
-    <string name="smswithoutboarders_official_gateway_client_seeding_url" translatable="false">https://smswithoutborders.com:15000/v3/clients</string>
     <string name="recovery_continue">Endelea</string>
 
-    <string name="vault_grpc_url" translatable="false">vault.smswithoutborders.com</string>
-    <string name="vault_grpc_port" translatable="false">443</string>
-
-    <string name="publisher_grpc_url" translatable="false">publisher.smswithoutborders.com</string>
-    <string name="publisher_grpc_port" translatable="false">443</string>
-
-    <string name="publisher_get_platforms_url" translatable="false">https://raw.githubusercontent.com/smswithoutborders/SMSWithoutBorders-Publisher/master/resources/platforms.json</string>
     <string name="cancel">Ghairi</string>
     <string name="click_continue_to_confirm_this_action_do_not_worry_this_has_no_dangerous_effects">Bonyeza endelea ili kuthibitisha kitendo hiki. Usijali, hii haina madhara yoyote hatari.</string>
     <string name="messaging">Ujumbe</string>

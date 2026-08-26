@@ -53,7 +53,12 @@ class PublisherGrpcImpl(val context: Context) : AutoCloseable {
                 setRequestIdentifier(requestIdentifier)
             }.build()
 
-        return publisherStub.getOAuth2AuthorizationUrl(request)
+        return try {
+            publisherStub.getOAuth2AuthorizationUrl(request)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            throw e
+        }
     }
 
     private fun getKeys()

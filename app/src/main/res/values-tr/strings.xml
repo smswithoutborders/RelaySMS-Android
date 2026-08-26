@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name" translatable="false">RelaySMS</string>
     <string name="messages_deleted">Mesajlar silindi</string>
     <string name="select_all">Tümünü Seç</string>
     <string name="selected_messages">%d seçildi</string>
@@ -52,22 +51,13 @@
     <string name="lock_screen_unlock_with_your_phone_s_locking_system">Telefonunuzun kilitleme sistemiyle kilidi açın</string>
     <string name="gateway_client_add_custom_example_text">örn. +237123456789 veya bir kişi seçin</string>
     <string name="gateway_client_add_gateway_client_text">Ağ Geçidi İstemcisi Ekle</string>
-    <string name="otp_verification_code_template" translatable="false">SMSWithoutBorders-Auth doğrulama kodunuz: </string>
 
     <string name="logout_you_have_no_accounts_logged_into_vaults_at_this_time">Şu anda Vaults\'a giriş yapmış hesabınız yok</string>
     <string name="security_settings_you_have_no_accounts_to_delete_in_vault_at_this_time">Şu anda Vault\'ta silinecek hesabınız yok</string>
     <string name="helper_yesterday">dün</string>
 
-    <string name="smswithoutboarders_official_gateway_client_seeding_url" translatable="false">https://smswithoutborders.com:15000/v3/clients</string>
     <string name="recovery_continue">Devam et</string>
 
-    <string name="vault_grpc_url" translatable="false">vault.smswithoutborders.com</string>
-    <string name="vault_grpc_port" translatable="false">443</string>
-
-    <string name="publisher_grpc_url" translatable="false">publisher.smswithoutborders.com</string>
-    <string name="publisher_grpc_port" translatable="false">443</string>
-
-    <string name="publisher_get_platforms_url" translatable="false">https://raw.githubusercontent.com/smswithoutborders/SMSWithoutBorders-Publisher/master/resources/platforms.json</string>
     <string name="cancel">İptal</string>
     <string name="click_continue_to_confirm_this_action_do_not_worry_this_has_no_dangerous_effects">Bu işlemi onaylamak için devam\'a tıklayın. Endişelenmeyin, bunun tehlikeli bir etkisi yok.</string>
     <string name="messaging">Mesajlaşma</string>
