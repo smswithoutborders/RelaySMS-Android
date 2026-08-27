@@ -556,5 +556,6 @@
     <string name="export_logs">Export logs</string>
     <string name="export_crasg_logs_for_debugging_purposes">Export crash logs for debugging purposes</string>
     <string name="wrong_code">Wrong code</string>
+    <string name="follow_us">Follow Us</string>
 
 </resources>

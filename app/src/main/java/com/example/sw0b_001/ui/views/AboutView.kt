@@ -182,7 +182,7 @@ fun AboutView(
 
             // Follow Us
             Text(
-                text = "Follow Us",
+                text = stringResource(R.string.follow_us),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface

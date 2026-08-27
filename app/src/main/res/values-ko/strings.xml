@@ -496,4 +496,6 @@
     <string name="add_a_platform">플랫폼을 추가하세요</string>
     <string name="export_logs">내보내기 로그</string>
     <string name="export_crasg_logs_for_debugging_purposes">디버깅 목적으로 충돌 로그를 내보냅니다.</string>
+    <string name="wrong_code">잘못된 코드입니다</string>
+    <string name="follow_us">팔로우하세요</string>
 </resources>
