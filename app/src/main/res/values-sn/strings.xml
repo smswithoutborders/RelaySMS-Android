@@ -440,4 +440,5 @@
     <string name="export_crasg_logs_for_debugging_purposes">Tumira magwaro ekupwanya kuti ugadzirise dambudziko</string>
     <string name="wrong_code">Kodhi isiriyo</string>
     <string name="follow_us">Titevere</string>
+    <string name="gateway_client_add_gateway_client_text">Wedzera Mutengi weGateway</string>
 </resources>
