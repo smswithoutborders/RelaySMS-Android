@@ -438,4 +438,6 @@
     <string name="add_a_platform">Wedzera Puratifomu</string>
     <string name="export_logs">Tumira magwaro ekutumira kunze</string>
     <string name="export_crasg_logs_for_debugging_purposes">Tumira magwaro ekupwanya kuti ugadzirise dambudziko</string>
+    <string name="wrong_code">Kodhi isiriyo</string>
+    <string name="follow_us">Titevere</string>
 </resources>

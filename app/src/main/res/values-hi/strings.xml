@@ -494,4 +494,6 @@
     <string name="add_a_platform">एक प्लेटफ़ॉर्म जोड़ें</string>
     <string name="export_logs">लॉग निर्यात करें</string>
     <string name="export_crasg_logs_for_debugging_purposes">डीबगिंग के लिए क्रैश लॉग एक्सपोर्ट करें</string>
+    <string name="wrong_code">गलत कोड</string>
+    <string name="follow_us">हमारे पर का पालन करें</string>
 </resources>

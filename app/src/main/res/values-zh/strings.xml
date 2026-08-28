@@ -487,4 +487,6 @@
     <string name="add_a_platform">添加平台</string>
     <string name="export_logs">导出日志</string>
     <string name="export_crasg_logs_for_debugging_purposes">导出崩溃日志以进行调试</string>
+    <string name="wrong_code">代码错误</string>
+    <string name="follow_us">跟着我们</string>
 </resources>
