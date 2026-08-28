@@ -243,9 +243,6 @@ fun HomepageView(
                     showBottomSheet = showAddGatewayClientsModal,
                     onDismiss = { showAddGatewayClientsModal = false },
                     viewModel = gatewayClientViewModel,
-                    onGatewayClientSaved = {
-                        showAddGatewayClientsModal = false
-                    }
                 )
             }
         }

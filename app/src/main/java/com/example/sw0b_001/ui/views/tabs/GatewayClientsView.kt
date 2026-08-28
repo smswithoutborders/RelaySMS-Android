@@ -150,9 +150,6 @@ fun GatewayClientView(
                 onDismiss = { editShowBottomSheet = false },
                 gatewayClients = currentGatewayClients,
                 viewModel = viewModel,
-                onGatewayClientSaved = {
-                    editShowBottomSheet = false
-                }
             )
         }
     }

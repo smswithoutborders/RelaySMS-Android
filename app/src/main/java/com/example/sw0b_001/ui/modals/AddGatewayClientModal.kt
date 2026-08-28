@@ -59,7 +59,6 @@ fun AddGatewayClientModal(
     showBottomSheet: Boolean,
     viewModel: GatewayClientViewModel,
     gatewayClients: GatewayClients? = null,
-    onGatewayClientSaved: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val activity = context as Activity
@@ -227,49 +226,47 @@ fun AddGatewayClientModal(
                 // Save Button
                 Button(
                     onClick = {
-                        if (phoneNumber.isBlank() ||
-                            !PhoneNumberUtils.isGlobalPhoneNumber(phoneNumber)) {
-                            isError = true
-                            return@Button
-                        }
                         isSaving = true
-                        scope.launch {
-                            try {
-                                val successRunnable = Runnable {
+                        try {
+                            val newNumber = phoneNumber.replace(" ", "")
+                            if (newNumber.isBlank() ||
+                                !PhoneNumberUtils.isGlobalPhoneNumber(newNumber)) {
+                                isError = true
+                                return@Button
+                            }
+                            if (gatewayClients == null) {
+                                val newGatewayClients = GatewayClients(
+                                    msisdn = newNumber,
+                                    operator = "Unknown",
+                                    country = "Unknown",
+                                    alias = alias,
+                                    manuallyAdded = true,
+                                )
+                                viewModel.insert( newGatewayClients ) {
                                     isSaving = false
-                                    onGatewayClientSaved()
                                     onDismiss()
                                 }
-
-                                val failureRunnable = Runnable {
-                                    isSaving = false
-                                    isError = true
-                                }
-
-                                if (gatewayClients == null) {
-                                    val newGatewayClients = GatewayClients(
-                                        msisdn = phoneNumber,
-                                        operator = "Unknown",
-                                        country = "Unknown",
-                                        alias = alias,
-                                        manuallyAdded = true,
-                                    )
-                                    viewModel.insert( newGatewayClients )
-                                } else {
-                                    gatewayClients.msisdn = phoneNumber
-                                    gatewayClients.alias = alias
-                                    viewModel.updateGatewayClient(
-                                        context,
-                                        gatewayClients,
-                                        successRunnable,
-                                        failureRunnable
-                                    )
-                                }
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                                isSaving = false
-                                isError = true
+                            } else {
+                                gatewayClients.msisdn = newNumber
+                                gatewayClients.alias = alias
+                                viewModel.updateGatewayClient(
+                                    context,
+                                    gatewayClients,
+                                    successRunnable = {
+                                        isSaving = false
+                                        onDismiss()
+                                    },
+                                    failureRunnable = {
+                                        isSaving = false
+                                        isError = true
+                                    }
+                                )
                             }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            isError = true
+                        } finally {
+                            isSaving = false
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),

@@ -158,12 +158,13 @@ class GatewayClientViewModel @Inject constructor(
         }
     }
 
-    fun insert(gatewayClients: GatewayClients) {
-        viewModelScope.launch {
+    fun insert(gatewayClients: GatewayClients, completeCallback: () -> Unit) {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 val db = Datastore.getDatastore(context)?.gatewayClientsDao()
                     ?: throw Exception("Could not get database")
                 db.insert(gatewayClients)
+                completeCallback()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
