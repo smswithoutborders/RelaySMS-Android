@@ -13,7 +13,7 @@ ext {
 
 android {
     namespace 'com.example.sw0b_001'
-    compileSdk 37
+    compileSdk 36
 
     def versionsPropertiesFile = rootProject.file("version.properties")
     def versionProperties = new Properties()
@@ -50,7 +50,7 @@ android {
     defaultConfig {
         applicationId "com.afkanerd.sw0b"
         minSdk 24
-        targetSdk 37
+        targetSdk 36
         versionCode tagVersion
         versionName _versionName
 
