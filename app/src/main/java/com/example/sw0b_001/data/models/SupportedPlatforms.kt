@@ -1,0 +1,23 @@
+package com.example.sw0b_001.data.models
+
+import androidx.annotation.Keep
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import kotlinx.serialization.Serializable
+
+@Entity
+@Keep
+@Serializable
+data class SupportedPlatforms(
+    @PrimaryKey
+    val name: String,
+    val display_name: String,
+    val supports_offline_first: Boolean,
+    var cat_id: Int,
+    val proto_id: Int?,
+    val icon_svg: String?,
+    val icon_png: String?,
+    val auth_provider: String? = null,
+    var logo: ByteArray? = null
+)
+

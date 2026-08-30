@@ -1,114 +1,99 @@
 plugins {
     id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
-//    id 'org.jetbrains.kotlin.jvm' version '1.9.23'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '2.2.20'
-    id "com.google.protobuf"
+    id 'org.jetbrains.kotlin.plugin.serialization' version '2.4.0'
+    id 'com.google.protobuf'
     alias(libs.plugins.compose.compiler)
-    id 'kotlin-kapt' // Add this line
-    id 'com.google.devtools.ksp' version '2.2.10-2.0.2'
+    id 'com.google.devtools.ksp' version '2.3.9'
+    id("com.google.dagger.hilt.android")
 }
 
-def versionsPropertiesFile = rootProject.file("version.properties")
-def versionProperties = new Properties()
-versionProperties.load(new FileInputStream(versionsPropertiesFile))
+ext {
+    abiCodes = ['armeabi-v7a': 1, 'x86_64': 2, 'arm64-v8a': 3]
+}
 
 android {
-    signingConfigs {
-        def localPropertiesFile = rootProject.file("local.properties")
+    namespace 'com.example.sw0b_001'
+    compileSdk 37
 
-        // 🔑 Check if the file exists before proceeding
-        if (localPropertiesFile.exists()) {
-            def localProperties = new Properties()
+    def versionsPropertiesFile = rootProject.file("version.properties")
+    def versionProperties = new Properties()
+    versionProperties.load(new FileInputStream(versionsPropertiesFile))
 
-            // Note: It's safer to use 'new FileInputStream(localPropertiesFile)' within 'try-catch'
-            // or use the file's 'withInputStream' method, but for a simple check,
-            // the 'exists()' guard is the primary requirement.
-            localProperties.load(new FileInputStream(localPropertiesFile))
-
-            if (localProperties['storeFile'] && localProperties['keyAlias'] &&
-                    localProperties['storePassword'] && localProperties['keyPassword']) {
-
-                // Configuration logic remains the same
-                debug {
-                    keyAlias = localProperties['keyAlias']
-                    storeFile = new File(localProperties['storeFile'])
-                    storePassword = localProperties['storePassword']
-                    keyPassword = localProperties['keyPassword']
-                }
-                release {
-                    keyAlias = localProperties['keyAlias']
-                    storeFile = new File(localProperties['storeFile'])
-                    storePassword = localProperties['storePassword']
-                    keyPassword = localProperties['keyPassword']
-                }
-            } else {
-                // Optional: Print a warning if the file exists but is missing required properties
-                println("⚠️ Warning: local.properties file exists, but is missing one or more required signing properties.")
-            }
-        } else {
-            // Optional: Print a warning if the file doesn't exist
-            println("⚠️ Warning: local.properties file not found. Signing configurations will not be applied.")
-        }
-    }
-    compileSdk 36
-
-    buildFeatures {
-        viewBinding true
-    }
+    def signingPropertiesFile = rootProject.file("keystore.properties")
+    def signingProperties = new Properties()
+    if(signingPropertiesFile.exists())
+        signingProperties.load(new FileInputStream(signingPropertiesFile))
 
     def _versionName = versionProperties['versionName']
     def tagVersion = Integer.parseInt(versionProperties['tagVersion'])
 
+    signingConfigs {
+        release {
+            if (signingProperties) {
+                storeFile = file(signingProperties['storeFile'])
+                storePassword = signingProperties['storePassword']
+                keyAlias = signingProperties['keyAlias']
+                keyPassword = signingProperties['keyPassword']
+            }
+        }
+    }
+
+    splits {
+        abi {
+            enable true
+            reset()
+            include "arm64-v8a", "armeabi-v7a", "x86_64"
+            universalApk false
+        }
+    }
+
     defaultConfig {
         applicationId "com.afkanerd.sw0b"
         minSdk 24
-        targetSdk 36
+        targetSdk 37
         versionCode tagVersion
         versionName _versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
         ksp {
             arg('room.schemaLocation', "$projectDir/schemas")
         }
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments += ["room.schemaLocation":
-                                      "$projectDir/schemas".toString()]
-            }
-        }
         resourceConfigurations += ['en', 'fr', 'fa', 'es', 'tr', 'ar', 'de', 'sw', 'zh', 'ko', 'hi', 'sn']
 
-        manifestPlaceholders =
-                ['appAuthRedirectScheme': 'oauth.afkanerd.com']
+        manifestPlaceholders = ['appAuthRedirectScheme': 'oauth.afkanerd.com']
 
-        // ...
         Properties properties = new Properties()
         if (rootProject.file("local.properties").exists()) {
             properties.load(rootProject.file("local.properties").newDataInputStream())
         }
         buildConfigField "String", "RECAPTCHA_KEY", properties.getProperty("recaptcha_key", "\"\"")
-
     }
 
     buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField("Boolean", "IS_RECAPTCHA", "false")
-            buildConfigField("Boolean", "IS_ONBOARDING", "false")
-            buildConfigField("Boolean", "IS_SHOWALL_ONBOARDING", "false")
+        profiling {
+            initWith release
+            signingConfig signingConfigs.debug
+            matchingFallbacks = ['release']
         }
-        debug {
-            buildConfigField("Boolean", "IS_RECAPTCHA", "false")
-            buildConfigField("Boolean", "IS_ONBOARDING", "false")
-            // Does not skip the onboarding screens
-            buildConfigField("Boolean", "IS_SHOWALL_ONBOARDING", "true")
-        }
-    }
 
-    buildFeatures {
-        viewBinding true
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+
+        debug {
+//            minifyEnabled true
+//            shrinkResources true
+//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+//            testProguardFiles 'proguard-rules.pro'
+        }
     }
 
     buildscript {
@@ -117,82 +102,101 @@ android {
             compose_version = '1.3.0-beta02'   //compose dependencies
             compose_material3 = '1.0.0-beta02' //material3 release
         }
-        //...
     }
 
+//    composeCompiler {
+//        includeComposeMappingFile.set(false)
+//    }
+
     compileOptions {
-        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
-//        kotlinCompilerExtensionVersion compose_compiler
     }
 
     lint {
         checkReleaseBuilds false
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
-    namespace 'com.example.sw0b_001'
-}
-
-//repositories {
-//	def releasePropertiesFile = rootProject.file("release.properties")
-//	def releaseProperties = new Properties()
-//	releaseProperties.load(new FileInputStream(releasePropertiesFile))
-//    maven {
-//        url = uri("https://maven.pkg.github.com/smswithoutborders/lib_signal_double_ratchet_java")
-//        credentials {
-//            username = releaseProperties['github_username']
-//            password = releaseProperties['github_token']
-//        }
-//    }
-//}
-
-
-import org.apache.tools.ant.taskdefs.condition.Os
-
-// Compatible with macOS on Apple Silicon
-def archSuffix = Os.isFamily(Os.FAMILY_MAC) ? ':osx-x86_64' : ''
-protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:4.27.0"
+    packagingOptions {
+        pickFirst 'META-INF/androidx.localbroadcastmanager_localbroadcastmanager.version'
+        resources.excludes.add("META-INF/proguard/okhttp3.pro")
     }
 
-    plugins {
-        grpc {
-            artifact = 'io.grpc:protoc-gen-grpc-java:1.64.0'
+    bundle {
+        language {
+            enableSplit = false
+        }
+        density {
+            enableSplit = false
+        }
+        abi {
+            enableSplit = false
         }
     }
+}
 
+androidComponents {
+    onVariants(selector().all()) { variant ->
+        variant.outputs.each { output ->
+            // Look up the ABI name from the variant filters
+            def abiFilter = output.filters.find { it.filterType.name() == "ABI" }?.identifier
+            def baseAbiVersionCode = project.ext.abiCodes.get(abiFilter)
+
+            if (baseAbiVersionCode != null) {
+                // In AGP 9.x, versionCode is a Property wrapper, so we must use .set()
+                output.versionCode.set((100 * android.defaultConfig.versionCode) + baseAbiVersionCode)
+            } else {
+                output.versionCode.set(100 * android.defaultConfig.versionCode)
+            }
+        }
+    }
+}
+
+protobuf {
+    protoc { artifact = 'com.google.protobuf:protoc:4.29.3' }
+    plugins {
+        grpc { artifact = 'io.grpc:protoc-gen-grpc-java:1.71.0' }
+    }
     generateProtoTasks {
         all().each { task ->
-            task.plugins {
-//                javalite {}
-                grpc { option 'lite' }
-            }
             task.builtins {
                 java { option 'lite' }
+                kotlin { option 'lite' }
             }
+            task.plugins { grpc { option 'lite' } }
         }
     }
 }
 
-configurations {
-    implementation.exclude module:'protobuf-javalite'
+configurations.configureEach {
+    resolutionStrategy {
+        force 'org.jetbrains.kotlin:kotlin-metadata-jvm:2.4.0'
+        force 'com.google.protobuf:protobuf-javalite:4.29.3'
+        force 'com.google.protobuf:protobuf-kotlin-lite:4.29.3'
+
+        force 'androidx.test.ext:junit:1.3.0'
+        force 'androidx.test.espresso:espresso-core:3.7.0'
+        force 'androidx.test:runner:1.6.0'
+        force 'androidx.test:rules:1.6.0'
+    }
 }
 
 
 dependencies {
-//    implementation project(':lib_smsmms_android:lib_smsmms_android')
-//    implementation project(':lib_image_android:app')
-    implementation 'com.github.smswithoutborders:lib_image_android:3275ac7'
-    implementation 'com.github.smswithoutborders:lib_smsmms_android:91141a5'
+    implementation libs.androidx.compose.foundation.layout
+    implementation libs.androidx.documentfile
+    implementation libs.smswithoutborders.lib.image.android
+    implementation libs.lib.smsmms.android
+    implementation libs.lib.signal.double.ratchet.java
+    implementation 'com.github.shortmesh:Widget-android:17ed994b6c'
+
+//    implementation(libs.jna)
+    implementation 'net.java.dev.jna:jna:5.14.0@aar'
 
     implementation libs.androidx.appcompat
     implementation libs.material
@@ -200,14 +204,14 @@ dependencies {
     implementation libs.androidx.annotation
     implementation libs.androidx.lifecycle.extensions
     implementation libs.androidx.lifecycle.viewmodel.ktx
-    implementation libs.androidx.legacy.support.v4
+//    implementation libs.androidx.legacy.support.v4
     implementation libs.androidx.preference
     implementation libs.androidx.preference.ktx
     implementation libs.androidx.baselibrary
     implementation libs.androidx.lifecycle.livedata.ktx
     implementation libs.androidx.activity
-    implementation libs.play.services.auth
-    implementation libs.play.services.auth.api.phone
+//    implementation libs.play.services.auth
+//    implementation libs.play.services.auth.api.phone
     implementation libs.androidx.ui.text.google.fonts
     implementation libs.androidx.paging.common
 //    implementation libs.androidx.datastore.core.jvm
@@ -252,7 +256,6 @@ dependencies {
 
     implementation libs.androidx.startup.runtime
 //    implementation libs.armadillo
-    implementation libs.smswithoutborders.libsignal
     implementation libs.appauth
     implementation libs.ccp
 
@@ -261,19 +264,14 @@ dependencies {
     implementation(libs.okhttp3.okhttp)
     implementation(libs.logging.interceptor)
     implementation libs.javax.annotation.api
-    implementation libs.grpc.core
+
+    implementation libs.grpc.okhttp // Default transport for Android
+    implementation libs.grpc.protobuf.lite
     implementation libs.grpc.stub
-    implementation libs.grpc.okhttp
-    implementation(libs.grpc.protobuf.lite) {
-        exclude module: "protobuf-lite"
-    }
-    androidTestImplementation(libs.grpc.testing)
-    androidTestImplementation(libs.grpc.inprocess)
+//    implementation("com.google.protobuf:protobuf-kotlin-lite:4.29.3")
 
-//     Add protobuf-java dependency
-    implementation libs.protobuf.java
 
-    implementation libs.fernet.java8
+    implementation libs.javax.annotation.api
 
     implementation(libs.androidx.material)
 
@@ -303,8 +301,8 @@ dependencies {
     // Optional - Included automatically by material, only add when you need
     // the icons but not the material library (e.g. when using Material3 or a
     // custom design system based on Foundation)
-    implementation 'androidx.compose.material:material-icons-core:1.7.8'
-    implementation "androidx.compose.material:material-icons-extended:1.7.8"
+    implementation libs.androidx.compose.material.icons.core
+    implementation libs.androidx.compose.material.icons.extended
 
     // Optional - Integration with activities
     implementation libs.androidx.activity.compose
@@ -363,5 +361,31 @@ dependencies {
     implementation(libs.coil.network.okhttp)
 
     coreLibraryDesugaring libs.desugar.jdk.libs
-}
 
+    implementation libs.androidx.security.crypto
+
+//    implementation libs.sqlcipher.android
+//    implementation libs.androidx.sqlite
+
+    implementation libs.hilt.android
+    ksp libs.hilt.compiler
+
+//    implementation("com.google.protobuf:protobuf-kotlin:4.34.1")
+    implementation(libs.protobuf.kotlin.lite)
+
+    // Retrofit
+    implementation(libs.retrofit)
+// Retrofit with Scalar Converter
+    implementation(libs.converter.scalars)
+//    implementation("org.bouncycastle:bcprov-jdk18on:1.83")
+
+    implementation(libs.converter.gson)
+
+    implementation(libs.glide)
+
+    // 2. Glide Compose integration library
+    implementation(libs.compose)
+
+    implementation("io.coil-kt.coil3:coil-svg:3.5.0")
+
+}

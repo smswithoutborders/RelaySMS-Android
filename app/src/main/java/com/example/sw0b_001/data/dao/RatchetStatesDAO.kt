@@ -8,19 +8,18 @@ import com.example.sw0b_001.data.models.RatchetStates
 
 @Dao
 interface RatchetStatesDAO {
-
-    @Insert
-    fun insert(ratchetStates: RatchetStates)
-
-    @Query("SELECT * FROM RatchetStates")
-    fun fetch(): List<RatchetStates>
+    @Query("SELECT * FROM RatchetStates where keystoreAlias = :keystoreAlias")
+    fun fetch(keystoreAlias: String): RatchetStates?
 
     @Query("DELETE FROM RatchetStates")
     fun deleteAll()
 
+    @Insert
+    fun _insert(ratchetStates: RatchetStates)
+
     @Transaction
-    fun update(ratchetStates: RatchetStates) {
+    fun insert(ratchetStates: RatchetStates) {
         deleteAll()
-        insert(ratchetStates)
+        _insert(ratchetStates)
     }
 }

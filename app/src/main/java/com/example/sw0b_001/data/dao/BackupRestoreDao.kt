@@ -1,0 +1,31 @@
+package com.example.sw0b_001.data.dao
+
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
+import com.example.sw0b_001.data.models.BackupRestoreEnt
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface BackupRestoreDao {
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPrivate(backupRestoreEnt: BackupRestoreEnt)
+
+    @Query("DELETE FROM BackupRestoreEnt")
+    suspend fun deleteAll()
+
+    @Transaction
+    suspend fun insert(backupRestoreEnt: BackupRestoreEnt) {
+        deleteAll()
+        insertPrivate(backupRestoreEnt)
+    }
+
+    @Query("SELECT * FROM BackupRestoreEnt ORDER BY date DESC LIMIT 1")
+    suspend fun fetch() : BackupRestoreEnt?
+
+    @Query("SELECT * FROM BackupRestoreEnt ORDER BY date DESC LIMIT 1")
+    fun fetchFlow() : Flow<BackupRestoreEnt?>
+}

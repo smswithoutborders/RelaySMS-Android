@@ -1,3 +1,15 @@
+pluginManagement {
+    repositories {
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -8,5 +20,3 @@ dependencyResolutionManagement {
 }
 rootProject.name = "sw0b_0.0.1"
 include ':app'
-//include ':lib_smsmms_android:lib_smsmms_android'
-//include ':lib_image_android:app'

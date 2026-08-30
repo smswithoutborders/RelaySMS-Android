@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.provider.ContactsContract
+import android.telephony.PhoneNumberUtils
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -44,14 +45,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.models.GatewayClients
-import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.verifyPhoneNumberFormat
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,7 +59,6 @@ fun AddGatewayClientModal(
     showBottomSheet: Boolean,
     viewModel: GatewayClientViewModel,
     gatewayClients: GatewayClients? = null,
-    onGatewayClientSaved: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val activity = context as Activity
@@ -229,53 +226,47 @@ fun AddGatewayClientModal(
                 // Save Button
                 Button(
                     onClick = {
-                        if (phoneNumber.isBlank() || !verifyPhoneNumberFormat(phoneNumber)) {
-                            isError = true
-                            return@Button
-                        }
                         isSaving = true
-                        scope.launch {
-                            try {
-                                val successRunnable = Runnable {
+                        try {
+                            val newNumber = phoneNumber.replace(" ", "")
+                            if (newNumber.isBlank() ||
+                                !PhoneNumberUtils.isGlobalPhoneNumber(newNumber)) {
+                                isError = true
+                                return@Button
+                            }
+                            if (gatewayClients == null) {
+                                val newGatewayClients = GatewayClients(
+                                    msisdn = newNumber,
+                                    operator = "Unknown",
+                                    country = "Unknown",
+                                    alias = alias,
+                                    manuallyAdded = true,
+                                )
+                                viewModel.insert( newGatewayClients ) {
                                     isSaving = false
-                                    onGatewayClientSaved()
                                     onDismiss()
                                 }
-
-                                val failureRunnable = Runnable {
-                                    isSaving = false
-                                    isError = true
-                                }
-
-                                if (gatewayClients == null) {
-                                    val newGatewayClients = GatewayClients(
-                                        msisdn = phoneNumber,
-                                        operator = "Unknown",
-                                        country = "Unknown",
-                                        alias = alias,
-                                        manuallyAdded = true,
-                                    )
-                                    viewModel.insertGatewayClient(
-                                        context,
-                                        newGatewayClients,
-                                        successRunnable,
-                                        failureRunnable
-                                    )
-                                } else {
-                                    gatewayClients.msisdn = phoneNumber
-                                    gatewayClients.alias = alias
-                                    viewModel.updateGatewayClient(
-                                        context,
-                                        gatewayClients,
-                                        successRunnable,
-                                        failureRunnable
-                                    )
-                                }
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                                isSaving = false
-                                isError = true
+                            } else {
+                                gatewayClients.msisdn = newNumber
+                                gatewayClients.alias = alias
+                                viewModel.updateGatewayClient(
+                                    context,
+                                    gatewayClients,
+                                    successRunnable = {
+                                        isSaving = false
+                                        onDismiss()
+                                    },
+                                    failureRunnable = {
+                                        isSaving = false
+                                        isError = true
+                                    }
+                                )
                             }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            isError = true
+                        } finally {
+                            isSaving = false
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
@@ -292,18 +283,5 @@ fun AddGatewayClientModal(
                 }
             }
         }
-    }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun AddGatewayClientModalPreview() {
-    AppTheme {
-        AddGatewayClientModal(
-            showBottomSheet = true,
-            onDismiss = {},
-            viewModel = remember{ GatewayClientViewModel() },
-        )
     }
 }

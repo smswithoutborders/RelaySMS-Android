@@ -28,3 +28,43 @@
     public static int v(...);
     public static int w(...);
 }
+
+#-dontwarn androidx.window.extensions.embedding.ActivityStack$Token
+#-dontwarn androidx.window.extensions.embedding.SplitInfo$Token
+
+-dontwarn com.squareup.okhttp.internal.Network
+
+-dontwarn java.awt.Component
+-dontwarn java.awt.GraphicsEnvironment
+-dontwarn java.awt.HeadlessException
+-dontwarn java.awt.Window
+
+-keep class com.sun.jna.** { *; }
+-keepclassmembers class * implements com.sun.jna.* { *; }
+-dontwarn com.sun.jna.**
+
+# Keep UniFFI internal structures and fields
+-keep class uniffi.** { *; }
+-keepclassmembers class uniffi.** { *; }
+
+# Prevent JNA from losing field reflection
+-keepclassmembers class * extends com.sun.jna.Structure {
+    *** capacity;
+    *** data;
+    *** len;
+}
+
+-keep class io.shortmesh.sdk.network.SupportedPlatforms { *; }
+
+# Keep Protobuf GeneratedMessageLite and its fields
+-keepclassmembers class * extends com.google.protobuf.GeneratedMessageLite {
+    <fields>;
+}
+
+# Keep any proto message types from being obfuscated/stripped
+-keep class * extends com.google.protobuf.MessageLite { *; }
+-keep class * extends com.google.protobuf.GeneratedMessageLite$Builder { *; }
+
+# If using Firebase or Play Services internals
+-dontwarn com.google.protobuf.**
+
