@@ -39,8 +39,15 @@ android {
     }
 
     splits {
+
         abi {
-            enable true
+            def isBuildingBundle = gradle.startParameter.taskNames.any {
+                it.toLowerCase().contains("bundle")
+            }
+
+            // Disable split abis when building appBundle
+//            isEnable = !isBuildingBundle
+            enable !isBuildingBundle
             reset()
             include "arm64-v8a", "armeabi-v7a", "x86_64"
             universalApk false
@@ -73,7 +80,7 @@ android {
         }
         buildConfigField "String", "RECAPTCHA_KEY", properties.getProperty("recaptcha_key", "\"\"")
     }
-
+    
     buildTypes {
         profiling {
             initWith release
@@ -81,18 +88,18 @@ android {
             matchingFallbacks = ['release']
         }
 
-        release {
+        debug {
+//            minifyEnabled false
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
+            testProguardFiles 'proguard-rules.pro'
         }
-
-        debug {
-//            minifyEnabled true
-//            shrinkResources true
-//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-//            testProguardFiles 'proguard-rules.pro'
+        release {
+//            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
