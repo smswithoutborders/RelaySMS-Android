@@ -84,6 +84,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Decode keystore
         run: |
@@ -269,5 +271,4 @@ jobs:
           **Build No:** ${{ steps.version.outputs.tag_version }}
           
           **SHA-256 Checksums:**
-          $NOTE_HASHES" \
-            --fail-on-no-commits
+          $NOTE_HASHES"
