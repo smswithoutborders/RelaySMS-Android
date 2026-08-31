@@ -13,7 +13,7 @@ ext {
 
 android {
     namespace 'com.example.sw0b_001'
-    compileSdk 36
+    compileSdk 37
 
     def versionsPropertiesFile = rootProject.file("version.properties")
     def versionProperties = new Properties()
