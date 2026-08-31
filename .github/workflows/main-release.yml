@@ -218,9 +218,6 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GH_LIB_SYNC_TOKEN }}
 
-      - name: Fetch all tags
-        run: git fetch --prune --unshallow --tags || git fetch --tags
-
       - name: Read version.properties
         id: version
         run: |
@@ -274,5 +271,4 @@ jobs:
           **Build No:** ${{ steps.version.outputs.tag_version }}
           
           **SHA-256 Checksums:**
-          $NOTE_HASHES" \
-            --fail-on-no-commits
+          $NOTE_HASHES"
