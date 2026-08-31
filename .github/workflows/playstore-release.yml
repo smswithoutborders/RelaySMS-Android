@@ -1,9 +1,8 @@
 name: Play Store Release
 
 on:
-  push:
-    tags:
-      - '[0-9]*'
+  release:
+    types: [published]
 
 jobs:
   release:
