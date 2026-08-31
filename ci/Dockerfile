@@ -38,7 +38,7 @@ RUN yes | sdkmanager --licenses --sdk_root="${ANDROID_HOME}"
 # Install valid stable packages (excluding non-existent android-37)
 RUN yes | sdkmanager --sdk_root="${ANDROID_HOME}" \
     "platform-tools" \
-    "platforms;android-37" \
+    "platforms;android-37.0" \
     "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
     "extras;google;m2repository" \
     "extras;android;m2repository" \
