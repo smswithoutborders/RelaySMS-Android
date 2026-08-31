@@ -1,55 +1,19 @@
 package com.example.sw0b_001.ui.modals
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SheetValue
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberStandardBottomSheetState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
-import com.example.sw0b_001.data.models.StoredPlatformsEntity
-import com.example.sw0b_001.R
+import com.example.sw0b_001.data.models.SupportedPlatforms
+import com.example.sw0b_001.data.models.Tokens
+import com.example.sw0b_001.ui.components.SelectAccountModalComponent
 import com.example.sw0b_001.ui.theme.AppTheme
-import kotlinx.coroutines.launch
+import uniffi.relaysms_spec_payload.V1ContentCategories
+import uniffi.relaysms_spec_payload.V1PayloadsSupportedProtocols
 
 // Data class to represent an account
 data class Account(
@@ -62,143 +26,83 @@ data class Account(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectAccountModal(
-    _accounts: List<StoredPlatformsEntity> = emptyList(),
-    name: String,
-    onAccountSelected: (StoredPlatformsEntity) -> Unit = {},
-    onDismissRequest: () -> Unit
+    accounts: List<Tokens>,
+    supportedPlatform: SupportedPlatforms,
+    isCompose: Boolean,
+    isComposeOffline: Boolean,
+    onRemoveAccountCallback: ((Tokens) -> Unit)? = null,
+    onAddAccountCallback: (() -> Unit)? = null,
+    onAccountSelected: ((Tokens) -> Unit)? = null,
+    onDismissRequest: () -> Unit,
 ) {
-    val context = LocalContext.current
-    val sheetState = rememberStandardBottomSheetState(
-        confirmValueChange = { it != SheetValue.Hidden },
-        skipHiddenState = false
+
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
     )
-    val scope = rememberCoroutineScope()
-    var showBottomSheet by remember { mutableStateOf(true) }
 
-    val platformsViewModel = remember{ PlatformsViewModel() }
-    val accounts: List<StoredPlatformsEntity> = if(LocalInspectionMode.current) _accounts
-    else platformsViewModel.getAccounts(context, name)
-        .observeAsState(emptyList()).value
-
-    if (showBottomSheet) {
-        ModalBottomSheet(
-            onDismissRequest = {
-
-            },
-            sheetState = sheetState,
-            dragHandle = null,
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Spacer(modifier = Modifier.weight(1f))
-                    IconButton(onClick = {
-                        scope.launch {
-                            sheetState.hide()
-                        }.invokeOnCompletion {
-                            showBottomSheet = false
-                            onDismissRequest()
-                        }
-                    }) {
-                        Icon(
-                            imageVector = Icons.Filled.Close,
-                            contentDescription = stringResource(R.string.close_modal)
-                        )
-                    }
-                }
-                Text(
-                    text = stringResource(R.string.select_an_account),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center,
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                LazyColumn(
-                    contentPadding = PaddingValues(bottom = 16.dp)
-                ) {
-                    items(accounts) { account ->
-                        AccountCard(account = account) {
-                            onAccountSelected(account)
-                            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                if (!sheetState.isVisible) {
-                                    showBottomSheet = false
-                                }
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun AccountCard(
-    account: StoredPlatformsEntity,
-    onAccountSelected: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onAccountSelected() },
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    Box(Modifier
+        .fillMaxSize()
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+        ModalBottomSheet(
+            onDismissRequest = onDismissRequest,
+            sheetState = sheetState,
+            dragHandle = null
         ) {
-            val profileImage = R.drawable.round_person_24
-            Image(
-                painter = painterResource(id = profileImage),
-                contentDescription = stringResource(R.string.profile_photo),
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
+            SelectAccountModalComponent(
+                accounts = accounts,
+                isCompose = isCompose,
+                isComposeOffline = isComposeOffline,
+                supportedPlatform = supportedPlatform,
+                onAccountSelected = { token ->
+                    onAccountSelected?.invoke(token)
+                    onDismissRequest()
+                },
+                onSheetHideCallback = onDismissRequest,
+                onAddAccountCallback = onAddAccountCallback ?: {},
+                onRemoveAccountCallback = onRemoveAccountCallback ?: {},
             )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column {
-                Text(
-                    text = account.account!!,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = account.name!!,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
-fun SelectAccountModalPreview() {
-    AppTheme {
-        val storedPlatform = StoredPlatformsEntity(
-            id= "0",
-            account = "developers@relaysms.me",
-            name = "gmail",
-            accessToken = "",
-            refreshToken = ""
+private fun SelectAccountModal_preview() {
+
+    val tokens = listOf(
+        Tokens(
+            tokenId = 1,
+            tokenHash = ByteArray(0),
+            catId = V1ContentCategories.EMAIL,
+            account = "sample@example.com",
+            platformName = "gmail",
+            date = System.currentTimeMillis()
+        ),
+        Tokens(
+            tokenId = 2,
+            tokenHash = ByteArray(0),
+            catId = V1ContentCategories.TEXT,
+            account = "sample@example.com",
+            platformName = "bluesky",
+            date = System.currentTimeMillis()
         )
+    )
+
+    val supportedPlatform = SupportedPlatforms(
+        name = "rmail",
+        display_name = "RelaySMS mail",
+        supports_offline_first = true,
+        cat_id = V1ContentCategories.EMAIL.value.toInt(),
+        proto_id = V1PayloadsSupportedProtocols.O_AUTH20.value.toInt(),
+        icon_svg = null,
+        icon_png = null
+    )
+    AppTheme() {
         SelectAccountModal(
-            _accounts = listOf(storedPlatform),
-            name = "gmail",
-            onAccountSelected = {},
-            onDismissRequest = {}
-        )
+            accounts = tokens,
+            supportedPlatform = supportedPlatform,
+            isCompose = true,
+            isComposeOffline = true
+        ) { }
     }
 }

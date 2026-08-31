@@ -1,13 +1,18 @@
 package com.example.sw0b_001.data.models
 
-import androidx.room.ColumnInfo
+import androidx.annotation.Keep
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 
+@OptIn(ExperimentalSerializationApi::class)
+@JsonIgnoreUnknownKeys
 @Serializable
 @Entity(indices = [Index(value = ["msisdn"], unique = true)])
+@Keep
 data class GatewayClients(
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0,
@@ -17,9 +22,9 @@ data class GatewayClients(
     var alias: String? = null,
     var date: Long = System.currentTimeMillis(),
     var isDefault: Boolean = false,
+    var possibleDefault: Boolean = false,
     var last_published_date: Long? = null,
     var manuallyAdded: Boolean = false,
     var operatorCode: String? = null,
-    var reliability: Long? = null,
     val region: String? = null,
 )

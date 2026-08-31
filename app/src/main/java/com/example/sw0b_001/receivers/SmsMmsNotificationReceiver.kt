@@ -4,10 +4,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.provider.Telephony
-import androidx.work.impl.utils.ForceStopRunnable
 import com.afkanerd.lib_smsmms_android.R
 import com.afkanerd.smswithoutborders_libsmsmms.data.entities.Conversations
-import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.NotificationTxType
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDatabase
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.notify
 import com.afkanerd.smswithoutborders_libsmsmms.receivers.SmsTextReceivedReceiver
@@ -60,7 +58,7 @@ class SmsMmsNotificationReceiver : BroadcastReceiver () {
             actions = false,
             text = content,
             cls = cls,
-            title = context.getString(R.string.failed_to_send_message)
+            title = context.getString(R.string.this_message_failed_to_send)
         )
     }
 

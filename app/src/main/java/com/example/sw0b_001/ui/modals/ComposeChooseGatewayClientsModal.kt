@@ -25,18 +25,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.sw0b_001.R
 import com.example.sw0b_001.extensions.context.settingsSetNotShowChooseGatewayClient
-import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
-import com.example.sw0b_001.ui.views.GatewayClientView
+import com.example.sw0b_001.ui.views.tabs.GatewayClientView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ComposeChooseGatewayClientsModal(
     showBottomSheet: Boolean,
+    gatewayClientViewModel: GatewayClientViewModel,
     onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -87,16 +86,8 @@ fun ComposeChooseGatewayClientsModal(
                         color = MaterialTheme.colorScheme.secondary
                     )
                 }
-                GatewayClientView(remember{ GatewayClientViewModel() })
+                GatewayClientView(gatewayClientViewModel)
             }
         }
-    }
-}
-
-@Preview
-@Composable
-fun ComposeChooseGatewayClientsPreview() {
-    AppTheme {
-        ComposeChooseGatewayClientsModal(true,) { }
     }
 }

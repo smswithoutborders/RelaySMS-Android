@@ -2,21 +2,24 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-feature
+        android:name="android.software.leanback"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
-
-
     <uses-permission android:name="android.permission.READ_LOGS" />
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
-
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
-
-    <uses-permission android:name="android.permission.POST_PROMOTED_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.POST_PROMOTED_NOTIFICATIONS" />
 
     <queries>
         <intent>
@@ -27,8 +30,10 @@
     </queries>
 
     <application
-        android:versionCode="48"
-        android:versionName="2.5.8"
+        android:name=".EntryActivity"
+        android:allowBackup="false"
+        android:enableOnBackInvokedCallback="true"
+        android:fullBackupContent="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:localeConfig="@xml/locales_config"
@@ -36,28 +41,37 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.main"
         android:usesCleartextTraffic="false"
-        android:enableOnBackInvokedCallback="true"
-        android:allowBackup="false"
-        android:fullBackupContent="false"
         tools:replace="android:label">
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
         <activity
+            android:name=".EntryActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
-            android:windowSoftInputMode="adjustResize"
+            android:exported="true"
             android:launchMode="singleInstance"
-            android:exported="true">
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="text/plain" />
             </intent-filter>
-
             <intent-filter>
                 <action android:name="android.intent.action.DATA_SMS_RECEIVED" />
                 <action android:name="android.intent.action.SEND" />
@@ -112,20 +126,6 @@
             </intent-filter>
         </activity>
 
-        <provider
-            android:name="androidx.startup.InitializationProvider"
-            android:authorities="${applicationId}.androidx-startup"
-            android:exported="false"
-            tools:node="merge">
-
-            <!-- This entry makes ExampleLoggerInitializer discoverable. -->
-            <meta-data
-                android:name="com.example.sw0b_001.StartupActivity"
-                android:value="androidx.startup" />
-        </provider>
-
-
-        <!-- Defaults -->
         <service
             android:name=".MainActivity"
             android:exported="true"
@@ -140,9 +140,7 @@
                 <data android:scheme="mms" />
                 <data android:scheme="mmsto" />
             </intent-filter>
-        </service>
-
-        <!-- Custom receiver for notifications from lib -->
+        </service> <!-- Custom receiver for notifications from lib -->
         <receiver
             android:name=".receivers.SmsMmsNotificationReceiver"
             android:exported="false">
@@ -151,7 +149,6 @@
                 <action android:name="com.afkanerd.deku.NOTIFICATION_REPLY_ACTION_INTENT_ACTION_REPLAY" />
             </intent-filter>
         </receiver>
-
     </application>
 
 </manifest>

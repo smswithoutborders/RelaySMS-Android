@@ -64,9 +64,6 @@
     <string name="vault_grpc_url" translatable="false">vault.smswithoutborders.com</string>
     <string name="vault_grpc_port" translatable="false">443</string>
 
-    <string name="publisher_grpc_url" translatable="false">publisher.smswithoutborders.com</string>
-    <string name="publisher_grpc_port" translatable="false">443</string>
-
     <string name="publisher_get_platforms_url" translatable="false">https://raw.githubusercontent.com/smswithoutborders/SMSWithoutBorders-Publisher/master/resources/platforms.json</string>
     <string name="cancel">Cancelar</string>
     <string name="click_continue_to_confirm_this_action_do_not_worry_this_has_no_dangerous_effects">Haga clic en Continuar para confirmar esta acción. No se preocupe, esto no tiene efectos peligrosos.</string>
@@ -83,6 +80,7 @@
     <string name="settings">Configuración</string>
     <string name="permission_denied">¡Permiso denegado!</string>
     <string name="add_gateway_client">Agregar cliente de puerta de enlace</string>
+    <string name="add_routing_numbers">Agregar números de ruta</string>
     <string name="edit_gateway_client">Editar cliente de puerta de enlace</string>
     <string name="e_g_237123456_or_select_contact">p. ej. +237123456 o seleccionar contacto</string>
     <string name="alias_optional">Alias (opcional)</string>
@@ -98,7 +96,15 @@
     <string name="send_message">Enviar mensaje</string>
     <string name="add_account">Agregar cuenta</string>
     <string name="remove_accounts">Eliminar cuentas</string>
+    <string name="onboarding_save_access_description">Guarda el acceso a tus cuentas. Se almacena de forma segura en tu dispositivo, para que puedas enviar mensajes con tu nombre de usuario.</string>
+    <string name="make_relaysms_your_default_sms_app">Establece RelaySMS como tu aplicación de SMS predeterminada.</string>
+    <string name="manage_your_sms_messages_from_one_place">¡Gestiona tus mensajes SMS desde un solo lugar y envía imágenes por SMS!</string>
+    <string name="previous">Previa</string>
+    <string name="awesome_">¡Impresionante!</string>
+    <string name="got_it_">¡Entiendo!</string>
+    <string name="done_">¡Hecho!</string>
     <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported">Agregar correos electrónicos a su cuenta RelaySMS le permite usarlos para enviar correos electrónicos mediante mensajería SMS.\n\nActualmente se admite Gmail.</string>
+    <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging__are_currently_supported">Agregar direcciones de correo electrónico a tu cuenta de RelaySMS te permite utilizarlas para enviar correos electrónicos mediante mensajes SMS.</string>
     <string name="adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported">Agregar números a su cuenta RelaySMS le permite usarlos para enviar mensajes mediante mensajería SMS.\n\nActualmente se admite la mensajería de Telegram.</string>
     <string name="adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported">Agregar cuentas a su cuenta RelaySMS le permite usarlas para publicar mensajes mediante mensajería SMS.\n\nActualmente se admite la publicación.</string>
     <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias">Su cuenta RelaySMS es un alias de su número de teléfono con el dominio @relaysms.me.\n\nPuede recibir respuestas por SMS cada vez que se envíe un mensaje a su alias.</string>
@@ -134,6 +140,7 @@
     <string name="create_your_account_and">Crea tu cuenta y</string>
     <string name="save_platforms">guardar plataformas</string>
     <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline">para que RelaySMS envíe mensajes a Gmail, X y Telegram en su nombre cuando esté sin conexión</string>
+    <string name="for_relaysms_to_send_messages_to__x_and_telegram_on_your_behalf_when_offline">para que RelaySMS envíe mensajes a Gmail, X y Telegram en tu nombre cuando estés sin conexión.</string>
     <string name="i_have_read_the">He leído la</string>
     <string name="privacy_policy">política de privacidad</string>
     <string name="log_in">Iniciar sesión</string>
@@ -147,6 +154,7 @@
     <string name="log_into_relaysms">Iniciar sesión en RelaySMS</string>
     <string name="log_into_your_account_and">Inicie sesión en su cuenta y</string>
     <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline_">para que RelaySMS envíe mensajes a Gmail,X y Telegram en su nombre cuando esté sin conexión</string>
+    <string name="for_relaysms_to_send_messages_to__x_and_telegram_on_your_behalf_when_offline_">para que RelaySMS envíe mensajes a Gmail, X y Telegram en tu nombre cuando estés sin conexión.</string>
     <string name="already_got_code">Ya tengo el código</string>
     <string name="do_not_have_an_account">¿No tienes una cuenta?</string>
     <string name="get_started_with">Comenzar con</string>
@@ -182,6 +190,7 @@
     <string name="security_and_privacy">Seguridad y privacidad</string>
     <string name="security">Seguridad</string>
     <string name="enable_app_locks_and_pin_codes">Activar bloqueos de aplicaciones y códigos PIN</string>
+    <string name="encryption_key_client">Claves de cifrado del cliente</string>
 
     <string name="english">Inglés</string>
     <string name="arabic">Árabe</string>
@@ -262,6 +271,7 @@
     <string name="store_tokens_on_device">Almacenar tokens en el dispositivo</string>
     <string name="storing_platform_accounts">Almacenando cuentas de plataforma</string>
     <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">Al agregar cuentas para plataformas que utilizan OAuth2.0 (por ejemplo, Gmail, X), habilitar esto asegura que sus tokens de acceso se almacenen en su dispositivo actual en su lugar.</string>
+    <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g__x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">Al agregar cuentas para plataformas que utilizan OAuth2.0, habilitar esta opción garantiza que sus tokens de acceso se almacenen en su dispositivo actual.</string>
     <string name="stored_tokens_detected_title">Tokens almacenados detectados</string>
     <string name="stored_tokens_dialog_message_part1">Se han detectado tokens almacenados para esta cuenta</string>
     <string name="stored_tokens_dialog_message_part2">. Puedes usar tus tokens almacenados para hacer una publicación en X</string>
@@ -381,7 +391,7 @@
     <string name="log_out">Finalizar la sesión</string>
     <string name="this_would_log_you_out_of_your_vault_account_on_this_device_you_can_log_back_in_at_anytime_with_an_internet_connection">Esto cerrará la sesión de su cuenta de Vault en este dispositivo. Puede volver a iniciar sesión en cualquier momento (con conexión a internet).</string>
     <string name="delete_account">Eliminar cuenta</string>
-    <string name="this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer">Esto revocaría todos tus tokens, claves de seguridad y todos los datos que tengas guardados en el dispositivo y en Vault. Podrás seguir usando los puentes cuando quieras.</string>
+    <string name="this_would_delete_all_your_saved_tokens_platforms_security_keys_and_every_data_you_have_stored_on_device_you_can_still_use_the_random_alias_whenever_you_want">Esto eliminará todos tus tokens guardados (plataformas), claves de seguridad y todos los datos almacenados en el dispositivo. Aún podrás usar el alias aleatorio cuando quieras.</string>
     <string name="this_would_migrate_your_tokens_stored_on_the_vault_to_your_device_this_would_send_the_token_alongside_every_time_you_send_the_message_potentially_increasing_the_size_of_messages">Esto revocaría todos tus tokens, claves de seguridad y todos los datos que tengas guardados en el dispositivo y en Vault. Podrás seguir usando los puentes cuando quieras.</string>
     <string name="enter_the_text_in_the_image">Introduce el texto de la imagen.</string>
     <string name="submit1">Entregar</string>
@@ -389,5 +399,97 @@
     <string name="optional">(Opcional)</string>
     <string name="email">Correo electrónico</string>
     <string name="phone_number1">Número de teléfono</string>
+    <string name="platform_image">Imagen de la plataforma</string>
+    <string name="backup">Respaldo</string>
+    <string name="restore">Restaurar</string>
+    <string name="on_device_backups">Copias de seguridad en el dispositivo</string>
+    <string name="backups_are_encrypted_with_a_passphrase_and_stored_on_your_device">Las copias de seguridad están cifradas con una contraseña y se almacenan en su dispositivo.</string>
+    <string name="backup_now">Copia de seguridad ahora</string>
+    <string name="your_recovery_key">Tu clave de recuperación</string>
+    <string name="your_recovery_key_is_a_64_character_code_that_you_will_need_to_restore_your_backup">Tu clave de recuperación es un código de 64 caracteres que necesitarás para restaurar tu copia de seguridad.</string>
+    <string name="store_your_recovery_key_somewhere_safe_like_a_secure_password_manager_and_don_t_share_it_with_anyone">Guarda tu clave de recuperación en un lugar seguro, como un gestor de contraseñas seguro, y no la compartas con nadie.</string>
+    <string name="if_you_lose_it_you_won_t_be_able_to_recover_your_messages">Si lo pierdes, no podrás recuperar tus mensajes.</string>
+    <string name="view_recovery_key">Ver clave de recuperación</string>
+    <string name="record_your_recovery_key">Anota tu clave de recuperación</string>
+    <string name="this_key_is_required_to_recover_your_saved_accounts_and_data_store_this_key_somewhere_safe_if_you_lose_it_you_won_t_be_able_to_recover_your_saved_accounts">Esta clave es necesaria para recuperar tus cuentas y datos guardados. Guárdala en un lugar seguro. Si la pierdes, no podrás recuperar tu cuenta.</string>
+    <string name="copy_to_clipboard">Copiar al portapapeles</string>
+    <string name="save_to_password_manager">Guardar en el gestor de contraseñas</string>
+    <string name="reset">Reiniciar</string>
+    <string name="reset_removes_all_your_stored_tokens_both_locally_and_on_the_cloud_this_is_what_a_complete_delete_would_look_like_if_there_were_traditional_accounts_you_can_add_more_at_anytime">El restablecimiento elimina todos tus tokens almacenados, tanto localmente como en la nube. Así es como se vería una eliminación completa, si hubiera cuentas tradicionales. Puedes agregar más en cualquier momento.</string>
+    <string name="restore_backup">Restaurar copia de seguridad</string>
+    <string name="enter_your_recovery_key">Introduzca su clave de recuperación</string>
+    <string name="your_recovery_key_is_a_64_character_code_required_to_recover_your_data">Su clave de recuperación es un código de 64 caracteres necesario para recuperar sus datos.</string>
+    <string name="recovery_key">Clave de recuperación</string>
+    <string name="you_can_use_this_account_without_verifying_a_number_this_is_a_one_time_use_account_and_cannot_receive_replies">Puedes usar esta cuenta sin verificar ningún número.</string>
+    <string name="your_sending_address_changes_everytime_you_use">Tu dirección de envío cambia cada vez que la usas.</string>
+    <string name="make_relaysms_default">Establecer RelaySMS como predeterminado</string>
+    <string name="you_need_to_set_relaysms_as_your_default_sms_app_to_be_able_to_send_attachments">Para poder enviar archivos adjuntos, debes configurar RelaySMS como tu aplicación de SMS predeterminada.</string>
+    <string name="enter_phone_number">Ingrese su número de teléfono.</string>
+    <string name="will_send_a_code">%1$s enviará un código.</string>
+    <string name="yes_remove">Sí, eliminar</string>
+    <string name="you_have_not_saved_any_account_yet_click_the_add_button_to_connect_your_account"><![CDATA[Aún no has guardado ninguna cuenta. Haz clic en el botón Añadir para conectar tu cuenta de <b>%1$s</b>.]]></string>
+    <string name="you_can_send_a_quick_mail_without_verifying_or_adding_accounts_using_relaysms_mail">Puedes enviar un correo electrónico rápido sin verificar ni agregar cuentas usando el servicio de correo RelaySMS.</string>
+    <string name="try_it">Pruébalo.</string>
+    <string name="you_can_always_find_the_option_when_you_click_compose"><![CDATA[Siempre puedes encontrar la opción cuando hagas clic en <b>Redactar</b>]]></string>
+    <string name="account_name">Nombre de la cuenta</string>
+    <string name="refresh">Refrescar</string>
+    <string name="encryption_keys_left">Claves de cifrado restantes</string>
+    <string name="number_of_stored_accounts">Número de cuentas almacenadas</string>
+    <string name="to_restore_a_backup_install_a_new_copy_of_relaysms_open_the_app_and_tap_restore_backup_then_locate_a_backup_file">Para restaurar una copia de seguridad, instale una nueva copia de RelaySMS. Abra la aplicación y pulse Restaurar copia de seguridad; a continuación, localice el archivo de copia de seguridad.</string>
+    <string name="create_backup">Crear copia de seguridad</string>
+    <string name="encryption_details">Detalles de cifrado</string>
+    <string name="text_keys">Teclas de texto</string>
+    <string name="attachment_keys">Claves de adjuntos</string>
+    <string name="offline_compose">composición sin conexión</string>
+    <string name="send_message_offline">Enviar mensaje sin conexión</string>
+    <string name="please_enter_your_avoid_copying_and_pasting_if_telegram_to_not_get_flagged">Por favor, introduce tu código %1$s. ¡Evita copiar y pegar si quieres que Telegram no sea marcado!</string>
+    <string name="this_lets_the_app_manage_the_sending_requirements_for_you">Esto permite que la aplicación gestione los requisitos de envío por usted.</string>
+    <string name="delete_backup">Eliminar copia de seguridad</string>
+    <string name="failed_to_delete_file">No se pudo eliminar el archivo.</string>
+    <string name="account_details">Detalles de la cuenta</string>
+    <string name="account_type">Tipo de cuenta</string>
+    <string name="date_stored">Fecha almacenada</string>
+    <string name="restore_your_saved_accounts_from_the_backup_you_saved_on_your_device_if_you_don_t_restore_now_you_won_t_be_able_to_restore_later">Restaura tus cuentas guardadas desde la copia de seguridad que guardaste en tu dispositivo. Si no las restauras ahora, no podrás hacerlo más adelante.</string>
+    <string name="choose_your_backup_file">Elige tu archivo de copia de seguridad</string>
+    <string name="select_the_file_on_your_device_where_your_backup_is_stored">Selecciona el archivo en tu dispositivo donde se almacena tu copia de seguridad.</string>
+    <string name="open_backup_file">Abrir archivo de copia de seguridad</string>
+    <string name="incorrect_recovery_key">Clave de recuperación incorrecta</string>
+    <string name="Settings">Ajustes</string>
+    <string name="default_routing_number">Número de ruta predeterminado</string>
+    <string name="_default">Por defecto</string>
+    <string name="error">Error</string>
+    <string name="show_accounts">Mostrar cuentas</string>
+    <string name="onboarding_no_login_description">RelaySMS ya no te pide que inicies sesión ni que te registres porque tu privacidad es importante.</string>
+    <string name="last_back">Último regreso: %1$s</string>
+    <string name="last_sync">Última sincronización: %1$s</string>
+    <string name="send_from_a_random_alias_e_g_qwertyuiop_relaysms_me">Enviar desde un alias aleatorio, por ejemplo, qwertyuiop@relaysms.me</string>
+    <string name="enter_your_password">Introduce tu contraseña</string>
+    <string name="send_with">Enviar con...</string>
+    <string name="send_messages_using_your_account">Envía mensajes usando tu cuenta de %1$s.</string>
+    <string name="add_new">Agregar nuevo</string>
+    <string name="learn_more">Más información</string>
+    <string name="to_send_attachments_and_enjoy_the_full_relaysms_experience_make_relaysms_your_default_sms_app">Para enviar archivos adjuntos y disfrutar de la experiencia completa de RelaySMS, configura RelaySMS como tu aplicación de SMS predeterminada.</string>
+    <string name="metrics">Métrica</string>
+    <string name="compose_your_first_message">Redacta tu primer mensaje.</string>
+    <string name="restore_on_device_backup">Restaurar la copia de seguridad en el dispositivo</string>
+    <string name="enter_verification_code">Introduzca el código de verificación</string>
+    <string name="Messages">Mensajes</string>
+    <string name="connect_your_accounts_once_while_online_send_from_any_of_them_offline_anytime">Conecta tus cuentas una sola vez mientras estés en línea. Envía desde cualquiera de ellas sin conexión, en cualquier momento.</string>
+    <string name="always_available_no_setup_required">Siempre disponible - No requiere configuración.</string>
+    <string name="backup_file">Archivo de copia de seguridad</string>
+    <string name="routing_numbers">Números de ruta</string>
+    <string name="encryption_keys_server">Servidor de claves de cifrado</string>
+    <string name="onboarding_save_vault_description">Guarda el acceso a tus cuentas. Se almacena de forma segura en tu dispositivo, para que puedas enviar mensajes con tu nombre de usuario.</string>
+    <string name="to_send_attachments_and_enjoy_the_best_experience_make_relaysms_your_default_sms_app">Para enviar archivos adjuntos y disfrutar de la mejor experiencia, configura RelaySMS como tu aplicación de SMS predeterminada.</string>
+    <plurals name="your_accounts_s">
+        <item quantity="one"><![CDATA[Tu cuenta de <b>%1$s</b>]]></item>
+        <item quantity="other"><![CDATA[Tus cuentas de <b>%1$s</b>]]></item>
+    </plurals>
+    <string name="no_saved_platforms">No hay plataformas guardadas</string>
+    <string name="add_a_platform">Agregar una plataforma</string>
+    <string name="export_logs">Exportar registros</string>
+    <string name="export_crasg_logs_for_debugging_purposes">Exportar registros de fallos para fines de depuración</string>
+    <string name="wrong_code">Código incorrecto</string>
+    <string name="follow_us">Síganos</string>
 
 </resources>

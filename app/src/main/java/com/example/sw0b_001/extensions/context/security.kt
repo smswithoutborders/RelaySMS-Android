@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
+import android.security.KeyStoreException
+import android.util.Base64
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.biometric.BiometricManager
@@ -11,8 +13,15 @@ import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
-import com.example.sw0b_001.R
+import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDualSim
+import com.example.sw0b_001.BuildConfig
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import java.security.KeyStore
+import java.security.NoSuchAlgorithmException
 import java.util.concurrent.Executor
+import javax.security.cert.CertificateException
+
 
 fun Context.isBiometricLockAvailable(): Int {
     val biometricManager = BiometricManager.from(this)
@@ -97,4 +106,58 @@ fun Context.promptBiometrics(
         .build()
 
     biometricPrompt.authenticate(promptInfo)
+}
+
+@Serializable
+data class StaticKeys(
+    val key_id: Int,
+    val public_key: String,
+)
+fun Context.getStaticKeys(
+    kid: Int
+) : ByteArray? {
+    return getStaticKeys()?.find { it.key_id == kid }?.public_key?.let {
+        Base64.decode(it, Base64.URL_SAFE)
+    }
+}
+
+fun Context.getStaticKeys() : List<StaticKeys>? {
+    try {
+        val filename = if(BuildConfig.DEBUG) "staging-static-x25519.json" else "static-x25519.json"
+        val inputStream = assets.open(filename)
+        val size = inputStream.available()
+        val buffer = ByteArray(size)
+        inputStream.read(buffer)
+        inputStream.close()
+
+        val json = String(buffer, Charsets.UTF_8)
+        return Json.decodeFromString<List<StaticKeys>>(json)
+    } catch(e: java.io.IOException) {
+        e.printStackTrace()
+        return null
+    }
+}
+
+@Throws(
+    KeyStoreException::class,
+    CertificateException::class,
+    java.io.IOException::class,
+    NoSuchAlgorithmException::class,
+    InterruptedException::class
+)
+fun Context.removeFromKeystore(keystoreAlias: String?) {
+    /*
+         * Load the Android KeyStore instance using the
+         * AndroidKeyStore provider to list the currently stored entries.
+         */
+    this.isDualSim()
+    val keyStore = KeyStore.getInstance("AndroidKeyStore")
+    keyStore.load(null)
+    keyStore.deleteEntry(keystoreAlias)
+}
+
+fun Context.isAvailableInKeystore(keystoreAlias: String) : Boolean {
+    val ks = KeyStore.getInstance("AndroidKeyStore")
+    ks.load(null)
+    return ks.containsAlias(keystoreAlias)
 }

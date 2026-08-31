@@ -4,73 +4,57 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.database.Cursor
 import android.net.Uri
 import android.provider.ContactsContract
-import android.util.Base64
-import android.util.Log
-import android.widget.Toast
-import androidx.activity.compose.BackHandler
+import android.telephony.PhoneNumberUtils
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContract
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Contacts
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDefaultSimSubscription
-import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
-import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
-import com.example.sw0b_001.data.models.AvailablePlatforms
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
-import com.example.sw0b_001.data.models.StoredPlatformsEntity
+import androidx.compose.ui.unit.sp
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.Composers
-import com.example.sw0b_001.ui.modals.SelectAccountModal
-import com.example.sw0b_001.ui.navigation.HomepageScreen
-import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.verifyPhoneNumberFormat
+import com.example.sw0b_001.extensions.context.getPhoneNumberFromUri
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-import java.nio.charset.StandardCharsets
 
 
 class PickPhoneNumberContract : ActivityResultContract<Unit, Uri?>() {
@@ -96,18 +80,23 @@ private fun getRecipientFieldInfo(): RecipientFieldInfo {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun MessageComposeView(
-    messageContent: Composers.MessageComposeHandler.MessageContent,
-    from: String?= null
+    to: String,
+    body: String,
+    toCallback: (String) -> Unit,
+    bodyCallback: (String) -> Unit,
 ) {
-
     val context = LocalContext.current
     val fieldInfo = getRecipientFieldInfo()
+
+    val density = LocalDensity.current
+    val coroutineScope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
 
     val launcher = rememberLauncherForActivityResult(
         contract = PickPhoneNumberContract()
     ) { uri ->
         uri?.let {
-            messageContent.to.value = PlatformsViewModel.getPhoneNumberFromUri(context, it)
+            toCallback(context.getPhoneNumberFromUri(it))
         }
     }
 
@@ -115,105 +104,135 @@ fun MessageComposeView(
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .padding(16.dp)
+            .imePadding()
+            .verticalScroll(scrollState)
     ) {
-        OutlinedTextField(
-            value = messageContent.from.value ?: "",
-            onValueChange = { messageContent.from.value = it },
-            label = { Text(stringResource(R.string.sender)) },
-            enabled = false,
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                disabledBorderColor = MaterialTheme.colorScheme.outline,
-                disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                disabledPlaceholderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                disabledLeadingIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                disabledTrailingIconColor = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        )
 
-        Spacer(modifier = Modifier.height(16.dp))
-        // Recipient Number
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(
+                    width = 1.dp,
+                    color = if (to.isNotEmpty() && !PhoneNumberUtils.isGlobalPhoneNumber(to))
+                        MaterialTheme.colorScheme.error
+                    else MaterialTheme.colorScheme.outline,
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .padding(horizontal = 16.dp)
         ) {
-            OutlinedTextField(
-                value = messageContent.to.value,
-                onValueChange = { messageContent.to.value = it },
-                label = { Text(fieldInfo.label, style = MaterialTheme.typography.bodyMedium) },
-                modifier = Modifier.weight(1f),
-                isError = messageContent.to.value.isNotEmpty() &&
-                        !verifyPhoneNumberFormat(messageContent.to.value),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Phone,
-                    imeAction = ImeAction.Next
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BasicTextField(
+                    value = to,
+                    onValueChange = toCallback,
+                    textStyle = TextStyle.Default.copy(
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = 16.sp
+                    ),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Phone,
+                        imeAction = ImeAction.Next
+                    ),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(vertical = 16.dp),
+                    decorationBox = { innerTextField ->
+                        if (to.isEmpty()) {
+                            Text(
+                                text = fieldInfo.label,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        innerTextField()
+                    }
                 )
-            )
 
-            Spacer(modifier = Modifier.width(8.dp))
-            IconButton(onClick = {
-                if(readContactPermissions.status.isGranted) {
-                    launcher.launch(Unit)
-                } else {
-                    readContactPermissions.launchPermissionRequest()
+                IconButton(onClick = {
+                    if (readContactPermissions.status.isGranted) {
+                        launcher.launch(Unit)
+                    } else {
+                        readContactPermissions.launchPermissionRequest()
+                    }
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.Contacts,
+                        contentDescription = stringResource(R.string.select_contact),
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
                 }
-
-            }) {
-                Icon(
-                    imageVector = Icons.Filled.Contacts,
-                    contentDescription = stringResource(R.string.select_contact),
-                    tint = MaterialTheme.colorScheme.primary,
-                )
             }
         }
 
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Text(
-            text = fieldInfo.hint,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-
-
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Message Body
-        OutlinedTextField(
-            value = messageContent.message.value,
-            onValueChange = { messageContent.message.value = it },
-            label = { Text(
-                stringResource(R.string.message),
-                style = MaterialTheme.typography.bodyMedium) },
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Done
+                .height(220.dp)
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outline,
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .padding(16.dp)
+        ) {
+            BasicTextField(
+                value = body,
+                onValueChange = { newValue ->
+                    bodyCallback(newValue)
+
+                    val lines = newValue.lines()
+                    val lineCount = lines.size
+
+                    val lineHeight = 20.dp
+                    val maxVisibleLines = 10
+
+                    if (lineCount > maxVisibleLines) {
+                        val scrollOffset = with(density) {
+                            (lineCount - maxVisibleLines) * lineHeight.toPx()
+                        }
+                        coroutineScope.launch {
+                            scrollState.animateScrollTo(scrollOffset.toInt())
+                        }
+                    }
+                },
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
+                textStyle = TextStyle.Default.copy(
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = 16.sp
+                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+                decorationBox = { innerTextField ->
+                    if (body.isEmpty()) {
+                        Text(
+                            text = stringResource(R.string.message),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontWeight = FontWeight.Medium,
+                            fontSize = 16.sp
+                        )
+                    }
+                    innerTextField()
+                }
             )
-        )
-    }
-}
-
-
-
-
-@Preview(showBackground = false)
-@Composable
-fun MessageComposePreview() {
-    AppTheme(darkTheme = false) {
-
-        val messageContent by remember{ mutableStateOf(
-            Composers.MessageComposeHandler.MessageContent()
-        )
         }
-        MessageComposeView(
-            messageContent = messageContent,
-            from = ""
-        )
     }
 }
+
+
+@Preview(showBackground = true)
+@Composable fun MessageComposePreview() {
+    MessageComposeView(
+        to = "",
+        body = "",
+        toCallback = {},
+        bodyCallback = {}
+    ) }

@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name" translatable="false">RelaySMS</string>
     <string name="messages_deleted">Ujumbe umefutwa</string>
     <string name="select_all">Chagua Zote</string>
     <string name="selected_messages">%d zimechaguliwa</string>
@@ -52,22 +51,13 @@
     <string name="lock_screen_unlock_with_your_phone_s_locking_system">Fungua kwa mfumo wa kufunga wa simu yako</string>
     <string name="gateway_client_add_custom_example_text">mf. +237123456789 au chagua anwani</string>
     <string name="gateway_client_add_gateway_client_text">Ongeza Mteja wa Lango</string>
-    <string name="otp_verification_code_template" translatable="false">Msimbo wako wa uthibitishaji wa SMSWithoutBorders-Auth ni:</string>
 
     <string name="logout_you_have_no_accounts_logged_into_vaults_at_this_time">Huna akaunti zilizounganishwa kwenye Vaults kwa wakati huu</string>
     <string name="security_settings_you_have_no_accounts_to_delete_in_vault_at_this_time">Huna akaunti za kufuta kwenye Vault kwa wakati huu</string>
     <string name="helper_yesterday">jana</string>
 
-    <string name="smswithoutboarders_official_gateway_client_seeding_url" translatable="false">https://smswithoutborders.com:15000/v3/clients</string>
     <string name="recovery_continue">Endelea</string>
 
-    <string name="vault_grpc_url" translatable="false">vault.smswithoutborders.com</string>
-    <string name="vault_grpc_port" translatable="false">443</string>
-
-    <string name="publisher_grpc_url" translatable="false">publisher.smswithoutborders.com</string>
-    <string name="publisher_grpc_port" translatable="false">443</string>
-
-    <string name="publisher_get_platforms_url" translatable="false">https://raw.githubusercontent.com/smswithoutborders/SMSWithoutBorders-Publisher/master/resources/platforms.json</string>
     <string name="cancel">Ghairi</string>
     <string name="click_continue_to_confirm_this_action_do_not_worry_this_has_no_dangerous_effects">Bonyeza endelea ili kuthibitisha kitendo hiki. Usijali, hii haina madhara yoyote hatari.</string>
     <string name="messaging">Ujumbe</string>
@@ -83,6 +73,7 @@
     <string name="settings">Mipangilio</string>
     <string name="permission_denied">Ruhusa Imekataliwa!</string>
     <string name="add_gateway_client">Ongeza Mteja wa Lango</string>
+    <string name="add_routing_numbers">Ongeza Nambari za Uelekezaji</string>
     <string name="edit_gateway_client">Hariri Mteja wa Lango</string>
     <string name="e_g_237123456_or_select_contact">mf. +237123456 au chagua anwani</string>
     <string name="alias_optional">Jina bandia (hiari)</string>
@@ -98,7 +89,15 @@
     <string name="send_message">Tuma Ujumbe</string>
     <string name="add_account">Ongeza Akaunti</string>
     <string name="remove_accounts">Ondoa Akaunti</string>
+    <string name="onboarding_save_access_description">Hifadhi ufikiaji wa akaunti zako. Imehifadhiwa salama kwenye kifaa chako, ili uweze kutuma ujumbe kama wewe mwenyewe.</string>
+    <string name="make_relaysms_your_default_sms_app">Fanya RelaySMS iwe programu yako chaguomsingi ya SMS</string>
+    <string name="manage_your_sms_messages_from_one_place">Dhibiti ujumbe wako wa SMS kutoka sehemu moja na utume picha kupitia SMS!</string>
+    <string name="previous">Iliyotangulia</string>
+    <string name="awesome_">Ajabu!</string>
+    <string name="got_it_">Nimeelewa!</string>
+    <string name="done_">Imekamilika!</string>
     <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging_gmail_are_currently_supported">Kuongeza barua pepe kwenye akaunti yako ya RelaySMS hukuwezesha kuzitumia kutuma barua pepe kwa kutumia ujumbe wa SMS.\n\nGmail inatumika kwa sasa.</string>
+    <string name="adding_emails_to_your_relaysms_account_enables_you_use_them_to_send_emails_using_sms_messaging__are_currently_supported">Kuongeza barua pepe kwenye akaunti yako ya RelaySMS hukuwezesha kuzitumia kutuma barua pepe kwa kutumia ujumbe mfupi.</string>
     <string name="adding_numbers_to_your_relaysms_account_enables_you_use_them_to_send_messages_using_sms_messaging_telegram_messaging_is_currently_supported">Kuongeza nambari kwenye akaunti yako ya RelaySMS hukuwezesha kuzitumia kutuma ujumbe kwa kutumia ujumbe wa SMS.\n\nUjumbe wa Telegram unatumika kwa sasa.</string>
     <string name="adding_accounts_to_your_relaysms_account_enables_you_use_them_to_make_post_using_sms_messaging_posting_is_currently_supported">Kuongeza akaunti kwenye akaunti yako ya RelaySMS hukuwezesha kuzitumia kuchapisha kwa kutumia ujumbe wa SMS.\n\nKuchapisha kunatumika kwa sasa.</string>
     <string name="your_relaysms_account_is_an_alias_of_your_phone_number_with_the_domain_relaysms_me_you_can_receive_replies_by_sms_whenever_a_message_is_sent_to_your_alias">Akaunti yako ya RelaySMS ni jina bandia la nambari yako ya simu na kikoa @relaysms.me.\n\nUnaweza kupokea majibu kwa SMS kila ujumbe unapotumwa kwa jina lako bandia.</string>
@@ -134,6 +133,7 @@
     <string name="create_your_account_and">Unda akaunti yako na</string>
     <string name="save_platforms">hifadhi majukwaa</string>
     <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline">kwa RelaySMS kutuma ujumbe kwa Gmail, X, na Telegram kwa niaba yako ukiwa nje ya mtandao</string>
+    <string name="for_relaysms_to_send_messages_to__x_and_telegram_on_your_behalf_when_offline">kwa RelaySMS kutuma ujumbe kwa Gmail, X, na Telegram kwa niaba yako ukiwa nje ya mtandao</string>
     <string name="i_have_read_the">Nimesoma</string>
     <string name="privacy_policy">sera ya faragha</string>
     <string name="log_in">Ingia</string>
@@ -147,6 +147,7 @@
     <string name="log_into_relaysms">Ingia kwenye RelaySMS</string>
     <string name="log_into_your_account_and">Ingia kwenye akaunti yako na</string>
     <string name="for_relaysms_to_send_messages_to_gmail_x_and_telegram_on_your_behalf_when_offline_">kwa RelaySMS kutuma ujumbe kwa Gmail, X, na Telegram kwa niaba yako ukiwa nje ya mtandao</string>
+    <string name="for_relaysms_to_send_messages_to__x_and_telegram_on_your_behalf_when_offline_">kwa RelaySMS kutuma ujumbe kwa Gmail, X, na Telegram kwa niaba yako ukiwa nje ya mtandao</string>
     <string name="already_got_code">Nimepata msimbo tayari</string>
     <string name="do_not_have_an_account">Huna akaunti?</string>
     <string name="get_started_with">Anza na</string>
@@ -182,6 +183,7 @@
     <string name="security_and_privacy">Usalama na Faragha</string>
     <string name="security">Usalama</string>
     <string name="enable_app_locks_and_pin_codes">Washa kufuli za programu na misimbo ya siri</string>
+    <string name="encryption_key_client">Kiteja cha funguo za usimbaji fiche</string>
 
     <string name="english">Kiingereza</string>
     <string name="arabic">Kiarabu</string>
@@ -262,6 +264,7 @@
     <string name="store_tokens_on_device">Hifadhi Tokeni Kwenye Kifaa</string>
     <string name="storing_platform_accounts">Kuhifadhi Akaunti za Jukwaa</string>
     <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g_gmail_x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">Wakati wa kuongeza akaunti kwa majukwaa yanayotumia OAuth2.0 (k.m. Gmail, X), kuwezesha hii huhakikisha kuwa tokeni zako za kufikia zinahifadhiwa kwenye kifaa chako cha sasa badala yake.</string>
+    <string name="when_adding_accounts_for_platforms_that_utilize_oauth2_0_e_g__x_enabling_this_makes_sure_your_access_tokens_are_rather_stored_on_your_current_device">Unapoongeza akaunti za mifumo inayotumia OAuth2.0, kuwezesha hili huhakikisha tokeni zako za ufikiaji zimehifadhiwa kwenye kifaa chako cha sasa.</string>
     <string name="stored_tokens_detected_title">Tokeni Zilizohifadhiwa Zimegunduliwa</string>
     <string name="stored_tokens_dialog_message_part1">Tokeni zilizohifadhiwa za akaunti hii</string>
     <string name="stored_tokens_dialog_message_part2"> zimegunduliwa. Unaweza kutumia tokeni zako zilizohifadhiwa kutuma chapisho kwenye X</string>
@@ -381,7 +384,7 @@
     <string name="log_out">Toka nje</string>
     <string name="this_would_log_you_out_of_your_vault_account_on_this_device_you_can_log_back_in_at_anytime_with_an_internet_connection">Hii itakuondoa kwenye akaunti yako ya Vault kwenye kifaa hiki. Unaweza kuingia tena wakati wowote (ukiwa na muunganisho wa intaneti)</string>
     <string name="delete_account">Futa Akaunti</string>
-    <string name="this_would_revoke_all_your_stored_tokens_security_keys_and_every_data_you_have_stored_on_device_and_vault_you_can_still_use_bridges_whenever_you_prefer">Hii inaweza kubatilisha tokeni zako zote zilizohifadhiwa, funguo za usalama na kila data uliyohifadhi kwenye kifaa na Vault. Bado unaweza kutumia madaraja wakati wowote upendavyo</string>
+    <string name="this_would_delete_all_your_saved_tokens_platforms_security_keys_and_every_data_you_have_stored_on_device_you_can_still_use_the_random_alias_whenever_you_want">Hii itafuta tokeni zako zote zilizohifadhiwa (majukwaa), funguo za usalama na kila data uliyohifadhi kwenye kifaa. Bado unaweza kutumia jina bandia nasibu wakati wowote unapotaka.</string>
     <string name="this_would_migrate_your_tokens_stored_on_the_vault_to_your_device_this_would_send_the_token_alongside_every_time_you_send_the_message_potentially_increasing_the_size_of_messages">Hii inaweza kuhamisha tokeni zako zilizohifadhiwa kwenye Vault hadi kwenye kifaa chako. Hii inaweza kutuma ishara pamoja kila wakati unapotuma ujumbe - uwezekano wa kuongeza ukubwa wa ujumbe</string>
     <string name="enter_the_text_in_the_image">Ingiza maandishi kwenye picha</string>
     <string name="submit1">Wasilisha</string>
@@ -389,5 +392,98 @@
     <string name="optional">(Si lazima)</string>
     <string name="email">Barua pepe</string>
     <string name="phone_number1">Nambari ya simu</string>
-
+    <string name="platform_image">Picha ya jukwaa</string>
+    <string name="backup">Hifadhi nakala rudufu</string>
+    <string name="restore">Rejesha</string>
+    <string name="on_device_backups">Hifadhi rudufu kwenye kifaa</string>
+    <string name="backups_are_encrypted_with_a_passphrase_and_stored_on_your_device">Nakala rudufu husimbwa kwa njia fiche kwa nenosiri na kuhifadhiwa kwenye kifaa chako.</string>
+    <string name="backup_now">Hifadhi nakala rudufu sasa</string>
+    <string name="your_recovery_key">Ufunguo wako wa kurejesha</string>
+    <string name="your_recovery_key_is_a_64_character_code_that_you_will_need_to_restore_your_backup">Ufunguo wako wa kurejesha ni msimbo wa herufi 64 ambao utahitaji ili kurejesha nakala rudufu yako</string>
+    <string name="store_your_recovery_key_somewhere_safe_like_a_secure_password_manager_and_don_t_share_it_with_anyone">Hifadhi ufunguo wako wa kurejesha data mahali salama kama kidhibiti cha nenosiri salama, na usiushiriki na mtu yeyote.</string>
+    <string name="if_you_lose_it_you_won_t_be_able_to_recover_your_messages">Ukiipoteza, hutaweza kurejesha ujumbe wako.</string>
+    <string name="view_recovery_key">Tazama ufunguo wa kurejesha data</string>
+    <string name="record_your_recovery_key">Rekodi ufunguo wako wa kurejesha data</string>
+    <string name="this_key_is_required_to_recover_your_saved_accounts_and_data_store_this_key_somewhere_safe_if_you_lose_it_you_won_t_be_able_to_recover_your_saved_accounts">Ufunguo huu unahitajika ili kurejesha akaunti na data yako iliyohifadhiwa. Hifadhi ufunguo huu mahali salama. Ukiupoteza, hutaweza kurejesha akaunti yako iliyohifadhiwa.</string>
+    <string name="copy_to_clipboard">Nakili kwenye ubao wa kunakili</string>
+    <string name="save_to_password_manager">Hifadhi kwenye kidhibiti cha nenosiri</string>
+    <string name="reset">Weka upya</string>
+    <string name="reset_removes_all_your_stored_tokens_both_locally_and_on_the_cloud_this_is_what_a_complete_delete_would_look_like_if_there_were_traditional_accounts_you_can_add_more_at_anytime">Kuweka upya huondoa tokeni zako zote zilizohifadhiwa ndani na kwenye wingu. Hivi ndivyo kufuta kabisa kungeonekana - kama kungekuwa na akaunti za kawaida. Unaweza kuongeza zaidi wakati wowote</string>
+    <string name="restore_backup">Rejesha nakala rudufu</string>
+    <string name="enter_your_recovery_key">Ingiza ufunguo wako wa kurejesha data</string>
+    <string name="your_recovery_key_is_a_64_character_code_required_to_recover_your_data">Ufunguo wako wa kurejesha data ni msimbo wa herufi 64 unaohitajika ili kurejesha data yako.</string>
+    <string name="recovery_key">Ufunguo wa kurejesha</string>
+    <string name="you_can_use_this_account_without_verifying_a_number_this_is_a_one_time_use_account_and_cannot_receive_replies">Unaweza kutumia akaunti hii bila kuthibitisha nambari.</string>
+    <string name="your_sending_address_changes_everytime_you_use">Anwani yako ya kutuma hubadilika kila wakati unapotumia.</string>
+    <string name="make_relaysms_default">Fanya RelaySMS iwe chaguo-msingi</string>
+    <string name="you_need_to_set_relaysms_as_your_default_sms_app_to_be_able_to_send_attachments">Unahitaji kuweka RelaySMS kama programu yako chaguo-msingi ya SMS ili uweze kutuma viambatisho.</string>
+    <string name="enter_phone_number">Ingiza nambari ya simu.</string>
+    <string name="will_send_a_code">%1$s itatuma msimbo.</string>
+    <string name="yes_remove">Ndiyo, ondoa</string>
+    <string name="you_have_not_saved_any_account_yet_click_the_add_button_to_connect_your_account"><![CDATA[Bado hujahifadhi akaunti yoyote. Bofya kitufe cha kuongeza ili kuunganisha akaunti yako ya <b>%1$s</b>.]]></string>
+    <string name="you_can_send_a_quick_mail_without_verifying_or_adding_accounts_using_relaysms_mail">Unaweza kutuma barua pepe haraka bila kuthibitisha au kuongeza akaunti kwa kutumia barua pepe ya RelaySMS.</string>
+    <string name="try_it">Jaribu.</string>
+    <string name="you_can_always_find_the_option_when_you_click_compose"><![CDATA[Unaweza kupata chaguo wakati wowote unapobofya <b>Tunga</b>]]></string>
+    <string name="account_name">Jina la akaunti</string>
+    <string name="refresh">Onyesha upya</string>
+    <string name="encryption_keys_left">Funguo za usimbaji fiche zimesalia</string>
+    <string name="number_of_stored_accounts">Idadi ya akaunti zilizohifadhiwa</string>
+    <string name="Settings">Mipangilio</string>
+    <string name="Messages">Ujumbe</string>
+    <string name="to_restore_a_backup_install_a_new_copy_of_relaysms_open_the_app_and_tap_restore_backup_then_locate_a_backup_file">Ili kurejesha nakala rudufu, sakinisha nakala mpya ya RelaySMS. Fungua programu na uguse Rejesha nakala rudufu, kisha tafuta faili rudufu.</string>
+    <string name="create_backup">Unda nakala rudufu</string>
+    <string name="encryption_details">Maelezo ya usimbaji fiche</string>
+    <string name="text_keys">Funguo za maandishi</string>
+    <string name="attachment_keys">Funguo za viambatisho</string>
+    <string name="offline_compose">Utunzi wa nje ya mtandao</string>
+    <string name="send_message_offline">Tuma ujumbe nje ya mtandao</string>
+    <string name="please_enter_your_avoid_copying_and_pasting_if_telegram_to_not_get_flagged">Tafadhali ingiza msimbo wako wa %1$s. Epuka kunakili na kubandika ikiwa Telegram ili isiashiriwe!</string>
+    <string name="this_lets_the_app_manage_the_sending_requirements_for_you">Hii inaruhusu programu kudhibiti mahitaji ya kutuma kwa ajili yako.</string>
+    <string name="delete_backup">Futa nakala rudufu</string>
+    <string name="failed_to_delete_file">Imeshindwa kufuta faili</string>
+    <string name="account_details">Maelezo ya akaunti</string>
+    <string name="account_type">Aina ya akaunti</string>
+    <string name="date_stored">Tarehe iliyohifadhiwa</string>
+    <string name="restore_your_saved_accounts_from_the_backup_you_saved_on_your_device_if_you_don_t_restore_now_you_won_t_be_able_to_restore_later">Rejesha akaunti zako zilizohifadhiwa kutoka kwa nakala rudufu uliyohifadhi kwenye kifaa chako. Usiporejesha sasa, hutaweza kurejesha baadaye.</string>
+    <string name="choose_your_backup_file">Chagua faili yako ya nakala rudufu</string>
+    <string name="select_the_file_on_your_device_where_your_backup_is_stored">Chagua faili kwenye kifaa chako ambapo nakala rudufu yako imehifadhiwa</string>
+    <string name="open_backup_file">Fungua faili ya nakala rudufu</string>
+    <string name="incorrect_recovery_key">Ufunguo usio sahihi wa kurejesha data</string>
+<!--    <string name="settings">Mipangilio</string>-->
+    <string name="default_routing_number">Nambari chaguo-msingi ya uelekezaji</string>
+    <string name="_default">Chaguo-msingi</string>
+    <string name="error">Hitilafu</string>
+    <string name="show_accounts">Onyesha akaunti</string>
+    <string name="onboarding_no_login_description">SMS za Kutuma Ujumbe Mfupi hazikuombi tena kuingia au kujiandikisha kwa sababu faragha yako ni muhimu.</string>
+    <string name="last_back">Mwisho wa kurudi: %1$s</string>
+    <string name="last_sync">Usawazishaji wa mwisho: %1$s</string>
+    <string name="send_from_a_random_alias_e_g_qwertyuiop_relaysms_me">Tuma kutoka kwa jina bandia bila mpangilio, k.m. qwertyuiop@relaysms.me</string>
+    <string name="enter_your_password">Ingiza nenosiri lako</string>
+    <string name="send_with">Tuma na...</string>
+    <string name="send_messages_using_your_account">Tuma ujumbe kwa kutumia akaunti yako ya %1$s.</string>
+    <string name="add_new">Ongeza Mpya</string>
+    <string name="learn_more">Pata maelezo zaidi</string>
+    <string name="to_send_attachments_and_enjoy_the_full_relaysms_experience_make_relaysms_your_default_sms_app">Ili kutuma viambatisho na kufurahia matumizi kamili ya RelaySMS, fanya RelaySMS iwe programu chaguo-msingi ya SMS.</string>
+    <string name="metrics">Vipimo</string>
+    <string name="compose_your_first_message">Tunga ujumbe wako wa kwanza.</string>
+    <string name="restore_on_device_backup">Rejesha nakala rudufu kwenye kifaa</string>
+    <string name="enter_verification_code">Ingiza nambari ya uthibitishaji</string>
+<!--    <string name="messages">Ujumbe</string>-->
+    <string name="connect_your_accounts_once_while_online_send_from_any_of_them_offline_anytime">Unganisha akaunti zako mara moja ukiwa mtandaoni. Tuma kutoka kwa yeyote kati yao nje ya mtandao, wakati wowote.</string>
+    <string name="always_available_no_setup_required">Inapatikana kila wakati - Hakuna usanidi unaohitajika.</string>
+    <string name="backup_file">Faili ya nakala rudufu</string>
+    <string name="routing_numbers">Nambari za uelekezaji</string>
+    <string name="encryption_keys_server">Seva ya funguo za usimbaji fiche</string>
+    <string name="onboarding_save_vault_description">Hifadhi ufikiaji wa akaunti zako. Imehifadhiwa salama kwenye kifaa chako, ili uweze kutuma ujumbe kama wewe mwenyewe.</string>
+    <string name="to_send_attachments_and_enjoy_the_best_experience_make_relaysms_your_default_sms_app">Ili kutuma viambatisho na kufurahia matumizi bora zaidi, fanya RelaySMS iwe programu yako chaguo-msingi ya SMS.</string>
+    <plurals name="your_accounts_s">
+        <item quantity="one"><![CDATA[Akaunti yako ya <b>%1$s</b>]]></item>
+        <item quantity="other"><![CDATA[Akaunti zako za <b>%1$s</b>]]></item>
+    </plurals>
+    <string name="no_saved_platforms">Hakuna Mifumo Iliyohifadhiwa</string>
+    <string name="add_a_platform">Ongeza Jukwaa</string>
+    <string name="export_logs">Hamisha kumbukumbu</string>
+    <string name="export_crasg_logs_for_debugging_purposes">Hamisha kumbukumbu za hitilafu kwa madhumuni ya utatuzi wa matatizo</string>
+    <string name="wrong_code">Msimbo usio sahihi</string>
+    <string name="follow_us">Tufuate</string>
 </resources>

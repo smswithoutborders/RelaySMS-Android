@@ -1,12 +1,8 @@
 package com.example.sw0b_001.ui.onboarding
 
-import android.accessibilityservice.GestureDescription
 import android.content.res.Configuration
-import androidx.activity.compose.LocalActivity
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,11 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
-import androidx.compose.material.icons.automirrored.filled.ArrowRightAlt
-import androidx.compose.material.icons.filled.ArrowRight
-import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.SelectAll
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -33,39 +24,30 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
-import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.example.sw0b_001.R
-import com.example.sw0b_001.extensions.context.settingsGetOnboardedCompletely
 import com.example.sw0b_001.extensions.context.settingsSetOnboardedCompletely
-import com.example.sw0b_001.ui.components.OnboardingNextButton
-import com.example.sw0b_001.ui.modals.OnlineActivePlatformsModal
+//import com.example.sw0b_001.ui.components.OnboardingNextButton
 import com.example.sw0b_001.ui.modals.SignupLoginModal
 import com.example.sw0b_001.ui.navigation.CreateAccountScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
 import com.example.sw0b_001.ui.navigation.LoginScreen
-import com.example.sw0b_001.ui.navigation.OnboardingSkipScreen
 import com.example.sw0b_001.ui.theme.AppTheme
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
-import com.example.sw0b_001.ui.views.makeDefault
+import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
+import com.example.sw0b_001.ui.views.threads.makeDefault
 
 data class InteractiveOnboarding(
     val title: String,
@@ -81,9 +63,10 @@ data class InteractiveOnboarding(
 fun OnboardingInteractive(
     navController: NavController,
     onboardingViewModel: OnboardingViewModel,
+    tokensViewModel: TokensViewModel,
+    supportedPlatformsViewModel: SupportedPlatformsViewModel,
 ) {
     val context = LocalContext.current
-    val activity = LocalActivity.current as AppCompatActivity
     val showingOnboarding by onboardingViewModel.onboardingState.collectAsState()
 
     val defaultBehaviour = getSetDefaultBehaviour(context) {
@@ -140,7 +123,7 @@ fun OnboardingInteractive(
             Spacer(modifier = Modifier.weight(1f))
 
             if(showingOnboarding == null)
-                onboardingViewModel.first(context, activity, navController)
+                onboardingViewModel.first()
 
             showingOnboarding?.let {
                 OnboardingScreen(it)
@@ -148,16 +131,16 @@ fun OnboardingInteractive(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            OnboardingNextButton("") {
-                if(onboardingViewModel.next()) {
-                    context.settingsSetOnboardedCompletely(true)
-                    navController.navigate(HomepageScreen) {
-                        popUpTo(HomepageScreen) {
-                            inclusive = true
-                        }
-                    }
-                }
-            }
+//            OnboardingNextButton("") {
+//                if(onboardingViewModel.next()) {
+//                    context.settingsSetOnboardedCompletely(true)
+//                    navController.navigate(HomepageScreen) {
+//                        popUpTo(HomepageScreen) {
+//                            inclusive = true
+//                        }
+//                    }
+//                }
+//            }
 
             Spacer(modifier = Modifier.padding(16.dp))
 
@@ -191,44 +174,6 @@ fun OnboardingInteractive(
                         onboardingViewModel.showLoginSignupModal = false
                     }
                 ) { onboardingViewModel.showLoginSignupModal = false }
-            }
-
-            if(onboardingViewModel.showAddPlatformsModal) {
-                OnlineActivePlatformsModal(
-                    onboardingViewModel.showAddPlatformsModal,
-                    navController = navController,
-                    isCompose = false,
-                    isOnboarding = true,
-                    onCompleteCallback = {
-                        onboardingViewModel.setOnboarding(
-                            InteractiveOnboarding(
-                                title = context.getString(R.string.way_to_go),
-                                description = context.getString(R.string.you_can_save_more_accounts_per_platform_at_anytime_from_inside_the_app),
-                                image = R.drawable.undraw_success_288d,
-                            ){}
-                        )
-                    }
-                ) { onboardingViewModel.showAddPlatformsModal = false }
-            }
-
-            if(onboardingViewModel.showSendPlatformsModal) {
-                onboardingViewModel.callback = {
-                    onboardingViewModel.setOnboarding(
-                        InteractiveOnboarding(
-                            title = context.getString(R.string.you_are_now_ready),
-                            description = context.getString(R.string.you_have_successfully_carried_out_the_essentials_of_messaging_with_relaysms),
-                            image = R.drawable.undraw_success_288d,
-                        ){}
-                    )
-                }
-
-                OnlineActivePlatformsModal(
-                    onboardingViewModel.showSendPlatformsModal,
-                    navController = navController,
-                    isCompose = true,
-                    isOnboarding = true,
-                    onCompleteCallback = {}
-                ) { onboardingViewModel.showSendPlatformsModal = false }
             }
 
             if(onboardingViewModel.showMakeDefaultRequest) {
@@ -317,13 +262,13 @@ fun OnboardingScreenPreview() {
     }
 }
 
-@Preview(showBackground = true,)
-@Composable
-fun OnboardingInteractivePreview() {
-    AppTheme {
-        OnboardingInteractive(
-            rememberNavController(),
-            remember{ OnboardingViewModel() }
-        )
-    }
-}
+//@Preview(showBackground = true,)
+//@Composable
+//fun OnboardingInteractivePreview() {
+//    AppTheme {
+//        OnboardingInteractive(
+//            rememberNavController(),
+//            remember{ OnboardingViewModel() }
+//        )
+//    }
+//}

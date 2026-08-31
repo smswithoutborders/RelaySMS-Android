@@ -1,0 +1,216 @@
+name: Reproducible Build Check
+
+on:
+  push:
+    branches: [ "staging" ]
+
+jobs:
+  build-1:
+    name: Build 1
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        working-directory: ci
+        run: docker build -t deku_rep_build_release .
+
+      - name: Build APK
+        run: |
+          docker run --rm \
+            -v "$(pwd)":/project \
+            -w /project \
+            --user "$(id -u):$(id -g)" \
+            -e ANDROID_USER_HOME=/project/.android \
+            -e GRADLE_USER_HOME=/project/.gradle \
+            deku_rep_build_release \
+            ./gradlew assembleRelease \
+              --no-daemon \
+              --max-workers=2 \
+              --console=plain \
+              -Dkotlin.compiler.execution.strategy=in-process
+
+      - name: Upload APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-build-1
+          # Uses wildcard to catch all split APKs
+          path: app/build/outputs/apk/release/app-*-release-unsigned.apk
+          retention-days: 1
+
+  build-2:
+    name: Build 2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        working-directory: ci
+        run: docker build -t deku_rep_build_release .
+
+      - name: Build APK
+        run: |
+          docker run --rm \
+            -v "$(pwd)":/project \
+            -w /project \
+            --user "$(id -u):$(id -g)" \
+            -e ANDROID_USER_HOME=/project/.android \
+            -e GRADLE_USER_HOME=/project/.gradle \
+            deku_rep_build_release \
+            ./gradlew assembleRelease \
+              --no-daemon \
+              --max-workers=2 \
+              --console=plain \
+              -Dkotlin.compiler.execution.strategy=in-process
+
+      - name: Upload APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-build-2
+          path: app/build/outputs/apk/release/app-*-release-unsigned.apk
+          retention-days: 1
+
+  compare:
+    name: Compare APKs
+    runs-on: ubuntu-latest
+    needs: [ build-1, build-2 ]
+    steps:
+      - name: Download APKs from build 1
+        uses: actions/download-artifact@v4
+        with:
+          name: apk-build-1
+          path: apk-build-1
+
+      - name: Download APKs from build 2
+        uses: actions/download-artifact@v4
+        with:
+          name: apk-build-2
+          path: apk-build-2
+
+      - name: Compare hashes
+        id: compare
+        run: |
+          # Generate checksum files for all contents in both directories
+          cd apk-build-1 && sha256sum app-*-release-unsigned.apk > ../hashes1.txt && cd ..
+          cd apk-build-2 && sha256sum app-*-release-unsigned.apk > ../hashes2.txt && cd ..
+          
+          echo "=== Build 1 Hashes ==="
+          cat hashes1.txt
+          echo "=== Build 2 Hashes ==="
+          cat hashes2.txt
+          
+          # Strip path names to compare purely the hashes and file structures
+          awk '{print $1}' hashes1.txt > clean_hashes1.txt
+          awk '{print $1}' hashes2.txt > clean_hashes2.txt
+          
+          if cmp -s clean_hashes1.txt clean_hashes2.txt; then
+            echo "Reproducible build verified — all split hashes match perfectly."
+            echo "reproducible=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Build is NOT reproducible — split hashes differ!"
+            echo "reproducible=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install diffoscope
+        if: steps.compare.outputs.reproducible == 'false'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y diffoscope
+
+      - name: Run diffoscope
+        if: steps.compare.outputs.reproducible == 'false'
+        run: |
+          # Run diffoscope across the directories to find differences in any split
+          diffoscope \
+            --text diffoscope-report.txt \
+            --html diffoscope-report.html \
+            apk-build-1/ \
+            apk-build-2/ || true
+
+      - name: Upload diffoscope report
+        if: steps.compare.outputs.reproducible == 'false'
+        uses: actions/upload-artifact@v4
+        with:
+          name: diffoscope-report
+          path: |
+            diffoscope-report.txt
+            diffoscope-report.html
+          retention-days: 7
+
+      - name: Fail if not reproducible
+        if: steps.compare.outputs.reproducible == 'false'
+        run: |
+          echo "See the diffoscope-report artifact for a full breakdown of differences."
+          exit 1
+
+  bump-version-and-pr:
+    name: Bump Version and Open PR to master
+    runs-on: ubuntu-latest
+    needs: [ compare ]
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: staging
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Verify version.properties exists
+        run: |
+          if [ ! -f version.properties ]; then
+            echo "ERROR: version.properties not found"
+            exit 1
+          fi
+
+      - name: Run bump_version.py
+        id: bump
+        run: |
+          python ci/bump_version.py "staging" > /tmp/version_bumped.properties
+          cp /tmp/version_bumped.properties version.properties
+          echo "result<<EOF" >> $GITHUB_OUTPUT
+          cat version.properties >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Commit and push version.properties
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add version.properties
+          git diff --cached --quiet || git commit -m "chore: bump version [skip ci]"
+          git push origin HEAD:staging
+
+      - name: Open or update PR to master
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_BODY="Automated version bump from \`staging\` — reproducible build verified
+
+          **version.properties:**
+          \`\`\`
+          ${{ steps.bump.outputs.result }}
+          \`\`\`"
+
+          NEW_VERSION=$(echo "${{ steps.bump.outputs.result }}" | grep "^versionName=" | cut -d'=' -f2)
+
+          if gh pr create \
+            --base master \
+            --head staging \
+            --title "New release: bump version ($NEW_VERSION)" \
+            --body "$PR_BODY"; then
+            echo "PR created"
+          else
+            echo "PR already exists, updating body..."
+            gh pr edit staging \
+              --title "New release: bump version ($NEW_VERSION)" \
+              --body "$PR_BODY"
+          fi

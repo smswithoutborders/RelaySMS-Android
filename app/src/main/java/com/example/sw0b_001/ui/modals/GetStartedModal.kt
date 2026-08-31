@@ -3,9 +3,7 @@ package com.example.sw0b_001.ui.modals
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -13,7 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.views.GetStartedView
+import com.example.sw0b_001.ui.views.threads.GetStartedView
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,7 +39,7 @@ fun GetStartedModal(
             sheetState = sheetState,
             modifier = Modifier.fillMaxWidth()
         ) {
-            GetStartedView(navController, isLoggedIn)
+            GetStartedView()
         }
 
     }

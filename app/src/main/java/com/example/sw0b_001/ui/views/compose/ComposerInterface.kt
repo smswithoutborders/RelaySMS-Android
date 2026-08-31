@@ -1,41 +1,29 @@
 package com.example.sw0b_001.ui.views.compose
 
-import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.ImageDecoder
-import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
-import android.util.Base64
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.AddToPhotos
 import androidx.compose.material.icons.filled.AttachFile
-import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.DeveloperMode
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.NoSim
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,7 +37,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,399 +45,250 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
 import com.afkanerd.lib_image_android.ui.navigation.ImageRenderNav
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDefaultSimSubscription
-import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getUriForDrawable
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.ui.components.mmsImagePicker
-import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
+import com.afkanerd.smswithoutborders_libsmsmms.ui.getSetDefaultBehaviour
 import com.example.sw0b_001.BuildConfig
-import com.example.sw0b_001.MainActivity
 import com.example.sw0b_001.R
-import com.example.sw0b_001.data.Composers
-import com.example.sw0b_001.data.GatewayClientsCommunications
-import com.example.sw0b_001.data.models.EncryptedContent
-import com.example.sw0b_001.data.models.Platforms
-import com.example.sw0b_001.data.models.StoredPlatformsEntity
+import com.example.sw0b_001.data.models.Tokens
 import com.example.sw0b_001.extensions.context.settingsGetNotShowChooseGatewayClient
+import com.example.sw0b_001.ui.components.AccountCard
 import com.example.sw0b_001.ui.components.AttachImageView
 import com.example.sw0b_001.ui.modals.ComposeChooseGatewayClientsModal
-import com.example.sw0b_001.ui.modals.SelectAccountModal
-import com.example.sw0b_001.ui.navigation.HomepageScreen
-import com.example.sw0b_001.ui.theme.AppTheme
-import com.example.sw0b_001.ui.viewModels.MessagesViewModel
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.verifyPhoneNumberFormat
-import com.example.sw0b_001.ui.views.DeveloperHTTPView
+import com.example.sw0b_001.ui.modals.MakeDefaultModal
+import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
+import com.example.sw0b_001.ui.viewModels.OfflineFirstPublisherViewModel
+import com.example.sw0b_001.ui.viewModels.OnlineFirstPublisherViewModel
+import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
+import com.example.sw0b_001.ui.views.threads.makeDefault
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import kotlin.text.isNotEmpty
+import uniffi.relaysms_spec_payload.V1ContentCategories
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ComposerInterface(
     navController: NavController,
-    type: Platforms.ServiceTypes,
     imageViewModel: ImageViewModel,
-    messagesViewModel: MessagesViewModel,
-    platformName: String?,
-    onSendCallback: ((Boolean) -> Unit)? = null,
+    gatewayClientViewModel: GatewayClientViewModel,
+    tokensViewModel: TokensViewModel,
+    payloadsViewModel: PayloadsViewModel,
+    onlineFirstPublisherViewModel: OnlineFirstPublisherViewModel,
+    offlineFirstPublisherViewModel: OfflineFirstPublisherViewModel,
+    supportedPlatformName: String,
+    catId: V1ContentCategories,
+    isOfflineCompose: Boolean,
+    messageId: Long? = null,
 ) {
     val context = LocalContext.current
     val inPreviewMode = LocalInspectionMode.current
 
-    var message by remember{ mutableStateOf(messagesViewModel.message)}
+    val processedImage by imageViewModel.processedImage.collectAsState()
 
     val subscriptionId by remember{
         mutableLongStateOf(
             if(inPreviewMode) -1 else
             if(context.isDefault()) context.getDefaultSimSubscription() ?: -1L else -1L)
     }
-    BackHandler {
-        imageViewModel.processedImage = null
+    fun backHandler() {
+        tokensViewModel.deleteAll()
+        payloadsViewModel.reset()
+        imageViewModel.reset()
         navController.popBackStack()
     }
+    BackHandler { backHandler() }
 
-    var isBridge by remember{ mutableStateOf(type == Platforms.ServiceTypes.BRIDGE) }
+    val payload by payloadsViewModel.message.collectAsStateWithLifecycle()
 
-    var processedImage by remember{ mutableStateOf(imageViewModel.processedImage) }
+    val tokens by tokensViewModel.fetchTokensForPlatforms(supportedPlatformName)
+        .collectAsStateWithLifecycle(emptyList())
 
-    var imageBitmap: Bitmap? by remember {
-        mutableStateOf(
-            if(inPreviewMode) {
-                BitmapFactory.decodeResource(context.resources,
-                    com.afkanerd.lib_image_android.R.drawable._0241226_124819)
-            } else processedImage?.image
-        )
+    val selectedToken by tokensViewModel.selectedToken.collectAsStateWithLifecycle()
+
+    LaunchedEffect(processedImage) {
+        payloadsViewModel.updateImageBitmap(processedImage?.image)
     }
 
-    val from = remember { mutableStateOf(when(type) {
-        Platforms.ServiceTypes.EMAIL,
-        Platforms.ServiceTypes.BRIDGE,
-        Platforms.ServiceTypes.BRIDGE_INCOMING -> message?.fromAccount
-        Platforms.ServiceTypes.TEXT -> message?.fromAccount
-        Platforms.ServiceTypes.MESSAGE -> message?.fromAccount
-        else -> null
-    }) }
+    LaunchedEffect(selectedToken) {
+        selectedToken?.let { selectedToken ->
+            payloadsViewModel.updateFrom(selectedToken.account)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        if(messageId != null) {
+            payloadsViewModel.get(messageId)
+        }
+    }
+
+    LaunchedEffect(payload) {
+        payload?.let { payload ->
+            payloadsViewModel.updateTo(payload.content.getTo()?.toUtf8String() ?: "")
+            payloadsViewModel.updateSubject(payload.content.getSubject()?.toUtf8String() ?: "")
+            payloadsViewModel.updateBody(payload.content.getBody().toUtf8String())
+        }
+    }
+
 
     var showChooseGatewayClient by remember { mutableStateOf(false) }
+
     var isSending by remember { mutableStateOf(false) }
-    var showSelectAccountModal by remember { mutableStateOf(
-        type != Platforms.ServiceTypes.BRIDGE) }
-    var selectedAccount: StoredPlatformsEntity? by remember { mutableStateOf(null) }
-
-    var showDeveloperDialog by remember{ mutableStateOf(false) }
-
-    var sendRequestPayload by remember{ mutableStateOf<ByteArray?>(null) }
-
-    val decomposedEmailMessage = remember {
-        if((type == Platforms.ServiceTypes.BRIDGE || type == Platforms.ServiceTypes.EMAIL) &&
-            message?.encryptedContent != null
-        ) {
-            try {
-                Composers.EmailComposeHandler
-                    .decomposeMessage(
-                        Base64.decode(message?.encryptedContent,
-                            Base64.DEFAULT),
-                        message?.imageLength!!,
-                        message?.textLength!!,
-                        type == Platforms.ServiceTypes.BRIDGE
-                    ).apply {
-                        if(message?.imageLength!! > 0 && processedImage == null) {
-                            processedImage = ImageViewModel.ProcessedImage(
-                                image = BitmapFactory.decodeByteArray(
-                                    this.image.value, 0,
-                                    this.image.value!!.size
-                                ),
-                                rawBytes = this.image.value!!,
-                                size = this.image.value!!.size.toLong(),
-                            )
-                            imageBitmap = processedImage!!.image
-                        }
-                    }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-        } else Composers.EmailComposeHandler.EmailContent()
-    }
-
-    val decomposedMessageMessage = remember {
-        if (type == Platforms.ServiceTypes.MESSAGE && message?.encryptedContent != null) {
-            try {
-                val contentBytes = Base64.decode(message!!.encryptedContent,
-                    Base64.DEFAULT)
-                Composers.MessageComposeHandler.decomposeMessage(contentBytes)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-        }
-        else Composers.MessageComposeHandler.MessageContent(from = from)
-    }
-
-    val decomposedTextMessage = remember {
-        if (type == Platforms.ServiceTypes.TEXT && message?.encryptedContent != null) {
-            try {
-                val contentBytes = Base64.decode(message?.encryptedContent,
-                    Base64.DEFAULT)
-                Composers.TextComposeHandler.decomposeMessage(contentBytes)
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-        }
-        else Composers.TextComposeHandler.TextContent(from)
-    }
-
-    val isSendingEnabled by remember(
-        type,
-        isSending,
-        decomposedEmailMessage?.to?.value,
-        decomposedEmailMessage?.body?.value,
-        decomposedTextMessage?.text?.value,
-        decomposedMessageMessage?.to?.value,
-        decomposedMessageMessage?.message?.value
-    ) {
-        mutableStateOf(
-            when (type) {
-                Platforms.ServiceTypes.EMAIL,
-                Platforms.ServiceTypes.BRIDGE,
-                Platforms.ServiceTypes.BRIDGE_INCOMING -> {
-                    !isSending &&
-                            decomposedEmailMessage?.to?.value?.isNotEmpty() == true &&
-                            decomposedEmailMessage.body.value.isNotEmpty()
-                }
-                Platforms.ServiceTypes.TEXT -> {
-                    !isSending &&
-                            decomposedTextMessage?.text?.value?.isNotEmpty() == true
-                }
-                Platforms.ServiceTypes.MESSAGE -> {
-                    !isSending &&
-                            decomposedMessageMessage?.to?.value?.isNotEmpty() == true &&
-                            decomposedMessageMessage.message.value.isNotEmpty() &&
-                            verifyPhoneNumberFormat(decomposedMessageMessage.to.value)
-                }
-                else -> false
-            }
-        )
-    }
-
-
-    var imageUri by remember{ mutableStateOf<Uri?>(null) }
-
-    fun imageRenderSubModule() {
-        imageViewModel.processedImage = null
-        processedImage = null
-        imageBitmap = null
-        navController.navigate(ImageRenderNav(imageUri.toString()))
-    }
 
     val imagePicker = mmsImagePicker { uri ->
-        imageUri = uri
-        imageRenderSubModule()
+        imageViewModel.reset()
+        navController.navigate(ImageRenderNav(uri.toString()))
     }
 
-    val platformsViewModel = remember{ PlatformsViewModel() }
+    val from by payloadsViewModel.from.collectAsStateWithLifecycle()
+    val to by payloadsViewModel.to.collectAsStateWithLifecycle()
+    val subject by payloadsViewModel.subject.collectAsStateWithLifecycle()
+    val body by payloadsViewModel.body.collectAsStateWithLifecycle()
+    val imageBitmap by payloadsViewModel.imageBitmap.collectAsStateWithLifecycle()
 
-    fun send(
-        smsTransmission: Boolean = true,
-        onCompleteCallback: ((ByteArray) -> Unit)? = null
-    ) {
-        fun sendingCallback(payload: ByteArray?) {
-            isSending = false
-            showChooseGatewayClient = false
-            if(onCompleteCallback != null && payload != null) {
-                onCompleteCallback.invoke(payload)
-            } else {
-                CoroutineScope(Dispatchers.Main).launch {
-                    onSendCallback?.invoke(true)
-                    imageViewModel.processedImage = null
-                    val route = if(context.isDefault()) HomeScreenNav()
-                    else HomepageScreen
-                    navController.navigate(route) {
-                        popUpTo(route) {
-                            inclusive = true
-                        }
-                    }
-                }
-            }
+    var showSetAsDefault by remember { mutableStateOf(false) }
+
+    val debugState by run {
+        if(isOfflineCompose) {
+            offlineFirstPublisherViewModel.debugUiState.collectAsStateWithLifecycle()
+        } else {
+            onlineFirstPublisherViewModel.debugUiState.collectAsStateWithLifecycle()
         }
+    }
 
-        fun onFailureCallback(msg: String?) {
-            isSending = false
-            showChooseGatewayClient = false
-            CoroutineScope(Dispatchers.Main).launch {
-                Toast.makeText(context, msg ?:
-                context.getString(R.string.unknown_error),
-                    Toast.LENGTH_LONG).show()
-            }
-        }
-
-        if(imageBitmap != null) {
-            platformsViewModel.sendPublishingForImage(
-                context = context,
-                account = selectedAccount,
-                text = when (type) {
-                    Platforms.ServiceTypes.BRIDGE,
-                    Platforms.ServiceTypes.BRIDGE_INCOMING,
-                    Platforms.ServiceTypes.EMAIL -> {
-                        Composers.EmailComposeHandler.createEmailByteBuffer(
-                            from = from.value,
-                            to = decomposedEmailMessage?.to!!.value,
-                            cc = decomposedEmailMessage.cc.value,
-                            bcc = decomposedEmailMessage.bcc.value,
-                            subject = decomposedEmailMessage.subject.value,
-                            body = decomposedEmailMessage.body.value,
-                            isBridge = type == Platforms.ServiceTypes.BRIDGE
-                        )
-                    }
-
-                    Platforms.ServiceTypes.TEXT -> {
-                        Composers.TextComposeHandler.createTextByteBuffer(
-                            from = from.value!!,
-                            body = decomposedEmailMessage?.body!!.value,
-                        )
-                    }
-
-                    Platforms.ServiceTypes.MESSAGE -> {
-                        Composers.MessageComposeHandler.createMessageByteBuffer(
-                            from = from.value!!,
-                            to = decomposedMessageMessage?.to!!.value,
-                            message = decomposedEmailMessage?.body!!.value,
-                        )
-                    }
-
-                    else -> byteArrayOf()
+    fun sendingCallback() {
+        if(!isOfflineCompose) {
+            onlineFirstPublisherViewModel.publish(
+                catId = catId,
+                body = body,
+                tokenId = selectedToken?.id,
+                to = to,
+                subject = subject,
+                imageViewModel = imageViewModel,
+                payloadsViewModel = payloadsViewModel,
+                platformName = selectedToken!!.platformName,
+                onFailureCallback = {
+                    Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+                    showChooseGatewayClient = false
                 },
-                isBridge = isBridge,
-                isLoggedIn = !isBridge,
-                onFailure = { onFailureCallback(it) },
-                imageByteArray = processedImage?.rawBytes!!,
-            ) { sendingCallback(it) }
-        }
-        else {
-            when(type) {
-                Platforms.ServiceTypes.EMAIL,
-                Platforms.ServiceTypes.BRIDGE,
-                Platforms.ServiceTypes.BRIDGE_INCOMING -> {
-                    platformsViewModel.sendPublishingForEmail(
-                        context = context,
-                        emailContent = decomposedEmailMessage!!,
-                        account = selectedAccount,
-                        isBridge = isBridge,
-                        subscriptionId = subscriptionId,
-                        smsTransmission = smsTransmission,
-                        onFailureCallback = { onFailureCallback(it) },
-                    ) { sendingCallback(it) }
-                }
-                Platforms.ServiceTypes.TEXT -> {
-                    platformsViewModel.sendPublishingForPost(
-                        context = context,
-                        text = decomposedTextMessage?.text?.value ?: "",
-                        account = selectedAccount!!,
-                        onFailure = { onFailureCallback(it) },
-                        onSuccess = { sendingCallback(it) },
-                        subscriptionId = subscriptionId
-                    )
-                }
-                Platforms.ServiceTypes.MESSAGE -> {
-                    platformsViewModel.sendPublishingForMessaging(
-                        context = context,
-                        messageContent = decomposedMessageMessage!!,
-                        account = selectedAccount!!,
-                        subscriptionId = subscriptionId,
-                        onFailure = { onFailureCallback(it) },
-                    ) { sendingCallback(it) }
-                }
-                Platforms.ServiceTypes.TEST -> {}
+            ) {
+                backHandler()
+            }
+        } else {
+            offlineFirstPublisherViewModel.publish(
+                body = body,
+                to = to,
+                subject = subject,
+                imageViewModel = imageViewModel,
+                payloadsViewModel = payloadsViewModel,
+                onFailureCallback = {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        Toast.makeText(context, it, Toast.LENGTH_LONG)
+                            .show()
+                    }
+                    showChooseGatewayClient = false
+                },
+                catId = catId,
+                platformName = supportedPlatformName
+            ) {
+                backHandler()
             }
         }
+
+    }
+
+    var isDefault by remember {
+        mutableStateOf(inPreviewMode || context.isDefault())
+    }
+
+    val getDefaultPermission = getSetDefaultBehaviour(context) {
+        isDefault = context.isDefault()
+        showSetAsDefault = false
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    when(type) {
-                        Platforms.ServiceTypes.EMAIL,
-                        Platforms.ServiceTypes.BRIDGE,
-                        Platforms.ServiceTypes.BRIDGE_INCOMING -> {
+                    when(catId) {
+                        V1ContentCategories.EMAIL -> {
                             Text(stringResource(R.string.compose_email))
                         }
-                        Platforms.ServiceTypes.TEXT -> {
+                        V1ContentCategories.TEXT -> {
                             Text(stringResource(R.string.new_post))
                         }
-                        Platforms.ServiceTypes.MESSAGE -> {
+                        V1ContentCategories.MESSAGE -> {
                             Text(stringResource(R.string.new_message))
                         }
-                        else -> {}
                     }
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-                        imageViewModel.processedImage = null
-                        navController.popBackStack()
+                        backHandler()
                     }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {
-                    if(BuildConfig.DEBUG || inPreviewMode) {
+                    if(BuildConfig.DEBUG) {
                         IconButton(
-                            enabled = isSendingEnabled,
                             onClick = {
-                                isSending = true
-                                send(false) {
-                                    sendRequestPayload = it
-                                    showDeveloperDialog = true
-                                    isSending = false
+                                if(isOfflineCompose) {
+                                    offlineFirstPublisherViewModel.toggleDebugState()
+                                } else {
+                                    onlineFirstPublisherViewModel.toggleDebugState()
                                 }
-                            }
+                            },
+//                            colors = MaterialTheme.colors.error
                         ) {
-                            Icon(Icons.Default.DeveloperMode, "" )
-                        }
-                    }
-
-                    if(inPreviewMode || context.isDefault()) {
-                        IconButton(
-                            onClick = { if(!context.isDefault()) TODO("Show toast") else {
-                                imagePicker.launch(
-                                    arrayOf( "image/png", "image/jpg", "image/jpeg"))
-                            }}
-                        ) {
-                            Icon(Icons.Default.AttachFile,
-                                stringResource(R.string.add_photos)
+                            Icon(Icons.Default.NoSim,
+                                "Debug send",
+                                tint = if(debugState) MaterialTheme.colorScheme.primary
+                                else Color.LightGray
                             )
                         }
                     }
 
                     IconButton(
-                        enabled = isSendingEnabled,
                         onClick = {
-                            isSending = true
-                            if(context.settingsGetNotShowChooseGatewayClient) {
-                                send()
-                            } else {
+                            if(!context.isDefault()) { showSetAsDefault = true }
+                            else {
+                                imagePicker.launch(
+                                    arrayOf( "image/png", "image/jpg", "image/jpeg"))
+                            }}
+                    ) {
+                        Icon(Icons.Default.AttachFile,
+                            stringResource(R.string.add_photos)
+                        )
+                    }
+
+                    IconButton(
+                        enabled = if(isOfflineCompose) {
+                            !isSending
+                        } else {
+                            !isSending && from.isNotBlank()
+                        },
+                        onClick = {
+                            if(!debugState && !context.settingsGetNotShowChooseGatewayClient)
                                 showChooseGatewayClient = true
+                            else {
+                                sendingCallback()
                             }
                         }
                     ) {
@@ -465,35 +303,40 @@ fun ComposerInterface(
             .fillMaxWidth()
             .padding(innerPadding)
         ) {
-            Column {
+            Column(Modifier.padding(16.dp)) {
                 if(isSending || LocalInspectionMode.current) {
                     LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
                 }
-                Column {
-                    when(type) {
-                        Platforms.ServiceTypes.EMAIL,
-                        Platforms.ServiceTypes.BRIDGE,
-                        Platforms.ServiceTypes.BRIDGE_INCOMING -> {
-                            EmailComposeView(
-                                isBridge = isBridge,
-                                emailContent = decomposedEmailMessage!!,
-                                from = from.value
-                            )
-                        }
-                        Platforms.ServiceTypes.TEXT, Platforms.ServiceTypes.TEST -> {
-                            TextComposeView(
-                                textContent = decomposedTextMessage!!,
-                                serviceType = type
-                            )
-                        }
-                        Platforms.ServiceTypes.MESSAGE -> {
-                            MessageComposeView(
-                                messageContent = decomposedMessageMessage!!,
-                                from = from.value
-                            )
-                        }
+                if(!isOfflineCompose) {
+                    FromView(
+                        tokens = tokens,
+                        selectedAccount = selectedToken,
+                    ) {
+                        tokensViewModel.updateSelectedToken(it)
                     }
+                }
 
+                Column {
+                    when(catId) {
+                        V1ContentCategories.EMAIL -> EmailComposeView(
+                            to = to,
+                            subject = subject,
+                            body = body,
+                            toCallback = { payloadsViewModel.updateTo(it) },
+                            subjectCallback = { payloadsViewModel.updateSubject(it) },
+                            bodyCallback = { payloadsViewModel.updateBody(it) }
+                        )
+                        V1ContentCategories.TEXT -> TextComposeView(
+                            body = body,
+                            bodyCallback = { payloadsViewModel.updateBody(it) }
+                        )
+                        V1ContentCategories.MESSAGE -> MessageComposeView(
+                            to = to,
+                            body = body,
+                            toCallback = { payloadsViewModel.updateTo(it) },
+                            bodyCallback = { payloadsViewModel.updateBody(it) }
+                        )
+                    }
                 }
 
                 imageBitmap?.let {
@@ -505,82 +348,160 @@ fun ComposerInterface(
                         AttachImageView(
                             it,
                             onCancelCallback = {
-                                processedImage = null
-                                imageViewModel.processedImage = null
-                                imageBitmap = null
+                                imageViewModel.reset()
                             }
                         ) {
-                            if(imageUri != null)
-                                imageRenderSubModule()
+                            processedImage?.uri.let { uri ->
+                                navController.navigate(ImageRenderNav(uri.toString()))
+                            }
                         }
                     }
                 }
             }
             if(showChooseGatewayClient) {
-                ComposeChooseGatewayClientsModal(showChooseGatewayClient) {
-                    send()
-                }
+                ComposeChooseGatewayClientsModal(
+                    showChooseGatewayClient,
+                    gatewayClientViewModel,
+                ) { sendingCallback() }
             }
 
-            if (showSelectAccountModal && !LocalInspectionMode.current) {
-                SelectAccountModal(
-                    onDismissRequest = {
-                        if (selectedAccount == null) {
-                            navController.popBackStack()
-                        }
-                        Toast.makeText(context,
-                            context.getString(R.string.no_account_selected),
-                            Toast.LENGTH_SHORT).show()
-                    },
-                    onAccountSelected = { account ->
-                        selectedAccount = account
-                        from.value = account.account!!
-                        showSelectAccountModal = false
-                    },
-                    name = platformName!!
-                )
-            }
-
-            if(showDeveloperDialog) {
-                DeveloperHTTPView(
-                    payload = sendRequestPayload!!,
+            if(showSetAsDefault) {
+                MakeDefaultModal(
+                    makeDefault = {
+                        getDefaultPermission.launch(makeDefault(context))
+                    }
                 ) {
-                    showDeveloperDialog = false
+
                 }
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Preview(showBackground = true)
 @Composable
-fun ComposerInterfacePreview() {
-    AppTheme {
-        ComposerInterface(
-            navController = rememberNavController(),
-            type = Platforms.ServiceTypes.BRIDGE,
-            imageViewModel = remember{ ImageViewModel() },
-            messagesViewModel = remember{ MessagesViewModel() },
-            platformName = "BRIDGE"
-        ){}
+private fun FromView(
+    tokens: List<Tokens> = listOf(
+        Tokens(
+            tokenId = 1,
+            tokenHash = ByteArray(0),
+            catId = V1ContentCategories.EMAIL,
+            account = "sample@example.com",
+            platformName = "sample platform"
+        )
+    ),
+    selectedAccount: Tokens? = null,
+    showListSelected: (Tokens) -> Unit = {},
+) {
+    val inPreviewMode = LocalInspectionMode.current
+    var showList by remember{ mutableStateOf(inPreviewMode)}
+    var dropDownIcon by remember(showList){ mutableStateOf(
+        if(!showList) Icons.Filled.KeyboardArrowDown
+        else Icons.Filled.KeyboardArrowUp,
+    )}
+    Column(Modifier
+        .fillMaxWidth()
+    ) {
+        if(selectedAccount == null || inPreviewMode) {
+            Box(Modifier.padding(16.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable { showList = !showList }
+                ) {
+                    Text(
+                        text = stringResource(R.string.from),
+                        modifier = Modifier.padding(end = 24.dp),
+                        fontWeight = FontWeight.Medium
+                    )
+
+                    Spacer(Modifier.weight(1f))
+
+                    IconButton(onClick = {
+                        showList = !showList
+                    }) {
+                        Icon(
+                            dropDownIcon,
+                            contentDescription = stringResource(R.string.expand_to)
+                        )
+                    }
+                }
+            }
+        }
+
+        if(selectedAccount != null || inPreviewMode) {
+            AccountCard(
+                account = if(inPreviewMode) {
+                    Tokens(
+                        tokenId = 1,
+                        tokenHash = ByteArray(0),
+                        catId = V1ContentCategories.EMAIL,
+                        account = "sample@example.com",
+                        platformName = "sample platform"
+                    )
+                } else selectedAccount!!,
+                supportingIcon = dropDownIcon,
+                supportingIconTint = MaterialTheme.colorScheme.onBackground,
+                supportingIconDescription = stringResource(R.string.show_accounts),
+                supportingIconCallback = { showList = !showList },
+            ){ showList = !showList }
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 8.dp)
+        ) {
+            if(showList) {
+                Divider(
+                    color = MaterialTheme.colorScheme.outline,
+                    modifier = Modifier
+                        .padding(top = 4.dp, bottom = 8.dp)
+                        .fillMaxWidth(),
+                    thickness = 0.5.dp,
+                )
+            }
+
+            DropdownMenu(
+                expanded = showList,
+                modifier = Modifier.width(IntrinsicSize.Min),
+                onDismissRequest = {
+                    showList = false
+                },
+            ) {
+                tokens.forEach { token ->
+                    DropdownMenuItem(
+                        leadingIcon = {
+                            Image(
+                                painter = painterResource(id = R.drawable.generic_avatar),
+                                contentDescription = stringResource(R.string.profile_photo),
+                                modifier = Modifier
+                                    .size(30.dp)
+                                    .clip(CircleShape),
+                                contentScale = ContentScale.Crop
+                            )
+
+                        },
+                        text = {
+                            Column {
+                                Text(
+                                    text = token.account,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                                Text(
+                                    text = token.platformName,
+                                    style = MaterialTheme.typography.titleSmall,
+                                )
+                            }
+                        },
+                        onClick = {
+                            showListSelected(token)
+                            showList = false
+                        }
+                    )
+                }
+            }
+        }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun AccountModalPreview() {
-    AppTheme(darkTheme = false) {
-        val storedPlatform = StoredPlatformsEntity(
-            id= "0",
-            account = "developers@relaysms.me",
-            name = "gmail",
-            accessToken = "",
-            refreshToken = ""
-        )
-        SelectAccountModal(
-            _accounts = listOf(storedPlatform),
-            name = "gmail",
-            onAccountSelected = {}
-        ) {}
-    }
-}

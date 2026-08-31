@@ -2,8 +2,8 @@ package com.example.sw0b_001.data
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.MutableStateSerializer
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel.Companion.parseLocalImageContent
+import com.example.sw0b_001.ui.viewModels.TokensViewModel.Companion.MutableStateSerializer
+import com.example.sw0b_001.ui.viewModels.TokensViewModel.Companion.parseLocalImageContent
 import kotlinx.serialization.Serializable
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -36,8 +36,6 @@ object Composers {
             subject: String,
             body: String,
             isBridge: Boolean,
-            accessToken: String? = null,
-            refreshToken: String? = null
         ): ByteArray {
             val fromBytes = from?.encodeToByteArray() ?: byteArrayOf()
             val toBytes = to.encodeToByteArray()
@@ -45,11 +43,7 @@ object Composers {
             val bccBytes = bcc.encodeToByteArray()
             val subjectBytes = subject.encodeToByteArray()
             val bodyBytes = body.encodeToByteArray()
-            val accessTokenBytes = accessToken?.encodeToByteArray()
-            val refreshTokenBytes = refreshToken?.encodeToByteArray()
 
-
-            // Calculate total size for the buffer
             var totalSize =
                 (if(from != null) 1 else 0) +  // from
                         2 +  // to
@@ -62,8 +56,7 @@ object Composers {
                         ccBytes.size +
                         bccBytes.size +
                         subjectBytes.size +
-                        bodyBytes.size +
-                        (accessTokenBytes?.size ?: 0) + (refreshTokenBytes?.size ?: 0)
+                        bodyBytes.size
             if(!isBridge) totalSize += 4
 
             val buffer = ByteBuffer.allocate(totalSize).order(ByteOrder.LITTLE_ENDIAN)
@@ -76,11 +69,6 @@ object Composers {
             buffer.put(subjectBytes.size.toByte())
             buffer.putShort(bodyBytes.size.toShort())
 
-            if(!isBridge) {
-                buffer.putShort((accessTokenBytes?.size ?: 0).toShort())
-                buffer.putShort((refreshTokenBytes?.size ?: 0).toShort())
-            }
-
             // Write field values
             if(fromBytes.isNotEmpty()) buffer.put(fromBytes)
             buffer.put(toBytes)
@@ -88,11 +76,6 @@ object Composers {
             buffer.put(bccBytes)
             buffer.put(subjectBytes)
             buffer.put(bodyBytes)
-
-            if(!isBridge) {
-                accessTokenBytes?.let { buffer.put(it) }
-                refreshTokenBytes?.let { buffer.put(it) }
-            }
 
             return buffer.array()
         }

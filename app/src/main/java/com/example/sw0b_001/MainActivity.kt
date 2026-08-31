@@ -1,146 +1,133 @@
 package com.example.sw0b_001
 
-import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
-import com.example.sw0b_001.ui.theme.AppTheme
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import com.example.sw0b_001.ui.viewModels.MessagesViewModel
-import com.example.sw0b_001.ui.viewModels.PlatformsViewModel
-import com.example.sw0b_001.ui.views.CreateAccountView
-import com.example.sw0b_001.ui.views.LoginView
-import com.example.sw0b_001.ui.navigation.CreateAccountScreen
-import com.example.sw0b_001.ui.navigation.LoginScreen
-import com.example.sw0b_001.ui.navigation.OTPCodeScreen
-import com.example.sw0b_001.ui.views.AboutView
-import com.example.sw0b_001.ui.views.HomepageView
-import com.example.sw0b_001.ui.views.OtpCodeVerificationView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
-import androidx.biometric.BiometricManager
-import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
-import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
-import androidx.biometric.BiometricPrompt
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.DrawerState
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
-import androidx.preference.PreferenceManager
-import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
-import com.example.sw0b_001.data.models.Platforms
-import com.example.sw0b_001.data.Vaults
-import com.example.sw0b_001.ui.navigation.AboutScreen
-import com.example.sw0b_001.ui.navigation.BridgeViewScreen
-import com.example.sw0b_001.ui.navigation.EmailViewScreen
-import com.example.sw0b_001.ui.navigation.ForgotPasswordScreen
-import com.example.sw0b_001.ui.navigation.GetMeOutScreen
-import com.example.sw0b_001.ui.navigation.MessageViewScreen
-import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
-import com.example.sw0b_001.ui.navigation.TextViewScreen
-import com.example.sw0b_001.ui.views.ForgotPasswordView
-import com.example.sw0b_001.ui.views.GetMeOutOfHere
-import com.example.sw0b_001.ui.views.PasteEncryptedTextView
-import com.example.sw0b_001.ui.views.details.EmailDetailsView
-import com.example.sw0b_001.ui.views.details.MessageDetailsView
-import com.example.sw0b_001.ui.views.details.TextDetailsView
-import io.grpc.Status
-import io.grpc.StatusRuntimeException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import androidx.core.content.edit
 import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
-import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.window.layout.WindowInfoTracker
 import androidx.window.layout.WindowLayoutInfo
-import com.afkanerd.lib_image_android.ui.components.ImageRender
+import com.afkanerd.lib_image_android.ui.BindActivity
+import com.afkanerd.lib_image_android.ui.ImageRender
 import com.afkanerd.lib_image_android.ui.navigation.ImageRenderNav
 import com.afkanerd.lib_image_android.ui.viewModels.ImageViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.NEW_NOTIFICATION_ACTION
-import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.getDatabase
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.makeE16PhoneNumber
 import com.afkanerd.smswithoutborders_libsmsmms.ui.components.NavHostControllerInstance
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.ConversationsScreenNav
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
 import com.afkanerd.smswithoutborders_libsmsmms.ui.requiredReadPhoneStatePermissions
+import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.SearchViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ThreadsViewModel
+import com.example.sw0b_001.data.CrashHandler
+import com.example.sw0b_001.data.CrashHandler.Companion.saveFileToUri
 import com.example.sw0b_001.extensions.context.promptBiometrics
 import com.example.sw0b_001.extensions.context.settingsGetLockDownApp
 import com.example.sw0b_001.extensions.context.settingsGetOnboardedCompletely
-import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
-import com.example.sw0b_001.ui.appbars.BottomNavBar
+import com.example.sw0b_001.extensions.context.settingsSetLockDownApp
+import com.example.sw0b_001.ui.navigation.AboutScreen
+import com.example.sw0b_001.ui.navigation.BackupScreen
 import com.example.sw0b_001.ui.navigation.ComposeScreen
+import com.example.sw0b_001.ui.navigation.DetailsInterfaceScreen
 import com.example.sw0b_001.ui.navigation.HomepageScreen
-import com.example.sw0b_001.ui.navigation.HomepageScreenRelay
-import com.example.sw0b_001.ui.navigation.OnboardingInteractiveScreen
-import com.example.sw0b_001.ui.navigation.OnboardingSkipScreen
+import com.example.sw0b_001.ui.navigation.MetricsScreen
+import com.example.sw0b_001.ui.navigation.OnboardingViewScreen
+import com.example.sw0b_001.ui.navigation.PasteEncryptedTextScreen
+import com.example.sw0b_001.ui.navigation.RestoreScreen
 import com.example.sw0b_001.ui.navigation.SettingsScreen
 import com.example.sw0b_001.ui.navigation.WelcomeScreen
-import com.example.sw0b_001.ui.onboarding.OnboardingInteractive
-import com.example.sw0b_001.ui.views.WelcomeMainView
+import com.example.sw0b_001.ui.onboarding.OnboardingView
+import com.example.sw0b_001.ui.theme.AppTheme
+import com.example.sw0b_001.ui.viewModels.BackupRestoreViewModel
+import com.example.sw0b_001.ui.viewModels.GatewayClientViewModel
+import com.example.sw0b_001.ui.viewModels.OfflineFirstPublisherViewModel
 import com.example.sw0b_001.ui.viewModels.OnboardingViewModel
-import com.example.sw0b_001.ui.viewModels.VaultsViewModel
-import com.example.sw0b_001.ui.views.BottomTabsItems
-import com.example.sw0b_001.ui.views.SettingsView
+import com.example.sw0b_001.ui.viewModels.OnlineFirstPublisherViewModel
+import com.example.sw0b_001.ui.viewModels.PayloadsViewModel
+import com.example.sw0b_001.ui.viewModels.SupportedPlatformsViewModel
+import com.example.sw0b_001.ui.viewModels.TokensViewModel
+import com.example.sw0b_001.ui.views.AboutView
+import com.example.sw0b_001.ui.views.WelcomeMainView
+import com.example.sw0b_001.ui.views.backupRestore.BackupView
+import com.example.sw0b_001.ui.views.backupRestore.RecoveryView
 import com.example.sw0b_001.ui.views.compose.ComposerInterface
+import com.example.sw0b_001.ui.views.details.DetailsInterfaceView
+import com.example.sw0b_001.ui.views.incoming.PasteEncryptedTextView
+import com.example.sw0b_001.ui.views.settings.SettingsView
+import com.example.sw0b_001.ui.views.tabs.HomepageView
+import com.example.sw0b_001.ui.views.threads.MetricsView
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
-import kotlinx.serialization.json.Json
-import java.util.concurrent.Executor
+import dagger.hilt.android.AndroidEntryPoint
+import io.shortmesh.sdk.viewmodel.AuthyViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import uniffi.relaysms_spec_payload.Transports
+import uniffi.relaysms_spec_payload.v1CalculateSegments
+import java.io.File
 import kotlin.system.exitProcess
 
-class MainActivity : AppCompatActivity() {
+@AndroidEntryPoint
+class MainActivity : BindActivity() {
+    companion object {
+        init {
+            System.loadLibrary("relaysms_spec_payload")
+        }
+    }
+
     private lateinit var navController: NavHostController
-    private lateinit var searchViewModel: SearchViewModel
+    val searchViewModel: SearchViewModel by viewModels()
+    val supportedPlatformsViewModel: SupportedPlatformsViewModel by viewModels()
 
     val threadsViewModel: ThreadsViewModel by viewModels()
+    val conversationViewModel: ConversationsViewModel by viewModels()
     val onboardingViewModel: OnboardingViewModel by viewModels()
 
-    val platformsViewModel: PlatformsViewModel by viewModels()
-    val messagesViewModel: MessagesViewModel by viewModels()
+    val tokensViewModel: TokensViewModel by viewModels()
+    val payloadsViewModel: PayloadsViewModel by viewModels()
     val gatewayClientViewModel: GatewayClientViewModel by viewModels()
     val imageViewModel: ImageViewModel by viewModels()
-
-    var loggedInAlready by mutableStateOf(false)
-
-    lateinit var vaultViewModel: VaultsViewModel
+    val onlineFirstPublisherViewModel: OnlineFirstPublisherViewModel by viewModels()
+    val offlineFirstPublisherViewModel: OfflineFirstPublisherViewModel by viewModels()
+    val backupRestoreViewModel: BackupRestoreViewModel by viewModels()
+    val authyViewModel: AuthyViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -151,8 +138,30 @@ class MainActivity : AppCompatActivity() {
             window.isNavigationBarContrastEnforced = false
         }
 
-        vaultViewModel = VaultsViewModel(applicationContext)
-        searchViewModel = SearchViewModel(getDatabase().threadsDao()!!)
+        imageTransmissionCallback()
+        CrashHandler.initialize(applicationContext)
+
+        lifecycleScope.launch {
+            onboardingViewModel.showBiometrics.collect { callback ->
+                promptBiometrics(this@MainActivity) {
+                    if(it) {
+                        settingsSetLockDownApp(true)
+                        callback()
+                    }
+                    else {
+                        Toast.makeText(applicationContext,
+                            getString(R.string.failed_to_set_biometric_authentication),
+                            Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            onboardingViewModel.navigate.collect { composable ->
+                navController.navigate( composable )
+            }
+        }
 
         fun beginAppLifecycle() {
             lifecycleScope.launch(Dispatchers.Main) {
@@ -172,18 +181,6 @@ class MainActivity : AppCompatActivity() {
                                 AppTheme {
                                     navController = rememberNavController()
 
-                                    LaunchedEffect(loggedInAlready) {
-                                        if(loggedInAlready) {
-                                            val route = if(isDefault()) HomeScreenNav()
-                                            else HomepageScreen
-                                            navController.navigate(GetMeOutScreen) {
-                                                popUpTo(route) {
-                                                    inclusive = true
-                                                }
-                                            }
-                                        }
-                                    }
-
                                     Surface( Modifier.fillMaxSize()) {
                                         MainNavigation(navController = navController, newLayoutInfo)
                                     }
@@ -195,10 +192,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        if(!settingsGetOnboardedCompletely) {
-            beginAppLifecycle()
-        }
-        else securityChecks {
+        securityChecks {
             beginAppLifecycle()
         }
     }
@@ -237,30 +231,16 @@ class MainActivity : AppCompatActivity() {
             mutableStateOf(context.settingsGetOnboardedCompletely)
         }
 
-        var isLoggedIn by remember {
-            mutableStateOf(
-                if(inPreview) true else
-                    Vaults.fetchLongLivedToken(context).isNotBlank()
-            )
-        }
-
         var showThreadsTopBar by remember { mutableStateOf(true) }
         var customThreadView: (@Composable () -> Unit)? by remember { mutableStateOf(null)}
-
 
         var navDrawItemSelected by remember{ mutableStateOf(false) }
         var drawerCallback by remember { mutableStateOf<(() -> Unit)?>(null) }
 
-        val lifeCycleOwner = LocalLifecycleOwner.current
-        DisposableEffect(lifeCycleOwner) {
-            val observer = Observer<ThreadsViewModel.InboxType> { newInboxType ->
-                navDrawItemSelected = newInboxType == ThreadsViewModel.InboxType.CUSTOM
-            }
-            threadsViewModel.selectedInbox.observe(lifeCycleOwner, observer)
+        val inboxType by threadsViewModel.inboxType.collectAsStateWithLifecycle()
 
-            onDispose {
-                threadsViewModel.selectedInbox.removeObserver(observer)
-            }
+        LaunchedEffect(inboxType) {
+            navDrawItemSelected = inboxType == ThreadsViewModel.InboxType.CUSTOM
         }
 
         LaunchedEffect(navDrawItemSelected) {
@@ -268,12 +248,15 @@ class MainActivity : AppCompatActivity() {
                 navDrawItemSelected -> {
                     {
                         showThreadsTopBar = false
+                        imageViewModel.reset()
+                        payloadsViewModel.reset()
                         HomepageView(
                             navController = navController,
-                            platformsViewModel = platformsViewModel,
-                            messagesViewModel = messagesViewModel,
+                            tokensViewModel = tokensViewModel,
+                            payloadsViewModel = payloadsViewModel,
                             gatewayClientViewModel = gatewayClientViewModel,
-                            imageViewModel = imageViewModel,
+                            supportedPlatformsViewModel = supportedPlatformsViewModel,
+                            authyViewModel = authyViewModel,
                             drawerCallback = drawerCallback
                         )
                     }
@@ -286,10 +269,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         NavHostControllerInstance(
-            newLayoutInfo,
-            navController,
-            threadsViewModel,
-            searchViewModel,
+            newLayoutInfo = newLayoutInfo,
+            navController = navController,
+            threadsViewModel = threadsViewModel,
+            conversationsViewModel = conversationViewModel,
+            searchViewModel = searchViewModel,
             appName = stringResource(R.string.app_name),
             showThreadsTopBar = showThreadsTopBar,
             startDestination = if(hasSeenOnboarding) {
@@ -320,134 +304,107 @@ class MainActivity : AppCompatActivity() {
             }
         ) {
             composable<WelcomeScreen> {
-                WelcomeMainView(navController)
+                WelcomeMainView(navController = navController)
             }
-            composable<OnboardingInteractiveScreen> {
-                OnboardingInteractive(
-                    navController,
-                    onboardingViewModel,
-                )
+
+            composable<OnboardingViewScreen> {
+                OnboardingView(navController = navController)
             }
-            composable<GetMeOutScreen> {
-                GetMeOutOfHere(navController)
-            }
+//            composable<OnboardingInteractiveScreen> {
+//                OnboardingInteractive(
+//                    navController,
+//                    onboardingViewModel,
+//                    tokensViewModel = tokensViewModel,
+//                    supportedPlatformsViewModel,
+//                )
+//            }
             composable<HomepageScreen> {
                 HomepageView(
                     navController = navController,
-                    platformsViewModel = platformsViewModel,
-                    messagesViewModel = messagesViewModel,
+                    tokensViewModel = tokensViewModel,
+                    payloadsViewModel = payloadsViewModel,
                     gatewayClientViewModel = gatewayClientViewModel,
-                    imageViewModel = imageViewModel,
-                )
-            }
-            composable<LoginScreen> { backEntry ->
-                val loginNav: LoginScreen = backEntry.toRoute()
-                LoginView(
-                    navController = navController,
-                    vaultViewModel = vaultViewModel,
-                    isOnboarding = loginNav.isOnboarding,
-                )
-            }
-            composable<ForgotPasswordScreen> { backEntry ->
-                val forgotPasswordNav: ForgotPasswordScreen = backEntry.toRoute()
-                ForgotPasswordView(
-                    navController = navController,
-                    vaultsViewModel = vaultViewModel,
-                    isOnboarding = forgotPasswordNav.isOnboarding,
-                )
-            }
-            composable<CreateAccountScreen> { backEntry ->
-                val createAccountNav: ForgotPasswordScreen = backEntry.toRoute()
-                CreateAccountView(
-                    navController = navController,
-                    vaultsViewModel = vaultViewModel,
-                    isOnboarding = createAccountNav.isOnboarding,
-                )
-            }
-            composable<OTPCodeScreen> { backEntry ->
-                val otpCodeNav: OTPCodeScreen = backEntry.toRoute()
-                OtpCodeVerificationView(
-                    navController = navController,
-                    email = otpCodeNav.email,
-                    loginSignupPhoneNumber = otpCodeNav.loginSignupPhoneNumber,
-                    loginSignupPassword = otpCodeNav.loginSignupPassword,
-                    countryCode = otpCodeNav.countryCode,
-                    otpRequestType = otpCodeNav.otpRequestType,
-                    recaptcha = otpCodeNav.recaptcha,
-                    nextAttemptTimestamp = otpCodeNav.nextAttemptTimestamp,
-                    onCompleteCallback = if(otpCodeNav.isOnboarding)
-                        onboardingViewModel.callback else null,
+                    supportedPlatformsViewModel = supportedPlatformsViewModel,
+                    authyViewModel = authyViewModel,
                 )
             }
             composable<AboutScreen> {
                 AboutView(navController = navController)
             }
-
             composable<ComposeScreen> { backEntry ->
                 val composeScreenNav: ComposeScreen = backEntry.toRoute()
                 ComposerInterface(
                     navController = navController,
-                    type = composeScreenNav.type,
                     imageViewModel = imageViewModel,
-                    messagesViewModel = messagesViewModel,
-                    onSendCallback = if(composeScreenNav.isOnboarding)
-                        onboardingViewModel.callback else null,
-                    platformName = composeScreenNav.platformName,
+                    gatewayClientViewModel = gatewayClientViewModel,
+                    tokensViewModel = tokensViewModel,
+                    messageId = composeScreenNav.messageId,
+                    payloadsViewModel = payloadsViewModel,
+                    onlineFirstPublisherViewModel = onlineFirstPublisherViewModel,
+                    offlineFirstPublisherViewModel = offlineFirstPublisherViewModel,
+                    catId = composeScreenNav.cat,
+                    supportedPlatformName = composeScreenNav.supportedPlatform,
+                    isOfflineCompose = composeScreenNav.isOfflineCompose,
                 )
             }
-            composable<EmailViewScreen> {
-                EmailDetailsView(
+            composable<DetailsInterfaceScreen> { backEntry ->
+                val detailsInterfaceScreen: DetailsInterfaceScreen = backEntry.toRoute()
+                DetailsInterfaceView(
                     navController = navController,
-                    platformsViewModel = platformsViewModel,
-                    messagesViewModel = messagesViewModel,
-                    imageViewModel = imageViewModel,
-                )
-            }
-            composable<BridgeViewScreen> {
-                EmailDetailsView(
-                    navController = navController,
-                    platformsViewModel = platformsViewModel,
-                    messagesViewModel = messagesViewModel,
-                    imageViewModel = imageViewModel,
-                    isBridge = true
-                )
-            }
-            composable<TextViewScreen> {
-                TextDetailsView(
-                    navController = navController,
-                    messagesViewModel = messagesViewModel,
-                    platformsViewModel = platformsViewModel,
-                )
-            }
-            composable<MessageViewScreen> {
-                MessageDetailsView(
-                    navController = navController,
-                    messagesViewModel = messagesViewModel,
-                    platformsViewModel = platformsViewModel,
+                    payloadsViewModel = payloadsViewModel,
+                    cat = detailsInterfaceScreen.cat,
+                    messageId = detailsInterfaceScreen.messageId,
+                    supportedPlatformsViewModel = supportedPlatformsViewModel,
+                    isOfflineMode = detailsInterfaceScreen.isOfflineCompose
                 )
             }
             composable<PasteEncryptedTextScreen> {
                 PasteEncryptedTextView(
-                    platformsViewModel = platformsViewModel,
-                    messagesViewModel = messagesViewModel,
+                    tokensViewModel = tokensViewModel,
+                    payloadsViewModel = payloadsViewModel,
                     navController = navController,
                 )
             }
-
             composable<ImageRenderNav>{ backStackEntry ->
                 val imageRenderNav: ImageRenderNav = backStackEntry.toRoute()
                 ImageRender(
                     navController = navController,
                     imageViewModel = imageViewModel,
-                    smsCountPaddingValue = imageRenderNav.smsCountPadding,
-                    uri = imageRenderNav.uri.toUri()
+                    uri = imageRenderNav.uri?.toUri(),
+                    attachmentCounterCallback = { payloadSize ->
+                        v1CalculateSegments(
+                            payloadSize.toUInt(),
+                            Transports.SMS,
+                            true
+                        ).toInt()
+                    },
+                    onApplyCallback = {
+                        navController.popBackStack()
+                    },
+                    backActionCallback = {
+                        navController.popBackStack()
+                    }
                 )
             }
-
             composable<SettingsScreen> {
                 SettingsView(
                     navController = navController,
+                    tokensViewModel = tokensViewModel,
                     activity = this@MainActivity
+                )
+            }
+            composable<BackupScreen> {
+                BackupView(navController, backupRestoreViewModel)
+            }
+            composable<RestoreScreen> {
+                RecoveryView(navController, backupRestoreViewModel)
+            }
+            composable<MetricsScreen> { backStackEntry ->
+                val metricsNav: MetricsScreen = backStackEntry.toRoute()
+                MetricsView(
+                    navController,
+                    tokensId = metricsNav.tokenId,
+                    tokensViewModel = tokensViewModel
                 )
             }
         }
@@ -455,35 +412,9 @@ class MainActivity : AppCompatActivity() {
         processIntent(navController)
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        CoroutineScope(Dispatchers.Default).launch {
-            try {
-                if(Vaults.isGetMeOut(applicationContext)) {
-                    loggedInAlready = true
-                } else {
-                    Vaults.fetchLongLivedToken(applicationContext).let { llt ->
-                        if(llt.isNotEmpty()) {
-                            val vault = Vaults(applicationContext)
-                            try {
-                                vault.refreshStoredTokens(
-                                    applicationContext,
-                                    settingsGetStoreTokensOnDevice)
-                            } catch(e: StatusRuntimeException) {
-                                if(e.status.code == Status.UNAUTHENTICATED.code) {
-                                    loggedInAlready = true
-                                }
-                            } finally {
-                                vault.shutdown()
-                            }
-
-                        }
-                    }
-                }
-            } catch(e: Exception) {
-                e.printStackTrace()
-            }
+    private fun imageTransmissionCallback() {
+        setRemoteExecutionCallback { payload ->
+            onlineFirstPublisherViewModel.attachmentExecutor(payload)
         }
     }
 
@@ -525,4 +456,22 @@ class MainActivity : AppCompatActivity() {
         if(::navController.isInitialized)
             processIntent(navController, intent)
     }
+
+    private var pendingSaveFile: File? = null
+    private val createDocumentLauncher = registerForActivityResult(
+        ActivityResultContracts.CreateDocument("text/plain")
+    ) { uri: Uri? ->
+        uri?.let { destUri ->
+            pendingSaveFile?.let { file ->
+                saveFileToUri(this, file, destUri)
+            }
+        }
+        pendingSaveFile = null
+    }
+
+    fun launchSaveCrashLog(mergedFile: File) {
+        pendingSaveFile = mergedFile
+        createDocumentLauncher.launch(mergedFile.name)
+    }
+
 }

@@ -3,22 +3,16 @@ package com.example.sw0b_001
 import android.content.Intent
 import android.os.Bundle
 import android.util.Base64
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.preference.PreferenceManager
-import com.example.sw0b_001.data.Publishers
-import com.example.sw0b_001.data.Vaults
 import com.example.sw0b_001.data.Helpers
+import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
 import io.grpc.StatusRuntimeException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
 import java.net.URLDecoder
-import android.net.Uri
-import com.example.sw0b_001.extensions.context.settingsGetStoreTokensOnDevice
 
 
 class OauthRedirectActivity : AppCompatActivity() {
@@ -27,63 +21,53 @@ class OauthRedirectActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_open_idoauth_redirect)
 
-        /**
-         * Send this to Vault to complete the OAuth process
-         */
-
         val intentUrl = intent.dataString
         if(intentUrl.isNullOrEmpty()) {
             finish()
         }
 
         val parameters = Helpers.extractParameters(intentUrl!!)
-        val decoded = String(Base64.decode(URLDecoder.decode(parameters["state"]!!, "UTF-8"),
-            Base64.DEFAULT), Charsets.UTF_8)
+        val decoded = String(
+            Base64.decode(
+                URLDecoder.decode(parameters["state"]!!, "UTF-8"),
+                Base64.DEFAULT
+            ), Charsets.UTF_8)
 
         val values = decoded.split(",")
         val platform = values[0]
-        val supportsUrlScheme = values[1] == "true"
         val code: String = URLDecoder.decode(parameters["code"]!!, "UTF-8")
 
 
         val scope = CoroutineScope(Dispatchers.Default)
         scope.launch {
-            val publishers = Publishers(applicationContext)
+            sendAuthCode(
+                platformName = platform,
+                code = code,
+            )
+        }
+    }
+
+    suspend fun sendAuthCode(
+        platformName: String,
+        code: String,
+    ) {
+        PublisherGrpcImpl(applicationContext).use { publisherGrpcImpl ->
             try {
-                val llt = Vaults.fetchLongLivedToken(applicationContext)
-                val codeVerifier = Publishers.fetchOauthRequestVerifier(applicationContext)
-                val publisherPublicKey = Publishers.fetchPublisherPublicKey(context = applicationContext)
-                val requestIdentifier = Base64.encodeToString(publisherPublicKey, Base64.NO_WRAP)
-
-                val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-                val storeTokensOnDevice = sharedPreferences.getBoolean("store_tokens_on_device", false)
-
-                if (storeTokensOnDevice) {
-                    publishers.sendOAuthAuthorizationCode(
-                        llt,
-                        platform,
-                        code,
-                        codeVerifier,
-                        supportsUrlScheme,
-                        false,
-                        requestIdentifier
-                    )
-                } else {
-                    publishers.sendOAuthAuthorizationCode(
-                        llt,
-                        platform,
-                        code,
-                        codeVerifier,
-                        supportsUrlScheme,
-                        requestIdentifier = requestIdentifier
-                    )
+                val oAuth = PublisherGrpcImpl
+                    .fetchOauthRequestVerifier(applicationContext, platformName)
+                oAuth.use { oa ->
+                    try {
+                        publisherGrpcImpl.sendOAuthAuthorizationCode(
+                            platform = platformName,
+                            code = code,
+                            codeVerifier = String(oa.codeVerifier),
+                            requestIdentifier = Base64
+                                .encodeToString(oa.requestId, Base64.NO_WRAP)
+                        )
+                    } finally {
+                        oAuth.clear(applicationContext)
+                    }
                 }
-
-                val vaults = Vaults(applicationContext)
-                vaults.refreshStoredTokens(
-                    applicationContext,
-                    settingsGetStoreTokensOnDevice)
-                vaults.shutdown()
             } catch(e: StatusRuntimeException) {
                 e.printStackTrace()
                 runOnUiThread {
@@ -95,24 +79,23 @@ class OauthRedirectActivity : AppCompatActivity() {
                 runOnUiThread {
                     Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
                 }
-            } finally {
-                publishers.shutdown()
-            }
-
-            runOnUiThread {
-                val isOnboarding = intent.getBooleanExtra("is_onboarding",
-                    false)
-                val intent = Intent( applicationContext,
-                    MainActivity::class.java)
-                    .apply {
-                        setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        setPackage(packageName)
-                        putExtra("is_onboarding", isOnboarding)
-                    }
-                startActivity(intent)
-                finish()
             }
         }
+
+        runOnUiThread {
+            val isOnboarding = intent.getBooleanExtra("is_onboarding",
+                false)
+            val intent = Intent( applicationContext,
+                MainActivity::class.java)
+                .apply {
+                    setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    setPackage(packageName)
+                    putExtra("is_onboarding", isOnboarding)
+                }
+            startActivity(intent)
+            finish()
+        }
+
     }
 
 }
