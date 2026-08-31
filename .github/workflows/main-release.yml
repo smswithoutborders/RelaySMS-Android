@@ -38,8 +38,6 @@ jobs:
               --no-daemon \
               --max-workers=2 \
               --console=plain \
-              -Dorg.gradle.jvmargs="-Xmx2048m -Xms512m -XX:MaxMetaspaceSize=512m -Dfile.encoding=UTF-8" \
-              -Dkotlin.daemon.jvm.options="-Xmx512m,-Xss1m" \
               -Dkotlin.compiler.execution.strategy=in-process
 
       - name: Sign split APKs with apksigner
@@ -110,8 +108,6 @@ jobs:
               --no-daemon \
               --max-workers=2 \
               --console=plain \
-              -Dorg.gradle.jvmargs="-Xmx2048m -Xms512m -XX:MaxMetaspaceSize=512m -Dfile.encoding=UTF-8" \
-              -Dkotlin.daemon.jvm.options="-Xmx512m,-Xss1m" \
               -Dkotlin.compiler.execution.strategy=in-process
 
       - name: Sign split APKs with apksigner
