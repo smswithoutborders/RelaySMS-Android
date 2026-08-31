@@ -57,7 +57,7 @@ android {
     defaultConfig {
         applicationId "com.afkanerd.sw0b"
         minSdk 24
-        targetSdk 36
+        targetSdk 37
         versionCode tagVersion
         versionName _versionName
 
