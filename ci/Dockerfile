@@ -16,7 +16,7 @@ WORKDIR /android
 ENV ANDROID_HOME=/usr/local/android-sdk-linux
 ENV ANDROID_SDK_ROOT=/usr/local/android-sdk-linux
 ENV PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools
-ENV ANDROID_BUILD_TOOLS_VERSION=35.0.0
+ENV ANDROID_BUILD_TOOLS_VERSION=36.0.0
 
 # Download and place commandline-tools into cmdline-tools/latest
 RUN mkdir -p ${ANDROID_HOME}/cmdline-tools && \
