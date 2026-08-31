@@ -84,6 +84,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Decode keystore
         run: |
@@ -215,6 +217,9 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GH_LIB_SYNC_TOKEN }}
+
+      - name: Fetch all tags
+        run: git fetch --prune --unshallow --tags || git fetch --tags
 
       - name: Read version.properties
         id: version
