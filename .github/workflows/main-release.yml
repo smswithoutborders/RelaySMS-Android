@@ -236,7 +236,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           # Tags using the clean tagVersion tracking integer
           git tag "v${{ steps.version.outputs.tag_version }}" -m "Release v${{ steps.version.outputs.version_name }}"
-          git push origin "${{ steps.version.outputs.tag_version }}"
+          git push origin "v${{ steps.version.outputs.tag_version }}"
 
       - name: Download signed APKs from build-1
         uses: actions/download-artifact@v4
