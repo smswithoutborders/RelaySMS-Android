@@ -235,7 +235,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           # Tags using the clean tagVersion tracking integer
-          git tag "${{ steps.version.outputs.tag_version }}" -m "Release ${{ steps.version.outputs.version_name }}"
+          git tag "v${{ steps.version.outputs.tag_version }}" -m "Release v${{ steps.version.outputs.version_name }}"
           git push origin "${{ steps.version.outputs.tag_version }}"
 
       - name: Download signed APKs from build-1
