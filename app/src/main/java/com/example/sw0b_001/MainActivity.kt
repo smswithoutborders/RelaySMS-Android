@@ -368,7 +368,6 @@ class MainActivity : BindActivity() {
             composable<ImageRenderNav>{ backStackEntry ->
                 val imageRenderNav: ImageRenderNav = backStackEntry.toRoute()
                 ImageRender(
-                    navController = navController,
                     imageViewModel = imageViewModel,
                     uri = imageRenderNav.uri?.toUri(),
                     attachmentCounterCallback = { payloadSize ->
