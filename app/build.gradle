@@ -204,7 +204,6 @@ dependencies {
     implementation libs.lib.signal.double.ratchet.java
     implementation 'com.github.shortmesh:Widget-android:17ed994b6c'
 
-//    implementation(libs.jna)
     implementation 'net.java.dev.jna:jna:5.14.0@aar'
 
     implementation libs.androidx.appcompat
@@ -213,14 +212,11 @@ dependencies {
     implementation libs.androidx.annotation
     implementation libs.androidx.lifecycle.extensions
     implementation libs.androidx.lifecycle.viewmodel.ktx
-//    implementation libs.androidx.legacy.support.v4
     implementation libs.androidx.preference
     implementation libs.androidx.preference.ktx
     implementation libs.androidx.baselibrary
     implementation libs.androidx.lifecycle.livedata.ktx
     implementation libs.androidx.activity
-//    implementation libs.play.services.auth
-//    implementation libs.play.services.auth.api.phone
     implementation libs.androidx.ui.text.google.fonts
     implementation libs.androidx.paging.common
 //    implementation libs.androidx.datastore.core.jvm
