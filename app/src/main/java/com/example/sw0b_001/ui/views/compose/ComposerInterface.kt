@@ -95,6 +95,7 @@ fun ComposerInterface(
     catId: V1ContentCategories,
     isOfflineCompose: Boolean,
     messageId: Long? = null,
+    onDefaultCallback: () -> Unit,
 ) {
     val context = LocalContext.current
     val inPreviewMode = LocalInspectionMode.current
@@ -219,6 +220,7 @@ fun ComposerInterface(
     val getDefaultPermission = getSetDefaultBehaviour(context) {
         isDefault = context.isDefault()
         showSetAsDefault = false
+        onDefaultCallback()
     }
 
     Scaffold(
