@@ -24,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -41,7 +40,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.window.layout.WindowInfoTracker
-import androidx.window.layout.WindowLayoutInfo
 import com.afkanerd.lib_image_android.ui.BindActivity
 import com.afkanerd.lib_image_android.ui.ImageRender
 import com.afkanerd.lib_image_android.ui.navigation.ImageRenderNav
@@ -51,8 +49,6 @@ import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.makeE16PhoneNumber
 import com.afkanerd.smswithoutborders_libsmsmms.ui.components.NavHostControllerInstance
 import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.ConversationsScreenNav
-import com.afkanerd.smswithoutborders_libsmsmms.ui.navigation.HomeScreenNav
-import com.afkanerd.smswithoutborders_libsmsmms.ui.requiredReadPhoneStatePermissions
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ConversationsViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.SearchViewModel
 import com.afkanerd.smswithoutborders_libsmsmms.ui.viewModels.ThreadsViewModel
@@ -94,7 +90,6 @@ import com.example.sw0b_001.ui.views.settings.SettingsView
 import com.example.sw0b_001.ui.views.tabs.HomepageView
 import com.example.sw0b_001.ui.views.threads.MetricsView
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberPermissionState
 import dagger.hilt.android.AndroidEntryPoint
 import io.shortmesh.sdk.viewmodel.AuthyViewModel
 import kotlinx.coroutines.Dispatchers
@@ -182,7 +177,7 @@ class MainActivity : BindActivity() {
                                     navController = rememberNavController()
 
                                     Surface( Modifier.fillMaxSize()) {
-                                        MainNavigation(navController = navController, newLayoutInfo)
+                                        MainNavigation(navController = navController,)
                                     }
                                 }
 
@@ -216,71 +211,43 @@ class MainActivity : BindActivity() {
     @Composable
     fun MainNavigation(
         navController: NavHostController,
-        newLayoutInfo: WindowLayoutInfo,
     ) {
         val context = LocalContext.current
-        val inPreview = LocalInspectionMode.current
-        var defaultSmsApp by remember { mutableStateOf(inPreview || context.isDefault()) }
+        val defaultSmsApp by threadsViewModel.isDefault.collectAsStateWithLifecycle()
 
-        val readPhoneStatePermission = rememberPermissionState(requiredReadPhoneStatePermissions)
-        LaunchedEffect(readPhoneStatePermission.status) {
-            defaultSmsApp = context.isDefault()
-        }
+//        rememberPermissionState(requiredReadPhoneStatePermissions) {
+//            defaultSmsApp = context.isDefault()
+//        }
+//        rememberPermissionState(requiredSendSMSPermission) {
+//            defaultSmsApp = context.isDefault()
+//        }
+//        rememberPermissionState(requiredReceiveSMSPermission) {
+//            defaultSmsApp = context.isDefault()
+//        }
 
         var hasSeenOnboarding by remember {
             mutableStateOf(context.settingsGetOnboardedCompletely)
         }
 
-        var showThreadsTopBar by remember { mutableStateOf(true) }
-        var customThreadView: (@Composable () -> Unit)? by remember { mutableStateOf(null)}
-
-        var navDrawItemSelected by remember{ mutableStateOf(false) }
-        var drawerCallback by remember { mutableStateOf<(() -> Unit)?>(null) }
-
         val inboxType by threadsViewModel.inboxType.collectAsStateWithLifecycle()
 
-        LaunchedEffect(inboxType) {
-            navDrawItemSelected = inboxType == ThreadsViewModel.InboxType.CUSTOM
-        }
-
-        LaunchedEffect(navDrawItemSelected) {
-            customThreadView = when {
-                navDrawItemSelected -> {
-                    {
-                        showThreadsTopBar = false
-                        imageViewModel.reset()
-                        payloadsViewModel.reset()
-                        HomepageView(
-                            navController = navController,
-                            tokensViewModel = tokensViewModel,
-                            payloadsViewModel = payloadsViewModel,
-                            gatewayClientViewModel = gatewayClientViewModel,
-                            supportedPlatformsViewModel = supportedPlatformsViewModel,
-                            authyViewModel = authyViewModel,
-                            drawerCallback = drawerCallback
-                        )
-                    }
-                }
-                else -> {
-                    showThreadsTopBar = true
-                    null
-                }
-            }
+        LaunchedEffect(Unit) {
+            threadsViewModel.setIsDefault(context.isDefault())
+            threadsViewModel.setInboxType(ThreadsViewModel.InboxType.CUSTOM)
         }
 
         NavHostControllerInstance(
-            newLayoutInfo = newLayoutInfo,
             navController = navController,
             threadsViewModel = threadsViewModel,
             conversationsViewModel = conversationViewModel,
             searchViewModel = searchViewModel,
             appName = stringResource(R.string.app_name),
-            showThreadsTopBar = showThreadsTopBar,
-            startDestination = if(hasSeenOnboarding) {
-                if(defaultSmsApp) HomeScreenNav() else HomepageScreen
+            showThreadsTopBar = defaultSmsApp,
+            customStartDestination = if(hasSeenOnboarding) {
+                HomepageScreen
             } else WelcomeScreen,
-            customThreadsView = customThreadView,
-            modalNavigationModalItems = { callback ->
+            isDefault = defaultSmsApp,
+            modalNavigationModalItems = {
                 NavigationDrawerItem(
                     icon = {
                         Icon(
@@ -295,10 +262,11 @@ class MainActivity : BindActivity() {
                             fontSize = 14.sp
                         )
                     },
-                    selected = navDrawItemSelected,
+                    selected = inboxType == ThreadsViewModel.InboxType.CUSTOM,
                     onClick = {
-                        drawerCallback = callback.invoke(ThreadsViewModel.InboxType.CUSTOM)
                         threadsViewModel.setInboxType(ThreadsViewModel.InboxType.CUSTOM)
+                        navController.navigate(HomepageScreen)
+                        threadsViewModel.toggleDrawerValue()
                     }
                 )
             }
@@ -310,14 +278,6 @@ class MainActivity : BindActivity() {
             composable<OnboardingViewScreen> {
                 OnboardingView(navController = navController)
             }
-//            composable<OnboardingInteractiveScreen> {
-//                OnboardingInteractive(
-//                    navController,
-//                    onboardingViewModel,
-//                    tokensViewModel = tokensViewModel,
-//                    supportedPlatformsViewModel,
-//                )
-//            }
             composable<HomepageScreen> {
                 HomepageView(
                     navController = navController,
@@ -326,7 +286,10 @@ class MainActivity : BindActivity() {
                     gatewayClientViewModel = gatewayClientViewModel,
                     supportedPlatformsViewModel = supportedPlatformsViewModel,
                     authyViewModel = authyViewModel,
-                )
+                    showBurgerMenu = defaultSmsApp
+                ) {
+                    threadsViewModel.toggleDrawerValue()
+                }
             }
             composable<AboutScreen> {
                 AboutView(navController = navController)
@@ -345,6 +308,9 @@ class MainActivity : BindActivity() {
                     catId = composeScreenNav.cat,
                     supportedPlatformName = composeScreenNav.supportedPlatform,
                     isOfflineCompose = composeScreenNav.isOfflineCompose,
+                    onDefaultCallback = {
+                        threadsViewModel.setIsDefault(context.isDefault())
+                    }
                 )
             }
             composable<DetailsInterfaceScreen> { backEntry ->

@@ -1,6 +1,6 @@
 plugins {
     id 'com.android.application'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '2.4.0'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '2.4.10'
     id 'com.google.protobuf'
     alias(libs.plugins.compose.compiler)
     id 'com.google.devtools.ksp' version '2.3.9'
@@ -92,10 +92,10 @@ android {
 
         debug {
 //            minifyEnabled false
-            minifyEnabled true
-            shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            testProguardFiles 'proguard-rules.pro'
+//            minifyEnabled true
+//            shrinkResources true
+//            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+//            testProguardFiles 'proguard-rules.pro'
         }
         release {
 //            minifyEnabled false
@@ -118,8 +118,10 @@ android {
 //    }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+//        sourceCompatibility JavaVersion.VERSION_1_8
+//        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     lint {
@@ -202,9 +204,9 @@ dependencies {
     implementation libs.smswithoutborders.lib.image.android
     implementation libs.lib.smsmms.android
     implementation libs.lib.signal.double.ratchet.java
-    implementation 'com.github.shortmesh:Widget-android:17ed994b6c'
+    implementation libs.widget.android
 
-    implementation 'net.java.dev.jna:jna:5.14.0@aar'
+    implementation 'net.java.dev.jna:jna:5.19.1@aar'
 
     implementation libs.androidx.appcompat
     implementation libs.material
@@ -391,6 +393,6 @@ dependencies {
     // 2. Glide Compose integration library
     implementation(libs.compose)
 
-    implementation("io.coil-kt.coil3:coil-svg:3.5.0")
+    implementation("io.coil-kt.coil3:coil-svg:3.6.0")
 
 }

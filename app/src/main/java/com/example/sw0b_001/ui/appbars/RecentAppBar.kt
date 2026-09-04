@@ -48,7 +48,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.afkanerd.smswithoutborders_libsmsmms.extensions.context.isDefault
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.getPhoneNumberFromPrefs
 import com.example.sw0b_001.ui.navigation.AboutScreen
@@ -72,6 +71,7 @@ fun RecentAppBar(
     onDeleteSelected: (() -> Unit)? = null,
     onCancelSelection: (() -> Unit)? = null,
     onMenuClickCallback: (() -> Unit)? = null,
+    showBurgerMenu: Boolean = false,
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -80,8 +80,6 @@ fun RecentAppBar(
     val inPreviewMode = LocalInspectionMode.current
 
     val phoneNumber = remember { getPhoneNumberFromPrefs(context) }
-    val isDefault by remember { mutableStateOf(if(inPreviewMode) true
-    else context.isDefault()) }
 
     Column(modifier = Modifier.fillMaxWidth()) {
         if (isSelectionMode) {
@@ -117,7 +115,8 @@ fun RecentAppBar(
                 scrollBehavior = scrollBehavior,
                 modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
             )
-        } else {
+        }
+        else {
             // Normal mode app bar
             CenterAlignedTopAppBar(
                 title = {
@@ -126,8 +125,10 @@ fun RecentAppBar(
                     }
                 },
                 navigationIcon = {
-                    if(isDefault) {
-                        IconButton(onClick = { onMenuClickCallback?.invoke() }) {
+                    if(showBurgerMenu) {
+                        IconButton(onClick = {
+                            onMenuClickCallback?.invoke()
+                        }) {
                             Icon(
                                 imageVector = Icons.Filled.Menu,
                                 contentDescription = stringResource(R.string.open_menu)

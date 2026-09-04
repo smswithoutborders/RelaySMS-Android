@@ -63,7 +63,7 @@ fun HomepageView(
     gatewayClientViewModel: GatewayClientViewModel,
     supportedPlatformsViewModel: SupportedPlatformsViewModel,
     authyViewModel: AuthyViewModel,
-    showTopBar: Boolean = true,
+    showBurgerMenu: Boolean = true,
     drawerCallback: (() -> Unit)? = {},
 ) {
     val inboxMessages = payloadsViewModel.getInboxMessages()
@@ -89,52 +89,51 @@ fun HomepageView(
     Scaffold (
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            if(showTopBar) {
-                when (tokensViewModel.bottomTabsItem) {
-                    BottomTabsItems.BottomBarRecentTab -> {
-                        RecentAppBar(
-                            navController = navController,
-                            onSearchQueryChanged = { searchQuery = it },
-                            searchQuery = searchQuery,
-                            isSearchActive = isSearchActive,
-                            onToggleSearch = {},
-                            onSearchDone = {},
-                            isSelectionMode = tokensViewModel.isSelectionMode,
-                            selectedCount = tokensViewModel.selectedMessagesCount,
-                            enableBackup = enableBackup,
-                            onSelectAll = tokensViewModel.onSelectAll,
-                            onDeleteSelected = tokensViewModel.onDeleteSelected,
-                            onCancelSelection = tokensViewModel.onCancelSelection,
-                            onMenuClickCallback = drawerCallback
-                        )
-                    }
-                    BottomTabsItems.BottomBarCountriesTab -> {
-                        GatewayClientsAppBar(
-                            navController = navController,
-                            onAddClicked = {
-                                showAddGatewayClientsModal = true
-                            },
-                            onRefreshClicked = {
-                                CoroutineScope(Dispatchers.Default).launch {
-                                    gatewayClientViewModel.fetch()
-                                }
-                            }
-                        )
-                    }
-                    BottomTabsItems.BottomBarInboxTab -> {
-                        TopAppBar(
-                            title = {
-                                Text(
-                                    text = stringResource(R.string.inbox),
-                                    style = MaterialTheme.typography.headlineLarge,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            },
-                            colors = TopAppBarDefaults.topAppBarColors()
-                        )
-                    }
-                    else -> {}
+            when (tokensViewModel.bottomTabsItem) {
+                BottomTabsItems.BottomBarRecentTab -> {
+                    RecentAppBar(
+                        navController = navController,
+                        onSearchQueryChanged = { searchQuery = it },
+                        searchQuery = searchQuery,
+                        isSearchActive = isSearchActive,
+                        onToggleSearch = {},
+                        onSearchDone = {},
+                        isSelectionMode = tokensViewModel.isSelectionMode,
+                        selectedCount = tokensViewModel.selectedMessagesCount,
+                        enableBackup = enableBackup,
+                        onSelectAll = tokensViewModel.onSelectAll,
+                        onDeleteSelected = tokensViewModel.onDeleteSelected,
+                        onCancelSelection = tokensViewModel.onCancelSelection,
+                        onMenuClickCallback = drawerCallback,
+                        showBurgerMenu = showBurgerMenu,
+                    )
                 }
+                BottomTabsItems.BottomBarCountriesTab -> {
+                    GatewayClientsAppBar(
+                        navController = navController,
+                        onAddClicked = {
+                            showAddGatewayClientsModal = true
+                        },
+                        onRefreshClicked = {
+                            CoroutineScope(Dispatchers.Default).launch {
+                                gatewayClientViewModel.fetch()
+                            }
+                        }
+                    )
+                }
+                BottomTabsItems.BottomBarInboxTab -> {
+                    TopAppBar(
+                        title = {
+                            Text(
+                                text = stringResource(R.string.inbox),
+                                style = MaterialTheme.typography.headlineLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors()
+                    )
+                }
+                else -> {}
             }
         },
         bottomBar = {
