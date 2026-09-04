@@ -228,7 +228,7 @@ jobs:
           VERSION_NAME=$(grep "^versionName=" version.properties | cut -d'=' -f2)
           # TAG_VERSION=$(grep "^tagVersion=" version.properties | cut -d'=' -f2)
           echo "version_name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
-          echo "tag_version=$VERSION_NAME" >> "$GITHUB_OUTPUT"
+          echo "tag_version=v$VERSION_NAME" >> "$GITHUB_OUTPUT"
 
       - name: Create and push tag
         run: |
