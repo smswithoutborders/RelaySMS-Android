@@ -107,6 +107,7 @@ fun ComposerInterface(
             if(inPreviewMode) -1 else
             if(context.isDefault()) context.getDefaultSimSubscription() ?: -1L else -1L)
     }
+
     fun backHandler() {
         tokensViewModel.deleteAll()
         payloadsViewModel.reset()

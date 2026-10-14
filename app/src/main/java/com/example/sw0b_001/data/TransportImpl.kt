@@ -97,14 +97,13 @@ object TransportImpl {
             tId = tokenId,
             sessId = null
         )
-        val serialized = payloads.serializeWithoutAttachment()
 
+        val serialized = payloads.serializeWithoutAttachment()
         val payload = Base64.encodeToString(serialized, Base64.NO_WRAP)
 
-        val fromAddress = Base64.encodeToString(
-            context.generateRandomBytes(16), Base64.DEFAULT)
-
         if(debugOnly) {
+            val fromAddress = Base64.encodeToString(
+                context.generateRandomBytes(16), Base64.DEFAULT)
             gatewayClientForwardDebugger(
                 message = payload,
                 fromAddress = fromAddress,
