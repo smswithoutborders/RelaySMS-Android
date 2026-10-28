@@ -89,7 +89,6 @@ import com.example.sw0b_001.ui.views.incoming.PasteEncryptedTextView
 import com.example.sw0b_001.ui.views.settings.SettingsView
 import com.example.sw0b_001.ui.views.tabs.HomepageView
 import com.example.sw0b_001.ui.views.threads.MetricsView
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import dagger.hilt.android.AndroidEntryPoint
 import io.shortmesh.sdk.viewmodel.AuthyViewModel
 import kotlinx.coroutines.Dispatchers
@@ -207,23 +206,12 @@ class MainActivity : BindActivity() {
         }
     }
 
-    @OptIn(ExperimentalPermissionsApi::class)
     @Composable
     fun MainNavigation(
         navController: NavHostController,
     ) {
         val context = LocalContext.current
         val defaultSmsApp by threadsViewModel.isDefault.collectAsStateWithLifecycle()
-
-//        rememberPermissionState(requiredReadPhoneStatePermissions) {
-//            defaultSmsApp = context.isDefault()
-//        }
-//        rememberPermissionState(requiredSendSMSPermission) {
-//            defaultSmsApp = context.isDefault()
-//        }
-//        rememberPermissionState(requiredReceiveSMSPermission) {
-//            defaultSmsApp = context.isDefault()
-//        }
 
         var hasSeenOnboarding by remember {
             mutableStateOf(context.settingsGetOnboardedCompletely)
@@ -437,6 +425,11 @@ class MainActivity : BindActivity() {
     fun launchSaveCrashLog(mergedFile: File) {
         pendingSaveFile = mergedFile
         createDocumentLauncher.launch(mergedFile.name)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        tokensViewModel.checkForRefresh()
     }
 
 }
