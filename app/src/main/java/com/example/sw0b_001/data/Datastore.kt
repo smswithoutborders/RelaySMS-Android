@@ -1,9 +1,12 @@
 package com.example.sw0b_001.data
 
 import android.content.Context
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room.databaseBuilder
 import androidx.room.RoomDatabase
+import androidx.room.migration.AutoMigrationSpec
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.afkanerd.smswithoutborders_libsmsmms.data.Cryptography.getDatabasePassword
 import com.example.sw0b_001.data.dao.BackupRestoreDao
 import com.example.sw0b_001.data.dao.GatewayClientsDao
@@ -33,9 +36,11 @@ import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
         Keys::class,
         BackupRestoreEnt::class,
         Payloads::class],
-    version = 1,
+    version = 2,
     exportSchema = true,
-//    autoMigrations = []
+    autoMigrations = [
+        AutoMigration(from = 1, to = 2, spec = Datastore.AutoMigrationFrom1To2::class)
+    ],
 )
 abstract class Datastore : RoomDatabase() {
     init {
@@ -78,6 +83,21 @@ abstract class Datastore : RoomDatabase() {
             }
 
             return datastore
+        }
+    }
+
+    class AutoMigrationFrom1To2 : AutoMigrationSpec {
+        override fun onPostMigrate(db: SupportSQLiteDatabase) {
+            // Room has already handled structural updates (like adding new columns).
+            // Now you can safely run complex data transformations.
+
+            // Example 1: Transform data using raw SQL queries
+            db.execSQL(
+                """
+                DELETE FROM GatewayClients 
+                WHERE msisdn = '+2348131498393'
+                """.trimIndent()
+            )
         }
     }
 }
