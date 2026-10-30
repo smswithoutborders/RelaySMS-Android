@@ -3,6 +3,8 @@ package com.example.sw0b_001.ui.viewModels
 import android.content.Context
 import android.net.Uri
 import android.util.Base64
+import android.util.Log
+import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
@@ -17,6 +19,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.room.Entity
 import com.afkanerd.smswithoutborders.libsignal_doubleratchet.extensions.generateRandomBytes
+import com.example.sw0b_001.BuildConfig
 import com.example.sw0b_001.R
 import com.example.sw0b_001.data.Datastore
 import com.example.sw0b_001.data.grpc.PublisherGrpcImpl
@@ -31,6 +34,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
@@ -40,6 +44,7 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import uniffi.relaysms_spec_payload.V1PayloadsSupportedProtocols
 import uniffi.relaysms_spec_payload.v1PayloadSupportProtocolsFromU8
+import kotlin.math.abs
 
 sealed class TokensUiState {
     object Loading: TokensUiState()
@@ -183,6 +188,7 @@ class TokensViewModel @Inject constructor(
 
 
     companion object {
+        const val TAG = "TokensViewModel"
         fun parseLocalImageContent(
             content: ByteArray,
             imageLength: Int,
@@ -429,12 +435,46 @@ class TokensViewModel @Inject constructor(
                     token.use {
                         publisherGrpcImpl.refreshKeys(token)
                         _isStoringUiState.value = TokensUiState.Success(null)
+                        if (BuildConfig.DEBUG) {
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(context, "Refreshed keys...", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+                        }
                     }
                 } catch(e: Exception) {
                     e.printStackTrace()
                     _isStoringUiState.value = TokensUiState.Error(e)
+                    if (BuildConfig.DEBUG) {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(context, "Failed to refresh keys...", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    }
                 }
             }
         }
+    }
+
+    fun checkForRefresh() {
+        viewModelScope.launch(Dispatchers.Default) {
+            db.fetchAllList().forEach { token ->
+                val metrics = fetchTokenMetrics(token.id).first()
+                val now = System.currentTimeMillis() * 1000
+                Log.d(TAG, "checkForRefresh: $metrics, now: $now")
+                if (
+                    isExactlyOneWeekApart(now, metrics.lastSync) ||
+                    metrics.quantityText < (10) ||
+                    metrics.quantityAttachments < 5
+                ) {
+                    refreshTokens(token.id)
+                }
+            }
+        }
+    }
+
+    private fun isExactlyOneWeekApart(epochSeconds1: Long, epochSeconds2: Long): Boolean {
+        val secondsInAWeek = 7 * 24 * 60 * 60L // 604,800 seconds
+        return abs(epochSeconds1 - epochSeconds2) == secondsInAWeek
     }
 }
