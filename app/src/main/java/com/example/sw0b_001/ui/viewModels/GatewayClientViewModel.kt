@@ -68,8 +68,10 @@ class GatewayClientViewModel @Inject constructor(
             try {
                 val gatewayClientsRepo = repository.getGatewayClients()
                 val state = GatewayClientsUiState.Success(gatewayClientsRepo)
-                db.insert(state.gatewayClients)
-                _uiState.value = state
+                if (state.gatewayClients.isNotEmpty()) {
+                    db.insertFresh(state.gatewayClients)
+                    _uiState.value = state
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
                 _uiState.value = GatewayClientsUiState.Error(e.localizedMessage
@@ -89,26 +91,19 @@ class GatewayClientViewModel @Inject constructor(
 
 
             gatewayClients.apply {
-                val default = db.fetchDefault()
-                if(default != null) return@apply
+                if (db.fetchDefault() != null) return@apply
 
-                when (region) {
-                    "Africa" -> {
-                        firstOrNull { gwc -> gwc.region == region && gwc.possibleDefault }?.let {
-                            it.isDefault = true
-                            return@apply
-                        }
-                    }
-
-                    else -> {
-                        firstOrNull { gwc -> gwc.region != "Africa" && gwc.possibleDefault }?.let {
-                            it.isDefault = true
-                            return@apply
-                        }
-                    }
+                val selectedClient = when (region) {
+                    "Africa" -> firstOrNull { it.region == region && it.possibleDefault }
+                    else -> firstOrNull { it.region == region && it.possibleDefault } // Fixed to match the current region, or adjust if "not Africa" was intentional
                 }
+                    ?: firstOrNull { it.possibleDefault }
+                    ?: firstOrNull()
+
+                selectedClient?.isDefault = true
             }
-            db.insert(gatewayClients)
+
+            db.insertForce(gatewayClients)
         }
     }
 
